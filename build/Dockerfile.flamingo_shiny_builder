@@ -57,7 +57,7 @@ RUN apt-get update -y && apt-get --no-install-recommends install -y \
     rm -rf /var/lib/apt/lists/*
 
 
-COPY build/entrypoint_tar-builder.sh /tmp/entrypoint.sh
+COPY src/shell-scripts/entrypoint_tar-builder.sh /tmp/entrypoint.sh
 COPY build/inconsolata.tar.xz /tmp/inconsolata.tar.xz
 
 # install inconsolata font for tex

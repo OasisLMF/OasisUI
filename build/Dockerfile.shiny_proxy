@@ -4,7 +4,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y default-jre-headless iproute
 
-COPY ./shinyproxy/shinyproxy-1.0.2.jar ./
+COPY ./shinyproxy/shinyproxy-1.1.0.jar ./
 COPY ./shinyproxy/application.yml ./
 COPY ./shinyproxy/flamingo.env ./
 
@@ -22,4 +22,4 @@ ENTRYPOINT \
     sed -i s#%FLAMINGO_SHARE_FILEPATH_ON_HOST%#$FLAMINGO_SHARE_FILEPATH_ON_HOST# application.yml && \
     sed -i s#%FLAMINGO_PORT_RANGE_START%#$FLAMINGO_PORT_RANGE_START# application.yml && \
     sed -i s/%FLAMINGO_PORT_RANGE_START%/$FLAMINGO_PORT_RANGE_START/ flamingo.env && \
-    java -jar shinyproxy-1.0.2.jar
+    java -jar shinyproxy-1.1.0.jar
