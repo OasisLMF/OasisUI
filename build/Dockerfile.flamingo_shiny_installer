@@ -42,13 +42,13 @@ RUN mkdir /var/log/shiny-server
 COPY flamingo.tar.gz /tmp/flamingo.tar.gz
 RUN R CMD INSTALL /tmp/flamingo.tar.gz
 
-# COPY shiny-server.sh /home/Flamingo/
-COPY freetds.conf /etc/freetds/
-COPY odbc.ini /etc/
-COPY odbcinst.ini /etc/
-# COPY shiny-server.conf /etc/shiny-server/
-COPY db_conf.sh /home/Flamingo/
-COPY Rprofile.site /usr/lib/R/etc/
+# COPY src/shell-scripts/shiny-server.sh /home/Flamingo/
+COPY config/freetds.conf /etc/freetds/
+COPY config/odbc.ini /etc/
+COPY config/odbcinst.ini /etc/
+# COPY config/shiny-server.conf /etc/shiny-server/
+COPY src/shell-scripts/db_conf.sh /home/Flamingo/
+COPY config/Rprofile.site /usr/lib/R/etc/
 
 EXPOSE 3838
 
