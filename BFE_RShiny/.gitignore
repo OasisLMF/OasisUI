@@ -1,0 +1,7 @@
+*.Rcheck
+Makefile
+notes.md
+*.tar.gz
+.project
+.Rd2pdf*
+*.pdf

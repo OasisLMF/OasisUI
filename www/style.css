@@ -1,0 +1,226 @@
+/*! normalize.css v3.0.0 | MIT License | git.io/normalize */
+html{
+    font-family:Verdana;
+    -ms-text-size-adjust:100%;
+    -webkit-text-size-adjust:100%
+}
+
+body{
+    background: #CCE0FF url("OasisPT.jpg") no-repeat top right fixed ;
+    background-size: 20%;
+
+}
+
+audio,canvas,progress,video{
+    display:inline-block;
+    vertical-align:baseline
+}
+
+a{
+    background:transparent
+}
+
+a:active,a:hover{
+    outline:0
+}
+
+/*button{
+    background-color:#D1FFFF;
+    width:300px;
+    font-size:17px;
+    font-color:#0A1A1A
+}*/
+
+.button {
+   border-top: 1px solid #96d1f8;
+   background: #65a9d7;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+   background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+   background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+   background: -o-linear-gradient(top, #3e779d, #65a9d7);
+   padding: 5px 10px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 14px;
+   font-family: 'Lucida Grande', Helvetica, Arial, Sans-Serif;
+   text-decoration: none;
+   vertical-align: middle;
+   width: 230px;
+   }
+.button:hover {
+   border-top-color: #28597a;
+   background: #28597a;
+   color: #ccc;
+   }
+.button:active {
+   border-top-color: #1b435e;
+   background: #1b435e;
+   }
+
+.button-small {
+   width: 150px;
+   }
+
+
+
+@import "http://fonts.googleapis.com/css?family=Raleway";
+/*----------------------------------------------
+CSS settings for HTML div Exact Center
+------------------------------------------------*/
+#popup {
+width:100%;
+height:100%;
+opacity:.95;
+top:0;
+left:0;
+display:none;
+position:fixed;
+background-color:#313131;
+overflow:auto
+}
+img#close {
+position:absolute;
+right:-14px;
+top:-14px;
+cursor:pointer
+}
+
+form {
+max-width:1000px;
+/*max-height:500px;*/
+padding:10px 50px;
+border:2px solid gray;
+border-radius:10px;
+background-color:#EBFFFF
+}
+p {
+margin-top:30px
+}
+h2 {
+background-color:#FEFFED;
+padding:20px 35px;
+margin:-10px -50px;
+text-align:center;
+border-radius:10px 10px 0 0
+}
+hr {
+margin:10px -50px;
+border:0;
+border-top:1px solid #ccc
+}
+input[type=text] {
+width:82%;
+padding:10px;
+margin-top:30px;
+border:1px solid #ccc;
+padding-left:40px;
+font-size:16px;
+font-family:raleway
+}
+#name {
+background-image:url(../images/name.jpg);
+background-repeat:no-repeat;
+background-position:5px 7px
+}
+
+span {
+color:red;
+font-weight:700
+}
+
+.tftable {
+    font-family:Arial;
+    color:#333333;
+    /*border-width: 1px;
+    border-color: #a9a9a9;
+    border-collapse: collapse;*/
+
+}
+.tftable th {
+    font-size:13px;
+    background-color:#999999;
+    padding: 8px;
+    border-width: 1px;
+    border-style:solid;
+    border-color: #a9a9a9;
+    text-align:left;
+}
+.tftable tr {
+    background-color:#cdcdcd;
+}
+.tftable td {
+    font-size:12px;
+    padding: 8px;
+    /*border-width: 1px;
+    border-style: solid;
+    border-color: #a9a9a9;*/
+}
+.tftable tr:nth-child(odd){
+    background-color:#b8b8b8;
+}
+.tftable tr:nth-child(even){
+    background-color:#cccccc;
+}
+.tftable tr:hover {
+    background-color:#ffffff;
+}
+
+.button_login {
+    display: inline-block;
+    background: #000;
+    padding: 5px 10px;
+    z-index: 0;
+    color: #fff;
+}
+.overlay {
+    z-index: 5;
+    background: rgba(0, 0, 0, .50);
+    display: block;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+.popup2 {
+    padding: 10px 10px 35px;
+    background: #fff;
+    z-index: 999;
+    display: none;
+    position: absolute;
+    right: 0;
+}
+.radio {
+    display: inline-block;
+    background: #000;
+    padding: 5px 10px;
+    z-index: 0;
+    color: #fff;
+}
+
+#wrapper {
+position:relative;
+}
+#content {
+padding:10px;
+}
+#console {
+position:fixed;
+bottom:0;
+left:0;
+max-height:40%;
+margin-top:40px;
+width:100%;
+text-align:center
+width:100%;
+background:#E3F6CE;
+border-top-style: solid;
+border-top-color: #A9BCF5;
+overflow: auto;
+}
+

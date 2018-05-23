@@ -1,0 +1,12 @@
+linear-gradient(#54B4EB, #F7819F 60%, #1D9CE5)
+
+#F5A9BC
+
+#BCE8F1: #F6CED8
+
+rgb(247, 129, 159)
+
+
+background-color: rgb(251, 239, 245);
+border-color: #F6CED8;
+color: #FA5882;

@@ -1,0 +1,63 @@
+FROM ubuntu:16.04
+
+RUN apt-get update && \
+    apt-get install -y gcc g++ && \
+    apt-get install -y --no-install-recommends libcurl4-gnutls-dev libcairo2-dev libxt-dev libssl-dev libssh2-1-dev libssl1.0.0 apt-utils && \
+    apt-get install -y --no-install-recommends -f libxml2-dev libssl-dev libiodbc2 libiodbc2-dev && \
+    apt-get install -y --no-install-recommends unixodbc unixodbc-dev freetds-dev freetds-bin tdsodbc libgeos-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# todo - remove this dual apt-get update
+# Install R
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends software-properties-common && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && \
+    add-apt-repository "deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu xenial/" && \
+
+    apt-get update && \
+    apt-get install -y --no-install-recommends r-base && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Shiny Server dependencies
+# RUN apt-get install -y \
+#     gdebi-core pandoc pandoc-citeproc libcurl4-gnutls-dev libcairo2 libxt-dev && \
+#     rm -rf /var/lib/apt/lists/*
+
+# Install Flamingo dependencies
+RUN R -e "install.packages(c('devtools', 'DT', 'shiny', 'shinyBS', 'httr', 'rjson', 'odbc', 'RODBC', 'leaflet', 'ggplot2', 'curl', 'RCurl', 'xml2', 'XML', 'rmarkdown', 'logging'), repos='https://cloud.r-project.org/')" && \
+    R -e "install.packages(c('Dataset'), repos='http://R-Forge.R-project.org')" && \
+    R -e "install.packages(c('shinyjs'), repos='https://cloud.r-project.org/')" && \
+    R -e "remove.packages(c('devtools'))"
+  
+RUN apt-get update && \
+    apt install -y gfortran && \
+    R -e "install.packages(c('plotly'), repos = 'https://cloud.r-project.org/')" \
+    rm -rf /var/lib/apt/lists/*
+
+
+# Create the logging directory
+RUN mkdir /var/log/shiny-server
+
+# Install the flamingo package
+COPY flamingo.tar.gz /tmp/flamingo.tar.gz
+RUN R CMD INSTALL /tmp/flamingo.tar.gz
+
+# COPY shiny-server.sh /home/Flamingo/
+COPY freetds.conf /etc/freetds/
+COPY odbc.ini /etc/
+COPY odbcinst.ini /etc/
+# COPY shiny-server.conf /etc/shiny-server/
+COPY db_conf.sh /home/Flamingo/
+COPY Rprofile.site /usr/lib/R/etc/
+
+EXPOSE 3838
+
+# Create and switch to jenkins user
+ARG USER_ID
+ARG DOCKER_GROUP_ID
+RUN adduser --shell /bin/bash --uid $USER_ID --disabled-password --gecos "" jenkins && \
+    groupadd --gid $DOCKER_GROUP_ID docker && \
+    usermod  -a -G docker jenkins
+USER jenkins
+
+CMD ["R", "-e", "flamingo::runFlamingo()"]
