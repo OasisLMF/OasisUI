@@ -2063,7 +2063,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-ALTER procedure [dbo].[generateOasisFiles2] @ProgOasisId int
+CREATE procedure [dbo].[generateOasisFiles2] @ProgOasisId int
 AS
 SET ANSI_NULLS ON;
 SET ANSI_WARNINGS ON;
