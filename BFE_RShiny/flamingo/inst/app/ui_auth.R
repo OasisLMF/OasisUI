@@ -33,10 +33,11 @@ authUI <- function() {
               
               tabPanel("Main Menu",  value = "emlp", id = "em-back"),
               
-              shinyFooter <- div(class = "flamingo-footer", align = "right",
-                  em("Powered by RShiny", style = "color:gray; font-size:10pt"))                              
+              shinyFooter <- div(class = "flamingo-footer", align = "left",
+                                 em("Flamingo 1.0 Oasis Business Front End", style = "color:gray; font-size:10pt; margin-left:1%"),
+                                 em("Powered by RShiny", style = "color:gray; font-size:10pt; float:right; margin-right:2%"))                               
           ) #End of navbarMenu("Exposure Management")
-      ), #ENd of conditional panel Exposure Management  
+      ), #End of conditional panel Exposure Management  
       
       
       ### Process Management 
@@ -54,7 +55,7 @@ authUI <- function() {
               
               shinyFooter
           ) #End of navbarMenu("Process Management")
-      ), #ENd of conditional panel Process Management
+      ), #End of conditional panel Process Management
       
       #### File Management
       conditionalPanel(
@@ -71,7 +72,7 @@ authUI <- function() {
               
               shinyFooter
           ) # End of navbarMenu(File Management")
-      ), # ENd of conditional panel File Management
+      ), # End of conditional panel File Management
       
       ### System Config
       conditionalPanel(
@@ -88,7 +89,7 @@ authUI <- function() {
               
               shinyFooter
           ) # End of navbarMenu(System Config)
-      ), # ENd of conditional panel System Config
+      ), # End of conditional panel System Config
       
       ### User Admin 
       conditionalPanel(
@@ -109,7 +110,7 @@ authUI <- function() {
               
               shinyFooter                            
           ) # End of navbarMenu("User Administration")
-      ) # ENd of conditional panel User Administrationt  
+      ) # End of conditional panel User Administrationt  
   
   ) # End of conditiopnalPanel Utilities                   
 }
