@@ -1,5 +1,7 @@
 <img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
 
+[![Build](http://ci.oasislmfdev.org/buildStatus/icon?job=pipeline_stable/oasis_ui)](http://ci.oasislmfdev.org/blue/organizations/jenkins/pipeline_dev%2Foasis_ui)
+
 # Oasis UI
 Web-based application client for managing exposure data and operating modelling workflows.There are three components:
   * Shiny UI application 
