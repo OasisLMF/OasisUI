@@ -130,9 +130,7 @@ def do_load_programme_data(progid):
         schema_filepath = FILES_DIRECTORY +  "/Exposures/Schema.ini"
         with open(schema_filepath, "w") as schema_file:
             for line in rows:
-                line = re.sub(",", "\t", str(line))
-                logging.getLogger().debug(re.sub("[()']", "", str(line)))
-                schema_file.write(re.sub("[()']", "", str(line)) + "\n")
+                schema_file.write(str(line[0]) + "\t\n")
 
         flamingo_db_utils.generate_canonical_model(progid)
     except:
