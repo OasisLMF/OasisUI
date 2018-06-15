@@ -49,7 +49,7 @@ def _check_file(filename):
         return True
 
 def _do_transform(
-    progid, sourcefilename, validationfilelocname, transformationfilename, 
+    progid, sourcefilename, validationfilelocname, transformationfilename,
     destinationfilepath, destinationfilename, do_sequence):
     '''
     Transform source to canonical.
@@ -76,14 +76,14 @@ def _do_transform(
 
 @log.oasis_log()
 def transform_source_to_canonical(
-    progid, sourcefilename, validationfilelocname, transformationfilename, 
+    progid, sourcefilename, validationfilelocname, transformationfilename,
     destinationfilepath, destinationfilename):
     '''
     Transform source to canonical.
     '''
     do_sequence = True
     trasform_status = _do_transform(
-        progid, sourcefilename, validationfilelocname, transformationfilename, 
+        progid, sourcefilename, validationfilelocname, transformationfilename,
     destinationfilepath, destinationfilename, do_sequence)
     if trasform_status is False:
         flamingo_db_utils.update_prog_status(progid, "Failed")
@@ -130,9 +130,7 @@ def do_load_programme_data(progid):
         schema_filepath = FILES_DIRECTORY +  "/Exposures/Schema.ini"
         with open(schema_filepath, "w") as schema_file:
             for line in rows:
-                line = re.sub(",", "\t", str(line))
-                logging.getLogger().debug(re.sub("[()']", "", str(line)))
-                schema_file.write(re.sub("[()']", "", str(line)) + "\n")
+                schema_file.write(str(line[0]) + "\t\n")
 
         flamingo_db_utils.generate_canonical_model(progid)
     except:
@@ -199,7 +197,7 @@ def do_run_prog_oasis(processrunid):
         input_location = client.upload_inputs_from_directory(
             upload_directory,
             do_il=create_il_bins,
-            do_build=True, 
+            do_build=True,
             do_clean=True)
         logging.getLogger().info(
             "Input location: {}".format(input_location))
@@ -238,9 +236,9 @@ def do_run_prog_oasis(processrunid):
 
         # download outputs and cleanup
         outputs_file = os.path.join(
-            upload_directory, 
+            upload_directory,
             outputs_location + ".tar.gz"
-        )    
+        )
         client.download_outputs(outputs_location, outputs_file)
         client.delete_exposure(input_location)
         client.delete_outputs(outputs_location)
@@ -257,15 +255,15 @@ def do_run_prog_oasis(processrunid):
             "exec dbo.linkOutputFileToProcessRun @ProcessRunId = ?, @OutputFiles = ?",
             processrunid, output_file_list)
         flamingo_db_utils.update_process_run_status(processrunid, 'Completed')
-    
+
         # append summary id meanings to output files
         output_file_details = flamingo_db_utils.get_output_file_details(processrunid)
-        logging.getLogger().debug("output_file_details: {}".format(output_file_details))        
+        logging.getLogger().debug("output_file_details: {}".format(output_file_details))
         columns = ["FileName","FileDesc","PerspectiveName","OutputID","LECFlag","AnalysisFileNameStub","SummaryLevelName"]
         df_output_file_details = pd.DataFrame(columns=columns)
         recs = map(lambda tup: dict(zip(columns, list(tup))), output_file_details)
         df_output_file_details = df_output_file_details.append(recs)
-        logging.getLogger().debug("df_output_file_details:\n{}".format(df_output_file_details))        
+        logging.getLogger().debug("df_output_file_details:\n{}".format(df_output_file_details))
 
         prog_oasis_location = flamingo_db_utils.get_prog_oasis_location(processrunid)
         itemdict = prog_oasis_location + '/ItemDict.csv'
@@ -276,18 +274,18 @@ def do_run_prog_oasis(processrunid):
 
         for index, row in df_output_file_details.iterrows():
             output = upload_directory + '/output/' + row['FileName']
-            logging.getLogger().debug("FileName: {}".format(output))        
+            logging.getLogger().debug("FileName: {}".format(output))
             output_tmp = output + '.tmp'
             SummaryLevelName = row['SummaryLevelName']
             df_output = pd.read_csv(output)
             SummaryLevelId = SummaryLevelName.lower() + '_id'
             SummaryLevelDesc = SummaryLevelName.lower() + '_desc'
-            logging.getLogger().debug("SummaryLevelName: {}".format(SummaryLevelName))        
+            logging.getLogger().debug("SummaryLevelName: {}".format(SummaryLevelName))
             if SummaryLevelName != "Portfolio":
                 if SummaryLevelName == "Policy":
                     # join fmdict to file
                     df_summarydict = df_fmdict[['agg_id','policy_layer']]
-                    logging.getLogger().debug("df_summarydict: {}".format(df_summarydict))        
+                    logging.getLogger().debug("df_summarydict: {}".format(df_summarydict))
                     df_summarydict_distinct = df_summarydict.drop_duplicates()
                     df_output_temp = df_output.join(df_summarydict_distinct.set_index('agg_id'), on='summary_id')
                 else:
@@ -295,7 +293,7 @@ def do_run_prog_oasis(processrunid):
                     df_summarydict = df_itemdict[[SummaryLevelId,SummaryLevelDesc]]
                     df_summarydict_distinct = df_summarydict.drop_duplicates()
                     df_output_temp = df_output.join(df_summarydict_distinct.set_index(SummaryLevelId), on='summary_id')
-                    logging.getLogger().debug("df_summarydict_distinct: {}".format(df_summarydict_distinct))        
+                    logging.getLogger().debug("df_summarydict_distinct: {}".format(df_summarydict_distinct))
                 df_output_temp.to_csv(output, encoding='utf-8', index=False)
 
 
@@ -336,7 +334,7 @@ def generate_summary_files(processrunid):
     destination = open(gulsummaryxref, 'wb')
     destination.write("coverage_id,summary_id,summaryset_id\n")
     shutil.copyfileobj(
-        open(input_location + "/gulsummaryxref_temp.csv", 'rb'), 
+        open(input_location + "/gulsummaryxref_temp.csv", 'rb'),
         destination)
     destination.close()
     os.remove(input_location + "/gulsummaryxref_temp.csv")
@@ -345,7 +343,7 @@ def generate_summary_files(processrunid):
     destination = open(fmsummaryxref, 'wb')
     destination.write("output_id,summary_id,summaryset_id\n")
     shutil.copyfileobj(
-        open(input_location + "/fmsummaryxref_temp.csv", 'rb'), 
+        open(input_location + "/fmsummaryxref_temp.csv", 'rb'),
         destination)
     destination.close()
     os.remove(input_location + "/fmsummaryxref_temp.csv")
@@ -529,7 +527,7 @@ def do_call_keys_service(progoasisid):
 
     response = requests.post(targetURI, headers=headers, data=data)
 
-    response_json = json.loads(response.content) 
+    response_json = json.loads(response.content)
     locations = response_json['items']
     sessionid = response_json['session_id'] if 'session_id' in response_json else 1
     process_keys_response(progoasisid, modelid, locations, sessionid)
