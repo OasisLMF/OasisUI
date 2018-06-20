@@ -103,6 +103,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
             selection = "single",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 scrollX = TRUE,
                 pageLength = 5
@@ -152,6 +153,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
             selection = "none",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 scrollX = TRUE
             )
@@ -528,6 +530,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
             selection = "single",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 scrollX = TRUE,
                 pageLength = 5
@@ -577,6 +580,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
             selection = "none",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 pageLength = 20,
                 scrollX = TRUE
