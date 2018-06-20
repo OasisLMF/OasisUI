@@ -102,6 +102,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
             selection = "single",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0))
             )
         )
@@ -129,7 +130,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
               rownames = TRUE,
               selection = "none",
               colnames = c('Row Number' = 1),
+              filter = 'bottom',
               options = list(
+                  searchHighlight = TRUE,
                   autoWidth=TRUE,
                   columnDefs = list(list(visible = FALSE, targets = 0)),
                   search = list(caseInsensitive = TRUE), 
@@ -160,7 +163,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
               rownames = TRUE,
               selection = "none",
               colnames = c('Row Number' = 1),
+              filter = 'bottom',
               options = list( 
+                  searchHighlight = TRUE,
                   autoWidth = TRUE,
                   scrollX = TRUE,
                   columnDefs = list(list(visible = FALSE, targets = 0)),
