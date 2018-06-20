@@ -150,6 +150,7 @@ processRunPage <- function(
             selection = list(mode = 'single',
                 selected = rownames(result$prcrundata)[c(as.integer(index))]),
             colnames = c('Row Number' = 1),
+            filter = 'bottom',
             options = getPRTableOptions()
         )
         
@@ -212,6 +213,7 @@ processRunPage <- function(
               rownames = TRUE,
               selection = "single",
               colnames = c('Row Number' = 1),
+              filter = 'bottom',
               options = getPRTableOptions()
           )
           
@@ -260,7 +262,9 @@ processRunPage <- function(
             class = "flamingo-table display",
             rownames = TRUE,
             selection = "none",
-            colnames = c('Row Number' = 1)
+            filter = 'bottom',
+            colnames = c('Row Number' = 1),
+            options = list(searchHighlight = TRUE)
         )
       })
   
@@ -310,6 +314,7 @@ processRunPage <- function(
             rownames = TRUE,
             selection = "none",
             colnames = c('Row Number' = 1),
+            filter = 'bottom',
             options = getPRTableOptions()
         )
         
@@ -366,6 +371,7 @@ processRunPage <- function(
               rownames = TRUE,
               selection = "none",
               colnames = c('Row Number' = 1),
+              filter = 'bottom',
               options = getPRTableOptions()
           )
           
