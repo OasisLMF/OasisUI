@@ -17,6 +17,7 @@ Imports:
   DBI,
   shinyBS,
   shinyjs,
+  shinyWidgets,
   DT,
   leaflet,
   plotly
