@@ -81,7 +81,7 @@ processRunPageUI <- function(id) {
                           tabPanel("File Contents", value = "tabprrunfiledata",
                               dataTableOutput(ns("dttableoutputfiledata")),
                               downloadButton(ns("PRfiledataIdownloadexcel"),
-                                  label = "Export to Excel")
+                                  label = "Export to csv")
                           ),
                           tabPanel("Summary", value = "tabprrunsummary",
                               fluidRow(
