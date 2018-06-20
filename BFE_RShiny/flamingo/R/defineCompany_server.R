@@ -52,6 +52,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
               selection = "single",
               colnames = c('Row Number' = 1),
               options = list(
+                  searchHighlight = TRUE,
                   columnDefs = list(list(visible = FALSE, targets = 0)),
                   autoWidth=TRUE
               )
