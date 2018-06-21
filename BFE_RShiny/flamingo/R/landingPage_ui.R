@@ -33,6 +33,7 @@ pageheaderUI <- function(id) {
                    circle = TRUE, status = "default",
                    icon = icon("user"),
                    size = "s",
+                   right = TRUE,
                    textOutput(ns("textOutputHeaderData2")),
                    bsButton(ns("abuttonuseradmin"), "User Administration",
                             style = "btn btn-primary", size = "default", type = "action",
