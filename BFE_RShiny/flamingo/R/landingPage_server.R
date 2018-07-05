@@ -12,6 +12,7 @@
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 #' }
 #' @importFrom DT renderDataTable
+#' @importFrom  shinyBS bsTooltip
 #' @export
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
@@ -168,6 +169,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' Page Structure
 #' @rdname pagestructure
 #' @inheritParams flamingoModule
+#' @importFrom  shinyBS bsTooltip
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
@@ -188,7 +190,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
       Width = 9
   )
   
-  observe(if(!is.null(W())){
+  observe(if (!is.null(W())) {
     result$Width <- W()
   })
 
@@ -199,17 +201,49 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   sidebarExtended <- panel(
     heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = FALSE),
     sidebar_button(ID = ns("abuttonexpmngt"),  Label = "Exposure Management"),
+    bsTooltip(ns("abuttonexpmngt"), 
+              landing_page$abuttonexpmngt, 
+              placement = "right", 
+              options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonprmngt"),   Label = "Process Management"),
+    bsTooltip(ns("abuttonprmngt"), 
+              landing_page$abuttonprmngt, 
+              placement = "right", 
+              options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonfilemngt"), Label = "File Management"),
-    sidebar_button(ID = ns("abuttonsysconf"),  Label = "System Configuration")
+    bsTooltip(ns("abuttonfilemngt"), 
+              landing_page$abuttonfilemngt, 
+              placement = "right", 
+              options   = list(container = "body")),
+    sidebar_button(ID = ns("abuttonsysconf"),  Label = "System Configuration"),
+    bsTooltip(ns("abuttonsysconf"), 
+              landing_page$abuttonsysconf, 
+              placement = "right", 
+              options   = list(container = "body"))
   )
   
-  sidebarCollapsed <-panel(
+  sidebarCollapsed <- panel(
     heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = TRUE), 
     sidebar_button(ID = ns("abuttonexpmngt"),  Label = "EM"),
+    bsTooltip(ns("abuttonexpmngt"), 
+              landing_page$abuttonexpmngt, 
+              placement = "right", 
+              options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonprmngt"),   Label = "PM"),
+    bsTooltip(ns("abuttonprmngt"), 
+              landing_page$abuttonprmngt, 
+              placement = "right", 
+              options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonfilemngt"), Label = "FM"),
-    sidebar_button(ID = ns("abuttonsysconf"),  Label = "SC")
+    bsTooltip(ns("abuttonfilemngt"), 
+              landing_page$abuttonfilemngt, 
+              placement = "right", 
+              options   = list(container = "body")),
+    sidebar_button(ID = ns("abuttonsysconf"),  Label = "SC"),
+    bsTooltip(ns("abuttonsysconf"), 
+              landing_page$abuttonsysconf, 
+              placement = "right", 
+              options   = list(container = "body"))
     )
 
   output$sidebar <- renderUI({sidebarExtended })
