@@ -1,7 +1,9 @@
 #' @rdname landingPage
 #' @importFrom DT dataTableOutput
+#' @importFrom  shinyBS bsTooltip
 #' @export
-landingPageUI<- function(id) {
+
+landingPageUI <- function(id) {
   
   ns <- NS(id)
   
@@ -11,10 +13,18 @@ landingPageUI<- function(id) {
                  dataTableOutput(ns("tableInbox")),
                  actionButton(ns("abuttongotorun"), "Goto Run Details",
                      class = "btn btn-primary", align = "right"),
+                 bsTooltip(ns("abuttongotorun"), 
+                           landing_page$abuttongotorun, 
+                           placement = "right", 
+                           options   = list(container = "body")),
                  actionButton(ns("refreshInbox"), "Refresh",
                      class = "btn btn-primary", align = "right"),
                  downloadButton(ns("PRIdownloadexcel"),
-                     label="Export to csv")
+                     label = "Export to csv"),
+                 bsTooltip(ns("PRIdownloadexcel"), 
+                           landing_page$PRIdownloadexcel, 
+                           placement = "right", 
+                           options   = list(container = "body"))
              )
              # img(src = "landingpage.png", width = "70%") # to be replaced with proper image
   )
