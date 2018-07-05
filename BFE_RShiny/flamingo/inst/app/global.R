@@ -15,6 +15,8 @@ library(DT, warn.conflicts = FALSE)
 library(DBI)
 library(logging)
 
+source(file.path(".", "helper_text.R"), local = TRUE)
+
 library(shinyWidgets)
 
 library(flamingo)
@@ -64,4 +66,3 @@ tryCatch({
     }, error = function(e) {
       logerror(e$message, logger = "flamingo.module")
     })
-
