@@ -19,18 +19,16 @@ fileViewerUI <- function(id) {
           checkboxInput(inputId = ns("tableFVfileListSelectall"), label = "Select all", value = FALSE),
           dataTableOutput(ns("tableFVfileList")),
 
-          # textOutput(ns("rowsSelected")),
-
           downloadButton(ns("FVfileListdownloadzip"), label = "Export to zip"),
           bsTooltip(ns("FVfileListdownloadzip"), 
                     file_Viewer$FVfileListdownloadzip,
                     placement = "right", 
                     options   = list(container = "body")),
-          downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
-          bsTooltip(ns("FVFLdownloadexcel"), 
-                      file_Viewer$FVFLdownloadexcel, 
-                      placement = "right", 
-                      options   = list(container = "body"))
+          # downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
+          # bsTooltip(ns("FVFLdownloadexcel"), 
+          #             file_Viewer$FVFLdownloadexcel, 
+          #             placement = "right", 
+          #             options   = list(container = "body"))
   
   ))
   
