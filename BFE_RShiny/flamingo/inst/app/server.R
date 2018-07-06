@@ -33,8 +33,8 @@ server <- function(input, output, session) {
   
   
   observeEvent(input$abuttoncollapsesidebar, {
-    result$counter <- result$counter +1
-    if((result$counter %% 2) == 0){
+    result$counter <- result$counter + 1
+    if ((result$counter %% 2) == 0) {
       result$WidthMain <- 9
       result$WidthSide <- 3
     } else {
@@ -128,7 +128,7 @@ server <- function(input, output, session) {
   ### authentication
   
   output$id <- reactive(result$userId)
-  outputOptions(output, "id", suspendWhenHidden=FALSE)
+  outputOptions(output, "id", suspendWhenHidden = FALSE)
   
   observe({
     result$userId <- loginDialogModule$userId()
