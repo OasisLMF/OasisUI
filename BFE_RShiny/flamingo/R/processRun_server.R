@@ -102,8 +102,8 @@ processRunPage <- function(
     }
     
     result$prcrundata <- getProcessRun(dbSettings, prcid, AllOrInProgress)%>% 
-      mutate(ProcessRunStatus = replace(ProcessRunStatus, ProcessRunStatus == "Failed", StatusFailed)) %>%
-      mutate(ProcessRunStatus = replace(ProcessRunStatus, ProcessRunStatus != "Completed" & ProcessRunStatus != "Failed" & ProcessRunStatus != StatusFailed & ProcessRunStatus != StatusCompleted, StatusProcessing)) %>%
+      mutate(ProcessRunStatus = replace(ProcessRunStatus, ProcessRunStatus == "Failed" | ProcessRunStatus == "Cancelled", StatusFailed)) %>%
+      mutate(ProcessRunStatus = replace(ProcessRunStatus, ProcessRunStatus != "Completed" & ProcessRunStatus != "Cancelled" & ProcessRunStatus != "Failed" & ProcessRunStatus != StatusFailed & ProcessRunStatus != StatusCompleted, StatusProcessing)) %>%
       mutate(ProcessRunStatus = replace(ProcessRunStatus, ProcessRunStatus == "Completed", StatusCompleted)) %>%
       as.data.frame()
     
@@ -244,8 +244,8 @@ processRunPage <- function(
                   
                   result$fileData <- read.csv(filename, header = TRUE, sep = ",",
                       quote = "\"", dec = ".", fill = TRUE, comment.char = "") %>% 
-                    mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
-                    mutate(Status = replace(Status, tolower(Status) != "success"  & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+                    mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
+                    mutate(Status = replace(Status, tolower(Status) != "success"  & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
                     mutate(Status = replace(Status, tolower(Status) == "success", StatusCompleted)) %>%
                     as.data.frame()
                   
@@ -380,8 +380,8 @@ processRunPage <- function(
           
           datatable(
               getProcessRunDetails(dbSettings, wfid) %>% 
-                mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
-                mutate(Status = replace(Status, tolower(Status) != "success"  & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+                mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
+                mutate(Status = replace(Status, tolower(Status) != "success"  & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
                 mutate(Status = replace(Status, tolower(Status) == "success", StatusCompleted)) %>%
                 as.data.frame(),
               class = "flamingo-table display",
