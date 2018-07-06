@@ -13,6 +13,7 @@
 #' }
 #' @importFrom DT renderDataTable
 #' @importFrom  shinyBS bsTooltip
+#' @importFrom dplyr mutate
 #' @export
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
