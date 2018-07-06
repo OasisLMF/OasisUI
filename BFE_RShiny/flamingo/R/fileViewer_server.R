@@ -103,12 +103,12 @@ fileViewer <- function(
     )
   })
   
-  # Download table of files to csv 
-  output$FVFLdownloadexcel <- downloadHandler(
-    filename = "filelist.csv",
-    content = function(file) {
-      write.csv(result$FLdata, file)}
-  )
+  # # Download table of files to csv 
+  # output$FVFLdownloadexcel <- downloadHandler(
+  #   filename = "filelist.csv",
+  #   content = function(file) {
+  #     write.csv(result$FLdata, file)}
+  # )
   
   ### Update Checkboxes
   
