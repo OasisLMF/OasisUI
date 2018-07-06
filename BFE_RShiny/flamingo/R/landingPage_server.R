@@ -37,9 +37,9 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
         landingPageButtonUpdate(session, dbSettings, userId())
 
         result$inbox <- getInboxData(dbSettings, userId()) %>% 
-          mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
-          mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+          mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
           mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
+          mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
           as.data.frame()
 
         logMessage("inbox refreshed")
