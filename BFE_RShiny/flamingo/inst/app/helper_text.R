@@ -4,7 +4,7 @@
 
 file_Viewer <- list(
   FVfileListdownloadzip = "Download all checked files",
-  FVFLdownloadexcel = "Download files table"
+  #FVFLdownloadexcel = "Download files table"
 )
 
 landing_page <- list(
