@@ -38,7 +38,7 @@ programmeDefinitionUI <- function(id) {
                   
                   column(12, align = "right",
                       actionButton(ns("abuttonprgtblrfsh"), "Refresh",
-                          class="btn btn-primary btn-refresh")),
+                          class = "btn btn-primary btn-refresh")),
                   
                   dataTableOutput(ns("tableDPprog")),
                   
