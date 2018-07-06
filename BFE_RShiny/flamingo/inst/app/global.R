@@ -66,3 +66,10 @@ tryCatch({
     }, error = function(e) {
       logerror(e$message, logger = "flamingo.module")
     })
+
+
+## Icons
+
+StatusFailed <- '<i class="fa fa-times-circle"></i>'
+StatusCompleted <- '<i class="fa fa-check-circle"></i>'
+StatusProcessing <- '<i class="fa fa-spinner"></i>'
