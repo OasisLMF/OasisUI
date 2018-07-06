@@ -20,7 +20,8 @@ Imports:
   shinyWidgets,
   DT,
   leaflet,
-  plotly
+  plotly,
+  dplyr
 Suggests:
   knitr,
   testthat
