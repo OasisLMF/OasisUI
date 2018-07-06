@@ -100,7 +100,12 @@ processRunPage <- function(
       AllOrInProgress = "In Progress"
     }
     
-    result$prcrundata <- getProcessRun(dbSettings, prcid, AllOrInProgress)
+    result$prcrundata <- getProcessRun(dbSettings, prcid, AllOrInProgress)%>% 
+      mutate(ProcessRunStatus = replace(ProcessRunStatus, ProcessRunStatus == "Failed", StatusFailed)) %>%
+      mutate(ProcessRunStatus = replace(ProcessRunStatus, ProcessRunStatus != "Completed" & ProcessRunStatus != "Failed" & ProcessRunStatus != StatusFailed & ProcessRunStatus != StatusCompleted, StatusProcessing)) %>%
+      mutate(ProcessRunStatus = replace(ProcessRunStatus, ProcessRunStatus == "Completed", StatusCompleted)) %>%
+      as.data.frame()
+    
     
   }
   
@@ -149,6 +154,7 @@ processRunPage <- function(
             rownames = TRUE,
             selection = list(mode = 'single',
                 selected = rownames(result$prcrundata)[c(as.integer(index))]),
+            escape = FALSE,
             colnames = c('Row Number' = 1),
             filter = 'bottom',
             options = getPRTableOptions()
@@ -236,7 +242,12 @@ processRunPage <- function(
             tryCatch({
                   
                   result$fileData <- read.csv(filename, header = TRUE, sep = ",",
-                      quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+                      quote = "\"", dec = ".", fill = TRUE, comment.char = "") %>% 
+                    mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
+                    mutate(Status = replace(Status, tolower(Status) != "success"  & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+                    mutate(Status = replace(Status, tolower(Status) == "success", StatusCompleted)) %>%
+                    as.data.frame()
+                  
                   
                 }, error = function(e) {
                   
@@ -262,6 +273,7 @@ processRunPage <- function(
             class = "flamingo-table display",
             rownames = TRUE,
             selection = "none",
+            escape = FALSE,
             filter = 'bottom',
             colnames = c('Row Number' = 1),
             options = list(searchHighlight = TRUE)
@@ -366,10 +378,15 @@ processRunPage <- function(
           logMessage("log table refreshed")
           
           datatable(
-              getProcessRunDetails(dbSettings, wfid),
+              getProcessRunDetails(dbSettings, wfid) %>% 
+                mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
+                mutate(Status = replace(Status, tolower(Status) != "success"  & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+                mutate(Status = replace(Status, tolower(Status) == "success", StatusCompleted)) %>%
+                as.data.frame(),
               class = "flamingo-table display",
               rownames = TRUE,
               selection = "none",
+              escape = FALSE,
               colnames = c('Row Number' = 1),
               filter = 'bottom',
               options = getPRTableOptions()
