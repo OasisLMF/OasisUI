@@ -13,6 +13,7 @@
 #' @importFrom DT renderDataTable
 #' @importFrom shinyjs enable disable show hide
 #' @importFrom plotly renderPlotly
+#' @importFrom dplyr mutate
 #' @export
 processRunPage <- function(
     input,
