@@ -23,7 +23,7 @@ fileViewerUI <- function(id) {
           bsTooltip(ns("FVfileListdownloadzip"), 
                     file_Viewer$FVfileListdownloadzip,
                     placement = "right", 
-                    options   = list(container = "body")),
+                    options   = list(container = "body"))
           # downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
           # bsTooltip(ns("FVFLdownloadexcel"), 
           #             file_Viewer$FVFLdownloadexcel, 
