@@ -233,6 +233,60 @@ programmeDefinitionAmendUI <- function(id) {
                       actionButton(ns("abuttonSAFileLink"), 
                           class = "btn btn-primary", label = "Link",
                           align = "left")
+                  )),
+
+              ## SR File
+
+              helpText(h4("Source Reinsurance File")),
+
+              selectInput(ns("sinputSRFile"), "Select Option", c("Select" = "",
+                      "Upload New File" = "U",
+                      "Select existing file" = "S")),
+
+              hidden(div(id = ns("divSRFileUpload"),
+                      fileInput(ns("SRFile"), 'Choose a file to upload:',
+                          accept = c(
+                              'csv',
+                              'comma-separated-values',
+                              '.csv'
+                          )),
+                      actionButton(ns("abuttonSRFileUpload"),
+                          class = "btn btn-primary", label = "Upload File", align = "left")
+                  )),
+
+              hidden(div(id = ns("divSRFileSelect"),
+                      selectInput(ns("sinputselectSRFile"),
+                          label = "Select existing File", choices = ""),
+                      actionButton(ns("abuttonSRFileLink"),
+                          class = "btn btn-primary", label = "Link",
+                          align = "left")
+                  )),
+
+              ## SRS File
+
+              helpText(h4("Source Reinsurance Scope File")),
+
+              selectInput(ns("sinputSRSFile"), "Select Option", c("Select" = "",
+                      "Upload New File" = "U",
+                      "Select existing file" = "S")),
+
+              hidden(div(id = ns("divSRSFileUpload"),
+                      fileInput(ns("SRSFile"), 'Choose a file to upload:',
+                          accept = c(
+                              'csv',
+                              'comma-separated-values',
+                              '.csv'
+                          )),
+                      actionButton(ns("abuttonSRSFileUpload"),
+                          class = "btn btn-primary", label = "Upload File", align = "left")
+                  )),
+
+              hidden(div(id = ns("divSRSFileSelect"),
+                      selectInput(ns("sinputselectSRSFile"),
+                          label = "Select existing File", choices = ""),
+                      actionButton(ns("abuttonSRSFileLink"),
+                          class = "btn btn-primary", label = "Link",
+                          align = "left")
                   ))
           
           ))
