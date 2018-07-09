@@ -395,7 +395,102 @@ processRunParamUI <- function(id) {
                       selected = NULL)
               )
           ),#end of fluidrow FM
-          
+
+          fluidRow(
+              column(4,
+                  h4("Net RI Loss", style="font-size: 18px; font-weight: bold;"),
+                  h5("Full Sample", style="font-size: 16.5px;"), 
+                  h5("ELT", style="font-size: 16.5px;"),
+                  tags$div(class = "h5-align", h5("AEP", style="font-size: 16.5px;")), 
+                  tags$div(class = "h5-align", h5("OEP", style="font-size: 16.5px;")),
+                  tags$div(class = "h5-align", h5("Multi AEP", style="font-size: 16.5px;")),
+                  h5("Multi OEP", style="font-size: 16.5px;"),  
+                  # h5("WS Mean AEP", style="font-size: 16.5px;"),
+                  # tags$div(class = "h5-align", h5("WS Mean OEP", style="font-size: 16.5px;")),  
+                  # tags$div(class = "h5-align",h5("Sample Mean AEP", style="font-size: 16.5px;")),
+                  # h5("Sample Mean OEP", style="font-size: 16.5px;"), 
+                  h5("AAL", style="font-size: 16.5px;"),
+                  tags$div(class = "h5-align",h5("PLT", style="font-size: 16.5px;"))),
+              
+              tags$div(class = "multicol", 
+                  checkboxGroupInput(ns("chkreprog"),
+                      label = h5("Prog", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "reprogSummary",
+                          " " = "reprogELT",
+                          " " = "reprogFullUncAEP",
+                          " " = "reprogFullUncOEP",
+                          " " = "reprogAEPWheatsheaf",
+                          " " = "reprogOEPWheatsheaf",  
+                          " " = "reprogAAL",
+                          " " = "reprogPLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkrepolicy"),
+                      label = h5("Policy", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "repolicySummary",
+                          " " = "repolicyELT",
+                          " " = "repolicyFullUncAEP",
+                          " " = "repolicyFullUncOEP",
+                          " " = "repolicyAEPWheatsheaf",
+                          " " = "repolicyOEPWheatsheaf", 
+                          " " = "repolicyAAL",
+                          " " = "repolicyPLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkrestate"),
+                      label = h5("State", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "restateSummary",
+                          " " = "restateELT",
+                          " " = "restateFullUncAEP",
+                          " " = "restateFullUncOEP",
+                          " " = "restateAEPWheatsheaf",
+                          " " = "restateOEPWheatsheaf", 
+                          " " = "restateAAL", " " = "restatePLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkrecounty"),
+                      label = h5("County", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "recountySummary",
+                          " " = "recountyELT",
+                          " " = "recountyFullUncAEP",
+                          " " = "recountyFullUncOEP",
+                          " " = "recountyAEPWheatsheaf",
+                          " " = "recountyOEPWheatsheaf", 
+                          " " = "recountyAAL", " " = "recountyPLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkreloc"),
+                      label = h5("Location", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "relocSummary",
+                          " " = "relocELT",
+                          " " = "relocFullUncAEP",
+                          " " = "relocFullUncOEP",
+                          " " = "relocAEPWheatsheaf",
+                          " " = "relocOEPWheatsheaf", 
+                          " " = "relocAAL",
+                          " " = "relocPLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkrelob"),
+                      label = h5("LOB", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "relobSummary",
+                          " " = "relobELT",
+                          " " = "relobFullUncAEP",
+                          " " = "relobFullUncOEP",
+                          " " = "relobAEPWheatsheaf",
+                          " " = "relobOEPWheatsheaf", 
+                          " " = "relobAAL",
+                          " " = "relobPLT"),
+                      selected = NULL)
+              )
+          ),#end of fluidrow RI
+
           actionButton(ns("abuttonexecuteprrun"), "Execute Run",
               class = "btn btn-primary"),
           actionButton(ns("abuttonsaveoutput"), "Save Output",
