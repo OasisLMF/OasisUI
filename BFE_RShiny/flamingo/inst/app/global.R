@@ -18,6 +18,7 @@ library(logging)
 source(file.path(".", "helper_text.R"), local = TRUE)
 
 library(shinyWidgets)
+library(dplyr)
 
 library(flamingo)
 
