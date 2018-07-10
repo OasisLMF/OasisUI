@@ -368,6 +368,8 @@ def get_analysis_settings_json(processrunid):
         flamingo_db_utils.get_gul_summaries(processrunid)
     il_summaries_data = \
         flamingo_db_utils.get_il_summaries(processrunid)
+    ri_summaries_data = \
+        flamingo_db_utils.get_ri_summaries(processrunid)
 
     analysis_settings = dict()
     general_settings = dict()
@@ -429,9 +431,32 @@ def get_analysis_settings_json(processrunid):
         il_summaries_dict[id]['id'] = id
         il_summaries.append(il_summaries_dict[id])
 
+    ri_summaries_dict = dict()
+    for row in ri_summaries_data:
+        id = int(row[0])
+        if not ri_summaries_dict.has_key(id):
+            ri_summaries_dict[id] = dict()
+        if row[3] == 1:
+            if not ri_summaries_dict[id].has_key('leccalc'):
+                ri_summaries_dict[id]['leccalc'] = dict()
+                ri_summaries_dict[id]['leccalc']['outputs'] = dict()
+            if row[1] == 'return_period_file':
+                ri_summaries_dict[id]['leccalc'][row[1]] = bool(row[2])
+            else:
+                ri_summaries_dict[id]['leccalc']['outputs'][row[1]] = bool(row[2])
+        else:
+            ri_summaries_dict[id][row[1]] = bool(row[2])
+
+    ri_summaries = list()
+    for id in ri_summaries_dict.keys():
+        ri_summaries_dict[id]['id'] = id
+        ri_summaries.append(ri_summaries_dict[id])
+
+
     general_settings['model_settings'] = model_settings
     general_settings['gul_summaries'] = gul_summaries
     general_settings['il_summaries'] = il_summaries
+    general_settings['ri_summaries'] = ri_summaries
     analysis_settings['analysis_settings'] = general_settings
     apijson = jsonpickle.encode(analysis_settings)
     return json.loads(apijson)
