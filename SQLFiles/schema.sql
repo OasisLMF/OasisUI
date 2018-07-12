@@ -2,7 +2,7 @@
 --Flamingo Database Generation Script
 --Author: Ben Hayes
 --Date: 2017-07-27
---Version: R_0_0_345_0
+--Version: 0.394.0
 
 
 -------------------------------------------------------------------------------
@@ -2320,7 +2320,7 @@ if @modeltypeid = 1
 		set AltItemID =A.AltItemID
 		From	(
 				select	itemid,
-						DENSE_RANK() OVER (ORDER BY itemid) AS AltItemID
+						DENSE_RANK() OVER (ORDER BY areaperilid, vulnerabilityid, itemid) AS AltItemID
 				from	#item
 				) AS A
 		where	#item.itemid = A.itemid
