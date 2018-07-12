@@ -74,3 +74,9 @@ tryCatch({
 StatusFailed <- '<i class="fa fa-times-circle"></i>'
 StatusCompleted <- '<i class="fa fa-check-circle"></i>'
 StatusProcessing <- '<i class="fa fa-spinner"></i>'
+
+## Defult Selection Items
+
+defaultSelectChoicesGUL <- c("gulprogSummary", "gulprogELT", "gulprogAAL", "gulprogPLT", "gulprogFullUncAEP", "gulprogFullUncOEP")
+defaultSelectChoicesIL <- c("ilprogSummary", "ilprogELT", "ilprogAAL", "ilprogPLT", "ilprogFullUncAEP", "ilprogFullUncOEP",
+                            "ilpolicyELT", "ilpolicyAAL", "ilpolicyPLT", "ilpolicyFullUncAEP", "ilpolicyFullUncOEP")
