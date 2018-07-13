@@ -887,11 +887,10 @@ processRunPage <- function(
   
   ## Reset view if new Prog Oasis is selected
   observeEvent( input$tableprocessdata2_rows_selected, {
-    hide("prruntable")
     hide("prrunoutput")
     hide("prrunlogtable")
-    selectRows(dataTableProxy("processrundata"), c(1))
-    force(result$processRunStatus <- result$prcrundata[input$processrundata_rows_selected, 4])
+    #selectRows(dataTableProxy("processrundata"), c(1))
+    #force(result$processRunStatus <- result$prcrundata[input$processrundata_rows_selected, 4])
   })
   
   
