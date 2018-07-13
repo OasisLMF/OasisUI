@@ -91,13 +91,13 @@ processRunPageUI <- function(id) {
                                tabPanel("Summary", value = "tabprrunsummary",
                                         fluidRow(
                                           column(6,
-                                                 h3("Summary EP Curves"),
+                                                 h3("Summary Exceedance Probability Curves"),
                                                  fluidRow(
                                                    column(12,
-                                                          h4("GUL Outputs"),
+                                                          h4("Ground Up Loss Outputs"),
                                                           plotlyOutput(ns("plotGULOutput"))),
                                                    column(12,
-                                                          h4("IL Outputs"),
+                                                          h4("Insured Loss Outputs"),
                                                           plotlyOutput(ns("plotILOutput"))))),
                                           column(6,
                                                  h3("Summary Table"),
@@ -154,22 +154,22 @@ processRunParamUI <- function(id) {
       column(8,
              panel(
                h4("Output Configuration"),
-               checkboxInput(ns("chkinputGUL"), "GUL", value = TRUE),
+               checkboxInput(ns("chkinputGUL"), label = "Ground Up Loss", value = TRUE),
                hidden(div(id = ns("processRunParamAdvancedGULUIOutput"), processRunParamAdvancedGULUI(id))),
-               checkboxInput(ns("chkinputIL"), "IL", value = FALSE), 
+               checkboxInput(ns("chkinputIL"), label = "Insured Loss", value = FALSE), 
                hidden(div(id = ns("processRunParamAdvancedILUIOutput"), processRunParamAdvancedILUI(id))),
-               div(id = ns("advanced"), style = "display: inline-block;margin-right:2%", align = "right", actionButton(ns("abtnadvanced"), "Advanced", class = "btn btn-primary")),
-               hidden(div(id = ns("basic"), style = "display: inline-block;margin-right:2%", align = "right", actionButton(ns("abtnbasic"), "Basic", class = "btn btn-primary"))),
-               hidden(div(id = ns("saveoutput"), style = "display: inline-block", actionButton(ns("abuttonsaveoutput"), "Save Output", class = "btn btn-primary"))),
-               hidden(div(id = ns("clroutopt"), style = "display: inline-block", actionButton(ns("abtnclroutopt"), "Default", class = "btn btn-primary")))
+               div(id = ns("advanced"), style = "display: inline-block;margin-right:2%", align = "right", actionButton(ns("abtnadvanced"), label = "Advanced", class = "btn btn-primary")),
+               hidden(div(id = ns("basic"), style = "display: inline-block;margin-right:2%", align = "right", actionButton(ns("abtnbasic"), label = "Basic", class = "btn btn-primary"))),
+               hidden(div(id = ns("saveoutput"), style = "display: inline-block", actionButton(ns("abuttonsaveoutput"), label = "Save Configuration", class = "btn btn-primary"))),
+               hidden(div(id = ns("clroutopt"), style = "display: inline-block", actionButton(ns("abtnclroutopt"), label = "Default", class = "btn btn-primary")))
              ))
       
     ),
     
     fluidRow(
       column(6, 
-             div(id = ns("executeprrun"), style = "display: inline-block", actionButton(ns("abuttonexecuteprrun"), "Execute Run", class = "btn btn-primary"))),
-      column(6, actionButton(ns("abuttoncancelrun"), "Cancel", class = "btn btn-primary"), align = "right")
+             div(id = ns("executeprrun"), style = "display: inline-block", actionButton(ns("abuttonexecuteprrun"), label = "Execute Run", class = "btn btn-primary"))),
+      column(6, actionButton(ns("abuttoncancelrun"), label = "Cancel", class = "btn btn-primary"), align = "right")
     )
   )
 }
@@ -203,17 +203,17 @@ processRunParamPerilAdvancedUI <- function(id) {
   fluidRow(
     h5("Available Perils"),
     hidden(div(id = ns("perilwind"),
-               checkboxInput(ns("chkinputprwind"), "Peril: Wind", value = TRUE))),
+               checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = TRUE))),
     hidden(div(id = ns("perilsurge"),
-               checkboxInput(ns("chkinputprstsurge"), "Peril: Surge", value = TRUE))),
+               checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = TRUE))),
     hidden(div(id = ns("perilquake"),
-               checkboxInput(ns("chkinputprquake"), "Peril: Quake", value = TRUE))),
+               checkboxInput(ns("chkinputprquake"), label = "Peril: Quake", value = TRUE))),
     hidden(div(id = ns("perilflood"),
-               checkboxInput(ns("chkinputprflood"), "Peril: Flood", value = TRUE))),
+               checkboxInput(ns("chkinputprflood"), label = "Peril: Flood", value = TRUE))),
     hidden(div(id = ns("demandsurge"),
-               checkboxInput(ns("chkinputdsurge"), "Demand Surge", value = TRUE))),
+               checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = TRUE))),
     hidden(div(id = ns("leakagefactor"),
-               sliderInput(ns("sliderleakagefac"), "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)))
+               sliderInput(ns("sliderleakagefac"), label = "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)))
   )
 }
 
