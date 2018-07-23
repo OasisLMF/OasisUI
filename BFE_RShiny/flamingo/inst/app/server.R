@@ -77,6 +77,42 @@ server <- function(input, output, session) {
                                   logMessage = logMessage,
                                   logout = reactive(pageheaderModule$logout()))
   
+  accountDefinitionModule <- callModule(accountDefinition,
+                                        id = "accountDefinition",
+                                        dbSettings = dbSettings,
+                                        active = reactive(authenticated() && result$navigate == "DA"))
+  
+  programmeDefinitionSingleModule <- callModule(programmeDefinitionSingle,
+                                        id = "programmeDefinitionSingle",
+                                        dbSettings = dbSettings,
+                                        apiSettings = apiSettings,
+                                        userId = reactive(result$userId),
+                                        preselRunId = landingPageModule$runId,
+                                        preselProcId = landingPageModule$procId,
+                                        logMessage = logMessage,
+                                        reloadMillis = reloadMillis,
+                                        active = reactive(authenticated() && result$navigate == "PS"))
+
+  programmeDefinitionBatchModule <- callModule(programmeDefinitionBatch,
+                                        id = "programmeDefinitionBatch",
+                                        dbSettings = dbSettings,
+                                        apiSettings = apiSettings,
+                                        userId = reactive(result$userId),
+                                        preselRunId = landingPageModule$runId,
+                                        preselProcId = landingPageModule$procId,
+                                        logMessage = logMessage,
+                                        reloadMillis = reloadMillis,
+                                        active = reactive(authenticated() && result$navigate == "PB"))
+  
+  browseprogrammesModule <- callModule(browseprogrammes,
+                                       id = "browseprogrammes",
+                                       dbSettings = dbSettings,
+                                       apiSettings = apiSettings,
+                                       userId = reactive(result$userId),
+                                       logMessage = logMessage,
+                                       reloadMillis = reloadMillis,
+                                       active = reactive(authenticated() && result$navigate == "BR"))
+  
   programmeDefinitionModule <- callModule(programmeDefinition,
                                           id = "programmeDefinition",
                                           dbSettings = dbSettings,
@@ -86,10 +122,10 @@ server <- function(input, output, session) {
                                           reloadMillis = reloadMillis,
                                           active = reactive(authenticated() && input$em == "defineProg"))
   
-  accountDefinitionModule <- callModule(accountDefinition,
-                                        id = "accountDefinition",
-                                        dbSettings = dbSettings,
-                                        active = reactive(authenticated() && input$em == "defineAccount"))
+  # accountDefinitionModule <- callModule(accountDefinition,
+  #                                       id = "accountDefinition",
+  #                                       dbSettings = dbSettings,
+  #                                       active = reactive(authenticated() && input$em == "defineAccount"))
   
   processRunPageModule <- callModule(processRunPage,
                                      id = "processRunPage",
@@ -174,6 +210,11 @@ server <- function(input, output, session) {
     }
   })
   
+  observe(if (authenticated()) {
+    if (!is.null(page <- programmeDefinitionSingleModule$navigate())) {
+      result$navigate <- page
+    }
+  })
   
   output$menu <- reactive(result$navigate)
   outputOptions(output, "menu", suspendWhenHidden = FALSE)
@@ -184,6 +225,26 @@ server <- function(input, output, session) {
            
            "WF" = { # go to Workflow submenu
              loginfo(paste("Navigate to Process Management, userId: ", result$userId),
+                     logger = "flamingo.module")
+           },
+           
+           "DA" = { # go to Define account submenu
+             loginfo(paste("Navigate to Define Account, userId: ", result$userId),
+                     logger = "flamingo.module")
+           },
+           
+           "PS" = { # go to Define programme single submenu
+             loginfo(paste("Navigate to Define Programme Single, userId: ", result$userId),
+                     logger = "flamingo.module")
+           },
+
+           "PB" = { # go to Define Define programme batch submenu
+             loginfo(paste("Navigate to Define Programme Batch, userId: ", result$userId),
+                     logger = "flamingo.module")
+           },
+           
+           "BR" = { # go to Define Define programme batch submenu
+             loginfo(paste("Navigate to Browse, userId: ", result$userId),
                      logger = "flamingo.module")
            },
            
