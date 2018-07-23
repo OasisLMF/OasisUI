@@ -37,21 +37,31 @@ landingPageUI <- function(id) {
 pageheaderUI <- function(id) {
   
   ns <- NS(id)
-  
-  tagList(
-    dropdownButton(label = "accountDD",
-                   circle = TRUE, status = "default",
-                   icon = icon("user"),
-                   size = "s",
-                   right = TRUE,
-                   textOutput(ns("textOutputHeaderData2")),
-                   bsButton(ns("abuttonuseradmin"), "User Administration",
-                            style = "btn btn-primary", size = "default", type = "action",
-                            block = TRUE),
-                   bsButton(ns("abuttonlogout"), "Logout",
-                            style = "btn btn-primary", size = "default", type = "action",
-                            block = TRUE)
-    )
+  attachDependencies(value = flamingoHtmlDependencies(), 
+                     tagList(
+                       div( id = ns("accountDDmenu"),
+                            dropdownButton(inputId = ns("accountDD"),
+                                           circle = TRUE, status = "default",
+                                           icon = icon("user"),
+                                           size = "s",
+                                           right = TRUE,
+                                           textOutput(ns("textOutputHeaderData2")),
+                                           bsButton(ns("abuttonuseradmin"), "User Administration",
+                                                    style = "btn btn-primary", size = "default", type = "action",
+                                                    block = TRUE),
+                                           bsButton(ns("abuttonsysconf"), "System Configuration",
+                                                    style = "btn btn-primary", size = "default", type = "action",
+                                                    block = TRUE),
+                                           bsTooltip(ns("abuttonsysconf"), 
+                                                     landing_page$abuttonsysconf, 
+                                                     placement = "left", 
+                                                     options   = list(container = "body")),
+                                           bsButton(ns("abuttonlogout"), "Logout",
+                                                    style = "btn btn-primary", size = "default", type = "action",
+                                                    block = TRUE)
+                            )
+                       )
+                     )
   )
 }
 
@@ -62,12 +72,11 @@ pageheaderUI <- function(id) {
 #' @importFrom shinyWidgets actionBttn
 #' @export
 pagestructureUI <- function(id) {
-
+  
   ns <- NS(id)
-
-  tagList(
-    uiOutput(ns("sidebar"))
-
-   )
-
+  attachDependencies(value = flamingoHtmlDependencies(),
+                     tagList(
+                       uiOutput(ns("sidebar"))
+                     )
+  )
 }
