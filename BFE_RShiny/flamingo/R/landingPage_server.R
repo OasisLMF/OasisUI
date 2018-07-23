@@ -67,7 +67,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   
   output$PRIdownloadexcel <- downloadHandler(
 
-      filename ="processruninbox.csv",
+      filename = "processruninbox.csv",
       content = function(file) {
         write.csv(result$inbox, file)
       }
@@ -79,10 +79,10 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   moduleOutput <- list(
     navigate = reactive(result$navigate),
     
-    runId = reactive(if(length(i <- input$tableInbox_rows_selected) == 1) {
+    runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
       result$inbox[i, 2]} else -1),
     # this is needed in processRun, probably shouldn't
-    procId = reactive(if(length(i <- input$tableInbox_rows_selected) == 1) {
+    procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
       result$inbox[i, 1]} else -1)
   )
   
@@ -121,11 +121,14 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   
   observeEvent(input$abuttonuseradmin,
                result$navigate <- structure("UA", count = input$abuttonuseradmin))#,
-               #shinyjs::hide("abuttonuseradmin"))
+               #shinyjs::hide(id = "accountDDmenu"))
+  
+  observeEvent(input$abuttonsysconf,
+               result$navigate <- structure("SC", count = input$abuttonsysconf))
   
   observeEvent(input$abuttonhome,
                result$navigate <- structure("LP", count = input$abuttonhome))#,
-              # shinyjs::hide("input$abuttonuseradmin"))
+              #shinyjs::hide(id = "accountDDmenu"))
   
   
   LogoutModal <- function(){
@@ -175,7 +178,8 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' Page Structure
 #' @rdname pagestructure
 #' @inheritParams flamingoModule
-#' @importFrom  shinyBS bsTooltip
+#' @importFrom shinyBS bsTooltip
+#' @importFrom shinyWidgets dropdownButton
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
@@ -206,6 +210,48 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   
   sidebarExtended <- panel(
     heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = FALSE),
+    # sidebar_button(ID = ns("abuttonrun"),  Label = "Run"),
+    # bsTooltip(ns("abuttonrun"), 
+    #           landing_page$abuttonrun, 
+    #           placement = "right", 
+    #           options   = list(container = "body")),
+    dropdown(
+      inputId = ns("abuttonrun"),
+      status = "primary",
+      label = "Run",
+      circle = FALSE,
+      tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
+      actionButton(ns("abuttondefineaccount"), "Define Account",
+                   class = "btn btn-primary", align = "right",  width = "100%"),
+      bsTooltip(ns("abuttondefineaccount"),
+                landing_page$abuttondefineaccount,
+                placement = "right",
+                options   = list(container = "body")),
+      dropdown(
+        inputId = ns("abuttondefineprogramme"),
+        label = "Define Programme",
+        status = "primary",
+        circle = FALSE,
+        tooltip = tooltipOptions(title = landing_page$abuttondefineprogramme, placement = "right"),
+        actionButton(ns("abuttondefineprogrammesingle"), "Define Single Programme",
+                     class = "btn btn-primary", align = "right",  width = "100%"),
+        bsTooltip(ns("abuttondefineprogrammesingle"),
+                  landing_page$abuttondefineprogrammesingle,
+                  placement = "right",
+                  options   = list(container = "body")),
+        actionButton(ns("abuttondefineprogrammebatch"), "Define Batch Programme",
+                     class = "btn btn-primary", align = "right",  width = "100%"),
+        bsTooltip(ns("abuttondefineprogrammebatch"),
+                  landing_page$abuttondefineprogrammebatch,
+                  placement = "right",
+                  options   = list(container = "body"))
+      )
+    ),
+    sidebar_button(ID = ns("abuttonbrowse"),  Label = "Browse"),
+    bsTooltip(ns("abuttonbrowse"), 
+              landing_page$abuttonbrowse, 
+              placement = "right", 
+              options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonexpmngt"),  Label = "Exposure Management"),
     bsTooltip(ns("abuttonexpmngt"), 
               landing_page$abuttonexpmngt, 
@@ -220,16 +266,52 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     bsTooltip(ns("abuttonfilemngt"), 
               landing_page$abuttonfilemngt, 
               placement = "right", 
-              options   = list(container = "body")),
-    sidebar_button(ID = ns("abuttonsysconf"),  Label = "System Configuration"),
-    bsTooltip(ns("abuttonsysconf"), 
-              landing_page$abuttonsysconf, 
-              placement = "right", 
-              options   = list(container = "body"))
+              options   = list(container = "body"))#,
+    # sidebar_button(ID = ns("abuttonsysconf"),  Label = "System Configuration"),
+    # bsTooltip(ns("abuttonsysconf"), 
+    #           landing_page$abuttonsysconf, 
+    #           placement = "right", 
+    #           options   = list(container = "body"))
   )
   
   sidebarCollapsed <- panel(
     heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = TRUE), 
+    dropdown(
+      inputId = ns("abuttonrun"),
+      status = "primary",
+      circle = FALSE,
+      tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
+      actionButton(ns("abuttondefineaccount"), "Define Account",
+                   class = "btn btn-primary", align = "right", width = "100%"),
+      bsTooltip(ns("abuttondefineaccount"),
+                landing_page$abuttondefineaccount,
+                placement = "right",
+                options   = list(container = "body")),
+      dropdown(
+        inputId = ns("abuttondefineprogramme"),
+        label = "Define Process",
+        status = "primary",
+        circle = FALSE,
+        tooltip = tooltipOptions(title = landing_page$abuttondefineprogramme, placement = "right"),
+        actionButton(ns("abuttondefineprogrammesingle"), "Define Single Process",
+                     class = "btn btn-primary", align = "right",  width = "100%"),
+        bsTooltip(ns("abuttondefineprogrammesingle"),
+                  landing_page$abuttondefineprogrammesingle,
+                  placement = "right",
+                  options   = list(container = "body")),
+        actionButton(ns("abuttondefineprogrammebatch"), "Define Batch Process",
+                     class = "btn btn-primary", align = "right",  width = "100%"),
+        bsTooltip(ns("abuttondefineprogrammebatch"),
+                  landing_page$abuttondefineprogrammebatch,
+                  placement = "right",
+                  options   = list(container = "body"))
+      )
+    ),
+    sidebar_button(ID = ns("abuttonbrowse"),   Icon = icon("eye")),
+    bsTooltip(ns("abuttonbrowse"), 
+              landing_page$abuttonbrowse, 
+              placement = "right", 
+              options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonexpmngt"),  Label = "EM"),
     bsTooltip(ns("abuttonexpmngt"), 
               landing_page$abuttonexpmngt, 
@@ -244,25 +326,42 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     bsTooltip(ns("abuttonfilemngt"), 
               landing_page$abuttonfilemngt, 
               placement = "right", 
-              options   = list(container = "body")),
-    sidebar_button(ID = ns("abuttonsysconf"),  Label = "SC"),
-    bsTooltip(ns("abuttonsysconf"), 
-              landing_page$abuttonsysconf, 
-              placement = "right", 
-              options   = list(container = "body"))
+              options   = list(container = "body"))#,
+    # sidebar_button(ID = ns("abuttonsysconf"),  Label = "SC"),
+    # bsTooltip(ns("abuttonsysconf"), 
+    #           landing_page$abuttonsysconf, 
+    #           placement = "right", 
+    #           options   = list(container = "body"))
     )
 
   output$sidebar <- renderUI({sidebarExtended })
 
   
-  observe(if( result$Width == 9 ) {
+  observe(if ( result$Width == 9 ) {
     output$sidebar <- renderUI({sidebarExtended})
   } else {
     output$sidebar <- renderUI({sidebarCollapsed})
   })
   
   
+  
   ### Navigation Menu
+  
+  observeEvent(input$abuttondefineaccount,
+               result$navigate <- structure("DA", count = input$abuttondefineaccount))#,
+               #shinyjs::hide(id = "abuttonrun"))
+  
+  observeEvent(input$abuttondefineprogrammesingle,
+               result$navigate <- structure("PS", count = input$abuttondefineprogrammesingle))#,
+               #shinyjs::hide(id = "abuttonrun"))
+  
+  observeEvent(input$abuttondefineprogrammebatch,
+               result$navigate <- structure("PB", count = input$abuttondefineprogrammebatch))#,
+  #shinyjs::hide(id = "abuttonrun"))
+  
+  observeEvent(input$abuttonbrowse,
+               result$navigate <- structure("BR", count = input$abuttonbrowse))#,
+  #shinyjs::hide(id = "abuttonrun"))
   
   observeEvent(input$abuttonhome,
                result$navigate <- structure("LP", count = input$abuttonhome))
@@ -275,9 +374,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   
   observeEvent(input$abuttonfilemngt,
       result$navigate <- structure("FM", count = input$abuttonfilemngt))
-  
-  observeEvent(input$abuttonsysconf,
-      result$navigate <- structure("SC", count = input$abuttonsysconf))
+
    
   ### Button permissions
   
@@ -327,39 +424,44 @@ landingPageButtonUpdate <- function(session, dbSettings, userId,
   
   # Not used anywhere else, probably just forgotten
   # permission <- flamingoDBCheckPermissions(dbSettings, userId, "600")
-  # if(identical(permission, character(0))){
-  #   updateButton(session, "abuttonenquiry", disabled=TRUE)}
-  # else{updateButton(session, "abuttonenquiry", disabled=FALSE)}
+  # if (identical(permission, character(0))){
+  #   updateButton(session, "abuttonenquiry", disabled = TRUE)}
+  # else{updateButton(session, "abuttonenquiry", disabled = FALSE)}
   # 
   permission <- flamingoDBCheckPermissions(dbSettings, userId, "1000")
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonprmngt", disabled=TRUE)}
-  else{updateButton(session, "abuttonprmngt", disabled=FALSE)}
+  if (identical(permission, character(0))) {
+    updateButton(session, "abuttonprmngt", disabled = TRUE)}
+  else {updateButton(session, "abuttonprmngt", disabled = FALSE)}
   
   permission <- flamingoDBCheckPermissions(dbSettings, userId, "700")
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonexpmngt", disabled=TRUE)}
-  else{updateButton(session, "abuttonexpmngt", disabled=FALSE)}
+  if (identical(permission, character(0))) {
+    updateButton(session, "abuttonexpmngt", disabled = TRUE)}
+  else {updateButton(session, "abuttonexpmngt", disabled = FALSE)}
+  
+  permission <- flamingoDBCheckPermissions(dbSettings, userId, "700")
+  if (identical(permission, character(0))) {
+    updateButton(session, "abuttonrun", disabled = TRUE)}
+  else {updateButton(session, "abuttonrun", disabled = FALSE)}
   
   permission <- flamingoDBCheckPermissions(dbSettings, userId, "904")
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonuseradmin", disabled=TRUE)}
-  else{updateButton(session, "abuttonuseradmin", disabled=FALSE)}
+  if (identical(permission, character(0))) {
+    updateButton(session, "abuttonuseradmin", disabled = TRUE)}
+  else {updateButton(session, "abuttonuseradmin", disabled = FALSE)}
   
   # Not used anywhere else, probably just forgotten
   # permission <- flamingoDBCheckPermissions(dbSettings, userId, "950")
-  # if(identical(permission, character(0))){
-  #   updateButton(session, "abuttonworkflowadmin", disabled=TRUE)}
-  # else{updateButton(session, "abuttonworkflowadmin", disabled=FALSE)}
+  # if (identical(permission, character(0))) {
+  #   updateButton(session, "abuttonworkflowadmin", disabled = TRUE)}
+  # else {updateButton(session, "abuttonworkflowadmin", disabled = FALSE)}
   
   permission <- flamingoDBCheckPermissions(dbSettings, userId, "200") 
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonsysconf", disabled=TRUE)}
-  else{updateButton(session, "abuttonsysconf", disabled=FALSE)}
+  if (identical(permission, character(0))) {
+    updateButton(session, "abuttonsysconf", disabled = TRUE)}
+  else {updateButton(session, "abuttonsysconf", disabled = FALSE)}
   
   permission <- flamingoDBCheckPermissions(dbSettings, userId, "300")
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonfilemngt", disabled=TRUE)}
-  else{updateButton(session, "abuttonfilemngt", disabled=FALSE)}
+  if (identical(permission, character(0))) {
+    updateButton(session, "abuttonfilemngt", disabled = TRUE)}
+  else {updateButton(session, "abuttonfilemngt", disabled = FALSE)}
   
 }
