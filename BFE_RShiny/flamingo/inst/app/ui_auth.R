@@ -43,15 +43,39 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
               landingPageUI("landingPage")
             ),
             
+            ### Define Account
+            conditionalPanel(
+              condition = "output.menu == 'DA'",
+              accountDefinitionUI("accountDefinition")
+            ),
+            
+            ### DefineProgramme Single
+            conditionalPanel(
+              condition = "output.menu == 'PS'",
+              programmeDefinitionSingleUI("programmeDefinitionSingle")
+            ),
+
+            # ### DefineProgramme Batch
+            # conditionalPanel(
+            #   condition = "output.menu == 'DPB'",
+            #   programmeDefinitionBatchUI("programmeDefinitionBatch")
+            # ),
+            
+            ### browseprogrammesUI
+            conditionalPanel(
+              condition = "output.menu == 'BR'",
+              browseprogrammesUI("browseprogrammes")
+            ),
+            
             ### Exposure Management
             conditionalPanel(
               condition = "output.menu == 'EM'",
               #navbarPage("Exposure Management", id = "em",
               tabsetPanel(id = "em",
 
-                         tabPanel("Define Account",
-                                  value = "defineAccount",
-                                  accountDefinitionUI("accountDefinition")),
+                         # tabPanel("Define Account",
+                         #          value = "defineAccount",
+                         #          accountDefinitionUI("accountDefinition")),
                          
                          tabPanel("Define Programme",
                                   value = "defineProg",
