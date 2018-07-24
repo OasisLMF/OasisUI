@@ -75,7 +75,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       clearTransformNameSelection()
     }
     
-    if (input$sliderdefprogsteps == "Associate Model") {
+    if (input$sliderdefprogsteps == "Select Programme & Associate Model") {
       reloadDPProgData()
       hideDivs()
       show("panelamendprogramme")
@@ -94,7 +94,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       reloadPOData()
     }
     
-    if (input$sliderdefprogsteps == "Run") {
+    if (input$sliderdefprogsteps == "Browse & re-run") {
       hideDivs()
       show("paneldefineids")
       logMessage("showing paneldefineids")
@@ -343,7 +343,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                         progId = result$DPProgData[result$DPprogID,1])
       if (loadprogdata == 'success' || loadprogdata == 'Success') {
         showNotification(type = "message", "Initiating load programme data...")
-        updateSliderTextInput(session, inputId = "sliderdefprogsteps", selected = "Associate Model")
+        updateSliderTextInput(session, inputId = "sliderdefprogsteps", selected = "Select Programme & Associate Model")
       } else {
         showNotification(type = "error", "Failed to load programme data.")
       }
@@ -778,7 +778,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
     if (length(row <- input$tableProgOasisOOK_rows_selected) > 0) {
       
-      if (result$POData[row, "Status"] == StatusCompleted & (input$sliderdefprogsteps == "Configure Workflow Output" | input$sliderdefprogsteps == "Run" )) {
+      if (result$POData[row, "Status"] == StatusCompleted & (input$sliderdefprogsteps == "Configure Workflow Output" | input$sliderdefprogsteps == "Browse & re-run" )) {
         show("panelconfigureoutput")
         logMessage("showing panelconfigureoutput")
         defaultview(session)
@@ -1073,7 +1073,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
           hide("abuttonshowlog")
           
         }
-        updateSliderTextInput(session, inputId = "sliderdefprogsteps", selected = "Run")
+        updateSliderTextInput(session, inputId = "sliderdefprogsteps", selected = "Browse & re-run")
       }
     }
   })

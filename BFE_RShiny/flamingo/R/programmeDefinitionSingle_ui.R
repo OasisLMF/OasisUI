@@ -13,7 +13,7 @@ programmeDefinitionSingleUI <- function(id) {
     tags$style(HTML(".js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {background: #8b2129}")),
     sliderTextInput(inputId = ns("sliderdefprogsteps"),
                     label = "Process Definition Steps" , 
-                    choices = c("Create Programme", "Associate Model", "Configure Workflow Output", "Run"), 
+                    choices = c("Create Programme", "Select Programme & Associate Model", "Configure Workflow Output", "Browse & re-run"), 
                     selected = c("Create Programme"), #incase you want all values by default 
                     animate = FALSE, grid = TRUE, 
                     hide_min_max = TRUE, from_fixed = FALSE,
@@ -42,7 +42,7 @@ createProgrammeUI <- function(id) {
   ns <- NS(id)
   
   panel(
-    helpText(h4("Create Programme", class = "flamingo-table-title")),
+    helpText(h4("Define Programme", class = "flamingo-table-title")),
     createammendProgrammeUI(id)   
   )
 }
@@ -272,7 +272,7 @@ associateModelUI <- function(id) {
 configureOutputUI <- function(id) {
   ns <- NS(id)
   panel(
-    helpText(h4("Configure Wrokflow Output", class = "flamingo-table-title")),
+    helpText(h4("Configure Wookflow Output", class = "flamingo-table-title")),
 
       fluidRow(
         column(4, 
