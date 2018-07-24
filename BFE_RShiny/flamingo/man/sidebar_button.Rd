@@ -4,7 +4,8 @@
 \alias{sidebar_button}
 \title{sidebar_button}
 \usage{
-sidebar_button(ID, Label = NULL, Icon = NULL)
+sidebar_button(ID, Label = NULL, Icon = NULL, Block = TRUE,
+  Style = "btn btn-primary")
 }
 \description{
 function containing the sidebar UI

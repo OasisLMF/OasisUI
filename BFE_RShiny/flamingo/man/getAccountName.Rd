@@ -13,7 +13,7 @@ getAccountName(dbSettings)
 \code{data.frame} of 2 variables:
 \itemize{
 		\item \code{Account ID}
-		\item \code{progOasisId} 
+		\item \code{progOasisId}
 }
 }
 \description{

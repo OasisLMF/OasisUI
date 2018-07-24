@@ -34,7 +34,6 @@ see \link{invalidateLater};}
 list of reactive expressions
 \itemize{
 		\item{\code{navigate}: }{reactive yielding navigation}
-		\item{\code{logout}: }{reactive yielding logout button signal}
 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 }

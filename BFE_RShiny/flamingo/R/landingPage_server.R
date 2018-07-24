@@ -11,21 +11,21 @@
 #' 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 #' }
-#' @importFrom DT renderDataTable
-#' @importFrom  shinyBS bsTooltip
-#' @importFrom dplyr mutate
+#' @importFrom DT renderDataTable datatable
+#' @importFrom dplyr mutate '%>%'
+#' @importFrom utils write.csv
 #' @export
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
-  
+
   result <- reactiveValues(
     navigate = NULL,
     inbox = NULL
   )
-  
+
   observeEvent(input$abuttongotorun,
       result$navigate <- structure("WF", count = input$abuttongotorun))
-  
+
   observe(if (active()) {
 
         # invalidate if the refresh button updates
@@ -33,10 +33,10 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 
         # reload automatically every so often
         invalidateLater(reloadMillis)
-        
+
         landingPageButtonUpdate(session, dbSettings, userId())
 
-        result$inbox <- getInboxData(dbSettings, userId()) %>% 
+        result$inbox <- getInboxData(dbSettings, userId()) %>%
           mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
           mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
           mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
@@ -44,8 +44,8 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 
         logMessage("inbox refreshed")
 
-      })
-  
+  })
+
   output$tableInbox <- renderDataTable(if (userId() != FLAMINGO_GUEST_ID) {
 
         datatable(
@@ -63,34 +63,29 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
             )
         )
 
-      })
-  
-  output$PRIdownloadexcel <- downloadHandler(
+  })
 
+  output$PRIdownloadexcel <- downloadHandler(
       filename ="processruninbox.csv",
       content = function(file) {
         write.csv(result$inbox, file)
       }
-
   )
-  
-  ### Module Output
-  
+
+  ### Module Output ----
   moduleOutput <- list(
     navigate = reactive(result$navigate),
-    
     runId = reactive(if(length(i <- input$tableInbox_rows_selected) == 1) {
       result$inbox[i, 2]} else -1),
     # this is needed in processRun, probably shouldn't
     procId = reactive(if(length(i <- input$tableInbox_rows_selected) == 1) {
       result$inbox[i, 1]} else -1)
   )
-  
-  return(moduleOutput)
-  
 
-  
+  return(moduleOutput)
+
 }
+
 
 #' pageheader
 #' @rdname pageheader
@@ -105,30 +100,27 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
 #' }
 #' @export
-
 pageheader <- function(input, output, session, userId, userName, dbSettings,
-                          reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
-  
+                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
+
   ns <- session$ns
-  
+
   result <- reactiveValues(
     navigate = NULL
   )
-  
-  ### Greeter
-  
+
+  ### Greeter ----
   output$textOutputHeaderData2 <- renderText(paste("User Name:", userName()))
-  
+
   observeEvent(input$abuttonuseradmin,
-               result$navigate <- structure("UA", count = input$abuttonuseradmin))#,
-               #shinyjs::hide("abuttonuseradmin"))
-  
+               result$navigate <- structure("UA", count = input$abuttonuseradmin))
+               # shinyjs::hide("abuttonuseradmin"))
+
   observeEvent(input$abuttonhome,
-               result$navigate <- structure("LP", count = input$abuttonhome))#,
+               result$navigate <- structure("LP", count = input$abuttonhome))
               # shinyjs::hide("input$abuttonuseradmin"))
-  
-  
-  LogoutModal <- function(){
+
+  LogoutModal <- function() {
     ns <- session$ns
     modalDialog(label = "modaldialoguelogout",
                 title = "Important message",
@@ -140,42 +132,35 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
                 size = "s",
                 easyClose = TRUE)
   }
-  
+
   observeEvent(input$abuttonlogout,
-               showModal(LogoutModal())
+    showModal(LogoutModal())
   )
-  
-  observeEvent(input$abuttonlogoutcontinue, {
+
+  observeEvent(input$abuttonlogoutcontinue,
     removeModal()
-  })
-  
-  ### Button permissions
-  
+  )
+
+  ### Button permissions ----
   observe(if (active()) {
     landingPageButtonUpdate(session, dbSettings, userId())
   })
-  
-  
-  
-  ### Module Output
-  
+
+  ### Module Output ----
   moduleOutput <- list(
     navigate = reactive(result$navigate),
-
     # logout = reactive(input$abuttonlogout),
     logout = reactive(input$abuttonlogoutcontinue)
   )
-  
-  return(moduleOutput)
-  
-}
 
+  return(moduleOutput)
+
+}
 
 
 #' Page Structure
 #' @rdname pagestructure
 #' @inheritParams flamingoModule
-#' @importFrom  shinyBS bsTooltip
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
@@ -185,131 +170,123 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' \itemize{
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' }
+#' @importFrom shinyBS bsTooltip
+#' @importFrom shinyWidgets panel
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
-    reloadMillis = 10000, logMessage = message, active = reactive(TRUE), W) {
- 
-   ns <- session$ns
-  
+                          reloadMillis = 10000, logMessage = message,
+                          active = reactive(TRUE), W) {
+
+  ns <- session$ns
+
   result <- reactiveValues(
       navigate = NULL,
       Width = 9
   )
-  
+
   observe(if (!is.null(W())) {
     result$Width <- W()
   })
 
-  
-  ### Sidebar
-
-  
+  ### Sidebar ----
   sidebarExtended <- panel(
     heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = FALSE),
     sidebar_button(ID = ns("abuttonexpmngt"),  Label = "Exposure Management"),
-    bsTooltip(ns("abuttonexpmngt"), 
-              landing_page$abuttonexpmngt, 
-              placement = "right", 
+    bsTooltip(ns("abuttonexpmngt"),
+              landing_page$abuttonexpmngt,
+              placement = "right",
               options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonprmngt"),   Label = "Process Management"),
-    bsTooltip(ns("abuttonprmngt"), 
-              landing_page$abuttonprmngt, 
-              placement = "right", 
+    bsTooltip(ns("abuttonprmngt"),
+              landing_page$abuttonprmngt,
+              placement = "right",
               options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonfilemngt"), Label = "File Management"),
-    bsTooltip(ns("abuttonfilemngt"), 
-              landing_page$abuttonfilemngt, 
-              placement = "right", 
+    bsTooltip(ns("abuttonfilemngt"),
+              landing_page$abuttonfilemngt,
+              placement = "right",
               options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonsysconf"),  Label = "System Configuration"),
-    bsTooltip(ns("abuttonsysconf"), 
-              landing_page$abuttonsysconf, 
-              placement = "right", 
+    bsTooltip(ns("abuttonsysconf"),
+              landing_page$abuttonsysconf,
+              placement = "right",
               options   = list(container = "body"))
   )
-  
+
   sidebarCollapsed <- panel(
-    heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = TRUE), 
+    heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = TRUE),
     sidebar_button(ID = ns("abuttonexpmngt"),  Label = "EM"),
-    bsTooltip(ns("abuttonexpmngt"), 
-              landing_page$abuttonexpmngt, 
-              placement = "right", 
+    bsTooltip(ns("abuttonexpmngt"),
+              landing_page$abuttonexpmngt,
+              placement = "right",
               options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonprmngt"),   Label = "PM"),
-    bsTooltip(ns("abuttonprmngt"), 
-              landing_page$abuttonprmngt, 
-              placement = "right", 
+    bsTooltip(ns("abuttonprmngt"),
+              landing_page$abuttonprmngt,
+              placement = "right",
               options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonfilemngt"), Label = "FM"),
-    bsTooltip(ns("abuttonfilemngt"), 
-              landing_page$abuttonfilemngt, 
-              placement = "right", 
+    bsTooltip(ns("abuttonfilemngt"),
+              landing_page$abuttonfilemngt,
+              placement = "right",
               options   = list(container = "body")),
     sidebar_button(ID = ns("abuttonsysconf"),  Label = "SC"),
-    bsTooltip(ns("abuttonsysconf"), 
-              landing_page$abuttonsysconf, 
-              placement = "right", 
+    bsTooltip(ns("abuttonsysconf"),
+              landing_page$abuttonsysconf,
+              placement = "right",
               options   = list(container = "body"))
-    )
+  )
 
-  output$sidebar <- renderUI({sidebarExtended })
+  output$sidebar <- renderUI({sidebarExtended})
 
-  
-  observe(if( result$Width == 9 ) {
+  observe(if (result$Width == 9) {
     output$sidebar <- renderUI({sidebarExtended})
   } else {
     output$sidebar <- renderUI({sidebarCollapsed})
   })
-  
-  
-  ### Navigation Menu
-  
+
+  ### Navigation Menu ----
   observeEvent(input$abuttonhome,
                result$navigate <- structure("LP", count = input$abuttonhome))
-  
+
   observeEvent(input$abuttonexpmngt,
       result$navigate <- structure("EM", count = input$abuttonexpmngt))
-  
+
   observeEvent(input$abuttonprmngt,
       result$navigate <- structure("WF", count = input$abuttonprmngt))
-  
+
   observeEvent(input$abuttonfilemngt,
       result$navigate <- structure("FM", count = input$abuttonfilemngt))
-  
+
   observeEvent(input$abuttonsysconf,
       result$navigate <- structure("SC", count = input$abuttonsysconf))
-   
-  ### Button permissions
-  
+
+  ### Button permissions ----
   observe(if (active()) {
     invalidateLater(reloadMillis)
     landingPageButtonUpdate(session, dbSettings, userId())
-   })
-  
-  
-  
-  ### Module Output
-  
+  })
+
+  ### Module Output ----
   moduleOutput <- list(
-      navigate = reactive(result$navigate)
-   )
-  
+    navigate = reactive(result$navigate)
+  )
+
   return(moduleOutput)
-  
+
 }
 
-#@inheritParams pagestructure
+
 #' sidebar_button
 #' @description function containing the sidebar UI
 #' @inheritParams pagestructure
+#' @importFrom shinyBS bsButton
 #' @export
-
 sidebar_button <- function(ID, Label = NULL, Icon = NULL, Block = TRUE, Style = "btn btn-primary"){
   fluidRow(
-    bsButton(inputId = ID, label = Label, icon = Icon,
-              style = Style, color = "primary", size = "default", type = "action",
-              block = Block),
-  style = "margin:2%;"
+    bsButton(inputId = ID, label = Label, icon = Icon, style = Style,
+             color = "primary", size = "default", type = "action", block = Block),
+    style = "margin:2%;"
   )
 }
 
@@ -317,49 +294,39 @@ sidebar_button <- function(ID, Label = NULL, Icon = NULL, Block = TRUE, Style = 
 #' Landing Page Access Control
 #' @description Disable/Enable menu buttons based on permissions in database
 #' @inheritParams pagestructure
+#' @importFrom shinyBS updateButton
 #' @export
 landingPageButtonUpdate <- function(session, dbSettings, userId,
-    logMessage = message) {
-  
+                                    logMessage = message) {
+
   logMessage("Checking Permissions")
-  
+
   if (userId == FLAMINGO_GUEST_ID) return(NULL)
-  
+
+  .updateButton <- function(db_resourceId, btn_inputId) {
+    permission <- flamingoDBCheckPermissions(dbSettings, userId, db_resourceId)
+    if (identical(permission, character(0))) {
+      updateButton(session, btn_inputId, disabled = TRUE)
+    } else {
+      updateButton(session, btn_inputId, disabled = FALSE)
+    }
+  }
+
   # Not used anywhere else, probably just forgotten
-  # permission <- flamingoDBCheckPermissions(dbSettings, userId, "600")
-  # if(identical(permission, character(0))){
-  #   updateButton(session, "abuttonenquiry", disabled=TRUE)}
-  # else{updateButton(session, "abuttonenquiry", disabled=FALSE)}
-  # 
-  permission <- flamingoDBCheckPermissions(dbSettings, userId, "1000")
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonprmngt", disabled=TRUE)}
-  else{updateButton(session, "abuttonprmngt", disabled=FALSE)}
-  
-  permission <- flamingoDBCheckPermissions(dbSettings, userId, "700")
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonexpmngt", disabled=TRUE)}
-  else{updateButton(session, "abuttonexpmngt", disabled=FALSE)}
-  
-  permission <- flamingoDBCheckPermissions(dbSettings, userId, "904")
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonuseradmin", disabled=TRUE)}
-  else{updateButton(session, "abuttonuseradmin", disabled=FALSE)}
-  
+  # ("600", "abuttonenquiry")
+
+  .updateButton("1000", "abuttonprmngt")
+
+  .updateButton("700", "abuttonexpmngt")
+
+  .updateButton("904", "abuttonuseradmin")
+
   # Not used anywhere else, probably just forgotten
-  # permission <- flamingoDBCheckPermissions(dbSettings, userId, "950")
-  # if(identical(permission, character(0))){
-  #   updateButton(session, "abuttonworkflowadmin", disabled=TRUE)}
-  # else{updateButton(session, "abuttonworkflowadmin", disabled=FALSE)}
-  
-  permission <- flamingoDBCheckPermissions(dbSettings, userId, "200") 
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonsysconf", disabled=TRUE)}
-  else{updateButton(session, "abuttonsysconf", disabled=FALSE)}
-  
-  permission <- flamingoDBCheckPermissions(dbSettings, userId, "300")
-  if(identical(permission, character(0))){
-    updateButton(session, "abuttonfilemngt", disabled=TRUE)}
-  else{updateButton(session, "abuttonfilemngt", disabled=FALSE)}
-  
+  # ("950", "abuttonworkflowadmin")
+
+  .updateButton("200", "abuttonsysconf")
+
+  .updateButton("300", "abuttonfilemngt")
+
+  invisible()
 }
