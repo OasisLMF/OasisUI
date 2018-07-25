@@ -4,9 +4,11 @@
 \alias{getProcRunDetForFileOutput}
 \title{Get Process Run Details}
 \usage{
-getProcRunDetForFileOutput(processRunId)
+getProcRunDetForFileOutput(dbSettings, processRunId)
 }
 \arguments{
+\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+
 \item{processRunId}{process run id}
 }
 \value{

@@ -1,5 +1,5 @@
 # Flamingo Shiny
-# 
+#
 # (c) 2013-2017 Oasis LMF Ltd.
 # Software provided for early adopter evaluation only.
 ###############################################################################
@@ -9,6 +9,8 @@ source(file.path(".", "ui_auth.R"), local = TRUE)$value
 
 
 server <- function(input, output, session) {
+  
+  `%>%` <- magrittr::`%>%`
   
   result <- reactiveValues(
     userId = FLAMINGO_GUEST_ID,
@@ -31,7 +33,7 @@ server <- function(input, output, session) {
     return(auth)
   }) %>% debounce(100)
   
-  
+  # collapse / expand sidebar
   observeEvent(input$abuttoncollapsesidebar, {
     result$counter <- result$counter + 1
     if ((result$counter %% 2) == 0) {
@@ -42,40 +44,48 @@ server <- function(input, output, session) {
       result$WidthSide <- 1
     }
   })
-
-  ### submodules
   
+  ### submodules ----
   modules <- list()
   
-  pageheaderModule <- callModule(pageheader, "pageheader",
-                                 userId = reactive(result$userId),
-                                 userName = reactive(result$userName),
-                                 dbSettings = dbSettings,
-                                 reloadMillis = reloadMillis,
-                                 logMessage = logMessage,
-                                 active = reactive(authenticated() ))
   
-  pagestructureModule <- callModule(pagestructure, "pagestructure",
-                                    userId = reactive(result$userId),
-                                    userName = reactive(result$userName),
-                                    dbSettings = dbSettings,
-                                    reloadMillis = reloadMillis,
-                                    logMessage = logMessage,
-                                    active = reactive(authenticated() ),
-                                    W = reactive(result$WidthMain))
+  .callModule <- function(...) {
+    callModule(..., dbSettings = dbSettings)
+  }
   
-  landingPageModule <- callModule(landingPage, "landingPage",
-                                  userId = reactive(result$userId),
-                                  userName = reactive(result$userName),
-                                  dbSettings = dbSettings,
-                                  reloadMillis = reloadMillis,
-                                  logMessage = logMessage,
-                                  active = reactive(authenticated() && result$navigate == "LP"))
+  pageheaderModule <- .callModule(
+    pageheader, "pageheader",
+    userId = reactive(result$userId),
+    userName = reactive(result$userName),
+    reloadMillis = reloadMillis,
+    logMessage = logMessage,
+    active = reactive(authenticated())
+  )
   
-  loginDialogModule <- callModule(loginDialog, "login",
-                                  dbSettings = dbSettings,
-                                  logMessage = logMessage,
-                                  logout = reactive(pageheaderModule$logout()))
+  pagestructureModule <- .callModule(
+    pagestructure, "pagestructure",
+    userId = reactive(result$userId),
+    userName = reactive(result$userName),
+    reloadMillis = reloadMillis,
+    logMessage = logMessage,
+    active = reactive(authenticated()),
+    W = reactive(result$WidthMain)
+  )
+  
+  landingPageModule <- .callModule(
+    landingPage, "landingPage",
+    userId = reactive(result$userId),
+    userName = reactive(result$userName),
+    reloadMillis = reloadMillis,
+    logMessage = logMessage,
+    active = reactive(authenticated() && result$navigate == "LP")
+  )
+  
+  loginDialogModule <- .callModule(
+    loginDialog, "login",
+    logMessage = logMessage,
+    logout = reactive(pageheaderModule$logout())
+  )
   
   accountDefinitionModule <- callModule(accountDefinition,
                                         id = "accountDefinition",
@@ -83,26 +93,26 @@ server <- function(input, output, session) {
                                         active = reactive(authenticated() && result$navigate == "DA"))
   
   programmeDefinitionSingleModule <- callModule(programmeDefinitionSingle,
-                                        id = "programmeDefinitionSingle",
-                                        dbSettings = dbSettings,
-                                        apiSettings = apiSettings,
-                                        userId = reactive(result$userId),
-                                        preselRunId = landingPageModule$runId,
-                                        preselProcId = landingPageModule$procId,
-                                        logMessage = logMessage,
-                                        reloadMillis = reloadMillis,
-                                        active = reactive(authenticated() && result$navigate == "PS"))
-
+                                                id = "programmeDefinitionSingle",
+                                                dbSettings = dbSettings,
+                                                apiSettings = apiSettings,
+                                                userId = reactive(result$userId),
+                                                preselRunId = landingPageModule$runId,
+                                                preselProcId = landingPageModule$procId,
+                                                logMessage = logMessage,
+                                                reloadMillis = reloadMillis,
+                                                active = reactive(authenticated() && result$navigate == "PS"))
+  
   programmeDefinitionBatchModule <- callModule(programmeDefinitionBatch,
-                                        id = "programmeDefinitionBatch",
-                                        dbSettings = dbSettings,
-                                        apiSettings = apiSettings,
-                                        userId = reactive(result$userId),
-                                        preselRunId = landingPageModule$runId,
-                                        preselProcId = landingPageModule$procId,
-                                        logMessage = logMessage,
-                                        reloadMillis = reloadMillis,
-                                        active = reactive(authenticated() && result$navigate == "PB"))
+                                               id = "programmeDefinitionBatch",
+                                               dbSettings = dbSettings,
+                                               apiSettings = apiSettings,
+                                               userId = reactive(result$userId),
+                                               preselRunId = landingPageModule$runId,
+                                               preselProcId = landingPageModule$procId,
+                                               logMessage = logMessage,
+                                               reloadMillis = reloadMillis,
+                                               active = reactive(authenticated() && result$navigate == "PB"))
   
   browseprogrammesModule <- callModule(browseprogrammes,
                                        id = "browseprogrammes",
@@ -113,56 +123,61 @@ server <- function(input, output, session) {
                                        reloadMillis = reloadMillis,
                                        active = reactive(authenticated() && result$navigate == "BR"))
   
-  programmeDefinitionModule <- callModule(programmeDefinition,
-                                          id = "programmeDefinition",
-                                          dbSettings = dbSettings,
-                                          apiSettings = apiSettings,
-                                          userId = reactive(result$userId),
-                                          logMessage = logMessage,
-                                          reloadMillis = reloadMillis,
-                                          active = reactive(authenticated() && input$em == "defineProg"))
+  programmeDefinitionModule <- .callModule(
+    programmeDefinition,
+    id = "programmeDefinition",
+    apiSettings = apiSettings,
+    userId = reactive(result$userId),
+    logMessage = logMessage,
+    reloadMillis = reloadMillis,
+    active = reactive(authenticated() && input$em == "defineProg")
+  )
   
   # accountDefinitionModule <- callModule(accountDefinition,
   #                                       id = "accountDefinition",
   #                                       dbSettings = dbSettings,
   #                                       active = reactive(authenticated() && input$em == "defineAccount"))
   
-  processRunPageModule <- callModule(processRunPage,
-                                     id = "processRunPage",
-                                     dbSettings = dbSettings,
-                                     apiSettings = apiSettings,
-                                     logMessage = logMessage,
-                                     userId = reactive(result$userId),
-                                     active = reactive(authenticated() ), #&& input$pr == "processrun"),
-                                     preselRunId = landingPageModule$runId,
-                                     preselProcId = landingPageModule$procId,
-                                     progOasisId = programmeDefinitionModule$progOasisId,
-                                     reloadMillis = reloadMillis)
+  processRunPageModule <- .callModule(
+    processRunPage,
+    id = "processRunPage",
+    apiSettings = apiSettings,
+    logMessage = logMessage,
+    userId = reactive(result$userId),
+    active = reactive(authenticated()), #&& input$pr == "processrun"),
+    preselRunId = landingPageModule$runId,
+    preselProcId = landingPageModule$procId,
+    progOasisId = programmeDefinitionModule$progOasisId,
+    reloadMillis = reloadMillis
+  )
   
-  fileViewerModule <- callModule(fileViewer,
-                                 id = "fileViewer",
-                                 dbSettings = dbSettings,
-                                 logMessage = logMessage,
-                                 active = reactive(authenticated() )) #&& input$fm == "fileviewer"))
+  fileViewerModule <- .callModule(
+    fileViewer,
+    id = "fileViewer",
+    logMessage = logMessage,
+    active = reactive(authenticated()) #&& input$fm == "fileviewer"))
+  )
   
-  modelSupplierPageModule <- callModule(modelSupplierPage,
-                                        id = "modelSupplierPage",
-                                        dbSettings = dbSettings,
-                                        active = reactive(authenticated() ))# && input$sc == "Model"))
+  modelSupplierPageModule <- .callModule(
+    modelSupplierPage,
+    id = "modelSupplierPage",
+    active = reactive(authenticated())# && input$sc == "Model"))
+  )
   
-  userAdminDefinitionModule <- callModule(userAdminDefinition,
-                                          id = "userAdminDefinition",
-                                          dbSettings = dbSettings,
-                                          active = reactive(authenticated() && input$ua == "defineuser"),
-                                          userId = reactive(result$userId))
+  userAdminDefinitionModule <- .callModule(
+    userAdminDefinition,
+    id = "userAdminDefinition",
+    active = reactive(authenticated() && input$ua == "defineuser"),
+    userId = reactive(result$userId)
+  )
   
-  companyDefinitionModule <- callModule(companyDefinition,
-                                        id = "companyDefinition",
-                                        dbSettings = dbSettings,
-                                        active = reactive(authenticated() && input$ua == "definecompany"))
-
-  ### authentication
+  companyDefinitionModule <- .callModule(
+    companyDefinition,
+    id = "companyDefinition",
+    active = reactive(authenticated() && input$ua == "definecompany")
+  )
   
+  ### authentication ----
   output$id <- reactive(result$userId)
   outputOptions(output, "id", suspendWhenHidden = FALSE)
   
@@ -171,14 +186,13 @@ server <- function(input, output, session) {
     result$userName <- loginDialogModule$userName()
   })
   
-  output$authUI <- renderUI(if (result$userId != FLAMINGO_GUEST_ID) authUI(WidthSide = result$WidthSide, WidthMain = result$WidthMain))
+  output$authUI <- renderUI(
+    if (result$userId != FLAMINGO_GUEST_ID) authUI(WidthSide = result$WidthSide, WidthMain = result$WidthMain)
+  )
   
   observe(result$logout <- pageheaderModule$logout())
   
-  
-  
-  ### navigation
-  
+  ### navigation ----
   observe(if (authenticated()) {
     if (!is.null(page <- pageheaderModule$navigate())) {
       result$navigate <- page
@@ -190,7 +204,6 @@ server <- function(input, output, session) {
       result$navigate <- page
     }
   })
-  
   
   observe(if (authenticated()) {
     if (!is.null(page <- landingPageModule$navigate())) {
@@ -237,7 +250,7 @@ server <- function(input, output, session) {
              loginfo(paste("Navigate to Define Programme Single, userId: ", result$userId),
                      logger = "flamingo.module")
            },
-
+           
            "PB" = { # go to Define Define programme batch submenu
              loginfo(paste("Navigate to Define Programme Batch, userId: ", result$userId),
                      logger = "flamingo.module")
@@ -276,7 +289,9 @@ server <- function(input, output, session) {
            },
            
            stop("page does not exist")
+           
     )
+    
   })
   
 }

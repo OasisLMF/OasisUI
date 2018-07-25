@@ -1,7 +1,7 @@
 
 #' Convenience function to execute database queries
 #' @description Opens a new connection to the database, executes the given
-#' query statement and then closes the connection again. 
+#' query statement and then closes the connection again.
 #' @param dbSettings setting object as returned by e.g. \link{flamingoDB}
 #' @param statement query statement to execute, e.g. as returned by
 #' \link{buildDbQuery}
@@ -15,46 +15,46 @@
 #' \code{simplify} is set to \code{TRUE}. \code{NULL} if no result
 #' can be returned.
 #' @importFrom DBI dbGetQuery dbConnect dbDisconnect
-#' @export 
+#' @export
 executeDbQuery <- function(dbSettings, statement, simplify = FALSE,
     verbose = FALSE, logMessage = message, logError = logMessage, ...) {
-  
+
   if (!any(class(dbSettings) == "flamingoDB")) {
     stop("invalid database settings")
   }
-  
+
   conn <- do.call(dbConnect, dbSettings)
   on.exit(dbDisconnect(conn))
-  
+
   dbGetQuery(conn, "SET ANSI_NULLS ON")
   dbGetQuery(conn, "SET ANSI_WARNINGS ON")
   dbGetQuery(conn, paste("use", dbSettings$database))
-  
+
   if (verbose) logMessage(statement)
-  
+
   res <- NULL
-  
+
   tryCatch({
         res <- dbGetQuery(conn, statement, ...)
       }, error = function(e) {
         if (verbose) logMessage(e$message)
       })
-  
+
   if (simplify) {
     if (ncol(res) > 1) {
       stop("cannot simplify: result contains more than one column")
     }
     res <- res[,1]
   }
-  
+
   return(res)
-  
+
 }
 
 
 #' Convenience function to construct query statements
 #' @description Constructs query statements that can be executed with
-#' \link{dbExecute}. 
+#' \link{dbExecute}.
 #' @param dbFunc database function to call
 #' @param ... arguments to \code{dbFunc}. \code{character()} args are quoted
 #' with single quotes (').
@@ -65,9 +65,9 @@ buildDbQuery <- function(
     dbFunc, ...,
     dboPrefix = TRUE,
     squareBrackets = FALSE) {
-  
+
   args <- list(...)
-  
+
   args <- sapply(args, function(x) {
         if (is.character(x)) {
           return(paste0("'", x, "'"))
@@ -75,18 +75,18 @@ buildDbQuery <- function(
           return(as.character(x))
         }
       })
-  
+
   if (dboPrefix) {
     dbFunc <- paste0("dbo.", dbFunc)
   }
-  
+
   stmt <- paste0("exec ", dbFunc, " ",
       if (squareBrackets) "[",
       paste(collapse = ", ", args),
       if (squareBrackets) "]")
-  
+
   return(trimws(stmt))
-  
+
 }
 
 #' Create a database settings object for the Flamingo Database
@@ -108,8 +108,9 @@ flamingoDB <- function(
     uid,
     pwd,
     driver = "{FreeTDS}") {
-  
+
   struct <- structure(
+      # this flamingoDB class thing doesn't really add anything (isn't used anywhere)
       class = c("flamingoDB", "list"),
       list(
           drv = odbc(),
@@ -119,9 +120,9 @@ flamingoDB <- function(
           uid = uid,
           pwd = pwd,
           driver = driver))
-  
+
   return(struct)
-  
+
 }
 
 ### Authentication / Authorization
@@ -134,10 +135,10 @@ flamingoDB <- function(
 #' @return user id if succesful, -1 otherwise
 #' @export
 flamingoDBLogin <- function(dbSettings, uid, pwd) {
-  
+
   stmt <- buildDbQuery("BFELogin", uid, pwd)
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(as.numeric(res))
 }
 
@@ -153,7 +154,7 @@ flamingoDBCheckPermissions <- function(dbSettings, userId, resourceId) {
 
   stmt <- buildDbQuery("getResourceModeUser", userId, as.numeric(resourceId))
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res[,1])
 }
 
@@ -173,10 +174,10 @@ flamingoDBCheckPermissions <- function(dbSettings, userId, resourceId) {
 #' }
 #' @export
 getCompanyList <- function(dbSettings) {
-  
+
   stmt <- paste("exec dbo.getCompanies")
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -195,10 +196,10 @@ getCompanyList <- function(dbSettings) {
 #' }
 #' @export
 getInboxData <- function(dbSettings, userId, ...) {
-  
+
   stmt <- paste0("exec dbo.getUserProcessDetails ", userId)
   res <- executeDbQuery(dbSettings, stmt, ...)
-  
+
   return(res)
 }
 
@@ -217,12 +218,12 @@ getInboxData <- function(dbSettings, userId, ...) {
 #' @export
 getProcessData <- function(dbSettings, pruser, prmodel, prprogramme,
     prworkflow) {
-  
+
   stmt <- buildDbQuery("getProcessData", pruser, prmodel, prprogramme,
       prworkflow)
-  
+
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -235,9 +236,9 @@ getProcessData <- function(dbSettings, pruser, prmodel, prprogramme,
 #' }
 #' @export
 getOasisSystemId <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getOasisSystemID"))
-  
+
   return(res)
 }
 
@@ -247,11 +248,11 @@ getOasisSystemId <- function(dbSettings) {
 #' @param prstatus process status
 #' @export
 getProcessRun <- function(dbSettings, procid, prstatus) {
-  
+
   stmt <- buildDbQuery("ListProcessRun", procid, prstatus)
-  
+
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -268,18 +269,18 @@ getProcessRun <- function(dbSettings, procid, prstatus) {
 #' }
 #' @export
 getProcessRunDetails <- function(dbSettings, wfid) {
-  
+
   if ( wfid != 0 ) {
-    
+
     res <- executeDbQuery(dbSettings, buildDbQuery("getProcessRunDetails", wfid))
-  
+
   } else {
-    
+
     warning("workflow id is 0; returning NULL")
     res <- NULL
-    
+
   }
-  
+
   return(res)
 }
 
@@ -289,32 +290,32 @@ getProcessRunDetails <- function(dbSettings, wfid) {
 #' @param prrunid process run id
 #' @return output files; \code{data.frame} of 10 variables:
 #' \itemize{
-#'     \item \code{FileID} 
-#'     \item \code{File Name} 
-#'     \item \code{Description} 
-#'     \item \code{Location} 
-#'     \item \code{Location Unix} 
-#'     \item \code{File Type} 
-#'     \item \code{Owner} 
-#'     \item \code{Source} 
-#'     \item \code{Resource Table} 
-#'     \item \code{Resource Key} 
+#'     \item \code{FileID}
+#'     \item \code{File Name}
+#'     \item \code{Description}
+#'     \item \code{Location}
+#'     \item \code{Location Unix}
+#'     \item \code{File Type}
+#'     \item \code{Owner}
+#'     \item \code{Source}
+#'     \item \code{Resource Table}
+#'     \item \code{Resource Key}
 #' }
 #' @export
 getFileList <- function(dbSettings, prrunid) {
-  
+
   if ( prrunid != 0) {
-    
+
     stmt <- paste("exec dbo.getFileViewerTable @ProcessRunID = ", prrunid)
     res <- executeDbQuery(dbSettings, stmt)
-    
+
   } else {
-    
+
     warning("process run id is 0; returning NULL")
     res <- NULL
-    
+
   }
-  
+
   return(res)
 }
 
@@ -323,10 +324,10 @@ getFileList <- function(dbSettings, prrunid) {
 #' @return output options
 #' @export
 getOutputOptions <- function(dbSettings, simplify = TRUE) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getOutputOptions"),
       simplify = simplify)
-  
+
   return(res)
 }
 
@@ -334,12 +335,12 @@ getOutputOptions <- function(dbSettings, simplify = TRUE) {
 #' @inheritParams executeDbQuery
 #' @param prgoasisid oasis programme id
 #' @return event set
-#' @export 
+#' @export
 getEventSet <- function(dbSettings, prgoasisid, simplify = TRUE){
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getEventSet", prgoasisid),
       simplify = simplify)
-  
+
   return(res)
 }
 
@@ -349,10 +350,10 @@ getEventSet <- function(dbSettings, prgoasisid, simplify = TRUE){
 #' @return event occurrence
 #' @export
 getEventOccurrence <- function(dbSettings, prgoasisid, simplify = TRUE) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getEventOccurrence", prgoasisid),
       simplify = simplify)
-  
+
   return(res)
 }
 
@@ -366,9 +367,9 @@ getEventOccurrence <- function(dbSettings, prgoasisid, simplify = TRUE) {
 #' }
 #' @export
 getResourceType <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getResourceType"))
-  
+
   return(res)
 }
 
@@ -382,9 +383,9 @@ getResourceType <- function(dbSettings) {
 #' }
 #' @export
 getModelList <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getmodel"))
-  
+
   return(res)
 }
 
@@ -393,13 +394,13 @@ getModelList <- function(dbSettings) {
 #' @return \code{data.frame} of 2 variables:
 #' \itemize{
 #' 		\item \code{FileName}
-#' 		\item \code{FileId} 
+#' 		\item \code{FileId}
 #' }
 #' @export
 getFileSourceAccountFile <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getFileSourceAccountFile"))
-  
+
   return(res)
 }
 
@@ -408,13 +409,13 @@ getFileSourceAccountFile <- function(dbSettings) {
 #' @return transforms; \code{data.frame} of 2 variables:
 #' \itemize{
 #' 		\item \code{TransformName}
-#' 		\item \code{TransformID} 
+#' 		\item \code{TransformID}
 #' }
 #' @export
 getTransformNameSourceCan <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getTransformNameSourceCan"))
-  
+
   return(res)
 }
 
@@ -423,13 +424,13 @@ getTransformNameSourceCan <- function(dbSettings) {
 #' @return \code{data.frame} of 2 variables:
 #' \itemize{
 #' 		\item \code{Account ID}
-#' 		\item \code{progOasisId} 
+#' 		\item \code{progOasisId}
 #' }
 #' @export
 getAccountName <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getAccount"))
-  
+
   return(res)
 }
 
@@ -442,9 +443,9 @@ getAccountName <- function(dbSettings) {
 #' }
 #' @export
 getTransformNameCanModel <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, paste("exec dbo.getTransformNameCanModel"))
-  
+
   return(res)
 }
 
@@ -457,9 +458,9 @@ getTransformNameCanModel <- function(dbSettings) {
 #' }
 #' @export
 getFileSourceLocationFile <- function(dbSettings){
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getFileSourceLocationFile"))
-  
+
   return(res)
 }
 
@@ -471,21 +472,21 @@ getFileSourceLocationFile <- function(dbSettings){
 #' 		\item \code{ProgOasisId}
 #' 		\item \code{ProgName}
 #' 		\item \code{ModelName}
-#' 		\item \code{TransformName} 
+#' 		\item \code{TransformName}
 #' 		\item \code{SourceFileId}
-#' 		\item \code{FileID} 
+#' 		\item \code{FileID}
 #' 		\item \code{Status}
-#' 		\item \code{API1aDateTime} 
+#' 		\item \code{API1aDateTime}
 #' 		\item \code{API1bDateTime}
-#' 		\item \code{API1cDateTime} 
+#' 		\item \code{API1cDateTime}
 #' 		\item \code{SessionId}
 #' }
 #' @export
 getProgOasisForProgdata <- function(dbSettings, progId) {
-  
+
   stmt <- buildDbQuery("getProgOasisForProg", progId)
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -504,9 +505,9 @@ getProgOasisForProgdata <- function(dbSettings, progId) {
 #' }
 #' @export
 getProgrammeList <- function (dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, paste("exec dbo.getProgData"))
-  
+
   return(res)
 }
 
@@ -517,10 +518,10 @@ getProgrammeList <- function (dbSettings) {
 #' @param userId user id
 #' @export
 getDeptData <- function(dbSettings, userId) {
-  
+
   stmt <- buildDbQuery("getUserDepartment", userId)
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -533,9 +534,9 @@ getDeptData <- function(dbSettings, userId) {
 #' }
 #' @export
 getSecurityGroups <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings, buildDbQuery("getSecurityGroups"))
-  
+
   return(res)
 }
 
@@ -548,10 +549,10 @@ getSecurityGroups <- function(dbSettings) {
 #' }
 #' @export
 getOasisUsers <- function(dbSettings) {
-  
+
   res <- executeDbQuery(dbSettings,
       paste("select OasisUserID, OasisUserName from dbo.OasisUser"))
-  
+
   return(res)
 }
 
@@ -561,10 +562,10 @@ getOasisUsers <- function(dbSettings) {
 #' @return param details
 #' @export
 getProcRunParamFileOutput <- function(dbSettings, processRunId){
-  
+
   stmt <- buildDbQuery("getUserParamsForProcessRun", processRunId)
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -572,12 +573,12 @@ getProcRunParamFileOutput <- function(dbSettings, processRunId){
 #' @inheritParams executeDbQuery
 #' @param processRunId process run id
 #' @return process run details
-#' @export 
-getProcRunDetForFileOutput <- function(processRunId) {
-  
+#' @export
+getProcRunDetForFileOutput <- function(dbSettings, processRunId) {
+
   stmt <- buildDbQuery("getProcessRunDetailsForFileOutput", processRunId)
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -622,11 +623,11 @@ createFileRecord <- function(dbSettings, fileName, fileDesc,
 #' @return Prog Oasis id
 #' @export
 createProgOasis <- function(dbSettings, progId, modelId, transformId) {
-  
+
   stmt <- buildDbQuery("createProgOasis", progId, modelId, transformId)
-  
+
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -647,12 +648,12 @@ createModelResource <- function(
     oasissys,
     modelid,
     modresval) {
-  
+
   stmt <- buildDbQuery("createModelResource", modresname, restype, oasissys,
       modelid, modresval)
-  
+
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -673,12 +674,12 @@ updateModelResource <- function(
     oasissys,
     modelid,
     modresval) {
-  
+
   stmt <- buildDbQuery("updateModelResource", modresid, modresname, restype,
       oasissys, modelid, modresval)
-  
+
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 
@@ -691,11 +692,11 @@ updateModelResource <- function(
 #' @return model resource id
 #' @export
 deleteModelResource <- function(dbSettings, modresid) {
-  
+
   stmt <- buildDbQuery("deleteModelResource", modresid)
-  
+
   res <- executeDbQuery(dbSettings, stmt)
-  
+
   return(res)
 }
 

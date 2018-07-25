@@ -24,6 +24,7 @@ Imports:
   dplyr
 Suggests:
   knitr,
-  testthat
+  testthat,
+  magrittr
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr

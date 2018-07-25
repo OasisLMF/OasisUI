@@ -13,7 +13,7 @@ getFileSourceAccountFile(dbSettings)
 \code{data.frame} of 2 variables:
 \itemize{
 		\item \code{FileName}
-		\item \code{FileId} 
+		\item \code{FileId}
 }
 }
 \description{
