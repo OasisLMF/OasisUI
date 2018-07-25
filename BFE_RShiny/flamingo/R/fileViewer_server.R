@@ -4,8 +4,9 @@
 #' @param userId user id
 #' @param preselRunId preselected run id
 #' @return empty list
-#' @importFrom DT renderDataTable
+#' @importFrom DT renderDataTable dataTableProxy selectRows
 #' @importFrom shinyjs show hide
+#' @importFrom utils read.csv zip
 #' @rdname fileViewer
 #' @export
 fileViewer <- function(

@@ -4,7 +4,7 @@
 #' geo details.
 #' @param address server address
 #' @return \code{data.frame} with details. If no match is found, the result
-#' is a \code{data.frame} of \code{NA} values.
+#' is a \code{data.frame} of \code{NA} values.\@importFrom ggmap geocode
 #' @export
 getGeoDetails <- function(address) {   
   geo_reply <- geocode(address, output = "all", messaging = TRUE,

@@ -10,10 +10,12 @@
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater}; 
 #' @return empty list
-#' @importFrom DT renderDataTable
+#' @importFrom DT renderDataTable dataTableProxy selectRows
 #' @importFrom shinyjs enable disable show hide
 #' @importFrom plotly renderPlotly
 #' @importFrom dplyr mutate
+#' @importFromutils read.csv
+#' @importFrom shinyBS toggleModal
 #' @export
 processRunPage <- function(
   input,

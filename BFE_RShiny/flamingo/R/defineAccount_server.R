@@ -7,6 +7,7 @@
 #' @import shiny
 #' @importFrom shinyjs onclick show disable enable hide
 #' @importFrom DT renderDataTable datatable
+#' @importFrom shinyBS toggleModal
 #' @rdname accountDefinition
 #' @export
 accountDefinition <- function(input, output, session, dbSettings,

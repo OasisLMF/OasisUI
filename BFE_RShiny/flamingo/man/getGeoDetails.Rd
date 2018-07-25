@@ -11,7 +11,7 @@ getGeoDetails(address)
 }
 \value{
 \code{data.frame} with details. If no match is found, the result
-is a \code{data.frame} of \code{NA} values.
+is a \code{data.frame} of \code{NA} values.\@importFrom ggmap geocode
 }
 \description{
 this function can be used to query google servers for

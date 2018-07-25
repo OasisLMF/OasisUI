@@ -6,8 +6,10 @@
 #' @return list of reactives:
 #' @rdname programmeDefinitionSingle
 #' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDataTable
+#' @importFrom DT renderDataTable dataTableProxy selectRows
 #' @importFrom dplyr mutate
+#' @importFrom shinyBS toggleModal
+#' @importFrom shinyWidgets updateSliderTextInput
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                       apiSettings, userId, active = reactive(TRUE), logMessage = message,

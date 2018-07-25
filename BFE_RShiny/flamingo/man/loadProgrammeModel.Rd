@@ -17,7 +17,7 @@ loadProgrammeModel(apiSettings, progOasisId, logWarning = function(w) warning,
 \item{...}{additional arguments to \link{httr::GET}}
 }
 \value{
-http status category
+http status category warn_for_status
 }
 \description{
 A function to load Programme data.

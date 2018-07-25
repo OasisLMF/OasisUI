@@ -6,6 +6,7 @@
 #' @rdname modelSupplierPage
 #' @importFrom DT renderDataTable
 #' @importFrom shinyjs hide show onclick
+#' @importFrom shinyBS toggleModal
 #' @export
 modelSupplierPage <- function(input, output, session, dbSettings,
     logMessage = message, active = reactive(TRUE)) {

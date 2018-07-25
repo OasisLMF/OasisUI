@@ -8,6 +8,7 @@
 #' @rdname userAdminDefinition
 #' @importFrom DT renderDataTable
 #' @importFrom shinyjs enable disable
+#' @importFrom shinyBS toggleModal
 #' @export
 userAdminDefinition <- function(input, output, session, dbSettings, userId,
     active = reactive(TRUE)) {

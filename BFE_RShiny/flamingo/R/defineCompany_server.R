@@ -5,6 +5,7 @@
 #' @param userId reactive expression yielding user id
 #' @return empty list
 #' @importFrom DT renderDataTable
+#' @importFrom shinyBS toggleModal
 #' @rdname companyDefinition
 #' @export
 companyDefinition <- function(input, output, session, dbSettings, userId,

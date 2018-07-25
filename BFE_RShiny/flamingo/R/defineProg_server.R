@@ -13,6 +13,7 @@
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDataTable
 #' @importFrom dplyr mutate
+#' @importFrom shinyBS toggleModal
 #' @export
 programmeDefinition <- function(input, output, session, dbSettings,
     apiSettings, userId, active = reactive(TRUE), logMessage = message,

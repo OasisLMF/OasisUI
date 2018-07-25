@@ -4,6 +4,9 @@
 #' @description plot EP Curve
 #' @param AEPData AEP data
 #' @param years years
+#' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
+#' @importFrom graphics lines graphics
+#' @importFrom data.table melt
 #' @export
 plotAEPCurve <- function(AEPData, years = 1000) {
 
@@ -30,6 +33,9 @@ plotAEPCurve <- function(AEPData, years = 1000) {
 #' @param interactive create interactive plot using \link{plotly::plot_ly}
 #' @return nothing; the interactive plot object if \code{interactive = TRUE}
 #' @importFrom plotly plot_ly add_trace layout
+#' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
+#' @importFrom graphics lines graphics
+#' @importFrom data.table melt
 #' @export
 plotIL <- function(outputPlotData, interactive = FALSE, ...) {
   
@@ -40,8 +46,8 @@ plotIL <- function(outputPlotData, interactive = FALSE, ...) {
     IL_OEP <- outputPlotData$IL_OEP
     
     options("scipen" = 100, "digits" = 4)
-    plot(x=returnPeriod, y=IL_AEP, ylab = "Loss", type = "o", col = "red", ...)+
-        lines(x=returnPeriod, y=IL_OEP, type = "o", col = "blue")
+    plot(x=returnPeriod, y = IL_AEP, ylab = "Loss", type = "o", col = "red", ...)+
+        lines(x = returnPeriod, y = IL_OEP, type = "o", col = "blue")
     
     invisible()
     
@@ -67,6 +73,9 @@ plotIL <- function(outputPlotData, interactive = FALSE, ...) {
 #' @param interactive create interactive plot using \link{plotly::plot_ly}
 #' @return nothing; the interactive plot object if \code{interactive = TRUE}
 #' @importFrom plotly plot_ly add_trace layout
+#' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
+#' @importFrom graphics lines graphics
+#' @importFrom data.table melt
 #' @export
 plotGUL <- function(outputPlotData, interactive = FALSE, ...) {
   
