@@ -247,12 +247,12 @@ server <- function(input, output, session) {
            },
            
            "PS" = { # go to Define programme single submenu
-             loginfo(paste("Navigate to Define Programme Single, userId: ", result$userId),
+             loginfo(paste("Navigate to Define Process Single, userId: ", result$userId),
                      logger = "flamingo.module")
            },
            
            "PB" = { # go to Define Define programme batch submenu
-             loginfo(paste("Navigate to Define Programme Batch, userId: ", result$userId),
+             loginfo(paste("Navigate to Define Process Batch, userId: ", result$userId),
                      logger = "flamingo.module")
            },
            
