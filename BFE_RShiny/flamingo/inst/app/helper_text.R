@@ -8,12 +8,12 @@ file_Viewer <- list(
 )
 
 landing_page <- list(
-  abuttonrun = "Define account and programme to run",
+  abuttonrun = "Define process to run",
   abuttonbrowse = "Visualize outputs",
   abuttondefineaccount = "Create/amend/delete account",
-  abuttondefineprogramme = "Create/amend/delete Programme; Associate Model; Run Model",
-  abuttondefineprogrammesingle = "Define single Programme Run",
-  abuttondefineprogrammebatch = "Define batch Programeme Run",
+  abuttondefineprogramme = "Create/amend/delete Programme; Associate Model; Run Process",
+  abuttondefineprogrammesingle = "Define single Process Run",
+  abuttondefineprogrammebatch = "Define batch Process Run",
   abuttongotorun = "Go to run details",
   PRIdownloadexcel = "Download files table",
   abuttonexpmngt = "Define the exposure inputs",
