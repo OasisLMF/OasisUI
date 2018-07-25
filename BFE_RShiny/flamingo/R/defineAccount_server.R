@@ -58,7 +58,7 @@ accountDefinition <- function(input, output, session, dbSettings,
       })
   
   output$DAAdownloadexcel <- downloadHandler(
-      filename ="accounts.csv",
+      filename = "accounts.csv",
       content = function(file) {
         write.csv(result$DAAccountData, file)}
   )
@@ -95,7 +95,7 @@ accountDefinition <- function(input, output, session, dbSettings,
   
   onclick("abuttonAccSubmit", {
         
-        if (result$accFlag == "C"){
+        if (result$accFlag == "C") {
           
           stmt <- buildDbQuery("createAccount", input$tinputDAAccountName,
               squareBrackets = FALSE)
@@ -138,7 +138,7 @@ accountDefinition <- function(input, output, session, dbSettings,
         
         toggleModal(session, "crtupModal", toggle = "close")
         
-        updateTextInput(session, "tinputDAAccountName", value="")
+        updateTextInput(session, "tinputDAAccountName", value = "")
         result$accFlag <- ""
         
         reloadDAAccountData()
@@ -148,7 +148,7 @@ accountDefinition <- function(input, output, session, dbSettings,
   onclick("abuttonAccCancel",{
         
         result$accFlag <- ""
-        updateTextInput(session, "tinputDAAccountName", value="")
+        updateTextInput(session, "tinputDAAccountName", value = "")
         
         toggleModal(session, "crtupModal", toggle = "close")
         
