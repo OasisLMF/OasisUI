@@ -5,7 +5,7 @@
 #' @param AEPData AEP data
 #' @param years years
 #' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
-#' @importFrom graphics lines graphics
+#' @importFrom graphics lines plot
 #' @importFrom data.table melt
 #' @export
 plotAEPCurve <- function(AEPData, years = 1000) {
@@ -34,7 +34,7 @@ plotAEPCurve <- function(AEPData, years = 1000) {
 #' @return nothing; the interactive plot object if \code{interactive = TRUE}
 #' @importFrom plotly plot_ly add_trace layout
 #' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
-#' @importFrom graphics lines graphics
+#' @importFrom graphics lines plot
 #' @importFrom data.table melt
 #' @export
 plotIL <- function(outputPlotData, interactive = FALSE, ...) {
@@ -74,7 +74,7 @@ plotIL <- function(outputPlotData, interactive = FALSE, ...) {
 #' @return nothing; the interactive plot object if \code{interactive = TRUE}
 #' @importFrom plotly plot_ly add_trace layout
 #' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
-#' @importFrom graphics lines graphics
+#' @importFrom graphics lines plot
 #' @importFrom data.table melt
 #' @export
 plotGUL <- function(outputPlotData, interactive = FALSE, ...) {

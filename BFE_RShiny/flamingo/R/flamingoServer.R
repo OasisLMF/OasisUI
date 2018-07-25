@@ -5,7 +5,7 @@
 #' @param logWarning warning message callback
 #' @param ... additional arguments to \link{httr::GET}
 #' @return http status category warn_for_status
-#' @importFrom http http_status
+#' @importFrom httr http_status
 #' @export
 loadProgrammeModel <- function(
     apiSettings,
