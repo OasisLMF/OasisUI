@@ -620,11 +620,11 @@ defineIDsUI <- function(id) {
   ns <- NS(id)
   panel(
     fluidRow(
-      div(id = ns("divselectprogammeID"), 
+      div(id = ns("divselectprogrammeID"), 
           column(5,
-                 selectInput(inputId =  ns("selectprogammeID"), label = "Programme ID", choices = "", selected = NULL),
-                 bsTooltip(ns("selectprogammeID"), 
-                           programme_Definition_Single$selectprogammeID, 
+                 selectInput(inputId =  ns("selectprogrammeID"), label = "Programme ID", choices = "", selected = NULL),
+                 bsTooltip(ns("selectprogrammeID"), 
+                           programme_Definition_Single$selectprogrammeID, 
                            placement = "right", 
                            options   = list(container = "body"))
           )),
