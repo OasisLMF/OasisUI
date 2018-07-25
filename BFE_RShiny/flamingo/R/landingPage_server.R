@@ -14,6 +14,7 @@
 #' @importFrom DT renderDataTable datatable
 #' @importFrom dplyr mutate '%>%'
 #' @importFrom utils write.csv
+#' @importFrom shinyWidgets dropdown
 #' @export
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
@@ -99,6 +100,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
 #' }
+#' @importFrom shinyWidgets dropdown
 #' @export
 pageheader <- function(input, output, session, userId, userName, dbSettings,
                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
@@ -115,6 +117,9 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   observeEvent(input$abuttonuseradmin,
                result$navigate <- structure("UA", count = input$abuttonuseradmin))#,
   #shinyjs::hide(id = "accountDDmenu"))
+  
+  observeEvent(input$abuttondefineaccount,
+               result$navigate <- structure("DA", count = input$abuttondefineaccount))
   
   observeEvent(input$abuttonsysconf,
                result$navigate <- structure("SC", count = input$abuttonsysconf))
@@ -203,34 +208,21 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     dropdown(
       inputId = ns("abuttonrun"),
       status = "primary",
-      label = "Run",
+      label = "Process",
       circle = FALSE,
       tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
-      actionButton(ns("abuttondefineaccount"), "Define Account",
+      actionButton(ns("abuttondefineprogrammesingle"), "Single Process",
                    class = "btn btn-primary", align = "right",  width = "100%"),
-      bsTooltip(ns("abuttondefineaccount"),
-                landing_page$abuttondefineaccount,
+      bsTooltip(ns("abuttondefineprogrammesingle"),
+                landing_page$abuttondefineprogrammesingle,
                 placement = "right",
                 options   = list(container = "body")),
-      dropdown(
-        inputId = ns("abuttondefineprogramme"),
-        label = "Define Programme",
-        status = "primary",
-        circle = FALSE,
-        tooltip = tooltipOptions(title = landing_page$abuttondefineprogramme, placement = "right"),
-        actionButton(ns("abuttondefineprogrammesingle"), "Define Single Programme",
-                     class = "btn btn-primary", align = "right",  width = "100%"),
-        bsTooltip(ns("abuttondefineprogrammesingle"),
-                  landing_page$abuttondefineprogrammesingle,
-                  placement = "right",
-                  options   = list(container = "body")),
-        actionButton(ns("abuttondefineprogrammebatch"), "Define Batch Programme",
-                     class = "btn btn-primary", align = "right",  width = "100%"),
-        bsTooltip(ns("abuttondefineprogrammebatch"),
-                  landing_page$abuttondefineprogrammebatch,
-                  placement = "right",
-                  options   = list(container = "body"))
-      )
+      actionButton(ns("abuttondefineprogrammebatch"), "Batch Process",
+                   class = "btn btn-primary", align = "right",  width = "100%"),
+      bsTooltip(ns("abuttondefineprogrammebatch"),
+                landing_page$abuttondefineprogrammebatch,
+                placement = "right",
+                options   = list(container = "body"))
     ),
     sidebar_button(ID = ns("abuttonbrowse"),  Label = "Browse"),
     bsTooltip(ns("abuttonbrowse"), 
@@ -261,36 +253,24 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   
   sidebarCollapsed <- panel(
     heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = TRUE), 
+    
     dropdown(
       inputId = ns("abuttonrun"),
       status = "primary",
       circle = FALSE,
       tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
-      actionButton(ns("abuttondefineaccount"), "Define Account",
-                   class = "btn btn-primary", align = "right", width = "100%"),
-      bsTooltip(ns("abuttondefineaccount"),
-                landing_page$abuttondefineaccount,
+      actionButton(ns("abuttondefineprogrammesingle"), "Single Process",
+                   class = "btn btn-primary", align = "right",  width = "100%"),
+      bsTooltip(ns("abuttondefineprogrammesingle"),
+                landing_page$abuttondefineprogrammesingle,
                 placement = "right",
                 options   = list(container = "body")),
-      dropdown(
-        inputId = ns("abuttondefineprogramme"),
-        label = "Define Process",
-        status = "primary",
-        circle = FALSE,
-        tooltip = tooltipOptions(title = landing_page$abuttondefineprogramme, placement = "right"),
-        actionButton(ns("abuttondefineprogrammesingle"), "Define Single Process",
-                     class = "btn btn-primary", align = "right",  width = "100%"),
-        bsTooltip(ns("abuttondefineprogrammesingle"),
-                  landing_page$abuttondefineprogrammesingle,
-                  placement = "right",
-                  options   = list(container = "body")),
-        actionButton(ns("abuttondefineprogrammebatch"), "Define Batch Process",
-                     class = "btn btn-primary", align = "right",  width = "100%"),
-        bsTooltip(ns("abuttondefineprogrammebatch"),
-                  landing_page$abuttondefineprogrammebatch,
-                  placement = "right",
-                  options   = list(container = "body"))
-      )
+      actionButton(ns("abuttondefineprogrammebatch"), "Batch Process",
+                   class = "btn btn-primary", align = "right",  width = "100%"),
+      bsTooltip(ns("abuttondefineprogrammebatch"),
+                landing_page$abuttondefineprogrammebatch,
+                placement = "right",
+                options   = list(container = "body"))
     ),
     sidebar_button(ID = ns("abuttonbrowse"),   Icon = icon("eye")),
     bsTooltip(ns("abuttonbrowse"), 
@@ -328,10 +308,6 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   })
   
   ### Navigation Menu ----
-  
-  observeEvent(input$abuttondefineaccount,
-               result$navigate <- structure("DA", count = input$abuttondefineaccount))#,
-  #shinyjs::hide(id = "abuttonrun"))
   
   observeEvent(input$abuttondefineprogrammesingle,
                result$navigate <- structure("PS", count = input$abuttondefineprogrammesingle))#,
