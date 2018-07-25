@@ -87,14 +87,12 @@ server <- function(input, output, session) {
     logout = reactive(pageheaderModule$logout())
   )
   
-  accountDefinitionModule <- callModule(accountDefinition,
+  accountDefinitionModule <- .callModule(accountDefinition,
                                         id = "accountDefinition",
-                                        dbSettings = dbSettings,
                                         active = reactive(authenticated() && result$navigate == "DA"))
   
-  programmeDefinitionSingleModule <- callModule(programmeDefinitionSingle,
+  programmeDefinitionSingleModule <- .callModule(programmeDefinitionSingle,
                                                 id = "programmeDefinitionSingle",
-                                                dbSettings = dbSettings,
                                                 apiSettings = apiSettings,
                                                 userId = reactive(result$userId),
                                                 preselRunId = landingPageModule$runId,
@@ -103,9 +101,8 @@ server <- function(input, output, session) {
                                                 reloadMillis = reloadMillis,
                                                 active = reactive(authenticated() && result$navigate == "PS"))
   
-  programmeDefinitionBatchModule <- callModule(programmeDefinitionBatch,
+  programmeDefinitionBatchModule <- .callModule(programmeDefinitionBatch,
                                                id = "programmeDefinitionBatch",
-                                               dbSettings = dbSettings,
                                                apiSettings = apiSettings,
                                                userId = reactive(result$userId),
                                                preselRunId = landingPageModule$runId,
@@ -114,9 +111,8 @@ server <- function(input, output, session) {
                                                reloadMillis = reloadMillis,
                                                active = reactive(authenticated() && result$navigate == "PB"))
   
-  browseprogrammesModule <- callModule(browseprogrammes,
+  browseprogrammesModule <- .callModule(browseprogrammes,
                                        id = "browseprogrammes",
-                                       dbSettings = dbSettings,
                                        apiSettings = apiSettings,
                                        userId = reactive(result$userId),
                                        logMessage = logMessage,
@@ -133,9 +129,8 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && input$em == "defineProg")
   )
   
-  # accountDefinitionModule <- callModule(accountDefinition,
+  # accountDefinitionModule <- .callModule(accountDefinition,
   #                                       id = "accountDefinition",
-  #                                       dbSettings = dbSettings,
   #                                       active = reactive(authenticated() && input$em == "defineAccount"))
   
   processRunPageModule <- .callModule(
