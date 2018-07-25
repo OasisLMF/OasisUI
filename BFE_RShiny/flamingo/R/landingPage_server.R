@@ -180,7 +180,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' }
 #' @importFrom shinyBS bsTooltip
-#' @importFrom shinyWidgets panel
+#' @importFrom shinyWidgets panel tooltipOptions
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
                           reloadMillis = 10000, logMessage = message,
