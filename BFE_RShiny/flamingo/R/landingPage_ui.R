@@ -49,7 +49,7 @@ pageheaderUI <- function(id) {
                                                     block = TRUE),
                                            bsTooltip(ns("abuttondefineaccount"),
                                                      landing_page$abuttondefineaccount,
-                                                     placement = "right",
+                                                     placement = "left",
                                                      options   = list(container = "body")),
                                            bsButton(ns("abuttonsysconf"), "System Configuration",
                                                     style = "btn btn-primary", size = "default", type = "action",
