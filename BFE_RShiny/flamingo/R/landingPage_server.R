@@ -198,128 +198,26 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   })
   
   ### Sidebar ----
-  sidebarExtended <- panel(
-    heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = FALSE),
-    # sidebar_button(ID = ns("abuttonrun"),  Label = "Run"),
-    # bsTooltip(ns("abuttonrun"), 
-    #           landing_page$abuttonrun, 
-    #           placement = "right", 
-    #           options   = list(container = "body")),
-    dropdown(
-      inputId = ns("abuttonrun"),
-      status = "primary",
-      label = "Process",
-      circle = FALSE,
-      tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
-      actionButton(ns("abuttondefineprogrammesingle"), "Single Process",
-                   class = "btn btn-primary", align = "right",  width = "100%"),
-      bsTooltip(ns("abuttondefineprogrammesingle"),
-                landing_page$abuttondefineprogrammesingle,
-                placement = "right",
-                options   = list(container = "body")),
-      actionButton(ns("abuttondefineprogrammebatch"), "Batch Process",
-                   class = "btn btn-primary", align = "right",  width = "100%"),
-      bsTooltip(ns("abuttondefineprogrammebatch"),
-                landing_page$abuttondefineprogrammebatch,
-                placement = "right",
-                options   = list(container = "body"))
-    ),
-    sidebar_button(ID = ns("abuttonbrowse"),  Label = "Browse"),
-    bsTooltip(ns("abuttonbrowse"), 
-              landing_page$abuttonbrowse, 
-              placement = "right", 
-              options   = list(container = "body")),
-    sidebar_button(ID = ns("abuttonexpmngt"),  Label = "Exposure Management"),
-    bsTooltip(ns("abuttonexpmngt"),
-              landing_page$abuttonexpmngt,
-              placement = "right",
-              options   = list(container = "body")),
-    sidebar_button(ID = ns("abuttonprmngt"),   Label = "Process Management"),
-    bsTooltip(ns("abuttonprmngt"),
-              landing_page$abuttonprmngt,
-              placement = "right",
-              options   = list(container = "body")),
-    sidebar_button(ID = ns("abuttonfilemngt"), Label = "File Management"),
-    bsTooltip(ns("abuttonfilemngt"), 
-              landing_page$abuttonfilemngt, 
-              placement = "right", 
-              options   = list(container = "body"))#,
-    # sidebar_button(ID = ns("abuttonsysconf"),  Label = "System Configuration"),
-    # bsTooltip(ns("abuttonsysconf"), 
-    #           landing_page$abuttonsysconf, 
-    #           placement = "right", 
-    #           options   = list(container = "body"))
+  # note that the more elegant
+  # .pagestructureSidebar(ns, collapsed = result$Width != 9)
+  # does not work
+  observe(
+    if (result$Width == 9) {
+      .pagestructureSidebar(ns, collapsed = result$Width != 9)
+    }
   )
   
-  sidebarCollapsed <- panel(
-    heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = TRUE), 
-    
-    dropdown(
-      inputId = ns("abuttonrun"),
-      status = "primary",
-      circle = FALSE,
-      tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
-      actionButton(ns("abuttondefineprogrammesingle"), "Single Process",
-                   class = "btn btn-primary", align = "right",  width = "100%"),
-      bsTooltip(ns("abuttondefineprogrammesingle"),
-                landing_page$abuttondefineprogrammesingle,
-                placement = "right",
-                options   = list(container = "body")),
-      actionButton(ns("abuttondefineprogrammebatch"), "Batch Process",
-                   class = "btn btn-primary", align = "right",  width = "100%"),
-      bsTooltip(ns("abuttondefineprogrammebatch"),
-                landing_page$abuttondefineprogrammebatch,
-                placement = "right",
-                options   = list(container = "body"))
-    ),
-    sidebar_button(ID = ns("abuttonbrowse"),   Icon = icon("eye")),
-    bsTooltip(ns("abuttonbrowse"), 
-              landing_page$abuttonbrowse, 
-              placement = "right", 
-              options   = list(container = "body")),
-    sidebar_button(ID = ns("abuttonexpmngt"),  Label = "EM"),
-    bsTooltip(ns("abuttonexpmngt"),
-              landing_page$abuttonexpmngt,
-              placement = "right",
-              options   = list(container = "body")),
-    sidebar_button(ID = ns("abuttonprmngt"),   Label = "PM"),
-    bsTooltip(ns("abuttonprmngt"),
-              landing_page$abuttonprmngt,
-              placement = "right",
-              options   = list(container = "body")),
-    sidebar_button(ID = ns("abuttonfilemngt"), Label = "FM"),
-    bsTooltip(ns("abuttonfilemngt"), 
-              landing_page$abuttonfilemngt, 
-              placement = "right", 
-              options   = list(container = "body"))#,
-    # sidebar_button(ID = ns("abuttonsysconf"),  Label = "SC"),
-    # bsTooltip(ns("abuttonsysconf"), 
-    #           landing_page$abuttonsysconf, 
-    #           placement = "right", 
-    #           options   = list(container = "body"))
-  )
-  
-  output$sidebar <- renderUI({sidebarExtended})
-  
-  observe(if (result$Width == 9) {
-    output$sidebar <- renderUI({sidebarExtended})
-  } else {
-    output$sidebar <- renderUI({sidebarCollapsed})
-  })
   
   ### Navigation Menu ----
   
   observeEvent(input$abuttondefineprogrammesingle,
-               result$navigate <- structure("PS", count = input$abuttondefineprogrammesingle))#,
-  #shinyjs::hide(id = "abuttonrun"))
+               result$navigate <- structure("PS", count = input$abuttondefineprogrammesingle))
   
   observeEvent(input$abuttondefineprogrammebatch,
-               result$navigate <- structure("PB", count = input$abuttondefineprogrammebatch))#,
-  #shinyjs::hide(id = "abuttonrun"))
+               result$navigate <- structure("PB", count = input$abuttondefineprogrammebatch))
   
   observeEvent(input$abuttonbrowse,
-               result$navigate <- structure("BR", count = input$abuttonbrowse))#,
-  #shinyjs::hide(id = "abuttonrun"))
+               result$navigate <- structure("BR", count = input$abuttonbrowse))
   
   observeEvent(input$abuttonhome,
                result$navigate <- structure("LP", count = input$abuttonhome))
@@ -406,3 +304,70 @@ landingPageButtonUpdate <- function(session, dbSettings, userId,
   
   invisible()
 }
+
+
+
+.pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
+  panel(
+    heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = FALSE),
+    dropdown(
+      inputId = ns("abuttonrun"),
+      status = "primary",
+      label = if (!collapsed) "Process",
+      icon = if (collapsed) icon("cog", lib = "glyphicon"),
+      circle = FALSE,
+      tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
+      actionButton(ns("abuttondefineprogrammesingle"), "Single Process",
+                   class = "btn btn-primary", align = "right",  width = "100%"),
+      bsTooltip(ns("abuttondefineprogrammesingle"),
+                landing_page$abuttondefineprogrammesingle,
+                placement = "right",
+                options   = list(container = "body")),
+      actionButton(ns("abuttondefineprogrammebatch"), "Batch Process",
+                   class = "btn btn-primary", align = "right",  width = "100%"),
+      bsTooltip(ns("abuttondefineprogrammebatch"),
+                landing_page$abuttondefineprogrammebatch,
+                placement = "right",
+                options   = list(container = "body"))
+    ),
+    sidebar_button(
+      ID = ns("abuttonbrowse"),
+      Label = if (!collapsed) "Browse",
+      Icon = if (collapsed) icon("eye")
+    ),
+    bsTooltip(ns("abuttonbrowse"),
+              landing_page$abuttonbrowse,
+              placement = "right",
+              options   = list(container = "body")),
+    sidebar_button(
+      ID = ns("abuttonexpmngt"),
+      Label = if (collapsed) "EM" else "Exposure Management"
+    ),
+    bsTooltip(ns("abuttonexpmngt"),
+              landing_page$abuttonexpmngt,
+              placement = "right",
+              options   = list(container = "body")),
+    sidebar_button(
+      ID = ns("abuttonprmngt"),
+      Label = if (collapsed) "PM" else "Process Management"
+    ),
+    bsTooltip(ns("abuttonprmngt"),
+              landing_page$abuttonprmngt,
+              placement = "right",
+              options   = list(container = "body")),
+    sidebar_button(
+      ID = ns("abuttonfilemngt"),
+      Label = if (collapsed) "FM" else "File Management"
+    ),
+    bsTooltip(ns("abuttonfilemngt"),
+              landing_page$abuttonfilemngt,
+              placement = "right",
+              options   = list(container = "body"))#,
+    # sidebar_button(ID = ns("abuttonsysconf"),  Label =  if (collapsed) "SC" else "System Configuration"),
+    # bsTooltip(ns("abuttonsysconf"),
+    #           landing_page$abuttonsysconf,
+    #           placement = "right",
+    #           options   = list(container = "body"))
+  )
+}
+
