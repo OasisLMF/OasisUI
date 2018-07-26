@@ -131,6 +131,10 @@ fileViewer <- function(
       selectRows(dataTableProxy("tableFVfileList"), input$tableFVfileList_rows_current)
     } else {
       selectRows(dataTableProxy("tableFVfileList"), NULL)
+      lapply(input$tableFVfileList_rows_current, function(i) {
+        shinyjs::hide(paste0("vrows_", i))
+        shinyjs::hide(paste0("mrows_", i))
+      })
     }
   })
   
