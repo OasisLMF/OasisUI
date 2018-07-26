@@ -14,7 +14,7 @@
 #' @importFrom shinyjs enable disable show hide
 #' @importFrom plotly renderPlotly
 #' @importFrom dplyr mutate
-#' @importFromutils read.csv
+#' @importFrom utils read.csv
 #' @importFrom shinyBS toggleModal
 #' @export
 processRunPage <- function(
