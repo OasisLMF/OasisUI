@@ -17,9 +17,19 @@ programmeDefinitionBatch <- function(input, output, session, dbSettings,
   
   ns <- session$ns
   
-  ### Module Output
+  # Reactive Values and parameters ------------------------------------------
   
-  moduleOutput <- list()
+  result <- reactiveValues(
+    #flag to navigate to different pages
+    navigate = NULL
+  )
+  
+  # Model Outout ------------------------------------------------------------
+  
+  moduleOutput <- list(
+    navigate = reactive(result$navigate)
+  )
   
   return(moduleOutput)
+  
 }
