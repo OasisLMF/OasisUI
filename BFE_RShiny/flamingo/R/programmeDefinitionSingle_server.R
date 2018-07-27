@@ -28,6 +28,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     DPprogID = NULL,
     #flag to know if the user is creating or amending a programme
     prog_flag = "",
+    # SL file to view
+    viewSLfile = NULL,
+    # SA file to view
+    viewSAfile = NULL,
     #Id of the Programme Model
     progOasisId = -1,
     #Id of the Process Run
@@ -67,6 +71,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     
     if (input$sliderdefprogsteps == "Create Programme") {
       .hideDivs()
+      hide("abuttonhidecreateprogpanel")
       show("panelcreateprogramme")
       logMessage("showing panelcreateprogramme")
       result$prog_flag <- "C"
@@ -348,9 +353,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   ### Cancel Programme
   
   onclick("abuttonProgCancel",{
+    accounts <- getAccountName(dbSettings)
+    updateSelectInput(session, "sinputDPAccountName",
+                      choices = createSelectOptions(accounts, "Select Account"),
+                      selected = NULL)
     updateTextInput(session, "tinputDPProgName", value = "")
     updateSelectInput(session, "sinputSLFile", selected = "")    
-    updateSelectInput(session, "sinputSAFile", selected = "")      
+    updateSelectInput(session, "sinputSAFile", selected = "")  
+    transforms <- getTransformNameSourceCan(dbSettings)
+    updateSelectInput(session, "sinputTransformname",
+                      choices = createSelectOptions(transforms, "Select Transform",
+                                                    labelCol = 1, valueCol = 2),
+                      selected = NULL)
   })
   
   ### Load Programme Button
@@ -525,6 +539,70 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
   
+  ### View source files
+  
+  #Source Location
+  onclick("abuttonSLFileView", {
+    
+    if (input$sinputselectSLFile != "") {
+      
+      toggleModal(session, "bsmodalviewSLfile", toggle = "open")
+      
+    } else {
+      
+      toggleModal(session, "bsmodalviewSLfile", toggle = "close")
+      showNotification(type = "warning", "Please select source file")
+      
+    }
+    
+  })  
+  
+  output$tableviewSLfile <- renderDataTable({
+    if (!is.null(result$viewSLfile)) {
+      datatable(
+        result$viewSLfile,
+        class = "flamingo-table display",
+        rownames = TRUE,
+        filter = "none",
+        escape = FALSE,
+        selection = list(mode = 'none'),
+        colnames = c('Row Number' = 1),
+        options = .getPRTableOptions()
+      ) 
+    }
+  })
+  
+  #Source Account
+  onclick("abuttonSAFileView", {
+    
+    if (input$sinputselectSLFile != "") {
+      
+      toggleModal(session, "bsmodalviewSAfile", toggle = "open")
+      
+    } else {
+      
+      toggleModal(session, "bsmodalviewSAfile", toggle = "close")
+      showNotification(type = "warning", "Please select source file")
+      
+    }
+    
+  }) 
+  
+  output$tableviewSAfile <- renderDataTable({
+    if (!is.null(result$viewSAfile)) {
+      datatable(
+        result$viewSAfile,
+        class = "flamingo-table display",
+        rownames = TRUE,
+        filter = "none",
+        escape = FALSE,
+        selection = list(mode = 'none'),
+        colnames = c('Row Number' = 1),
+        options = .getPRTableOptions()
+      ) 
+    }
+  })
+  
 
   # Programme Details -------------------------------------------------------
 
@@ -601,6 +679,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       .updateTransformNameSelection()
       
       show("panelcreateprogramme")
+      show("abuttonhidecreateprogpanel")
       logMessage("showing panelcreateprogramme")
       
     } else {
@@ -608,6 +687,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       showNotification(type = "warning", "Please select a Programme to Amend")
       hide("panelcreateprogramme")
     }
+  })
+  
+  onclick("abuttonhidecreateprogpanel", {
+    hide("panelcreateprogramme")
+    hide("abuttonhidecreateprogpanel")
   })
   
   

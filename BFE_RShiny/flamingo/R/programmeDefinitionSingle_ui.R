@@ -3,7 +3,9 @@
 #' @inheritParams flamingoModuleUI
 #' @return list of tags
 #' @importFrom DT dataTableOutput
-#' @importFrom shinyWidgets sliderTextInput
+#' @importFrom shinyWidgets sliderTextInput panel
+#' @importFrom shinyjs hidden
+#' @importFrom shinyBS bsModal
 #' @export
 programmeDefinitionSingleUI <- function(id) {
   
@@ -22,27 +24,41 @@ programmeDefinitionSingleUI <- function(id) {
                     post = NULL, dragRange = FALSE),
     bsModal(ns("bsmodalsaveoutput"), "Save Configuration", trigger = "", size = "small",
             textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
-            actionButton(ns("abuttonsubmitoutput"), "Submit", class = "btn btn-primary")
+            actionButton(inputId = ns("abuttonsubmitoutput"), label = "Submit", class = "btn btn-primary")
+    ),
+    bsModal(ns("bsmodalviewSLfile"), "Source Location File View", trigger = "", size = "large",
+            dataTableOutput(ns("tableviewSLfile"))
+    ),
+    bsModal(ns("bsmodalviewSAfile"), "Source Account File View", trigger = "", size = "large",
+            dataTableOutput(ns("tableviewSAfile"))
     ),
     hidden( div(id = ns("panelamendprogramme"), amendProgrammeUI(id))),
     div(id = ns("panelcreateprogramme"), createProgrammeUI(id)),
     hidden(div(id = ns("paneldefineids"), defineIDsUI(id))),
     hidden(div(id = ns("panelamendmodel"), amendModelUI(id))),
     hidden( div(id = ns("panelassociatemodel"), associateModelUI(id))),
-    hidden( div(id = ns("panelconfigureoutput"), configureOutputUI(id))),
-    hidden( div(id = ns("panelrunprogramme"), runProgrammeUI(id)))
+    hidden( div(id = ns("panelrunprogramme"), runProgrammeUI(id))),
+    hidden( div(id = ns("panelconfigureoutput"), configureOutputUI(id)))
+    
   )
 }
 
 #' UI/View to define the parameters of a process run
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyjs hidden
+#' @importFrom shinyWidgets panel
 #' @export
 createProgrammeUI <- function(id) {
   ns <- NS(id)
   
   panel(
-    helpText(h4("Define Programme", class = "flamingo-table-title")),
+    fluidRow(
+      column(11,
+             helpText(h4("Define Programme", class = "flamingo-table-title"))
+             ),
+      column(1,
+             style = "float:right;",
+             hidden(actionButton(inputId = ns("abuttonhidecreateprogpanel"), label = NULL, icon = icon("times")))
+             )),
     createammendProgrammeUI(id)   
   )
 }
@@ -51,10 +67,12 @@ createProgrammeUI <- function(id) {
 #' UI/View to define the parameters of a process run
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyjs hidden
+#' @importFrom shinyBS bsTooltip
 #' @export
 createammendProgrammeUI <- function(id) {
   ns <- NS(id)
   fluidPage(
+
     fluidRow(
       column(4,
              selectInput(ns("sinputDPAccountName"), label = "Account Name",
@@ -101,7 +119,9 @@ createammendProgrammeUI <- function(id) {
                         selectInput(ns("sinputselectSLFile"),
                                     label = "Select existing File", choices = ""),
                         actionButton(ns("abuttonSLFileLink"),
-                                     class = "btn btn-primary", label = "Link", align = "left")
+                                     class = "btn btn-primary", label = "Link", align = "left"),
+                        actionButton(ns("abuttonSLFileView"),
+                                     class = "btn btn-primary", label = "View", align = "left")
              ))
       ),
       
@@ -125,17 +145,18 @@ createammendProgrammeUI <- function(id) {
                         selectInput(ns("sinputselectSAFile"),
                                     label = "Select existing File", choices = ""),
                         actionButton(ns("abuttonSAFileLink"),
-                                     class = "btn btn-primary", label = "Link",
-                                     align = "left")
+                                     class = "btn btn-primary", label = "Link", align = "left"),
+                        actionButton(ns("abuttonSAFileView"),
+                                     class = "btn btn-primary", label = "View", align = "left")
              ))
       )
     ),
     
     fluidRow(
       column(4,
-             offset = 8,
+             style = "float:right;",
              actionButton(ns("buttonloadcanmodpr"), label = "Load Programme", class = "btn btn-primary", align = "left"),
-             actionButton(ns("abuttonProgCancel"), label = "Cancel", class = "btn btn-primary", align = "left")
+             actionButton(ns("abuttonProgCancel"), label = "Clear", class = "btn btn-primary", align = "left")
       )
     )
   )
@@ -145,40 +166,56 @@ createammendProgrammeUI <- function(id) {
 #' UI/View to define the parameters of a process run
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyjs hidden
+#' @importFrom shinyWidgets panel
 #' @export
 amendProgrammeUI <- function(id) {
   ns <- NS(id)
-  panel(
-    helpText(h4("Programme Table",
-                class = "flamingo-table-title")),
-    
-    column(12, align = "right",
-           actionButton(ns("abuttonprgtblrfsh"), "Refresh",
-                        class = "btn btn-primary btn-refresh")),
-    
-    dataTableOutput(ns("tableDPprog")),
-    
-    actionButton(ns("buttonamendpr"), "Amend Programme",
-                 class = "btn btn-primary", align = "centre"),
-    actionButton(ns("buttondeletepr"), "Delete Programme",
-                 class = "btn btn-primary", align = "right"),
-    actionButton(ns("buttonprogdetails"), "Show Programme Details",
-                 class = "btn btn-primary", align = "right"),
-    hidden(actionButton(ns("buttonhideprogdetails"), "Hide Programme Details",
-                 class = "btn btn-primary", align = "right")),
+  
+  fluidPage(
+    panel(
+      helpText(h4("Programme Table",
+                  class = "flamingo-table-title")),
+      
+      column(12, align = "right",
+             actionButton(ns("abuttonprgtblrfsh"), "Refresh",
+                          class = "btn btn-primary btn-refresh")),
+      
+      dataTableOutput(ns("tableDPprog")),
+      
+      actionButton(ns("buttonamendpr"), "Amend Programme",
+                   class = "btn btn-primary", align = "centre"),
+      actionButton(ns("buttondeletepr"), "Delete Programme",
+                   class = "btn btn-primary", align = "right"),
+      actionButton(ns("buttonprogdetails"), "Show Programme Details",
+                   class = "btn btn-primary", align = "right")
+    ),
     
     hidden(
       div(id = ns("divdefprogdetails"),
-          class = "flamingo-page-division",
-          
-          helpText(h4("Programme Details",
-                      class = "flamingo-table-title")),
-          column(12,
-                 actionButton(ns("abuttondefprogrfsh"),
-                              "Refresh", class = "btn btn-primary"),
-                 align = "right"),
-          
-          dataTableOutput(ns("tableprogdetails"))
+          panel(
+            fluidRow(
+              column(11,
+                     helpText(h4("Programme Details",
+                                 class = "flamingo-table-title"))
+              ),
+              column(1, 
+                     style = "float:right;",
+                     hidden(actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times"), 
+                                         align = "right"))
+              )
+            ),
+            
+            br(),
+            
+            fluidRow(
+              column(12,
+                     actionButton(ns("abuttondefprogrfsh"),
+                                  "Refresh", class = "btn btn-primary"),
+                     align = "right")
+            ),
+            
+            dataTableOutput(ns("tableprogdetails"))
+          )
       )
     )
   )
@@ -187,6 +224,7 @@ amendProgrammeUI <- function(id) {
 #' UI/View to define the parameters of a process run
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyjs hidden
+#' @importFrom shinyWidgets panel
 #' @export
 amendModelUI <- function(id) {
   ns <- NS(id)
@@ -206,8 +244,6 @@ amendModelUI <- function(id) {
             dataTableOutput(ns("tableProgOasisOOK")),
             
             column(12,
-                   hidden(actionButton(ns("buttonhidemodeldetails"), "Hide Programme Model Details",
-                                       class = "btn btn-primary")),
                    actionButton(ns("buttonmodeldetails"), "Show Programme Model Details",
                                 class = "btn btn-primary")
                    , align = "right")
@@ -218,20 +254,27 @@ amendModelUI <- function(id) {
     hidden(
       div(id = ns("divprogoasisfiles"),
           panel(
-            class = "flamingo-page-division",
             
-            helpText(h4("Programme Model Details",
-                        class = "flamingo-table-title")),
+            fluidRow(
+              column(11,
+                     helpText(h4("Programme Model Details",
+                                 class = "flamingo-table-title"))
+                     ),
+              column(1,
+                     hidden(actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"),
+                                         style = "align:right")))
+            ),
             
             column(12,
-                   actionButton(ns("abuttonprgoasisrfsh"),
+                   actionButton(inputId = ns("abuttonprgoasisrfsh"),
                                 label = "Refresh",
                                 class = "btn btn-primary"),
                    align = "right"),
             
             dataTableOutput(ns("tabledisplayprogoasisfiles")) 
           )
-      ))
+      )
+    )
   )
 }
 
@@ -239,6 +282,8 @@ amendModelUI <- function(id) {
 #' UI/View to define the parameters of a process run
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyjs hidden
+#' @importFrom shinyBS bsTooltip
+#' @importFrom shinyWidgets panel
 #' @export
 associateModelUI <- function(id) {
   ns <- NS(id)
@@ -260,7 +305,8 @@ associateModelUI <- function(id) {
                        options   = list(container = "body")))
     ),
     
-    actionButton(ns("abuttoncrprogoasis"), "Create",
+    actionButton(inputId = ns("abuttoncrprogoasis"), 
+                 label = "Create",
                  class = "btn btn-primary")
   )
 }
@@ -268,6 +314,7 @@ associateModelUI <- function(id) {
 #' UI/View to define the parameters of a process run
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyjs hidden
+#' @importFrom shinyWidgets panel
 #' @export
 configureOutputUI <- function(id) {
   ns <- NS(id)
@@ -295,25 +342,24 @@ configureOutputUI <- function(id) {
                  hidden(div(id = ns("configureOutputAdvancedGULUIOutput"), configureOutputAdvancedGULUI(id))),
                  checkboxInput(ns("chkinputIL"), label = "Insured Loss", value = FALSE), 
                  hidden(div(id = ns("configureOutputAdvancedILUIOutput"), configureOutputAdvancedILUI(id))),
-                 div(id = ns("advanced"), style = "display: inline-block;margin-right:2%", align = "right", actionButton(ns("abtnadvanced"), label = "Advanced", class = "btn btn-primary")),
-                 hidden(div(id = ns("basic"), style = "display: inline-block;margin-right:2%", align = "right", actionButton(ns("abtnbasic"), label = "Basic", class = "btn btn-primary"))),
-                 hidden(div(id = ns("saveoutput"), style = "display: inline-block", actionButton(ns("abuttonsaveoutput"), label = "Save Configuration", class = "btn btn-primary"))),
-                 hidden(div(id = ns("clroutopt"), style = "display: inline-block", actionButton(ns("abtnclroutopt"), label = "Default", class = "btn btn-primary")))
+                 div(id = ns("advanced"), style = "display: inline-block;margin-right:2%", align = "right", actionButton(inputId = ns("abtnadvanced"), label = "Advanced", class = "btn btn-primary")),
+                 hidden(div(id = ns("basic"), style = "display: inline-block;margin-right:2%", align = "right", actionButton(inputId = ns("abtnbasic"), label = "Basic", class = "btn btn-primary"))),
+                 hidden(div(id = ns("saveoutput"), style = "display: inline-block", actionButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration", class = "btn btn-primary"))),
+                 hidden(div(id = ns("clroutopt"), style = "display: inline-block", actionButton(inputId = ns("abtnclroutopt"), label = "Default", class = "btn btn-primary")))
                ))
         
       ),
       
       fluidRow(
         column(12,
-               hidden(div(id = ns("hidepanelconfigureoutput"), style = "display: inline-block", actionButton(ns("abuttonehidepanelconfigureoutput"), label = "Hide Configure Output", class = "btn btn-primary"))),
-               div(id = ns("executeprrun"), style = "display: inline-block", actionButton(ns("abuttonexecuteprrun"), label = "Execute Run", class = "btn btn-primary")), align = "right"))
+               hidden(div(id = ns("hidepanelconfigureoutput"), style = "display: inline-block", actionButton(inputId = ns("abuttonehidepanelconfigureoutput"), label = "Hide Configure Output", class = "btn btn-primary"))),
+               div(id = ns("executeprrun"), style = "display: inline-block", actionButton(inputId = ns("abuttonexecuteprrun"), label = "Execute Run", class = "btn btn-primary")), align = "right"))
   )
 }
 
 
 #' UI/View to define the Advanced  Model parameters of a process run 
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyjs hidden
 #' @export
 configureOutputAdvancedUI <- function(id) {
   
@@ -354,7 +400,6 @@ configureOutputPerilAdvancedUI <- function(id) {
 
 #' UI/View to define the Advanced  GUL parameters of a process run 
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyjs hidden
 #' @export
 configureOutputAdvancedGULUI <- function(id) {
   
@@ -477,7 +522,7 @@ configureOutputAdvancedGULUI <- function(id) {
                                   # " " = "gulpolicySampleMeanAEP",
                                   # " " = "gulpolicySampleMeanOEP",
                                   " " = "gulpolicyAAL", " " = "gulpolicyPLT"),
-                                selected =NULL)
+                                selected = NULL)
     )
   )
 }
@@ -485,7 +530,6 @@ configureOutputAdvancedGULUI <- function(id) {
 
 #' UI/View to define the Advanced  IL parameters of a process run 
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyjs hidden
 #' @export
 configureOutputAdvancedILUI <- function(id) {
   
@@ -615,6 +659,8 @@ configureOutputAdvancedILUI <- function(id) {
 #' UI/View to define the parameters of a process run
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyjs hidden
+#' @importFrom shinyBS bsTooltip
+#' @importFrom shinyWidgets panel
 #' @export
 defineIDsUI <- function(id) {
   ns <- NS(id)
@@ -645,58 +691,63 @@ defineIDsUI <- function(id) {
 #' UI/View to define the parameters of a process run
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyjs hidden
+#' @importFrom shinyWidgets panel
 #' @export
 runProgrammeUI <- function(id) {
   ns <- NS(id)
-  panel(
-
-    fluidRow(
-      column(12,
-             hidden(
-               div(id = ns("prruntable"), class = "flamingo-page-division",
-                   fluidRow(
-                     column(6,
-                            h4("Process Runs", class = "flamingo-table-title")),
+  fluidPage(
+    panel(
+      
+      fluidRow(
+        column(12,
+               hidden(
+                 div(id = ns("prruntable"), class = "flamingo-page-division",
+                     fluidRow(
+                       column(6,
+                              h4("Process Runs", class = "flamingo-table-title")),
+                       
+                       column(4,
+                              radioButtons(inputId = ns("radioprrunsAllOrInProgress"),
+                                           "Processes' Status", list("All", "In_Progress"),
+                                           inline = TRUE)),
+                       column(1,
+                              actionButton(inputId = ns("abuttonrefreshprrun"), "Refresh",
+                                           class = "btn btn-primary"), align = "right")
+                     ),#End of fluidrow
                      
-                     column(4,
-                            radioButtons(ns("radioprrunsAllOrInProgress"),
-                                         "Processes' Status", list("All", "In_Progress"),
-                                         inline = TRUE)),
-                     column(1,
-                            actionButton(ns("abuttonrefreshprrun"), "Refresh",
-                                         class = "btn btn-primary"), align = "right")
-                   ),#End of fluidrow
-                   
-                   dataTableOutput(ns("processrundata")),
-                   
-                   actionButton(ns("abuttondisplayoutput"), "Go To Display Output",
-                                class = "btn btn-primary"),
-                   actionButton(ns("abuttonrerunpr"), "Rerun",
-                                class = "btn btn-primary"),
-                   actionButton(ns("abuttonshowlog"), "Show Process Run Log",
-                                class = "btn btn-primary", style = "align:right"),
-                   hidden(actionButton(ns("abuttonhidelog"), "Hide Process Run Log",
-                                       class = "btn btn-primary", style = "align:right"))
-               )#End of div prruntable 
-             )
+                     dataTableOutput(ns("processrundata")),
+                     
+                     actionButton(inputId = ns("abuttondisplayoutput"), label = "Go To Display Output",
+                                  class = "btn btn-primary"),
+                     actionButton(inputId = ns("abuttonrerunpr"), label = "Rerun",
+                                  class = "btn btn-primary"),
+                     actionButton(inputId = ns("abuttonshowlog"), label = "Show Process Run Log",
+                                  class = "btn btn-primary", style = "align:right")
+                     
+                 )#End of div prruntable 
+               )
+        )
       )
     ),
     
-    fluidRow( 
-      column(12,
-             hidden(
-               div(id = ns("prrunlogtable"), class = "flamingo-page-division",
-                   fluidRow(
-                     column(10,
-                            h4("Process Run Logs", class = "flamingo-table-title")),
-                     column(2, actionButton(ns("abuttonrefreshprrunlogs"),
-                                            "Refresh", class = "btn btn-primary"), align = "right")
-                   ),#End of fluidrow
-                   dataTableOutput(ns("log"))
-               )#End of div prrunlogtable
-             )
+    hidden(
+      div(id = ns("prrunlogtable"), 
+          panel(
+            fluidRow(
+              column(11,
+                     h4("Process Run Logs", class = "flamingo-table-title")),
+              column(1,
+                     hidden(actionButton(inputId =  ns("abuttonhidelog"), label = NULL, icon = icon("times"),
+                                         style = "align:right")))
+            ),
+            fluidRow(
+              column(12, actionButton(inputId =  ns("abuttonrefreshprrunlogs"),
+                                     label = "Refresh", class = "btn btn-primary"), align = "right")
+            ),#End of fluidrow
+            dataTableOutput(ns("log"))
+          )#End of div prrunlogtable
       )
     )
-    
   )
+  
 }
