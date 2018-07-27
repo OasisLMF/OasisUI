@@ -10,6 +10,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
     
     tags$script("Shiny.onInputChange('authUIRenderCallback', true)"),
     tags$style(HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #ebcccc !important;}')),
+    
     # Header ----
     fluidRow(
       column(3,
@@ -26,13 +27,14 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
     
     hr(),
     
-    # Main body ###
+    # Main body ----
     fluidRow(
-      # Sidebar panel
+      
+      # Sidebar panel ----
       column(WidthSide,
              pagestructureUI("pagestructure")),
       
-      #Main panel
+      #Main panel -----
       column(WidthMain,
              
              ### Landing Page
@@ -54,11 +56,11 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
                programmeDefinitionSingleUI("programmeDefinitionSingle")
              ),
              
-             # ### DefineProgramme Batch
-             # conditionalPanel(
-             #   condition = "output.menu == 'DPB'",
-             #   programmeDefinitionBatchUI("programmeDefinitionBatch")
-             # ),
+             ### DefineProgramme Batch
+             conditionalPanel(
+               condition = "output.menu == 'PB'",
+               programmeDefinitionBatchUI("programmeDefinitionBatch")
+             ),
              
              ### browseprogrammesUI
              conditionalPanel(
