@@ -233,6 +233,13 @@ server <- function(input, output, session) {
       result$navigate <- page
     }
   })
+  
+  #placeholder
+  observe(if (authenticated()) {
+    if (!is.null(page <- programmeDefinitionBatchModule$navigate())) {
+      result$navigate <- page
+    }
+  })
 
   output$menu <- reactive(result$navigate)
   outputOptions(output, "menu", suspendWhenHidden = FALSE)
