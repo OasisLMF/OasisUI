@@ -10,7 +10,8 @@ RUN apt-get update && \
 # Install R
 RUN apt-get update && \
     apt-get install -y --no-install-recommends software-properties-common && \
-    add-apt-repository "deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu trusty/" && \
+#    add-apt-repository "deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu trusty/" && \
+    add-apt-repository "deb http://www.stats.bris.ac.uk/R/bin/linux/ubuntu xenial/" && \
     apt-get update && \
     apt-get install -y --no-install-recommends --allow-unauthenticated r-base && \
     rm -rf /var/lib/apt/lists/*
