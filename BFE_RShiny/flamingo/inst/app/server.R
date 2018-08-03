@@ -191,9 +191,19 @@ server <- function(input, output, session) {
     result$userName <- loginDialogModule$userName()
   })
 
+  # UI non-reactive to (result$WidthSide) and (result$Widthmain)
   output$authUI <- renderUI(
-    if (result$userId != FLAMINGO_GUEST_ID) authUI(WidthSide = result$WidthSide, WidthMain = result$WidthMain)
+    if (result$userId != FLAMINGO_GUEST_ID) {
+      authUI(
+        WidthSide = isolate(result$WidthSide),
+        WidthMain = isolate(result$WidthMain)
+      )
+    }
   )
+  # reactivity via flexColumn module
+  callModule(flexColumn, "sidebar", reactive(result$WidthSide))
+  callModule(flexColumn, "main", reactive(result$WidthMain))
+
 
   observe(result$logout <- pageheaderModule$logout())
 
@@ -233,7 +243,7 @@ server <- function(input, output, session) {
       result$navigate <- page
     }
   })
-  
+
   #placeholder
   observe(if (authenticated()) {
     if (!is.null(page <- programmeDefinitionBatchModule$navigate())) {
