@@ -1,0 +1,76 @@
+# Module server function ----
+
+#' Resizable UI column
+#'
+#' Shiny module providing support for dynamic UI [column][shiny::column] width
+#' without re-rendering the column content.
+#'
+#' @template params-module
+#' @param width Width of the column, a reactive value for `flexColumn()`,
+#'   non-reactive (or [isolated][shiny::isolate]) for `flexColumnUI()`
+#'
+#' @details
+#' Dynamic column width via `renderUI()` based on a reactive value forces the
+#' re-rendering of the column content. This has the following undesired effects:
+#'   * The state of the existing column UI content (including user input) is
+#'   lost.
+#'   * Depending on the complexity of the content, rendering can slow-down the
+#'   re-sizing.
+#'
+#' The _flexColumn_ Shiny module prevents re-rendering based on reactive column
+#' width. Instead, it changes the class of the existing column UI element
+#' (`"col-sm-<WIDTH>"`) depending on a reactive `width` value.
+#'
+#' The module relies on [shinyjs::addClass()] and [shinyjs::removeClass()],
+#' which means [shinyjs::useShinyjs()] must be included in the app `ui`
+#' definition.
+#'
+#' @example man-roxygen/ex-flexColumn.R
+#'
+#' @export
+#'
+#' @md
+flexColumn <- function(input, output, session, width) {
+  state <- reactiveValues(
+    width = isolate(width())
+  )
+  observeEvent(
+    width(), {
+      replace_col_class("column", state$width, width())
+      state$width <- width()
+    })
+}
+
+
+# Module UI function ----
+
+#' @rdname flexColumn
+#' @export
+flexColumnUI <- function(id, width, ...) {
+  ns <- NS(id)
+  column(
+    width = width,
+    id = ns("column"),
+    ...
+  )
+}
+
+
+
+# utilities ----
+
+col_class <- function(width) {
+  sprintf("col-sm-%d", width)
+}
+
+
+replace_class <- function(id, old, new) {
+  # add the class before removing it to avoid intermediate status w/o class
+  shinyjs::addClass(id, new)
+  shinyjs::removeClass(id, old)
+}
+
+
+replace_col_class <- function(id, old, new) {
+  replace_class(id, col_class(old), col_class(new))
+}
