@@ -16,7 +16,7 @@ server <- function(input, output, session) {
     userId = FLAMINGO_GUEST_ID,
     userName = "",
     navigate = "LP",
-    counter = 0,
+    collapsed = FALSE,
     WidthMain = 9,
     WidthSide = 3
   )
@@ -35,8 +35,8 @@ server <- function(input, output, session) {
 
   # collapse / expand sidebar
   observeEvent(input$abuttoncollapsesidebar, {
-    result$counter <- result$counter + 1
-    if ((result$counter %% 2) == 0) {
+    result$collapsed <- !result$collapsed
+    if (result$collapsed) {
       result$WidthMain <- 9
       result$WidthSide <- 3
     } else {
