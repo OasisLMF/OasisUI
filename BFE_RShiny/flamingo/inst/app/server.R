@@ -16,7 +16,7 @@ server <- function(input, output, session) {
     userId = FLAMINGO_GUEST_ID,
     userName = "",
     navigate = "LP",
-    counter = 0,
+    collapsed = FALSE,
     WidthMain = 9,
     WidthSide = 3
   )
@@ -35,8 +35,8 @@ server <- function(input, output, session) {
 
   # collapse / expand sidebar
   observeEvent(input$abuttoncollapsesidebar, {
-    result$counter <- result$counter + 1
-    if ((result$counter %% 2) == 0) {
+    result$collapsed <- !result$collapsed
+    if (result$collapsed) {
       result$WidthMain <- 9
       result$WidthSide <- 3
     } else {
@@ -191,9 +191,19 @@ server <- function(input, output, session) {
     result$userName <- loginDialogModule$userName()
   })
 
+  # UI non-reactive to (result$WidthSide) and (result$Widthmain)
   output$authUI <- renderUI(
-    if (result$userId != FLAMINGO_GUEST_ID) authUI(WidthSide = result$WidthSide, WidthMain = result$WidthMain)
+    if (result$userId != FLAMINGO_GUEST_ID) {
+      authUI(
+        WidthSide = isolate(result$WidthSide),
+        WidthMain = isolate(result$WidthMain)
+      )
+    }
   )
+  # reactivity via flexColumn module
+  callModule(flexColumn, "sidebar", reactive(result$WidthSide))
+  callModule(flexColumn, "main", reactive(result$WidthMain))
+
 
   observe(result$logout <- pageheaderModule$logout())
 
@@ -233,7 +243,7 @@ server <- function(input, output, session) {
       result$navigate <- page
     }
   })
-  
+
   #placeholder
   observe(if (authenticated()) {
     if (!is.null(page <- programmeDefinitionBatchModule$navigate())) {
