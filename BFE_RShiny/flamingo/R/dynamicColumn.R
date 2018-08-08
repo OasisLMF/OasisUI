@@ -48,11 +48,13 @@ dynamicColumn <- function(input, output, session, width) {
 #' @export
 dynamicColumnUI <- function(id, width, ...) {
   ns <- NS(id)
-  column(
-    width = width,
-    id = ns("column"),
-    ...
-  )
+  # NOTE that we do not call shiny::column() directly but set an explict
+  # col-sm-<width> class, since this is what the module relies on; we also do
+  # not support offset.
+  if (!is.numeric(width) || (width < 1) || (width > 12)) {
+    stop("column width must be between 1 and 12")
+  }
+  div(id = ns("column"), class = col_class(width), ...)
 }
 
 
