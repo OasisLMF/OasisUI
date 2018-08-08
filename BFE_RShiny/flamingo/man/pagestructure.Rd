@@ -34,7 +34,7 @@ see \link{invalidateLater};}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{collapsed}{reactive expression yelding the sidebar collapsed status}
+\item{collapsed}{reactive expression determining how the UI should be rendered}
 }
 \value{
 list of reactive expressions

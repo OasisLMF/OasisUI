@@ -174,7 +174,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
-#' @param collapsed reactive expression yelding the sidebar collapsed status
+#' @param collapsed reactive expression determining how the UI should be rendered
 #' @return list of reactive expressions
 #' \itemize{
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
