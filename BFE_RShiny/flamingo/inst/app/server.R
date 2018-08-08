@@ -36,7 +36,7 @@ server <- function(input, output, session) {
   # collapse / expand sidebar
   observeEvent(input$abuttoncollapsesidebar, {
     result$collapsed <- !result$collapsed
-    if (result$collapsed) {
+    if (!result$collapsed) {
       result$WidthMain <- 9
       result$WidthSide <- 3
     } else {
@@ -69,7 +69,7 @@ server <- function(input, output, session) {
     reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated()),
-    W = reactive(result$WidthMain)
+    collapsed = reactive(result$collapsed)
   )
 
   landingPageModule <- .callModule(

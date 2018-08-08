@@ -174,7 +174,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
-#' @param W reactive expressione yelding the Width of the sidebar
+#' @param status reactive expressione yelding the sidebar collapsed status
 #' @return list of reactive expressions
 #' \itemize{
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
@@ -184,30 +184,18 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
                           reloadMillis = 10000, logMessage = message,
-                          active = reactive(TRUE), W) {
+                          active = reactive(TRUE), collapsed = reactive(FALSE)) {
 
   ns <- session$ns
 
   result <- reactiveValues(
-    navigate = NULL,
-    Width = 9
+    navigate = NULL
   )
 
-  observe(if (!is.null(W())) {
-    result$Width <- W()
+  observe({
+    output$sidebar <-
+      renderUI(pagestructureSidebar(ns, collapsed = collapsed()))
   })
-
-  ### Sidebar ----
-  # note that the more elegant
-  # pagestructureSidebar(ns, collapsed = result$Width != 9)
-  # does not work
-  observe(
-    if (result$Width == 9) {
-      output$sidebar <- renderUI({pagestructureSidebar(ns, collapsed = FALSE)})
-    } else {
-      output$sidebar <- renderUI({pagestructureSidebar(ns, collapsed = TRUE)})
-    }
-  )
 
 
   ### Navigation Menu ----
