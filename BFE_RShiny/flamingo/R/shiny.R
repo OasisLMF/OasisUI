@@ -76,6 +76,7 @@ showNotification <- function(ui,
 #' @param value value for extra option to add at the top
 #' @param labelCol column index of the column that is used for the labels
 #' @param valueCol column index of the column that is used for the values
+#' @importFrom stats setNames
 #' @export
 createSelectOptions <- function(df, label = NA, value = "0", labelCol = 2,
     valueCol = 1) {

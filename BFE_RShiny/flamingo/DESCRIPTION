@@ -17,11 +17,14 @@ Imports:
   DBI,
   shinyBS,
   shinyjs,
+  shinyWidgets,
   DT,
   leaflet,
-  plotly
+  plotly,
+  dplyr
 Suggests:
   knitr,
-  testthat
+  testthat,
+  magrittr
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr

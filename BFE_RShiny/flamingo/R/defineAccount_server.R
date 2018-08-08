@@ -7,6 +7,7 @@
 #' @import shiny
 #' @importFrom shinyjs onclick show disable enable hide
 #' @importFrom DT renderDataTable datatable
+#' @importFrom shinyBS toggleModal
 #' @rdname accountDefinition
 #' @export
 accountDefinition <- function(input, output, session, dbSettings,
@@ -50,6 +51,7 @@ accountDefinition <- function(input, output, session, dbSettings,
             selection = "single",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 pageLength = 5
             )
@@ -57,7 +59,7 @@ accountDefinition <- function(input, output, session, dbSettings,
       })
   
   output$DAAdownloadexcel <- downloadHandler(
-      filename ="accounts.csv",
+      filename = "accounts.csv",
       content = function(file) {
         write.csv(result$DAAccountData, file)}
   )
@@ -94,7 +96,7 @@ accountDefinition <- function(input, output, session, dbSettings,
   
   onclick("abuttonAccSubmit", {
         
-        if (result$accFlag == "C"){
+        if (result$accFlag == "C") {
           
           stmt <- buildDbQuery("createAccount", input$tinputDAAccountName,
               squareBrackets = FALSE)
@@ -137,7 +139,7 @@ accountDefinition <- function(input, output, session, dbSettings,
         
         toggleModal(session, "crtupModal", toggle = "close")
         
-        updateTextInput(session, "tinputDAAccountName", value="")
+        updateTextInput(session, "tinputDAAccountName", value = "")
         result$accFlag <- ""
         
         reloadDAAccountData()
@@ -147,7 +149,7 @@ accountDefinition <- function(input, output, session, dbSettings,
   onclick("abuttonAccCancel",{
         
         result$accFlag <- ""
-        updateTextInput(session, "tinputDAAccountName", value="")
+        updateTextInput(session, "tinputDAAccountName", value = "")
         
         toggleModal(session, "crtupModal", toggle = "close")
         

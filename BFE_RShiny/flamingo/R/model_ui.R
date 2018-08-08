@@ -46,7 +46,7 @@ modelSupplierPageUI <- function(id) {
               div(class = "flamingo-page-division",
                   helpText(h4("Model", class = "flamingo-table-title")),
                   dataTableOutput(ns("tablemodel")),
-                  downloadButton(ns("Modeldownloadexcel"), label="Export to Excel")
+                  downloadButton(ns("Modeldownloadexcel"), label="Export to csv")
               ),
         
               hidden(
@@ -60,7 +60,7 @@ modelSupplierPageUI <- function(id) {
                       actionButton(ns("btnDelete"), "Delete",
                           class="btn btn-primary", align = "right"),
                       # actionButton(ns("abuttoncrtudptdelmodres"), "Create/Update/Delete", class="btn btn-primary"),
-                      downloadButton(ns("MRdownloadexcel"), label="Export to Excel")
+                      downloadButton(ns("MRdownloadexcel"), label="Export to csv")
                   )
               )
       

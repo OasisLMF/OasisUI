@@ -12,6 +12,8 @@
 #' @rdname programmeDefinition
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDataTable
+#' @importFrom dplyr mutate
+#' @importFrom shinyBS toggleModal
 #' @export
 programmeDefinition <- function(input, output, session, dbSettings,
     apiSettings, userId, active = reactive(TRUE), logMessage = message,
@@ -69,8 +71,8 @@ programmeDefinition <- function(input, output, session, dbSettings,
         hide("divSAFileSelect")
         hide("divdefprogdetails")
         hide("divprogoasisfiles")
-        updateSelectInput(session, "sinputSLFile", selected="")
-        updateSelectInput(session, "sinputSAFile", selected="")
+        updateSelectInput(session, "sinputSLFile", selected = "")
+        updateSelectInput(session, "sinputSAFile", selected = "")
         
       })
   
@@ -88,10 +90,12 @@ programmeDefinition <- function(input, output, session, dbSettings,
         force(result$DPProgDataCounter)
         
         stmt <- buildDbQuery("getProgData")
-        result$DPProgData <- executeDbQuery(dbSettings, stmt)
-        
+        result$DPProgData <- executeDbQuery(dbSettings, stmt) %>% 
+                             mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
+                             mutate(Status = replace(Status, Status != "Loaded" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+                             mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
+                             as.data.frame()
         logMessage("programme table refreshed")
-        
       })
   
   output$tableDPprog <- renderDataTable({
@@ -100,12 +104,15 @@ programmeDefinition <- function(input, output, session, dbSettings,
             class = "flamingo-table display",
             rownames = TRUE,
             filter = "none",
+            escape = FALSE,
             selection = "single",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 scrollX = TRUE,
-                pageLength = 5
+                pageLength = 5,
+                autoWidth = TRUE
             )
         )
       })
@@ -125,14 +132,18 @@ programmeDefinition <- function(input, output, session, dbSettings,
         # reload after reloadProgDetails is called
         force(result$reloadProgDetails)
         
-        if(length(input$tableDPprog_rows_selected) > 0) {
+        if (length(input$tableDPprog_rows_selected) > 0) {
           
           show("divdefprogdetails")
           
           progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
           
           stmt <- buildDbQuery("getProgFileDetails", progId)
-          result$progDetails <- executeDbQuery(dbSettings, stmt)
+          result$progDetails <- executeDbQuery(dbSettings, stmt) %>% 
+            mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
+            mutate(Status = replace(Status, Status != "Loaded" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+            mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
+            as.data.frame()
           
           logMessage("programme details table refreshed")
         
@@ -149,9 +160,11 @@ programmeDefinition <- function(input, output, session, dbSettings,
             class = "flamingo-table display",
             rownames = TRUE,
             filter = "none",
+            escape = FALSE,
             selection = "none",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 scrollX = TRUE
             )
@@ -174,7 +187,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
     updateSelectInput(session, "sinputTransformname",
         choices = createSelectOptions(transforms, "Select Transform",
             labelCol = 1, valueCol = 2),
-        selected=c("Select Transform" = 0))
+        selected = c("Select Transform" = 0))
   }
   
   updateDPAccountSelection <- function() {
@@ -270,7 +283,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
           
         } else {
           
-          if (result$prog_flag == "A"){
+          if (result$prog_flag == "A") {
             query <- paste0("exec dbo.updateProg ", result$DPProgData[input$tableDPprog_rows_selected,1],",[",input$tinputDPProgName,"],", input$sinputDPAccountName,", [",input$sinputTransformname,"]")
             res <- executeDbQuery(dbSettings, query)
             if (is.null(res)) {
@@ -287,7 +300,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
 
         toggleModal(session, "prog-crtupModal", toggle = "close")
         hide("divFileUpload")
-        updateTextInput(session, "tinputDPProgName", value="")
+        updateTextInput(session, "tinputDPProgName", value = "")
         shinyjs::enable("buttoncreatepr")
         shinyjs::enable("buttonamendpr")
         result$prog_flag <- ""
@@ -300,9 +313,9 @@ programmeDefinition <- function(input, output, session, dbSettings,
         hide("divSLFileSelect")
         hide("divSAFileUpload")
         hide("divSAFileSelect")
-        updateTextInput(session, "tinputDPProgName", value="")
-        updateSelectInput(session, "sinputSLFile", selected="")    
-        updateSelectInput(session, "sinputSAFile", selected="")      
+        updateTextInput(session, "tinputDPProgName", value = "")
+        updateSelectInput(session, "sinputSLFile", selected = "")    
+        updateSelectInput(session, "sinputSAFile", selected = "")      
         result$prog_flag <- ""
       })
   
@@ -316,7 +329,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
         flcopy <- file.copy(inFile$datapath,
             file.path(flc,inFile[1,1]), overwrite = TRUE)
         logMessage(file.path(flc,inFile[1,1]))
-        if (flcopy == TRUE){
+        if (flcopy == TRUE) {
           recordId <- createFileRecord(dbSettings,
               inFile[1,1], "Source Loc File", 101, flc, userId(),
               "Prog", result$DPProgData[input$tableDPprog_rows_selected,1])
@@ -338,7 +351,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
         flcopy <- file.copy(inFile$datapath,
             file.path(flc, inFile[1,1]), overwrite = TRUE)
         logMessage(file.path(flc,inFile[1,1]))
-        if (flcopy == TRUE){
+        if (flcopy == TRUE) {
           recordId <- createFileRecord(dbSettings,
               inFile[1,1], "Source Acc File", 102, flc, userId(),
               "Prog", result$DPProgData[input$tableDPprog_rows_selected,1])
@@ -362,8 +375,8 @@ programmeDefinition <- function(input, output, session, dbSettings,
         res <- executeDbQuery(dbSettings,
             paste("exec dbo.updateSourceLocationFileForProg ",
                 input$sinputselectSLFile, ", ",result$DPProgData[input$tableDPprog_rows_selected,1]))
-        if(input$sinputselectSLFile != ""){
-          if (is.null(res)){
+        if(input$sinputselectSLFile != "") {
+          if (is.null(res)) {
             showNotification(type = "error", "Failed to link the File!")
           }else {
             showNotification(type = "message",
@@ -378,8 +391,8 @@ programmeDefinition <- function(input, output, session, dbSettings,
         res <- executeDbQuery(dbSettings,
             paste("exec dbo.updateSourceAccountFileForProg ",
                 input$sinputselectSAFile, ", ", result$DPProgData[input$tableDPprog_rows_selected,1]))
-        if(input$sinputselectSAFile != ""){
-          if (is.null(res)){
+        if(input$sinputselectSAFile != "") {
+          if (is.null(res)) {
             showNotification(type = "error", "Failed to link the File!")
           }else {
             showNotification(type = "message", 
@@ -395,12 +408,12 @@ programmeDefinition <- function(input, output, session, dbSettings,
   ### Load Programme data
   
   onclick("buttonloadcanmodpr",{
-        if(length(input$tableDPprog_rows_selected) > 0) {
+        if (length(input$tableDPprog_rows_selected) > 0) {
 
           loadprogdata <- loadProgrammeData(apiSettings,
               progId = toString(result$DPProgData[input$tableDPprog_rows_selected,1]))
           
-          if(loadprogdata == 'success' || loadprogdata == 'Success') {
+          if (loadprogdata == 'success' || loadprogdata == 'Success') {
             showNotification(type = "message", "Initiating load programme data...")
           } else {
             showNotification(type = "error", "Failed to load programme data.")
@@ -416,11 +429,11 @@ programmeDefinition <- function(input, output, session, dbSettings,
   ### Display File Upload/link options
   observe(if (active()) {
         
-        if(input$sinputSLFile == "U") {
+        if (input$sinputSLFile == "U") {
           show("divSLFileUpload")
           disable("abuttonSLFileUpload")
           hide("divSLFileSelect")
-        } else if(input$sinputSLFile == "S") {
+        } else if (input$sinputSLFile == "S") {
           show("divSLFileSelect")
           hide("divSLFileUpload")
         }
@@ -429,11 +442,11 @@ programmeDefinition <- function(input, output, session, dbSettings,
   
   observe(if (active()) {
         
-        if(input$sinputSAFile == "U") {
+        if (input$sinputSAFile == "U") {
           show("divSAFileUpload")
           disable("abuttonSAFileUpload")
           hide("divSAFileSelect")
-        } else if(input$sinputSAFile == "S") {
+        } else if (input$sinputSAFile == "S") {
           show("divSAFileSelect")
           hide("divSAFileUpload")
         }
@@ -452,7 +465,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
             enable("abuttonSLFileUpload")
           }  
         } else {
-          if (input$sinputSLFile == "S"){
+          if (input$sinputSLFile == "S") {
             SLfiles <- getFileSourceLocationFile(dbSettings)
             updateSelectInput(session, "sinputselectSLFile",
                 choices = createSelectOptions(SLfiles, labelCol = 1,
@@ -469,7 +482,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
             enable("abuttonSAFileUpload")
           }  
         } else {
-          if (input$sinputSAFile == "S"){
+          if (input$sinputSAFile == "S") {
             SAfiles <- getFileSourceAccountFile(dbSettings)
             updateSelectInput(session, "sinputselectSAFile",
                 choices = createSelectOptions(SAfiles, labelCol = 1,
@@ -492,13 +505,17 @@ programmeDefinition <- function(input, output, session, dbSettings,
         # reload automatically every so often
         invalidateLater(reloadMillis)
         
-        if(length(input$tableDPprog_rows_selected) > 0) {
+        if (length(input$tableDPprog_rows_selected) > 0) {
           
           show("divprogmodeltable")
         
           prgId <- result$DPProgData[input$tableDPprog_rows_selected,1]
           
-          result$POData <- getProgOasisForProgdata(dbSettings, prgId)
+          result$POData <- getProgOasisForProgdata(dbSettings, prgId)  %>% 
+            mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
+            mutate(Status = replace(Status, Status != "Loaded" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+            mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
+            as.data.frame()
           
           logMessage("programme model table refreshed")
           
@@ -525,9 +542,11 @@ programmeDefinition <- function(input, output, session, dbSettings,
             class = "flamingo-table display",
             rownames = TRUE,
             filter = "none",
+            escape = FALSE,
             selection = "single",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 scrollX = TRUE,
                 pageLength = 5
@@ -551,14 +570,18 @@ programmeDefinition <- function(input, output, session, dbSettings,
         # reload automatically every so often
         invalidateLater(reloadMillis)
         
-        if(length(input$tableProgOasisOOK_rows_selected) > 0) {
+        if (length(input$tableProgOasisOOK_rows_selected) > 0) {
           
           show("divprogoasisfiles")
           
           progOasisId <- toString(result$POData[input$tableProgOasisOOK_rows_selected,1])
           
           stmt <- buildDbQuery("getProgOasisFileDetails", progOasisId)
-          result$progFiles <- executeDbQuery(dbSettings, stmt)
+          result$progFiles <- executeDbQuery(dbSettings, stmt)  %>% 
+            mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
+            mutate(Status = replace(Status, Status != "Loaded" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+            mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
+            as.data.frame()
           
           logMessage("programme files table refreshed")
           
@@ -568,15 +591,17 @@ programmeDefinition <- function(input, output, session, dbSettings,
       })
   
   output$tabledisplayprogoasisfiles <- renderDataTable(
-      if (!is.null(result$progFiles)){
+      if (!is.null(result$progFiles)) {
         datatable(
             result$progFiles,
             class = "flamingo-table display",
             rownames = TRUE,
             filter = "none",
+            escape = FALSE,
             selection = "none",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 pageLength = 20,
                 scrollX = TRUE
@@ -592,14 +617,14 @@ programmeDefinition <- function(input, output, session, dbSettings,
     programmes <- getProgrammeList(dbSettings)
     updateSelectInput(session, "sinputookprogid",
         choices = createSelectOptions(programmes, "Select Programme"),
-        selected = c("Select Programme"= 0))
+        selected = c("Select Programme" = 0))
   }
   
   clearOOKModelSelection <- function() {
     models <- getModelList(dbSettings)
     updateSelectInput(session, "sinputookmodelid",
         choices = createSelectOptions(models, "Select Model"),
-        selected = c("Select Model"= 0))
+        selected = c("Select Model" = 0))
   }
   
   clearOOKTransformSelection <- function() {
@@ -656,7 +681,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
   
   # on click of create prog oasis button
   onclick("abuttoncrprogoasis",{
-        if(isolate(input$sinputookprogid) > 0 &&
+        if (isolate(input$sinputookprogid) > 0 &&
             isolate(input$sinputookmodelid) > 0) {
           
           progOasisId <- createProgOasis(dbSettings,
@@ -684,12 +709,12 @@ programmeDefinition <- function(input, output, session, dbSettings,
   
   # on click of load programme model
   onclick("abuttonloadprogmodel",{
-        if(length(input$tableProgOasisOOK_rows_selected) > 0){
+        if (length(input$tableProgOasisOOK_rows_selected) > 0) {
 
           loadprogmodel <- loadProgrammeModel(apiSettings,
               progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected,1]))
           
-          if(loadprogmodel == 'success' || loadprogmodel == 'Success'){
+          if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
             showNotification(type = "message", "Initiating load programme model..")
             reloadProgFiles()
           } else {
@@ -707,7 +732,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
   
   # navigation to Define process
   onclick("abuttongotoprocessrun", {
-        if (length(rows <- input$tableProgOasisOOK_rows_selected) > 0){
+        if (length(rows <- input$tableProgOasisOOK_rows_selected) > 0) {
           
           result$progOasisId <- toString(result$POData[rows, 1])
           
@@ -724,7 +749,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
   ### Export to Excel
   
   output$DPPdownloadexcel <- downloadHandler(
-      filename ="programmelist.csv",
+      filename = "programmelist.csv",
       content = function(file) {
         write.csv(result$DPProgData, file)}
   )

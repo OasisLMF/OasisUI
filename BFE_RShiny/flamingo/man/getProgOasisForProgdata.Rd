@@ -15,13 +15,13 @@ getProgOasisForProgdata(dbSettings, progId)
 		\item \code{ProgOasisId}
 		\item \code{ProgName}
 		\item \code{ModelName}
-		\item \code{TransformName} 
+		\item \code{TransformName}
 		\item \code{SourceFileId}
-		\item \code{FileID} 
+		\item \code{FileID}
 		\item \code{Status}
-		\item \code{API1aDateTime} 
+		\item \code{API1aDateTime}
 		\item \code{API1bDateTime}
-		\item \code{API1cDateTime} 
+		\item \code{API1cDateTime}
 		\item \code{SessionId}
 }
 }
