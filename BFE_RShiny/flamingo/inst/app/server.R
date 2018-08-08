@@ -200,9 +200,9 @@ server <- function(input, output, session) {
       )
     }
   )
-  # reactivity via flexColumn module
-  callModule(flexColumn, "sidebar", reactive(result$WidthSide))
-  callModule(flexColumn, "main", reactive(result$WidthMain))
+  # reactivity via dynamicColumn module
+  callModule(dynamicColumn, "sidebar", reactive(result$WidthSide))
+  callModule(dynamicColumn, "main", reactive(result$WidthMain))
 
 
   observe(result$logout <- pageheaderModule$logout())

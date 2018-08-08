@@ -31,14 +31,14 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
     fluidRow(
 
       # Sidebar panel ----
-      flexColumnUI(
+      dynamicColumnUI(
         "sidebar",
         WidthSide,
         pagestructureUI("pagestructure")
       ),
 
       #Main panel -----
-      flexColumnUI(
+      dynamicColumnUI(
         "main",
         WidthMain,
         ### Landing Page
