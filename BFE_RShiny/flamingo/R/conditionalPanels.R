@@ -19,6 +19,8 @@
 #'
 #' @example man-roxygen/ex-conditionalPanels.R
 #'
+#' @export
+#'
 #' @md
 conditionalPanels <- function(input, output, session, visible) {
   output$visible <- visible

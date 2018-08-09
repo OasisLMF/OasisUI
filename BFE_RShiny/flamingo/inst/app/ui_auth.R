@@ -37,90 +37,77 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
         pagestructureUI("pagestructure")
       ),
 
-      #Main panel -----
+      # Main panel -----
       flexColumnUI(
         "main",
         WidthMain,
-        ### Landing Page
-        conditionalPanel(
-          condition = "output.menu == 'LP'",
-          #img(src = "landingpage.png", width = "70%")
-          landingPageUI("landingPage")
-        ),
+        conditionalPanelsUI(
+          "mainPanel",
+          list(
 
-        ### Define Account
-        conditionalPanel(
-          condition = "output.menu == 'DA'",
-          accountDefinitionUI("accountDefinition")
-        ),
+            # Landing Page
+            LP =
+              #img(src = "landingpage.png", width = "70%")
+              landingPageUI("landingPage"),
 
-        ### DefineProgramme Single
-        conditionalPanel(
-          condition = "output.menu == 'PS'",
-          programmeDefinitionSingleUI("programmeDefinitionSingle")
-        ),
+            # Define Account
+            DA =
+              accountDefinitionUI("accountDefinition"),
 
-        ### DefineProgramme Batch
-        conditionalPanel(
-          condition = "output.menu == 'PB'",
-          programmeDefinitionBatchUI("programmeDefinitionBatch")
-        ),
+            # DefineProgramme Single
+            PS =
+              programmeDefinitionSingleUI("programmeDefinitionSingle"),
 
-        ### browseprogrammesUI
-        conditionalPanel(
-          condition = "output.menu == 'BR'",
-          browseprogrammesUI("browseprogrammes")
-        ),
+            # DefineProgramme Batch
+            PB =
+              programmeDefinitionBatchUI("programmeDefinitionBatch"),
 
-        ### Exposure Management
-        conditionalPanel(
-          condition = "output.menu == 'EM'",
-          #navbarPage("Exposure Management", id = "em",
-          tabsetPanel(id = "em",
+            # browseprogrammesUI
+            BR = browseprogrammesUI("browseprogrammes"),
 
-                      # tabPanel("Define Account",
-                      #          value = "defineAccount",
-                      #          accountDefinitionUI("accountDefinition")),
+            # Exposure Management
+            EM =
+              #navbarPage("Exposure Management", id = "em",
+              tabsetPanel(
+                id = "em",
+                # tabPanel("Define Account",
+                #          value = "defineAccount",
+                #          accountDefinitionUI("accountDefinition")),
 
-                      tabPanel("Define Programme",
-                               value = "defineProg",
-                               programmeDefinitionUI("programmeDefinition"))
-          ) #End of navbarMenu("Exposure Management")
-        ), #End of conditional panel Exposure Management
+                tabPanel("Define Programme",
+                         value = "defineProg",
+                         programmeDefinitionUI("programmeDefinition"))
+              ), #End of navbarMenu("Exposure Management")
 
+            # Process Management
+            WF =
+              processRunPageUI("processRunPage"),
 
-        ### Process Management
-        conditionalPanel(
-          condition = "output.menu == 'WF'",
-          processRunPageUI("processRunPage")), #End of conditional panel Process Management
+            ## File Management
+            FM =
+              fileViewerUI("fileViewer"),
 
-        #### File Management
-        conditionalPanel(
-          condition = "output.menu == 'FM'",
-          fileViewerUI("fileViewer")), # End of conditional panel File Management
+            # System Config
+            SC =
+              modelSupplierPageUI("modelSupplierPage"),
 
-        ### System Config
-        conditionalPanel(
-          condition = "output.menu == 'SC'",
-          modelSupplierPageUI("modelSupplierPage")), # End of conditional panel System Config
+            # User Admin
+            UA = #navbarPage("User Administration", id = "ua",
+              tabsetPanel(
+                id = "ua",
+                tabPanel("Company",
+                         value = "definecompany",
+                         companyDefinitionUI("companyDefinition")),
 
-        ### User Admin
-        conditionalPanel(
-          condition = "output.menu == 'UA'",
-          #navbarPage("User Administration", id = "ua",
-          tabsetPanel(id = "ua",
-                      tabPanel("Company",
-                               value = "definecompany",
-                               companyDefinitionUI("companyDefinition")),
+                tabPanel("Company User Administraton",
+                         value = "defineuser",
+                         userAdminDefinitionUI("userAdminDefinition"))
+              ) # End of tabsetpanel
 
-                      tabPanel("Company User Administraton",
-                               value = "defineuser",
-                               userAdminDefinitionUI("userAdminDefinition"))
-          ) # End of tabsetpanel
-        ) # End of conditional panel User Administration
-
-      ) # endo of column
-    ), # end of fluidRow
+          ) # End of panels list
+        ) # End of conditionalPanelsUI
+      ) # End of column
+    ), # End of fluidRow
 
     # Footer ----
     fillRow(
