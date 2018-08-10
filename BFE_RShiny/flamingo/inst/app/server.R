@@ -12,10 +12,16 @@ server <- function(input, output, session) {
 
   `%>%` <- magrittr::`%>%`
 
+  # active main panel based on the reactive navigation state
+  navigation_state <- reactiveNavigation("LP")
+  main_visible <- getNavigation(outputNavigation(
+    # force_react = FALSE allows reacting only to actual changes
+    navigation_state, force_react = FALSE
+  ))
+
   result <- reactiveValues(
     userId = FLAMINGO_GUEST_ID,
     userName = "",
-    navigate = "LP",
     collapsed = FALSE,
     WidthMain = 9,
     WidthSide = 3
@@ -46,14 +52,20 @@ server <- function(input, output, session) {
   })
 
   ### submodules ----
-  modules <- list()
-
-
   .callModule <- function(...) {
     callModule(..., dbSettings = dbSettings)
   }
 
-  pageheaderModule <- .callModule(
+  loginDialogModule <- .callModule(
+    loginDialog, "login",
+    logMessage = logMessage,
+    logout = reactive(auth_modules$pageheader$logout())
+  )
+
+  # list of modules for the authenticated UI
+  auth_modules <- list()
+
+  auth_modules$pageheader <- .callModule(
     pageheader, "pageheader",
     userId = reactive(result$userId),
     userName = reactive(result$userName),
@@ -62,7 +74,7 @@ server <- function(input, output, session) {
     active = reactive(authenticated())
   )
 
-  pagestructureModule <- .callModule(
+  auth_modules$pagestructure <- .callModule(
     pagestructure, "pagestructure",
     userId = reactive(result$userId),
     userName = reactive(result$userName),
@@ -72,62 +84,56 @@ server <- function(input, output, session) {
     W = reactive(result$WidthMain)
   )
 
-  landingPageModule <- .callModule(
+  auth_modules$landingPage <- .callModule(
     landingPage, "landingPage",
     userId = reactive(result$userId),
     userName = reactive(result$userName),
     reloadMillis = reloadMillis,
     logMessage = logMessage,
-    active = reactive(authenticated() && result$navigate == "LP")
+    active = reactive(authenticated() && main_visible() == "LP")
   )
 
-  loginDialogModule <- .callModule(
-    loginDialog, "login",
-    logMessage = logMessage,
-    logout = reactive(pageheaderModule$logout())
-  )
-
-  accountDefinitionModule <- .callModule(
+  auth_modules$DA <- .callModule(
     accountDefinition,
-    id = "accountDefinition",
-    active = reactive(authenticated() && result$navigate == "DA")
+    id = "DA",
+    active = reactive(authenticated() && main_visible() == "DA")
   )
 
-  programmeDefinitionSingleModule <- .callModule(
+  auth_modules$programmeDefinitionSingle <- .callModule(
     programmeDefinitionSingle,
     id = "programmeDefinitionSingle",
     apiSettings = apiSettings,
     userId = reactive(result$userId),
-    preselRunId = landingPageModule$runId,
-    preselProcId = landingPageModule$procId,
+    preselRunId = auth_modules$landingPage$runId,
+    preselProcId = auth_modules$landingPage$procId,
     logMessage = logMessage,
     reloadMillis = reloadMillis,
-    active = reactive(authenticated() && result$navigate == "PS")
+    active = reactive(authenticated() && main_visible() == "PS")
   )
 
-  programmeDefinitionBatchModule <- .callModule(
+  auth_modules$programmeDefinitionBatch <- .callModule(
     programmeDefinitionBatch,
     id = "programmeDefinitionBatch",
     apiSettings = apiSettings,
     userId = reactive(result$userId),
-    preselRunId = landingPageModule$runId,
-    preselProcId = landingPageModule$procId,
+    preselRunId = auth_modules$landingPage$runId,
+    preselProcId = auth_modules$landingPage$procId,
     logMessage = logMessage,
     reloadMillis = reloadMillis,
-    active = reactive(authenticated() && result$navigate == "PB")
+    active = reactive(authenticated() && main_visible() == "PB")
   )
 
-  browseprogrammesModule <- .callModule(
+  auth_modules$browseprogrammes <- .callModule(
     browseprogrammes,
     id = "browseprogrammes",
     apiSettings = apiSettings,
     userId = reactive(result$userId),
     logMessage = logMessage,
     reloadMillis = reloadMillis,
-    active = reactive(authenticated() && result$navigate == "BR")
+    active = reactive(authenticated() && main_visible() == "BR")
   )
 
-  programmeDefinitionModule <- .callModule(
+  auth_modules$programmeDefinition <- .callModule(
     programmeDefinition,
     id = "programmeDefinition",
     apiSettings = apiSettings,
@@ -137,46 +143,46 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && input$em == "defineProg")
   )
 
-  # accountDefinitionModule <- .callModule(
+  # auth_modules$accountDefinition <- .callModule(
   #   accountDefinition,
   #   id = "accountDefinition",
   #   active = reactive(authenticated() && input$em == "defineAccount")
   # )
 
-  processRunPageModule <- .callModule(
+  auth_modules$processRunPage <- .callModule(
     processRunPage,
     id = "processRunPage",
     apiSettings = apiSettings,
     logMessage = logMessage,
     userId = reactive(result$userId),
     active = reactive(authenticated()), #&& input$pr == "processrun"),
-    preselRunId = landingPageModule$runId,
-    preselProcId = landingPageModule$procId,
-    progOasisId = programmeDefinitionModule$progOasisId,
+    preselRunId = auth_modules$landingPage$runId,
+    preselProcId = auth_modules$landingPage$procId,
+    progOasisId = auth_modules$programmeDefinition$progOasisId,
     reloadMillis = reloadMillis
   )
 
-  fileViewerModule <- .callModule(
+  auth_modules$fileViewer <- .callModule(
     fileViewer,
     id = "fileViewer",
     logMessage = logMessage,
     active = reactive(authenticated()) #&& input$fm == "fileviewer"))
   )
 
-  modelSupplierPageModule <- .callModule(
+  auth_modules$modelSupplierPage <- .callModule(
     modelSupplierPage,
     id = "modelSupplierPage",
     active = reactive(authenticated())# && input$sc == "Model"))
   )
 
-  userAdminDefinitionModule <- .callModule(
+  auth_modules$userAdminDefinition <- .callModule(
     userAdminDefinition,
     id = "userAdminDefinition",
     active = reactive(authenticated() && input$ua == "defineuser"),
     userId = reactive(result$userId)
   )
 
-  companyDefinitionModule <- .callModule(
+  auth_modules$companyDefinition <- .callModule(
     companyDefinition,
     id = "companyDefinition",
     active = reactive(authenticated() && input$ua == "definecompany")
@@ -207,59 +213,18 @@ server <- function(input, output, session) {
   callModule(flexColumn, "sidebar", reactive(result$WidthSide))
   callModule(flexColumn, "main", reactive(result$WidthMain))
 
-
-  observe(result$logout <- pageheaderModule$logout())
+  observe(result$logout <- auth_modules$pageheader$logout())
 
   ### navigation ----
-  observe(if (authenticated()) {
-    if (!is.null(page <- pageheaderModule$navigate())) {
-      result$navigate <- page
-    }
-  })
-
-  observe(if (authenticated()) {
-    if (!is.null(page <- pagestructureModule$navigate())) {
-      result$navigate <- page
-    }
-  })
-
-  observe(if (authenticated()) {
-    if (!is.null(page <- landingPageModule$navigate())) {
-      result$navigate <- page
-    }
-  })
-
-  observe(if (authenticated()) {
-    if (!is.null(page <- programmeDefinitionModule$navigate())) {
-      result$navigate <- page
-    }
-  })
-
-  observe(if (authenticated()) {
-    if (!is.null(page <- userAdminDefinitionModule$navigate())) {
-      result$navigate <- page
-    }
-  })
-
-  observe(if (authenticated()) {
-    if (!is.null(page <- programmeDefinitionSingleModule$navigate())) {
-      result$navigate <- page
-    }
-  })
-
-  #placeholder
-  observe(if (authenticated()) {
-    if (!is.null(page <- programmeDefinitionBatchModule$navigate())) {
-      result$navigate <- page
-    }
-  })
+  # observe the possible navigation state propagated from any module
+  observeModuleNavigation(navigation_state, auth_modules, logger = logMessage)
 
   # activate the main panel the user navigates to
-  callModule(conditionalPanels, "mainPanel", reactive(result$navigate))
+  callModule(conditionalPanels, "mainPanel", main_visible)
 
   observe(if (authenticated()) {
 
-    switch(result$navigate,
+    switch(main_visible(),
 
            "WF" = { # go to Workflow submenu
              loginfo(paste("Navigate to Process Management, userId: ", result$userId),

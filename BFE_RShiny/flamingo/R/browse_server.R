@@ -2,7 +2,7 @@
 #' @description Server logic to define a programme
 #' @inheritParams flamingoModule
 #' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater}; 
+#' see \link{invalidateLater};
 #' @return list of reactives:
 #' \itemize{
 #' 		\item{\code{navigate}}{reactive yielding navigation}
@@ -16,7 +16,9 @@
 browseprogrammes <- function(input, output, session, dbSettings,
                                 apiSettings, userId, active = reactive(TRUE), logMessage = message,
                                 reloadMillis = 10000) {
-  
+
   ns <- session$ns
-  
+
+  invisible()
+
 }

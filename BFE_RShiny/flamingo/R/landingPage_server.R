@@ -19,13 +19,14 @@
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
+  navigation_state <- reactiveNavigation()
+
   result <- reactiveValues(
-    navigate = NULL,
     inbox = NULL
   )
 
   observeEvent(input$abuttongotorun,
-               result$navigate <- structure("WF", count = input$abuttongotorun))
+               updateNavigation(navigation_state, "WF"))
 
   observe(if (active()) {
 
@@ -74,16 +75,18 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   )
 
   ### Module Output ----
-  moduleOutput <- list(
-    navigate = reactive(result$navigate),
-    runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-      result$inbox[i, 2]} else -1),
-    # this is needed in processRun, probably shouldn't
-    procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-      result$inbox[i, 1]} else -1)
+  moduleOutput <- c(
+    outputNavigation(navigation_state),
+    list(
+      runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
+        result$inbox[i, 2]} else -1),
+      # this is needed in processRun, probably shouldn't
+      procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
+        result$inbox[i, 1]} else -1)
+    )
   )
 
-  return(moduleOutput)
+  moduleOutput
 
 }
 
@@ -107,25 +110,23 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 
   ns <- session$ns
 
-  result <- reactiveValues(
-    navigate = NULL
-  )
+  navigation_state <- reactiveNavigation()
 
   ### Greeter ----
   output$textOutputHeaderData2 <- renderText(paste("User Name:", userName()))
 
   observeEvent(input$abuttonuseradmin,
-               result$navigate <- structure("UA", count = input$abuttonuseradmin))#,
+               updateNavigation(navigation_state, "UA"))#,
   #shinyjs::hide(id = "accountDDmenu"))
 
   observeEvent(input$abuttondefineaccount,
-               result$navigate <- structure("DA", count = input$abuttondefineaccount))
+               updateNavigation(navigation_state, "DA"))
 
   observeEvent(input$abuttonsysconf,
-               result$navigate <- structure("SC", count = input$abuttonsysconf))
+               updateNavigation(navigation_state, "SC"))
 
   observeEvent(input$abuttonhome,
-               result$navigate <- structure("LP", count = input$abuttonhome))#,
+               updateNavigation(navigation_state, "LP"))#,
   #shinyjs::hide(id = "accountDDmenu"))
 
 
@@ -156,13 +157,15 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   })
 
   ### Module Output ----
-  moduleOutput <- list(
-    navigate = reactive(result$navigate),
-    # logout = reactive(input$abuttonlogout),
-    logout = reactive(input$abuttonlogoutcontinue)
+  moduleOutput <- c(
+    outputNavigation(navigation_state),
+    list(
+      # logout = reactive(input$abuttonlogout),
+      logout = reactive(input$abuttonlogoutcontinue)
+    )
   )
 
-  return(moduleOutput)
+  moduleOutput
 
 }
 
@@ -188,8 +191,9 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 
   ns <- session$ns
 
+  navigation_state <- reactiveNavigation()
+
   result <- reactiveValues(
-    navigate = NULL,
     Width = 9
   )
 
@@ -213,25 +217,25 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   ### Navigation Menu ----
 
   observeEvent(input$abuttondefineprogrammesingle,
-               result$navigate <- structure("PS", count = input$abuttondefineprogrammesingle))
+               updateNavigation(navigation_state, "PS"))
 
   observeEvent(input$abuttondefineprogrammebatch,
-               result$navigate <- structure("PB", count = input$abuttondefineprogrammebatch))
+               updateNavigation(navigation_state, "PB"))
 
   observeEvent(input$abuttonbrowse,
-               result$navigate <- structure("BR", count = input$abuttonbrowse))
+               updateNavigation(navigation_state, "BR"))
 
   observeEvent(input$abuttonhome,
-               result$navigate <- structure("LP", count = input$abuttonhome))
+               updateNavigation(navigation_state, "LP"))
 
   observeEvent(input$abuttonexpmngt,
-               result$navigate <- structure("EM", count = input$abuttonexpmngt))
+               updateNavigation(navigation_state, "EM"))
 
   observeEvent(input$abuttonprmngt,
-               result$navigate <- structure("WF", count = input$abuttonprmngt))
+               updateNavigation(navigation_state, "WF"))
 
   observeEvent(input$abuttonfilemngt,
-               result$navigate <- structure("FM", count = input$abuttonfilemngt))
+               updateNavigation(navigation_state, "FM"))
 
 
   ### Button permissions ----
@@ -242,11 +246,12 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   })
 
   ### Module Output ----
-  moduleOutput <- list(
-    navigate = reactive(result$navigate)
+  moduleOutput <- c(
+    outputNavigation(navigation_state),
+    list() # placeholder
   )
 
-  return(moduleOutput)
+  moduleOutput
 
 }
 
