@@ -187,7 +187,7 @@ server <- function(input, output, session) {
   appState <- reactive(
     if (result$userId == FLAMINGO_GUEST_ID) "loggedout" else "loggedin"
   )
-  # callModule(conditionalPanels, id = "appUI", appState)
+  callModule(conditionalPanels, id = "appUI", appState)
 
   observe({
     result$userId <- loginDialogModule$userId()
@@ -255,7 +255,7 @@ server <- function(input, output, session) {
   })
 
   # activate the main panel the user navigates to
-  # callModule(conditionalPanels, "mainPanel", reactive(result$navigate))
+  callModule(conditionalPanels, "mainPanel", reactive(result$navigate))
 
   observe(if (authenticated()) {
 
