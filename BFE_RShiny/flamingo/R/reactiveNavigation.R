@@ -53,10 +53,10 @@
 #' @md
 reactiveNavigation <- function(value = NULL) {
   reactiveValues(
-    navigate_to = value,
-    # `react` allows reactivity upon any observed action, even if $navigate_to is
-    # not changed
-    react = TRUE
+    .navigate_to = value,
+    # `.react` allows reactivity upon any observed action, even if $.navigate_to
+    # is not changed
+    .react = TRUE
   )
 }
 
@@ -68,15 +68,15 @@ reactiveNavigation <- function(value = NULL) {
 #'
 #' @md
 updateNavigation <- function(state, value, force_react = TRUE) {
-  state$navigate_to <- value
+  state$.navigate_to <- value
   if (force_react) {
-    # `react` gets always invalidated by changing its value
-    state$react <- !state$react
+    # `.react` gets always invalidated by changing its value
+    state$.react <- !state$.react
   }
   invisible()
 }
 
-# reactive navigation state output, including or excluding react invalidation
+# reactive navigation state output, including or excluding .react invalidation
 #' @rdname reactiveNavigation
 #'
 #' @export
@@ -85,15 +85,15 @@ updateNavigation <- function(state, value, force_react = TRUE) {
 outputNavigation <- function(state, force_react = TRUE) {
   if (force_react) {
     list(
-      navigate_to = reactive({
-        state$react
-        state$navigate_to
+      .navigate_to = reactive({
+        state$.react
+        state$.navigate_to
       })
     )
   } else {
     list(
-      navigate_to = reactive({
-        state$navigate_to
+      .navigate_to = reactive({
+        state$.navigate_to
       })
     )
   }
@@ -107,7 +107,7 @@ outputNavigation <- function(state, force_react = TRUE) {
 #'
 #' @md
 getNavigation <- function(module) {
-  reactive(if (!is.null(module$navigate_to)) module$navigate_to())
+  reactive(if (!is.null(module$.navigate_to)) module$.navigate_to())
 }
 
 # create observers that update the inpuit navigation `state` based on the
@@ -121,10 +121,10 @@ observeModuleNavigation <- function(state, modules, force_react = TRUE,
                                     logger = NULL) {
   lapply(modules, function(module) {
     observeEvent(getNavigation(module)(), {
-      navigate_to <- getNavigation(module)()
-      if (!is.null(navigate_to)) {
-        if (!is.null(logger)) logger(paste0(" => ", navigate_to))
-        updateNavigation(state, navigate_to, force_react = force_react)
+      .navigate_to <- getNavigation(module)()
+      if (!is.null(.navigate_to)) {
+        if (!is.null(logger)) logger(paste0(" => ", .navigate_to))
+        updateNavigation(state, .navigate_to, force_react = force_react)
       }
     })
   })
