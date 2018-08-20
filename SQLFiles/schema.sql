@@ -2,7 +2,7 @@
 --Flamingo Database Generation Script
 --Author: Ben Hayes
 --Date: 2017-07-27
---Version: R_0_0_345_0
+--Version: 0.394.0
 
 
 -------------------------------------------------------------------------------
@@ -2320,7 +2320,7 @@ if @modeltypeid = 1
 		set AltItemID =A.AltItemID
 		From	(
 				select	itemid,
-						DENSE_RANK() OVER (ORDER BY itemid) AS AltItemID
+						DENSE_RANK() OVER (ORDER BY areaperilid, vulnerabilityid, itemid) AS AltItemID
 				from	#item
 				) AS A
 		where	#item.itemid = A.itemid
@@ -6032,7 +6032,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE Procedure [dbo].[linkOutputFileToProcessRun] @ProcessRunId int, @OutputFiles nvarchar(2500)
+CREATE Procedure [dbo].[linkOutputFileToProcessRun] @ProcessRunId int, @OutputFiles nvarchar(max)
 AS
 
 SET NOCOUNT ON;
@@ -6053,7 +6053,7 @@ declare @fileid int = (select isnull(max(fileid),0) from [file])
 declare @resourceid int = (select isnull(max(resourceid),0) from [resource])
 declare @fileresourceid int = (select isnull(max(fileresourceid),0) from [fileresource])
 declare @locationid int = (select isnull(max(locationid),0) +1 from [location])
-declare @sql nvarchar(2500)
+declare @sql nvarchar(max)
 
 set @OutputFiles =  replace(@OutputFiles,',',''',''') 
 
@@ -6647,8 +6647,8 @@ CREATE PROCEDURE [dbo].[workflowFlattener]
 		@NumberOfSamples int = null,
 		@GULThreshold int = null,
 		@UseRandomNumberFile int = null,
-		@OutputsStringGUL nvarchar(2500) = null,
-		@OutputsStringIL nvarchar(2500) = null,
+		@OutputsStringGUL nvarchar(max) = null,
+		@OutputsStringIL nvarchar(max) = null,
 		@EventSetID nvarchar(255)  = null,
 		@EventOccurrenceID nvarchar(255)  = null,
 		@DemandSurge bit  = null,
@@ -6667,7 +6667,7 @@ SET NOCOUNT ON;
 ----------------------------------------------------------------------------
 --log database usage
 declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = '@ProgOasisID = ' + convert(nvarchar,@ProgOasisID) + ', ' +
+declare	@ParameterList nvarchar(max) = '@ProgOasisID = ' + convert(nvarchar,@ProgOasisID) + ', ' +
 										'@WorkflowID = ' + convert(nvarchar,@WorkflowID) + ', ' +
 										'@NumberOfSamples = ' + convert(nvarchar,@NumberOfSamples) + ', ' +
 										'@GULThreshold = ' + convert(nvarchar,@GULThreshold) + ', ' +
@@ -6710,7 +6710,7 @@ Declare @ModelName nvarchar(255)		= (Select ModelName From Model Where ModelId =
 Declare	@ModuleSupplierId nvarchar(255)	= (Select ModelResourceValue From ModelResource Where ModelID = @ModelID And ModelResourceName = 'module_supplier_id')
 Declare	@ModelVersionId nvarchar(255)	= (Select ModelResourceValue From ModelResource Where ModelID = @ModelID And ModelResourceName = 'model_version_id')
 Declare	@NumberOfPeriods nvarchar(255)	= (Select ModelResourceValue From ModelResource Where ModelID = @ModelID And ModelResourceName = 'number_of_periods')
-Declare @SQL nvarchar(2500)
+Declare @SQL nvarchar(max)
 --Set	@ProcessRunName = @ProgName + ' - ' + @ModelName + case when @ProcessRunName = '' then '' else ': ' + @ProcessRunName end
 if @SummaryReports = 1
 begin
@@ -6750,7 +6750,9 @@ end
 --Add quotation marks into Outputs String Params
 Set @OutputsStringGUL = '''' + @OutputsStringGUL + ''''
 Set @OutputsStringIL = '''' + @OutputsStringIL + ''''
-Set @OutputsStringGUL = REPLACE(@OutputsStringGUL,', ',''',''')
+Set @OutputsStringGUL = REPLACE(@OutputsStringGUL,' ','')
+Set @OutputsStringIL = REPLACE(@OutputsStringIL,' ', '')
+Set @OutputsStringGUL = REPLACE(@OutputsStringGUL,',',''',''')
 Set @OutputsStringIL = REPLACE(@OutputsStringIL,',', ''',''')
 --Workflow
 Create Table #WorkflowElements (RowID int identity(1,1), ElementRunID int null, ElementRunName nvarchar(255) null, WorkflowElementID int null,
@@ -6858,6 +6860,8 @@ Select	@OutputRunID + RowId AS OutputRunID,
 		@SummaryLevelRunID + RowId AS SummaryLevelRunID
 From	#OutputRun
 Drop Table #OutputRun
+Drop Table #ModelParameters
+Drop Table #WorkflowElements
 Select @ProcessRunId AS ReturnValue
 GO
 						     
