@@ -85,3 +85,7 @@ defaultSelectChoicesIL <- c(
   "ilprogFullUncAEP", "ilprogFullUncOEP", "ilpolicyELT", "ilpolicyAAL",
   "ilpolicyPLT", "ilpolicyFullUncAEP", "ilpolicyFullUncOEP"
 )
+
+
+### Panels Programme Workflow -----
+panelsProgrammeWorkflow <- c("Create Programme", "Select Programme & Associate Model", "Configure Workflow Output", "Browse & re-run")
