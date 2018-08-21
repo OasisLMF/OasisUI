@@ -12,14 +12,6 @@ programmeDefinitionSingleUI <- function(id) {
   ns <- NS(id)
   
   tagList(
-    tags$style(type = "text/css", ".irs-grid-pol.small {height: 0px;}"),
-    tags$style(type = "text/css", ".irs-bar, .irs-bar-edge, .irs-line{height:15px;}"),
-    tags$style(type = "text/css", ".irs-grid-text {font-size:14px;  top: 20px;}"),
-    tags$style(type = "text/css", ".irs-single {font-size:14px;top:-5px}"),
-    tags$style(type = "text/css", ".irs-grid-pol {display: none;}"),
-    tags$style(HTML(".irs-single, .irs-bar-edge, .irs-bar {background: #8b2129}")),
-    
-    #                 ")),
     sliderInputBlock(id),
     
     #Modals
@@ -60,15 +52,17 @@ sliderInputBlock <- function(id){
   tagList(
     h4("Process Definition Steps"),
     br(),
-    sliderTextInput(inputId = ns("sliderdefprogsteps"),
-                    label = NULL, 
-                    choices = panelsProgrammeWorkflow, 
-                    selected = panelsProgrammeWorkflow[1], #incase you want all values by default 
-                    animate = FALSE, grid = TRUE, 
-                    hide_min_max = TRUE, from_fixed = FALSE,
-                    to_fixed = FALSE, from_min = NULL, from_max = NULL, to_min = NULL,
-                    to_max = NULL, force_edges = TRUE, width = '100%', pre = NULL,
-                    post = NULL, dragRange = FALSE)
+    div(id = ns("divsliderdefprogsteps"),
+        sliderTextInput(inputId = ns("sliderdefprogsteps"),
+                        label = NULL, 
+                        choices = panelsProgrammeWorkflow, 
+                        selected = panelsProgrammeWorkflow[1], # in case you want all values by default 
+                        animate = FALSE, grid = TRUE, 
+                        hide_min_max = TRUE, from_fixed = FALSE,
+                        to_fixed = FALSE, from_min = NULL, from_max = NULL, to_min = NULL,
+                        to_max = NULL, force_edges = TRUE, width = '100%', pre = NULL,
+                        post = NULL, dragRange = FALSE)
+        )
   )
 }
 
@@ -202,28 +196,10 @@ panelDefineIDs <-  function(id){
   ns <- NS(id)
   
   panel(
-    tags$head(
-      tags$style(type = "text/css", 
-                 ".inline_sliderInput label.control-label, .inline_sliderInput .selectize-control.single { 
-         display: table-cell; 
-         text-align: center; 
-         vertical-align: middle; 
-      } 
-      .inline_sliderInput label.control-label {
-        padding-right: 10px;
-      }
-      .inline_sliderInput .form-group { 
-        display: table-row;
-      }
-      .inline_sliderInput .selectize-control.single div.item {
-        padding-right: 15px;
-      }")
-    ),
     status = "primary",
     #heading = fluidRow(column(11, h4("Filter"))),
     fluidRow(
       div(id = ns("divselectprogrammeID"), 
-               class = "inline_sliderInput",
           column(3,
                  selectInput(inputId =  ns("selectprogrammeID"), label = "Programme ID", choices = "", selected = NULL),
                  bsTooltip(ns("selectprogrammeID"), 
@@ -231,7 +207,6 @@ panelDefineIDs <-  function(id){
                            placement = "right", 
                            options   = list(container = "body")))),
       hidden(div(id = ns("divselectprogOasisID"), 
-                 class = "inline_sliderInput",
                  column(3,
                         selectInput(inputId =  ns("selectprogOasisID"), label = "Oasis Programme ID", choices = "", selected = NULL),
                         bsTooltip(ns("selectprogOasisID"), 
@@ -303,7 +278,6 @@ panelDefineOutputs <-  function(id){
 panelDefineOutputsDetails <-  function(id){
   ns <- NS(id)
   tagList(
-    tags$style(HTML(".irs-single, .irs-bar-edge, .irs-bar {background: #8b2129}")),
     panel(
       heading = fluidRow(column(11, h4("Configuration Details"))),
       selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = ""),
