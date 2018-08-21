@@ -7,7 +7,7 @@
 #' @rdname programmeDefinitionSingle
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDataTable dataTableProxy selectRows
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate select
 #' @importFrom shinyBS toggleModal
 #' @importFrom shinyWidgets updateSliderTextInput
 #' @importFrom shinyjs onclick
