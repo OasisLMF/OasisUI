@@ -100,7 +100,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
 #' }
-#' @importFrom shinyWidgets dropdown
+#' @importFrom shinyWidgets dropdown toggleDropdownButton
 #' @export
 pageheader <- function(input, output, session, userId, userName, dbSettings,
                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
@@ -114,19 +114,21 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   ### Greeter ----
   output$textOutputHeaderData2 <- renderText(paste("User Name:", userName()))
 
-  observeEvent(input$abuttonuseradmin,
-               result$navigate <- structure("UA", count = input$abuttonuseradmin))#,
-  #shinyjs::hide(id = "accountDDmenu"))
+  observeEvent(input$abuttonuseradmin,{
+               result$navigate <- structure("UA", count = input$abuttonuseradmin)
+               toggleDropdownButton(ns("accountDDmenu"))})
 
-  observeEvent(input$abuttondefineaccount,
-               result$navigate <- structure("DA", count = input$abuttondefineaccount))
+  observeEvent(input$abuttondefineaccount,{
+               result$navigate <- structure("DA", count = input$abuttondefineaccount)
+               toggleDropdownButton(ns("accountDDmenu"))})
 
-  observeEvent(input$abuttonsysconf,
-               result$navigate <- structure("SC", count = input$abuttonsysconf))
+  observeEvent(input$abuttonsysconf,{
+               result$navigate <- structure("SC", count = input$abuttonsysconf)
+               toggleDropdownButton(ns("accountDDmenu"))})
 
-  observeEvent(input$abuttonhome,
-               result$navigate <- structure("LP", count = input$abuttonhome))#,
-  #shinyjs::hide(id = "accountDDmenu"))
+  observeEvent(input$abuttonhome,{
+               result$navigate <- structure("LP", count = input$abuttonhome)
+               toggleDropdownButton(ns("accountDDmenu"))})
 
 
   LogoutModal <- function(){
@@ -180,7 +182,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' }
 #' @importFrom shinyBS bsTooltip
-#' @importFrom shinyWidgets panel tooltipOptions
+#' @importFrom shinyWidgets panel tooltipOptions toggleDropdownButton
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
                           reloadMillis = 10000, logMessage = message,
@@ -200,11 +202,13 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 
   ### Navigation Menu ----
 
-  observeEvent(input$abuttondefineprogrammesingle,
-               result$navigate <- structure("PS", count = input$abuttondefineprogrammesingle))
+  observeEvent(input$abuttondefineprogrammesingle,{
+               result$navigate <- structure("PS", count = input$abuttondefineprogrammesingle)
+               toggleDropdownButton(ns("abuttonrun"))})
 
-  observeEvent(input$abuttondefineprogrammebatch,
-               result$navigate <- structure("PB", count = input$abuttondefineprogrammebatch))
+  observeEvent(input$abuttondefineprogrammebatch,{
+               result$navigate <- structure("PB", count = input$abuttondefineprogrammebatch)
+               toggleDropdownButton(ns("abuttonrun"))})
 
   observeEvent(input$abuttonbrowse,
                result$navigate <- structure("BR", count = input$abuttonbrowse))

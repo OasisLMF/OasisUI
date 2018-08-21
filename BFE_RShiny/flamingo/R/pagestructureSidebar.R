@@ -1,12 +1,13 @@
 pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
   panel(
     heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = FALSE),
-    dropdown(
+    dropdownButton(
       inputId = ns("abuttonrun"),
       status = "primary",
       label = if (!collapsed) "Process",
       icon = if (collapsed) icon("cog", lib = "glyphicon"),
       circle = FALSE,
+      right = TRUE,
       tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
       actionButton(ns("abuttondefineprogrammesingle"), "Single Process",
                    class = "btn btn-primary", align = "right",  width = "100%"),
