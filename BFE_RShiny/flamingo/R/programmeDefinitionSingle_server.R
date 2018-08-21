@@ -558,8 +558,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   observe( if (active()) {
     if ( !is.null(result$DPProgData)) {
       if (input$selectprogrammeID == "") {
+        if (preselProcId() != -1) {
+          index <- 1
+        } else {
+          index <- match(c(preselProcId()), result$DPProgData[[1]]) 
+        }
         logMessage(paste0("updating selectprogrammeID choices based on Programme Table"))
-        updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[1:nrow(result$DPProgData),1])
+        updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[1:nrow(result$DPProgData),index])
       }
     }
   })
