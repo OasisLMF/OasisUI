@@ -21,7 +21,8 @@ Imports:
   DT,
   leaflet,
   plotly,
-  dplyr
+  dplyr,
+  V8
 Suggests:
   knitr,
   testthat,

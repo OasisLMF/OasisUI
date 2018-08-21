@@ -10,7 +10,7 @@
 #' @importFrom dplyr mutate select
 #' @importFrom shinyBS toggleModal
 #' @importFrom shinyWidgets updateSliderTextInput
-#' @importFrom shinyjs onclick
+#' @importFrom shinyjs onclick js
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                       apiSettings, userId, active = reactive(TRUE), logMessage = message,
@@ -75,23 +75,27 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (input$sliderdefprogsteps == panelsProgrammeWorkflow[1]) {
       logMessage("showing panelDefineProgramme")
       .hideDivs()
+      .hideSliderLabel(1)
       .defaultCreateProg()
     }
     if (input$sliderdefprogsteps == panelsProgrammeWorkflow[2]) {
       logMessage("showing panelProgrammeTable panelAssociateModel")
       .hideDivs()
+      .hideSliderLabel(2)
       .defaultAssociateModel()
       .reloadDPProgData()
     }
     if (input$sliderdefprogsteps == panelsProgrammeWorkflow[3]) {
       logMessage("showing panelDefineIDs panelProgrammeModelTable panelDefineOutputs")
       .hideDivs()
+      .hideSliderLabel(3)
       .defaultConfigOutput()
       .reloadPOData()
     }
     if (input$sliderdefprogsteps == panelsProgrammeWorkflow[4]) {
       logMessage("showing panelDefineIDs panelProcessRunTable")
       .hideDivs()
+      .hideSliderLabel(4)
       .defaultRun()
       .reloadRunData()
     }
@@ -1267,7 +1271,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   observe({
-    .reloadRunData
+    .reloadRunData()
     if (length(input$tableprocessrundata_rows_selected) > 0) {
       result$prcrundata_selected_rows <- input$tableprocessrundata_rows_selected
     } else {
@@ -1311,6 +1315,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     hide("panelDefineOutputConfiguration")
     hide("panelProcessRunTable")
     hide("panelProcessRunLogs")
+  }
+  
+  # hide label of the currently selected element in sliderdefprogsteps
+  .hideSliderLabel <- function(index) {
+    numLabels <- length(panelsProgrammeWorkflow)
+    # N.B.: JavaScript array indices start from zero
+    # make all the labels visible
+    lapply(seq(numLabels), function(i) {
+      js$changeJSGridTextVisibility(index = i - 1, visible = TRUE)
+    })
+    # hide the current one
+    js$changeJSGridTextVisibility(index = index - 1, visible = FALSE)
   }
   
   # default view for panels
