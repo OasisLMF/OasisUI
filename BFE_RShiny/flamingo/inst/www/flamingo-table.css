@@ -37,7 +37,3 @@ And used by e.g.
 	font-size: 12px;
 	text-align: center
 }
-
-table.dataTable tr.selected td, table.dataTable td.selected {
-  background-color: #ebcccc !important;
-}

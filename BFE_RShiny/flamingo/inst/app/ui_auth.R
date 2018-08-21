@@ -9,6 +9,9 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
   tagList(
 
     tags$script("Shiny.onInputChange('authUIRenderCallback', true)"),
+    tags$style(
+      HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #ebcccc !important;}')
+    ),
 
     # Header ----
     fluidRow(
