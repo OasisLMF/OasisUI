@@ -4,42 +4,42 @@
 /* CSS class to format checkboxinputgroups into 6 columns */
 
 .h5-align {
-	margin-top: 14px;
+  margin-top: 14px;
   margin-bottom: 0px;
 }
 
 .multicol {
-	-webkit-column-count: 6; /* Chrome, Safari, Opera */
+  -webkit-column-count: 6; /* Chrome, Safari, Opera */
   -moz-column-count: 6; /* Firefox */
   column-count: 6;
 }
 
 h3.flamingo-page-title {
-	margin-top: 3em;
-	text-align: center;
+  margin-top: 3em;
+  text-align: center;
 }
 
 h4.flamingo-table-title {
-	text-align: left;
-	display: block;
+  text-align: left;
+  display: block;
 }
 
 div.flamingo-page-division {
-	margin-top: 2em;
-	/* border: 1px solid #e3e3e3; */
-	padding: 20px;
-	border-radius: 4px;
-	margin-left: auto;
-	margin-right: auto;
-	max-width: 1600px;
+  margin-top: 2em;
+  /* border: 1px solid #e3e3e3; */
+  padding: 20px;
+  border-radius: 4px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1600px;
 }
 
 .btn {
-	margin-bottom: 5px !important;
+  margin-bottom: 5px !important;
 }
 
 .flamingo-page-wrap {
-	max-width: 1000px;
+  max-width: 1000px;
 }
 
 .datatables {
@@ -53,52 +53,52 @@ div.flamingo-page-division {
 /*** Modal Windows ***/
 
 .modal-footless .modal-footer {
-	display: none;
+  display: none;
 }
 
 /*** Login ***/
 
 .login-dialog {
-	padding: 1em;
+  padding: 1em;
 }
 
 .login-dialog img {
-	margin-bottom: 3em;
+  margin-bottom: 3em;
 }
 
 .login-dialog input {
-	margin-bottom: 1em;
-	font-size: 14pt;
-	display: block;
+  margin-bottom: 1em;
+  font-size: 14pt;
+  display: block;
 }
 
 .login-dialog button {
-	margin-top: 1em;
-	margin-bottom: 1em;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 /*** File Viewer ***/
 
 #fileViewer-plainmap {
-	height: calc(100vh - 230px) !important;
+  height: calc(100vh - 230px) !important;
 }
 
 #FVPanelSwitcher {
-	color: rgba(0, 0, 0, 0);
-	background-color: rgba(0, 0, 0, 0);
-	font-size: 1%;
-	height: 1px;
-	border-style: none; 
+  color: rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
+  font-size: 1%;
+  height: 1px;
+  border-style: none; 
 }
 
 
 /*** Notifications ***/
 
 .shiny-notification-side {
-	display: inline-block;
-	margin-right: 10px;
-	font-size: 24px;
-	vertical-align: top;
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 24px;
+  vertical-align: top;
 }
 
 .shiny-notification-main {
@@ -108,10 +108,10 @@ div.flamingo-page-division {
 }
 
 .shiny-notification-error {
-	background: linear-gradient(to bottom, #dc6462 0%, #a94442 100%);
-	border: 1px solid #994442;
-	min-height: 100px;
-	color: #fff;
+  background: linear-gradient(to bottom, #dc6462 0%, #a94442 100%);
+  border: 1px solid #994442;
+  min-height: 100px;
+  color: #fff;
 }
 
 .shiny-notification-warning {
@@ -122,4 +122,34 @@ div.flamingo-page-division {
 .shiny-notification-message {
   background: linear-gradient(to bottom, #fff 0%, #dcdcdc 100%);
   border: 1px solid #979797;
+}
+
+/* Slider styles */
+.irs-grid-pol.small {
+  height: 0px !important;
+}
+
+.irs-grid-pol {
+  display: none !important;
+}
+
+.irs-single, .irs-bar-edge, .irs-bar {
+  background: #8b2129 !important;
+}
+
+/* Styles for sliderdefprogsteps */
+#programmeDefinitionSingle-divsliderdefprogsteps .irs-bar,
+#programmeDefinitionSingle-divsliderdefprogsteps .irs-bar-edge,
+#programmeDefinitionSingle-divsliderdefprogsteps .irs-line {
+  height:15px;
+}
+
+#programmeDefinitionSingle-divsliderdefprogsteps .irs-grid-text {
+  font-size: 14px;
+  top: 20px;
+}
+
+#programmeDefinitionSingle-divsliderdefprogsteps .irs-single {
+  font-size: 14px;
+  top: -5px;
 }
