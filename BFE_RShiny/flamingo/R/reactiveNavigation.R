@@ -1,35 +1,31 @@
 #' Reactive navigation
 #'
-#' Set of utilities providing a common way to store reactive navigation state
-#' and propagate it as or retrieve it from module outputs, supporting navigation
-#' across nested modules.
+#' Set of utilities for storing reactive navigation state and propagating it as
+#' or retrieving it from module outputs, supporting navigation across nested
+#' modules. This provides a common, aligned way of handling navigation,
+#' abstracting from the specific implementation details.
 #'
-#' @param value
+#' @param value Desired value of the navigation state.
 #'
 #' @details
 #' The details behind how the navigation state is stored, propagated and
-#' observed are encapsulate using utilities for initializing the state
-#' (`reactiveNavigation()`), updating it (`updateNavigation()`), making it a
-#' module output reactive list element (`outputNavigation()`), retrieving it from
-#' a module output (`getNavigation()`). Observing and collecting navigation
-#' state from a list of (sub-) modules (`observeModuleNavigation()`) allows
-#' flexible modular configurations with arbitrarily nested modules.
+#' observed are encapsulated using utilities for initializing the state
+#' (`reactiveNavigation()`), updating it (`updateNavigation()`), adding it as
+#' part of the module output list (`outputNavigation()`), retrieving it from a
+#' module output (`getNavigation()`). Observing and collecting navigation state
+#' from a list of (sub-) modules (`observeModuleNavigation()`) allows flexible
+#' modular configurations with arbitrarily nested modules.
 #'
-#' This functionality provides a common, aligned way of handling navigation,
-#' abstracting from the specific implementation details. In fact, from the user
-#' (shiny app developer) perspective, there is no need to explicitly know how
-#' the navigation state is internally stored or called.
-#'
-#' Enabling navigation in the sever or a module's server function) boils down
+#' Enabling navigation in the sever (or a module's server function) boils down
 #' to:
 #' ``` r
 #' # [...]
 #' # initialize the reactive navigation state
 #' navigation_state <- reactiveNavigation()
 #' # [...]
-#' # possibly observe what is relevant for the update of the navigation state
+#' # observe what is relevant for the update of the navigation state
 #' observeEvent(..., {updateNavigation(navigation_state, new_value)})
-#' # possibly observe the navigation coming from a list of (sub)modules outout
+#' # possibly observe the navigation coming from a list of (sub)modules outputs
 #' observeModuleNavigation(navigation_state, modules)
 #' # [...]
 #' # construct the navigation-related part of the module output list
@@ -38,15 +34,15 @@
 #'   list(other_reactive_outputs)
 #' )
 #' [...]
-#' # get the reactive value when needed (typically in the top-level module/server)
-#' getNavigation(navigation_state)
+#' # get the reactive value when needed (typically in the top-level server)
 #' getNavigation(outputNavigation(navigation_state))
 #' [...]
 #' ```
 #'
-#' @return TBD
+#' @return `reactiveNavigation()` returns the navigation state to be used by the
+#'   other functions, initialized with `value`.
 #'
-#' @examples
+#' @example man-roxygen/ex-reactiveNavigation.R
 #'
 #' @export
 #'
@@ -61,8 +57,16 @@ reactiveNavigation <- function(value = NULL) {
 }
 
 
-# update navigation state
 #' @rdname reactiveNavigation
+#'
+#' @param state Reactive navigation state created with `reactiveNavigation()`.
+#' @param force_react Logical flag specifying whether the observed event for
+#'   navigation state update should always invalidate the reactive navigation
+#'   state, thus forcing rectivity. This is especially desirable within inner
+#'   modules.
+#'
+#' @return `updateNavigation()` returns `NULL`, invisibly, and is called for its
+#'   side-effect of updating the input `state` with the supplied `value`.
 #'
 #' @export
 #'
@@ -76,8 +80,12 @@ updateNavigation <- function(state, value, force_react = TRUE) {
   invisible()
 }
 
-# reactive navigation state output, including or excluding .react invalidation
+
 #' @rdname reactiveNavigation
+#'
+#' @return `outputNavigation()` returns a list containing the reactive
+#'   navigation state, to be possibliy `c`ombined with other module outputs. The
+#'   reactive navigation state can then be extracted using `getNavigation()`.
 #'
 #' @export
 #'
@@ -99,20 +107,33 @@ outputNavigation <- function(state, force_react = TRUE) {
   }
 }
 
-# extract the navigation state as a reactive value if present, returining
-# reactive(NULL) otherwise
+
 #' @rdname reactiveNavigation
+#'
+#' @param output A list possibly containing a reactive navigation state
+#'   component (created with `outputNavigation()`).
+#'
+#' @return `getNavigation()` returns the reactive navigation state extracted
+#'   from `output` if present, `reactive(NULL)` otherwise.
 #'
 #' @export
 #'
 #' @md
-getNavigation <- function(module) {
-  reactive(if (!is.null(module$.navigate_to)) module$.navigate_to())
+getNavigation <- function(output) {
+  reactive(if (!is.null(output$.navigate_to)) output$.navigate_to())
 }
 
-# create observers that update the inpuit navigation `state` based on the
-# navigation state of a list of modules
+
 #' @rdname reactiveNavigation
+#'
+#' @param modules A list of modules output lists, each possibly containing a
+#'   reactive navigation state component (created with `outputNavigation()`).
+#' @param logger Optional logging function to log the observed navigation state
+#'   updates.
+#'
+#' @return `observeModuleNavigation()` returns `NULL`, invisibly, and is called
+#'   for its side-effect of updating the input navigation `state` by observing
+#'   the navigation state of the input `modules`.
 #'
 #' @export
 #'
@@ -128,4 +149,5 @@ observeModuleNavigation <- function(state, modules, force_react = TRUE,
       }
     })
   })
+  invisible()
 }
