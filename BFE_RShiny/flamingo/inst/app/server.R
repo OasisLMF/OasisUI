@@ -217,11 +217,14 @@ server <- function(input, output, session) {
 
   ### navigation ----
   # observe the possible navigation state propagated from any module
-  observeModuleNavigation(navigation_state, auth_modules, logger = logMessage)
+  observeModuleNavigation(navigation_state, auth_modules, logger = NULL)
 
   # activate the main panel the user navigates to
   callModule(conditionalPanels, "mainPanel", main_visible)
 
+
+  # TODO: Consider simplifying the logging of the navigation using the `logger`
+  # argument of `observeModuleNavigation()` above.
   observe(if (authenticated()) {
 
     switch(main_visible(),
