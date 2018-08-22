@@ -103,7 +103,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
 #' }
-#' @importFrom shinyWidgets dropdown
+#' @importFrom shinyWidgets dropdown toggleDropdownButton
 #' @export
 pageheader <- function(input, output, session, userId, userName, dbSettings,
                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
@@ -115,20 +115,25 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   ### Greeter ----
   output$textOutputHeaderData2 <- renderText(paste("User Name:", userName()))
 
-  observeEvent(input$abuttonuseradmin,
-               updateNavigation(navigation_state, "UA"))#,
-  #shinyjs::hide(id = "accountDDmenu"))
+  observeEvent(input$abuttonuseradmin, {
+    updateNavigation(navigation_state, "UA")
+    toggleDropdownButton(ns("accountDDmenu"))
+  })
 
-  observeEvent(input$abuttondefineaccount,
-               updateNavigation(navigation_state, "DA"))
+  observeEvent(input$abuttondefineaccount, {
+    updateNavigation(navigation_state, "DA")
+    toggleDropdownButton(ns("accountDDmenu"))
+  })
 
-  observeEvent(input$abuttonsysconf,
-               updateNavigation(navigation_state, "SC"))
+  observeEvent(input$abuttonsysconf, {
+    updateNavigation(navigation_state, "SC")
+    toggleDropdownButton(ns("accountDDmenu"))
+  })
 
-  observeEvent(input$abuttonhome,
-               updateNavigation(navigation_state, "LP"))#,
-  #shinyjs::hide(id = "accountDDmenu"))
-
+  observeEvent(input$abuttonhome, {
+    updateNavigation(navigation_state, "LP")
+    toggleDropdownButton(ns("accountDDmenu"))
+  })
 
   LogoutModal <- function(){
     ns <- session$ns
@@ -177,65 +182,60 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
-#' @param W reactive expressione yelding the Width of the sidebar
+#' @param collapsed reactive expression determining how the UI should be rendered
 #' @return list of reactive expressions
 #' \itemize{
 #' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' }
 #' @importFrom shinyBS bsTooltip
-#' @importFrom shinyWidgets panel tooltipOptions
+#' @importFrom shinyWidgets panel tooltipOptions toggleDropdownButton
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
                           reloadMillis = 10000, logMessage = message,
-                          active = reactive(TRUE), W) {
+                          active = reactive(TRUE), collapsed = reactive(FALSE)) {
 
   ns <- session$ns
 
   navigation_state <- reactiveNavigation()
 
-  result <- reactiveValues(
-    Width = 9
-  )
 
-  observe(if (!is.null(W())) {
-    result$Width <- W()
+  observe({
+    output$sidebar <-
+      renderUI(pagestructureSidebar(ns, collapsed = collapsed()))
   })
-
-  ### Sidebar ----
-  # note that the more elegant
-  # pagestructureSidebar(ns, collapsed = result$Width != 9)
-  # does not work
-  observe(
-    if (result$Width == 9) {
-      output$sidebar <- renderUI({pagestructureSidebar(ns, collapsed = FALSE)})
-    } else {
-      output$sidebar <- renderUI({pagestructureSidebar(ns, collapsed = TRUE)})
-    }
-  )
 
 
   ### Navigation Menu ----
 
-  observeEvent(input$abuttondefineprogrammesingle,
-               updateNavigation(navigation_state, "PS"))
+  observeEvent(input$abuttondefineprogrammesingle, {
+    updateNavigation(navigation_state, "PS")
+    toggleDropdownButton(ns("abuttonrun"))
+  })
 
-  observeEvent(input$abuttondefineprogrammebatch,
-               updateNavigation(navigation_state, "PB"))
+  observeEvent(input$abuttondefineprogrammebatch, {
+    updateNavigation(navigation_state, "PB")
+    toggleDropdownButton(ns("abuttonrun"))
+  })
 
-  observeEvent(input$abuttonbrowse,
-               updateNavigation(navigation_state, "BR"))
+  observeEvent(input$abuttonbrowse, {
+    updateNavigation(navigation_state, "BR")
+  })
 
-  observeEvent(input$abuttonhome,
-               updateNavigation(navigation_state, "LP"))
+  observeEvent(input$abuttonhome, {
+    updateNavigation(navigation_state, "LP")
+  })
 
-  observeEvent(input$abuttonexpmngt,
-               updateNavigation(navigation_state, "EM"))
+  observeEvent(input$abuttonexpmngt, {
+    updateNavigation(navigation_state, "EM")
+  })
 
-  observeEvent(input$abuttonprmngt,
-               updateNavigation(navigation_state, "WF"))
+  observeEvent(input$abuttonprmngt, {
+    updateNavigation(navigation_state, "WF")
+  })
 
-  observeEvent(input$abuttonfilemngt,
-               updateNavigation(navigation_state, "FM"))
+  observeEvent(input$abuttonfilemngt, {
+    updateNavigation(navigation_state, "FM")
+  })
 
 
   ### Button permissions ----

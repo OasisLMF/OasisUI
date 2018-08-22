@@ -23,9 +23,7 @@ fileViewer <- function(
     FLdata = NULL,               #table of files
     FVid = -1,                   #needed to get the operations valid on file id
     fileData = NULL,             #file to download
-    lastViewBtn = character(),   #last button View to be clicked
-    lastMapBtn  = character(),   #last button Map to be clicked
-    validButtons = NULL,         #buttons for which the user has permission. Depends on current list of files
+    currentFile = NULL,          #Current filename
     lenFLdata = 400              #length of the table fileData
   )
   
@@ -72,8 +70,8 @@ fileViewer <- function(
     cbind(
       data.frame(Selected = .shinyInput(checkboxInput,"srows_", nrow(result$FLdata), value = FALSE, width = 1)),
       result$FLdata,
-      data.frame(View = .shinyInput(actionButton, "vrows_", nrow(result$FLdata), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')), 
-      data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(result$FLdata), Label = "Map",  hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;' ))
+      data.frame(View = .shinyInput(actionButton, "vrows_", nrow(result$FLdata), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')), #,style = "color: #8b2129; background-color: transparent; border-color: #8b2129")), 
+      data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(result$FLdata), Label = "Map",  hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;'))   #, style = "color: #8b2129; background-color: transparent; border-color: #8b2129"))
     )
   })
 
@@ -208,7 +206,7 @@ fileViewer <- function(
   
   # Export to .csv
   output$FVEdownloadexcel <- downloadHandler(
-    filename = paste0(result$FLdata[result$lastViewClicked, 3]),
+    filename = result$currentFile, 
     content = function(file) {
       write.csv(result$fileData, file)}
   )
@@ -237,7 +235,7 @@ fileViewer <- function(
     FUN = function(i){
       observeEvent(input[[paste0("vrows_", i)]], {
         if (input[[paste0("vrows_", i)]] > 0) {
-          result$lastViewBtn <- paste0(i)   
+          result$currentFile <-  paste0(result$FLdata[i, 2])
           showModal(FileContent)
           # Extra info table
           output$tableFVExposureSelectedInfo <- renderUI({
@@ -279,7 +277,6 @@ fileViewer <- function(
     FUN = function(i){
       observeEvent(input[[paste0("mrows_", i)]], {
         if (input[[paste0("mrows_", i)]] > 0) {
-          result$lastMapBtn <- paste0(i)   
           showModal(Map)
           fileName <- file.path(result$FLdata[i, 5], result$FLdata[i, 2])
           # Extra info table

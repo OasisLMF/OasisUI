@@ -7,8 +7,9 @@
 \alias{programmeDefinitionAmendUI}
 \title{Programme Definition Module}
 \usage{
-programmeDefinition(input, output, session, dbSettings, apiSettings, userId,
-  active = reactive(TRUE), logMessage = message, reloadMillis = 10000)
+programmeDefinition(input, output, session, dbSettings, apiSettings,
+  userId, active = reactive(TRUE), logMessage = message,
+  reloadMillis = 10000)
 
 programmeDefinitionUI(id)
 

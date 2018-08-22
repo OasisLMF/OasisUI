@@ -5,7 +5,8 @@
 \title{pageheader}
 \usage{
 pageheader(input, output, session, userId, userName, dbSettings,
-  reloadMillis = 10000, logMessage = message, active = reactive(TRUE))
+  reloadMillis = 10000, logMessage = message,
+  active = reactive(TRUE))
 }
 \arguments{
 \item{input}{shiny input object}

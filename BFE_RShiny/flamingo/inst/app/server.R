@@ -42,7 +42,7 @@ server <- function(input, output, session) {
   # collapse / expand sidebar
   observeEvent(input$abuttoncollapsesidebar, {
     result$collapsed <- !result$collapsed
-    if (result$collapsed) {
+    if (!result$collapsed) {
       result$WidthMain <- 9
       result$WidthSide <- 3
     } else {
@@ -81,7 +81,7 @@ server <- function(input, output, session) {
     reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated()),
-    W = reactive(result$WidthMain)
+    collapsed = reactive(result$collapsed)
   )
 
   auth_modules$landingPage <- .callModule(
@@ -209,9 +209,9 @@ server <- function(input, output, session) {
       )
     }
   )
-  # reactivity via flexColumn module
-  callModule(flexColumn, "sidebar", reactive(result$WidthSide))
-  callModule(flexColumn, "main", reactive(result$WidthMain))
+  # reactivity via dynamicColumn module
+  callModule(dynamicColumn, "sidebar", reactive(result$WidthSide))
+  callModule(dynamicColumn, "main", reactive(result$WidthMain))
 
   observe(result$logout <- auth_modules$pageheader$logout())
 

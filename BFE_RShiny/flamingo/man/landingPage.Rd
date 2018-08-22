@@ -6,7 +6,8 @@
 \title{Landing Page}
 \usage{
 landingPage(input, output, session, userId, userName, dbSettings,
-  reloadMillis = 10000, logMessage = message, active = reactive(TRUE))
+  reloadMillis = 10000, logMessage = message,
+  active = reactive(TRUE))
 
 landingPageUI(id)
 }

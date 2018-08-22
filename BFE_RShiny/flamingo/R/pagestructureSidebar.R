@@ -1,21 +1,22 @@
 pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
   panel(
     heading = sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = FALSE),
-    dropdown(
+    dropdownButton(
       inputId = ns("abuttonrun"),
       status = "primary",
       label = if (!collapsed) "Process",
       icon = if (collapsed) icon("cog", lib = "glyphicon"),
       circle = FALSE,
+      right = FALSE,
       tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
       actionButton(ns("abuttondefineprogrammesingle"), "Single Process",
-                   class = "btn btn-primary", align = "right",  width = "100%"),
+                   class = "btn btn-primary", align = "left",  width = "100%"),
       bsTooltip(ns("abuttondefineprogrammesingle"),
                 landing_page$abuttondefineprogrammesingle,
                 placement = "right",
                 options   = list(container = "body")),
       actionButton(ns("abuttondefineprogrammebatch"), "Batch Process",
-                   class = "btn btn-primary", align = "right",  width = "100%"),
+                   class = "btn btn-primary", align = "left",  width = "100%"),
       bsTooltip(ns("abuttondefineprogrammebatch"),
                 landing_page$abuttondefineprogrammebatch,
                 placement = "right",

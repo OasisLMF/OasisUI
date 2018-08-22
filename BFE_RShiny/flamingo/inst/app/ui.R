@@ -13,6 +13,8 @@ ui <- function(request) {
         tags$link(rel = "stylesheet", type = "text/css", href = "bootstrap.css")
       ),
       shinyjs::useShinyjs(),
+      shinyjs::extendShinyjs(script = system.file("www", "flamingo.js", package = "flamingo")),
+
       title = "Flamingo",
 
       conditionalPanelsUI(
