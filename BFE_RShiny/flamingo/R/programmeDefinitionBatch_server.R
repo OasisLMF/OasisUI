@@ -3,7 +3,8 @@
 #' @inheritParams flamingoModule
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater};
-#' @return list of reactives:
+#' @return For \code{programmeDefinitionBatch()}, list of reactives.
+#' @template return-outputNavigation
 #' @rdname programmeDefinitionBatch
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDataTable

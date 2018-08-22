@@ -5,12 +5,12 @@
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
-#' @return list of reactive expressions
+#' @return For \code{landingPage()}, list of reactives:
 #' \itemize{
-#' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 #' }
+#' @template return-outputNavigation
 #' @importFrom DT renderDataTable datatable
 #' @importFrom dplyr mutate '%>%'
 #' @importFrom utils write.csv
@@ -98,11 +98,11 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
-#' @return list of reactive expressions
+#' @return For \code{pageheader()}, list of reactives:
 #' \itemize{
-#' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
 #' }
+#' @template return-outputNavigation
 #' @importFrom shinyWidgets dropdown toggleDropdownButton
 #' @export
 pageheader <- function(input, output, session, userId, userName, dbSettings,
@@ -183,10 +183,8 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
 #' @param collapsed reactive expression determining how the UI should be rendered
-#' @return list of reactive expressions
-#' \itemize{
-#' 		\item{\code{navigate}: }{reactive yielding navigation}
-#' }
+#' @return For \code{pagestructure()}, list of reactives.
+#' @template return-outputNavigation
 #' @importFrom shinyBS bsTooltip
 #' @importFrom shinyWidgets panel tooltipOptions toggleDropdownButton
 #' @export

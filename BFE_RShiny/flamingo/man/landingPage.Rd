@@ -32,12 +32,14 @@ see \link{invalidateLater};}
 \item{active}{reactive expression whether the module state should be updated.}
 }
 \value{
-list of reactive expressions
+For \code{landingPage()}, list of reactives:
 \itemize{
-		\item{\code{navigate}: }{reactive yielding navigation}
 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 }
+
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 }
 \description{
 Landing Page

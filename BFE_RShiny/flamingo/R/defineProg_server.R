@@ -4,11 +4,11 @@
 #' @inheritParams flamingoModule
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater};
-#' @return list of reactives:
+#' @return For \code{programmeDefinition()}, list of reactives:
 #' \itemize{
-#' 		\item{\code{navigate}}{reactive yielding navigation}
 #' 		\item{\code{progOasisId}}{selected ProgOasis Id}
 #' }
+#' @template return-outputNavigation
 #' @rdname programmeDefinition
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDataTable

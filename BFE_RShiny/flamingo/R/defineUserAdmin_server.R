@@ -4,7 +4,8 @@
 #' in association with OASIS LMF
 #' @inheritParams flamingoModule
 #' @param userId reactive yielding user id (of the logged in user)
-#' @return empty list
+#' @return For \code{userAdminDefinition()}, list of reactives.
+#' @template return-outputNavigation
 #' @rdname userAdminDefinition
 #' @importFrom DT renderDataTable
 #' @importFrom shinyjs enable disable

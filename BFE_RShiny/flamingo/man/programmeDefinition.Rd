@@ -38,11 +38,13 @@ see \link{invalidateLater};}
 \item{id}{shiny module id}
 }
 \value{
-list of reactives:
+For \code{programmeDefinition()}, list of reactives:
 \itemize{
-		\item{\code{navigate}}{reactive yielding navigation}
 		\item{\code{progOasisId}}{selected ProgOasis Id}
 }
+
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
 list of tags
 }
