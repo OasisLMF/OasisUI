@@ -18,7 +18,8 @@ server <- function(input, output, session) {
     navigate = "LP",
     collapsed = FALSE,
     WidthMain = 9,
-    WidthSide = 3
+    WidthSide = 3,
+    preselPanel = panelsProgrammeWorkflow[1]
   )
 
   authenticated <- reactive({
@@ -100,6 +101,7 @@ server <- function(input, output, session) {
     userId = reactive(result$userId),
     preselRunId = landingPageModule$runId,
     preselProcId = landingPageModule$procId,
+    preselPanel = reactive(result$preselPanel),
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && result$navigate == "PS")
@@ -110,8 +112,6 @@ server <- function(input, output, session) {
     id = "programmeDefinitionBatch",
     apiSettings = apiSettings,
     userId = reactive(result$userId),
-    preselRunId = landingPageModule$runId,
-    preselProcId = landingPageModule$procId,
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && result$navigate == "PB")
@@ -122,6 +122,9 @@ server <- function(input, output, session) {
     id = "browseprogrammes",
     apiSettings = apiSettings,
     userId = reactive(result$userId),
+    runIdList = landingpageModule$runIdList,
+    preselRunId = landingPageModule$runId,
+    processRunId = programmeDefinitionSingleModule$processRunId,
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && result$navigate == "BR")

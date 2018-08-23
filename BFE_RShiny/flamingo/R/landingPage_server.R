@@ -67,7 +67,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   })
 
   output$PRIdownloadexcel <- downloadHandler(
-    filename ="processruninbox.csv",
+    filename = "processruninbox.csv",
     content = function(file) {
       write.csv(result$inbox, file)
     }
@@ -80,7 +80,8 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
       result$inbox[i, 2]} else -1),
     # this is needed in processRun, probably shouldn't
     procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-      result$inbox[i, 1]} else -1)
+      result$inbox[i, 1]} else -1),
+    runIdList = reactive(result$inbox[i, 2])
   )
 
   return(moduleOutput)

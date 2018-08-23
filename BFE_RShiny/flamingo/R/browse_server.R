@@ -3,6 +3,8 @@
 #' @inheritParams flamingoModule
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater}; 
+#' @param preselRunId reactive string expression for reselected run id from  landingpage
+#' @param processRunId reactive string expression for reselected run id from  defineProgramme
 #' @return list of reactives:
 #' \itemize{
 #' 		\item{\code{navigate}}{reactive yielding navigation}
@@ -14,9 +16,27 @@
 #' @importFrom dplyr mutate
 #' @export
 browseprogrammes <- function(input, output, session, dbSettings,
-                                apiSettings, userId, active = reactive(TRUE), logMessage = message,
-                                reloadMillis = 10000) {
+                             apiSettings, userId, 
+                             runIdList, preselRunId, processRunId,
+                             active = reactive(TRUE), logMessage = message,
+                             reloadMillis = 10000) {
   
   ns <- session$ns
+  
+  # Reactive Values and parameters ------------------------------------------
+  
+  #navigation_state <- reactiveNavigation()
+  
+  result <- reactiveValues(
+    
+  )
+  
+  # Run identification -----------------------------------------------------
+  
+  # Additional plot --------------------------------------------------------
+  
+  # Plots ------------------------------------------------------------------
+  
+  # Go to Configure Output button -----------------------------------------------
   
 }
