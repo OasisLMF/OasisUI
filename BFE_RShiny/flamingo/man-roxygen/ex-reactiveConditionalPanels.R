@@ -2,7 +2,7 @@ if (interactive()) {
   library(shiny)
   ui <- fluidPage(
     shinyjs::useShinyjs(),
-    titlePanel("Reactive panel visibility via `conditionalPanels`"),
+    titlePanel("Multiple reactive panel visibility via `reactiveConditionalPanels`"),
     sidebarLayout(
       sidebarPanel(
         radioButtons(
@@ -12,7 +12,7 @@ if (interactive()) {
         )
       ),
       mainPanel(
-        conditionalPanelsUI(
+        reactiveConditionalPanelsUI(
           "main",
           c(
             mapply(SIMPLIFY = FALSE, textInput,
@@ -24,7 +24,7 @@ if (interactive()) {
     )
   )
   server <- function(input, output) {
-    callModule(conditionalPanels, "main", reactive(input$main_visible))
+    callModule(reactiveConditionalPanels, "main", reactive(input$main_visible))
   }
   shinyApp(ui = ui, server = server)
 }

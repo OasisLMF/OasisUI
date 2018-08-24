@@ -1,6 +1,6 @@
 # Module server function ----
 
-#' Reactive conditional panels
+#' Reactive Conditional Panels
 #'
 #' Shiny module handling the visibility of a set of panels depending on a
 #' reactive input.
@@ -17,12 +17,15 @@
 #' @templateVar shinyjsdep package \pkg{shinyjs}
 #' @template note-shinyjs
 #'
-#' @example man-roxygen/ex-conditionalPanels.R
+#' @seealso Module _[reactiveConditionalPanel]_, providing similar functionality
+#'   for a single panel.
+#'
+#' @example man-roxygen/ex-reactiveConditionalPanels.R
 #'
 #' @export
 #'
 #' @md
-conditionalPanels <- function(input, output, session, visible) {
+reactiveConditionalPanels <- function(input, output, session, visible) {
   output$visible <- visible
   outputOptions(output, "visible", suspendWhenHidden = FALSE)
   invisible()
@@ -31,7 +34,7 @@ conditionalPanels <- function(input, output, session, visible) {
 
 # Module UI function ----
 
-#' @rdname conditionalPanels
+#' @rdname reactiveConditionalPanels
 #'
 #' @param panels Named list of UI content for a set of panels. Only the panels
 #'   whose name matches the `visible` reactive input to the module server
@@ -40,7 +43,7 @@ conditionalPanels <- function(input, output, session, visible) {
 #' @export
 #'
 #' @md
-conditionalPanelsUI <- function(id, panels) {
+reactiveConditionalPanelsUI <- function(id, panels) {
   ns <- NS(id)
   tagList(
     lapply(seq_along(panels), function(i) {

@@ -43,7 +43,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
       dynamicColumnUI(
         "main",
         WidthMain,
-        conditionalPanelsUI(
+        reactiveConditionalPanelsUI(
           "mainPanel",
           list(
 
@@ -107,7 +107,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
               ) # End of tabsetpanel
 
           ) # End of panels list
-        ) # End of conditionalPanelsUI
+        ) # End of reactiveConditionalPanelsUI
       ) # End of column
     ), # End of fluidRow
 

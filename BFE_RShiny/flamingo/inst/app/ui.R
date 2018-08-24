@@ -17,7 +17,7 @@ ui <- function(request) {
 
       title = "Flamingo",
 
-      conditionalPanelsUI(
+      reactiveConditionalPanelsUI(
         "appUI",
         list(
           loggedout = loginDialogUI("login"),
