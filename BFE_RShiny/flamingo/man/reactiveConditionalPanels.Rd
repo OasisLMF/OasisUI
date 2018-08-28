@@ -21,9 +21,9 @@ panels.}
 
 \item{id}{Namespace ID for the module.}
 
-\item{panels}{Named list of UI content for a set of panels. Only the panels
+\item{panels}{Named list of UI content for a set of panels. Only the panel
 whose name matches the \code{visible} reactive input to the module server
-function are shown.}
+function is shown.}
 }
 \description{
 Shiny module handling the visibility of a set of panels depending on a
@@ -31,12 +31,12 @@ reactive input.
 }
 \details{
 In comparison to \code{\link[shiny:conditionalPanel]{shiny::conditionalPanel()}}, the
-\emph{conditionalPanels} module provides a convenient abstraction from the
+\emph{reactiveConditionalPanels} module provides a convenient abstraction from the
 JavaScript condition details and only relies on the reactive input
 \code{visible} to determine which panels are visible.
 }
 \note{
-The module relies on package \pkg{shinyjs}, which means
+The module relies on the package \pkg{shinyjs}, which means
 \code{\link[shinyjs:useShinyjs]{shinyjs::useShinyjs()}} must be included in the app \code{ui} definition.
 }
 \examples{

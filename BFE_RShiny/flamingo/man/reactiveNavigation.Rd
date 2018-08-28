@@ -58,9 +58,9 @@ the navigation state of the input \code{modules}.
 }
 \description{
 Set of utilities for storing reactive navigation state and propagating it as
-or retrieving it from module outputs, supporting navigation across nested
-modules. This provides a common, aligned way of handling navigation,
-abstracting from the specific implementation details.
+module output or retrieving it from module outputs, supporting navigation
+across nested modules. This provides a common, aligned way of handling
+navigation, abstracting from the specific implementation details.
 }
 \details{
 The details behind how the navigation state is stored, propagated and

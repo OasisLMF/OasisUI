@@ -28,11 +28,11 @@ Shiny module handling the visibility of a panel based on a reactive \code{condit
 }
 \details{
 In comparison to \code{\link[shiny:conditionalPanel]{shiny::conditionalPanel()}}, the
-\emph{conditionalPanel} module provides a convenient abstraction from the
+\emph{reactiveConditionalPanel} module provides a convenient abstraction from the
 JavaScript condition details, relying on the reactive \code{condition} instead.
 }
 \note{
-The module relies on package \pkg{shinyjs}, which means
+The module relies on the package \pkg{shinyjs}, which means
 \code{\link[shinyjs:useShinyjs]{shinyjs::useShinyjs()}} must be included in the app \code{ui} definition.
 }
 \examples{
