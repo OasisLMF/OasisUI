@@ -34,7 +34,10 @@ see \link{invalidateLater};}
 \item{id}{module id}
 }
 \value{
-list of reactives:
+For \code{programmeDefinitionSingle()}, list of reactives.
+
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
 list of tags
 }

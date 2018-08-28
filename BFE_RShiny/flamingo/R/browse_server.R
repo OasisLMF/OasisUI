@@ -39,4 +39,6 @@ browseprogrammes <- function(input, output, session, dbSettings,
   
   # Go to Configure Output button -----------------------------------------------
   
+  invisible()
+  
 }

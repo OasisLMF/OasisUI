@@ -5,12 +5,12 @@
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
-#' @return list of reactive expressions
+#' @return For \code{landingPage()}, list of reactives:
 #' \itemize{
-#' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 #' }
+#' @template return-outputNavigation
 #' @importFrom DT renderDataTable datatable
 #' @importFrom dplyr mutate '%>%'
 #' @importFrom utils write.csv
@@ -19,13 +19,14 @@
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
+  navigation_state <- reactiveNavigation()
+
   result <- reactiveValues(
-    navigate = NULL,
     inbox = NULL
   )
 
   observeEvent(input$abuttongotorun,
-               result$navigate <- structure("WF", count = input$abuttongotorun))
+               updateNavigation(navigation_state, "WF"))
 
   observe(if (active()) {
 
@@ -74,17 +75,18 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   )
 
   ### Module Output ----
-  moduleOutput <- list(
-    navigate = reactive(result$navigate),
-    runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-      result$inbox[i, 2]} else -1),
-    # this is needed in processRun, probably shouldn't
-    procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-      result$inbox[i, 1]} else -1),
-    runIdList = reactive(result$inbox[i, 2])
+  moduleOutput <- c(
+    outputNavigation(navigation_state),
+    list(
+      runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
+        result$inbox[i, 2]} else -1),
+      # this is needed in processRun, probably shouldn't
+      procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
+        result$inbox[i, 1]} else -1)
+    )
   )
 
-  return(moduleOutput)
+  moduleOutput
 
 }
 
@@ -96,11 +98,11 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
-#' @return list of reactive expressions
+#' @return For \code{pageheader()}, list of reactives:
 #' \itemize{
-#' 		\item{\code{navigate}: }{reactive yielding navigation}
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
 #' }
+#' @template return-outputNavigation
 #' @importFrom shinyWidgets dropdown toggleDropdownButton
 #' @export
 pageheader <- function(input, output, session, userId, userName, dbSettings,
@@ -108,29 +110,30 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 
   ns <- session$ns
 
-  result <- reactiveValues(
-    navigate = NULL
-  )
+  navigation_state <- reactiveNavigation()
 
   ### Greeter ----
   output$textOutputHeaderData2 <- renderText(paste("User Name:", userName()))
 
-  observeEvent(input$abuttonuseradmin,{
-               result$navigate <- structure("UA", count = input$abuttonuseradmin)
-               toggleDropdownButton(ns("accountDDmenu"))})
+  observeEvent(input$abuttonuseradmin, {
+    updateNavigation(navigation_state, "UA")
+    toggleDropdownButton(ns("accountDDmenu"))
+  })
 
-  observeEvent(input$abuttondefineaccount,{
-               result$navigate <- structure("DA", count = input$abuttondefineaccount)
-               toggleDropdownButton(ns("accountDDmenu"))})
+  observeEvent(input$abuttondefineaccount, {
+    updateNavigation(navigation_state, "DA")
+    toggleDropdownButton(ns("accountDDmenu"))
+  })
 
-  observeEvent(input$abuttonsysconf,{
-               result$navigate <- structure("SC", count = input$abuttonsysconf)
-               toggleDropdownButton(ns("accountDDmenu"))})
+  observeEvent(input$abuttonsysconf, {
+    updateNavigation(navigation_state, "SC")
+    toggleDropdownButton(ns("accountDDmenu"))
+  })
 
-  observeEvent(input$abuttonhome,{
-               result$navigate <- structure("LP", count = input$abuttonhome)
-               toggleDropdownButton(ns("accountDDmenu"))})
-
+  observeEvent(input$abuttonhome, {
+    updateNavigation(navigation_state, "LP")
+    toggleDropdownButton(ns("accountDDmenu"))
+  })
 
   LogoutModal <- function(){
     ns <- session$ns
@@ -159,13 +162,15 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   })
 
   ### Module Output ----
-  moduleOutput <- list(
-    navigate = reactive(result$navigate),
-    # logout = reactive(input$abuttonlogout),
-    logout = reactive(input$abuttonlogoutcontinue)
+  moduleOutput <- c(
+    outputNavigation(navigation_state),
+    list(
+      # logout = reactive(input$abuttonlogout),
+      logout = reactive(input$abuttonlogoutcontinue)
+    )
   )
 
-  return(moduleOutput)
+  moduleOutput
 
 }
 
@@ -178,10 +183,8 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
 #' @param collapsed reactive expression determining how the UI should be rendered
-#' @return list of reactive expressions
-#' \itemize{
-#' 		\item{\code{navigate}: }{reactive yielding navigation}
-#' }
+#' @return For \code{pagestructure()}, list of reactives.
+#' @template return-outputNavigation
 #' @importFrom shinyBS bsTooltip
 #' @importFrom shinyWidgets panel tooltipOptions toggleDropdownButton
 #' @export
@@ -191,9 +194,8 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 
   ns <- session$ns
 
-  result <- reactiveValues(
-    navigate = NULL
-  )
+  navigation_state <- reactiveNavigation()
+
 
   observe({
     output$sidebar <-
@@ -203,28 +205,35 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 
   ### Navigation Menu ----
 
-  observeEvent(input$abuttondefineprogrammesingle,{
-               result$navigate <- structure("PS", count = input$abuttondefineprogrammesingle)
-               toggleDropdownButton(ns("abuttonrun"))})
+  observeEvent(input$abuttondefineprogrammesingle, {
+    updateNavigation(navigation_state, "PS")
+    toggleDropdownButton(ns("abuttonrun"))
+  })
 
-  observeEvent(input$abuttondefineprogrammebatch,{
-               result$navigate <- structure("PB", count = input$abuttondefineprogrammebatch)
-               toggleDropdownButton(ns("abuttonrun"))})
+  observeEvent(input$abuttondefineprogrammebatch, {
+    updateNavigation(navigation_state, "PB")
+    toggleDropdownButton(ns("abuttonrun"))
+  })
 
-  observeEvent(input$abuttonbrowse,
-               result$navigate <- structure("BR", count = input$abuttonbrowse))
+  observeEvent(input$abuttonbrowse, {
+    updateNavigation(navigation_state, "BR")
+  })
 
-  observeEvent(input$abuttonhome,
-               result$navigate <- structure("LP", count = input$abuttonhome))
+  observeEvent(input$abuttonhome, {
+    updateNavigation(navigation_state, "LP")
+  })
 
-  observeEvent(input$abuttonexpmngt,
-               result$navigate <- structure("EM", count = input$abuttonexpmngt))
+  observeEvent(input$abuttonexpmngt, {
+    updateNavigation(navigation_state, "EM")
+  })
 
-  observeEvent(input$abuttonprmngt,
-               result$navigate <- structure("WF", count = input$abuttonprmngt))
+  observeEvent(input$abuttonprmngt, {
+    updateNavigation(navigation_state, "WF")
+  })
 
-  observeEvent(input$abuttonfilemngt,
-               result$navigate <- structure("FM", count = input$abuttonfilemngt))
+  observeEvent(input$abuttonfilemngt, {
+    updateNavigation(navigation_state, "FM")
+  })
 
 
   ### Button permissions ----
@@ -235,11 +244,12 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   })
 
   ### Module Output ----
-  moduleOutput <- list(
-    navigate = reactive(result$navigate)
+  moduleOutput <- c(
+    outputNavigation(navigation_state),
+    list() # placeholder
   )
 
-  return(moduleOutput)
+  moduleOutput
 
 }
 

@@ -38,10 +38,10 @@ re-sizing.
 The \emph{dynamicColumn} Shiny module prevents re-rendering based on reactive column
 width. Instead, it changes the class of the existing column UI element
 (\code{"col-sm-<WIDTH>"}) depending on a reactive \code{width} value.
-
-The module relies on \code{\link[shinyjs:addClass]{shinyjs::addClass()}} and \code{\link[shinyjs:removeClass]{shinyjs::removeClass()}},
-which means \code{\link[shinyjs:useShinyjs]{shinyjs::useShinyjs()}} must be included in the app \code{ui}
-definition.
+}
+\note{
+The module relies on \code{\link[shinyjs:addClass]{shinyjs::addClass()}} and \code{\link[shinyjs:removeClass]{shinyjs::removeClass()}}, which means
+\code{\link[shinyjs:useShinyjs]{shinyjs::useShinyjs()}} must be included in the app \code{ui} definition.
 }
 \examples{
 if (interactive()) {

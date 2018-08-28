@@ -5,7 +5,8 @@
 \title{pageheader}
 \usage{
 pageheader(input, output, session, userId, userName, dbSettings,
-  reloadMillis = 10000, logMessage = message, active = reactive(TRUE))
+  reloadMillis = 10000, logMessage = message,
+  active = reactive(TRUE))
 }
 \arguments{
 \item{input}{shiny input object}
@@ -28,11 +29,13 @@ see \link{invalidateLater};}
 \item{active}{reactive expression whether the module state should be updated.}
 }
 \value{
-list of reactive expressions
+For \code{pageheader()}, list of reactives:
 \itemize{
-		\item{\code{navigate}: }{reactive yielding navigation}
 		\item{\code{logout}: }{reactive yielding logout button signal}
 }
+
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 }
 \description{
 pageheader

@@ -5,7 +5,8 @@
 \alias{accountDefinitionUI}
 \title{Account Definition Module}
 \usage{
-accountDefinition(input, output, session, dbSettings, active = reactive(TRUE))
+accountDefinition(input, output, session, dbSettings,
+  active = reactive(TRUE))
 
 accountDefinitionUI(id)
 }

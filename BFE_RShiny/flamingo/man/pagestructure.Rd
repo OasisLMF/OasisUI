@@ -7,8 +7,8 @@
 \title{Page Structure}
 \usage{
 pagestructure(input, output, session, userId, userName, dbSettings,
-  reloadMillis = 10000, logMessage = message, active = reactive(TRUE),
-  collapsed = reactive(FALSE))
+  reloadMillis = 10000, logMessage = message,
+  active = reactive(TRUE), collapsed = reactive(FALSE))
 
 pageheaderUI(id)
 
@@ -37,10 +37,10 @@ see \link{invalidateLater};}
 \item{collapsed}{reactive expression determining how the UI should be rendered}
 }
 \value{
-list of reactive expressions
-\itemize{
-		\item{\code{navigate}: }{reactive yielding navigation}
-}
+For \code{pagestructure()}, list of reactives.
+
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 }
 \description{
 Page Structure

@@ -5,7 +5,8 @@
 \title{browseprogrammes Module}
 \usage{
 browseprogrammes(input, output, session, dbSettings, apiSettings, userId,
-  active = reactive(TRUE), logMessage = message, reloadMillis = 10000)
+  active = reactive(TRUE), logMessage = message,
+  reloadMillis = 10000)
 }
 \arguments{
 \item{input}{shiny input object}
