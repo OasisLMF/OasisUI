@@ -136,35 +136,6 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "BR")
   )
 
-  auth_modules$programmeDefinition <- .callModule(
-    programmeDefinition,
-    id = "programmeDefinition",
-    apiSettings = apiSettings,
-    userId = reactive(result$userId),
-    logMessage = logMessage,
-    reloadMillis = reloadMillis,
-    active = reactive(authenticated() && input$em == "defineProg")
-  )
-
-  # auth_modules$accountDefinition <- .callModule(
-  #   accountDefinition,
-  #   id = "accountDefinition",
-  #   active = reactive(authenticated() && input$em == "defineAccount")
-  # )
-
-  auth_modules$processRunPage <- .callModule(
-    processRunPage,
-    id = "processRunPage",
-    apiSettings = apiSettings,
-    logMessage = logMessage,
-    userId = reactive(result$userId),
-    active = reactive(authenticated()), #&& input$pr == "processrun"),
-    preselRunId = auth_modules$landingPage$runId,
-    preselProcId = auth_modules$landingPage$procId,
-    progOasisId = auth_modules$programmeDefinition$progOasisId,
-    reloadMillis = reloadMillis
-  )
-
   auth_modules$fileViewer <- .callModule(
     fileViewer,
     id = "fileViewer",
@@ -247,7 +218,7 @@ server <- function(input, output, session) {
                      logger = "flamingo.module")
            },
 
-           "PB" = { # go to Define Define programme batch submenu
+           "PB" = { # go to Define programme batch submenu
              loginfo(paste("Navigate to Define Process Batch, userId: ", result$userId),
                      logger = "flamingo.module")
            },
@@ -255,12 +226,6 @@ server <- function(input, output, session) {
            "BR" = { # go to Define Define programme batch submenu
              loginfo(paste("Navigate to Browse, userId: ", result$userId),
                      logger = "flamingo.module")
-           },
-
-           "EM" = { # go to Exposure Management submenu
-             loginfo(paste("Navigate to Exposure Management, userId: ", result$userId),
-                     logger = "flamingo.module")
-             updateTabsetPanel(session, "em", selected = "defineProg")
            },
 
            "UA" = { # go to User Admin submenu

@@ -32,22 +32,6 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
               placement = "right",
               options   = list(container = "body")),
     sidebar_button(
-      ID = ns("abuttonexpmngt"),
-      Label = if (collapsed) "EM" else "Exposure Management"
-    ),
-    bsTooltip(ns("abuttonexpmngt"),
-              landing_page$abuttonexpmngt,
-              placement = "right",
-              options   = list(container = "body")),
-    sidebar_button(
-      ID = ns("abuttonprmngt"),
-      Label = if (collapsed) "PM" else "Process Management"
-    ),
-    bsTooltip(ns("abuttonprmngt"),
-              landing_page$abuttonprmngt,
-              placement = "right",
-              options   = list(container = "body")),
-    sidebar_button(
       ID = ns("abuttonfilemngt"),
       Label = if (collapsed) "FM" else "File Management"
     ),

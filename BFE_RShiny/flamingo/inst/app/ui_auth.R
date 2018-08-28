@@ -67,24 +67,6 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
             # browseprogrammesUI
             BR = browseprogrammesUI("browseprogrammes"),
 
-            # Exposure Management
-            EM =
-              #navbarPage("Exposure Management", id = "em",
-              tabsetPanel(
-                id = "em",
-                # tabPanel("Define Account",
-                #          value = "defineAccount",
-                #          accountDefinitionUI("accountDefinition")),
-
-                tabPanel("Define Programme",
-                         value = "defineProg",
-                         programmeDefinitionUI("programmeDefinition"))
-              ), #End of navbarMenu("Exposure Management")
-
-            # Process Management
-            WF =
-              processRunPageUI("processRunPage"),
-
             ## File Management
             FM =
               fileViewerUI("fileViewer"),

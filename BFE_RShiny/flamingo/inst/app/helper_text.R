@@ -16,8 +16,6 @@ landing_page <- list(
   abuttondefineprogrammebatch = "Define batch Process Run",
   abuttongotorun = "Go to run details",
   PRIdownloadexcel = "Download files table",
-  abuttonexpmngt = "Define the exposure inputs",
-  abuttonprmngt = "Define programme details",
   abuttonfilemngt = "Access input/output files",
   abuttonsysconf = "System configuration"
 )

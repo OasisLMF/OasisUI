@@ -223,14 +223,6 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "LP")
   })
 
-  observeEvent(input$abuttonexpmngt, {
-    updateNavigation(navigation_state, "EM")
-  })
-
-  observeEvent(input$abuttonprmngt, {
-    updateNavigation(navigation_state, "WF")
-  })
-
   observeEvent(input$abuttonfilemngt, {
     updateNavigation(navigation_state, "FM")
   })
@@ -291,10 +283,6 @@ landingPageButtonUpdate <- function(session, dbSettings, userId,
 
   # Not used anywhere else, probably just forgotten
   # ("600", "abuttonenquiry")
-
-  .updateButton("1000", "abuttonprmngt")
-
-  .updateButton("700", "abuttonexpmngt")
 
   .updateButton("700", "abuttonrun")
 
