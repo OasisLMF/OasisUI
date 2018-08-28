@@ -319,4 +319,6 @@ fileViewer <- function(
     inputs
   }
   
+  invisible()
+  
 }
