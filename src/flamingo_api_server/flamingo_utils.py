@@ -470,16 +470,31 @@ def process_keys_response(progoasisid, modelid, apiJSON, sessionid):
             all_location_count = all_location_count + 1
             if location['status'] == 'success':
                 success_location_count = success_location_count + 1
-                out_writer.writerow(
-                    [location['id'], location['peril_id'], location["coverage"], location['area_peril_id'], location['vulnerability_id']])
+                out_writer.writerow([
+                    location['id'], 
+                    location['peril_id'], 
+                    location.get("coverage") or location.get("coverage_type"), 
+                    location['area_peril_id'], 
+                    location['vulnerability_id']
+                    ])
 
             elif location['status'] == 'nomatch':
                 nomatch_location_count = nomatch_location_count + 1
-                error_writer.writerow([location['id'], location['peril_id'], location["coverage"], location['message']])
+                error_writer.writerow([
+                    location['id'], 
+                    location['peril_id'], 
+                    location.get("coverage") or location.get("coverage_type"), 
+                    location['message']
+                    ])
 
             elif location['status'] == 'fail':
                 fail_location_count = fail_location_count + 1
-                error_writer.writerow([location['id'], location['peril_id'], location["coverage"], location['message']])
+                error_writer.writerow([
+                    location['id'], 
+                    location['peril_id'], 
+                    location.get("coverage") or location.get("coverage_type"), 
+                    location['message']
+                    ])
 
     logging.getLogger().info('{:,} locations'.format(all_location_count))
     logging.getLogger().info('{0:.2f}% success'.format(100.0 * success_location_count/all_location_count))
