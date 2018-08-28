@@ -193,7 +193,7 @@ server <- function(input, output, session) {
   appState <- reactive(
     if (result$userId == FLAMINGO_GUEST_ID) "loggedout" else "loggedin"
   )
-  callModule(reactiveConditionalPanels, id = "appUI", appState)
+  callModule(reactiveConditionalPanels, "appUI", appState)
 
   observe({
     result$userId <- loginDialogModule$userId()

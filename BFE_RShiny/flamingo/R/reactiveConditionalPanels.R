@@ -10,11 +10,11 @@
 #'   panels.
 #'
 #' @details In comparison to [shiny::conditionalPanel()], the
-#'   _conditionalPanels_ module provides a convenient abstraction from the
+#'   _reactiveConditionalPanels_ module provides a convenient abstraction from the
 #'   JavaScript condition details and only relies on the reactive input
 #'   `visible` to determine which panels are visible.
 #'
-#' @templateVar shinyjsdep package \pkg{shinyjs}
+#' @templateVar shinyjsdep the package \pkg{shinyjs}
 #' @template note-shinyjs
 #'
 #' @seealso Module _[reactiveConditionalPanel]_, providing similar functionality
@@ -36,9 +36,9 @@ reactiveConditionalPanels <- function(input, output, session, visible) {
 
 #' @rdname reactiveConditionalPanels
 #'
-#' @param panels Named list of UI content for a set of panels. Only the panels
+#' @param panels Named list of UI content for a set of panels. Only the panel
 #'   whose name matches the `visible` reactive input to the module server
-#'   function are shown.
+#'   function is shown.
 #'
 #' @export
 #'

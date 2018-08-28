@@ -21,7 +21,7 @@
 #' width. Instead, it changes the class of the existing column UI element
 #' (`"col-sm-<WIDTH>"`) depending on a reactive `width` value.
 #'
-#' @templateVar shinyjsdep <[shinyjs::addClass()] and [shinyjs::removeClass()]
+#' @templateVar shinyjsdep [shinyjs::addClass()] and [shinyjs::removeClass()]
 #' @template note-shinyjs
 #'
 #' @example man-roxygen/ex-dynamicColumn.R

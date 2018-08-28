@@ -1,9 +1,9 @@
 #' Reactive navigation
 #'
 #' Set of utilities for storing reactive navigation state and propagating it as
-#' or retrieving it from module outputs, supporting navigation across nested
-#' modules. This provides a common, aligned way of handling navigation,
-#' abstracting from the specific implementation details.
+#' module output or retrieving it from module outputs, supporting navigation
+#' across nested modules. This provides a common, aligned way of handling
+#' navigation, abstracting from the specific implementation details.
 #'
 #' @param value Desired value of the navigation state.
 #'
@@ -74,7 +74,7 @@ reactiveNavigation <- function(value = NULL) {
 updateNavigation <- function(state, value, force_react = TRUE) {
   state$.navigate_to <- value
   if (force_react) {
-    # `.react` gets always invalidated by changing its value
+    # always invalidate `.react`  by changing its value
     state$.react <- !state$.react
   }
   invisible()

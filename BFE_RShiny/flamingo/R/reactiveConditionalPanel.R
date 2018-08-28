@@ -9,10 +9,10 @@
 #'   the panel.
 #'
 #' @details In comparison to [shiny::conditionalPanel()], the
-#'   _conditionalPanel_ module provides a convenient abstraction from the
+#'   _reactiveConditionalPanel_ module provides a convenient abstraction from the
 #'   JavaScript condition details, relying on the reactive `condition` instead.
 #'
-#' @templateVar shinyjsdep package \pkg{shinyjs}
+#' @templateVar shinyjsdep the package \pkg{shinyjs}
 #' @template note-shinyjs
 #'
 #' @seealso Module _[reactiveConditionalPanels]_, providing similar
