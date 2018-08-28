@@ -68,7 +68,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   })
 
   output$PRIdownloadexcel <- downloadHandler(
-    filename ="processruninbox.csv",
+    filename = "processruninbox.csv",
     content = function(file) {
       write.csv(result$inbox, file)
     }
