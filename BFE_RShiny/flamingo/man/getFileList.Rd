@@ -14,16 +14,16 @@ getFileList(dbSettings, prrunid)
 \value{
 output files; \code{data.frame} of 10 variables:
 \itemize{
-    \item \code{FileID} 
-    \item \code{File Name} 
-    \item \code{Description} 
-    \item \code{Location} 
-    \item \code{Location Unix} 
-    \item \code{File Type} 
-    \item \code{Owner} 
-    \item \code{Source} 
-    \item \code{Resource Table} 
-    \item \code{Resource Key} 
+    \item \code{FileID}
+    \item \code{File Name}
+    \item \code{Description}
+    \item \code{Location}
+    \item \code{Location Unix}
+    \item \code{File Type}
+    \item \code{Owner}
+    \item \code{Source}
+    \item \code{Resource Table}
+    \item \code{Resource Key}
 }
 }
 \description{

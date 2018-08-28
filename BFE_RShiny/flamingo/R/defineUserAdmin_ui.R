@@ -23,7 +23,7 @@ userAdminDefinitionUI <- function(id) {
                   
                   helpText(h4("Company User List", class = "flamingo-table-title")),
                   dataTableOutput(ns("tablecompanyuserlist")),
-                  downloadButton(ns("CUACULdownloadexcel"),label="Export to Excel"),
+                  downloadButton(ns("CUACULdownloadexcel"),label="Export to csv"),
                   actionButton(ns("abuttonnewUser"), class="btn btn-primary",
                       label = "Create", align = "left"),
                   actionButton(ns("abuttonuserupdate"), class="btn btn-primary",
@@ -47,7 +47,7 @@ userAdminDefinitionUI <- function(id) {
                       h4("User Security Groups", class = "flamingo-table-title"),
                       dataTableOutput(ns("tableusersecuritygroups")),
                       downloadButton(ns("CUAUUSGdownloadexcel"), 
-                          label="Export to Excel")
+                          label="Export to csv")
                   )#End of div usgroups
               )#End of hidden for usgroups
           )
@@ -60,7 +60,7 @@ userAdminDefinitionUI <- function(id) {
                       h4("User Licenses", class = "flamingo-table-title"),
                       dataTableOutput(ns("tableuserlicenses")),
                       downloadButton(ns("CUAULdownloadexcel"),
-                          label="Export to Excel")
+                          label="Export to csv")
                   )#End of div ulicenses
               )#End of hidden for ulicense
           )

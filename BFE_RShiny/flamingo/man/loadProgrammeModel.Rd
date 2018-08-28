@@ -4,8 +4,8 @@
 \alias{loadProgrammeModel}
 \title{Call BFE webservice to load programme data}
 \usage{
-loadProgrammeModel(apiSettings, progOasisId, logWarning = function(w) warning,
-  ...)
+loadProgrammeModel(apiSettings, progOasisId, logWarning = function(w)
+  warning, ...)
 }
 \arguments{
 \item{apiSettings}{settings object as returned by \link{flamingoServer}}
@@ -17,7 +17,7 @@ loadProgrammeModel(apiSettings, progOasisId, logWarning = function(w) warning,
 \item{...}{additional arguments to \link{httr::GET}}
 }
 \value{
-http status category
+http status category warn_for_status
 }
 \description{
 A function to load Programme data.

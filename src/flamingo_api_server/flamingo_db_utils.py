@@ -13,12 +13,12 @@ def load_programme_data(progid):
 @oasis_log()
 def update_prog_status(progid, status):
     db.execute(
-        "exec dbo.updateProgStatus?, ?", progid, status)
+        "exec dbo.updateProgStatus ?, ?", progid, status)
 
 @oasis_log()
 def update_progoasis_status(progoasisid, status):
     db.execute(
-        "exec dbo.updateProgOasisStatus?, ?", progoasisid, status)
+        "exec dbo.updateProgOasisStatus ?, ?", progoasisid, status)
 
 
 

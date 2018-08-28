@@ -1,4 +1,6 @@
 #' @import shiny
 .onLoad <- function(libname, pkgname) {
-  addResourcePath("flamingo", system.file("www", package = "flamingo"))
+  # https://github.com/ebailey78/shinyBS/issues/100
+  shiny::addResourcePath("sbs", system.file("www", package="shinyBS"))
+  shiny::addResourcePath("flamingo", system.file("www", package = "flamingo"))
 }

@@ -3,6 +3,7 @@
 #' @description creates a plain map using leaflet
 #' @param fileName full file path to marker data
 #' @import leaflet
+#' @importFrom utils read.csv
 #' @export
 createPlainMap <- function(fileName) {
   

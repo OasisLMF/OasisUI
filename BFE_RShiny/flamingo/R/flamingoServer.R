@@ -4,7 +4,8 @@
 #' @param progOasisId oasis programme identifier
 #' @param logWarning warning message callback
 #' @param ... additional arguments to \link{httr::GET}
-#' @return http status category
+#' @return http status category warn_for_status
+#' @importFrom httr http_status
 #' @export
 loadProgrammeModel <- function(
     apiSettings,
@@ -34,7 +35,7 @@ loadProgrammeModel <- function(
 #' @param progId programme identifier
 #' @param logWarning warning message callback
 #' @param ... additional arguments to \link{httr::GET}
-#' @return http status category
+#' @return http status category warn_for_status
 #' @export
 loadProgrammeData <- function(
     apiSettings,
@@ -89,7 +90,7 @@ flamingoServer <- function(host, port, scheme = c("http", "https")) {
 #' @param ... further arguments to \link{GET}
 #' @return \code{200} if the health check succeeds; otherwise an exception is
 #' raised.
-#' @importFrom httr GET modify_url
+#' @importFrom httr GET modify_url status_code
 #' @export
 testFlamingoServer <- function(apiSettings, ...) {
   
@@ -114,7 +115,7 @@ testFlamingoServer <- function(apiSettings, ...) {
 #' @param runId run identifier
 #' @param logWarning warning message callback
 #' @param ... further arguments to \link{GET}
-#' @return http status category
+#' @return http status category warn_for_status
 #' @export
 runProcess <- function(
     apiSettings,

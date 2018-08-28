@@ -1,457 +1,324 @@
-
-#' File Management Buttons
-fileMgmtButtons <- c(
-    FOBtnShowTable 					= "FO_btn_show_table",
-    FOBtnShowRawContent 		= "FO_btn_show_raw_content",
-    FOBtnShowMap 						= "FO_btn_show_map",
-    FOBtnShowAEPCurve 			= "FO_btn_show_AEPCurve",
-    FOBtnShowGeocode 				= "FO_btn_show_geocode",
-    FOBtnShowEventFootprint = "FO_btn_show_EventFootprint")
-
-#' File Management Divisions
-fileMgmtDivs <- c(
-    FODivTable              = "FO_div_table",
-    FODivFilecontents       = "FO_div_filecontents",
-    FODivPlainMap           = "FO_div_plainmap",
-    FODivAEPcurve           = "FO_div_AEPcurve",
-    FODivGeocode            = "FO_div_geocode",
-    FODivEventFootprint     = "FO_div_EventFootprint")
-
 #' File Viewer Module
 #' @description Server logic to view files
 #' @inheritParams flamingoModule
 #' @param userId user id
 #' @param preselRunId preselected run id
 #' @return empty list
-#' @importFrom DT renderDataTable
-#' @importFrom shinyjs show hide
+#' @importFrom DT renderDataTable dataTableProxy selectRows
+#' @importFrom shinyjs show hide hidden
+#' @importFrom utils read.csv zip
 #' @rdname fileViewer
 #' @export
 fileViewer <- function(
-    input,
-    output,
-    session,
-    dbSettings,
-    userId,
-    preselRunId = reactive(-1),
-    active = reactive(TRUE),
-    logMessage = message) {
+  input,
+  output,
+  session,
+  dbSettings,
+  userId,
+  preselRunId = reactive(-1),
+  active = reactive(TRUE),
+  logMessage = message) {
+  
+  # Reactive Values -----
   
   result <- reactiveValues(
-      FLdata = NULL,
-      FVid = -1,
-      
-      AEPData = NULL,
-      
-      fileData = NULL
+    FLdata = NULL,               #table of files
+    FVid = -1,                   #needed to get the operations valid on file id
+    fileData = NULL,             #file to download
+    currentFile = NULL,          #Current filename
+    currentrows = 0           #indices of current rows selected
   )
   
-  ### File List Table
+  ns <- session$ns
+  
+  ### File List Table ----
   
   # Load Company user list data when the page is loaded
   # queries the database every time to update its dataset
   observe(if (active()) {
-        
-        stmt <- buildDbQuery("getFileViewerTable")
-        result$FLdata <- executeDbQuery(dbSettings, stmt)
-        
-      })
+    stmt <- buildDbQuery("getFileViewerTable")
+    result$FLdata <- executeDbQuery(dbSettings, stmt)
+  })
+  
+  # Pre-select the correct runId
+  initialSelection <- reactive({
+    if (preselRunId() == -1) {
+      index <- 1 
+      initialSelection <- NULL
+    } else {
+      index <- match(c(paste0("Process:", preselRunId())), result$FLdata[[7]])
+      initialSelection <- rownames(result$FLdata)[c(as.integer(index))]
+    }
+    return(initialSelection)
+  })
+  
+  # Add buttons to table
+  FLdata <- reactive({
+    cbind(
+      data.frame(Selected = .shinyInput(checkboxInput,"srows_", nrow(result$FLdata), value = FALSE, width = 1)),
+      result$FLdata,
+      data.frame(View = .shinyInput(actionButton, "vrows_", nrow(result$FLdata), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')), #,style = "color: #8b2129; background-color: transparent; border-color: #8b2129")), 
+      data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(result$FLdata), Label = "Map",  hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;'))   #, style = "color: #8b2129; background-color: transparent; border-color: #8b2129"))
+    )
+  })
   
   # draw company user list table with custom format options
-  output$tableFVfileList <- renderDataTable(if (!is.null(result$FLdata)){
-        
-        if (preselRunId() == -1) {
-          index <- 1 
-        } else {
-          index <- match(c(paste0("Process:", preselRunId())), result$FLdata[[7]])
-        }
-        
-        datatable(
-            result$FLdata,
-            class = "flamingo-table display",
-            rownames = TRUE,
-            selection = list(mode = "single",
-                selected = rownames(result$FLdata)[c(as.integer(index))]),
-            colnames = c("Row Number" = 1),
-            options = list(
-                columnDefs = list(list(visible = FALSE, targets = c(0,4,5))),
-                pageLength = 20,
-                autoWidth=TRUE)
-        )
-      })
-  
-  # Export to .csv
-  output$FVFLdownloadexcel <- downloadHandler(
-      filename = "filelist.csv",
-      content = function(file) {
-        write.csv(result$FLdata, file)}
-  )
-  
-  # Enable/disable Process details based on the type of file selected
-  observe(if (active()) {
-        if (length(rows <- input$tableFVfileList_rows_selected) > 0) {
-          
-          sourcename <- result$FLdata[rows, 7][length(result$FLdata[rows, 7])]
-          srcname <- nchar(toString(sourcename))
-          prcrunid <- substr(sourcename, 9, srcname)
-          prcstr <- toString(substr(sourcename,0,8))
-          
-          if (prcstr == "Process:") {
-            
-            show("processruninfodiv")
-            prcrunid = as.integer(prcrunid)
-            
-            showprcinfo <- getProcRunDetForFileOutput(dbSettings, prcrunid)
-            
-            showruntimeparam <- createSelectOptions(labelCol = 1, valueCol = 2,
-                getProcRunParamFileOutput(dbSettings, prcrunid))
-            
-            output$textprcruninfo <- renderUI({
-                  prid <- paste(strong("Process Id: "), showprcinfo[[1]][1])
-                  prrnid <- paste(strong("Process Run Id: "), showprcinfo[[2]][1])
-                  prname <- paste(strong("Process Name: "), showprcinfo[[3]][1])
-                  prgname <- paste(strong("Programme: "), showprcinfo[[4]][1])
-                  modname <- paste(strong("Model: "), showprcinfo[[5]][1])
-                  wkflow <- paste(strong("Workflow: "), showprcinfo[[6]][1])
-                  params <- paste(sep = "<br/>",
-                      prid, prrnid, prname, prgname, modname, wkflow)
-                  HTML(params)
-                })
-            
-            output$textprcrunparaminfo <- renderUI({
-                  paramstype <- names(showruntimeparam)
-                  paramvalues <- showruntimeparam
-                  params <- paste0(sep = "<br/>",
-                      "<b>", paramstype, ": </b>", paramvalues)
-                  HTML(params)
-                })
-            
-          } else {
-            
-            hide("processruninfodiv")
-            
-          }
-        } else {
-          
-          hide("processruninfodiv")
-          
-        }
-      })
-      
-  
-  
-  ### prinfotable
-  
-  drawprinfotable <- function(prcrunid) {
-    
-    prinfo <- getProcRunDetForFileOutput(dbSettings, prcrunid)
+  output$tableFVfileList <- renderDataTable( if (!is.null(result$FLdata) ) {
     
     datatable(
-        prinfo,
-        class = c("flamingo-table", "display", "flamingo-table-narrow"),
-        rownames = TRUE,
-        selection = list(mode = "none"),
-        colnames = c("Row Number" = 1),
-        options = list(
-            columnDefs = list(list(visible = FALSE, targets = 0)),
-            scrollX = TRUE,
-            paging = FALSE,
-            searching = FALSE)
+      #result$FLdata,
+      FLdata(),
+      class = "flamingo-table display",
+      rownames = TRUE,
+      selection = "multiple", #list(mode = "multiple",
+                    #"none"
+                       #selected = initialSelection()
+      #),
+      colnames = c("Row Number" = 1),
+      filter = 'bottom',
+      escape = FALSE,
+      options = list(
+        searchHighlight = TRUE,
+        columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
+        pageLength = 10,
+        preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
+        drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } '),
+        autoWidth = TRUE)
     )
-  }
+  })
   
+
+  # # Download table of files to csv 
+  # output$FVFLdownloadexcel <- downloadHandler(
+  #   filename = "filelist.csv",
+  #   content = function(file) {
+  #     write.csv(result$FLdata, file)}
+  # )
   
+  ### Checkboxes & Enabling/show buttons ----
+
   
-  ### FV Table & FVAEP Curve
+  observe({
+    currentrows <- input$tableFVfileList_rows_selected
+    if (is.null(currentrows)) {
+      result$currentrows <- 0
+    } else {
+      result$currentrows <- currentrows
+    }
+  })
+  
+  #if one row is selected/unselected, update checkbox and sow/hide buttons
+  observeEvent( result$currentrows, {
+    if (all(result$currentrows != 0 )) {
+      lapply(result$currentrows, function(i){
+        updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = TRUE)
+        .enableButton(i)})
+      lapply(setdiff(input$tableFVfileList_rows_current, result$currentrows), function(i) {
+        updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = FALSE)
+        .hideButtons(i)})
+    } else {
+      lapply(input$tableFVfileList_rows_current, function(i){
+        updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = FALSE)
+        .hideButtons(i)})
+    }
+  })
+  
   
   observe(if (active()) {
-        
-        stmt <- buildDbQuery("getFileDataForFile", result$FVid)
-        result$AEPdata <- executeDbQuery(dbSettings, stmt)
-        
-      })
+    if (!is.null(input$tableFVfileListSelectall) && input$tableFVfileListSelectall) {
+      lapply(input$tableFVfileList_rows_current, function(i){updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = input$tableFVfileListSelectall)})
+      selectRows(dataTableProxy("tableFVfileList"), input$tableFVfileList_rows_current)
+    }
+  })
   
-  output$tableFVAEPdata <- renderDataTable(if (!is.null(result$AEPData)) {
-        
-        if (is.character(result$AEPData)) {
-          validate(
-              need(result$AEPData != "", "Data cannot be displayed for this file type.")
-          )
-        } else {
-          datatable(
-              result$AEPData,
-              class = "flamingo-table display",
-              rownames = TRUE,
-              colnames = c("Row Number" = 1),
-              options = list(
-                  columnDefs = list(list(visible = FALSE, targets = 0)),
-                  pageLength = 20)
-          )
-        }
-        
-      })
+  # Select all functionality
+  #update checkboxes according to selectAll button
+  observeEvent(input$tableFVfileListSelectall, {
+    lapply(input$tableFVfileList_rows_current, function(i){updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = input$tableFVfileListSelectall)})
+    #to update the selection if page is changed
+    if (input$tableFVfileListSelectall == TRUE) {
+      selectRows(dataTableProxy("tableFVfileList"), input$tableFVfileList_rows_current)
+    } else {
+      selectRows(dataTableProxy("tableFVfileList"), NULL)
+      lapply(input$tableFVfileList_rows_current, function(i){.hideButtons(i)} )
+    }
+  })
   
-  output$plotFVAEPCurve <- renderPlot(if (!is.null(result$AEPData)) {
-        
-        plotAEPCurve(result$AEPData)
-        
-      })
+  # Download Files ----
   
-  # Export to .csv
-  output$FVAEPdownloadexcel <- downloadHandler(
-      filename = "AEPdata.csv",
-      content = function(file) {
-        write.csv(result$AEPData, file)
-      }
+  # Files to download in zip bundle
+  fs <- reactive({
+    files <- c()
+    if (all(result$currentrows != 0)) {
+      files <- file.path(result$FLdata[result$currentrows, 5], result$FLdata[result$currentrows, 2])
+    }
+    files
+  })
+  
+  # Download zip button
+  output$FVfileListdownloadzip <- downloadHandler(
+    filename = "files.zip",
+    content = function(fname){
+      zip(zipfile = fname, files = fs())
+      if (file.exists(paste0(fname, "./"))) {file.rename(paste0(fname, ".zip"), fname)}
+    }
   )
   
-
-
-  ### Plain Map
   
-  output$plainmap <- renderLeaflet({
-        
-        if (length(rows <- c(input$tableFVfileList_rows_selected)) == 1) {
-          
-          fileName <- file.path(result$FLdata[rows, 5], result$FLdata[rows, 2])
-          
-          createPlainMap(fileName)
-          
-        }
-        
-      })
+  ### FV Exposure / File Contents ----
   
-  
-  
-  ### Foot Print Map
-  
-  output$EventFootprintMap <- renderLeaflet({
-        
-        filePath <- createFootprintMap(fileId = result$FVID)
-        
-      })
-  
-  
-  
-  ### FV Exposure / File Contents
-  
+  # Exposure table
   output$tableFVExposureSelected <- renderDataTable(
-      if (length(rows <- input$tableFVfileList_rows_selected) > 0) {
-        fileName <- file.path(result$FLdata[rows, 5], result$FLdata[rows, 2])
-        
-        tryCatch({
-              result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-                  quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-            }, error = function(e) {
-              showNotification(type = "error",
-                  paste("Could not read file:", e$message))
-              result$fileData <- NULL
-            })
-        
-        if (!is.null(result$fileData)) {
-          datatable(
-              result$fileData,
-              class = "flamingo-table display",
-              rownames = TRUE,
-              selection = "none",
-              colnames = c("Row Number" = 1))
-        } else {
-          datatable(
-              data.frame(content = "nothing to show"),
-              class = "flamingo-table display",
-              selection = "none",
-              rownames = FALSE,
-              colnames = c(""))
-        }
-        
-      })
+    if (!is.null(result$fileData)) {
+      datatable(
+        result$fileData,
+        class = "flamingo-table display",
+        rownames = TRUE,
+        selection = "none",
+        filter = 'bottom',
+        colnames = c("Row Number" = 1),
+        width = "100%",
+        options = list(searchHighlight = TRUE,
+                       scrollX = TRUE))
+    } else {
+      datatable(
+        data.frame(content = "nothing to show"),
+        class = "flamingo-table display",
+        selection = "none",
+        rownames = FALSE,
+        filter = 'bottom',
+        colnames = c(""),
+        width = "100%",
+        options = list(searchHighlight = TRUE,
+                       scrollX = TRUE))
+    }
+  )
   
   # Export to .csv
   output$FVEdownloadexcel <- downloadHandler(
-      filename = paste0(result$FLdata[c(input$tableFVfileList_rows_selected), 2]),
-      content = function(file) {
-        write.csv(result$fileData, file)}
+    filename = result$currentFile, 
+    content = function(file) {
+      write.csv(result$fileData, file)}
   )
   
+  # Modal Panel
+  FileContent <- modalDialog(
+    easyClose = TRUE,
+    size = "l",
+    fluidPage(
+      h4("File Contents", class = "flamingo-table-title"),
+      htmlOutput(ns("tableFVExposureSelectedInfo")),
+      dataTableOutput(ns("tableFVExposureSelected")),
+      br(),
+      downloadButton(ns("FVEdownloadexcel"), label = "Export to csv")
+    )
+  )
+  
+  # # Length table
+  # observe({if (!is.null(result$FLdata) ) {
+  #   result$lenFLdata <- nrow(result$FLdata)
+  # }
+  # })
+  
+  #Show content in Modal
+  observe({
+    if (!is.null(result$FLdata)) {
+      lapply(
+        X = 1:nrow(result$FLdata),
+        FUN = function(i){
+          observeEvent(input[[paste0("vrows_", i)]], {
+            if (input[[paste0("vrows_", i)]] > 0) {
+              result$currentFile <-  paste0(result$FLdata[i, 2])
+              showModal(FileContent)
+              # Extra info table
+              output$tableFVExposureSelectedInfo <- renderUI({
+                str1 <- paste("File Name: ", result$FLdata[i,2])
+                str2 <- paste("Resource Key ", result$FLdata[i,10])
+                HTML(paste(str1, str2, sep = '<br/>'))
+              })
+              # get data to show in modal table
+              fileName <- file.path(result$FLdata[i, 5], result$FLdata[i, 2])
+              tryCatch({
+                result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
+                                            quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+              }, error = function(e) {
+                showNotification(type = "error",
+                                 paste("Could not read file:", e$message))
+                result$fileData <- NULL
+              }) # end try catch
+            } # end check on input vrous_i
+          }) # End observer
+        }) # end lapply
+    } #end if
+  })
   
   
-  ### Geocode Data
+  ### Plain Map ----
   
-  funcForTableGeocodeData <- function() {
-    
-    ## Only gets the first 50 rows of data.
-    
-    geocoded <- data.frame()
-    filePath <- getFilePath()
-    
-    stmt <- buildDbQuery("getFileDataForFile", result$FVid)
-    GeoData <- executeDbQuery(dbSettings, stmt)
-    
-    withProgress(message = "Getting Geocode Data",{
-          for(n in 1:50) {
-            query <- paste(GeoData[n,2], GeoData[n,3], GeoData[n,4])
-            logMessage(query)
-            result = getGeoDetails(query)
-            geocoded <- rbind(geocoded, result)
-            geocoded$number[n] <- GeoData[n,2]
-            geocoded$street[n] <- paste(GeoData[n,3])
-            geocoded$postcode[n] <- paste(GeoData[n,4])
-            incProgress(amount = 0.02, detail = paste0(n*2, "%"))
-          }
+  Map <- modalDialog(
+    easyClose = TRUE,
+    size = "l",
+    fluidPage(
+      h4("Map", class = "flamingo-table-title"),
+      htmlOutput(ns("tableFVExposureSelectedInfo")),
+      leafletOutput(ns("plainmap"))
+    )
+  )
+  
+  observe({
+    if (!is.null(result$FLdata)) {
+      lapply(
+        X = 1:nrow(result$FLdata),
+        FUN = function(i){
+          observeEvent(input[[paste0("mrows_", i)]], {
+            if (input[[paste0("mrows_", i)]] > 0) {
+              showModal(Map)
+              fileName <- file.path(result$FLdata[i, 5], result$FLdata[i, 2])
+              # Extra info table
+              output$tableFVExposureSelectedInfo <- renderUI({
+                str1 <- paste("File Name: ", result$FLdata[i,2])
+                str2 <- paste("Resource Key ", result$FLdata[i,10])
+                HTML(paste(str1, str2, sep = '<br/>'))
+              })
+              output$plainmap <- renderLeaflet({createPlainMap(fileName)})
+            }
+          })
         })
-    # note that %>% must follow on immediately from an expression,
-    # it can't appear on a line by itself
-    datatable(
-            geocoded,
-            selection = "none",
-            colnames = c("Building No.", "Street Name", "Postcode", "Latitude",
-                "Longitude", "Returned Address", "Accuracy", "Status"),
-            options = list(
-                columnDefs = list(list(visible = FALSE, targets = 0)),
-                autoWidth=TRUE)
-        ) %>%
-        formatStyle("lat", backgroundColor = "#96BFD8") %>%
-        formatStyle("long", backgroundColor = "#96BFD8") %>%
-        formatStyle("accuracy", backgroundColor = "#96BFD8") %>%
-        formatStyle("formatted_address", backgroundColor = "#96BFD8") %>%
-        formatStyle("status", backgroundColor = "#96BFD8")
-  }
-  
-  output$tableGeocodeData <- renderDataTable(funcForTableGeocodeData())
-  
-  # Export to .csv
-  output$FVGdownloadexcel <- downloadHandler(
-      filename = "geocodeddata.csv",
-      content = function(file) {
-        write.csv(executeDbQuery(dbSettings,
-                buildDbQuery("getFileDataForFile", result$FVid)),
-            file)
-      }
-  )
-  
-  
-  
-  ### When active (e.g. tab is loaded)
-  
-  observe(if (active()) {
-        
-        if (length(rows <- c(input$tableFVfileList_rows_selected)) > 0) {
-          
-          result$FVid <- result$FLdata[rows, 1]
-          
-          disableAllButtonsButTable()
-          
-          validButtons <- executeDbQuery(dbSettings,
-              buildDbQuery("TellOperationsValidOnFileID", result$FVid))
-          
-          for(btnIDs in t(validButtons)) {
-            enable(btnIDs)
-          }
-          
-          # Enable/Disable access to other panes based on selected file
-          fileName <- file.path(result$FLdata[rows, 5], result$FLdata[rows, 2])
-          
-          if (!file.exists(fileName)) {
-            
-            showNotification(type = "warning", "File not found")
-            disable(fileMgmtButtons[["FOBtnShowRawContent"]])
-            
-          } else {
-            
-            enable(fileMgmtButtons[["FOBtnShowRawContent"]])
-            
-          }
-          
-          
-        } else {
-          
-          disableAllButtonsButTable()
-          
-        }
-        
-      })
-  
-
-  
-  ### Panel Switcher
-  
-  # show the first panel by default
-  output$FVPanelSwitcher <- reactive(fileMgmtDivs[[1]])
-  outputOptions(output, "FVPanelSwitcher", suspendWhenHidden = FALSE)
-  
-  displayOnePanel <- function(panelName) {
-    logMessage(paste("showing ", panelName))
-    output$FVPanelSwitcher <- reactive(panelName)
-  }
-  
-  onclick(fileMgmtButtons[["FOBtnShowTable"]], {
-        displayOnePanel(fileMgmtDivs[["FODivTable"]])
-      })
-  
-  onclick(fileMgmtButtons[["FOBtnShowRawContent"]], {
-        displayOnePanel(fileMgmtDivs[["FODivFilecontents"]])
-      })
-  
-  onclick(fileMgmtButtons[["FOBtnShowMap"]], {
-        displayOnePanel(fileMgmtDivs[["FODivPlainMap"]])
-      })
-  
-  onclick(fileMgmtButtons[["FOBtnShowAEPCurve"]], {
-        displayOnePanel(fileMgmtDivs[["FODivAEPcurve"]])
-      })
-  
-  onclick(fileMgmtButtons[["FOBtnShowGeocode"]], {
-        displayOnePanel(fileMgmtDivs[["FODivGeocode"]])
-      })
-  
-  onclick(fileMgmtButtons[["FOBtnShowEventFootprint"]], {
-        displayOnePanel(fileMgmtDivs[["FODivEventFootprint"]])
-      })
-  
-  
-  
-  ### Helper Functions
-  
-  hideAllFileMgmtDivs <- function() {
-    for(nm in allFileMgmtDivIDs) {
-      hide(nm)
-      disable(nm)
     }
+  })
+  
+  # Helper functions ------------------------
+  
+  # Check permission row by row
+  .enableButton <- function(i) {
+    result$FVid <- result$FLdata[i, 1]
+    validButtons <- executeDbQuery(dbSettings,
+                                   buildDbQuery("TellOperationsValidOnFileID", result$FVid))
+    manageButtons <- c("FO_btn_show_raw_content" = paste0("vrows_", i),
+                       "FO_btn_show_map" = paste0("mrows_", i))
+    # lapply(t(validButtons), function(btnIDs){enable(manageButtons[btnIDs])})
+    lapply(t(validButtons), function(btnIDs){shinyjs::show(manageButtons[btnIDs])})
   }
   
-  disableAllButtonsButTable <- function() {
-    for(btnName in names(fileMgmtButtons)) {
-      if (!is.null(isolate(input[[btnName]])) &&
-          btnName != fileMgmtButtons["FOBtnShowTable"]) {
-        disable(btnName)
+  #hide buttons in a row
+  .hideButtons <- function(i=NULL){
+    shinyjs::hide(paste0("vrows_", i))
+    shinyjs::hide(paste0("mrows_", i))
+  }
+  
+  # utility function to add input Id to buttons in table
+  .shinyInput <- function(FUN, id, num, Label = NULL, hidden = FALSE,  ...) {
+    inputs <- character(num)
+    for (i in seq_len(num)) {
+      if (hidden) {
+        inputs[i] <- as.character(shinyjs::hidden(FUN(inputId = ns(paste0(id,i)), label = Label, ...)))
+      } else {
+        inputs[i] <- as.character(FUN(inputId = ns(paste0(id,i)), label = Label, ...))
       }
     }
+    inputs
   }
   
-  getFilePath <- function() {
-    rows <- c(input$tableFVfileList_rows_selected)
-    filePath <- result$FLdata[rows, 3][length(result$FLdata[rows, 4])]
-    fileName <- result$FLdata[rows, 4][length(result$FLdata[rows, 4])]
-    filePath <- file.path(filePath, fileName)
-    return(filePath)
-  }
-  
-  getYears <- function() {
-    rows <- c(input$tableFVfileList_rows_selected)
-    fileName <- result$FLdata[rows, 6][length(result$FLdata[rows, 6])]
-    fileName <- toString(fileName)
-    logMessage(paste("selected fileName", typeof(fileName)))
-    years <- strsplit(fileName, split = "[_]")
-    years <- years[[1]][2]
-    return(as.integer(years))
-  }
-  
-  
-  
-  ### Module Output
-  
-  moduleOutput <- list()
-  
-  return(moduleOutput)
+  invisible()
   
 }

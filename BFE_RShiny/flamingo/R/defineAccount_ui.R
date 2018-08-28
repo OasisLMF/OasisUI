@@ -25,7 +25,7 @@ accountDefinitionUI <- function(id) {
                   
                   dataTableOutput(ns("tableDAAccount")),
                   
-                  downloadButton(ns("DAAdownloadexcel"), label= " Export to Excel"),
+                  downloadButton(ns("DAAdownloadexcel"), label= " Export to csv"),
                   
                   actionButton(ns("buttoncreateac"), "Create Account",
                       class="btn btn-primary", align = "left"),

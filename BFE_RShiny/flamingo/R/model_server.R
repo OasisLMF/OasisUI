@@ -6,6 +6,7 @@
 #' @rdname modelSupplierPage
 #' @importFrom DT renderDataTable
 #' @importFrom shinyjs hide show onclick
+#' @importFrom shinyBS toggleModal
 #' @export
 modelSupplierPage <- function(input, output, session, dbSettings,
     logMessage = message, active = reactive(TRUE)) {
@@ -56,6 +57,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
             selection = "single",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 scrollX = TRUE
             )
@@ -105,6 +107,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
             selection = "single",
             colnames = c('Row Number' = 1),
             options = list(
+                searchHighlight = TRUE,
                 columnDefs = list(list(visible = FALSE, targets = 0)),
                 scrollX = TRUE
             )
