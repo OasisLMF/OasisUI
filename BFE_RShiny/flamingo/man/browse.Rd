@@ -5,8 +5,8 @@
 \title{browseprogrammes Module}
 \usage{
 browseprogrammes(input, output, session, dbSettings, apiSettings, userId,
-  active = reactive(TRUE), logMessage = message,
-  reloadMillis = 10000)
+  runIdList, preselRunId, processRunId, active = reactive(TRUE),
+  logMessage = message, reloadMillis = 10000)
 }
 \arguments{
 \item{input}{shiny input object}
@@ -18,6 +18,10 @@ browseprogrammes(input, output, session, dbSettings, apiSettings, userId,
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{preselRunId}{reactive string expression for reselected run id from  landingpage}
+
+\item{processRunId}{reactive string expression for reselected run id from  defineProgramme}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

@@ -1,21 +1,21 @@
 
 #' Convenience function to execute database queries
-#' @description Opens a new connection to the database, executes the given
-#' query statement and then closes the connection again.
-#' @param dbSettings setting object as returned by e.g. \link{flamingoDB}
+#' @description Opens a new connection to the database, executes the given query
+#'   statement and then closes the connection again.
+#' @param dbSettings setting object as returned by e.g. [flamingoDB()]
 #' @param statement query statement to execute, e.g. as returned by
-#' \link{buildDbQuery}
-#' @param simplify if \code{TRUE}, a vector will be returned instead of
-#' a \code{data.frame} only a single column is returned.
+#'   [buildDbQuery()]
+#' @param simplify if `TRUE`, a vector will be returned instead of a
+#'   `data.frame` only a single column is returned.
 #' @param verbose print query statement
 #' @param logMessage function to call with log message
 #' @param logError function to call with error log message
-#' @param ... further arguments to \link{dbGetQuery}
-#' @return result of the query as a \code{data.frame} or a vector if
-#' \code{simplify} is set to \code{TRUE}. \code{NULL} if no result
-#' can be returned.
+#' @param ... further arguments to [dbGetQuery()]
+#' @return result of the query as a `data.frame` or a vector if `simplify` is
+#'   set to `TRUE`. `NULL` if no result can be returned.
 #' @importFrom DBI dbGetQuery dbConnect dbDisconnect
 #' @export
+#' @md
 executeDbQuery <- function(dbSettings, statement, simplify = FALSE,
     verbose = FALSE, logMessage = message, logError = logMessage, ...) {
 
@@ -54,14 +54,15 @@ executeDbQuery <- function(dbSettings, statement, simplify = FALSE,
 
 #' Convenience function to construct query statements
 #' @description Constructs query statements that can be executed with
-#' \link{dbExecute}.
+#'   [DBI::dbExecute()].
 #' @param dbFunc database function to call
-#' @param ... arguments to \code{dbFunc}. \code{character()} args are quoted
-#' with single quotes (').
-#' @param dboPrefix prefix \code{dbFunc} with \code{"dbo."}
-#' @param squareBrackets surround the argument list with [ and ]
+#' @param ... arguments to `dbFunc`. `character()` args are quoted with single
+#'   quotes (').
+#' @param dboPrefix prefix `dbFunc` with `"dbo."`
+#' @param squareBrackets surround the argument list with \[ and \]
 #' @export
-buildDbQuery <- function(
+#' @md
+buildDbQuery <- function( 
     dbFunc, ...,
     dboPrefix = TRUE,
     squareBrackets = FALSE) {

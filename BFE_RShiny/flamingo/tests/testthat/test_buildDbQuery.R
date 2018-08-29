@@ -4,7 +4,7 @@ test_that("query builder produces correct queries", {
       stmt11 <- "exec dbo.ListProcessRun 1, 'test'"
       stmt12 <- buildDbQuery("ListProcessRun", 1, "test")
       
-      expect_equal(stmt12, stmt22)
+      expect_equal(stmt11, stmt12)
       
       stmt21 <- "exec dbo.createCompany 'a', 'b', 'c', 'd'"
       stmt22 <- buildDbQuery("createCompany", "a", "b", "c", "d")

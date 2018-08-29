@@ -7,7 +7,7 @@
 getDeptData(dbSettings, userId)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
 \item{userId}{user id}
 }

@@ -7,7 +7,7 @@
 getOasisUsers(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
 oasis users; \code{data.frame} of 2 variables:

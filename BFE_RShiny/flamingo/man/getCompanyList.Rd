@@ -7,7 +7,7 @@
 getCompanyList(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
 companies; \code{data.frame} of 5 variables:
