@@ -22,7 +22,6 @@ server <- function(input, output, session) {
   result <- reactiveValues(
     userId = FLAMINGO_GUEST_ID,
     userName = "",
-    collapsed = FALSE,
     WidthMain = 9,
     WidthSide = 3,
     preselPanel = panelsProgrammeWorkflow[1]
@@ -39,18 +38,6 @@ server <- function(input, output, session) {
 
     return(auth)
   }) %>% debounce(100)
-
-  # collapse / expand sidebar
-  observeEvent(input$abuttoncollapsesidebar, {
-    result$collapsed <- !result$collapsed
-    if (!result$collapsed) {
-      result$WidthMain <- 9
-      result$WidthSide <- 3
-    } else {
-      result$WidthMain <- 11
-      result$WidthSide <- 1
-    }
-  })
 
   ### submodules ----
   .callModule <- function(...) {
@@ -81,8 +68,7 @@ server <- function(input, output, session) {
     userName = reactive(result$userName),
     reloadMillis = reloadMillis,
     logMessage = logMessage,
-    active = reactive(authenticated()),
-    collapsed = reactive(result$collapsed)
+    active = reactive(authenticated())
   )
 
   auth_modules$landingPage <- .callModule(
@@ -188,6 +174,17 @@ server <- function(input, output, session) {
   callModule(dynamicColumn, "main", reactive(result$WidthMain))
 
   observe(result$logout <- auth_modules$pageheader$logout())
+
+  ### collapse / expand sidebar ----
+  observe({
+    if (auth_modules$pagestructure$collapsed()) {
+      result$WidthMain <- 11
+      result$WidthSide <- 1
+    } else {
+      result$WidthMain <- 9
+      result$WidthSide <- 3
+    }
+  })
 
   ### navigation ----
   # observe the possible navigation state propagated from any module
