@@ -11,7 +11,7 @@ loginDialogUI <- function(id) {
   attachDependencies(value = flamingoHtmlDependencies(), tagList(
 
     tags$div(align = "center", class = "login-dialog",
-             img(src = "assets/img/Flamingo.jpg" ),
+             img(src = "img/Flamingo.jpg" ),
              tags$input(id = ns("userid"), type = "text",
                         placeholder = "username", size = 15),
              tags$input(id = ns("password"), type = "password",

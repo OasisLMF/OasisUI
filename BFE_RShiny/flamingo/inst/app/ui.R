@@ -10,7 +10,7 @@ ui <- function(request) {
 
     fluidPage(
       tags$head(
-        tags$link(rel = "stylesheet", type = "text/css", href = "assets/css/bootstrap.css")
+        tags$link(rel = "stylesheet", type = "text/css", href = "css/bootstrap.css")
       ),
       shinyjs::useShinyjs(),
       shinyjs::extendShinyjs(script = system.file("app", "www", "js", "flamingo.js", package = "flamingo")),
