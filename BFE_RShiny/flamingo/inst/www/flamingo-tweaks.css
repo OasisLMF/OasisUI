@@ -46,6 +46,11 @@ div.flamingo-page-division {
   margin-bottom: 1em;
 }
 
+table.dataTable tr.selected td,
+table.dataTable td.selected {
+  background-color: #ebcccc !important;
+}
+
 .tab-content {
   padding-top: 1em;
 }

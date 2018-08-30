@@ -42,7 +42,7 @@ if (FALSE) {
   if (interactive()) {
     library(shiny)
     ui <- fluidPage(
-      # replace eventually with falmingo-tweaks.css via system.file()
+      # replace eventually with flamingo-tweaks.css via system.file()
       tags$style(HTML('
       .collapsebtn:after {
       content:"-";
@@ -97,7 +97,7 @@ if (FALSE) {
   if (interactive()) {
     library(shiny)
     ui <- fluidPage(
-      # replace eventually with falmingo-tweaks.css via system.file()
+      # replace eventually with flamingo-tweaks.css via system.file()
       tags$style(HTML('
       .collapsebtn:after {
       content:"-";
