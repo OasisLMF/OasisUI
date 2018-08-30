@@ -57,8 +57,8 @@ fileViewer <- function(
     cbind(
       data.frame(Selected = .shinyInput(checkboxInput,"srows_", nrow(result$FLdata), value = FALSE, width = 1)),
       result$FLdata,
-      data.frame(View = .shinyInput(actionButton, "vrows_", nrow(result$FLdata), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')), #,style = "color: #8b2129; background-color: transparent; border-color: #8b2129")), 
-      data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(result$FLdata), Label = "Map",  hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;'))   #, style = "color: #8b2129; background-color: transparent; border-color: #8b2129"))
+      data.frame(View = .shinyInput(actionButton, "vrows_", nrow(result$FLdata), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')),
+      data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(result$FLdata), Label = "Map",  hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;'))
     )
   })
   
