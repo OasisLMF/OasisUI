@@ -24,6 +24,32 @@ h4.flamingo-table-title {
   display: block;
 }
 
+h4.flamingo-loss {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+h5.flamingo-measure {
+  font-size: 16.5px;
+}
+
+h6.flamingo-granularity {
+  font-size: 15px;
+}
+
+em.flamingo-footer {
+  color: gray;
+  font-size: 10pt;
+  margin-left: 5%;
+}
+
+em.rshiny-footer {
+  color: gray;
+  font-size: 10pt;
+  float: right;
+  margin-right: 2%;
+}
+
 div.flamingo-page-division {
   margin-top: 2em;
   /* border: 1px solid #e3e3e3; */
@@ -44,11 +70,6 @@ div.flamingo-page-division {
 
 .datatables {
   margin-bottom: 1em;
-}
-
-table.dataTable tr.selected td,
-table.dataTable td.selected {
-  background-color: #ebcccc !important;
 }
 
 .tab-content {
@@ -146,7 +167,7 @@ table.dataTable td.selected {
 #programmeDefinitionSingle-divsliderdefprogsteps .irs-bar,
 #programmeDefinitionSingle-divsliderdefprogsteps .irs-bar-edge,
 #programmeDefinitionSingle-divsliderdefprogsteps .irs-line {
-  height:15px;
+  height: 15px;
 }
 
 #programmeDefinitionSingle-divsliderdefprogsteps .irs-grid-text {

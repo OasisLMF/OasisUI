@@ -228,23 +228,23 @@ processRunParamAdvancedGULUI <- function(id) {
   fluidRow(
     # Few outputs commented/disabled for the first release. To be enabled for later releases.  
     column(4,
-           h4("Ground Up Loss", style = "font-size: 18px; font-weight: bold;"),
-           h5("Full Sample", style = "font-size: 16.5px;"), 
-           h5("ELT", style = "font-size: 16.5px;"),
-           tags$div(class = "h5-align", h5("AEP", style = "font-size: 16.5px;")), 
-           tags$div(class = "h5-align", h5("OEP", style = "font-size: 16.5px;")),
-           tags$div(class = "h5-align", h5("Multi AEP", style = "font-size: 16.5px;")),
-           h5("Multi OEP", style = "font-size: 16.5px;"),
-           # h5("WS Mean AEP", style = "font-size: 16.5px;"),
-           # tags$div(class = "h5-align", h5("WS Mean OEP", style = "font-size: 16.5px;")),
-           # tags$div(class = "h5-align",h5("Sample Mean AEP", style = "font-size: 16.5px;")),
-           # h5("Sample Mean OEP", style = "font-size: 16.5px;"), 
-           h5("AAL", style = "font-size: 16.5px;"),
-           tags$div(class = "h5-align",h5("PLT", style = "font-size: 16.5px;"))),
+           h4("Ground Up Loss", class = "flamingo-loss"),
+           h5("Full Sample", class = "flamingo-measure"), 
+           h5("ELT", class = "flamingo-measure"),
+           tags$div(class = "h5-align", h5("AEP", class = "flamingo-measure")), 
+           tags$div(class = "h5-align", h5("OEP", class = "flamingo-measure")),
+           tags$div(class = "h5-align", h5("Multi AEP", class = "flamingo-measure")),
+           h5("Multi OEP", class = "flamingo-measure"),
+           # h5("WS Mean AEP", class = "flamingo-measure"),
+           # tags$div(class = "h5-align", h5("WS Mean OEP", class = "flamingo-measure")),
+           # tags$div(class = "h5-align", h5("Sample Mean AEP", class = "flamingo-measure")),
+           # h5("Sample Mean OEP", class = "flamingo-measure"), 
+           h5("AAL", class = "flamingo-measure"),
+           tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
     
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkgulprog"),
-                                label = h4("Prog", style = "font-size: 15.0px;"), 
+                                label = h6("Prog", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "gulprogSummary",
                                   " " = "gulprogELT",
@@ -261,7 +261,7 @@ processRunParamAdvancedGULUI <- function(id) {
                                 selected = defaultSelectChoicesGUL),
              
              checkboxGroupInput(ns("chkgulstate"),
-                                label = h4("State", style = "font-size: 15.0px;"), 
+                                label = h6("State", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "gulstateSummary",
                                   " " = "gulstateELT",
@@ -278,7 +278,7 @@ processRunParamAdvancedGULUI <- function(id) {
                                 selected = defaultSelectChoicesGUL),
              
              checkboxGroupInput(ns("chkgulcounty"),
-                                label = h4("County", style = "font-size: 15.0px;"), 
+                                label = h6("County", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "gulcountySummary",
                                   " " = "gulcountyELT",
@@ -295,7 +295,7 @@ processRunParamAdvancedGULUI <- function(id) {
                                 selected = defaultSelectChoicesGUL),
              
              checkboxGroupInput(ns("chkgulloc"),
-                                label = h4("Location", style = "font-size: 15.0px;"), 
+                                label = h6("Location", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "gullocSummary",
                                   " " = "gullocELT",
@@ -312,7 +312,7 @@ processRunParamAdvancedGULUI <- function(id) {
                                 selected = defaultSelectChoicesGUL),
              
              checkboxGroupInput(ns("chkgullob"),
-                                label = h4("LOB", style = "font-size: 15.0px;"), 
+                                label = h6("LOB", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "gullobSummary",
                                   " " = "gullobELT",
@@ -329,7 +329,7 @@ processRunParamAdvancedGULUI <- function(id) {
                                 selected = defaultSelectChoicesGUL),
              
              checkboxGroupInput(ns("chkgulpolicy"),
-                                label = h4("Policy", style = "font-size: 15.0px;"), 
+                                label = h6("Policy", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "gulpolicySummary",
                                   " " = "gulpolicyELT",
@@ -358,23 +358,23 @@ processRunParamAdvancedILUI <- function(id) {
   
   fluidRow(
     column(4,
-           h4("Insured Loss", style = "font-size: 18px; font-weight: bold;"),
-           h5("Full Sample", style = "font-size: 16.5px;"), 
-           h5("ELT", style = "font-size: 16.5px;"),
-           tags$div(class = "h5-align", h5("AEP", style = "font-size: 16.5px;")), 
-           tags$div(class = "h5-align", h5("OEP", style = "font-size: 16.5px;")),
-           tags$div(class = "h5-align", h5("Multi AEP", style = "font-size: 16.5px;")),
-           h5("Multi OEP", style = "font-size: 16.5px;"),  
-           # h5("WS Mean AEP", style = "font-size: 16.5px;"),
-           # tags$div(class = "h5-align", h5("WS Mean OEP", style = "font-size: 16.5px;")),  
-           # tags$div(class = "h5-align",h5("Sample Mean AEP", style = "font-size: 16.5px;")),
-           # h5("Sample Mean OEP", style = "font-size: 16.5px;"), 
-           h5("AAL", style = "font-size: 16.5px;"),
-           tags$div(class = "h5-align",h5("PLT", style = "font-size: 16.5px;"))),
+           h4("Insured Loss", class = "flamingo-loss"),
+           h5("Full Sample", class = "flamingo-measure"), 
+           h5("ELT", class = "flamingo-measure"),
+           tags$div(class = "h5-align", h5("AEP", class = "flamingo-measure")), 
+           tags$div(class = "h5-align", h5("OEP", class = "flamingo-measure")),
+           tags$div(class = "h5-align", h5("Multi AEP", class = "flamingo-measure")),
+           h5("Multi OEP", class = "flamingo-measure"),  
+           # h5("WS Mean AEP", class = "flamingo-measure"),
+           # tags$div(class = "h5-align", h5("WS Mean OEP", class = "flamingo-measure")),  
+           # tags$div(class = "h5-align", h5("Sample Mean AEP", class = "flamingo-measure")),
+           # h5("Sample Mean OEP", class = "flamingo-measure"), 
+           h5("AAL", class = "flamingo-measure"),
+           tags$div(class = "h5-align",h5("PLT", class = "flamingo-measure"))),
     
     tags$div(class = "multicol", 
              checkboxGroupInput(ns("chkilprog"),
-                                label = h5("Prog", style = "font-size: 15.0px;"), 
+                                label = h6("Prog", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "ilprogSummary",
                                   " " = "ilprogELT",
@@ -391,7 +391,7 @@ processRunParamAdvancedILUI <- function(id) {
                                 selected = NULL),
              
              checkboxGroupInput(ns("chkilstate"),
-                                label = h5("State", style = "font-size: 15.0px;"), 
+                                label = h6("State", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "ilstateSummary",
                                   " " = "ilstateELT",
@@ -407,7 +407,7 @@ processRunParamAdvancedILUI <- function(id) {
                                 selected = NULL),
              
              checkboxGroupInput(ns("chkilcounty"),
-                                label = h5("County", style = "font-size: 15.0px;"), 
+                                label = h6("County", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "ilcountySummary",
                                   " " = "ilcountyELT",
@@ -423,7 +423,7 @@ processRunParamAdvancedILUI <- function(id) {
                                 selected = NULL),
              
              checkboxGroupInput(ns("chkilloc"),
-                                label = h5("Location", style = "font-size: 15.0px;"), 
+                                label = h6("Location", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "illocSummary",
                                   " " = "illocELT",
@@ -440,7 +440,7 @@ processRunParamAdvancedILUI <- function(id) {
                                 selected = NULL),
              
              checkboxGroupInput(ns("chkillob"),
-                                label = h5("LOB", style = "font-size: 15.0px;"), 
+                                label = h6("LOB", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "illobSummary",
                                   " " = "illobELT",
@@ -457,7 +457,7 @@ processRunParamAdvancedILUI <- function(id) {
                                 selected = NULL),
              
              checkboxGroupInput(ns("chkilpolicy"),
-                                label = h5("Policy", style = "font-size: 15.0px;"), 
+                                label = h6("Policy", class = "flamingo-granularity"), 
                                 choices = list(
                                   " " = "ilpolicySummary",
                                   " " = "ilpolicyELT",
