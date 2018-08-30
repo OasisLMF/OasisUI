@@ -23,7 +23,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
     fluidRow(
       column(3,
              a(href = "https://oasislmf.org",
-               img(src = "OASIS_LMF_COLOUR.png", width = "85%", style = "margin-top:5%"))
+               img(src = "assets/img/OASIS_LMF_COLOUR.png", width = "85%", style = "margin-top:5%"))
       ),
       column(8,
              actionButton(inputId = "abuttoncollapsesidebar", icon = icon("ellipsis-v"), label = NULL),

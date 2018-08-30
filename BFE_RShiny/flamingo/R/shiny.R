@@ -30,8 +30,8 @@ flamingoModule <- function(
 #' @export
 flamingoHtmlDependencies <- function() {
   
-  htmlDependency(name = "flamingo", version = "0.0.4", src = c(href = "flamingo"),
-      stylesheet = c("flamingo-tweaks.css", "flamingo-table.css"))
+  htmlDependency(name = "flamingo", version = "0.0.4", src = c(href = "assets"),
+      stylesheet = c("css/flamingo-tweaks.css", "css/flamingo-table.css"))
   
 }
 
