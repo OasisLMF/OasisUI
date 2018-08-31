@@ -2,7 +2,7 @@
 # adapted from shinyWidgets::panel() including IDs and collapsible (inspired by
 # shinyBS::bsCollapsePanel())
 # TODO: roxygen tags including example (see below)
-flamingoPanel <- function (id, ..., heading = NULL, footer = NULL, status = "default", collapsible = FALSE, show = TRUE) {
+flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "default", collapsible = FALSE, show = TRUE) {
 
   with_id <- function(x) paste(id, x, sep = "-")
   status <- match.arg(
@@ -45,11 +45,11 @@ if (FALSE) {
       # replace eventually with flamingo-tweaks.css via system.file()
       tags$style(HTML('
       .collapsebtn:after {
-      content:"-";
+      font-family: "FontAwesome"; font-weight: 900; content: "\\f068";
       float: right;
       }
       .collapsebtn.collapsed:after {
-      content: "+";
+      content: "\\f065";
       }
       '
       )),
@@ -70,11 +70,24 @@ if (FALSE) {
         "...Yeah yeah yeah",
         heading = tagList(
           "She loves you...",
-          shiny::actionButton("aa", "X", style = "float: right")
+          shiny::actionButton("aa", icon("times"), style = "float: right")
         ),
+        footer = fluidRow(column(
+          12,
+          shiny::actionButton("aa", "+", style = "float: left")
+        )),
         collapsible = TRUE,
         show = FALSE
       ),
+      flamingoPanel(
+        "dpanel",
+        footer = fluidRow(column(
+          12,
+          shiny::actionButton("aa", "+", style = "float: left")
+        )),
+        show = FALSE
+      ),
+
       NULL
     )
     server <- function(input, output) {}
