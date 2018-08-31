@@ -17,9 +17,14 @@ flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "defa
         id = with_id("heading"), class = "panel-heading",
         fluidRow(column(
           12,
-          heading,
+          if (is.character(heading)) {
+            # TODO: fine-tune font size
+            htmltools::tags$div(heading, style = "font-size: 24px; display: inline-block")
+          } else {
+            heading
+          },
           if (collapsible) {
-            collapseButton(with_id("collapse-button"), with_id("body"), style = "float: right", collapsed = !show)
+            collapseButton(with_id("collapse-button"), with_id("body"), style = "display: inline-block; float: right", collapsed = !show)
           }
         ))
       )
