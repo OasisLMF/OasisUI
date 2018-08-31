@@ -62,8 +62,23 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state, new_c
 
 panelsState <- function(IDs) {
   reactiveVal(
-    setNames(c(TRUE, rep(FALSE, length(IDs))), IDs)
+    setNames(rep(FALSE, length(IDs)), IDs)
   )
+}
+
+callIncrementalPanelModules <- function(IDs, ID_0, contentIDs, contentUI, ...,
+                                        collapsible = FALSE, show = TRUE,
+                                        ns = identity) {
+  panels_state <- panelsState(ns(IDs))
+  # panels modules
+  lapply(
+    c(IDs, ID_0),
+    callModule, module = flamingoIncrementalPanel,
+    panels_state,
+    ns(contentIDs), contentUI,
+    collapsible = collapsible, show = show
+  )
+
 }
 
 if (FALSE) {
@@ -95,7 +110,7 @@ if (FALSE) {
       titlePanel("Dynamic panels"),
       fluidPage(
         flamingoIncrementalPanelUI(
-          "extpanel-0", heading = "Add a new panel",
+          "start-panel", heading = "Add a new panel",
           collapsible = FALSE, show = FALSE, removable = FALSE
         )
       )
@@ -105,21 +120,16 @@ if (FALSE) {
       # used for the UI components must include session$ns (relevant for module
       # server functions)
       ns <- session$ns
-      # track which panels are taken (by name)
-      panel_names <- paste0("extpanel-", c(seq_len(n_panels)))
-      panels_state <- panelsState(ns(panel_names))
+      panel_IDs <- paste0("extpanel-", c(seq_len(n_panels)))
       # content IDs used for the content module server and UI
-      content_IDs <- paste0("content-", seq_len(n_panels))
-      # panels modules
-      lapply(
-        c(panel_names, "extpanel-0"),
-        callModule, module = flamingoIncrementalPanel,
-        panels_state,
-        ns(content_IDs), examplePanelUI,
-        collapsible = TRUE, show = TRUE
-      )
       # content modules
+      content_IDs <- paste0("content-", seq_len(n_panels))
       lapply(content_IDs, callModule, module = examplePanel)
+      callIncrementalPanelModules(
+        panel_IDs, "start-panel", content_IDs,
+        examplePanelUI, collapsible = TRUE, show = TRUE,
+        ns = ns
+      )
     }
 
     shinyApp(ui = ui, server = server)
