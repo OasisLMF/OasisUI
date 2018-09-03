@@ -17,7 +17,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                       apiSettings, userId, active = reactive(TRUE), logMessage = message,
                                       preselRunId = reactive(-1),
                                       preselProcId = reactive(-1),
-                                      preselPanel,
+                                      preselPanel =  panelsProgrammeWorkflow[1],
                                       reloadMillis = 10000) {
 
   ns <- session$ns
@@ -132,9 +132,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                          paste("Please select a Programme to ammend first."))
       }
     }
-    #Reload Programme Table
-    .reloadDPProgData()
-    selectRows(dataTableProxy("tableDPprog"), c(1))
+    result$DPProgData_selected_rows <- 1
+    # #Reload Programme Table
+    # .reloadDPProgData()
+    # selectRows(dataTableProxy("tableDPprog"), 1)
   })
 
   ### Clear Programme Definition panel
@@ -162,7 +163,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     .reloadDPProgData()
   })
 
-  ### Source Files ----
+  ### > Source Files ----
 
   ### Upload Location/Account File
   onclick("abuttonSLFileUpload", {
@@ -359,7 +360,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # Panel Associate Model -----------------------------------------------------
 
-  ### Programme Table ------
+  ### > Programme Table ------
 
   # Data Programme Table
   observe(if (active()) {
@@ -400,7 +401,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  ### Programme Actions ----
+  ### > Programme Actions ----
 
   # Ammend Programme
   onclick("buttonamendpr", {
@@ -438,7 +439,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
 
-  # Programme Details Table-----
+  # > Programme Details Table-----
 
   ### Programme Detail Table
   observeEvent(result$progDetailsCounter, {
@@ -521,7 +522,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  # Create Model ----
+  # > Create Model ----
 
   # on click of create prog oasis button - Creates and loads the model - sends user to Configure Output panel
   onclick("abuttoncrprogoasis", {
@@ -552,7 +553,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # Panel Configure Output  ----------------------------------------------------
 
-  ### selectprogrammeID ----
+  ### > selectprogrammeID ----
 
   # Add choices possibilities  to selectprogrammeID
   observe( if (active()) {
@@ -596,7 +597,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   observe({
     result$PODataCounter
     result$POData_selected_rows
-    if(result$POData_selected_rows != 0) {
+    if(result$POData_selected_rows != 0 & !is.null(result$POData)) {
       if (!is.na(result$POData[result$POData_selected_rows, "Status"])) {
         if (result$POData[result$POData_selected_rows, "Status"] == StatusCompleted) {
           if (active()) {
@@ -630,7 +631,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  ### Programme Model Table (previously OOK) ----
+  ### > Programme Model Table (previously OOK) ----
   observeEvent(result$PODataCounter,{
     if (!is.null(input$selectprogrammeID)) {
       POData <- getProgOasisForProgdata(dbSettings, input$selectprogrammeID)
@@ -682,7 +683,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     })
 
 
-  # Model Details Table -----
+  # > Model Details Table -----
 
   observeEvent(result$progFilesCounter, {
 
@@ -734,7 +735,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     hide("panelModelDetails")
   })
 
-  # Configure Output ------
+  # > Configure Output ------
 
   #simplified view selection
   observe( if (active()) {
@@ -742,6 +743,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         length(input$chkgulcounty) > 0 |  length(input$chkgulloc) > 0 |
         length(input$chkgullob) > 0 | length(input$chkgulpolicy) > 0) {
       updateCheckboxInput(session, "chkinputGUL", value = TRUE)
+      disable("chkgulpolicy")
     }
     if (length(input$chkilprog) > 0 |  length(input$chkilstate) > 0 |
         length(input$chkilcounty) > 0 |  length(input$chkilloc) > 0 |
@@ -755,6 +757,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (input$chkinputGUL == FALSE) {
       .clearchkboxGULgrp()
     }  else {
+      disable("chkgulpolicy")
       gullistlength <- length(input$chkgulprog) + length(input$chkgulstate) +
         length(input$chkgulcounty) + length(input$chkgulloc) +
         length(input$chkgullob) + length(input$chkgulpolicy)
@@ -981,7 +984,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # Panel Run ------------------------------------------------------------------
 
-  ### selectprogOasisID ----
+  ### > selectprogOasisID ----
 
   # Add choices possibilities to selectprogOasisID
   observeEvent( result$PODataCounter, {
@@ -1021,7 +1024,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  ### Process Run Table -----
+  ### > Process Run Table -----
 
   .getProcessRunWithUserChoices <- function(pruser, prmodel, prprogramme,
                                             prworkflow) {
@@ -1095,11 +1098,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     )
   })
 
-  ### Navigation ----
+  ### > Navigation ----
 
   #Allow display output option only if run successfull. Otherwise default view is logs
   observeEvent(result$prcrundata_selected_rows, {
-    if (result$prcrundata_selected_rows != 0) {
+    if (result$prcrundata_selected_rows != 0 & !is.null(result$prcrundata)) {
+      hide("panelDefineOutputs")
       if (result$prcrundata[result$prcrundata_selected_rows, "ProcessRunStatus"] != StatusCompleted) {
         hide("abuttondisplayoutput")
         hide("abuttonshowlog")
@@ -1138,11 +1142,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     hide("abuttonehidepanelconfigureoutput")
   })
 
-  ### Rerun Process ----
-
+  ### > Rerun Process ----
+  
+  #RunId of selected row
+  observeEvent(result$prcrundata_selected_rows,{
+    if (!is.null(result$prcrundata_selected_rows)) {
+      result$prrunid <- (result$prcrundata[result$prcrundata_selected_rows, 1][length(result$prcrundata[result$prcrundata_selected_rows, 1])])
+    }
+  })
+  
+  
   onclick("abuttonrerunpr", {
     if (result$prcrundata_selected_rows != 0) {
-      result$prrunid <- (result$prcrundata[result$prcrundata_selected_rows, 1][length(result$prcrundata[result$prcrundata_selected_rows, 1])])
       outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid ))
       runparamsforpr <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$prrunid ))
 
@@ -1210,7 +1221,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  ### Logs ---------------------------------------------------------------
+  ### > Logs ---------------------------------------------------------------
 
   observeEvent( input$abuttonshowlog, {
     if (result$prcrundata_selected_rows != 0) {
@@ -1405,6 +1416,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   #Reload Programme table
   .reloadDPProgData <- function() {
     result$DPProgDataCounter <- isolate(result$DPProgDataCounter + 1)
+    result$DPProgData_selected_rows <- 1
   }
 
   #Reload Programme Details table
@@ -1415,6 +1427,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   #Reload Programme Model table
   .reloadPOData <- function() {
     result$PODataCounter <- isolate(result$PODataCounter + 1)
+    result$POData_selected_rows <- 1
   }
 
   #Reload Programme Model Details table
@@ -1425,6 +1438,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   #Reload Process Runs table
   .reloadRunData <- function() {
     result$prcrundataCounter <- isolate(result$prcrundataCounter + 1)
+    result$prcrundata_selected_rows <- 1
   }
 
   #Reload Process Logs table
