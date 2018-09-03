@@ -179,3 +179,29 @@ div.flamingo-page-division {
   font-size: 14px;
   top: -5px;
 }
+
+#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype label.control-label, #browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype  .selectize-control.single { 
+         display: table-cell; 
+         text-align: center; 
+         vertical-align: middle; 
+} 
+
+#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype  label.control-label {
+        padding-right: 10px;
+}
+
+#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype .form-group { 
+        display: table-row;
+}
+
+#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype .selectize-control.single div.item {
+        padding-right: 15px;
+}
+
+.collapsebtn:after {
+      font-family: "FontAwesome"; font-weight: 900; content: "\f068";
+      float: right;
+      }
+      .collapsebtn.collapsed:after {
+      content: "\f065";
+      }
