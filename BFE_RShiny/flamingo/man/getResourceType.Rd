@@ -12,9 +12,9 @@ getResourceType(dbSettings)
 \value{
 resource types; \code{data.frame} of 3 variables:
 \itemize{
-		\item \code{ResourceTypeID}
-		\item \code{ResourceTypeName}
-   \item \code{Source}
+\item \code{ResourceTypeID}
+\item \code{ResourceTypeName}
+\item \code{Source}
 }
 }
 \description{

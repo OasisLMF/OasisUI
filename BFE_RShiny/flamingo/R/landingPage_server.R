@@ -182,7 +182,6 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' see \link{invalidateLater};
 #' @param userId reactive expression yielding user id
 #' @param userName reactive expression yielding user name
-#' @param collapsed reactive expression determining how the UI should be rendered
 #' @return For \code{pagestructure()}, list of reactives.
 #' @template return-outputNavigation
 #' @importFrom shinyBS bsTooltip
@@ -190,16 +189,23 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
                           reloadMillis = 10000, logMessage = message,
-                          active = reactive(TRUE), collapsed = reactive(FALSE)) {
+                          active = reactive(TRUE)) {
 
   ns <- session$ns
 
   navigation_state <- reactiveNavigation()
+  
+  state <- reactiveValues(
+    collapsed = FALSE
+  )
 
-
+  observeEvent(input$abuttoncollapsesidebar, {
+    state$collapsed <- !state$collapsed
+  })
+  
   observe({
     output$sidebar <-
-      renderUI(pagestructureSidebar(ns, collapsed = collapsed()))
+      renderUI(pagestructureSidebar(ns, state$collapsed))
   })
 
 
@@ -238,7 +244,9 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   ### Module Output ----
   moduleOutput <- c(
     outputNavigation(navigation_state),
-    list() # placeholder
+    list(
+      collapsed = reactive(state$collapsed)
+    ) # placeholder
   )
 
   moduleOutput

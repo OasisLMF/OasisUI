@@ -76,6 +76,7 @@ pagestructureUI <- function(id) {
   ns <- NS(id)
   
   tagList(
+    actionButton(inputId = ns("abuttoncollapsesidebar"), icon = icon("ellipsis-v"), label = NULL),
     uiOutput(ns("sidebar"))
   )
   

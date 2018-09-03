@@ -8,7 +8,7 @@
 \usage{
 pagestructure(input, output, session, userId, userName, dbSettings,
   reloadMillis = 10000, logMessage = message,
-  active = reactive(TRUE), collapsed = reactive(FALSE))
+  active = reactive(TRUE))
 
 pageheaderUI(id)
 
@@ -33,8 +33,6 @@ see \link{invalidateLater};}
 \item{logMessage}{function that will be passed info messages}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{collapsed}{reactive expression determining how the UI should be rendered}
 }
 \value{
 For \code{pagestructure()}, list of reactives.

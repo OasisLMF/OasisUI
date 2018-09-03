@@ -12,13 +12,13 @@ getProgrammeList(dbSettings)
 \value{
 \code{data.frame} of 7 variables:
 \itemize{
-   \item \code{Programme ID}
-   \item \code{Programme Name}
-   \item \code{Account ID}
-   \item \code{Account Name}
-   \item \code{Transform ID}
-   \item \code{Transform}
-   \item \code{Status}
+\item \code{Programme ID}
+\item \code{Programme Name}
+\item \code{Account ID}
+\item \code{Account Name}
+\item \code{Transform ID}
+\item \code{Transform}
+\item \code{Status}
 }
 }
 \description{
