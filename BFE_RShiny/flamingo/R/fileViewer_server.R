@@ -23,7 +23,6 @@ fileViewer <- function(
   
   result <- reactiveValues(
     FLdata = NULL,               #table of files
-    FVid = -1,                   #needed to get the operations valid on file id
     fileData = NULL,             #file to download
     currentFile = NULL,          #Current filename
     currentrows = 0           #indices of current rows selected
@@ -291,9 +290,9 @@ fileViewer <- function(
   
   # Check permission row by row
   .enableButton <- function(i) {
-    result$FVid <- result$FLdata[i, 1]
+    FVid <- result$FLdata[i, 1]
     validButtons <- executeDbQuery(dbSettings,
-                                   buildDbQuery("TellOperationsValidOnFileID", result$FVid))
+                                   buildDbQuery("TellOperationsValidOnFileID", FVid))
     manageButtons <- c("FO_btn_show_raw_content" = paste0("vrows_", i),
                        "FO_btn_show_map" = paste0("mrows_", i))
     # lapply(t(validButtons), function(btnIDs){enable(manageButtons[btnIDs])})
