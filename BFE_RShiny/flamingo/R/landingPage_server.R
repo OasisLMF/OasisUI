@@ -14,7 +14,7 @@
 #' @importFrom DT renderDataTable datatable
 #' @importFrom dplyr mutate '%>%'
 #' @importFrom utils write.csv
-#' @importFrom shinyWidgets dropdown
+#' @importFrom shinyWidgets dropdown toggleDropdownButton
 #' @export
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
@@ -22,7 +22,8 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues(
-    inbox = NULL
+    inbox = NULL,
+    runIdList = NULL
   )
 
   observeEvent(input$abuttongotorun,
@@ -38,7 +39,8 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 
     landingPageButtonUpdate(session, dbSettings, userId())
 
-    result$inbox <- getInboxData(dbSettings, userId()) %>%
+    data <- getInboxData(dbSettings, userId())
+    result$inbox <-  data %>%
       mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
       mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
       mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
@@ -46,6 +48,8 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 
     logMessage("inbox refreshed")
 
+    result$runIdList <- result$inbox[, c("RunID", "Status")]
+    #logMessage(paste0("result$runIdList ", names(result$runIdList)))
   })
 
   output$tableInbox <- renderDataTable(if (userId() != FLAMINGO_GUEST_ID) {
@@ -82,10 +86,12 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
         result$inbox[i, 2]} else -1),
       # this is needed in processRun, probably shouldn't
       procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        result$inbox[i, 1]} else -1)
+        result$inbox[i, 1]} else -1),
+      runIdList = reactive(result$runIdList)
     )
+    
   )
-
+  
   moduleOutput
 
 }
