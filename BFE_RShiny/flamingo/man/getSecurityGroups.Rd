@@ -12,8 +12,8 @@ getSecurityGroups(dbSettings)
 \value{
 security groups; \code{data.frame} of 2 variables:
 \itemize{
-		\item \code{Security Group ID}
-		\item \code{Security Group Name}
+\item \code{Security Group ID}
+\item \code{Security Group Name}
 }
 }
 \description{

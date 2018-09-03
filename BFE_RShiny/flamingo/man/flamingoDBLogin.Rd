@@ -7,7 +7,7 @@
 flamingoDBLogin(dbSettings, uid, pwd)
 }
 \arguments{
-\item{dbSettings}{object as returned by \link{flamingoDB}}
+\item{dbSettings}{object as returned by \code{\link[=flamingoDB]{flamingoDB()}}}
 
 \item{uid}{user name}
 

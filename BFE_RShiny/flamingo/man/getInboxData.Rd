@@ -9,19 +9,19 @@ getInboxData(dbSettings, userId, ...)
 \arguments{
 \item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
-\item{userId}{user id as returned by \link{flamingoDBLogin}}
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{...}{other arguments to \link{executeDbQuery}}
+\item{...}{other arguments to \code{\link[=executeDbQuery]{executeDbQuery()}}}
 }
 \value{
 inbox; \code{data.frame} of 6 variables:
 \itemize{
-		\item \code{ProgOasisID}
-		\item \code{RunID}
-   \item \code{Run Name}
-		\item \code{Model}
-		\item \code{Status}
-   \item \code{Completed}
+\item \code{ProgOasisID}
+\item \code{RunID}
+\item \code{Run Name}
+\item \code{Model}
+\item \code{Status}
+\item \code{Completed}
 }
 }
 \description{

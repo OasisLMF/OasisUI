@@ -20,7 +20,6 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
                img(src = "OASIS_LMF_COLOUR.png", width = "85%", style = "margin-top:5%"))
       ),
       column(8,
-             actionButton(inputId = "abuttoncollapsesidebar", icon = icon("ellipsis-v"), label = NULL),
              style = "margin-top:2%"),
       column(1,
              pageheaderUI("pageheader"),

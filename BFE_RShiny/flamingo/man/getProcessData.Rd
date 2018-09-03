@@ -20,9 +20,9 @@ getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
 \value{
 process data; \code{data.frame} of 3 variables:
 \itemize{
-  \item \code{ProgOasisId}
-  \item \code{ProgName}
-  \item \code{ModelName}
+\item \code{ProgOasisId}
+\item \code{ProgName}
+\item \code{ModelName}
 }
 }
 \description{

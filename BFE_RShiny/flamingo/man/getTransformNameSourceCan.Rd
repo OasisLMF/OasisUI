@@ -12,8 +12,8 @@ getTransformNameSourceCan(dbSettings)
 \value{
 transforms; \code{data.frame} of 2 variables:
 \itemize{
-		\item \code{TransformName}
-		\item \code{TransformID}
+\item \code{TransformName}
+\item \code{TransformID}
 }
 }
 \description{

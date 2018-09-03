@@ -10,10 +10,10 @@ getAccountName(dbSettings)
 \item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
-\code{data.frame} of 2 variables:
+account name; \code{data.frame} of 2 variables:
 \itemize{
-		\item \code{Account ID}
-		\item \code{progOasisId}
+\item \code{Account ID}
+\item \code{progOasisId}
 }
 }
 \description{

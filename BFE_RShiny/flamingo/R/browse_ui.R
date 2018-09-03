@@ -1,3 +1,4 @@
+#' Browse programmes UI
 #' @rdname browseprogrammesUI
 #' @description UI/View for the process run page
 #' @inheritParams flamingoModuleUI

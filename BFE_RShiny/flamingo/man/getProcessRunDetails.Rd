@@ -14,11 +14,11 @@ getProcessRunDetails(dbSettings, wfid)
 \value{
 log details; \code{data.frame} of 5 variables:
 \itemize{
-    \item \code{Element ID}
-    \item \code{Element Name}
-    \item \code{Status}
-    \item \code{Description}
-    \item \code{CompletedAt}
+\item \code{Element ID}
+\item \code{Element Name}
+\item \code{Status}
+\item \code{Description}
+\item \code{CompletedAt}
 }
 }
 \description{
