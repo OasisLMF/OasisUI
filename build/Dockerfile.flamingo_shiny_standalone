@@ -22,7 +22,7 @@ RUN apt-get update && \
 #     rm -rf /var/lib/apt/lists/*
 
 # Install Flamingo dependencies
-RUN R -e "install.packages(c('shinyWidgets', 'V8', 'devtools', 'DT', 'shiny', 'shinyBS', 'httr', 'rjson', 'odbc', 'RODBC', 'leaflet', 'ggplot2', 'curl', 'RCurl', 'xml2', 'XML', 'rmarkdown', 'logging'), repos='https://cloud.r-project.org/')" && \
+RUN R -e "install.packages(c('shinyWidgets', 'V8', 'devtools', 'DT', 'shiny', 'shinyBS', 'bsplus', 'httr', 'rjson', 'odbc', 'RODBC', 'leaflet', 'ggplot2', 'curl', 'RCurl', 'xml2', 'XML', 'rmarkdown', 'logging'), repos='https://cloud.r-project.org/')" && \
     R -e "install.packages(c('Dataset'), repos='http://R-Forge.R-project.org')" && \
     R -e "install.packages(c('shinyjs'), repos='https://cloud.r-project.org/')" && \
     R -e "remove.packages(c('devtools'))"
