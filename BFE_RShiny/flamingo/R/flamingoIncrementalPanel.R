@@ -78,7 +78,7 @@ callIncrementalPanelModules <- function(IDs, ID_0, contentIDs, contentUI, ...,
     ns(contentIDs), contentUI,
     collapsible = collapsible, show = show
   )
-
+ panels_state
 }
 
 if (FALSE) {
