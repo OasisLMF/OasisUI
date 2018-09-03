@@ -89,3 +89,11 @@ defaultSelectChoicesIL <- c(
 
 ### Panels Programme Workflow -----
 panelsProgrammeWorkflow <- c("Create Programme", "Select Programme & Associate Model", "Configure Workflow Output", "Browse & re-run")
+
+### Plots types ------
+plottypeslist <- c("loss per return period")
+
+#Output options
+granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
+losstypes <- c("GUL", "IL")
+variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")
