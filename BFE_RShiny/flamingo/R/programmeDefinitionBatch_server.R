@@ -12,8 +12,6 @@
 #' @export
 programmeDefinitionBatch <- function(input, output, session, dbSettings,
                                      apiSettings, userId, active = reactive(TRUE), logMessage = message,
-                                     preselRunId = reactive(-1),
-                                     preselProcId = reactive(-1),
                                      reloadMillis = 10000) {
 
   ns <- session$ns

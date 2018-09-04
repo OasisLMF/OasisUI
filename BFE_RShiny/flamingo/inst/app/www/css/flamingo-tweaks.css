@@ -24,6 +24,32 @@ h4.flamingo-table-title {
   display: block;
 }
 
+h4.flamingo-loss {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+h5.flamingo-measure {
+  font-size: 16.5px;
+}
+
+h6.flamingo-granularity {
+  font-size: 15px;
+}
+
+em.flamingo-footer {
+  color: gray;
+  font-size: 10pt;
+  margin-left: 5%;
+}
+
+em.rshiny-footer {
+  color: gray;
+  font-size: 10pt;
+  float: right;
+  margin-right: 2%;
+}
+
 div.flamingo-page-division {
   margin-top: 2em;
   /* border: 1px solid #e3e3e3; */
@@ -141,7 +167,7 @@ div.flamingo-page-division {
 #programmeDefinitionSingle-divsliderdefprogsteps .irs-bar,
 #programmeDefinitionSingle-divsliderdefprogsteps .irs-bar-edge,
 #programmeDefinitionSingle-divsliderdefprogsteps .irs-line {
-  height:15px;
+  height: 15px;
 }
 
 #programmeDefinitionSingle-divsliderdefprogsteps .irs-grid-text {
@@ -153,3 +179,29 @@ div.flamingo-page-division {
   font-size: 14px;
   top: -5px;
 }
+
+#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype label.control-label, #browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype  .selectize-control.single { 
+         display: table-cell; 
+         text-align: center; 
+         vertical-align: middle; 
+} 
+
+#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype  label.control-label {
+        padding-right: 10px;
+}
+
+#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype .form-group { 
+        display: table-row;
+}
+
+#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype .selectize-control.single div.item {
+        padding-right: 15px;
+}
+
+.collapsebtn:after {
+      font-family: "FontAwesome"; font-weight: 900; content: "\f068";
+      float: right;
+      }
+      .collapsebtn.collapsed:after {
+      content: "\f065";
+      }

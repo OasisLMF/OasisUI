@@ -1,0 +1,18 @@
+/*** Flamingo Data Tables ***/
+
+.flamingo-table {
+	width: 100%;
+}
+
+.flamingo-table-narrow {
+	max-width: 1400px;
+}
+
+.flamingo-table th {
+	text-align: center;
+}
+
+.flamingo-table td {
+	font-size: 12px;
+	text-align: center
+}

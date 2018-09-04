@@ -7,22 +7,22 @@
 getProgOasisForProgdata(dbSettings, progId)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
 \code{data.frame} of 11 variables:
 \itemize{
-		\item \code{ProgOasisId}
-		\item \code{ProgName}
-		\item \code{ModelName}
-		\item \code{TransformName}
-		\item \code{SourceFileId}
-		\item \code{FileID}
-		\item \code{Status}
-		\item \code{API1aDateTime}
-		\item \code{API1bDateTime}
-		\item \code{API1cDateTime}
-		\item \code{SessionId}
+\item \code{ProgOasisId}
+\item \code{ProgName}
+\item \code{ModelName}
+\item \code{TransformName}
+\item \code{SourceFileId}
+\item \code{FileID}
+\item \code{Status}
+\item \code{API1aDateTime}
+\item \code{API1bDateTime}
+\item \code{API1cDateTime}
+\item \code{SessionId}
 }
 }
 \description{

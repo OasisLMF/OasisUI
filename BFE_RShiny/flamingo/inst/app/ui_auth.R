@@ -9,6 +9,12 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
   tagList(
 
     tags$script("Shiny.onInputChange('authUIRenderCallback', true)"),
+    # N.B.: this style cannot be easily moved to one of our CSS files.
+    # The reasons are:
+    # - the same selectors are used in jquery.dataTables.extra.css, which is
+    #   loaded after our CSS files
+    # - the background-color in jquery.dataTables.extra.css is marked with
+    #   !important
     tags$style(
       HTML('table.dataTable tr.selected td, table.dataTable td.selected {background-color: #ebcccc !important;}')
     ),
@@ -17,10 +23,9 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
     fluidRow(
       column(3,
              a(href = "https://oasislmf.org",
-               img(src = "OASIS_LMF_COLOUR.png", width = "85%", style = "margin-top:5%"))
+               img(src = "img/OASIS_LMF_COLOUR.png", width = "85%", style = "margin-top:5%"))
       ),
       column(8,
-             actionButton(inputId = "abuttoncollapsesidebar", icon = icon("ellipsis-v"), label = NULL),
              style = "margin-top:2%"),
       column(1,
              pageheaderUI("pageheader"),
@@ -96,10 +101,10 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
     # Footer ----
     fillRow(
       em("Flamingo 1.1 Oasis Business Front End",
-         style = "color:gray; font-size:10pt; margin-left:5%"),
+         class = "flamingo-footer"),
       a(href = "https://shiny.rstudio.com/",
         em("Powered by RShiny",
-           style = "color:gray; font-size:10pt; float:right; margin-right:2%"),
+           class = "rshiny-footer"),
         align = "left")
     )
 

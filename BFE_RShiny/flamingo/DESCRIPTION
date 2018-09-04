@@ -18,6 +18,7 @@ Imports:
   shinyBS,
   shinyjs,
   shinyWidgets,
+  bsplus,
   DT,
   leaflet,
   plotly,

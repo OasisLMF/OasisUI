@@ -7,7 +7,7 @@
 getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
 \item{pruser}{process user}
 
@@ -20,9 +20,9 @@ getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
 \value{
 process data; \code{data.frame} of 3 variables:
 \itemize{
-  \item \code{ProgOasisId}
-  \item \code{ProgName}
-  \item \code{ModelName}
+\item \code{ProgOasisId}
+\item \code{ProgName}
+\item \code{ModelName}
 }
 }
 \description{

@@ -7,14 +7,14 @@
 getModelList(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
-\code{data.frame} of 3 variables:
+res \code{data.frame} of 3 variables:
 \itemize{
-		\item \code{Model ID}
-		\item \code{Model Name}
-   \item \code{Model Description}
+\item \code{Model ID}
+\item \code{Model Name}
+\item \code{Model Description}
 }
 }
 \description{

@@ -8,7 +8,7 @@ createModelResource(dbSettings, modresname, restype, oasissys, modelid,
   modresval)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
 \item{modresname}{\code{character()}; name of the model resource}
 

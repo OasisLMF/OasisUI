@@ -7,11 +7,11 @@
 flamingoDBCheckPermissions(dbSettings, userId, resourceId)
 }
 \arguments{
-\item{dbSettings}{object as returned by \link{flamingoDB}}
+\item{dbSettings}{object as returned by \code{\link[=flamingoDB]{flamingoDB()}}}
 
-\item{userId}{user id as returned by \link{flamingoDBLogin}}
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{resourceId}{resource identifier, e.g. \code{c("1000"}}
+\item{resourceId}{resource identifier, e.g. \code{c("1000")}}
 }
 \value{
 character vector of permission Modes, e.g. #' \code{c("CRUD" "R")}

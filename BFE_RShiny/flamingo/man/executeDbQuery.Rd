@@ -8,13 +8,13 @@ executeDbQuery(dbSettings, statement, simplify = FALSE,
   verbose = FALSE, logMessage = message, logError = logMessage, ...)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
 \item{statement}{query statement to execute, e.g. as returned by
-\link{buildDbQuery}}
+\code{\link[=buildDbQuery]{buildDbQuery()}}}
 
-\item{simplify}{if \code{TRUE}, a vector will be returned instead of
-a \code{data.frame} only a single column is returned.}
+\item{simplify}{if \code{TRUE}, a vector will be returned instead of a
+\code{data.frame} only a single column is returned.}
 
 \item{verbose}{print query statement}
 
@@ -22,14 +22,13 @@ a \code{data.frame} only a single column is returned.}
 
 \item{logError}{function to call with error log message}
 
-\item{...}{further arguments to \link{dbGetQuery}}
+\item{...}{further arguments to \code{\link[=dbGetQuery]{dbGetQuery()}}}
 }
 \value{
-result of the query as a \code{data.frame} or a vector if
-\code{simplify} is set to \code{TRUE}. \code{NULL} if no result
-can be returned.
+result of the query as a \code{data.frame} or a vector if \code{simplify} is
+set to \code{TRUE}. \code{NULL} if no result can be returned.
 }
 \description{
-Opens a new connection to the database, executes the given
-query statement and then closes the connection again.
+Opens a new connection to the database, executes the given query
+statement and then closes the connection again.
 }
