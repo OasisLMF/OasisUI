@@ -122,6 +122,15 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "BR")
   )
 
+  
+  # preselected panel
+  observe({if (!is.null(auth_modules$panelOutputModule$preselPanel)) {
+    result$preselPanel <- auth_modules$panelOutputModule$preselPanel
+  } else {
+    result$preselPanel <- panelsProgrammeWorkflow[1]
+  }
+  })
+
   auth_modules$fileViewer <- .callModule(
     fileViewer,
     id = "fileViewer",
@@ -147,7 +156,7 @@ server <- function(input, output, session) {
     id = "companyDefinition",
     active = reactive(authenticated() && input$ua == "definecompany")
   )
-
+  
   ### authentication ----
   # show the logged-in part of the UI if login is completed
   appState <- reactive(
@@ -160,6 +169,8 @@ server <- function(input, output, session) {
     result$userName <- loginDialogModule$userName()
   })
 
+  ### Module input parameters depending on othe rmodules outputs ---
+  
   # UI non-reactive to (result$WidthSide) and (result$Widthmain)
   output$authUI <- renderUI(
     if (result$userId != FLAMINGO_GUEST_ID) {
