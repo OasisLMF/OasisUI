@@ -4,8 +4,7 @@
 \alias{showNotification}
 \title{Show or remove a notification}
 \usage{
-showNotification(ui, type = c("default", "message", "warning", "error"),
-  ...)
+showNotification(ui, type = c("default", "message", "warning", "error"), ...)
 }
 \arguments{
 \item{ui}{see \link{shiny::showNotification}}
