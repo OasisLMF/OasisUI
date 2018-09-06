@@ -129,13 +129,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         }
       } else {
         showNotification(type = "warning",
-                         paste("Please select a Programme to ammend first."))
+                         paste("Please select a Programme to amend first."))
       }
     }
-    result$DPProgData_selected_rows <- 1
+    #result$DPProgData_selected_rows <- 1
     # #Reload Programme Table
-    # .reloadDPProgData()
-    # selectRows(dataTableProxy("tableDPprog"), 1)
+    .reloadDPProgData()
+    # update result$DPProgDataCounter --> a) reload table result$DPProgData, ### b) update result$DPProgData_selected_rows
+    ### b2) update selectprogrammeID drop-down --> selectRows(dataTableProxy("tableDPprog"),rowToSelect), update tableDPprog_rows_selected, .reloadPOData()
+    # a2) [498], update selectprogrammeID drop-down through observe() --> selectRows(dataTableProxy("tableDPprog"),rowToSelect), update tableDPprog_rows_selected, .reloadPOData()
+    ### update result$DPProgData_selected_rows
+
+    # invisible(selectRows(dataTableProxy("tableDPprog"), 1))
   })
 
   ### Clear Programme Definition panel
@@ -556,29 +561,43 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   ### > selectprogrammeID ----
 
   # Add choices possibilities  to selectprogrammeID
-  observe( if (active()) {
-    if ( !is.null(result$DPProgData)) {
-      if (input$selectprogrammeID == "") {
-        if (preselProcId() != -1) {
-          if (!is.null(result$POData)) {
-            index <- match(c(preselProcId()), result$POData[[1]]) 
-          }
-          index <- 1
-        } else {
-          index <- 1
-        }
-        logMessage(paste0("updating selectprogrammeID choices based on Programme Table"))
-        updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[1:nrow(result$DPProgData),1], selected = result$DPProgData[index,1])
-      }
+  # observe(if (active()) {
+  #   if (!is.null(result$DPProgData)) {
+  #     #if (input$selectprogrammeID == "") {
+  #       # if (preselProcId() != -1) {
+  #       #   if (!is.null(result$POData)) {
+  #       #     index <- match(c(preselProcId()), result$POData[[1]]) 
+  #       #   }
+  #       #   index <- 1
+  #       # } else {
+  #       #   index <- 1
+  #       # }
+  #       # TODO-Nikki- index not being hardcoded to 1 but similar style to prgId (tableDPProg)line 586
+  #       index <- tableDPProg
+  #       logMessage(paste0("updating selectprogrammeID choices based on Programme Table"))
+  #       updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[1:nrow(result$DPProgData),1], selected = result$DPProgData[index,1])
+  #     #}
+  #   }
+  # })
+
+  # Update selectprogrammeID
+  observeEvent(result$DPProgData, {
+    if (!is.null(result$DPProgData)) {
+      logMessage(paste0("updating selectprogrammeID choices because programme table was reloaded - contains ", nrow(result$DPProgData), " rows"))
+      if (input$selectprogrammeID == "")
+        prgId <- 1
+      else
+        prgId <- input$selectprogrammeID
+      updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[, 1], selected = prgId)
     }
   })
 
   # Preselect selectprogrammeID
-  observeEvent( result$DPProgData_selected_rows, {
-    if ( result$DPProgData_selected_rows != 0) {
+  observeEvent(result$DPProgData_selected_rows, {
+    if (result$DPProgData_selected_rows != 0) {
       prgId <- result$DPProgData[result$DPProgData_selected_rows,1]
       logMessage(paste0("updating selectprogrammeID because selection in programme table changed to ",  result$DPProgData_selected_rows))
-      updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[1:nrow(result$DPProgData),1], selected = prgId)
+      updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[, 1], selected = prgId)
     }
   })
 
@@ -986,8 +1005,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   ### > selectprogOasisID ----
 
+  # observeEvent(preselProcId(), {
+  #   if (preselProcId() != -1) {
+  #     result$POData_selected_rows <- match(c(preselProcId()), result$POData[[1]])
+  #   } else {
+  #     result$POData_selected_rows <- 1
+  #   }
+  # })
+  
   # Add choices possibilities to selectprogOasisID
-  observeEvent( result$PODataCounter, {
+  observeEvent(result$PODataCounter, {
     if (active()) {
       if ( !is.null(result$POData) & input$selectprogrammeID != "") {
         logMessage(paste0("updating selectprogOasisID choices based on Programme Model Table"))
@@ -1271,14 +1298,21 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # rowselected reactives including no selection -----------------------------
 
-  observe({
-    result$DPProgDataCounter
+  # observeEvent(result$DPProgDataCounter, {
+  #   if (length(input$tableDPprog_rows_selected) > 0) {
+  #     result$DPProgData_selected_rows <- input$tableDPprog_rows_selected
+  #   } else {
+  #     result$DPProgData_selected_rows <- 0
+  #   }
+  # })
+  
+  observeEvent(input$tableDPprog_rows_selected, {
     if (length(input$tableDPprog_rows_selected) > 0) {
-      result$DPProgData_selected_rows <- input$tableDPprog_rows_selected
-    } else {
-      result$DPProgData_selected_rows <- 0
-    }
-  })
+        result$DPProgData_selected_rows <- input$tableDPprog_rows_selected
+      } else {
+        result$DPProgData_selected_rows <- 0
+      }
+    })
 
   observe({
     result$PODataCounter
@@ -1416,7 +1450,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   #Reload Programme table
   .reloadDPProgData <- function() {
     result$DPProgDataCounter <- isolate(result$DPProgDataCounter + 1)
-    result$DPProgData_selected_rows <- 1
+    invisible()
+    #result$DPProgData_selected_rows <- 1
   }
 
   #Reload Programme Details table
