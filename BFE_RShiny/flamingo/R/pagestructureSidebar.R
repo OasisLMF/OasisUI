@@ -1,22 +1,17 @@
 pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
-  panel(
-    heading = fluidRow(
-      splitLayout(
-        column(2,
-               sidebar_button(ID = ns("abuttonhome"),  Icon = icon("home"), Block = FALSE)
-        ),
-        column(10,
-               actionButton(inputId = ns("abuttoncollapsesidebar"), icon = icon("ellipsis-v"),
-                            label = NULL),
-               align = "right"
-        )
-      )
+  flamingoPanel(
+    "sidebar",
+    heading = div(
+      actionButton(inputId = ns("abuttonhome"), class = "btn btn-primary", icon = icon("home"),
+                   label = NULL),
+      actionButton(inputId = ns("abuttoncollapsesidebar"), icon = icon("ellipsis-v"),
+                   label = NULL, style = "float:right;")
     ),
     dropdownButton(
       inputId = ns("abuttonrun"),
       status = "dropdown",
       label = if (!collapsed) "Process",
-      icon = if (collapsed) icon("cog", lib = "glyphicon"),
+      icon = if (TRUE) icon("cog", lib = "glyphicon"),
       circle = FALSE,
       right = FALSE,
       width = "100%",
@@ -33,13 +28,13 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
                 landing_page$abuttondefineprogrammebatch,
                 placement = "right",
                 options   = list(container = "body"))
-    ),  
-    
+    ),
+
     dropdownButton(
       inputId = ns("abuttonbrowse"),
       status = "dropdown",
       label = if (!collapsed) "Browse",
-      icon = if (collapsed) icon("eye"),
+      icon = if (TRUE) icon("eye"),
       circle = FALSE,
       right = FALSE,
       width = "100%",
@@ -57,9 +52,12 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
                 placement = "right",
                 options   = list(container = "body"))
     ),
-    
-    actionButton(ns("abuttonfilemngt"), label = if (!collapsed) "File Management", 
-                 icon = if (collapsed) icon("file", lib = "glyphicon"), class = "btn btn-primary", align = "left",  width = "100%"
+
+    actionButton(
+      ns("abuttonfilemngt"),
+      label = if (!collapsed) "File Management",
+      icon = if (TRUE) icon("file", lib = "glyphicon"),
+      class = "btn btn-primary", align = "left",  width = "100%"
     ),
     bsTooltip(ns("abuttonfilemngt"),
               landing_page$abuttonfilemngt,
