@@ -26,3 +26,10 @@ programme_Definition_Single <- list(
   selectprogammeID = "Select a programme ID to which associate a model",
   selectprogOasisID = "Select the Oasis Programme to Run"
 )
+
+### Panel Browse ----  
+
+browse_programmes <- list(
+  selectRunID = "Selecct RunID",
+  abuttonplusplot = "Add a new plot"
+  )
