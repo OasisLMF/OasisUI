@@ -108,8 +108,8 @@ server <- function(input, output, session) {
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "PB")
   )
-
-  auth_modules$browseprogrammes <- .callModule(
+  
+  auth_modules$visualizationSBR <- .callModule(
     browseprogrammes,
     id = "browseprogrammes",
     apiSettings = apiSettings,
@@ -119,7 +119,17 @@ server <- function(input, output, session) {
     processRunId = auth_modules$programmeDefinitionSingle$processRunId,
     logMessage = logMessage,
     reloadMillis = reloadMillis,
-    active = reactive(authenticated() && main_visible() == "BR")
+    active = reactive(authenticated() && main_visible() == "SBR")
+  )
+  
+  auth_modules$visualizationBBR<- .callModule(
+    visualizationBBR,
+    id = "visualizationBBR",
+    apiSettings = apiSettings,
+    userId = reactive(result$userId),
+    logMessage = logMessage,
+    reloadMillis = reloadMillis,
+    active = reactive(authenticated() && main_visible() == "BBR")
   )
 
   
@@ -231,8 +241,13 @@ server <- function(input, output, session) {
                      logger = "flamingo.module")
            },
 
-           "BR" = { # go to Define Define programme batch submenu
-             loginfo(paste("Navigate to Browse, userId: ", result$userId),
+           "SBR" = { # go to Single browse submenu
+             loginfo(paste("Navigate to Single browse, userId: ", result$userId),
+                     logger = "flamingo.module")
+           },
+           
+           "BBR" = { # go to Batch browse submenu
+             loginfo(paste("Navigate to Batch browse, userId: ", result$userId),
                      logger = "flamingo.module")
            },
 

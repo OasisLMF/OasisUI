@@ -69,8 +69,11 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
             PB =
               programmeDefinitionBatchUI("programmeDefinitionBatch"),
 
-            # browseprogrammesUI
-            BR = browseprogrammesUI("browseprogrammes"),
+            # DefineBrowse Single
+            SBR = browseprogrammesUI("browseprogrammes"),
+            
+            # DefineBrowse Batch
+            BBR = visualizationBBRUI("visualizationBBR"),
 
             ## File Management
             FM =
