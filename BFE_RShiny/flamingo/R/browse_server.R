@@ -485,21 +485,15 @@ panelDefineDataToPlotModule <- function(input, output, session, logMessage = mes
   # Enable / Disable options based on run ID -------------------------------
 
   observe({
-    input$inputplottype
+    plotType <- input$inputplottype
     if (!is.null(filesListData() )) {
-      Granularities <- unique(filesListData()$Granularity) 
-      Losstypes <- unique(filesListData()$Losstype) 
-      Variables <- unique(filesListData()$Variable) 
-      .reactiveUpdateGelectGroupInput(Losstypes, losstypes, "chkboxgrplosstypes", "Loss Types")
-      .reactiveUpdateGelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", "Granularities")
-      .reactiveUpdateGelectGroupInput(Variables, variables, "chkboxgrpvariables", "Variables")
+      Granularities <- unique(filesListData()$Granularity)
+      Losstypes <- unique(filesListData()$Losstype)
+      Variables <- unique(filesListData()$Variable)
+      .reactiveUpdateSelectGroupInput(Losstypes, losstypes, "chkboxgrplosstypes", plotType)
+      .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", plotType)
+      .reactiveUpdateSelectGroupInput(Variables, variables, "chkboxgrpvariables", plotType)
     }
-  })
-  
-  # Enable / Disable options based on plot type ----------------------------
-  
-  observeEvent(input$inputplottype, {
-    .reactiveUpdateGelectGroupInput(plottypeslist[[input$inputplottype]]$Variables, variables, "chkboxgrpvariables", "Variables")
   })
 
   # Extract dataframe to plot ----------------------------------------------
@@ -622,25 +616,23 @@ panelDefineDataToPlotModule <- function(input, output, session, logMessage = mes
 
   # Helper functions -------------------------
   
-  .reactiveUpdateGelectGroupInput <- function(reactivelistvalues, listvalues, inputid, Label){
+  .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
     if (!is.null(reactivelistvalues)) {
-      updateCheckboxGroupInput(session = session, inputId = inputid, choices = listvalues, selected = reactivelistvalues, label = Label, inline = TRUE)
-      # #extract newest selection by identifying which values are in the CheckboxGroupInput choices but not in the reactivelistvalues
-      # # selector #browseprogrammes-panelOutputModule-chkboxgrpgranularities > div > label:nth-child(1) > input[type="checkbox"]
-      # idxtoBeDisabled <- which(!(listvalues %in% reactivelistvalues))
-      # idxtoBeEnabled <- which((listvalues %in% reactivelistvalues))
-      # subElementDisabled <- paste0("#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-",inputid," .checkbox:nth-child( 1 ) label")
-      # subElementEnabled <- paste0("#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-",inputid," .checkbox:nth-child(2) label")
-      # subElementDisabled <- paste0("#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-",inputid," .checkbox:nth-child(", idxtoBeDisabled,") label")
-      # subElementEnabled <- paste0("#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-",inputid," .checkbox:nth-child(", idxtoBeEnabled,") label")
-      #disable single checkbox of subElementDisabled
-      # shinyjs::disable(selector = subElementDisabled)
-      # #enable single checkbox of subElementEnabled
-      # shinyjs::enable(selector = subElementEnabled)
+      # disable and untick variables that are not relevant
+      if (inputid == "chkboxgrpvariables" && !is.null(plotType)) {
+        relevantVariables <- plottypeslist[[plotType]][["Variables"]]
+        selected <- intersect(reactivelistvalues, relevantVariables)
+      } else {
+        selected <- reactivelistvalues
+      }
+      updateCheckboxGroupInput(session = session, inputId = inputid, selected = selected)
+      # N.B.: JavaScript array indices start at 0
+      js$disableCheckboxes(checkboxGroupInputId = ns(inputid),
+                           disableIdx = which(listvalues %in% setdiff(listvalues, selected)) - 1)
     } else {
-      updateCheckboxGroupInput(session = session, inputId = inputid, choices = listvalues, selected = FALSE, label = Label , inline = TRUE )
-      # subElementDisabled <- paste0("#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-",inputid," .checkbox:nth-child(", seq(1:length(listvalues)),") label")
-      # shinyjs::disable(selector = subElementDisabled)
+      updateCheckboxGroupInput(session = session, inputId = inputid, selected = FALSE)
+      js$disableCheckboxes(checkboxGroupInputId = ns(inputid),
+                           disableIdx = seq_along(listvalues) - 1)
     }
   }
   
