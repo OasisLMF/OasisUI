@@ -4,8 +4,8 @@
 \alias{loadProgrammeModel}
 \title{Call BFE webservice to load programme data}
 \usage{
-loadProgrammeModel(apiSettings, progOasisId, logWarning = function(w)
-  warning, ...)
+loadProgrammeModel(apiSettings, progOasisId, logWarning = function(w) warning,
+  ...)
 }
 \arguments{
 \item{apiSettings}{settings object as returned by \link{flamingoServer}}
