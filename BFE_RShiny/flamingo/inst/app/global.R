@@ -91,7 +91,13 @@ defaultSelectChoicesIL <- c(
 panelsProgrammeWorkflow <- c("Create Programme", "Select Programme & Associate Model", "Configure Workflow Output", "Browse & re-run")
 
 ### Plots types ------
-plottypeslist <- c("loss per return period")
+plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty OEP", "AAL"), 
+                                                      "keycols" = c("loss"),
+                                                      "x" = c("return_period"),
+                                                      "extracols" = c("X", "summary_id"),
+                                                      "xlabel" = c("Return Period"),
+                                                      "ylabel" = c("Loss"))
+)
 
 #Output options
 granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
