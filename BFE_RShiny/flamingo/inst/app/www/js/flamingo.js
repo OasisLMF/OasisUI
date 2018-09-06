@@ -23,7 +23,11 @@ shinyjs.disableCheckboxes = function(params) {
     for (i = 0; i < nodeList.length; i++) {
       nodeList[i].disabled = false;
     }
-    // disable those in disableIdx
+    // single indices are not passed by R as an array
+    if (!(params.disableIdx instanceof Array)) {
+      params.disableIdx = [params.disableIdx];
+    }
+    // disable checkboxes according to disableIdx
     for (i = 0; i < params.disableIdx.length; i++) {
       nodeList[params.disableIdx[i]].disabled = true;
     }

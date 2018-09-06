@@ -91,7 +91,8 @@ defaultSelectChoicesIL <- c(
 panelsProgrammeWorkflow <- c("Create Programme", "Select Programme & Associate Model", "Configure Workflow Output", "Browse & re-run")
 
 ### Plots types ------
-plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty OEP"), 
+plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP",
+                                                                      "LEC Full Uncertainty AEP"),
                                                       "keycols" = c("loss"),
                                                       "x" = c("return_period"),
                                                       "extracols" = c("X", "summary_id"),

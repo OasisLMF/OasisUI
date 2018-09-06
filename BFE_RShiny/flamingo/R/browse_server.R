@@ -485,22 +485,15 @@ panelDefineDataToPlotModule <- function(input, output, session, logMessage = mes
   # Enable / Disable options based on run ID -------------------------------
 
   observe({
-    input$inputplottype
+    plotType <- input$inputplottype
     if (!is.null(filesListData() )) {
       Granularities <- unique(filesListData()$Granularity)
       Losstypes <- unique(filesListData()$Losstype)
       Variables <- unique(filesListData()$Variable)
-      .reactiveUpdateSelectGroupInput(Losstypes, losstypes, "chkboxgrplosstypes", "Loss Types")
-      .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", "Granularities")
-      .reactiveUpdateSelectGroupInput(Variables, variables, "chkboxgrpvariables", "Variables")
+      .reactiveUpdateSelectGroupInput(Losstypes, losstypes, "chkboxgrplosstypes", plotType)
+      .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", plotType)
+      .reactiveUpdateSelectGroupInput(Variables, variables, "chkboxgrpvariables", plotType)
     }
-  })
-  
-  # Enable / Disable options based on plot type ----------------------------
-  
-  observeEvent(input$inputplottype, {
-    .reactiveUpdateSelectGroupInput(plottypeslist[[input$inputplottype]]$Variables,
-                                    variables, "chkboxgrpvariables", "Variables")
   })
 
   # Extract dataframe to plot ----------------------------------------------
@@ -623,16 +616,23 @@ panelDefineDataToPlotModule <- function(input, output, session, logMessage = mes
 
   # Helper functions -------------------------
   
-  .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, Label) {
+  .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
     if (!is.null(reactivelistvalues)) {
-      updateCheckboxGroupInput(session = session, inputId = inputid, selected = reactivelistvalues)
+      # disable and untick variables that are not relevant
+      if (inputid == "chkboxgrpvariables" && !is.null(plotType)) {
+        relevantVariables <- plottypeslist[[plotType]][["Variables"]]
+        selected <- intersect(reactivelistvalues, relevantVariables)
+      } else {
+        selected <- reactivelistvalues
+      }
+      updateCheckboxGroupInput(session = session, inputId = inputid, selected = selected)
       # N.B.: JavaScript array indices start at 0
       js$disableCheckboxes(checkboxGroupInputId = ns(inputid),
-                           disableIdx = which(listvalues %in% setdiff(listvalues, reactivelistvalues)) - 1)
+                           disableIdx = which(listvalues %in% setdiff(listvalues, selected)) - 1)
     } else {
       updateCheckboxGroupInput(session = session, inputId = inputid, selected = FALSE)
       js$disableCheckboxes(checkboxGroupInputId = ns(inputid),
-                           disableIdx = seq_along(listvalues))
+                           disableIdx = seq_along(listvalues) - 1)
     }
   }
   
