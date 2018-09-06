@@ -180,21 +180,21 @@ div.flamingo-page-division {
   top: -5px;
 }
 
-#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype label.control-label, #browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype  .selectize-control.single { 
+.InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single { 
          display: table-cell; 
          text-align: center; 
          vertical-align: middle; 
 } 
 
-#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype  label.control-label {
+.InlineSelectInput  label.control-label {
         padding-right: 10px;
 }
 
-#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype .form-group { 
+.InlineSelectInput .form-group { 
         display: table-row;
 }
 
-#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype .selectize-control.single div.item {
+.InlineSelectInput.selectize-control.single div.item {
         padding-right: 15px;
 }
 
