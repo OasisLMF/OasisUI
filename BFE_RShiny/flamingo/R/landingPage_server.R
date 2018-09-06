@@ -226,11 +226,17 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "PB")
     toggleDropdownButton(ns("abuttonrun"))
   })
-
-  observeEvent(input$abuttonbrowse, {
-    updateNavigation(navigation_state, "BR")
+  
+  observeEvent(input$abuttonbrowseSBR, {
+    updateNavigation(navigation_state, "SBR")
+    toggleDropdownButton(ns("abuttonbrowse"))
   })
 
+  observeEvent(input$abuttonbrowseBBR, {
+    updateNavigation(navigation_state, "BBR")
+    toggleDropdownButton(ns("abuttonbrowse"))
+  })
+  
   observeEvent(input$abuttonhome, {
     updateNavigation(navigation_state, "LP")
   })
@@ -299,6 +305,7 @@ landingPageButtonUpdate <- function(session, dbSettings, userId,
   # ("600", "abuttonenquiry")
 
   .updateButton("700", "abuttonrun")
+  .updateButton("700", "abuttonbrowse")
 
   .updateButton("904", "abuttonuseradmin")
 
