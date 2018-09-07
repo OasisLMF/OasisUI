@@ -7,29 +7,29 @@
 #' @importFrom shinyBS bsTooltip
 #' @export
 fileViewerUI <- function(id) {
-  
+
   ns <- NS(id)
 
-  attachDependencies(value = flamingoHtmlDependencies(), tagList(
-      
-      h3("File Viewer", class = "flamingo-page-title"),
+  tagList(
 
-          h4("File List", class = "flamingo-table-title"),
+    h3("File Viewer", class = "flamingo-page-title"),
 
-          checkboxInput(inputId = ns("tableFVfileListSelectall"), label = "Select all", value = FALSE),
-          dataTableOutput(ns("tableFVfileList")),
+    h4("File List", class = "flamingo-table-title"),
 
-          downloadButton(ns("FVfileListdownloadzip"), label = "Export to zip"),
-          bsTooltip(ns("FVfileListdownloadzip"), 
-                    file_Viewer$FVfileListdownloadzip,
-                    placement = "right", 
-                    options   = list(container = "body"))
-          # downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
-          # bsTooltip(ns("FVFLdownloadexcel"), 
-          #             file_Viewer$FVFLdownloadexcel, 
-          #             placement = "right", 
-          #             options   = list(container = "body"))
-  
-  ))
-  
+    checkboxInput(inputId = ns("tableFVfileListSelectall"), label = "Select all", value = FALSE),
+    dataTableOutput(ns("tableFVfileList")),
+
+    downloadButton(ns("FVfileListdownloadzip"), label = "Export to zip"),
+    bsTooltip(ns("FVfileListdownloadzip"),
+              file_Viewer$FVfileListdownloadzip,
+              placement = "right",
+              options   = list(container = "body"))
+    # downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
+    # bsTooltip(ns("FVFLdownloadexcel"),
+    #             file_Viewer$FVFLdownloadexcel,
+    #             placement = "right",
+    #             options   = list(container = "body"))
+
+  )
+
 }

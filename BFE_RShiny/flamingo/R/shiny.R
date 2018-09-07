@@ -2,7 +2,7 @@
 #' Flamingo Module Template UI
 #' @param id module id
 flamingoModuleUI <- function(
-    id) {}
+  id) {}
 
 
 #' Flamingo Module Template
@@ -15,25 +15,14 @@ flamingoModuleUI <- function(
 #' @param logMessage function that will be passed info messages
 #' @param logError function that will be passed error messages
 flamingoModule <- function(
-    input,
-    output,
-    session,
-    active,
-    dbSettings,
-    apiSettings,
-    logMessage,
-    logError) {}
-
-
-#' HTML Dependencies For The Flamingo Interface
-#' @importFrom htmltools htmlDependency
-#' @export
-flamingoHtmlDependencies <- function() {
-  
-  htmlDependency(name = "flamingo", version = "0.0.4", src = c(href = "css"),
-      stylesheet = c("flamingo-tweaks.css", "flamingo-table.css"))
-  
-}
+  input,
+  output,
+  session,
+  active,
+  dbSettings,
+  apiSettings,
+  logMessage,
+  logError) {}
 
 
 #' Action button/link
@@ -53,17 +42,17 @@ actionButton <- function(class = c("btn", "btn-primary", "btn-flamingo"), ...) {
 #' @param ... other arguments to \link{shiny::showNotification}
 #' @export
 showNotification <- function(ui,
-    type = c("default", "message", "warning", "error"), ...) {
-  
+                             type = c("default", "message", "warning", "error"), ...) {
+
   iconName <- switch(type, "warning" = "exclamation-triangle",
-      "message" = "check-circle", "error" = "minus-circle", "info-circle")
-  
+                     "message" = "check-circle", "error" = "minus-circle", "info-circle")
+
   shiny::showNotification(
-      ui = tagList(
-          div(class = "shiny-notification-side", icon(iconName)),
-          div(class = "shiny-notification-main", ui)),
-      type = type,
-      ...)
+    ui = tagList(
+      div(class = "shiny-notification-side", icon(iconName)),
+      div(class = "shiny-notification-main", ui)),
+    type = type,
+    ...)
 }
 
 
@@ -79,7 +68,7 @@ showNotification <- function(ui,
 #' @importFrom stats setNames
 #' @export
 createSelectOptions <- function(df, label = NA, value = "0", labelCol = 2,
-    valueCol = 1) {
+                                valueCol = 1) {
   if (!is.null(df) && nrow(df) > 0) {
     if (!is.na(label)) {
       selectOptions <- setNames(list(value), label)
