@@ -4,8 +4,8 @@
 \alias{executeDbQuery}
 \title{Convenience function to execute database queries}
 \usage{
-executeDbQuery(dbSettings, statement, simplify = FALSE,
-  verbose = FALSE, logMessage = message, logError = logMessage, ...)
+executeDbQuery(dbSettings, statement, simplify = FALSE, verbose = FALSE,
+  logMessage = message, logError = logMessage, ...)
 }
 \arguments{
 \item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
