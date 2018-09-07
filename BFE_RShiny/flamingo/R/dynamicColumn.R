@@ -8,6 +8,7 @@
 #' @template params-module
 #' @param width Width of the column, a reactive value for `dynamicColumn()`,
 #'   non-reactive (or [isolated][shiny::isolate]) for `dynamicColumnUI()`.
+#' @inheritParams shiny::column
 #'
 #' @details
 #' Dynamic column width via `renderUI()` based on a reactive value forces the
