@@ -27,7 +27,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   )
 
   observeEvent(input$abuttongotorun,
-               updateNavigation(navigation_state, "WF"))
+               updateNavigation(navigation_state, "SBR"))
 
   observe(if (active()) {
 
@@ -89,9 +89,9 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
         result$inbox[i, 1]} else -1),
       runIdList = reactive(result$runIdList)
     )
-    
+
   )
-  
+
   moduleOutput
 
 }
@@ -200,7 +200,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   ns <- session$ns
 
   navigation_state <- reactiveNavigation()
-  
+
   state <- reactiveValues(
     collapsed = FALSE
   )
@@ -208,7 +208,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   observeEvent(input$abuttoncollapsesidebar, {
     state$collapsed <- !state$collapsed
   })
-  
+
   observe({
     output$sidebar <-
       renderUI(pagestructureSidebar(ns, state$collapsed))
@@ -226,7 +226,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "PB")
     toggleDropdownButton(ns("abuttonrun"))
   })
-  
+
   observeEvent(input$abuttonbrowseSBR, {
     updateNavigation(navigation_state, "SBR")
     toggleDropdownButton(ns("abuttonbrowse"))
@@ -236,7 +236,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "BBR")
     toggleDropdownButton(ns("abuttonbrowse"))
   })
-  
+
   observeEvent(input$abuttonhome, {
     updateNavigation(navigation_state, "LP")
   })

@@ -221,11 +221,6 @@ server <- function(input, output, session) {
 
     switch(main_visible(),
 
-           "WF" = { # go to Workflow submenu
-             loginfo(paste("Navigate to Process Management, userId: ", result$userId),
-                     logger = "flamingo.module")
-           },
-
            "DA" = { # go to Define account submenu
              loginfo(paste("Navigate to Define Account, userId: ", result$userId),
                      logger = "flamingo.module")
