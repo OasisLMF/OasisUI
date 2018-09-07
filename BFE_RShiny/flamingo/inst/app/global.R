@@ -96,6 +96,7 @@ plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full 
                                                       "keycols" = c("loss"),
                                                       "x" = c("return_period"),
                                                       "extracols" = c("X", "summary_id"),
+                                                      "plottype" = "line",
                                                       "xlabel" = c("Return Period"),
                                                       "ylabel" = c("Loss"))
 )
