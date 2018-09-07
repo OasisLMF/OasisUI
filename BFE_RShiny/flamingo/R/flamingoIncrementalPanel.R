@@ -84,7 +84,19 @@ callIncrementalPanelModules <- function(IDs, ID_0,
     new_headings = headings,
     collapsible = collapsible, show = show
   )
-  panels_state
+
+  list(
+    state = panels_state,
+    remove_all = function() {
+      IDs <- names(panels_state()[panels_state()])
+      cat("delete", IDs, "\n")
+      lapply(IDs, function(id) {
+        removeUI(sprintf("#%s", id), immediate = TRUE)
+      })
+      panels_state(panels_state() & FALSE)
+      invisible(IDs)
+    }
+  )
 }
 
 if (FALSE) {
@@ -115,7 +127,8 @@ if (FALSE) {
       }
       ')),
       titlePanel("Dynamic panels"),
-      fluidPage(
+      verticalLayout(
+        shiny::actionButton("delete_all", "Remove all panels"),
         flamingoIncrementalPanelUI(
           "start-panel", heading = "Add a new panel",
           collapsible = FALSE, show = FALSE, removable = FALSE
@@ -132,7 +145,7 @@ if (FALSE) {
       # content modules
       content_IDs <- paste0("content-", seq_len(n_panels))
       panel_modules <- lapply(content_IDs, callModule, module = examplePanel)
-      callIncrementalPanelModules(
+      all_panels <- callIncrementalPanelModules(
         panel_IDs, "start-panel", content_IDs,
         examplePanelUI,
         headings = lapply(seq_len(n_panels), function(i) {flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))}),#
@@ -142,6 +155,9 @@ if (FALSE) {
       )
       lapply(seq_along(panel_modules), function(i) {
         output[[paste0("paneltitle", i)]] <- renderflamingoPanelHeading(panel_modules[[i]]())
+      })
+      observeEvent(input$delete_all, {
+        all_panels$remove_all()
       })
     }
 
