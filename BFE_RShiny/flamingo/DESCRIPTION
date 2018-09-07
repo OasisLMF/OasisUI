@@ -23,7 +23,10 @@ Imports:
   leaflet,
   plotly,
   dplyr,
-  V8
+  V8,
+  data.table,
+  ggplot2,
+  tidyr
 Suggests:
   knitr,
   testthat,
