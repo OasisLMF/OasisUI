@@ -9,10 +9,10 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
   flamingoPanel(
     id = id,
     ...,
-    heading = tagList(
-      shiny::actionButton(ns("add"), icon("plus"), style = "display: inline-block; float: left; margin-right: 12px"),
+    heading = tagAppendChildren(
       flamingoPanelHeading(heading),
-      if(removable) shiny::actionButton(ns("delete"), icon("times"), style = "display: inline-block; float: right")
+      shiny::actionButton(ns("add"), icon("plus"), style = "float: left; margin-right: 12px"),
+      if (removable) shiny::actionButton(ns("delete"), icon("times"), style = "float: right")
     ),
     footer = footer,
     status = status,
@@ -21,7 +21,9 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
   )
 }
 
-flamingoIncrementalPanel <- function(input, output, session, panels_state, new_content_IDs, new_content_fun, ..., collapsible = FALSE, show = TRUE) {
+flamingoIncrementalPanel <- function(input, output, session, panels_state,
+                                     new_content_IDs, new_content_fun, ..., new_headings = NULL,
+                                     collapsible = FALSE, show = TRUE) {
   id <- session$ns(NULL)
   observeEvent(input$add, {
     taken <- panels_state()
@@ -34,7 +36,8 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state, new_c
       new_content_id <- new_content_IDs[new_i]
       insertUI(
         sprintf("#%s", id), "beforeBegin",
-        flamingoIncrementalPanelUI(new_id, new_content_fun(new_content_id, ...), collapsible = collapsible, show = show)
+        flamingoIncrementalPanelUI(new_id, new_content_fun(new_content_id, ...), heading = new_headings[[new_i]],
+                                   collapsible = collapsible, show = show)
       )
     } else {
       showNotification("Reached maximum number of panels", type = "warning")
@@ -66,7 +69,9 @@ panelsState <- function(IDs) {
   )
 }
 
-callIncrementalPanelModules <- function(IDs, ID_0, contentIDs, contentUI, ...,
+callIncrementalPanelModules <- function(IDs, ID_0,
+                                        contentIDs, contentUI, ...,
+                                        headings = NULL,
                                         collapsible = FALSE, show = TRUE,
                                         ns = identity) {
   panels_state <- panelsState(ns(IDs))
@@ -76,9 +81,10 @@ callIncrementalPanelModules <- function(IDs, ID_0, contentIDs, contentUI, ...,
     callModule, module = flamingoIncrementalPanel,
     panels_state,
     ns(contentIDs), contentUI,
+    new_headings = headings,
     collapsible = collapsible, show = show
   )
- panels_state
+  panels_state
 }
 
 if (FALSE) {
@@ -95,6 +101,7 @@ if (FALSE) {
     }
     examplePanel <- function(input, output, session, active) {
       output$txt_out <- renderText(input$txt_in)
+      reactive(input$txt_in)
     }
     ui <- fluidPage(
       # replace eventually with flamingo-tweaks.css via system.file()
@@ -124,12 +131,18 @@ if (FALSE) {
       # content IDs used for the content module server and UI
       # content modules
       content_IDs <- paste0("content-", seq_len(n_panels))
-      lapply(content_IDs, callModule, module = examplePanel)
+      panel_modules <- lapply(content_IDs, callModule, module = examplePanel)
       callIncrementalPanelModules(
         panel_IDs, "start-panel", content_IDs,
-        examplePanelUI, collapsible = TRUE, show = TRUE,
+        examplePanelUI,
+        headings = lapply(seq_len(n_panels), function(i) {flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))}),#
+        # headings = lapply(seq_len(n_panels), function(i) {uiOutput(h4(i))}),#
+        collapsible = TRUE, show = TRUE,
         ns = ns
       )
+      lapply(seq_along(panel_modules), function(i) {
+        output[[paste0("paneltitle", i)]] <- renderflamingoPanelHeading(panel_modules[[i]]())
+      })
     }
 
     shinyApp(ui = ui, server = server)

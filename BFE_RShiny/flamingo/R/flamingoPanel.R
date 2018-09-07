@@ -17,10 +17,13 @@ flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "defa
         id = with_id("heading"), class = "panel-heading",
         fluidRow(column(
           12,
-          flamingoPanelHeading(heading),
-          if (collapsible) {
-            collapseButton(with_id("collapse-button"), with_id("body"), style = "display: inline-block; float: right", collapsed = !show)
-          }
+          tagAppendAttributes(
+            tagAppendChild(
+              flamingoPanelHeading(heading),
+              if (collapsible) {
+                collapseButton(with_id("collapse-button"), with_id("body"), style = "float: right", collapsed = !show)
+              }
+            ))
         ))
       )
     },
@@ -57,12 +60,12 @@ if (FALSE) {
       flamingoPanel(
         "apanel",
         "...Yeah yeah yeah",
-        heading ="She loves you..."
+        heading = h4("She loves you...")
       ),
       flamingoPanel(
         "bpanel",
         "...Yeah yeah yeah",
-        heading ="She loves you...",
+        heading = h4("She loves you..."),
         collapsible = TRUE
       ),
       flamingoPanel(
@@ -138,8 +141,16 @@ if (FALSE) {
 flamingoPanelHeading <- function(heading) {
   if (is.character(heading)) {
     # TODO: fine-tune font size
-    htmltools::tags$div(heading, style = "font-size: 22px; display: inline-block")
+    htmltools::tags$span(heading, style = "font-size: 22px;")
   } else {
     heading
   }
+}
+
+flamingoPanelHeadingOutput <- function(outputId, ...) {
+  div(uiOutput(outputId, inline = TRUE, ...))
+}
+
+renderflamingoPanelHeading <- function(expr, env = parent.frame(), ...) {
+  renderUI(call("flamingoPanelHeading", substitute(expr)), quoted = TRUE, env = env, ...)
 }
