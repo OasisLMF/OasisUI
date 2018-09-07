@@ -109,8 +109,8 @@ browseprogrammes <- function(input, output, session, dbSettings,
       show("outputsummarytable")
     }
   })
-
-
+  
+  
   observeEvent(input$selectRunID, {
     result$selectedRunId <- input$selectRunID
     if (!is.null(result$selectedRunId)) {
@@ -125,9 +125,9 @@ browseprogrammes <- function(input, output, session, dbSettings,
     }
   })
   
-
+  
   # Extract Output files for given runID------------------------------------
-   observeEvent( input$selectRunID, {if (input$selectRunID != "") {
+  observeEvent( input$selectRunID, {if (input$selectRunID != "") {
     if (!is.null(runIdList())) {
       index <- match(c(input$selectRunID), runIdList()$RunID)
       status <- runIdList()[index, "Status"]
@@ -135,8 +135,8 @@ browseprogrammes <- function(input, output, session, dbSettings,
         if (status == StatusCompleted) {
           result$filesListData <- getFileList(dbSettings, input$selectRunID)
           result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))        }
-        }
-      } 
+      }
+    } 
   }
   })
   
@@ -147,24 +147,29 @@ browseprogrammes <- function(input, output, session, dbSettings,
     logMessage = logMessage)
   
   
- # panelOutputModule module -----------------------------------------------------
+  # panelOutputModule module -----------------------------------------------------
   
   #incremental panels
-  panel_names <- paste0("flamingoIncrementalPanelpanelOutput-", c(seq_len(n_panels)))
-  content_IDs <- paste0("flamingoIncrementalPanelpanelOutputcontent-", seq_len(n_panels))
+  panel_names <- paste0("flamingoIncrementalPanelOutput-", c(seq_len(n_panels)))
+  content_IDs <- paste0("flamingoIncrementalPanelOutputcontent-", seq_len(n_panels))
+  plotsubmodules <- list()
+  plotsubmodules <- lapply(content_IDs, callModule, module = panelOutputModule, 
+                           filesListData =  reactive(result$filesListData))  
   callIncrementalPanelModules(
-    panel_names, "flamingoIncrementalPanelpanelOutput-0", content_IDs,
-    panelOutputModuleUI, collapsible = TRUE, show = TRUE,
+    panel_names, "flamingoIncrementalPanelOutput-0", content_IDs,
+    panelOutputModuleUI, 
+    headings = lapply(seq_len(n_panels), function(i) {flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))}),
+    collapsible = TRUE, show = TRUE,
     ns = ns
   )
+  lapply(seq_along(plotsubmodules), function(i) {
+    output[[paste0("paneltitle", i)]] <- renderflamingoPanelHeading(plotsubmodules[[i]]())
+  })
   
   
   # content modules
-  plotsubmodules <- list()
-  plotsubmodules <- lapply(content_IDs, callModule, module = panelOutputModule, 
-                           filesListData =  reactive(result$filesListData))
-  observeModuleNavigation(navigation_state, plotsubmodules, logger = NULL)
-
+  # observeModuleNavigation(navigation_state, plotsubmodules, logger = NULL)
+  
   # Helper functions --------------------------------------------------------
   
   #table settings for pr tab: returns option list for datatable
@@ -184,10 +189,10 @@ browseprogrammes <- function(input, output, session, dbSettings,
     y <- unlist(strsplit(x,split =" ")) 
     z <- data.frame("Granularity" = y[2], "Losstype" = y[4], "Variable" = paste(y[5:length(y)], collapse = " "), stringsAsFactors = FALSE)
     return(z)}
-
+  
   
   # Module Outout ------------------------------------------------------------
-
+  
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -230,7 +235,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
     }
   })
   
-
+  
   output$outputfilestable <- renderDataTable(
     if (!is.null(result$filesListData)) {
       filesListDataFiltered <- result$filesListData %>% select(-contains("Location")) %>% select(-c("Variable", "Granularity", "Losstype")) 
@@ -390,7 +395,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
   .hideButtons <- function(i=NULL){
     shinyjs::hide(paste0("vrows_", i))
   }
-
+  
   
   # utility function to add input Id to buttons in table
   .shinyInput <- function(FUN, id, num, Label = NULL, hidden = FALSE,  ...) {
@@ -415,75 +420,29 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
 #' @description Server logic to define a programme
 #' @inheritParams flamingoModule
 #' @param filesListData table of output files for a given runID
-#' @return list of reactives:
+#' @return reactive value of the title
 #' @rdname panelOutputModule
-#' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDataTable datatable
-#' @importFrom dplyr mutate select contains filter
-#' @export
-panelOutputModule <- function(input, output, session, logMessage = message, filesListData ) {
-  
-  ns <- session$ns
-  
-  # Reactive values & parameters --------------------------------------------
-  
-  navigation_state <- reactiveNavigation()
-  
-  result <- reactiveValues(
-    filesToPlot = NULL
-  )
-  
-  sub_modules <- list()
-  
-  # Content of the panel ------------------ -------------------------------
-  
-
-  sub_modules$panelDefineDataToPlotModule <- callModule(
-    panelDefineDataToPlotModule,
-    id = "panelDefineDataToPlotModule",
-    filesListData = filesListData,
-    logMessage = logMessage)
-
-  
-  # Module Output -----------------------
-invisible()
-}
-
-
-# panelDefineDataToPlotModule Module -----------------------
-#' @description Server logic to define a programme
-#' @inheritParams flamingoModule
-#' @param filesListData table of output files for a given runID
-#' @return list of reactives:
-#' @rdname panelDefineDataToPlotModule
 #' @importFrom shinyjs show hide enable disable hidden
 #' @importFrom dplyr rename left_join filter group_by summarise
 #' @importFrom tidyr gather
-#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank 
+#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point
 #' @importFrom plotly ggplotly  renderPlotly
 #' @export
-panelDefineDataToPlotModule <- function(input, output, session, logMessage = message, filesListData) {
+panelOutputModule <- function(input, output, session, logMessage = message, filesListData) {
   
   ns <- session$ns
   
   # Reactive values & parameters --------------------------------------------
   
   result <- reactiveValues(
-    #table of files to plot
-    filesToPlot = NULL,
-    #number of plots
-    multipleplots = FALSE,
-    #default plot title
-    title = "",
-    #DF to plot
-    fileData = NULL,
-    #vector identifying the type of plot
-    plotstrc = NULL
+    #plot and panel title
+    Title = " "
   )
   
-
-  # Enable / Disable options based on run ID -------------------------------
-
+  
+  # Enable / Disable options -------------------------------
+  
+  # based on run ID
   observe({
     plotType <- input$inputplottype
     if (!is.null(filesListData() )) {
@@ -495,18 +454,66 @@ panelDefineDataToPlotModule <- function(input, output, session, logMessage = mes
       .reactiveUpdateSelectGroupInput(Variables, variables, "chkboxgrpvariables", plotType)
     }
   })
-
+  
+  #based on plot type 
+  observeEvent(input$inputplottype, {
+    .reactiveUpdateSelectGroupInput(plottypeslist[[input$inputplottype]]$Variables, variables, "chkboxgrpvariables", "Variables")
+  })
+  
+  #No policiy if only GUL is selected
+  observeEvent(input$chkboxgrplosstypes, {
+    print(input$chkboxgrplosstypes)
+    currlostypes <- paste(input$chkboxgrplosstypes, collapse = "")
+    if (currlostypes == "GUL") {
+      updateCheckboxGroupInput(session = session, inputId = "chkboxgrpgranularities", selected = granularities[which(granularities != "Policy")] )
+      js$disableCheckboxes(checkboxGroupInputId = ns("chkboxgrpgranularities"),
+                           disableIdx = which(granularities == "Policy") - 1)
+      }
+  })
+  
+  
+  #Disable Cumulative if Aggregate and/or multiple variables are selected
+  
+observeEvent( input$inputplottype, {
+  if (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1 ) {
+    disable(id = "chkboxcumulate")
+  } else {
+    enable(id = "chkboxcumulate")
+  }
+})
+  
   # Extract dataframe to plot ----------------------------------------------
   
-  #Logic to filter the files to plot
+  #Logic to filter the files to plot 
   #Missing logic in case either variables or granularities are not selected. For the moment not allowed
-  observeEvent(input$abuttonloaddata, {
-  result$fileData <- NULL
-  # Plot parameters
-  key <- plottypeslist[[input$inputplottype]]$keycols
-  # construct DF of files to read
-    #DF indicating structure of the plot
-    result$plotstrc <- data.frame("Loss" = NULL, "Variable" = NULL, "Granularity" = NULL)
+  observeEvent(input$abuttondraw, {
+    
+    # > print current selection
+    logMessage(paste0("Plotting ", input$inputplottype, 
+                      " for loss types: ", input$chkboxgrplosstypes, 
+                      ", variables: ", input$chkboxgrpvariables, 
+                      ", granularities: ",input$chkboxgrpgranularities ))
+    
+    # > clear data ----
+    fileData <- NULL
+    cumulate <- FALSE
+    multipleplots <- FALSE
+    filesToPlot <- NULL
+    
+    # > Plot parameters ----
+    key <- plottypeslist[[input$inputplottype]]$keycols
+    suffix <- c("Losstype", "Variable", "Granularity" )
+    key <- plottypeslist[[input$inputplottype]]$keycols
+    x <- plottypeslist[[input$inputplottype]]$x
+    colsToDrop <- plottypeslist[[input$inputplottype]]$extracols
+    colsToPlot <- c("xaxis", "key", "value")
+    xlabel <- plottypeslist[[input$inputplottype]]$xlabel
+    ylabel <- plottypeslist[[input$inputplottype]]$ylabel
+    
+    # > DF indicating structure of the plot -----
+    plotstrc <- data.frame("Loss" = NULL, "Variable" = NULL, "Granularity" = NULL)
+    
+    
     # Not allowed to have no choices or multiple granularities in one plot
     if (length(input$chkboxgrplosstypes) == 0 | length(input$chkboxgrpgranularities) == 0 | length(input$chkboxgrpvariables) == 0 | length(input$chkboxgrpgranularities) > 1) {
       showNotification("Select the loss type(s), the variable(s) and the granularity to plot", type = "error")
@@ -515,105 +522,108 @@ panelDefineDataToPlotModule <- function(input, output, session, logMessage = mes
         if (length(input$chkboxgrpvariables) > 1) {
           showNotification("With multiple loss types only one variable per plot is allowed", type = "error")
         } else {
-          result$plotstrc <- data.frame("Loss" = c(2), "Variable" = c(1), "Granularity" = c(1))
-          result$title <- paste0(key, " per ", input$chkboxgrpgranularities)
+          plotstrc <- data.frame("Loss" = c(2), "Variable" = c(1), "Granularity" = c(1))
+          result$Title <- paste0(key, " per ", input$chkboxgrpgranularities)
         }
       } else {
-        result$title <- paste0(input$chkboxgrplosstypes, " per ", input$chkboxgrpgranularities)
+        result$Title <- paste0(input$chkboxgrplosstypes, " ", input$chkboxgrpvariables, " per ", input$chkboxgrpgranularities)
         if (length(input$chkboxgrpvariables) > 1) {
-            result$plotstrc <- data.frame("Loss" = c(1), "Variable" = c(length(input$chkboxgrpvariables)), "Granularity" = c(1))
+          plotstrc <- data.frame("Loss" = c(1), "Variable" = c(length(input$chkboxgrpvariables)), "Granularity" = c(1))
         } else {
-          result$plotstrc <- data.frame("Loss" = c(1), "Variable" = c(1), "Granularity" = c(1))
+          plotstrc <- data.frame("Loss" = c(1), "Variable" = c(1), "Granularity" = c(1))
         }
       }
     }
-    # get table of files to plot
-    if (!is.null(filesListData()) & nrow(result$plotstrc) > 0 ) {
-      result$filesToPlot <- filesListData()  %>% filter(Losstype %in% input$chkboxgrplosstypes, 
-                                                        Variable %in% input$chkboxgrpvariables, 
-                                                        Granularity %in% input$chkboxgrpgranularities) 
-      if (nrow(result$filesToPlot) !=  prod(result$plotstrc)) {
+    
+    # > get table of files to plot ----
+    if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
+      filesToPlot <- filesListData()  %>% filter(Losstype %in% input$chkboxgrplosstypes, 
+                                                 Variable %in% input$chkboxgrpvariables, 
+                                                 Granularity %in% input$chkboxgrpgranularities) 
+      if (nrow(filesToPlot) !=  prod(plotstrc)) {
         showNotification("The run did not produce the selected output. Please check the logs", type = "error")
-        result$filesToPlot <- NULL
+        filesToPlot <- NULL
       }
     }
-
-  # Read files to plot
-    if (!is.null(result$filesToPlot)) {
-      # Plot parameters
-      suffix <- c("Losstype", "Variable", "Granularity" )
-      key <- plottypeslist[[input$inputplottype]]$keycols
-      x <- plottypeslist[[input$inputplottype]]$x
-      colsToDrop <- plottypeslist[[input$inputplottype]]$extracols
-      colsToPlot <- c("xaxis", "key", "value")
+    
+    # > Read files to plot ---------
+    if (!is.null(filesToPlot)) {
+      
       #get data to show in modal table
-      lapply(seq(nrow(result$filesToPlot)), function(i) {
+      for (i in seq(nrow(filesToPlot))) {
         #read file
-        # oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        # fileName <- file.path(oasisBasePath, result$filesToPlot[i, 2])
-        fileName <- file.path(result$filesToPlot[i, 5], result$filesToPlot[i, 2])
-        fileData <- .readFile(fileName)
+        oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+        fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
+        # fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
+        currfileData <- .readFile(fileName)
         logMessage(paste0("Reading file ", fileName))
         #replace names with standards
-        if (any(which(result$plotstrc == 2))) {
-          newname <- paste0(key, ".", result$filesToPlot[i, suffix[which(result$plotstrc == 2)]]) 
+        if (any(which(plotstrc == 2))) {
+          newname <- paste0(key, ".", filesToPlot[i, suffix[which(plotstrc == 2)]]) 
         } else {
-          newname <- paste0(key, ".", result$filesToPlot[i, suffix[3]])
+          newname <- paste0(key, ".", filesToPlot[i, suffix[3]])
         }
         oldname <- plottypeslist[[input$inputplottype]]$keycols
-        names(fileData)[names(fileData) == oldname] <- newname
+        names(currfileData)[names(currfileData) == oldname] <- newname
         #Join data
-        if (is.null(result$fileData)) {
-          result$fileData <- fileData
+        if (is.null(fileData)) {
+          fileData <- currfileData
         } else {
-          bycol <- names(fileData)[ !grepl(key, names(fileData))]
-          result$fileData <- left_join(result$fileData, fileData, by = bycol )
-        }
-      })
-      nonkey <- names(result$fileData)[ !grepl(key, names(result$fileData))]
-      #make ggplot friendly
-      result$fileData <- result$fileData %>% gather( key = key, value = "value", -nonkey)
-      names(result$fileData)[names(result$fileData) == x] <- "xaxis"
-      if (input$chkboxaggregate) {
-        result$fileData <- result$fileData %>%
-          group_by(xaxis, key) %>%
-          summarise(value = sum(value))
-        result$title <- paste0("aggregated ", result$title)
-        result$multipleplots <- FALSE
-        names(result$fileData)[names(result$fileData) == "key"] <- "colour"
-      } else {
-        colsToGrid <- names(result$fileData)[!(names(result$fileData) %in% c(colsToPlot, colsToDrop))]
-        names(result$fileData)[names(result$fileData) == colsToGrid] <- "gridCol" 
-        if (any(result$plotstrc == 2)) {
-          result$multipleplots <- TRUE
-          names(result$fileData)[names(result$fileData) == "key"] <- "colour"
-        } else {
-          result$multipleplots <- FALSE
-          names(result$fileData)[names(result$fileData) == "gridCol"] <- "colour"
+          bycol <- names(currfileData)[ !grepl(key, names(currfileData))]
+          fileData <- left_join(fileData, currfileData, by = bycol )
         }
       }
       
-      print(paste0("result$fileData is"))
-      print(result$fileData)
+      print("fileData")
+      print(fileData)
+      # > make ggplot friendly ------
+      nonkey <- names(fileData)[ !grepl(key, names(fileData))]
+      fileData <- fileData %>% gather( key = key, value = "value", -nonkey)
+      names(fileData)[names(fileData) == x] <- "xaxis"
+      if (input$chkboxaggregate | input$chkboxgrpgranularities == "Portfolio") {
+        fileData <- fileData %>%
+          group_by(xaxis, key) %>%
+          summarise(value = sum(value))
+        result$Title <- paste0("Aggregated ", result$Title)
+        multipleplots <- FALSE
+        names(fileData)[names(fileData) == "key"] <- "colour"
+      } else {
+        colsToGrid <- names(fileData)[!(names(fileData) %in% c(colsToPlot, colsToDrop))]
+        names(fileData)[names(fileData) == colsToGrid] <- "gridCol" 
+        if (any(plotstrc == 2)) {
+          multipleplots <- TRUE
+          names(fileData)[names(fileData) == "key"] <- "colour"
+        } else {
+          multipleplots <- FALSE
+          names(fileData)[names(fileData) == "gridCol"] <- "colour"
+          if (input$chkboxcumulate) {
+            cumulate <- TRUE
+          }
+        }
+      }
+      fileData$colour <- gsub(paste0(key, "."), "", fileData$colour)
+      print(paste0("fileData is"))
+      print(fileData)
     }
-  })
-
-
-  observeEvent(input$abuttondraw, {
-    xlabel <- plottypeslist[[input$inputplottype]]$xlabel
-    ylabel <- plottypeslist[[input$inputplottype]]$ylabel
+    
+    # > Draw plot ----
     if (input$textinputtitle != "") {
-      titleToUse <- toupper(input$textinputtitle) 
-    } else {
-      titleToUse <- toupper(result$title)
-    }
-    if (!is.null(result$fileData)) {
-      p <- .plotDF(xlabel, ylabel, titleToUse, result$fileData, result$multipleplots)
+      result$Title <- input$textinputtitle 
+    } 
+    result$Title <- toupper(result$Title)
+    if (!is.null(fileData)) {
+      if (plottypeslist[[input$inputplottype]]$plottype == "line") {
+        p <- .linePlotDF(xlabel, ylabel, result$Title, fileData, 
+                         multipleplots = multipleplots, cumulative = cumulate) 
+      }
       # https://github.com/rstudio/rstudio/issues/2919
       output$outputplot <- renderPlotly({ggplotly(p)})
+    } else {
+      showNotification("No data to plot", type = "error")
     }
   })
-
+  
+  
   # Helper functions -------------------------
   
   .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
@@ -641,24 +651,31 @@ panelDefineDataToPlotModule <- function(input, output, session, logMessage = mes
   # xaxis : column for aes x
   # value : column for aes y
   # color : column for the aes col
-  .plotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE){
-      p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
-        geom_line(size = 2) +
-        # scale_color_manual(labels= c("GUL", "IL"), values = c("red", "blue")) +
-        labs(title = titleToUse, x = xlabel, y = ylabel) +
-        theme(
-          plot.title = element_text(color = "grey45", size = 18, face = "bold.italic", hjust = 0.5),
-          text = element_text(size = 18),
-          panel.background = element_blank(),
-          axis.line.x = element_line(color = "grey45", size = 0.5),
-          axis.line.y = element_line(color = "grey45", size = 0.5),
-          legend.title =  element_blank(),
-          legend.position = "top"
-        ) 
+  # flag multipleplots generates grid
+  # flag cumulative is a fill area plot
+  .linePlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE, cumulative = FALSE){
+    p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
+      labs(title = titleToUse, x = xlabel, y = ylabel) +
+      theme(
+        plot.title = element_text(color = "grey45", size = 18, face = "bold.italic", hjust = 0.5),
+        text = element_text(size = 18),
+        panel.background = element_blank(),
+        axis.line.x = element_line(color = "grey45", size = 0.5),
+        axis.line.y = element_line(color = "grey45", size = 0.5),
+        legend.title =  element_blank(),
+        legend.position = "top"
+      ) 
+    if (cumulative) {
+      p <- p + geom_area(aes(fill = colour), alpha = 0.2)
+    } else {
+      p <- p + 
+        geom_line(size = 1) +
+        geom_point(size = 2)
       if (multipleplots) {
         p <- p + facet_wrap(.~ gridCol)
       } 
-      p
+    }
+    p
   }
   
   #Helper function to read one file from DB
@@ -681,8 +698,7 @@ panelDefineDataToPlotModule <- function(input, output, session, logMessage = mes
   }
   
   # Module Output -----------------------
-  invisible()
-  
+  reactive(result$Title) 
 }
 
 # panelSummaryTableModule Module -----------------------
@@ -707,34 +723,34 @@ panelSummaryTableModule <- function(input, output, session, dbSettings,
     result$selectRunID <- selectRunID()
   })
   
-observe({
-  output$outputsummarytable <- renderDataTable({
-   outputSummaryData <- executeDbQuery(dbSettings,
-                                        paste("exec getOutputSummary", result$selectRunID))
-    if (!is.null(outputSummaryData)) {
-      datatable(
-        outputSummaryData,
-        class = "flamingo-table display",
-        rownames = TRUE,
-        selection = "none",
-        colnames = c('Row Number' = 1),
-        options = .getPRTableOptions()
-      )      
-    } else {
-      datatable(
-        data.frame(content = "nothing to show"),
-        class = "flamingo-table display",
-        rownames = FALSE,
-        selection = "none",
-        colnames = c('Row Number' = 1),
-        options = .getPRTableOptions()
-      )
-    }
+  observe({
+    output$outputsummarytable <- renderDataTable({
+      outputSummaryData <- executeDbQuery(dbSettings,
+                                          paste("exec getOutputSummary", result$selectRunID))
+      if (!is.null(outputSummaryData)) {
+        datatable(
+          outputSummaryData,
+          class = "flamingo-table display",
+          rownames = TRUE,
+          selection = "none",
+          colnames = c('Row Number' = 1),
+          options = .getPRTableOptions()
+        )      
+      } else {
+        datatable(
+          data.frame(content = "nothing to show"),
+          class = "flamingo-table display",
+          rownames = FALSE,
+          selection = "none",
+          colnames = c('Row Number' = 1),
+          options = .getPRTableOptions()
+        )
+      }
+      
+    })
+    
     
   })
-  
-  
-})
   # Helper functions --------------------------------------------------------
   
   #table settings for pr tab: returns option list for datatable

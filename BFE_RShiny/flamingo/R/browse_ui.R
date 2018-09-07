@@ -12,11 +12,10 @@ browseprogrammesUI <- function(id) {
   tagList(
     
     h4("Browse Processes outputs", class = "flamingo-page-title") ,
-    
-    div(id = ns("panelDefineRunID"), panelDefineRunID(id)),
-    div(id = ns("panelSummaryTable"), panelSummaryTable(id)),
-    div(id = ns("panelOutput"), panelOutput(id)),
-    div(id = ns("panelViewOutputFiles"), panelViewOutputFiles(id))
+    panelDefineRunID(id),
+    panelSummaryTable(id),
+    panelOutput(id),
+    panelViewOutputFiles(id)
   )
 }
 
@@ -30,7 +29,6 @@ browseprogrammesUI <- function(id) {
 #' @export
 panelDefineRunID <-  function(id){
   ns <- NS(id)
-  
   panel(
     status = "primary",
     fluidRow(
@@ -55,12 +53,10 @@ panelDefineRunID <-  function(id){
 panelSummaryTable <-  function(id){
   ns <- NS(id)
   flamingoPanel(
-    id = ns("flamingoPanelpanelSummaryTable"),
+    id = ns("flamingoPanelSummaryTable"),
     collapsible = TRUE,
     heading = "Process Run Summary Table",
-    div( id = ns("outputsummarytable"),
     panelSummaryTableModuleUI(ns( "panelSummaryTableModule"))
-    )
   )
 }
 
@@ -70,7 +66,6 @@ panelSummaryTable <-  function(id){
 #' @export
 panelSummaryTableModuleUI <-  function(id){
   ns <- NS(id)
-  
   tagList(
     dataTableOutput(ns("outputsummarytable"))
   )
@@ -83,27 +78,11 @@ panelSummaryTableModuleUI <-  function(id){
 #' @export
 panelOutput <-  function(id){
   ns <- NS(id)
-  
   flamingoIncrementalPanelUI(
-    id = ns("flamingoIncrementalPanelpanelOutput-0"),
-    heading = "Process Run Output Plot",
+    id = ns("flamingoIncrementalPanelOutput-0"),
+    # heading = "Process Run Output Custom Plot",
     collapsible = FALSE, show = FALSE, removable = FALSE)
 }
-
-
-#' Function wrapping panel to define prgramme and model IDs
-#' @inheritParams flamingoModuleUI
-#' @importFrom shinyBS bsTooltip
-#' @export
-panelOutputModuleUI <-  function(id){
-  ns <- NS(id)
-  
-  tagList(
-    panelDefineDataToPlotModuleUI(ns("panelDefineDataToPlotModule"))
-  )
-}
-
-
 
 
 #' Function wrapping panel to define prgramme and model IDs
@@ -111,54 +90,40 @@ panelOutputModuleUI <-  function(id){
 #' @importFrom shinyWidgets panel 
 #' @importFrom plotly plotlyOutput
 #' @export
-panelDefineDataToPlotModuleUI <-  function(id){
+panelOutputModuleUI <-  function(id){
   ns <- NS(id)
   tagList(
-    # Define data to plot
-  fluidRow(
-    column(12,
-           panel(
-             heading = fluidRow(column(10, h4("Define Data to Plot"))),
-             fluidRow(
-               column(4,
-                      div( id = ns("inputplottype"), selectInput(inputId = ns("inputplottype"), label = "Select a plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1]))),
-               column(8, 
-                      checkboxInput(ns("chkboxaggregate"), "Aggregate by granularity", TRUE))),
-             br(),
-             fluidRow(
-               column(4,
-                      checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Loss Types", choices = losstypes, inline = TRUE)),
-               column(8,
-                      checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Granularities", choices = granularities, inline = TRUE))),
-             br(),
-             checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Variables", choices = variables, inline = TRUE),
-             br(),
-             fluidRow(
-               column(6,
-                      actionButton(inputId = ns("abuttonloaddata"), label = "Load Data",  class = "btn btn-primary")))
-           ))),
-  fluidRow(
-    # Customize plot
-    column(3,
-           panel(
-             heading = fluidRow(column(10, h4("Customize Plot"))),
-             textInput(ns("textinputtitle"), "Title", ""),
-             actionButton(inputId = ns("abuttondraw"), label = "Draw Plot",  class = "btn btn-primary"))),
-    # Plot 
-    column(9,
-           panel(
-             heading = fluidRow(column(10, h4("Plot"))),
-             fluidRow(
-               column(12,
-                      plotlyOutput(ns("outputplot"))
-                      # plotOutput(ns("outputplot"))
-                      )),
-             fluidRow(
-               column(12,
-                      stile = "float:right;",
-                      downloadButton(ns("BRdownloadplot"),
-                                     label = "Download plot")))
-           )))
+    flamingoPanel(
+      id = ns("flamingoPanelOutputModule"),
+      collapsible = TRUE,
+      heading = "Custom Plot",
+      h4("Data to plot"),
+      br(),
+      div( id = ns("inputplottype"), class = "InlineSelectInput", 
+           selectInput(inputId = ns("inputplottype"), label = "Select a plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1])),
+      br(),
+      column(4,
+             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Loss Types", choices = losstypes, inline = TRUE)),
+      column(8,
+             checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Granularities", choices = granularities, inline = TRUE)),
+      br(),
+      checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Variables", choices = variables, inline = TRUE),
+      br(),
+      br(),
+      h4("Customize Plot"),
+      column(4,
+             textInput(ns("textinputtitle"), "Title", "")), 
+      column(4,
+             checkboxInput(ns("chkboxaggregate"), "Aggregate by granularity", TRUE)),
+      column(4,
+             checkboxInput(ns("chkboxcumulate"), "Cumulate plot", FALSE)),
+      actionButton(inputId = ns("abuttondraw"), label = "Draw Plot",  class = "btn btn-primary", style = "float:right")
+    ),
+    
+    panel(
+      # heading = h4("Plot"),
+      plotlyOutput(ns("outputplot"))
+    )
   )
 }
 
@@ -169,10 +134,10 @@ panelDefineDataToPlotModuleUI <-  function(id){
 #' @export
 panelViewOutputFiles <-  function(id){
   ns <- NS(id)
-  
-  panel(
-    heading = fluidRow(column(10, h4("Process Run Output Files Table")),
-                       column(2, align = "right",  actionButton(inputId = ns("abuttonhidefiles"), label = NULL, icon = icon("minus")))),
+  flamingoPanel(
+    id = ns("flamingoPanelViewOutputFiles"),
+    collapsible = TRUE,
+    heading = "Process Run Output Files Table",
     panelViewOutputFilesModuleUI(ns("panelViewOutputFilesModule"))
   )
 }
@@ -182,7 +147,6 @@ panelViewOutputFiles <-  function(id){
 #' @export
 panelViewOutputFilesModuleUI <-  function(id){
   ns <- NS(id)
-  
   tagList(
     dataTableOutput(ns("outputfilestable")),
     downloadButton(ns("FLTdownloadexcel"), label = "Export to csv")
