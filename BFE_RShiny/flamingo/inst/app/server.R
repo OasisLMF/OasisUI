@@ -82,7 +82,7 @@ server <- function(input, output, session) {
 
   auth_modules$DA <- .callModule(
     accountDefinition,
-    id = "DA",
+    id = "accountDefinition",
     active = reactive(authenticated() && main_visible() == "DA")
   )
 
@@ -108,7 +108,7 @@ server <- function(input, output, session) {
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "PB")
   )
-  
+
   auth_modules$visualizationSBR <- .callModule(
     browseprogrammes,
     id = "browseprogrammes",
@@ -121,7 +121,7 @@ server <- function(input, output, session) {
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "SBR")
   )
-  
+
   auth_modules$visualizationBBR<- .callModule(
     visualizationBBR,
     id = "visualizationBBR",
@@ -132,7 +132,7 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "BBR")
   )
 
-  
+
   # preselected panel
   observe({if (!is.null(auth_modules$panelOutputModule$preselPanel)) {
     result$preselPanel <- auth_modules$panelOutputModule$preselPanel
@@ -166,7 +166,7 @@ server <- function(input, output, session) {
     id = "companyDefinition",
     active = reactive(authenticated() && input$ua == "definecompany")
   )
-  
+
   ### authentication ----
   # show the logged-in part of the UI if login is completed
   appState <- reactive(
@@ -180,7 +180,7 @@ server <- function(input, output, session) {
   })
 
   ### Module input parameters depending on othe rmodules outputs ---
-  
+
   # UI non-reactive to (result$WidthSide) and (result$Widthmain)
   output$authUI <- renderUI(
     if (result$userId != FLAMINGO_GUEST_ID) {
@@ -245,7 +245,7 @@ server <- function(input, output, session) {
              loginfo(paste("Navigate to Single browse, userId: ", result$userId),
                      logger = "flamingo.module")
            },
-           
+
            "BBR" = { # go to Batch browse submenu
              loginfo(paste("Navigate to Batch browse, userId: ", result$userId),
                      logger = "flamingo.module")
