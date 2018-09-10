@@ -92,7 +92,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
   # Go to Configure Output button ------------------------------------------
   observeEvent(input$abuttongotoconfig, {
     updateNavigation(navigation_state, "PS")
-    result$preselPanel <- structure(panelsProgrammeWorkflow[4], count = input$abuttongotoconfig) 
+    result$preselPanel <- "4"
     print(paste0("result$preselPanel is ", result$preselPanel))
   })
   

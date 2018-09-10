@@ -10,14 +10,14 @@
 #' @importFrom DT renderDataTable dataTableProxy selectRows
 #' @importFrom dplyr mutate select
 #' @importFrom shinyBS toggleModal
-#' @importFrom shinyWidgets updateSliderTextInput
+#' @importFrom shinyWidgets updateSliderTextInput updateRadioGroupButtons
 #' @importFrom shinyjs onclick js
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                       apiSettings, userId, active = reactive(TRUE), logMessage = message,
                                       preselRunId = reactive(-1),
                                       preselProcId = reactive(-1),
-                                      preselPanel =  panelsProgrammeWorkflow[1],
+                                      preselPanel = "1",
                                       reloadMillis = 10000) {
 
   ns <- session$ns
@@ -67,38 +67,37 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Panels switch ------------------------------------------------------------
 
   #Make sure the first view is reset to first panel
-  observe( if (active()) {
-    updateSliderTextInput(session, inputId = "sliderdefprogsteps", selected = preselPanel() )
+  observe(if (active()) {
+    updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "1")
   })
 
-  observeEvent(input$sliderdefprogsteps, {
-    if (input$sliderdefprogsteps == panelsProgrammeWorkflow[1]) {
-      logMessage("showing panelDefineProgramme")
-      .hideDivs()
-      .hideSliderLabel(1)
-      .defaultCreateProg()
-    }
-    if (input$sliderdefprogsteps == panelsProgrammeWorkflow[2]) {
-      logMessage("showing panelProgrammeTable panelAssociateModel")
-      .hideDivs()
-      .hideSliderLabel(2)
-      .defaultAssociateModel()
-      .reloadDPProgData()
-    }
-    if (input$sliderdefprogsteps == panelsProgrammeWorkflow[3]) {
-      logMessage("showing panelDefineIDs panelProgrammeModelTable panelDefineOutputs")
-      .hideDivs()
-      .hideSliderLabel(3)
-      .defaultConfigOutput()
-      .reloadPOData()
-    }
-    if (input$sliderdefprogsteps == panelsProgrammeWorkflow[4]) {
-      logMessage("showing panelDefineIDs panelProcessRunTable")
-      .hideDivs()
-      .hideSliderLabel(4)
-      .defaultRun()
-      .reloadRunData()
-    }
+  observeEvent(input$radioprogsteps, {
+    switch(
+      input$radioprogsteps,
+      "1" = {
+        logMessage("showing panelDefineProgramme")
+        .hideDivs()
+        .defaultCreateProg()
+      },
+      "2" = {
+        logMessage("showing panelProgrammeTable panelAssociateModel")
+        .hideDivs()
+        .defaultAssociateModel()
+        .reloadDPProgData()
+      },
+      "3" = {
+        logMessage("showing panelDefineIDs panelProgrammeModelTable panelDefineOutputs")
+        .hideDivs()
+        .defaultConfigOutput()
+        .reloadPOData()
+      },
+      "4" = {
+        logMessage("showing panelDefineIDs panelProcessRunTable")
+        .hideDivs()
+        .defaultRun()
+        .reloadRunData()
+      }
+    )
   })
 
   # Panel Create Programme ----------------------------------------------------
@@ -158,7 +157,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                         progId = result$DPProgData[result$DPProgData_selected_rows,1])
       if (loadprogdata == 'success' || loadprogdata == 'Success') {
         showNotification(type = "message", "Initiating load programme data...")
-        updateSliderTextInput(session, inputId = "sliderdefprogsteps", selected = panelsProgrammeWorkflow[2])
+        updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "2")
       } else {
         showNotification(type = "error", "Failed to load programme data.")
       }
@@ -498,18 +497,19 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Manage panels to show when selected row changes
   observeEvent(result$DPProgData_selected_rows, {
     if (active()) {
-      if (input$sliderdefprogsteps == panelsProgrammeWorkflow[2]) {
+      if (input$radioprogsteps == "2") {
         .defaultAssociateModel()
       }
     }
     if (result$DPProgData_selected_rows != 0) {
       if (active()) {
-        if (input$sliderdefprogsteps == panelsProgrammeWorkflow[2]) {
+        if (input$radioprogsteps == "3") {
           show("panelAssociateModel")
         }
       }
       .defaultOOKSidebar()
-      if (result$DPProgData[input$tableDPprog_rows_selected, "Status"] == StatusCompleted & input$sliderdefprogsteps == panelsProgrammeWorkflow[2]) {
+      if (result$DPProgData[input$tableDPprog_rows_selected, "Status"] == StatusCompleted &&
+          input$radioprogsteps == "2") {
         .defaultOOKSidebar()
       } else {
         if (active()) {
@@ -539,7 +539,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       showNotification(type = "message",
                        paste("Prog Oasis id:", result$progOasisId,  " created."))
       .clearOOKSidebar()
-      updateSliderTextInput(session, inputId = "sliderdefprogsteps", selected = panelsProgrammeWorkflow[3])
+      updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "3")
       .reloadPOData()
       if (result$POData_selected_rows != 0) {
         loadprogmodel <- loadProgrammeModel(apiSettings,
@@ -620,7 +620,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       if (!is.na(result$POData[result$POData_selected_rows, "Status"])) {
         if (result$POData[result$POData_selected_rows, "Status"] == StatusCompleted) {
           if (active()) {
-            if (input$sliderdefprogsteps == panelsProgrammeWorkflow[3]) {
+            if (input$radioprogsteps == "3") {
               .defaultview(session)
             }
           }
@@ -981,7 +981,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                          "Process Run ID could not be generated. So process run cannot be executed.")
       } else {
         status <- runProcess(apiSettings, runId)
-        updateSliderTextInput(session, inputId = "sliderdefprogsteps", selected = panelsProgrammeWorkflow[4])
+        updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "4")
         if (grepl("success", status, ignore.case = TRUE)) {
           showNotification(type = "message",
                            sprintf("Created Process Run ID: %s and process run is executing.",
@@ -1034,7 +1034,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # If selectprogOasisID changes, reload progcess run table and set view back to default
   observeEvent( input$selectprogOasisID, {
     .reloadRunData()
-    if (input$sliderdefprogsteps == panelsProgrammeWorkflow[4]) {
+    if (input$radioprogsteps == "4") {
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
       #consider cases of programmes wtithout a run process
@@ -1083,7 +1083,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         } else {
           hide("tableprocessrundata")
           hide("divprocessRunButtons")
-          if (input$sliderdefprogsteps == panelsProgrammeWorkflow[4]) {
+          if (input$radioprogsteps == "4") {
             showNotification(type = "warning", "Current Programme does not have any assocated run Process")
           }
         }
@@ -1095,7 +1095,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     # reload if radio buttons for 'All' vs 'In_Progress' change
     input$radioprrunsAllOrInProgress
     if (!is.null(input$selectprogOasisID) ) {
-      if (input$sliderdefprogsteps == panelsProgrammeWorkflow[4]) {
+      if (input$radioprogsteps == "4") {
         show("panelProcessRunTable")
       }
       .getProcessRunWithUserChoices(userId(), 0, 0, 0)
@@ -1368,18 +1368,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     hide("panelDefineOutputConfiguration")
     hide("panelProcessRunTable")
     hide("panelProcessRunLogs")
-  }
-
-  # hide label of the currently selected element in sliderdefprogsteps
-  .hideSliderLabel <- function(index) {
-    numLabels <- length(panelsProgrammeWorkflow)
-    # N.B.: JavaScript array indices start from zero
-    # make all the labels visible
-    lapply(seq(numLabels), function(i) {
-      js$changeJSGridTextVisibility(index = i - 1, visible = TRUE)
-    })
-    # hide the current one
-    js$changeJSGridTextVisibility(index = index - 1, visible = FALSE)
   }
 
   # default view for panels
@@ -1671,7 +1659,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   .hiddenconfigOutputView <- function(textMessage) {
     hide("panelDefineOutputs")
     if (active()) {
-      if (input$sliderdefprogsteps == panelsProgrammeWorkflow[3]) {
+      if (input$radioprogsteps == "3") {
         showNotification(type = "warning", textMessage)
       }
     }

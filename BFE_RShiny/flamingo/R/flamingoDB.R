@@ -59,7 +59,7 @@ executeDbQuery <- function(dbSettings, statement, simplify = FALSE,
 #' @param ... arguments to `dbFunc`. `character()` args are quoted with single
 #'   quotes (').
 #' @param dboPrefix prefix `dbFunc` with `"dbo."`
-#' @param squareBrackets surround the argument list with \[ and \]
+#' @param squareBrackets surround the argument list with square brackets
 #' @export
 #' @md
 buildDbQuery <- function( 

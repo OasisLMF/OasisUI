@@ -163,23 +163,6 @@ div.flamingo-page-division {
   background: #8b2129 !important;
 }
 
-/* Styles for sliderdefprogsteps */
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-bar,
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-bar-edge,
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-line {
-  height: 15px;
-}
-
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-grid-text {
-  font-size: 14px;
-  top: 20px;
-}
-
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-single {
-  font-size: 14px;
-  top: -5px;
-}
-
 .InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single { 
          display: table-cell; 
          text-align: center; 

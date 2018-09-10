@@ -24,7 +24,7 @@ server <- function(input, output, session) {
     userName = "",
     WidthMain = 9,
     WidthSide = 3,
-    preselPanel = panelsProgrammeWorkflow[1]
+    preselPanel = "1"
   )
 
   authenticated <- reactive({
@@ -137,7 +137,7 @@ server <- function(input, output, session) {
   observe({if (!is.null(auth_modules$panelOutputModule$preselPanel)) {
     result$preselPanel <- auth_modules$panelOutputModule$preselPanel
   } else {
-    result$preselPanel <- panelsProgrammeWorkflow[1]
+    result$preselPanel <- "1"
   }
   })
 

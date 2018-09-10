@@ -88,7 +88,10 @@ defaultSelectChoicesIL <- c(
 
 
 ### Panels Programme Workflow -----
-panelsProgrammeWorkflow <- c("Create Programme", "Select Programme & Associate Model", "Configure Workflow Output", "Browse & re-run")
+programmeWorkflowSteps <- list("Create Programme" = "1",
+                               "Select Programme & Associate Model" = "2",
+                               "Configure Workflow Output" = "3",
+                               "Browse & re-run" = "4")
 
 ### Plots types ------
 plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP",

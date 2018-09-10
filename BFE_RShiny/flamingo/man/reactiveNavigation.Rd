@@ -16,7 +16,8 @@ outputNavigation(state, force_react = TRUE)
 
 getNavigation(output)
 
-observeModuleNavigation(state, modules, force_react = TRUE, logger = NULL)
+observeModuleNavigation(state, modules, force_react = TRUE,
+  logger = NULL)
 }
 \arguments{
 \item{value}{Desired value of the navigation state.}

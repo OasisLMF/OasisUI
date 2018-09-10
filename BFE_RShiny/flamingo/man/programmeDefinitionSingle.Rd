@@ -9,7 +9,7 @@
 programmeDefinitionSingle(input, output, session, dbSettings, apiSettings,
   userId, active = reactive(TRUE), logMessage = message,
   preselRunId = reactive(-1), preselProcId = reactive(-1),
-  preselPanel = panelsProgrammeWorkflow[1], reloadMillis = 10000)
+  preselPanel = "1", reloadMillis = 10000)
 
 programmeDefinitionSingleUI(id)
 }
