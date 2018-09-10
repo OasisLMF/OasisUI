@@ -75,7 +75,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # Make sure the first view is reset to first panel
   observe(if (active()) {
-    workflowSteps$update("2")
+    workflowSteps$update("1")
     .reloadDPProgData()
   })
 
