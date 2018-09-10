@@ -87,14 +87,6 @@ defaultSelectChoicesIL <- c(
 )
 
 
-### Panels Programme Workflow -----
-# N.B.: checkbox values need to have type = "character", otherwise jQuery errors
-# are thrown when programmatically setting choices
-programmeWorkflowSteps <- list("Create Programme" = "1",
-                               "Select Programme & Associate Model" = "2",
-                               "Configure Workflow Output" = "3",
-                               "Browse & re-run" = "4")
-
 ### Plots types ------
 plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP",
                                                                       "LEC Full Uncertainty AEP"),
