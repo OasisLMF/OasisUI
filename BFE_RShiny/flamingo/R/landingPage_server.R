@@ -19,43 +19,39 @@
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
+  # navigation -----
   navigation_state <- reactiveNavigation()
-
-  result <- reactiveValues(
-    inbox = NULL,
-    runIdList = NULL
-  )
-
   observeEvent(input$abuttongotorun,
-               updateNavigation(navigation_state, "WF"))
+               updateNavigation(navigation_state, "SBR"))
+
+  inbox <- reactive({
+    if (active()) {
+      # reload automatically every so often
+      invalidateLater(reloadMillis) # does not seem to work as of 10/09/2018
+      # explicit refresh button
+      input$refreshInbox
+      logMessage("refreshing inbox...")
+      data <- getInboxData(dbSettings, userId())
+      data %>%
+        mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
+        mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
+        mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+        as.data.frame()
+    }
+  })
 
   observe(if (active()) {
-
+    logMessage("refreshing permissions")
     # invalidate if the refresh button updates
     force(input$refreshInbox)
-
     # reload automatically every so often
-    invalidateLater(reloadMillis)
-
+    invalidateLater(reloadMillis, session)
     landingPageButtonUpdate(session, dbSettings, userId())
-
-    data <- getInboxData(dbSettings, userId())
-    result$inbox <-  data %>%
-      mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
-      mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
-      mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
-      as.data.frame()
-
-    logMessage("inbox refreshed")
-
-    result$runIdList <- result$inbox[, c("RunID", "Status")]
-    #logMessage(paste0("result$runIdList ", names(result$runIdList)))
   })
 
   output$tableInbox <- renderDataTable(if (userId() != FLAMINGO_GUEST_ID) {
-
     datatable(
-      result$inbox,
+      inbox(),
       class = "flamingo-table display",
       rownames = TRUE,
       selection = "single",
@@ -68,13 +64,12 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
         columnDefs = list(list(visible = FALSE, targets = 0, type = 'natural'))
       )
     )
-
   })
 
   output$PRIdownloadexcel <- downloadHandler(
     filename = "processruninbox.csv",
     content = function(file) {
-      write.csv(result$inbox, file)
+      write.csv(inbox(), file)
     }
   )
 
@@ -83,15 +78,14 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     outputNavigation(navigation_state),
     list(
       runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        result$inbox[i, 2]} else -1),
+        inbox()[i, 2]} else -1),
       # this is needed in processRun, probably shouldn't
       procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        result$inbox[i, 1]} else -1),
-      runIdList = reactive(result$runIdList)
+        inbox()[i, 1]} else -1),
+      runIdList = reactive(inbox()[, c("RunID", "Status")])
     )
-    
   )
-  
+
   moduleOutput
 
 }
@@ -200,7 +194,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   ns <- session$ns
 
   navigation_state <- reactiveNavigation()
-  
+
   state <- reactiveValues(
     collapsed = FALSE
   )
@@ -208,7 +202,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   observeEvent(input$abuttoncollapsesidebar, {
     state$collapsed <- !state$collapsed
   })
-  
+
   observe({
     output$sidebar <-
       renderUI(pagestructureSidebar(ns, state$collapsed))
@@ -226,7 +220,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "PB")
     toggleDropdownButton(ns("abuttonrun"))
   })
-  
+
   observeEvent(input$abuttonbrowseSBR, {
     updateNavigation(navigation_state, "SBR")
     toggleDropdownButton(ns("abuttonbrowse"))
@@ -236,7 +230,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "BBR")
     toggleDropdownButton(ns("abuttonbrowse"))
   })
-  
+
   observeEvent(input$abuttonhome, {
     updateNavigation(navigation_state, "LP")
   })
