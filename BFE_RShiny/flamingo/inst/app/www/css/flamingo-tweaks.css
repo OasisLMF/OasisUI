@@ -244,3 +244,16 @@ div.flamingo-page-division {
           filter: none;
   border: 1px solid #2e4b69;
 }
+
+#programmeDefinitionSingle-workflowsteps-radiobuttons button {
+  border: 1px solid #000000;
+  background-color: #535555;
+  background-image: none;
+  border-radius: 20px;
+}
+
+#programmeDefinitionSingle-workflowsteps-radiobuttons button.btn-primary.active {
+  font-weight: bold;
+  border: 1px solid #8b2129;
+  background-color: #bb252c;
+}

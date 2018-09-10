@@ -3,17 +3,16 @@
 #' @inheritParams flamingoModuleUI
 #' @return list of tags
 #' @importFrom DT DTOutput
-#' @importFrom shinyWidgets sliderTextInput panel
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @importFrom shinyBS bsModal
-#' @importFrom shinyWidgets radioGroupButtons
 #' @export
 programmeDefinitionSingleUI <- function(id) {
 
   ns <- NS(id)
 
   tagList(
-    sliderInputBlock(id),
+    singleProgrammeWorkflowStepsUI(ns("workflowsteps")),
 
     #Modals
     bsModal(ns("bsmodalsaveoutput"), "Save Configuration", trigger = "", size = "small",
@@ -42,27 +41,6 @@ programmeDefinitionSingleUI <- function(id) {
 }
 
 # Functions for UI Panels ------------------------------------------------------------------------------
-
-
-#' Function wrapping slider input
-#' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel sliderTextInput
-#' @export
-sliderInputBlock <- function(id){
-  ns <- NS(id)
-  tagList(
-    h4("Process Definition Steps"),
-    br(),
-    div(id = ns("divradioprogsteps"),
-        radioGroupButtons(
-          inputId = ns("radioprogsteps"), label = NULL, 
-          choices = programmeWorkflowSteps, 
-          justified = TRUE, individual = TRUE, status = "primary",
-          checkIcon = list(yes = NULL, no = NULL)
-        )
-    )
-  )
-}
 
 #'  Function defining panel elements to define a programme
 #' @inheritParams flamingoModuleUI
