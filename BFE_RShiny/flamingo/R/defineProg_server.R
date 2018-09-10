@@ -368,7 +368,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
         logMessage(file.path(flc,inFile[1,1]))
         if (flcopy == TRUE){
           recordId <- createFileRecord(dbSettings,
-              inFile[1,1], "Source Reinsurance File", 401, flc, userId(),
+              inFile[1,1], "Source Reinsurance File", 301, flc, userId(),
               "Prog", result$DPProgData[input$tableDPprog_rows_selected,1])
           if (!is.null(recordId)) {
             showNotification(type = "message",
@@ -390,7 +390,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
         logMessage(file.path(flc,inFile[1,1]))
         if (flcopy == TRUE){
           recordId <- createFileRecord(dbSettings,
-              inFile[1,1], "Source Reinsurance Scope File", 402, flc, userId(),
+              inFile[1,1], "Source Reinsurance Scope File", 302, flc, userId(),
               "Prog", result$DPProgData[input$tableDPprog_rows_selected,1])
           if (!is.null(recordId)) {
             showNotification(type = "message",
@@ -490,11 +490,11 @@ programmeDefinition <- function(input, output, session, dbSettings,
         
       })
   
-  observe(if (active()) {
+    observe(if (active()) {
 
         if(input$sinputSRFile == "U") {
           show("divSRFileUpload")
-          disable("abuttonSRFileUpload")
+          disable("abuttonSLFileUpload")
           hide("divSRFileSelect")
         } else if(input$sinputSRFile == "S") {
           show("divSRFileSelect")
@@ -553,39 +553,6 @@ programmeDefinition <- function(input, output, session, dbSettings,
         }
       })
   
-  observe(if (active()) {
-        if (input$sinputSRFile == "U") {
-          options(shiny.maxRequestSize = 1024*1024^2)
-          inFile <- input$SRFile
-          if (!is.null(inFile)) {
-            enable("abuttonSRFileUpload")
-          }
-        } else {
-          if (input$sinputSRFile == "S"){
-            SRfiles <- getFileSourceAccountFile(dbSettings)
-            updateSelectInput(session, "sinputselectSRFile",
-                choices = createSelectOptions(SRfiles, labelCol = 1,
-                    valueCol = 2))
-          }
-        }
-      })
-
-  observe(if (active()) {
-        if (input$sinputSRSFile == "U") {
-          options(shiny.maxRequestSize = 1024*1024^2)
-          inFile <- input$SRSFile
-          if (!is.null(inFile)) {
-            enable("abuttonSRSFileUpload")
-          }
-        } else {
-          if (input$sinputSRSFile == "S"){
-            SRSfiles <- getFileSourceAccountFile(dbSettings)
-            updateSelectInput(session, "sinputselectSRSFile",
-                choices = createSelectOptions(SRSfiles, labelCol = 1,
-                    valueCol = 2))
-          }
-        }
-      })
   
   
   ### Programme Model Table (previously OOK)
