@@ -2,8 +2,7 @@
 #' @rdname fileViewer
 #' @description UI/View to view files
 #' @import leaflet
-#' @importFrom DT dataTableOutput
-#' @importFrom shinyjs hidden disabled
+#' @importFrom DT DTOutput
 #' @importFrom shinyBS bsTooltip
 #' @export
 fileViewerUI <- function(id) {
@@ -17,7 +16,7 @@ fileViewerUI <- function(id) {
     h4("File List", class = "flamingo-table-title"),
 
     checkboxInput(inputId = ns("tableFVfileListSelectall"), label = "Select all", value = FALSE),
-    dataTableOutput(ns("tableFVfileList")),
+    DTOutput(ns("tableFVfileList")),
 
     downloadButton(ns("FVfileListdownloadzip"), label = "Export to zip"),
     bsTooltip(ns("FVfileListdownloadzip"),

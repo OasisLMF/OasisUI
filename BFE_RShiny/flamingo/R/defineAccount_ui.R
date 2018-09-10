@@ -5,8 +5,7 @@
 #' @rdname accountDefinition
 #' @importFrom shiny actionButton helpText textInput sidebarLayout sidebarPanel
 #' downloadButton
-#' @importFrom DT dataTableOutput
-#' @importFrom shinyjs hidden
+#' @importFrom DT DTOutput
 #' @importFrom shinyBS bsModal
 #' @export
 accountDefinitionUI <- function(id) {
@@ -23,7 +22,7 @@ accountDefinitionUI <- function(id) {
 
                  helpText(h4("Account Table", class = "flamingo-table-title")),
 
-                 dataTableOutput(ns("tableDAAccount")),
+                 DTOutput(ns("tableDAAccount")),
 
                  downloadButton(ns("DAAdownloadexcel"), label= " Export to csv"),
 

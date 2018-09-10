@@ -222,7 +222,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
 #' @return list of reactives:
 #' @rdname panelViewOutputFilesModule
 #' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDataTable datatable
+#' @importFrom DT renderDataTable datatable DTOutput
 #' @importFrom dplyr mutate select contains filter
 #' @export
 panelViewOutputFilesModule <- function(input, output, session, logMessage = message, filesListData) {
@@ -337,7 +337,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
     fluidPage(
       h4("File Contents", class = "flamingo-table-title"),
       htmlOutput(ns("tableFVExposureSelectedInfo")),
-      dataTableOutput(ns("tableFVExposureSelected")),
+      DTOutput(ns("tableFVExposureSelected")),
       br(),
       downloadButton(ns("FVEdownloadexcel"), label = "Export to csv")
     )

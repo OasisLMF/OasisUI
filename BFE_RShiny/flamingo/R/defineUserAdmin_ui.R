@@ -6,7 +6,7 @@
 #' @return list of tags
 #' @importFrom shiny actionButton helpText textInput sidebarLayout sidebarPanel
 #' downloadButton
-#' @importFrom DT dataTableOutput
+#' @importFrom DT DTOutput
 #' @importFrom shinyjs hidden
 #' @export
 userAdminDefinitionUI <- function(id) {
@@ -22,7 +22,7 @@ userAdminDefinitionUI <- function(id) {
              div(class = "flamingo-page-division",
 
                  helpText(h4("Company User List", class = "flamingo-table-title")),
-                 dataTableOutput(ns("tablecompanyuserlist")),
+                 DTOutput(ns("tablecompanyuserlist")),
                  downloadButton(ns("CUACULdownloadexcel"),label="Export to csv"),
                  actionButton(ns("abuttonnewUser"), class="btn btn-primary",
                               label = "Create", align = "left"),
@@ -45,7 +45,7 @@ userAdminDefinitionUI <- function(id) {
              hidden(
                div(id = ns("usgroups"), class = "flamingo-page-division",
                    h4("User Security Groups", class = "flamingo-table-title"),
-                   dataTableOutput(ns("tableusersecuritygroups")),
+                   DTOutput(ns("tableusersecuritygroups")),
                    downloadButton(ns("CUAUUSGdownloadexcel"),
                                   label="Export to csv")
                )#End of div usgroups
@@ -58,7 +58,7 @@ userAdminDefinitionUI <- function(id) {
              hidden(
                div(id = ns("ulicenses"), class = "flamingo-page-division",
                    h4("User Licenses", class = "flamingo-table-title"),
-                   dataTableOutput(ns("tableuserlicenses")),
+                   DTOutput(ns("tableuserlicenses")),
                    downloadButton(ns("CUAULdownloadexcel"),
                                   label="Export to csv")
                )#End of div ulicenses

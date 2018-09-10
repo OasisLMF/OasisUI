@@ -1,5 +1,5 @@
 #' @rdname landingPage
-#' @importFrom DT dataTableOutput
+#' @importFrom DT DTOutput
 #' @importFrom shinyBS bsTooltip
 #' @export
 landingPageUI <- function(id) {
@@ -9,7 +9,7 @@ landingPageUI <- function(id) {
   tagList(
     wellPanel(
       h4("Process Runs Inbox"),
-      dataTableOutput(ns("tableInbox")),
+      DTOutput(ns("tableInbox")),
       actionButton(ns("abuttongotorun"), "Goto Run Details",
                    class = "btn btn-primary", align = "right"),
       bsTooltip(ns("abuttongotorun"), landing_page$abuttongotorun,

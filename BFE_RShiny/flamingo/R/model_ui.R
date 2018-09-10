@@ -3,7 +3,8 @@
 #' @description UI/View for the model supplier page
 #' @inheritParams accountDefinitionUI
 #' @importFrom shinyjs hidden
-#' @importFrom shiny actionButton
+#' @importFrom shinyBS bsModal
+#' @importFrom DT DTOutput
 #' @export
 modelSupplierPageUI <- function(id) {
 
@@ -45,14 +46,14 @@ modelSupplierPageUI <- function(id) {
 
              div(class = "flamingo-page-division",
                  helpText(h4("Model", class = "flamingo-table-title")),
-                 dataTableOutput(ns("tablemodel")),
+                 DTOutput(ns("tablemodel")),
                  downloadButton(ns("Modeldownloadexcel"), label="Export to csv")
              ),
 
              hidden(
                div(id = ns("divmr"), class = "flamingo-page-division",
                    h4("Model Resource", class = "flamingo-table-title"),
-                   dataTableOutput(ns("mrtable")),
+                   DTOutput(ns("mrtable")),
                    actionButton(ns("btnCreate"), "Create",
                                 class="btn btn-primary", align = "left"),
                    actionButton(ns("btnAmend"), "Amend",

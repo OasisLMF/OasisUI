@@ -3,10 +3,7 @@
 #' @param id account id
 #' @return list of tags
 #' @rdname companyDefinition
-#' @importFrom shiny actionButton helpText textInput sidebarLayout sidebarPanel
-#' downloadButton
-#' @importFrom DT dataTableOutput
-#' @importFrom shinyjs hidden
+#' @importFrom DT DTOutput
 #' @importFrom shinyBS bsModal
 #' @export
 companyDefinitionUI <- function(id) {
@@ -23,7 +20,7 @@ companyDefinitionUI <- function(id) {
 
                   helpText(h4("Company List", class = "flamingo-table-title")),
 
-                  dataTableOutput(ns("tablecompanylist")),
+                  DTOutput(ns("tablecompanylist")),
 
                   actionButton(ns("abuttoncompcrt"),  class="btn btn-primary",
                       label = "Create", align = "left"),
@@ -60,4 +57,3 @@ companyDefinitionUI <- function(id) {
   )
 
 }
-
