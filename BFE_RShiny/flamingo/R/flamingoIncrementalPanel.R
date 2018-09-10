@@ -108,12 +108,28 @@ if (FALSE) {
       ns <- NS(id)
       verticalLayout(
         textInput(ns("txt_in"), label = paste("type something", id)),
-        textOutput(ns("txt_out"))
+        textOutput(ns("txt_out")),
+        shiny::actionButton(ns("upd"), "Update")
       )
     }
-    examplePanel <- function(input, output, session, active) {
-      output$txt_out <- renderText(input$txt_in)
-      reactive(input$txt_in)
+    examplePanel <- function(input, output, session, reset = reactive(FALSE)) {
+
+      if (FALSE) {
+        txt <- eventReactive(input$upd, {
+          input$txt_in
+        })
+        output$txt_out <- renderText(txt())
+        txt
+      } else {
+        txt <- reactiveVal(NULL)
+        observe({
+          reset()
+          txt(NULL)
+        })
+        observeEvent(input$upd, txt(input$txt_in))
+        output$txt_out <- renderText(txt())
+        reactive(txt())
+      }
     }
     ui <- fluidPage(
       # replace eventually with flamingo-tweaks.css via system.file()
@@ -144,7 +160,6 @@ if (FALSE) {
       # content IDs used for the content module server and UI
       # content modules
       content_IDs <- paste0("content-", seq_len(n_panels))
-      panel_modules <- lapply(content_IDs, callModule, module = examplePanel)
       all_panels <- callIncrementalPanelModules(
         panel_IDs, "start-panel", content_IDs,
         examplePanelUI,
@@ -153,6 +168,9 @@ if (FALSE) {
         collapsible = TRUE, show = TRUE,
         ns = ns
       )
+      panel_modules <- lapply(seq_along(content_IDs), function(i) {
+        callModule(examplePanel, content_IDs[i], reactive(all_panels$state()[[i]]))
+      })
       lapply(seq_along(panel_modules), function(i) {
         output[[paste0("paneltitle", i)]] <- renderflamingoPanelHeading(panel_modules[[i]]())
       })
