@@ -6,6 +6,7 @@
 #' @importFrom shinyWidgets sliderTextInput panel
 #' @importFrom shinyjs hidden
 #' @importFrom shinyBS bsModal
+#' @importFrom shinyWidgets radioGroupButtons
 #' @export
 programmeDefinitionSingleUI <- function(id) {
   
@@ -52,17 +53,14 @@ sliderInputBlock <- function(id){
   tagList(
     h4("Process Definition Steps"),
     br(),
-    div(id = ns("divsliderdefprogsteps"),
-        sliderTextInput(inputId = ns("sliderdefprogsteps"),
-                        label = NULL, 
-                        choices = panelsProgrammeWorkflow, 
-                        selected = panelsProgrammeWorkflow[1], # in case you want all values by default 
-                        animate = FALSE, grid = TRUE, 
-                        hide_min_max = TRUE, from_fixed = FALSE,
-                        to_fixed = FALSE, from_min = NULL, from_max = NULL, to_min = NULL,
-                        to_max = NULL, force_edges = TRUE, width = '100%', pre = NULL,
-                        post = NULL, dragRange = FALSE)
+    div(id = ns("divradioprogsteps"),
+        radioGroupButtons(
+          inputId = ns("radioprogsteps"), label = NULL, 
+          choices = programmeWorkflowSteps, 
+          justified = TRUE, individual = TRUE, status = "primary",
+          checkIcon = list(yes = NULL, no = NULL)
         )
+    )
   )
 }
 
