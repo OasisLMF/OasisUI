@@ -246,14 +246,23 @@ div.flamingo-page-division {
 }
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button {
-  border: 1px solid #000000;
-  background-color: #535555;
   background-image: none;
   border-radius: 20px;
+  color: #000000bf;
+  border: 1px solid #000000;
 }
 
-#programmeDefinitionSingle-workflowsteps-radiobuttons button.btn-primary.active {
-  font-weight: bold;
-  border: 1px solid #8b2129;
+#programmeDefinitionSingle-workflowsteps-radiobuttons button.previousStepButton {
+  background-color: #eacbcb;
+}
+
+#programmeDefinitionSingle-workflowsteps-radiobuttons button.activeStepButton {
   background-color: #bb252c;
+  border: 1px solid #8b2129;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+#programmeDefinitionSingle-workflowsteps-radiobuttons button.nextStepButton {
+  background-color: #ffffff;
 }

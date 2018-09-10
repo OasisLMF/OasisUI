@@ -21,3 +21,31 @@ shinyjs.disableCheckboxes = function(params) {
     }
   }
 };
+
+shinyjs.updateStepColors = function(params) {
+  var defaultParams = {
+    radioButtonsId: null
+  };
+  params = shinyjs.getParams(params, defaultParams);
+  var nodeList = document.querySelectorAll('#' + params.radioButtonsId + ' button');
+  if (nodeList.length > 0) {
+    var i, selectedButtonIdx = nodeList.length - 1;
+    for (i = 0; i < nodeList.length; i++) {
+      nodeList[i].classList.remove("previousStepButton");
+      nodeList[i].classList.remove("activeStepButton");
+      nodeList[i].classList.remove("nextStepButton");
+      var classes = nodeList[i].className.split(" ");
+      // check whether the current button is the active one
+      if ($.inArray("active", classes) > -1) {
+        selectedButtonIdx = i;
+        nodeList[i].classList.add("activeStepButton");
+      }
+      if (i < selectedButtonIdx) {
+        nodeList[i].classList.add("previousStepButton");
+      }
+      if (i > selectedButtonIdx) {
+        nodeList[i].classList.add("nextStepButton");
+      }
+    }
+  }
+};

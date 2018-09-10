@@ -15,6 +15,10 @@ singleProgrammeWorkflowStepsUI <- function(id) {
 
 #' @importFrom shinyWidgets updateRadioGroupButtons
 singleProgrammeWorkflowSteps <- function(input, output, session) {
+  observeEvent(input$radiobuttons, {
+    # update steps colors
+    js$updateStepColors(radioButtonsId = session$ns("radiobuttons"))
+  })
   list(step = reactive({input$radiobuttons}), 
        update = function(step) {
          updateRadioGroupButtons(session, inputId = "radiobuttons", selected = step)
