@@ -9,8 +9,8 @@ actionButton(class = c("btn", "btn-primary", "btn-flamingo"), ...)
 \arguments{
 \item{class}{HTML class attribute}
 
-\item{...}{arguments to \link{shiny::actionButton}}
+\item{...}{arguments to \code{\link[shiny:actionButton]{shiny::actionButton()}}}
 }
 \description{
-Modified version of the default \link{shiny::actionButton}
+Modified version of the default \code{\link[shiny:actionButton]{shiny::actionButton()}}
 }

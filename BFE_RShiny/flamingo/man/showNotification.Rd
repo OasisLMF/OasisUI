@@ -8,12 +8,12 @@ showNotification(ui, type = c("default", "message", "warning", "error"),
   ...)
 }
 \arguments{
-\item{ui}{see \link{shiny::showNotification}}
+\item{ui}{see \code{\link[shiny:showNotification]{shiny::showNotification()}}}
 
-\item{type}{see \link{shiny::showNotification}}
+\item{type}{see \code{\link[shiny:showNotification]{shiny::showNotification()}}}
 
-\item{...}{other arguments to \link{shiny::showNotification}}
+\item{...}{other arguments to \code{\link[shiny:showNotification]{shiny::showNotification()}}}
 }
 \description{
-Modified version of the default \link{shiny::showNotifcation}
+Modified version of the default \code{\link[shiny:showNotification]{shiny::showNotification()}}
 }

@@ -19,6 +19,6 @@ runProcess(apiSettings, runId, logWarning = warning, ...)
 http status category warn_for_status
 }
 \description{
-Submit a GET request to the Flamingo API Server to execute 
+Submit a GET request to the Flamingo API Server to execute
 the workflow.
 }

@@ -1,11 +1,12 @@
 # browseprogrammes Module -----------------------------
-#' @description Server logic to define a programme
+#' browseprogrammes Module
+#' @description Server logic for viewing results of a single run
 #' @inheritParams flamingoModule
 #' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater};
+#' see \link{invalidateLater}
 #' @param runIdList list of runs and their status
-#' @param preselRunId reactive string expression for reselected run id from  landingpage
-#' @param processRunId reactive string expression for reselected run id from  defineProgramme
+#' @param preselRunId reactive string expression for reselected run id from landingpage
+#' @param processRunId reactive string expression for reselected run id from defineProgramme
 #' @return list of reactives:
 #' @rdname browseprogrammes
 #' @importFrom shinyjs show hide enable disable hidden
@@ -210,7 +211,8 @@ browseprogrammes <- function(input, output, session, dbSettings,
 
 
 # panelViewOutputFilesModule Module -----------------------
-#' @description Server logic to define a programme
+#' Module for the Panel to View Output Files
+#' @description Server logic to view output files
 #' @inheritParams flamingoModule
 #' @param filesListData table of output files for a given runID
 #' @return list of reactives:
@@ -423,7 +425,8 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
 
 
 # panelOutputModule Module -----------------------
-#' @description Server logic to define a programme
+#' Module for Output Panel
+#' @description Server logic to show graphical output such as plots
 #' @inheritParams flamingoModule
 #' @param filesListData table of output files for a given runID
 #' @return reactive value of the title
@@ -715,7 +718,8 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
 }
 
 # panelSummaryTableModule Module -----------------------
-#' @description Server logic to define a programme
+#' Module for Summary Table Panel
+#' @description Server logic to show the summary table output
 #' @inheritParams flamingoModule
 #' @param selectRunID selected runID
 #' @return null

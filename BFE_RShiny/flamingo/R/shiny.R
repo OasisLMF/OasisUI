@@ -1,8 +1,7 @@
 
 #' Flamingo Module Template UI
 #' @param id module id
-flamingoModuleUI <- function(
-  id) {}
+flamingoModuleUI <- function(id) {}
 
 
 #' Flamingo Module Template
@@ -26,21 +25,23 @@ flamingoModule <- function(
 
 
 #' Action button/link
-#' @description Modified version of the default \link{shiny::actionButton}
+#' @description Modified version of the default [shiny::actionButton()]
 #' @param class HTML class attribute
-#' @param ... arguments to \link{shiny::actionButton}
+#' @param ... arguments to [shiny::actionButton()]
 #' @export
+#' @md
 actionButton <- function(class = c("btn", "btn-primary", "btn-flamingo"), ...) {
   shiny::actionButton(class = class, ...)
 }
 
 
 #' Show or remove a notification
-#' @description Modified version of the default \link{shiny::showNotifcation}
-#' @param ui see \link{shiny::showNotification}
-#' @param type see \link{shiny::showNotification}
-#' @param ... other arguments to \link{shiny::showNotification}
+#' @description Modified version of the default [shiny::showNotification()]
+#' @param ui see [shiny::showNotification()]
+#' @param type see [shiny::showNotification()]
+#' @param ... other arguments to [shiny::showNotification()]
 #' @export
+#' @md
 showNotification <- function(ui,
                              type = c("default", "message", "warning", "error"), ...) {
 

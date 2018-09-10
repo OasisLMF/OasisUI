@@ -21,6 +21,7 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
   )
 }
 
+#' @importFrom utils head
 flamingoIncrementalPanel <- function(input, output, session, panels_state,
                                      new_content_IDs, new_content_fun, ..., new_headings = NULL,
                                      collapsible = FALSE, show = TRUE) {

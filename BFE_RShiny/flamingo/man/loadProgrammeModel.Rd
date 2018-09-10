@@ -8,13 +8,13 @@ loadProgrammeModel(apiSettings, progOasisId, logWarning = function(w)
   warning, ...)
 }
 \arguments{
-\item{apiSettings}{settings object as returned by \link{flamingoServer}}
+\item{apiSettings}{settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}}
 
 \item{progOasisId}{oasis programme identifier}
 
 \item{logWarning}{warning message callback}
 
-\item{...}{additional arguments to \link{httr::GET}}
+\item{...}{additional arguments to \code{\link[httr:GET]{httr::GET()}}}
 }
 \value{
 http status category warn_for_status
