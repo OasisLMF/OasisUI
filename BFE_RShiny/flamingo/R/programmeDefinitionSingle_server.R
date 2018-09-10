@@ -10,7 +10,6 @@
 #' @importFrom DT renderDT dataTableProxy selectRows
 #' @importFrom dplyr mutate select
 #' @importFrom shinyBS toggleModal
-#' @importFrom shinyWidgets updateSliderTextInput updateRadioGroupButtons
 #' @importFrom shinyjs onclick js
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,
@@ -58,6 +57,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     prog_flag = ""
   )
 
+  workflowSteps <- callModule(singleProgrammeWorkflowSteps, "workflowsteps")
+
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
 
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
@@ -74,13 +75,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # Make sure the first view is reset to first panel
   observe(if (active()) {
-    updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "1")
+    workflowSteps$update("2")
     .reloadDPProgData()
   })
 
-  observeEvent(input$radioprogsteps, {
+  observeEvent(workflowSteps$step(), {
     switch(
-      input$radioprogsteps,
+      workflowSteps$step(),
       "1" = {
         logMessage("showing panelDefineProgramme")
         .hideDivs()
@@ -171,7 +172,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                         progId = result$DPProgData[result$DPProgData_selected_rows,1])
       if (loadprogdata == 'success' || loadprogdata == 'Success') {
         showNotification(type = "message", "Initiating load programme data...")
-        updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "2")
+        workflowSteps$update("2")
       } else {
         showNotification(type = "error", "Failed to load programme data.")
       }
@@ -497,23 +498,23 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Manage panels to show when selected row changes
   observeEvent(result$DPProgData_selected_rows, {
     if (active()) {
-      if (input$radioprogsteps == "2") {
+      if (workflowSteps$step() == "2") {
         .defaultAssociateModel()
       }
     }
     if (result$DPProgData_selected_rows != 0) {
       if (active()) {
-        if (input$radioprogsteps == "3") {
+        if (workflowSteps$step() == "3") {
           #show("panelAssociateModel")
         }
       }
       .defaultOOKSidebar()
       if (result$DPProgData[input$tableDPprog_rows_selected, "Status"] == StatusCompleted &&
-          input$radioprogsteps == "2") {
+          workflowSteps$step() == "2") {
         .defaultOOKSidebar()
       } else {
         hide("panelAssociateModel")
-        if (active() && input$radioprogsteps == "2") {
+        if (active() && workflowSteps$step() == "2") {
           showNotification(type = "warning", "Please select a completed Programme to which associate a model")
         }
       }
@@ -539,7 +540,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       showNotification(type = "message",
                        paste("Prog Oasis id:", result$progOasisId,  " created."))
       .clearOOKSidebar()
-      updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "3")
+      workflowSteps$update("3")
       .reloadPOData()
       if (result$POData_selected_rows != 0) {
         loadprogmodel <- loadProgrammeModel(apiSettings,
@@ -621,7 +622,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       if (!is.na(result$POData[result$POData_selected_rows, "Status"])) {
         if (result$POData[result$POData_selected_rows, "Status"] == StatusCompleted) {
           if (active()) {
-            if (input$radioprogsteps == "3") {
+            if (workflowSteps$step() == "3") {
               .defaultview(session)
             }
           }
@@ -983,7 +984,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                          "Process Run ID could not be generated. So process run cannot be executed.")
       } else {
         status <- runProcess(apiSettings, runId)
-        updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "4")
+        workflowSteps$update("4")
         if (grepl("success", status, ignore.case = TRUE)) {
           showNotification(type = "message",
                            sprintf("Created Process Run ID: %s and process run is executing.",
@@ -1036,7 +1037,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # If selectprogOasisID changes, reload progcess run table and set view back to default
   observeEvent(input$selectprogOasisID, {
     .reloadRunData()
-    if (input$radioprogsteps == "4") {
+    if (workflowSteps$step() == "4") {
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
       #consider cases of programmes wtithout a run process
@@ -1085,7 +1086,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         } else {
           hide("tableprocessrundata")
           hide("divprocessRunButtons")
-          if (input$radioprogsteps == "4") {
+          if (workflowSteps$step() == "4") {
             showNotification(type = "warning", "Current Programme does not have any assocated run Process")
           }
         }
@@ -1097,7 +1098,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     # reload if radio buttons for 'All' vs 'In_Progress' change
     input$radioprrunsAllOrInProgress
     if (!is.null(input$selectprogOasisID) ) {
-      if (input$radioprogsteps == "4") {
+      if (workflowSteps$step() == "4") {
         show("panelProcessRunTable")
       }
       .getProcessRunWithUserChoices(userId(), 0, 0, 0)
@@ -1681,7 +1682,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   .hiddenconfigOutputView <- function(textMessage) {
     hide("panelDefineOutputs")
     if (active()) {
-      if (input$radioprogsteps == "3") {
+      if (workflowSteps$step() == "3") {
         showNotification(type = "warning", textMessage)
       }
     }

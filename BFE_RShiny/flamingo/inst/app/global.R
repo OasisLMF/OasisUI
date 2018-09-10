@@ -88,6 +88,8 @@ defaultSelectChoicesIL <- c(
 
 
 ### Panels Programme Workflow -----
+# N.B.: checkbox values need to have type = "character", otherwise jQuery errors
+# are thrown when programmatically setting choices
 programmeWorkflowSteps <- list("Create Programme" = "1",
                                "Select Programme & Associate Model" = "2",
                                "Configure Workflow Output" = "3",

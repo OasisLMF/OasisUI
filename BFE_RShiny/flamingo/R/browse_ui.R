@@ -4,7 +4,6 @@
 #' @inheritParams flamingoModuleUI
 #' @return list of tags
 #' @importFrom DT dataTableOutput
-#' @importFrom shinyWidgets sliderTextInput
 #' @export
 browseprogrammesUI <- function(id) {
   
