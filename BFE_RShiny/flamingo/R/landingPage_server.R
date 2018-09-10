@@ -27,26 +27,17 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   inbox <- reactive({
     if (active()) {
       # reload automatically every so often
-      invalidateLater(reloadMillis) # does not seem to work as of 10/09/2018
+      invalidateLater(reloadMillis)
       # explicit refresh button
-      input$refreshInbox
+      invisible(input$refreshInbox)
       logMessage("refreshing inbox...")
-      data <- getInboxData(dbSettings, userId())
-      data %>%
+      data <- getInboxData(dbSettings, userId()) %>%
         mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
         mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
         mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
         as.data.frame()
+      data
     }
-  })
-
-  observe(if (active()) {
-    logMessage("refreshing permissions")
-    # invalidate if the refresh button updates
-    force(input$refreshInbox)
-    # reload automatically every so often
-    invalidateLater(reloadMillis, session)
-    landingPageButtonUpdate(session, dbSettings, userId())
   })
 
   output$tableInbox <- renderDataTable(if (userId() != FLAMINGO_GUEST_ID) {
@@ -171,7 +162,6 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   )
 
   moduleOutput
-
 }
 
 
@@ -239,14 +229,6 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "FM")
   })
 
-
-  ### Button permissions ----
-
-  observe(if (active()) {
-    invalidateLater(reloadMillis)
-    landingPageButtonUpdate(session, dbSettings, userId())
-  })
-
   ### Module Output ----
   moduleOutput <- c(
     outputNavigation(navigation_state),
@@ -289,26 +271,26 @@ landingPageButtonUpdate <- function(session, dbSettings, userId,
   .updateButton <- function(db_resourceId, btn_inputId) {
     permission <- flamingoDBCheckPermissions(dbSettings, userId, db_resourceId)
     if (identical(permission, character(0))) {
-      updateButton(session, btn_inputId, disabled = TRUE)
+      updateButton(session, session$ns(btn_inputId), disabled = TRUE)
     } else {
-      updateButton(session, btn_inputId, disabled = FALSE)
+      updateButton(session, session$ns(btn_inputId), disabled = TRUE)
     }
   }
 
   # Not used anywhere else, probably just forgotten
   # ("600", "abuttonenquiry")
 
-  .updateButton("700", "abuttonrun")
-  .updateButton("700", "abuttonbrowse")
+  #.updateButton("700", "abuttonrun")
+  #.updateButton("700", "abuttonbrowse")
 
-  .updateButton("904", "abuttonuseradmin")
+  # .updateButton("904", "abuttonuseradmin")
 
   # Not used anywhere else, probably just forgotten
   # ("950", "abuttonworkflowadmin")
 
   .updateButton("200", "abuttonsysconf")
 
-  .updateButton("300", "abuttonfilemngt")
+  #.updateButton("300", "abuttonfilemngt")
 
   invisible()
 }
