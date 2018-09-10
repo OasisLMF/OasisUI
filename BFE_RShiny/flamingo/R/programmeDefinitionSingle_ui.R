@@ -2,34 +2,34 @@
 #' @description UI/View for the process run page
 #' @inheritParams flamingoModuleUI
 #' @return list of tags
-#' @importFrom DT dataTableOutput
+#' @importFrom DT DTOutput
 #' @importFrom shinyWidgets sliderTextInput panel
 #' @importFrom shinyjs hidden
 #' @importFrom shinyBS bsModal
 #' @importFrom shinyWidgets radioGroupButtons
 #' @export
 programmeDefinitionSingleUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   tagList(
     sliderInputBlock(id),
-    
+
     #Modals
     bsModal(ns("bsmodalsaveoutput"), "Save Configuration", trigger = "", size = "small",
             textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
             actionButton(inputId = ns("abuttonsubmitoutput"), label = "Submit", class = "btn btn-primary")
     ),
     bsModal(ns("bsmodalviewSLfile"), "Source Location File View", trigger = "", size = "large",
-            dataTableOutput(ns("tableviewSLfile"))
+            DTOutput(ns("tableviewSLfile"))
     ),
     bsModal(ns("bsmodalviewSAfile"), "Source Account File View", trigger = "", size = "large",
-            dataTableOutput(ns("tableviewSAfile"))
+            DTOutput(ns("tableviewSAfile"))
     ),
-    
+
     # Hidden/visible panels
     hidden(div(id = ns("panelProgrammeTable"), panelProgrammeTable(id))),
-    div(id = ns("panelDefineProgramme"), panelDefineProgramme(id)), 
+    div(id = ns("panelDefineProgramme"), panelDefineProgramme(id)),
     hidden(div(id = ns("panelProgrammeDetails"), panelProgrammeDetails(id))),
     hidden(div(id = ns("panelAssociateModel"), panelAssociateModel(id))),
     hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
@@ -41,7 +41,7 @@ programmeDefinitionSingleUI <- function(id) {
   )
 }
 
-# Functions for UI Panels ------------------------------------------------------------------------------  
+# Functions for UI Panels ------------------------------------------------------------------------------
 
 
 #' Function wrapping slider input
@@ -66,7 +66,7 @@ sliderInputBlock <- function(id){
 
 #'  Function defining panel elements to define a programme
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 defineProgramme <- function(id){
@@ -79,9 +79,9 @@ defineProgramme <- function(id){
              textInput(inputId = ns("tinputDPProgName"), label = "Programme Name")),
       column(4,
              selectInput(inputId = ns("sinputTransformname"), label = "Transform Name", choices = ""),
-             bsTooltip(ns("sinputTransformname"), 
-                       programme_Definition_Single$sinputTransformname, 
-                       placement = "right", 
+             bsTooltip(ns("sinputTransformname"),
+                       programme_Definition_Single$sinputTransformname,
+                       placement = "right",
                        options   = list(container = "body")))),
     fluidRow(column(4,
                     actionButton(ns("abuttonProgSubmit"), "Create Programme", class = "btn btn-primary"))),
@@ -115,13 +115,13 @@ defineProgramme <- function(id){
 }
 
 #' Function wrapping panel to create/ammend programme
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 panelDefineProgramme <-  function(id){
   ns <- NS(id)
   panel(
-    heading = fluidRow(column(11, h4("Define Programme")), 
+    heading = fluidRow(column(11, h4("Define Programme")),
                        column(1, align = "right",  actionButton(inputId = ns("abuttonhidedefineprogpanel"), label = NULL, icon = icon("times")))),
     defineProgramme(id)
   )
@@ -129,15 +129,16 @@ panelDefineProgramme <-  function(id){
 
 #' Function wrapping panel to show created programmes table
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
+#' @importFrom DT DTOutput
 #' @export
 panelProgrammeTable <-  function(id){
   ns <- NS(id)
   panel(
-    heading = fluidRow(column(10, h4("Programme Table")), 
+    heading = fluidRow(column(10, h4("Programme Table")),
                        column(2, align = "right", actionButton(inputId = ns("abuttonprgtblrfsh"), label = "Refresh"))),
-    dataTableOutput(ns("tableDPprog")),
+    DTOutput(ns("tableDPprog")),
     actionButton(ns("buttonamendpr"), "Amend Programme", class = "btn btn-primary", align = "centre"),
     actionButton(ns("buttondeletepr"), "Delete Programme", class = "btn btn-primary", align = "right"),
     actionButton(ns("buttonprogdetails"), "Show Programme Details", class = "btn btn-primary", align = "right")
@@ -146,23 +147,24 @@ panelProgrammeTable <-  function(id){
 
 #' Function wrapping panel to show programme details table
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
+#' @importFrom DT DTOutput
 #' @export
 panelProgrammeDetails <-  function(id){
   ns <- NS(id)
   panel(
     heading = fluidRow(column(10, h4("Programme Details")),
-                       column(2, align = "right", 
+                       column(2, align = "right",
                               actionButton(inputId = ns("abuttondefprogrfsh"), label = "Refresh"),
                               actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times")))),
-    dataTableOutput(ns("tableprogdetails"))
+    DTOutput(ns("tableprogdetails"))
   )
 }
 
 #' Function wrapping panel to associate model
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 panelAssociateModel <- function(id){
@@ -176,40 +178,40 @@ panelAssociateModel <- function(id){
              selectInput(ns("sinputookmodelid"), "Model:", choices = c(""))),
       column(4,
              selectInput(ns("sinputProgModTransform"), "Transform Name", choices = ""),
-             bsTooltip(ns("sinputProgModTransform"), 
-                       programme_Definition_Single$sinputProgModTransform, 
-                       placement = "right", 
+             bsTooltip(ns("sinputProgModTransform"),
+                       programme_Definition_Single$sinputProgModTransform,
+                       placement = "right",
                        options   = list(container = "body")))),
-    
+
     actionButton(inputId = ns("abuttoncrprogoasis"), label = "Create", class = "btn btn-primary")
   )
 }
 
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 panelDefineIDs <-  function(id){
   ns <- NS(id)
-  
+
   panel(
     status = "primary",
     #heading = fluidRow(column(11, h4("Filter"))),
     fluidRow(
-      div(id = ns("divselectprogrammeID"), 
+      div(id = ns("divselectprogrammeID"),
           column(3,
                  selectInput(inputId =  ns("selectprogrammeID"), label = "Programme ID", choices = "", selected = NULL),
-                 bsTooltip(ns("selectprogrammeID"), 
-                           programme_Definition_Single$selectprogrammeID, 
-                           placement = "right", 
+                 bsTooltip(ns("selectprogrammeID"),
+                           programme_Definition_Single$selectprogrammeID,
+                           placement = "right",
                            options   = list(container = "body")))),
-      hidden(div(id = ns("divselectprogOasisID"), 
+      hidden(div(id = ns("divselectprogOasisID"),
                  column(3,
                         selectInput(inputId =  ns("selectprogOasisID"), label = "Oasis Programme ID", choices = "", selected = NULL),
-                        bsTooltip(ns("selectprogOasisID"), 
-                                  programme_Definition_Single$selectprogOasisID, 
-                                  placement = "right", 
+                        bsTooltip(ns("selectprogOasisID"),
+                                  programme_Definition_Single$selectprogOasisID,
+                                  placement = "right",
                                   options   = list(container = "body")))))
     )
   )
@@ -217,44 +219,46 @@ panelDefineIDs <-  function(id){
 
 #' Function wrapping panel to show created programme model table
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
+#' @importFrom DT DTOutput
 #' @export
 panelProgrammeModelTable <-  function(id){
   ns <- NS(id)
   panel(
-    heading = fluidRow(column(10, h4("Programme Model Table")), 
+    heading = fluidRow(column(10, h4("Programme Model Table")),
                        column(2, align = "right",  actionButton(inputId = ns("abuttonookrefresh"), label = "Refresh"))),
-    dataTableOutput(ns("tableProgOasisOOK")),
+    DTOutput(ns("tableProgOasisOOK")),
     fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Programme Model Details", class = "btn btn-primary"), align = "right"))
   )
 }
 
 #' Function wrapping panel to show programme details table
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
+#' @importFrom DT DTOutput
 #' @export
 panelModelDetails <-  function(id){
   ns <- NS(id)
   panel(
-    heading = fluidRow(column(10, h4("Programme Model Details")), 
-                       column(2, align = "right", 
+    heading = fluidRow(column(10, h4("Programme Model Details")),
+                       column(2, align = "right",
                               actionButton(inputId = ns("abuttonprgoasisrfsh"), label = "Refresh"),
                               actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times")))),
-    dataTableOutput(ns("tabledisplayprogoasisfiles"))
+    DTOutput(ns("tabledisplayprogoasisfiles"))
   )
 }
 
 #' Function wrapping panel to define outputs
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 panelDefineOutputs <-  function(id){
   ns <- NS(id)
   panel(
-    heading = fluidRow(column(10, h4("Define Programme Output")), 
+    heading = fluidRow(column(10, h4("Define Programme Output")),
                        column(2, align = "right",  hidden(actionButton(inputId = ns("abuttonehidepanelconfigureoutput"), label = NULL, icon = icon("times"))))),
     fluidRow(
       column(4,
@@ -270,7 +274,7 @@ panelDefineOutputs <-  function(id){
 
 #' Function wrapping sub-panel to define outputs details
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 panelDefineOutputsDetails <-  function(id){
@@ -302,7 +306,7 @@ panelDefineOutputsDetails <-  function(id){
 
 #' Function wrapping sub-panel to define outputs configuration
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 panelDefineOutputConfiguration <-  function(id){
@@ -311,7 +315,7 @@ panelDefineOutputConfiguration <-  function(id){
     heading = fluidRow(column(11, h4("Output Configuration"))),
     checkboxInput(ns("chkinputGUL"), label = "Ground Up Loss", value = TRUE),
     hidden(div(id = ns("configureAdvancedGUL"), configureAdvancedGUL(id))),
-    checkboxInput(ns("chkinputIL"), label = "Insured Loss", value = FALSE), 
+    checkboxInput(ns("chkinputIL"), label = "Insured Loss", value = FALSE),
     hidden(div(id = ns("configureAdvancedIL"), configureAdvancedIL(id))),
     actionButton(inputId = ns("abtnadvanced"), label = "Advanced", class = "btn btn-primary"),
     hidden(actionButton(inputId = ns("abtnbasic"), label = "Basic", class = "btn btn-primary")),
@@ -322,38 +326,38 @@ panelDefineOutputConfiguration <-  function(id){
 
 #' Function wrapping sub-panel to define outputs advanced configuration GUL
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 configureAdvancedGUL <-  function(id){
   ns <- NS(id)
   fluidRow(
-    # Few outputs commented/disabled for the first release. To be enabled for later releases.  
+    # Few outputs commented/disabled for the first release. To be enabled for later releases.
     column(4,
            h4("Ground Up Loss", class = "flamingo-loss"),
-           h5("Full Sample", class = "flamingo-measure"), 
+           h5("Full Sample", class = "flamingo-measure"),
            h5("ELT", class = "flamingo-measure"),
-           tags$div(class = "h5-align", h5("AEP", class = "flamingo-measure")), 
+           tags$div(class = "h5-align", h5("AEP", class = "flamingo-measure")),
            tags$div(class = "h5-align", h5("OEP", class = "flamingo-measure")),
            tags$div(class = "h5-align", h5("Multi AEP", class = "flamingo-measure")),
            h5("Multi OEP", class = "flamingo-measure"),
            # h5("WS Mean AEP", class = "flamingo-measure"),
            # tags$div(class = "h5-align", h5("WS Mean OEP", class = "flamingo-measure")),
            # tags$div(class = "h5-align", h5("Sample Mean AEP", class = "flamingo-measure")),
-           # h5("Sample Mean OEP", class = "flamingo-measure"), 
+           # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-    
+
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkgulprog"),
-                                label = h6("Prog", class = "flamingo-granularity"), 
+                                label = h6("Prog", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "gulprogSummary",
                                   " " = "gulprogELT",
                                   " " = "gulprogFullUncAEP",
                                   " " = "gulprogFullUncOEP",
                                   " " = "gulprogAEPWheatsheaf",
-                                  " " = "gulprogOEPWheatsheaf", 
+                                  " " = "gulprogOEPWheatsheaf",
                                   # " " = "gulprogMeanAEPWheatsheaf",
                                   # " " = "gulprogMeanOEPWheatsheaf",
                                   # " " = "gulprogSampleMeanAEP",
@@ -361,16 +365,16 @@ configureAdvancedGUL <-  function(id){
                                   " " = "gulprogAAL",
                                   " " = "gulprogPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulstate"),
-                                label = h6("State", class = "flamingo-granularity"), 
+                                label = h6("State", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "gulstateSummary",
                                   " " = "gulstateELT",
                                   " " = "gulstateFullUncAEP",
                                   " " = "gulstateFullUncOEP",
                                   " " = "gulstateAEPWheatsheaf",
-                                  " " = "gulstateOEPWheatsheaf", 
+                                  " " = "gulstateOEPWheatsheaf",
                                   # " " = "gulstateMeanAEPWheatsheaf",
                                   # " " = "gulstateMeanOEPWheatsheaf",
                                   # " " = "gulstateSampleMeanAEP",
@@ -378,16 +382,16 @@ configureAdvancedGUL <-  function(id){
                                   " " = "gulstateAAL",
                                   " " = "gulstatePLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulcounty"),
-                                label = h6("County", class = "flamingo-granularity"), 
+                                label = h6("County", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "gulcountySummary",
                                   " " = "gulcountyELT",
                                   " " = "gulcountyFullUncAEP",
                                   " " = "gulcountyFullUncOEP",
                                   " " = "gulcountyAEPWheatsheaf",
-                                  " " = "gulcountyOEPWheatsheaf", 
+                                  " " = "gulcountyOEPWheatsheaf",
                                   # " " = "gulcountyMeanAEPWheatsheaf",
                                   # " " = "gulcountyMeanOEPWheatsheaf",
                                   # " " = "gulcountySampleMeanAEP",
@@ -395,9 +399,9 @@ configureAdvancedGUL <-  function(id){
                                   " " = "gulcountyAAL",
                                   " " = "gulcountyPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulloc"),
-                                label = h6("Location", class = "flamingo-granularity"), 
+                                label = h6("Location", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "gullocSummary",
                                   " " = "gullocELT",
@@ -405,40 +409,40 @@ configureAdvancedGUL <-  function(id){
                                   " " = "gullocFullUncOEP",
                                   " " = "gullocAEPWheatsheaf",
                                   " " = "gullocOEPWheatsheaf",
-                                  # " " = "gullocMeanAEPWheatsheaf", 
-                                  # " " = "gullocMeanOEPWheatsheaf", 
+                                  # " " = "gullocMeanAEPWheatsheaf",
+                                  # " " = "gullocMeanOEPWheatsheaf",
                                   # " " = "gullocSampleMeanAEP",
                                   # " " = "gullocSampleMeanOEP",
                                   " " = "gullocAAL",
                                   " " = "gullocPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgullob"),
-                                label = h6("LOB", class = "flamingo-granularity"), 
+                                label = h6("LOB", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "gullobSummary",
                                   " " = "gullobELT",
                                   " " = "gullobFullUncAEP",
                                   " " = "gullobFullUncOEP",
                                   " " = "gullobAEPWheatsheaf",
-                                  " " = "gullobOEPWheatsheaf", 
+                                  " " = "gullobOEPWheatsheaf",
                                   # " " = "gullobMeanAEPWheatsheaf",
                                   # " " = "gullobMeanOEPWheatsheaf",
-                                  # " " = "gullobSampleMeanAEP", 
+                                  # " " = "gullobSampleMeanAEP",
                                   # " " = "gullobSampleMeanOEP",
                                   " " = "gullobAAL",
                                   " " = "gullobPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulpolicy"),
-                                label = h6("Policy", class = "flamingo-granularity"), 
+                                label = h6("Policy", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "gulpolicySummary",
                                   " " = "gulpolicyELT",
                                   " " = "gulpolicyFullUncAEP",
                                   " " = "gulpolicyFullUncOEP",
                                   " " = "gulpolicyAEPWheatsheaf",
-                                  " " = "gulpolicyOEPWheatsheaf",  
+                                  " " = "gulpolicyOEPWheatsheaf",
                                   # " " = "gulpolicyMeanAEPWheatsheaf",
                                   # " " = "gulpolicyMeanOEPWheatsheaf",
                                   # " " = "gulpolicySampleMeanAEP",
@@ -451,7 +455,7 @@ configureAdvancedGUL <-  function(id){
 
 #' Function wrapping sub-panel to define outputs advanced configuration IL
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @export
 configureAdvancedIL <-  function(id){
@@ -459,29 +463,29 @@ configureAdvancedIL <-  function(id){
   fluidRow(
     column(4,
            h4("Insured Loss", class = "flamingo-loss"),
-           h5("Full Sample", class = "flamingo-measure"), 
+           h5("Full Sample", class = "flamingo-measure"),
            h5("ELT", class = "flamingo-measure"),
-           tags$div(class = "h5-align", h5("AEP", class = "flamingo-measure")), 
+           tags$div(class = "h5-align", h5("AEP", class = "flamingo-measure")),
            tags$div(class = "h5-align", h5("OEP", class = "flamingo-measure")),
            tags$div(class = "h5-align", h5("Multi AEP", class = "flamingo-measure")),
-           h5("Multi OEP", class = "flamingo-measure"),  
+           h5("Multi OEP", class = "flamingo-measure"),
            # h5("WS Mean AEP", class = "flamingo-measure"),
-           # tags$div(class = "h5-align", h5("WS Mean OEP", class = "flamingo-measure")),  
+           # tags$div(class = "h5-align", h5("WS Mean OEP", class = "flamingo-measure")),
            # tags$div(class = "h5-align", h5("Sample Mean AEP", class = "flamingo-measure")),
-           # h5("Sample Mean OEP", class = "flamingo-measure"), 
+           # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align",h5("PLT", class = "flamingo-measure"))),
-    
-    tags$div(class = "multicol", 
+
+    tags$div(class = "multicol",
              checkboxGroupInput(ns("chkilprog"),
-                                label = h6("Prog", class = "flamingo-granularity"), 
+                                label = h6("Prog", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "ilprogSummary",
                                   " " = "ilprogELT",
                                   " " = "ilprogFullUncAEP",
                                   " " = "ilprogFullUncOEP",
                                   " " = "ilprogAEPWheatsheaf",
-                                  " " = "ilprogOEPWheatsheaf",  
+                                  " " = "ilprogOEPWheatsheaf",
                                   # " " = "ilprogMeanAEPWheatsheaf",
                                   # " " = "ilprogMeanOEPWheatsheaf",
                                   # " " = "ilprogSampleMeanAEP",
@@ -489,48 +493,48 @@ configureAdvancedIL <-  function(id){
                                   " " = "ilprogAAL",
                                   " " = "ilprogPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilstate"),
-                                label = h6("State", class = "flamingo-granularity"), 
+                                label = h6("State", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "ilstateSummary",
                                   " " = "ilstateELT",
                                   " " = "ilstateFullUncAEP",
                                   " " = "ilstateFullUncOEP",
                                   " " = "ilstateAEPWheatsheaf",
-                                  " " = "ilstateOEPWheatsheaf", 
-                                  # " " = "ilstateMeanAEPWheatsheaf", 
-                                  # " " = "ilstateMeanOEPWheatsheaf", 
-                                  # " " = "ilstateSampleMeanAEP", 
+                                  " " = "ilstateOEPWheatsheaf",
+                                  # " " = "ilstateMeanAEPWheatsheaf",
+                                  # " " = "ilstateMeanOEPWheatsheaf",
+                                  # " " = "ilstateSampleMeanAEP",
                                   # " " = "ilstateSampleMeanOEP",
                                   " " = "ilstateAAL", " " = "ilstatePLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilcounty"),
-                                label = h6("County", class = "flamingo-granularity"), 
+                                label = h6("County", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "ilcountySummary",
                                   " " = "ilcountyELT",
                                   " " = "ilcountyFullUncAEP",
                                   " " = "ilcountyFullUncOEP",
                                   " " = "ilcountyAEPWheatsheaf",
-                                  " " = "ilcountyOEPWheatsheaf", 
+                                  " " = "ilcountyOEPWheatsheaf",
                                   # " " = "ilcountyMeanAEPWheatsheaf",
                                   # " " = "ilcountyMeanOEPWheatsheaf",
                                   # " " = "ilcountySampleMeanAEP",
                                   # " " = "ilcountySampleMeanOEP",
                                   " " = "ilcountyAAL", " " = "ilcountyPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilloc"),
-                                label = h6("Location", class = "flamingo-granularity"), 
+                                label = h6("Location", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "illocSummary",
                                   " " = "illocELT",
                                   " " = "illocFullUncAEP",
                                   " " = "illocFullUncOEP",
                                   " " = "illocAEPWheatsheaf",
-                                  " " = "illocOEPWheatsheaf", 
+                                  " " = "illocOEPWheatsheaf",
                                   # " " = "illocMeanAEPWheatsheaf",
                                   # " " = "illocMeanOEPWheatsheaf",
                                   # " " = "illocSampleMeanAEP",
@@ -538,16 +542,16 @@ configureAdvancedIL <-  function(id){
                                   " " = "illocAAL",
                                   " " = "illocPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkillob"),
-                                label = h6("LOB", class = "flamingo-granularity"), 
+                                label = h6("LOB", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "illobSummary",
                                   " " = "illobELT",
                                   " " = "illobFullUncAEP",
                                   " " = "illobFullUncOEP",
                                   " " = "illobAEPWheatsheaf",
-                                  " " = "illobOEPWheatsheaf", 
+                                  " " = "illobOEPWheatsheaf",
                                   # " " = "illobMeanAEPWheatsheaf",
                                   # " " = "illobMeanOEPWheatsheaf",
                                   # " " = "illobSampleMeanAEP",
@@ -555,16 +559,16 @@ configureAdvancedIL <-  function(id){
                                   " " = "illobAAL",
                                   " " = "illobPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilpolicy"),
-                                label = h6("Policy", class = "flamingo-granularity"), 
+                                label = h6("Policy", class = "flamingo-granularity"),
                                 choices = list(
                                   " " = "ilpolicySummary",
                                   " " = "ilpolicyELT",
                                   " " = "ilpolicyFullUncAEP",
                                   " " = "ilpolicyFullUncOEP",
                                   " " = "ilpolicyAEPWheatsheaf",
-                                  " " = "ilpolicyOEPWheatsheaf", 
+                                  " " = "ilpolicyOEPWheatsheaf",
                                   # " " = "ilpolicyMeanAEPWheatsheaf",
                                   # " " = "ilpolicyMeanOEPWheatsheaf",
                                   # " " = "ilpolicySampleMeanAEP",
@@ -578,19 +582,20 @@ configureAdvancedIL <-  function(id){
 
 #' Function wrapping panel to show process run table
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
+#' @importFrom DT DTOutput
 #' @export
 panelProcessRunTable <-  function(id){
   ns <- NS(id)
   panel(
-    heading = fluidRow(column(10, h4("Process Runs")), 
+    heading = fluidRow(column(10, h4("Process Runs")),
                        column(2, align = "right",  actionButton(inputId = ns("abuttonrefreshprrun"), label = "Refresh"))),
     div(id = "divProcessRun",
-        fluidRow(column(12, 
+        fluidRow(column(12,
                         radioButtons(inputId = ns("radioprrunsAllOrInProgress"), "Processes' Status", list("All", "In_Progress"), inline = TRUE))),
-        dataTableOutput(ns("tableprocessrundata")),
-        fluidRow(column(12, 
+        DTOutput(ns("tableprocessrundata")),
+        fluidRow(column(12,
                         div(id = ns("divprocessRunButtons"),
                             actionButton(inputId = ns("abuttondisplayoutput"), label = "Go To Display Output", class = "btn btn-primary"),
                             actionButton(inputId = ns("abuttonrerunpr"), label = "Rerun", class = "btn btn-primary"),
@@ -602,16 +607,17 @@ panelProcessRunTable <-  function(id){
 
 #' Function wrapping panel to show Process Run logs table
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel 
+#' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
+#' @importFrom DT DTOutput
 #' @export
 panelProcessRunLogs <-  function(id){
   ns <- NS(id)
   panel(
-    heading = fluidRow(column(10, h4("Process Run Logs")), 
-                       column(2, align = "right", 
+    heading = fluidRow(column(10, h4("Process Run Logs")),
+                       column(2, align = "right",
                               actionButton(inputId = ns("abuttonrefreshprrunlogs"), label = "Refresh"),
                               actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times")))),
-    dataTableOutput(ns("tablelog"))
+    DTOutput(ns("tablelog"))
   )
 }

@@ -7,7 +7,7 @@
 #' @template return-outputNavigation
 #' @rdname programmeDefinitionSingle
 #' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDataTable dataTableProxy selectRows
+#' @importFrom DT renderDT dataTableProxy selectRows
 #' @importFrom dplyr mutate select
 #' @importFrom shinyBS toggleModal
 #' @importFrom shinyWidgets updateSliderTextInput updateRadioGroupButtons
@@ -29,7 +29,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   result <- reactiveValues(
     #reactive values for the programme table
     DPProgData = NULL,
-    DPProgDataCounter = 0,
     DPProgData_selected_rows = 0,
     # SL file to view
     viewSLfile = NULL,
@@ -59,16 +58,24 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     prog_flag = ""
   )
 
-
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
 
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
 
+  # Newly created account needs to be added to choices
+  observe(if (active()) {
+    accounts <- getAccountName(dbSettings)
+    updateSelectInput(session, "sinputDPAccountName",
+                      choices = createSelectOptions(accounts, "Select Account"),
+                      selected = isolate(input$sinputDPAccountName))
+  })
+
   # Panels switch ------------------------------------------------------------
 
-  #Make sure the first view is reset to first panel
+  # Make sure the first view is reset to first panel
   observe(if (active()) {
     updateRadioGroupButtons(session, inputId = "radioprogsteps", selected = "1")
+    .reloadDPProgData()
   })
 
   observeEvent(input$radioprogsteps, {
@@ -83,7 +90,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         logMessage("showing panelProgrammeTable panelAssociateModel")
         .hideDivs()
         .defaultAssociateModel()
-        .reloadDPProgData()
+        #.reloadDPProgData()
       },
       "3" = {
         logMessage("showing panelDefineIDs panelProgrammeModelTable panelDefineOutputs")
@@ -104,27 +111,33 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   ### Submit Button
   onclick("abuttonProgSubmit", {
+    idxSel <- 1
     if (result$prog_flag == "C") {
-      query <- paste0("exec dbo.createProg [",input$tinputDPProgName,
-                      "],",input$sinputDPAccountName,", [",input$sinputTransformname,"]")
+      query <- paste0("exec dbo.createProg [", input$tinputDPProgName,
+                      "],", input$sinputDPAccountName, ", [",
+                      input$sinputTransformname, "]")
       res <- executeDbQuery(dbSettings, query)
       if (is.null(res)) {
         showNotification(type = "error",
                          paste("Failed to create a Programme - ", input$tinputDPProgName))
-      } else{
+      } else {
         showNotification(type = "message",
                          paste("Programme ", input$tinputDPProgName, " created."))
       }
     } else {
       if (result$prog_flag == "A" & result$DPProgData_selected_rows != 0) {
-        query <- paste0("exec dbo.updateProg ", result$DPProgData[result$DPProgData_selected_rows,1],",[",input$tinputDPProgName,"],", input$sinputDPAccountName,", [",input$sinputTransformname,"]")
+        idxSel <- input$tableDPprog_rows_selected
+        query <- paste0("exec dbo.updateProg ", result$DPProgData[result$DPProgData_selected_rows, 1],
+                        ",[", input$tinputDPProgName,"],", input$sinputDPAccountName,
+                        ", [", input$sinputTransformname, "]")
         res <- executeDbQuery(dbSettings, query)
+        message(paste("A res is:", res))
         if (is.null(res)) {
           showNotification(type = "error",
-                           paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected,2]))
-        } else{
+                           paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, 2]))
+        } else {
           showNotification(type = "message",
-                           paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected,2], " amended."))
+                           paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, 2], " amended."))
         }
       } else {
         showNotification(type = "warning",
@@ -136,10 +149,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     .reloadDPProgData()
     # update result$DPProgDataCounter --> a) reload table result$DPProgData, ### b) update result$DPProgData_selected_rows
     ### b2) update selectprogrammeID drop-down --> selectRows(dataTableProxy("tableDPprog"),rowToSelect), update tableDPprog_rows_selected, .reloadPOData()
-    # a2) [498], update selectprogrammeID drop-down through observe() --> selectRows(dataTableProxy("tableDPprog"),rowToSelect), update tableDPprog_rows_selected, .reloadPOData()
+    # a2) [498], update selectprogrammeID drop-down through observeEvent() --> selectRows(dataTableProxy("tableDPprog"), rowToSelect), update tableDPprog_rows_selected, .reloadPOData()
     ### update result$DPProgData_selected_rows
-
-    # invisible(selectRows(dataTableProxy("tableDPprog"), 1))
+    logMessage(paste("updating tableDPprog select because programme table was reloaded:", idxSel))
+    selectRows(dataTableProxy("tableDPprog"), idxSel)
+    logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
   })
 
   ### Clear Programme Definition panel
@@ -322,7 +336,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  output$tableviewSLfile <- renderDataTable({
+  output$tableviewSLfile <- renderDT({
     if (!is.null(result$viewSLfile)) {
       datatable(
         result$viewSLfile,
@@ -347,7 +361,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  output$tableviewSAfile <- renderDataTable({
+  output$tableviewSAfile <- renderDT({
     if (!is.null(result$viewSAfile)) {
       datatable(
         result$viewSAfile,
@@ -365,43 +379,29 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Panel Associate Model -----------------------------------------------------
 
   ### > Programme Table ------
-
-  # Data Programme Table
-  observe(if (active()) {
-
-    # reload after reloadDPProgData is called
-    result$DPProgDataCounter
-
-    stmt <- buildDbQuery("getProgData")
-    DPProgData <- executeDbQuery(dbSettings, stmt)
-    if (!is.null(DPProgData)) {
-      result$DPProgData <- DPProgData %>%
-        mutate(Status = replace(Status, Status == "Failed" | is.na(Status), StatusFailed)) %>%
-        mutate(Status = replace(Status, Status != "Loaded" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
-        mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
-        as.data.frame()
-      logMessage("programme table refreshed")
-    }
-  })
-
-  output$tableDPprog <- renderDataTable({
-    if (!is.null(result$DPProgData)) {
-      if (input$selectprogrammeID != "") {
-        rowToSelect <- which(result$DPProgData[1:nrow(result$DPProgData),1] == input$selectprogrammeID)
+  output$tableDPprog <- renderDT({
+    dtOut <- result$DPProgData
+    logMessage("re-rendering programme table")
+    if (!is.null(dtOut)) {
+      if (isolate(input$selectprogrammeID) != "") {
+        rowToSelect <- which(dtOut[, 1] == isolate(input$selectprogrammeID))
       } else {
         rowToSelect <- 1
       }
       datatable(
-        result$DPProgData,
+        dtOut,
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'single',
-                         selected = rownames(result$DPProgData)[rowToSelect]),
+                         selected = rowToSelect,
+                         target = 'row'),
         colnames = c('Row Number' = 1),
         options = .getPRTableOptions()
       )
+    } else {
+      NULL
     }
   })
 
@@ -423,7 +423,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  #Hide Programme Definition Panel
+  # Hide Programme Definition Panel
   onclick("abuttonhidedefineprogpanel", {
     hide("panelDefineProgramme")
     hide("abuttonhidedefineprogpanel")
@@ -469,7 +469,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
 
-  output$tableprogdetails <- renderDataTable({
+  output$tableprogdetails <- renderDT({
     datatable(
       result$progDetails,
       class = "flamingo-table display",
@@ -504,7 +504,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (result$DPProgData_selected_rows != 0) {
       if (active()) {
         if (input$radioprogsteps == "3") {
-          show("panelAssociateModel")
+          #show("panelAssociateModel")
         }
       }
       .defaultOOKSidebar()
@@ -512,10 +512,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
           input$radioprogsteps == "2") {
         .defaultOOKSidebar()
       } else {
-        if (active()) {
+        hide("panelAssociateModel")
+        if (active() && input$radioprogsteps == "2") {
           showNotification(type = "warning", "Please select a completed Programme to which associate a model")
         }
-        hide("panelAssociateModel")
       }
     } else {
       hide("panelAssociateModel")
@@ -566,7 +566,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   #     #if (input$selectprogrammeID == "") {
   #       # if (preselProcId() != -1) {
   #       #   if (!is.null(result$POData)) {
-  #       #     index <- match(c(preselProcId()), result$POData[[1]]) 
+  #       #     index <- match(c(preselProcId()), result$POData[[1]])
   #       #   }
   #       #   index <- 1
   #       # } else {
@@ -593,30 +593,31 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   # Preselect selectprogrammeID
-  observeEvent(result$DPProgData_selected_rows, {
-    if (result$DPProgData_selected_rows != 0) {
-      prgId <- result$DPProgData[result$DPProgData_selected_rows,1]
-      logMessage(paste0("updating selectprogrammeID because selection in programme table changed to ",  result$DPProgData_selected_rows))
-      updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[, 1], selected = prgId)
-    }
-  })
+  # observeEvent(result$DPProgData_selected_rows, {
+  #   if (result$DPProgData_selected_rows != 0) {
+  #     prgId <- result$DPProgData[result$DPProgData_selected_rows, 1]
+  #     logMessage(paste0("updating selectprogrammeID because selection in programme table changed to ",  result$DPProgData_selected_rows))
+  #     updateSelectInput(session, inputId = "selectprogrammeID", selected = prgId)
+  #   }
+  # })
 
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(input$selectprogrammeID, {
-    show("buttonmodeldetails")
-    hide("panelModelDetails")
-    if (!is.null(result$DPProgData)) {
-      rowToSelect <- which(result$DPProgData[1:nrow(result$DPProgData),1] == input$selectprogrammeID)
-      selectRows(dataTableProxy("tableDPprog"),rowToSelect)
+    if (active()) {
+      show("buttonmodeldetails")
+      hide("panelModelDetails")
+      logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
+      if (!is.null(result$DPProgData)) {
+         rowToSelect <- which(result$DPProgData[, 1] == input$selectprogrammeID)
+         selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+      }
+      .reloadPOData()
     }
-    .reloadPOData()
   })
 
-  # Manage what to show based on  status of row selected in programme Model table
-  observe({
-    result$PODataCounter
-    result$POData_selected_rows
-    if(result$POData_selected_rows != 0 & !is.null(result$POData)) {
+  # Output configuration: manage what to show based on  status of row selected in programme Model table
+  observeEvent(result$POData_selected_rows, {
+    if (result$POData_selected_rows != 0 & !is.null(result$POData)) {
       if (!is.na(result$POData[result$POData_selected_rows, "Status"])) {
         if (result$POData[result$POData_selected_rows, "Status"] == StatusCompleted) {
           if (active()) {
@@ -624,7 +625,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
               .defaultview(session)
             }
           }
-          #Show perils according to programme
+          # Show perils according to programme
           prtable <- getProcessData(dbSettings, userId(), 0, 0, 0)
           procId <- toString(prtable[result$POData_selected_rows, 1][length(prtable[result$POData_selected_rows, 1])])
           paramlist <- executeDbQuery(dbSettings,
@@ -651,7 +652,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   ### > Programme Model Table (previously OOK) ----
-  observeEvent(result$PODataCounter,{
+  observeEvent(result$PODataCounter, {
     if (!is.null(input$selectprogrammeID)) {
       POData <- getProgOasisForProgdata(dbSettings, input$selectprogrammeID)
       if (!is.null(POData)) {
@@ -671,7 +672,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
 
-  # Manage what to show based on  rows being selected in programme Model table
+  # Manage what to show based on rows being selected in programme Model table
   observeEvent(result$POData_selected_rows, {
     if (result$POData_selected_rows != 0) {
       .reloadProgFiles()
@@ -686,7 +687,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  output$tableProgOasisOOK <- renderDataTable(
+  output$tableProgOasisOOK <- renderDT(
     if (!is.null(result$POData)) {
       datatable(
         result$POData,
@@ -695,11 +696,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'single',
-                         selected = rownames( result$POData)[1]),
+                         selected = rownames(result$POData)[1]),
         colnames = c('Row Number' = 1),
         options = .getPRTableOptions()
       )
-    })
+    }
+  )
 
 
   # > Model Details Table -----
@@ -726,7 +728,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  output$tabledisplayprogoasisfiles <- renderDataTable(
+  output$tabledisplayprogoasisfiles <- renderDT(
     if (!is.null(result$progFiles)) {
       datatable(
         result$progFiles,
@@ -1012,27 +1014,27 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   #     result$POData_selected_rows <- 1
   #   }
   # })
-  
+
   # Add choices possibilities to selectprogOasisID
-  observeEvent(result$PODataCounter, {
+  observeEvent(result$POData, {
     if (active()) {
-      if ( !is.null(result$POData) & input$selectprogrammeID != "") {
-        logMessage(paste0("updating selectprogOasisID choices based on Programme Model Table"))
-        updateSelectInput(session, inputId = "selectprogOasisID", choices = result$POData[1:nrow(result$POData),1])
-      } 
+      if (!is.null(result$POData) & input$selectprogrammeID != "") {
+        logMessage(paste("updating selectprogOasisID choices based on Programme Model Table"))
+        updateSelectInput(session, inputId = "selectprogOasisID", choices = result$POData[, 1])
+      }
     }
   })
 
   # Preselect selectprogOasisID
-  observeEvent(result$POData_selected_rows, {
-    if (result$POData_selected_rows != 0 ) {
-      prgId <- result$POData[input$tableProgOasisOOK_rows_selected,1]
-      updateSelectInput(session, inputId = "selectprogOasisID", choices = result$POData[1:nrow(result$POData),1], selected = prgId)
-    }
-  })
+  # observeEvent(result$POData_selected_rows, {
+  #   if (result$POData_selected_rows != 0 ) {
+  #     prgId <- result$POData[input$tableProgOasisOOK_rows_selected,1]
+  #     updateSelectInput(session, inputId = "selectprogOasisID", choices = result$POData[, 1], selected = prgId)
+  #   }
+  # })
 
   # If selectprogOasisID changes, reload progcess run table and set view back to default
-  observeEvent( input$selectprogOasisID, {
+  observeEvent(input$selectprogOasisID, {
     .reloadRunData()
     if (input$radioprogsteps == "4") {
       hide("panelDefineOutputs")
@@ -1043,11 +1045,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         showNotification(type = "warning", "Please select a Programme with a valid Oasis Programme ID.")
       } else {
         show("panelProcessRunTable")
-        if (!is.null(result$POData)) {
-          rowToSelect <- which(result$POData[1:nrow(result$POData),1] == input$selectprogrammeID)
-          selectRows(dataTableProxy("tableProgOasisOOK"),rowToSelect)
-        }
       }
+    }
+    if (!is.null(result$POData)) {
+      rowToSelect <- which(result$POData[, 1] == input$selectprogOasisID)
+      selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
     }
   })
 
@@ -1062,24 +1064,24 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       # created, in progress etc), pass 'All', for just in progress pass
       # 'In Progress'
       prcid <-  input$selectprogOasisID
-      
+
       AllOrInProgress <- isolate(input$radioprrunsAllOrInProgress)
       if (AllOrInProgress == "In_Progress") {
         AllOrInProgress = "In Progress"
       }
-      
+
       prcrundata <- getProcessRun(dbSettings, prcid, AllOrInProgress)
-      
+
       if (!is.null(prcrundata)) {
         if (nrow(prcrundata) > 0 ) {
           show("tableprocessrundata")
           show("divprocessRunButtons")
-          result$prcrundata <- prcrundata %>% 
+          result$prcrundata <- prcrundata %>%
             mutate(ProcessRunStatus = replace(ProcessRunStatus, grepl("Failed", ProcessRunStatus, ignore.case = TRUE) | grepl("Cancelled", ProcessRunStatus, ignore.case = TRUE) | is.na(ProcessRunStatus), StatusFailed)) %>%
             mutate(ProcessRunStatus = replace(ProcessRunStatus, !grepl("Completed", ProcessRunStatus, ignore.case = TRUE) & !grepl("Failed", ProcessRunStatus, ignore.case = TRUE) & !grepl("Cancelled", ProcessRunStatus, ignore.case = TRUE) & ProcessRunStatus != StatusFailed & ProcessRunStatus != StatusCompleted, StatusProcessing)) %>%
             mutate(ProcessRunStatus = replace(ProcessRunStatus, grepl("Completed", ProcessRunStatus, ignore.case = TRUE), StatusCompleted)) %>%
             as.data.frame()
-          
+
         } else {
           hide("tableprocessrundata")
           hide("divprocessRunButtons")
@@ -1091,7 +1093,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   }
 
-  observeEvent( result$prcrundataCounter, {
+  observeEvent(result$prcrundataCounter, {
     # reload if radio buttons for 'All' vs 'In_Progress' change
     input$radioprrunsAllOrInProgress
     if (!is.null(input$selectprogOasisID) ) {
@@ -1105,7 +1107,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     logMessage("process run table refreshed")
   })
 
-  output$tableprocessrundata <- renderDataTable(if (!is.null(result$prcrundata)) {
+  output$tableprocessrundata <- renderDT(if (!is.null(result$prcrundata)) {
     if (preselRunId() == -1) {
       index <- 1
     } else {
@@ -1170,15 +1172,15 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   ### > Rerun Process ----
-  
+
   #RunId of selected row
   observeEvent(result$prcrundata_selected_rows,{
     if (!is.null(result$prcrundata_selected_rows)) {
       result$prrunid <- (result$prcrundata[result$prcrundata_selected_rows, 1][length(result$prcrundata[result$prcrundata_selected_rows, 1])])
     }
   })
-  
-  
+
+
   onclick("abuttonrerunpr", {
     if (result$prcrundata_selected_rows != 0) {
       outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid ))
@@ -1269,7 +1271,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   ### Log Table
 
-  output$tablelog <- renderDataTable({
+  output$tablelog <- renderDT({
     if (result$prcrundata_selected_rows != 0) {
       # manual refresh button
       force(result$logsCounter)
@@ -1305,19 +1307,25 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   #     result$DPProgData_selected_rows <- 0
   #   }
   # })
-  
+
   observeEvent(input$tableDPprog_rows_selected, {
     if (length(input$tableDPprog_rows_selected) > 0) {
-        result$DPProgData_selected_rows <- input$tableDPprog_rows_selected
-      } else {
-        result$DPProgData_selected_rows <- 0
-      }
-    })
+      logMessage(paste("input$tableDPprog_rows_selected is:", input$tableDPprog_rows_selected))
+      result$DPProgData_selected_rows <- input$tableDPprog_rows_selected
+      prgId <- result$DPProgData[result$DPProgData_selected_rows, 1]
+      logMessage(paste("updating selectprogrammeID because selection in programme table changed to",  prgId))
+      updateSelectInput(session, inputId = "selectprogrammeID", selected = prgId)
+    } else {
+      result$DPProgData_selected_rows <- 0
+    }
+  })
 
-  observe({
-    result$PODataCounter
+  observeEvent(input$tableProgOasisOOK_rows_selected, {
     if (length(input$tableProgOasisOOK_rows_selected) > 0) {
       result$POData_selected_rows <- input$tableProgOasisOOK_rows_selected
+      prgId <- result$POData[result$POData_selected_rows, 1]
+      logMessage(paste("updating selectprogOasisID because selection in programme model table changed to",  prgId))
+      updateSelectInput(session, inputId = "selectprogOasisID", selected = prgId)
     } else {
       result$POData_selected_rows <- 0
     }
@@ -1371,17 +1379,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   }
 
   # default view for panels
-  .defaultCreateProg <- function(){
+  .defaultCreateProg <- function() {
     hide("abuttonhidedefineprogpanel")
     .clearDPAccountSelection()
     .clearProgrammeName()
     .clearSourceFilesSelection()
     .clearTransformNameSelection()
+    show("panelProgrammeTable")
     show("panelDefineProgramme")
     result$prog_flag <- "C"
   }
 
-  .defaultAssociateModel <- function(){
+  .defaultAssociateModel <- function() {
     show("abuttonhidedefineprogpanel")
     show("buttonprogdetails")
     show("panelProgrammeTable")
@@ -1392,7 +1401,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     result$prog_flag <- "A"
   }
 
-  .defaultConfigOutput <- function(){
+  .defaultConfigOutput <- function() {
     hide("divselectprogOasisID")
     show("buttonmodeldetails")
     show("abtnadvanced")
@@ -1410,7 +1419,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   }
 
-  .defaultRun <- function(){
+  .defaultRun <- function() {
     show("abuttonehidepanelconfigureoutput")
     show("panelDefineIDs")
     show("divselectprogOasisID")
@@ -1435,9 +1444,20 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # reload functions --------------------------------------------------------
 
-  #Reload Programme table
+  # Reload Programme table
   .reloadDPProgData <- function() {
-    result$DPProgDataCounter <- isolate(result$DPProgDataCounter + 1)
+    if (active()) {
+      stmt <- buildDbQuery("getProgData")
+      DPProgData <- executeDbQuery(dbSettings, stmt)
+      if (!is.null(DPProgData)) {
+        result$DPProgData <- DPProgData %>%
+          mutate(Status = replace(Status, Status == "Failed" | is.na(Status), StatusFailed)) %>%
+          mutate(Status = replace(Status, Status != "Loaded" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+          mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
+          as.data.frame()
+        logMessage("programme table refreshed")
+      }
+    }
     invisible()
     #result$DPProgData_selected_rows <- 1
   }
@@ -1449,8 +1469,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   #Reload Programme Model table
   .reloadPOData <- function() {
-    result$PODataCounter <- isolate(result$PODataCounter + 1)
-    result$POData_selected_rows <- 1
+    result$PODataCounter <- result$PODataCounter + 1
+    message(paste("PODataCounter is:", isolate(result$PODataCounter)))
+    invisible()
+    #result$POData_selected_rows <- 1
   }
 
   #Reload Programme Model Details table
@@ -1655,7 +1677,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     show("panelDefineOutputs")
     disable("chkgulpolicy")
   }
-  
+
   .hiddenconfigOutputView <- function(textMessage) {
     hide("panelDefineOutputs")
     if (active()) {
