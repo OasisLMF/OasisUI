@@ -52,32 +52,36 @@ browseprogrammes <- function(input, output, session, dbSettings,
 
   #Define reactive value to react if any of the preselected run Ids changes
   observe({
-    preselRunId()
-    processRunId()
-    if (is.null(processRunId())) {
-      result$processRunId <- -1
-    } else {
-      result$processRunId <- processRunId()
+    if (active()) {
+      preselRunId()
+      processRunId()
+      if (is.null(processRunId())) {
+        result$processRunId <- -1
+      } else {
+        result$processRunId <- processRunId()
+      }
+      if (is.null(preselRunId())) {
+        result$preselRunId <- -1
+      } else {
+        result$preselRunId <- preselRunId()
+      }
+      result$RunIDchanged <- result$preselRunId + result$processRunId
     }
-    if (is.null(preselRunId())) {
-      result$preselRunId <- -1
-    } else {
-      result$preselRunId <- preselRunId()
-    }
-    result$RunIDchanged <- result$preselRunId + result$processRunId
   })
 
   #Update selected runID
   observe({
-    result$RunIDchanged
-    if (result$RunIDchanged == -2 ) {
-      result$preselectedRunId = runIdList()$RunID[1]
-    } else {
-      if (result$preselRunId != -1) {
-        result$preselectedRunId = isolate(result$preselRunId)
-      }
-      if (result$processRunId != -1) {
-        result$preselectedRunId = isolate(result$processRunId)
+    if (active()) {
+      result$RunIDchanged
+      if (result$RunIDchanged == -2 ) {
+        result$preselectedRunId = runIdList()$RunID[1]
+      } else {
+        if (result$preselRunId != -1) {
+          result$preselectedRunId = isolate(result$preselRunId)
+        }
+        if (result$processRunId != -1) {
+          result$preselectedRunId = isolate(result$processRunId)
+        }
       }
     }
   })
