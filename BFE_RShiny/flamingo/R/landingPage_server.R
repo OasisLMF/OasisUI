@@ -19,30 +19,61 @@
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
-  # navigation -----
+  # Reactive Values and parameters -----
   navigation_state <- reactiveNavigation()
+  
+  result <- reactiveValues(
+    inbox = NULL,
+    runIdList = NULL
+  )
+  
+  # navigation -----
   observeEvent(input$abuttongotorun,
                updateNavigation(navigation_state, "SBR"))
 
-  inbox <- reactive({
-    if (active()) {
-      # reload automatically every so often
-      invalidateLater(reloadMillis)
-      # explicit refresh button
-      invisible(input$refreshInbox)
-      logMessage("refreshing inbox...")
-      data <- getInboxData(dbSettings, userId()) %>%
-        mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
-        mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
-        mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
-        as.data.frame()
-      data
-    }
-  })
+  # inbox <- reactive({
+  #   if (active()) {
+  #     # reload automatically every so often
+  #     invalidateLater(reloadMillis)
+  #     # explicit refresh button
+  #     invisible(input$refreshInbox)
+  #     logMessage("refreshing inbox...")
+  #     data <- getInboxData(dbSettings, userId()) %>%
+  #       mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
+  #       mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
+  #       mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+  #       as.data.frame()
+  #     data
+  #   }
+  # })
 
+  observe(if (active()) {
+    
+    # invalidate if the refresh button updates
+    force(input$refreshInbox)
+    
+    # reload automatically every so often
+    invalidateLater(reloadMillis)
+    
+    landingPageButtonUpdate(session, dbSettings, userId())
+    
+    data <- getInboxData(dbSettings, userId())
+    result$inbox <-  data %>%
+      mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
+      mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
+      mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+      as.data.frame()
+    
+    logMessage("inbox refreshed")
+    
+    result$runIdList <- result$inbox[, c("RunID", "Status")]
+    #logMessage(paste0("result$runIdList ", names(result$runIdList)))
+  })
+  
   output$tableInbox <- renderDT(if (userId() != FLAMINGO_GUEST_ID) {
     datatable(
-      inbox(),
+      # inbox(),
+      result$inbox,
       class = "flamingo-table display",
       rownames = TRUE,
       selection = "single",
@@ -65,18 +96,29 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   )
 
   ### Module Output ----
+  # moduleOutput <- c(
+  #   outputNavigation(navigation_state),
+  #   list(
+  #     runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
+  #       inbox()[i, 2]} else -1),
+  #     # this is needed in processRun, probably shouldn't
+  #     procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
+  #       inbox()[i, 1]} else -1),
+  #     runIdList = reactive(inbox()[, c("RunID", "Status")])
+  #   )
+  # )
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
       runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        inbox()[i, 2]} else -1),
+        result$inbox[i, 2]} else -1),
       # this is needed in processRun, probably shouldn't
       procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        inbox()[i, 1]} else -1),
-      runIdList = reactive(inbox()[, c("RunID", "Status")])
+        result$inbox[i, 1]} else -1),
+      runIdList = reactive(result$runIdList)
     )
   )
-
+  
   moduleOutput
 
 }
