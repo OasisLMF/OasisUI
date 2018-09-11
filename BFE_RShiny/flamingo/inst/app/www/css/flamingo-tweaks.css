@@ -163,45 +163,106 @@ div.flamingo-page-division {
   background: #8b2129 !important;
 }
 
-/* Styles for sliderdefprogsteps */
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-bar,
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-bar-edge,
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-line {
-  height: 15px;
-}
-
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-grid-text {
-  font-size: 14px;
-  top: 20px;
-}
-
-#programmeDefinitionSingle-divsliderdefprogsteps .irs-single {
-  font-size: 14px;
-  top: -5px;
-}
-
-#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype label.control-label, #browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype  .selectize-control.single { 
+.InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single { 
          display: table-cell; 
          text-align: center; 
          vertical-align: middle; 
 } 
 
-#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype  label.control-label {
+.InlineSelectInput  label.control-label {
         padding-right: 10px;
 }
 
-#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype .form-group { 
+.InlineSelectInput .form-group { 
         display: table-row;
 }
 
-#browseprogrammes-panelOutputModule-panelDefineDataToPlotModule-inputplottype .selectize-control.single div.item {
+.InlineSelectInput.selectize-control.single div.item {
         padding-right: 15px;
 }
 
+/* Button to collapse flamingo panels */
 .collapsebtn:after {
-      font-family: "FontAwesome"; font-weight: 900; content: "\f068";
-      float: right;
-      }
-      .collapsebtn.collapsed:after {
-      content: "\f065";
-      }
+  font-family: "FontAwesome"; font-weight: 900; content: "\f068";
+  float: right;
+}
+
+.collapsebtn.collapsed:after {
+  content: "\f065";
+}
+
+.btn-dropdown {
+  width: 100%;
+  color: #ffffff;
+  background-color: #8b2129;
+  border-color: #8b2129;
+}
+
+#pagestructure-abuttonrun.btn-dropdown {
+  background-image: -webkit-linear-gradient(#d41f29, #8b2129 50%, #8b2129);
+  background-image: -o-linear-gradient(#d41f29, #8b2129 50%, #8b2129);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#d41f29), color-stop(50%, #8b2129), to(#8b2129));
+  background-image: linear-gradient(#d41f29, #8b2129 50%, #8b2129);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6d94bf', endColorstr='#ff3e648d', GradientType=0);
+  -webkit-filter: none;
+          filter: none;
+  border: 1px solid #8b2129;
+}
+
+#pagestructure-abuttonrun.btn-dropdown:hover {
+  background-image: -webkit-linear-gradient(#87474c, #8b2129 50%, #8b2129);
+  background-image: -o-linear-gradient(#87474c, #8b2129 50%, #8b2129);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#87474c), color-stop(50%, #8b2129), to(#8b2129));
+  background-image: linear-gradient(#87474c, #8b2129 50%, #8b2129);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5f8ab9', endColorstr='#ff385a7f', GradientType=0);
+  -webkit-filter: none;
+          filter: none;
+  border: 1px solid #2e4b69;
+}
+
+#pagestructure-abuttonbrowse.btn-dropdown {
+  background-image: -webkit-linear-gradient(#d41f29, #8b2129 50%, #8b2129);
+  background-image: -o-linear-gradient(#d41f29, #8b2129 50%, #8b2129);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#d41f29), color-stop(50%, #8b2129), to(#8b2129));
+  background-image: linear-gradient(#d41f29, #8b2129 50%, #8b2129);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6d94bf', endColorstr='#ff3e648d', GradientType=0);
+  -webkit-filter: none;
+          filter: none;
+  border: 1px solid #8b2129;
+}
+#pagestructure-abuttonbrowse.btn-dropdown:hover {
+  background-image: -webkit-linear-gradient(#87474c, #8b2129 50%, #8b2129);
+  background-image: -o-linear-gradient(#87474c, #8b2129 50%, #8b2129);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#87474c), color-stop(50%, #8b2129), to(#8b2129));
+  background-image: linear-gradient(#87474c, #8b2129 50%, #8b2129);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5f8ab9', endColorstr='#ff385a7f', GradientType=0);
+  -webkit-filter: none;
+          filter: none;
+  border: 1px solid #2e4b69;
+}
+
+#programmeDefinitionSingle-workflowsteps-radiobuttons button {
+  background-image: none;
+  border-radius: 20px;
+  color: #000000bf;
+  border: 1px solid #000000;
+}
+
+#programmeDefinitionSingle-workflowsteps-radiobuttons button.previousStepButton {
+  background-color: #eacbcb;
+}
+
+#programmeDefinitionSingle-workflowsteps-radiobuttons button.activeStepButton {
+  background-color: #bb252c;
+  border: 1px solid #8b2129;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+#programmeDefinitionSingle-workflowsteps-radiobuttons button.nextStepButton {
+  background-color: #ffffff;
+}

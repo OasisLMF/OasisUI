@@ -24,7 +24,7 @@ server <- function(input, output, session) {
     userName = "",
     WidthMain = 9,
     WidthSide = 3,
-    preselPanel = panelsProgrammeWorkflow[1]
+    preselPanel = "1"
   )
 
   authenticated <- reactive({
@@ -82,7 +82,7 @@ server <- function(input, output, session) {
 
   auth_modules$DA <- .callModule(
     accountDefinition,
-    id = "DA",
+    id = "accountDefinition",
     active = reactive(authenticated() && main_visible() == "DA")
   )
 
@@ -109,7 +109,7 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "PB")
   )
 
-  auth_modules$browseprogrammes <- .callModule(
+  auth_modules$visualizationSBR <- .callModule(
     browseprogrammes,
     id = "browseprogrammes",
     apiSettings = apiSettings,
@@ -119,8 +119,27 @@ server <- function(input, output, session) {
     processRunId = auth_modules$programmeDefinitionSingle$processRunId,
     logMessage = logMessage,
     reloadMillis = reloadMillis,
-    active = reactive(authenticated() && main_visible() == "BR")
+    active = reactive(authenticated() && main_visible() == "SBR")
   )
+
+  auth_modules$visualizationBBR<- .callModule(
+    visualizationBBR,
+    id = "visualizationBBR",
+    apiSettings = apiSettings,
+    userId = reactive(result$userId),
+    logMessage = logMessage,
+    reloadMillis = reloadMillis,
+    active = reactive(authenticated() && main_visible() == "BBR")
+  )
+
+
+  # preselected panel
+  observe({if (!is.null(auth_modules$visualizationSBR$preselPanel)) {
+    result$preselPanel <- auth_modules$visualizationSBR$preselPanel
+  } else {
+    result$preselPanel <- "1"
+  }
+  })
 
   auth_modules$fileViewer <- .callModule(
     fileViewer,
@@ -159,6 +178,8 @@ server <- function(input, output, session) {
     result$userId <- loginDialogModule$userId()
     result$userName <- loginDialogModule$userName()
   })
+
+  ### Module input parameters depending on othe rmodules outputs ---
 
   # UI non-reactive to (result$WidthSide) and (result$Widthmain)
   output$authUI <- renderUI(
@@ -200,11 +221,6 @@ server <- function(input, output, session) {
 
     switch(main_visible(),
 
-           "WF" = { # go to Workflow submenu
-             loginfo(paste("Navigate to Process Management, userId: ", result$userId),
-                     logger = "flamingo.module")
-           },
-
            "DA" = { # go to Define account submenu
              loginfo(paste("Navigate to Define Account, userId: ", result$userId),
                      logger = "flamingo.module")
@@ -220,8 +236,13 @@ server <- function(input, output, session) {
                      logger = "flamingo.module")
            },
 
-           "BR" = { # go to Define Define programme batch submenu
-             loginfo(paste("Navigate to Browse, userId: ", result$userId),
+           "SBR" = { # go to Single browse submenu
+             loginfo(paste("Navigate to Single browse, userId: ", result$userId),
+                     logger = "flamingo.module")
+           },
+
+           "BBR" = { # go to Batch browse submenu
+             loginfo(paste("Navigate to Batch browse, userId: ", result$userId),
                      logger = "flamingo.module")
            },
 

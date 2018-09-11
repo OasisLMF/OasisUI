@@ -4,7 +4,7 @@
 #' @param userId user id
 #' @param preselRunId preselected run id
 #' @return empty list
-#' @importFrom DT renderDataTable dataTableProxy selectRows
+#' @importFrom DT renderDT DTOutput dataTableProxy selectRows
 #' @importFrom shinyjs show hide hidden
 #' @importFrom utils read.csv zip
 #' @rdname fileViewer
@@ -18,31 +18,31 @@ fileViewer <- function(
   preselRunId = reactive(-1),
   active = reactive(TRUE),
   logMessage = message) {
-  
+
   # Reactive Values -----
-  
+
   result <- reactiveValues(
     FLdata = NULL,               #table of files
     fileData = NULL,             #file to download
     currentFile = NULL,          #Current filename
     currentrows = 0           #indices of current rows selected
   )
-  
+
   ns <- session$ns
-  
+
   ### File List Table ----
-  
+
   # Load Company user list data when the page is loaded
   # queries the database every time to update its dataset
   observe(if (active()) {
     stmt <- buildDbQuery("getFileViewerTable")
     result$FLdata <- executeDbQuery(dbSettings, stmt)
   })
-  
+
   # Pre-select the correct runId
   initialSelection <- reactive({
     if (preselRunId() == -1) {
-      index <- 1 
+      index <- 1
       initialSelection <- NULL
     } else {
       index <- match(c(paste0("Process:", preselRunId())), result$FLdata[[7]])
@@ -50,7 +50,7 @@ fileViewer <- function(
     }
     return(initialSelection)
   })
-  
+
   # Add buttons to table
   FLdata <- reactive({
     cbind(
@@ -60,19 +60,16 @@ fileViewer <- function(
       data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(result$FLdata), Label = "Map",  hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;'))
     )
   })
-  
+
   # draw company user list table with custom format options
-  output$tableFVfileList <- renderDataTable( if (!is.null(result$FLdata) ) {
-    
+  output$tableFVfileList <- renderDT(if (!is.null(result$FLdata)) {
+
     datatable(
       #result$FLdata,
       FLdata(),
       class = "flamingo-table display",
       rownames = TRUE,
-      selection = "multiple", #list(mode = "multiple",
-                    #"none"
-                       #selected = initialSelection()
-      #),
+      selection = "multiple",
       colnames = c("Row Number" = 1),
       filter = 'bottom',
       escape = FALSE,
@@ -85,18 +82,18 @@ fileViewer <- function(
         autoWidth = TRUE)
     )
   })
-  
 
-  # # Download table of files to csv 
+
+  # # Download table of files to csv
   # output$FVFLdownloadexcel <- downloadHandler(
   #   filename = "filelist.csv",
   #   content = function(file) {
   #     write.csv(result$FLdata, file)}
   # )
-  
+
   ### Checkboxes & Enabling/show buttons ----
 
-  
+
   observe({
     currentrows <- input$tableFVfileList_rows_selected
     if (is.null(currentrows)) {
@@ -105,7 +102,7 @@ fileViewer <- function(
       result$currentrows <- currentrows
     }
   })
-  
+
   #if one row is selected/unselected, update checkbox and sow/hide buttons
   observeEvent( result$currentrows, {
     if (all(result$currentrows != 0 )) {
@@ -121,15 +118,15 @@ fileViewer <- function(
         .hideButtons(i)})
     }
   })
-  
-  
+
+
   observe(if (active()) {
     if (!is.null(input$tableFVfileListSelectall) && input$tableFVfileListSelectall) {
       lapply(input$tableFVfileList_rows_current, function(i){updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = input$tableFVfileListSelectall)})
       selectRows(dataTableProxy("tableFVfileList"), input$tableFVfileList_rows_current)
     }
   })
-  
+
   # Select all functionality
   #update checkboxes according to selectAll button
   observeEvent(input$tableFVfileListSelectall, {
@@ -142,9 +139,9 @@ fileViewer <- function(
       lapply(input$tableFVfileList_rows_current, function(i){.hideButtons(i)} )
     }
   })
-  
+
   # Download Files ----
-  
+
   # Files to download in zip bundle
   fs <- reactive({
     files <- c()
@@ -153,7 +150,7 @@ fileViewer <- function(
     }
     files
   })
-  
+
   # Download zip button
   output$FVfileListdownloadzip <- downloadHandler(
     filename = "files.zip",
@@ -162,12 +159,12 @@ fileViewer <- function(
       if (file.exists(paste0(fname, "./"))) {file.rename(paste0(fname, ".zip"), fname)}
     }
   )
-  
-  
+
+
   ### FV Exposure / File Contents ----
-  
+
   # Exposure table
-  output$tableFVExposureSelected <- renderDataTable(
+  output$tableFVExposureSelected <- renderDT(
     if (!is.null(result$fileData)) {
       datatable(
         result$fileData,
@@ -192,14 +189,14 @@ fileViewer <- function(
                        scrollX = TRUE))
     }
   )
-  
+
   # Export to .csv
   output$FVEdownloadexcel <- downloadHandler(
-    filename = result$currentFile, 
+    filename = result$currentFile,
     content = function(file) {
       write.csv(result$fileData, file)}
   )
-  
+
   # Modal Panel
   FileContent <- modalDialog(
     easyClose = TRUE,
@@ -207,18 +204,18 @@ fileViewer <- function(
     fluidPage(
       h4("File Contents", class = "flamingo-table-title"),
       htmlOutput(ns("tableFVExposureSelectedInfo")),
-      dataTableOutput(ns("tableFVExposureSelected")),
+      DTOutput(ns("tableFVExposureSelected")),
       br(),
       downloadButton(ns("FVEdownloadexcel"), label = "Export to csv")
     )
   )
-  
+
   # # Length table
   # observe({if (!is.null(result$FLdata) ) {
   #   result$lenFLdata <- nrow(result$FLdata)
   # }
   # })
-  
+
   #Show content in Modal
   observe({
     if (!is.null(result$FLdata)) {
@@ -250,10 +247,10 @@ fileViewer <- function(
         }) # end lapply
     } #end if
   })
-  
-  
+
+
   ### Plain Map ----
-  
+
   Map <- modalDialog(
     easyClose = TRUE,
     size = "l",
@@ -263,7 +260,7 @@ fileViewer <- function(
       leafletOutput(ns("plainmap"))
     )
   )
-  
+
   observe({
     if (!is.null(result$FLdata)) {
       lapply(
@@ -285,9 +282,9 @@ fileViewer <- function(
         })
     }
   })
-  
+
   # Helper functions ------------------------
-  
+
   # Check permission row by row
   .enableButton <- function(i) {
     FVid <- result$FLdata[i, 1]
@@ -298,13 +295,13 @@ fileViewer <- function(
     # lapply(t(validButtons), function(btnIDs){enable(manageButtons[btnIDs])})
     lapply(t(validButtons), function(btnIDs){shinyjs::show(manageButtons[btnIDs])})
   }
-  
+
   #hide buttons in a row
   .hideButtons <- function(i=NULL){
     shinyjs::hide(paste0("vrows_", i))
     shinyjs::hide(paste0("mrows_", i))
   }
-  
+
   # utility function to add input Id to buttons in table
   .shinyInput <- function(FUN, id, num, Label = NULL, hidden = FALSE,  ...) {
     inputs <- character(num)
@@ -317,7 +314,7 @@ fileViewer <- function(
     }
     inputs
   }
-  
+
   invisible()
-  
+
 }

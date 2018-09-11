@@ -5,7 +5,8 @@
 \title{browseprogrammes Module}
 \usage{
 browseprogrammes(input, output, session, dbSettings, apiSettings, userId,
-  runIdList, preselRunId, processRunId, active = reactive(TRUE),
+  runIdList = reactive(c(-1)), preselRunId = reactive(-1),
+  processRunId = reactive(-1), active = reactive(TRUE),
   logMessage = message, reloadMillis = 10000)
 }
 \arguments{
@@ -19,24 +20,22 @@ browseprogrammes(input, output, session, dbSettings, apiSettings, userId,
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{preselRunId}{reactive string expression for reselected run id from  landingpage}
+\item{runIdList}{list of runs and their status}
 
-\item{processRunId}{reactive string expression for reselected run id from  defineProgramme}
+\item{preselRunId}{reactive string expression for reselected run id from landingpage}
+
+\item{processRunId}{reactive string expression for reselected run id from defineProgramme}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages}
 
 \item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater};}
+see \link{invalidateLater}}
 }
 \value{
 list of reactives:
-\itemize{
-		\item{\code{navigate}}{reactive yielding navigation}
-		\item{\code{progOasisId}}{selected ProgOasis Id}
-}
 }
 \description{
-Server logic to define a programme
+Server logic for viewing results of a single run
 }

@@ -14,7 +14,7 @@ quotes (').}
 
 \item{dboPrefix}{prefix \code{dbFunc} with \code{"dbo."}}
 
-\item{squareBrackets}{surround the argument list with [ and ]}
+\item{squareBrackets}{surround the argument list with square brackets}
 }
 \description{
 Constructs query statements that can be executed with

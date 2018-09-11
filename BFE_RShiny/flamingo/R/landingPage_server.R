@@ -11,7 +11,7 @@
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 #' }
 #' @template return-outputNavigation
-#' @importFrom DT renderDataTable datatable
+#' @importFrom DT renderDT datatable
 #' @importFrom dplyr mutate '%>%'
 #' @importFrom utils write.csv
 #' @importFrom shinyWidgets dropdown toggleDropdownButton
@@ -19,42 +19,60 @@
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
+  # Reactive Values and parameters -----
   navigation_state <- reactiveNavigation()
-
+  
   result <- reactiveValues(
     inbox = NULL,
     runIdList = NULL
   )
-
+  
+  # navigation -----
   observeEvent(input$abuttongotorun,
-               updateNavigation(navigation_state, "WF"))
+               updateNavigation(navigation_state, "SBR"))
+
+  # inbox <- reactive({
+  #   if (active()) {
+  #     # reload automatically every so often
+  #     invalidateLater(reloadMillis)
+  #     # explicit refresh button
+  #     invisible(input$refreshInbox)
+  #     logMessage("refreshing inbox...")
+  #     data <- getInboxData(dbSettings, userId()) %>%
+  #       mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
+  #       mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
+  #       mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+  #       as.data.frame()
+  #     data
+  #   }
+  # })
 
   observe(if (active()) {
-
+    
     # invalidate if the refresh button updates
     force(input$refreshInbox)
-
+    
     # reload automatically every so often
     invalidateLater(reloadMillis)
-
+    
     landingPageButtonUpdate(session, dbSettings, userId())
-
+    
     data <- getInboxData(dbSettings, userId())
     result$inbox <-  data %>%
       mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
       mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
       mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
       as.data.frame()
-
+    
     logMessage("inbox refreshed")
-
+    
     result$runIdList <- result$inbox[, c("RunID", "Status")]
     #logMessage(paste0("result$runIdList ", names(result$runIdList)))
   })
-
-  output$tableInbox <- renderDataTable(if (userId() != FLAMINGO_GUEST_ID) {
-
+  
+  output$tableInbox <- renderDT(if (userId() != FLAMINGO_GUEST_ID) {
     datatable(
+      # inbox(),
       result$inbox,
       class = "flamingo-table display",
       rownames = TRUE,
@@ -68,17 +86,27 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
         columnDefs = list(list(visible = FALSE, targets = 0, type = 'natural'))
       )
     )
-
   })
 
   output$PRIdownloadexcel <- downloadHandler(
     filename = "processruninbox.csv",
     content = function(file) {
-      write.csv(result$inbox, file)
+      write.csv(inbox(), file)
     }
   )
 
   ### Module Output ----
+  # moduleOutput <- c(
+  #   outputNavigation(navigation_state),
+  #   list(
+  #     runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
+  #       inbox()[i, 2]} else -1),
+  #     # this is needed in processRun, probably shouldn't
+  #     procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
+  #       inbox()[i, 1]} else -1),
+  #     runIdList = reactive(inbox()[, c("RunID", "Status")])
+  #   )
+  # )
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -89,7 +117,6 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
         result$inbox[i, 1]} else -1),
       runIdList = reactive(result$runIdList)
     )
-    
   )
   
   moduleOutput
@@ -177,7 +204,6 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   )
 
   moduleOutput
-
 }
 
 
@@ -200,7 +226,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   ns <- session$ns
 
   navigation_state <- reactiveNavigation()
-  
+
   state <- reactiveValues(
     collapsed = FALSE
   )
@@ -208,7 +234,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   observeEvent(input$abuttoncollapsesidebar, {
     state$collapsed <- !state$collapsed
   })
-  
+
   observe({
     output$sidebar <-
       renderUI(pagestructureSidebar(ns, state$collapsed))
@@ -227,8 +253,14 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     toggleDropdownButton(ns("abuttonrun"))
   })
 
-  observeEvent(input$abuttonbrowse, {
-    updateNavigation(navigation_state, "BR")
+  observeEvent(input$abuttonbrowseSBR, {
+    updateNavigation(navigation_state, "SBR")
+    toggleDropdownButton(ns("abuttonbrowse"))
+  })
+
+  observeEvent(input$abuttonbrowseBBR, {
+    updateNavigation(navigation_state, "BBR")
+    toggleDropdownButton(ns("abuttonbrowse"))
   })
 
   observeEvent(input$abuttonhome, {
@@ -237,14 +269,6 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 
   observeEvent(input$abuttonfilemngt, {
     updateNavigation(navigation_state, "FM")
-  })
-
-
-  ### Button permissions ----
-
-  observe(if (active()) {
-    invalidateLater(reloadMillis)
-    landingPageButtonUpdate(session, dbSettings, userId())
   })
 
   ### Module Output ----
@@ -289,25 +313,26 @@ landingPageButtonUpdate <- function(session, dbSettings, userId,
   .updateButton <- function(db_resourceId, btn_inputId) {
     permission <- flamingoDBCheckPermissions(dbSettings, userId, db_resourceId)
     if (identical(permission, character(0))) {
-      updateButton(session, btn_inputId, disabled = TRUE)
+      updateButton(session, session$ns(btn_inputId), disabled = TRUE)
     } else {
-      updateButton(session, btn_inputId, disabled = FALSE)
+      updateButton(session, session$ns(btn_inputId), disabled = TRUE)
     }
   }
 
   # Not used anywhere else, probably just forgotten
   # ("600", "abuttonenquiry")
 
-  .updateButton("700", "abuttonrun")
+  #.updateButton("700", "abuttonrun")
+  #.updateButton("700", "abuttonbrowse")
 
-  .updateButton("904", "abuttonuseradmin")
+  # .updateButton("904", "abuttonuseradmin")
 
   # Not used anywhere else, probably just forgotten
   # ("950", "abuttonworkflowadmin")
 
   .updateButton("200", "abuttonsysconf")
 
-  .updateButton("300", "abuttonfilemngt")
+  #.updateButton("300", "abuttonfilemngt")
 
   invisible()
 }

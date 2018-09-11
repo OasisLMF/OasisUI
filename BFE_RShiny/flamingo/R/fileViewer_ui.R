@@ -2,34 +2,33 @@
 #' @rdname fileViewer
 #' @description UI/View to view files
 #' @import leaflet
-#' @importFrom DT dataTableOutput
-#' @importFrom shinyjs hidden disabled
+#' @importFrom DT DTOutput
 #' @importFrom shinyBS bsTooltip
 #' @export
 fileViewerUI <- function(id) {
-  
+
   ns <- NS(id)
 
-  attachDependencies(value = flamingoHtmlDependencies(), tagList(
-      
-      h3("File Viewer", class = "flamingo-page-title"),
+  tagList(
 
-          h4("File List", class = "flamingo-table-title"),
+    h3("File Viewer", class = "flamingo-page-title"),
 
-          checkboxInput(inputId = ns("tableFVfileListSelectall"), label = "Select all", value = FALSE),
-          dataTableOutput(ns("tableFVfileList")),
+    h4("File List", class = "flamingo-table-title"),
 
-          downloadButton(ns("FVfileListdownloadzip"), label = "Export to zip"),
-          bsTooltip(ns("FVfileListdownloadzip"), 
-                    file_Viewer$FVfileListdownloadzip,
-                    placement = "right", 
-                    options   = list(container = "body"))
-          # downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
-          # bsTooltip(ns("FVFLdownloadexcel"), 
-          #             file_Viewer$FVFLdownloadexcel, 
-          #             placement = "right", 
-          #             options   = list(container = "body"))
-  
-  ))
-  
+    checkboxInput(inputId = ns("tableFVfileListSelectall"), label = "Select all", value = FALSE),
+    DTOutput(ns("tableFVfileList")),
+
+    downloadButton(ns("FVfileListdownloadzip"), label = "Export to zip"),
+    bsTooltip(ns("FVfileListdownloadzip"),
+              file_Viewer$FVfileListdownloadzip,
+              placement = "right",
+              options   = list(container = "body"))
+    # downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
+    # bsTooltip(ns("FVFLdownloadexcel"),
+    #             file_Viewer$FVFLdownloadexcel,
+    #             placement = "right",
+    #             options   = list(container = "body"))
+
+  )
+
 }

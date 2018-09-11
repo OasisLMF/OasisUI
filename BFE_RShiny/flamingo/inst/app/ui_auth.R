@@ -41,6 +41,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
       dynamicColumnUI(
         "sidebar",
         WidthSide,
+        style = "min-width: 135px;",
         pagestructureUI("pagestructure")
       ),
 
@@ -48,6 +49,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
       dynamicColumnUI(
         "main",
         WidthMain,
+        style = "max-width: calc(100% - 135px);",
         reactiveConditionalPanelsUI(
           "mainPanel",
           list(
@@ -69,8 +71,11 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
             PB =
               programmeDefinitionBatchUI("programmeDefinitionBatch"),
 
-            # browseprogrammesUI
-            BR = browseprogrammesUI("browseprogrammes"),
+            # DefineBrowse Single
+            SBR = browseprogrammesUI("browseprogrammes"),
+
+            # DefineBrowse Batch
+            BBR = visualizationBBRUI("visualizationBBR"),
 
             ## File Management
             FM =

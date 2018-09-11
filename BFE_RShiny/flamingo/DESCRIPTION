@@ -23,10 +23,14 @@ Imports:
   leaflet,
   plotly,
   dplyr,
-  V8
+  V8,
+  data.table,
+  ggplot2,
+  tidyr
 Suggests:
   knitr,
   testthat,
   magrittr
+Encoding: UTF-8
 RoxygenNote: 6.1.0
 VignetteBuilder: knitr

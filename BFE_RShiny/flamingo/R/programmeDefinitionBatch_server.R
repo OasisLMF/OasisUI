@@ -6,13 +6,10 @@
 #' @return For \code{programmeDefinitionBatch()}, list of reactives.
 #' @template return-outputNavigation
 #' @rdname programmeDefinitionBatch
-#' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDataTable
-#' @importFrom dplyr mutate
 #' @export
 programmeDefinitionBatch <- function(input, output, session, dbSettings,
-                                     apiSettings, userId, active = reactive(TRUE), logMessage = message,
-                                     reloadMillis = 10000) {
+                                     apiSettings, userId, active = reactive(TRUE),
+                                     logMessage = message, reloadMillis = 10000) {
 
   ns <- session$ns
 
@@ -20,13 +17,13 @@ programmeDefinitionBatch <- function(input, output, session, dbSettings,
 
   navigation_state <- reactiveNavigation()
 
-  result <- reactiveValues() # palceholder
+  result <- reactiveValues() # placeholder
 
   # Model Outout ------------------------------------------------------------
 
   moduleOutput <- c(
     outputNavigation(navigation_state),
-    list() #placeholder
+    list() # placeholder
   )
 
   moduleOutput

@@ -7,7 +7,7 @@
 #' @return For \code{userAdminDefinition()}, list of reactives.
 #' @template return-outputNavigation
 #' @rdname userAdminDefinition
-#' @importFrom DT renderDataTable
+#' @importFrom DT renderDT
 #' @importFrom shinyjs enable disable
 #' @importFrom shinyBS toggleModal
 #' @export
@@ -95,7 +95,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   })
 
   # draw company user list table with custom format options
-  output$tablecompanyuserlist <- renderDataTable({
+  output$tablecompanyuserlist <- renderDT({
     datatable(
       result$CULData,
       class = "flamingo-table display",
@@ -124,7 +124,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   })
 
   # draw User Securtiy Group table with custom format options
-  output$tableusersecuritygroups <- renderDataTable({
+  output$tableusersecuritygroups <- renderDT({
     if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       datatable(
         result$USGData,
@@ -158,7 +158,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   })
 
   # draw User License table with custom format options
-  output$tableuserlicenses <- renderDataTable({
+  output$tableuserlicenses <- renderDT({
     if (length(input$tablecompanyuserlist_rows_selected) > 0){
       datatable(
         result$CUAULData,

@@ -1,14 +1,13 @@
 #' @description UI/View to login an user
 #' @param id account id
 #' @rdname loginDialog
-#' @importFrom htmltools attachDependencies 
 #' @importFrom shinyjs hidden
 #' @export
 loginDialogUI <- function(id) {
 
   ns <- NS(id)
 
-  attachDependencies(value = flamingoHtmlDependencies(), tagList(
+  tagList(
 
     tags$div(align = "center", class = "login-dialog",
              img(src = "img/Flamingo.jpg" ),
@@ -21,5 +20,5 @@ loginDialogUI <- function(id) {
                           ns("loginbutton"))),
              actionButton(ns("loginbutton"), "Login", class = "btn btn-success")
     )
-  ))
+  )
 }

@@ -1,8 +1,7 @@
 
 #' Flamingo Module Template UI
 #' @param id module id
-flamingoModuleUI <- function(
-    id) {}
+flamingoModuleUI <- function(id) {}
 
 
 #' Flamingo Module Template
@@ -15,55 +14,46 @@ flamingoModuleUI <- function(
 #' @param logMessage function that will be passed info messages
 #' @param logError function that will be passed error messages
 flamingoModule <- function(
-    input,
-    output,
-    session,
-    active,
-    dbSettings,
-    apiSettings,
-    logMessage,
-    logError) {}
-
-
-#' HTML Dependencies For The Flamingo Interface
-#' @importFrom htmltools htmlDependency
-#' @export
-flamingoHtmlDependencies <- function() {
-  
-  htmlDependency(name = "flamingo", version = "0.0.4", src = c(href = "css"),
-      stylesheet = c("flamingo-tweaks.css", "flamingo-table.css"))
-  
-}
+  input,
+  output,
+  session,
+  active,
+  dbSettings,
+  apiSettings,
+  logMessage,
+  logError) {}
 
 
 #' Action button/link
-#' @description Modified version of the default \link{shiny::actionButton}
+#' @description Modified version of the default [shiny::actionButton()]
 #' @param class HTML class attribute
-#' @param ... arguments to \link{shiny::actionButton}
+#' @param ... arguments to [shiny::actionButton()]
 #' @export
+#' @md
 actionButton <- function(class = c("btn", "btn-primary", "btn-flamingo"), ...) {
   shiny::actionButton(class = class, ...)
 }
 
 
 #' Show or remove a notification
-#' @description Modified version of the default \link{shiny::showNotifcation}
-#' @param ui see \link{shiny::showNotification}
-#' @param type see \link{shiny::showNotification}
-#' @param ... other arguments to \link{shiny::showNotification}
+#' @description Modified version of the default [shiny::showNotification()]
+#' @param ui see [shiny::showNotification()]
+#' @param type see [shiny::showNotification()]
+#' @param ... other arguments to [shiny::showNotification()]
 #' @export
+#' @md
 showNotification <- function(ui,
-    type = c("default", "message", "warning", "error"), ...) {
-  
+                             type = c("default", "message", "warning", "error"), ...) {
+
   iconName <- switch(type, "warning" = "exclamation-triangle",
-      "message" = "check-circle", "error" = "minus-circle", "info-circle")
-  
+                     "message" = "check-circle", "error" = "minus-circle", "info-circle")
+
   shiny::showNotification(
-      ui = tagList(
-          div(class = "shiny-notification-side", icon(iconName)),
-          div(class = "shiny-notification-main", ui)),
-      type = type,
-      ...)
+    ui = tagList(
+      div(class = "shiny-notification-side", icon(iconName)),
+      div(class = "shiny-notification-main", ui)),
+    type = type,
+    ...)
 }
 
 
@@ -79,7 +69,7 @@ showNotification <- function(ui,
 #' @importFrom stats setNames
 #' @export
 createSelectOptions <- function(df, label = NA, value = "0", labelCol = 2,
-    valueCol = 1) {
+                                valueCol = 1) {
   if (!is.null(df) && nrow(df) > 0) {
     if (!is.na(label)) {
       selectOptions <- setNames(list(value), label)

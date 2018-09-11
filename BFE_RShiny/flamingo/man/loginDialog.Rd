@@ -5,8 +5,8 @@
 \alias{loginDialogUI}
 \title{Login Dialog Module}
 \usage{
-loginDialog(input, output, session, dbSettings, logout,
-  logMessage = message, logError = logMessage)
+loginDialog(input, output, session, dbSettings, logout, logMessage = message,
+  logError = logMessage)
 
 loginDialogUI(id)
 }

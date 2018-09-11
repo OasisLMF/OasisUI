@@ -20,6 +20,8 @@ dynamicColumnUI(id, width, ...)
 non-reactive (or \link[shiny:isolate]{isolated}) for \code{dynamicColumnUI()}.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{...}{Elements to include within the column}
 }
 \description{
 Shiny module providing support for dynamic UI \link[shiny:column]{column} width
