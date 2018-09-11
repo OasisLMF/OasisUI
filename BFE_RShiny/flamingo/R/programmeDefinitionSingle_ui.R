@@ -83,18 +83,19 @@ defineProgramme <- function(id) {
                         actionButton(inputId = ns("abuttonSAFileView"), class = "btn btn-primary", label = "View", align = "left"))))),
     fluidRow(
       column(11,
-             align="right",
+             align = "right",
              actionButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", class = "btn btn-primary", align = "left"),
              actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", class = "btn btn-primary", align = "left")))
   )
 }
 
-#' Function wrapping panel to create/ammend programme
+#' Function wrapping panel to create/amend programme
 #' @export
 panelDefineProgramme <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    collapsible = FALSE,
+    collapsible = TRUE,
+    show = FALSE,
     ns("progdef"),
     heading = tagAppendChildren(
       h4("Define Programme"),
@@ -111,7 +112,7 @@ panelDefineProgramme <- function(id) {
 panelProgrammeTable <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    collapsible = FALSE,
+    collapsible = TRUE,
     ns("progtbl"),
     heading = tagAppendChildren(
       h4("Programme Table"),
