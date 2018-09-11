@@ -3,12 +3,13 @@
 #' @description UI/View for the process run page
 #' @inheritParams flamingoModuleUI
 #' @return list of tags
+#' @importFrom DT dataTableOutput
 #' @export
 browseprogrammesUI <- function(id) {
-
+  
   ns <- NS(id)
-
   tagList(
+    
     h4("Browse Processes outputs", class = "flamingo-page-title") ,
     panelDefineRunID(id),
     panelSummaryTable(id),
@@ -18,23 +19,23 @@ browseprogrammesUI <- function(id) {
 }
 
 
-# Functions for UI Panels ------------------------------------------------------------------------------
+# Functions for UI Panels ------------------------------------------------------------------------------  
 
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel
+#' @importFrom shinyWidgets panel 
 #' @importFrom shinyBS bsTooltip
 #' @export
-panelDefineRunID <-  function(id) {
+panelDefineRunID <-  function(id){
   ns <- NS(id)
   panel(
     status = "primary",
     fluidRow(
       column(6,
              selectInput(inputId =  ns("selectRunID"), label = "Run ID", choices = "", selected = NULL),
-             bsTooltip(ns("selectRunID"),
-                       browse_programmes$selectRunID,
-                       placement = "right",
+             bsTooltip(ns("selectRunID"), 
+                       browse_programmes$selectRunID, 
+                       placement = "right", 
                        options   = list(container = "body"))),
       column(6,
              align = "right",
@@ -43,10 +44,11 @@ panelDefineRunID <-  function(id) {
   )
 }
 
+
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
 #' @export
-panelSummaryTable <-  function(id) {
+panelSummaryTable <-  function(id){
   ns <- NS(id)
   flamingoPanel(
     id = ns("flamingoPanelSummaryTable"),
@@ -58,33 +60,33 @@ panelSummaryTable <-  function(id) {
 
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
-#' @importFrom DT DTOutput
 #' @export
-panelSummaryTableModuleUI <-  function(id) {
+panelSummaryTableModuleUI <-  function(id){
   ns <- NS(id)
   tagList(
-    DTOutput(ns("outputsummarytable"))
+    dataTableOutput(ns("outputsummarytable"))
   )
 }
+
 
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
 #' @export
-panelOutput <-  function(id) {
+panelOutput <-  function(id){
   ns <- NS(id)
   flamingoIncrementalPanelUI(
     id = ns("flamingoIncrementalPanelOutput-0"),
     # heading = "Process Run Output Custom Plot",
-    collapsible = FALSE, show = FALSE, removable = FALSE
-  )
+    collapsible = FALSE, show = FALSE, removable = FALSE)
 }
+
 
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel
+#' @importFrom shinyWidgets panel 
 #' @importFrom plotly plotlyOutput
 #' @export
-panelOutputModuleUI <-  function(id) {
+panelOutputModuleUI <-  function(id){
   ns <- NS(id)
   tagList(
     flamingoPanel(
@@ -93,7 +95,7 @@ panelOutputModuleUI <-  function(id) {
       heading = "Custom Plot",
       h4("Data to plot"),
       br(),
-      div( id = ns("inputplottype"), class = "InlineSelectInput",
+      div( id = ns("inputplottype"), class = "InlineSelectInput", 
            selectInput(inputId = ns("inputplottype"), label = "Select a plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1])),
       br(),
       column(4,
@@ -101,19 +103,20 @@ panelOutputModuleUI <-  function(id) {
       column(8,
              checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Granularities", choices = granularities, inline = TRUE)),
       br(),
-      checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Variables", choices = variables, inline = TRUE),
+      column(12,
+      checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Variables", choices = variables, inline = TRUE)),
       br(),
       br(),
       h4("Customize Plot"),
       column(4,
-             textInput(ns("textinputtitle"), "Title", "")),
+             textInput(ns("textinputtitle"), "Title", "")), 
       column(4,
              checkboxInput(ns("chkboxaggregate"), "Aggregate by granularity", TRUE)),
       column(4,
              checkboxInput(ns("chkboxcumulate"), "Cumulate plot", FALSE)),
       actionButton(inputId = ns("abuttondraw"), label = "Draw Plot",  class = "btn btn-primary", style = "float:right")
     ),
-
+    
     panel(
       # heading = h4("Plot"),
       plotlyOutput(ns("outputplot"))
@@ -121,10 +124,11 @@ panelOutputModuleUI <-  function(id) {
   )
 }
 
+
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
 #' @export
-panelViewOutputFiles <-  function(id) {
+panelViewOutputFiles <-  function(id){
   ns <- NS(id)
   flamingoPanel(
     id = ns("flamingoPanelViewOutputFiles"),
@@ -136,12 +140,11 @@ panelViewOutputFiles <-  function(id) {
 
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
-#' @importFrom DT DTOutput
 #' @export
-panelViewOutputFilesModuleUI <-  function(id) {
+panelViewOutputFilesModuleUI <-  function(id){
   ns <- NS(id)
   tagList(
-    DTOutput(ns("outputfilestable")),
+    dataTableOutput(ns("outputfilestable")),
     downloadButton(ns("FLTdownloadexcel"), label = "Export to csv")
   )
 }
