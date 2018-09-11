@@ -26,7 +26,6 @@ loadProgrammeModel <- function(
       warning = function(w) logWarning(w$message))
 
   return(http_status(response)$category)
-
 }
 
 
@@ -37,6 +36,7 @@ loadProgrammeModel <- function(
 #' @param logWarning warning message callback
 #' @param ... additional arguments to [httr::GET()]
 #' @return http status category warn_for_status
+#' @importFrom httr modify_url GET warn_for_status http_status
 #' @export
 #' @md
 loadProgrammeData <- function(
@@ -57,7 +57,6 @@ loadProgrammeData <- function(
       warning = function(w) logWarning(w$message))
 
   return(http_status(response)$category)
-
 }
 
 
@@ -83,7 +82,6 @@ flamingoServer <- function(host, port, scheme = c("http", "https")) {
           url = paste0(scheme[1], "://", host, ":", port)))
 
   return(struct)
-
 }
 
 #' Flamingo API Server health check
