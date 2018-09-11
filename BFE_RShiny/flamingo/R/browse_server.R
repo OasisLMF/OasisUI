@@ -490,6 +490,10 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       result$Losstypes <- NULL
       result$Variables <- NULL
     }
+  })
+  
+  observeEvent(active(), {
+    if (active()) {
     if (!is.null(input$inputplottype)) {
       plotType <- input$inputplottype
       .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", plotType)
@@ -497,8 +501,8 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
       .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
     }
+    }
   })
-  
 
 
   # based on  inputs
