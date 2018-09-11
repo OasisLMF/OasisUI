@@ -4,7 +4,7 @@
 #' @param userId user id
 #' @param preselRunId preselected run id
 #' @return empty list
-#' @importFrom DT renderDataTable DTOutput dataTableProxy selectRows
+#' @importFrom DT renderDT DTOutput dataTableProxy selectRows
 #' @importFrom shinyjs show hide hidden
 #' @importFrom utils read.csv zip
 #' @rdname fileViewer
@@ -62,17 +62,14 @@ fileViewer <- function(
   })
 
   # draw company user list table with custom format options
-  output$tableFVfileList <- renderDataTable( if (!is.null(result$FLdata) ) {
+  output$tableFVfileList <- renderDT(if (!is.null(result$FLdata)) {
 
     datatable(
       #result$FLdata,
       FLdata(),
       class = "flamingo-table display",
       rownames = TRUE,
-      selection = "multiple", #list(mode = "multiple",
-                    #"none"
-                       #selected = initialSelection()
-      #),
+      selection = "multiple",
       colnames = c("Row Number" = 1),
       filter = 'bottom',
       escape = FALSE,
@@ -167,7 +164,7 @@ fileViewer <- function(
   ### FV Exposure / File Contents ----
 
   # Exposure table
-  output$tableFVExposureSelected <- renderDataTable(
+  output$tableFVExposureSelected <- renderDT(
     if (!is.null(result$fileData)) {
       datatable(
         result$fileData,

@@ -11,7 +11,7 @@
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 #' }
 #' @template return-outputNavigation
-#' @importFrom DT renderDataTable datatable
+#' @importFrom DT renderDT datatable
 #' @importFrom dplyr mutate '%>%'
 #' @importFrom utils write.csv
 #' @importFrom shinyWidgets dropdown toggleDropdownButton
@@ -40,7 +40,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     }
   })
 
-  output$tableInbox <- renderDataTable(if (userId() != FLAMINGO_GUEST_ID) {
+  output$tableInbox <- renderDT(if (userId() != FLAMINGO_GUEST_ID) {
     datatable(
       inbox(),
       class = "flamingo-table display",

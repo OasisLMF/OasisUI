@@ -6,34 +6,31 @@
 #' @return For \code{visualizationSBR()}, list of reactives.
 #' @template return-outputNavigation
 #' @rdname visualizationSBR
-#' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDataTable
-#' @importFrom dplyr mutate
 #' @export
 visualizationSBR <- function(input, output, session, dbSettings,
-                                   apiSettings, userId, 
+                                   apiSettings, userId,
                                    runIdList, preselRunId, processRunId,
                                    active = reactive(TRUE), logMessage = message,
                                    reloadMillis = 10000) {
-  
+
   ns <- session$ns
-  
+
   # Reactive Values and parameters ------------------------------------------
-  
+
   #navigation_state <- reactiveNavigation()
-  
+
   result <- reactiveValues(
-    
+
   )
-  
+
   # Run identification -----------------------------------------------------
-  
+
   # Additional plot --------------------------------------------------------
-  
+
   # Plots ------------------------------------------------------------------
-  
+
   # Go to Configure Output button -----------------------------------------------
-  
+
   invisible()
-  
+
 }
