@@ -4,8 +4,8 @@
 \alias{panelOutputModule}
 \title{Module for Output Panel}
 \usage{
-panelOutputModule(input, output, session, logMessage = message,
-  filesListData, active)
+panelOutputModule(input, output, session, logMessage = message, filesListData,
+  active)
 }
 \arguments{
 \item{input}{shiny input object}

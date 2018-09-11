@@ -4,8 +4,7 @@
 \alias{loadProgrammeData}
 \title{Call BFE webservice to load programme data}
 \usage{
-loadProgrammeData(apiSettings, progId, logWarning = function(w) warning,
-  ...)
+loadProgrammeData(apiSettings, progId, logWarning = function(w) warning, ...)
 }
 \arguments{
 \item{apiSettings}{settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}}
