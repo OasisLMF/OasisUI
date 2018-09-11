@@ -93,7 +93,7 @@ server <- function(input, output, session) {
     userId = reactive(result$userId),
     preselRunId =  auth_modules$landingPage$runId,
     preselProcId =  auth_modules$landingPage$procId,
-    preselPanel = reactive(result$preselPanel),
+    preselPanel = reactive(result$preselPanel), #auth_modules$visualizationSBR$preselPanel,#
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "PS")
@@ -135,7 +135,7 @@ server <- function(input, output, session) {
 
   # preselected panel
   observe({if (!is.null(auth_modules$visualizationSBR$preselPanel)) {
-    result$preselPanel <- auth_modules$visualizationSBR$preselPanel
+    result$preselPanel <- auth_modules$visualizationSBR$preselPanel()
   } else {
     result$preselPanel <- "1"
   }

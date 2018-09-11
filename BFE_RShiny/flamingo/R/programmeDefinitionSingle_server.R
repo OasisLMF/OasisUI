@@ -73,7 +73,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Panels switch ------------------------------------------------------------
   # Make sure the first view is reset to first panel
   observe(if (active()) {
-    workflowSteps$update("1")
+       workflowSteps$update("1") 
+   .reloadDPProgData()
+  })
+  
+  observeEvent(active(), {
+    print("preselPanel")
+    print(preselPanel())
+    if (!is.null(preselPanel())) {
+      workflowSteps$update(preselPanel())
+    } else {
+      workflowSteps$update("1") 
+    }
     .reloadDPProgData()
   })
 
