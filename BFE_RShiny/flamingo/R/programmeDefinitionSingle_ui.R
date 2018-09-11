@@ -26,8 +26,8 @@ programmeDefinitionSingleUI <- function(id) {
 
     # Hidden/visible panels
     hidden(div(id = ns("panelProgrammeTable"), panelProgrammeTable(id))),
-    div(id = ns("panelDefineProgramme"), panelDefineProgramme(id)),
     hidden(div(id = ns("panelProgrammeDetails"), panelProgrammeDetails(id))),
+    div(id = ns("panelDefineProgramme"), panelDefineProgramme(id)),
     hidden(div(id = ns("panelAssociateModel"), panelAssociateModel(id))),
     hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
     hidden(div(id = ns("panelProgrammeModelTable"), panelProgrammeModelTable(id))),

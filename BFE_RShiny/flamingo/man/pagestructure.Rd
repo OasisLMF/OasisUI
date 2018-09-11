@@ -7,7 +7,8 @@
 \title{Page Structure}
 \usage{
 pagestructure(input, output, session, userId, userName, dbSettings,
-  reloadMillis = 10000, logMessage = message, active = reactive(TRUE))
+  reloadMillis = 10000, logMessage = message,
+  active = reactive(TRUE))
 
 pageheaderUI(id)
 

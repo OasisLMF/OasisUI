@@ -40,12 +40,19 @@ browseprogrammes <- function(input, output, session, dbSettings,
     #selected run
     preselectedRunId = NULL,
     selectedRunId = NULL,
+    #Panel to select
+    preselPanel = "1",
     # output files table
     filesListData = NULL
   )
 
   #number of plot output panels
   n_panels <- 5
+  
+  #clean value
+  observeEvent(active(), {
+    result$preselPanel <- "1"
+  })
 
 
   # Run identification -----------------------------------------------------
@@ -208,7 +215,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      preselPanel = reactive(result$preselPanel)
+      preselPanel = reactive({result$preselPanel})
     )
   )
   
@@ -452,7 +459,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
 #' @importFrom shinyjs show hide enable disable hidden
 #' @importFrom dplyr rename left_join filter group_by summarise intersect
 #' @importFrom tidyr gather
-#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point
+#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area
 #' @importFrom plotly ggplotly  renderPlotly
 #' @export
 panelOutputModule <- function(input, output, session, logMessage = message, filesListData, active) {
@@ -478,9 +485,6 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
 
   # based on run ID
   observe(if (active()) {
-    print("input$chkboxgrplosstypes")
-    print(input$chkboxgrplosstypes)
-    # observeEvent( input$inputplottype, 
     if (!is.null(filesListData() )) {
       result$Granularities <- unique(filesListData()$Granularity)
       result$Losstypes <- unique(filesListData()$Losstype)
@@ -492,15 +496,13 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
   })
   
-  observeEvent(active(), {
-    if (active()) {
+  observeEvent(input$inputplottype, {
     if (!is.null(input$inputplottype)) {
       plotType <- input$inputplottype
       .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", plotType)
       .reactiveUpdateSelectGroupInput(result$Granularities, granularities, "chkboxgrpgranularities", plotType)
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
       .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
-    }
     }
   })
 
@@ -607,11 +609,11 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       for (i in seq(nrow(filesToPlot))) {
         #read file
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
-        # if (TRUE) {
-        #   oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
-        # }
+        if (TRUE) {
+          oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+          # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+          fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
+        }
         currfileData <- .readFile(fileName)
         logMessage(paste0("Reading file ", fileName))
         #replace names with standards
@@ -631,8 +633,6 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
         }
       }
 
-      print("fileData")
-      print(fileData)
       # > make ggplot friendly ------
       nonkey <- names(fileData)[ !grepl(key, names(fileData))]
       fileData <- fileData %>% gather( key = key, value = "value", -nonkey)

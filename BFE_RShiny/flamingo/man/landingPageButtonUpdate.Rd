@@ -4,7 +4,8 @@
 \alias{landingPageButtonUpdate}
 \title{Landing Page Access Control}
 \usage{
-landingPageButtonUpdate(session, dbSettings, userId, logMessage = message)
+landingPageButtonUpdate(session, dbSettings, userId,
+  logMessage = message)
 }
 \arguments{
 \item{session}{shiny session object}

@@ -25,6 +25,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   navigation_state <- reactiveNavigation()
 
+  bl_dirty = FALSE
+
   result <- reactiveValues(
     # reactive values for the programme table
     DPProgData = NULL,
@@ -71,7 +73,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Panels switch ------------------------------------------------------------
   # Make sure the first view is reset to first panel
   observe(if (active()) {
-    workflowSteps$update("1")
+       workflowSteps$update("1") 
+   .reloadDPProgData()
+  })
+  
+  observeEvent(active(), {
+    print("preselPanel")
+    print(preselPanel())
+    if (!is.null(preselPanel())) {
+      workflowSteps$update(preselPanel())
+    } else {
+      workflowSteps$update("1") 
+    }
     .reloadDPProgData()
   })
 
@@ -154,7 +167,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   ### Clear Programme Definition panel
-  onclick("abuttonProgCancel",{
+  onclick("abuttonProgCancel", {
     .clearDPAccountSelection()
     .clearProgrammeName()
     .clearSourceFilesSelection()
@@ -162,20 +175,23 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   ### Load Programme Button
-  onclick("buttonloadcanmodpr",{
+  onclick("buttonloadcanmodpr", {
     if (result$DPProgData_selected_rows != 0) {
+      #loadprogdata <- "success"
+      #progId = result$DPProgData[result$DPProgData_selected_rows, 1]
+      #logMessage(paste("loading programme - progId is:", progId))
       loadprogdata <- loadProgrammeData(apiSettings,
-                                        progId = result$DPProgData[result$DPProgData_selected_rows,1])
+                                        progId = result$DPProgData[result$DPProgData_selected_rows, 1])
       if (loadprogdata == 'success' || loadprogdata == 'Success') {
         showNotification(type = "message", "Initiating load programme data...")
         workflowSteps$update("2")
       } else {
         showNotification(type = "error", "Failed to load programme data.")
       }
+      .reloadDPProgData()
     } else {
       showNotification(type = "warning", "Please select a Programme to load programme data.")
     }
-    .reloadDPProgData()
   })
 
   ### > Source Files ----
@@ -520,14 +536,14 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Add choices possibilities  to selectprogrammeID
   # Update selectprogrammeID
   observeEvent(result$DPProgData, {
-    if (!is.null(result$DPProgData)) {
+    #if (!is.null(result$DPProgData)) {
       logMessage(paste0("updating selectprogrammeID choices because programme table was reloaded - contains ", nrow(result$DPProgData), " rows"))
       if (input$selectprogrammeID == "")
         prgId <- 1
       else
         prgId <- input$selectprogrammeID
       updateSelectInput(session, inputId = "selectprogrammeID", choices = result$DPProgData[, 1], selected = prgId)
-    }
+    #}
   })
 
   # Preselect selectprogrammeID
@@ -541,11 +557,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(input$selectprogrammeID, {
+    if (bl_dirty) logMessage("*** bl is dirty")
     if (active()) {
       show("buttonmodeldetails")
       hide("panelModelDetails")
       logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
-      if (!is.null(result$DPProgData)) {
+      if (!is.null(result$DPProgData) && !bl_dirty) {
          rowToSelect <- which(result$DPProgData[, 1] == input$selectprogrammeID)
          selectRows(dataTableProxy("tableDPprog"), rowToSelect)
       }
@@ -557,7 +574,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Add choices possibilities to selectprogOasisID
   observeEvent(result$POData, {
     if (active()) {
-      if (!is.null(result$POData) & input$selectprogrammeID != "") {
+      if (input$selectprogrammeID != "") {
         logMessage(paste("updating selectprogOasisID choices based on Programme Model Table"))
         updateSelectInput(session, inputId = "selectprogOasisID", choices = result$POData[, 1])
       }
@@ -1016,7 +1033,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # hide process run section if DC returns empty table
   observeEvent(result$prcrundata, {
-    if (!is.null(result$prcrundata)) {
+    #if (!is.null(result$prcrundata)) {
       if (nrow(result$prcrundata) == 0) {
         hide("abuttondisplayoutput")
         hide("divProcessRun")
@@ -1026,7 +1043,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         show("divProcessRun")
         hide("divhelpProcessRun")
       }
-    }
+    #}
   })
 
   # Go to browse section
@@ -1167,6 +1184,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # rowselected reactives including no selection -----------------------------
   observeEvent(input$tableDPprog_rows_selected, {
+    bl_dirty = TRUE
     if (length(input$tableDPprog_rows_selected) > 0) {
       logMessage(paste("input$tableDPprog_rows_selected is:", input$tableDPprog_rows_selected))
       result$DPProgData_selected_rows <- input$tableDPprog_rows_selected
@@ -1176,6 +1194,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     } else {
       result$DPProgData_selected_rows <- 0
     }
+    bl_dirty = FALSE
   })
 
   observeEvent(input$tableProgOasisOOK_rows_selected, {
@@ -1242,6 +1261,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     .clearSourceFilesSelection()
     .clearTransformNameSelection()
     show("panelProgrammeTable")
+    hide("panelProgrammeDetails")
     show("panelDefineProgramme")
     result$prog_flag <- "C"
   }
@@ -1421,7 +1441,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     updateTextInput(session, "tinputDPProgName", value = "")
   }
 
-  .clearSourceFilesSelection <- function(){
+  .clearSourceFilesSelection <- function() {
     updateSelectInput(session, "sinputSLFile", selected = "")
     updateSelectInput(session, "sinputSAFile", selected = "")
     hide("divSLFileSelect")
