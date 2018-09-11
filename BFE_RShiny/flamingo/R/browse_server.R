@@ -603,11 +603,11 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       for (i in seq(nrow(filesToPlot))) {
         #read file
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
-        if (TRUE) {
-          oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-          oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-          fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
-        }
+        # if (TRUE) {
+        #   oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+        #   oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+        #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
+        # }
         currfileData <- .readFile(fileName)
         logMessage(paste0("Reading file ", fileName))
         #replace names with standards
