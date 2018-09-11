@@ -134,8 +134,8 @@ server <- function(input, output, session) {
 
 
   # preselected panel
-  observe({if (!is.null(auth_modules$panelOutputModule$preselPanel)) {
-    result$preselPanel <- auth_modules$panelOutputModule$preselPanel
+  observe({if (!is.null(auth_modules$visualizationSBR$preselPanel)) {
+    result$preselPanel <- auth_modules$visualizationSBR$preselPanel
   } else {
     result$preselPanel <- "1"
   }
