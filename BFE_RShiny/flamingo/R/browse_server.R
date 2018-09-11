@@ -10,7 +10,7 @@
 #' @return list of reactives:
 #' @rdname browseprogrammes
 #' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDataTable datatable
+#' @importFrom DT renderDT datatable
 #' @importFrom dplyr mutate select contains filter
 #' @export
 browseprogrammes <- function(input, output, session, dbSettings,
@@ -94,7 +94,6 @@ browseprogrammes <- function(input, output, session, dbSettings,
   observeEvent(input$abuttongotoconfig, {
     updateNavigation(navigation_state, "PS")
     result$preselPanel <- "4"
-    print(paste0("result$preselPanel is ", result$preselPanel))
   })
 
   # Summary Table ----------------------------------------------------------
@@ -136,10 +135,16 @@ browseprogrammes <- function(input, output, session, dbSettings,
         if (status == StatusCompleted) {
           result$filesListData <- getFileList(dbSettings, input$selectRunID)
           result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))        }
+      } 
+      else {
+        result$filesListData <- NULL
       }
+    } else {
+      result$filesListData <- NULL
     }
   }
   })
+  
 
   sub_modules$panelViewOutputFilesModule <- callModule(
     panelViewOutputFilesModule,
@@ -206,6 +211,8 @@ browseprogrammes <- function(input, output, session, dbSettings,
       preselPanel = reactive(result$preselPanel)
     )
   )
+  
+  moduleOutput
 }
 
 
@@ -218,7 +225,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
 #' @return list of reactives:
 #' @rdname panelViewOutputFilesModule
 #' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDataTable datatable DTOutput
+#' @importFrom DT renderDT datatable DTOutput
 #' @importFrom dplyr mutate select contains filter
 #' @export
 panelViewOutputFilesModule <- function(input, output, session, logMessage = message, filesListData) {
@@ -244,7 +251,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
   })
 
 
-  output$outputfilestable <- renderDataTable(
+  output$outputfilestable <- renderDT(
     if (!is.null(result$filesListData)) {
       filesListDataFiltered <- result$filesListData %>% select(-contains("Location")) %>% select(-c("Variable", "Granularity", "Losstype"))
       datatable(
@@ -256,8 +263,19 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
         colnames = c('Row Number' = 1),
         options = .getFLTableOptions()
       )
-
-    })
+    } else {
+      datatable(
+        data.frame(content = "nothing to show"),
+        class = "flamingo-table display",
+        selection = "none",
+        rownames = FALSE,
+        filter = 'bottom',
+        colnames = c(""),
+        width = "100%",
+        options = list(searchHighlight = TRUE))
+    }
+    
+    )
 
   output$FLTdownloadexcel <- downloadHandler(
     filename = "outputfilestable.csv",
@@ -269,7 +287,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
   # File content view ---------------------------------------------------
 
   # Exposure table
-  output$tableFVExposureSelected <- renderDataTable(
+  output$tableFVExposureSelected <- renderDT(
     if (!is.null(result$fileData)) {
       datatable(
         result$fileData,
@@ -432,7 +450,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
 #' @return reactive value of the title
 #' @rdname panelOutputModule
 #' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom dplyr rename left_join filter group_by summarise
+#' @importFrom dplyr rename left_join filter group_by summarise intersect
 #' @importFrom tidyr gather
 #' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point
 #' @importFrom plotly ggplotly  renderPlotly
@@ -445,7 +463,9 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
 
   result <- reactiveValues(
     #plot and panel title
-    Title = ""
+    Title = "",
+    #checkboxes
+    chkboxes = FALSE
   )
 
   observe(if (active()) {
@@ -453,46 +473,63 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     # plotlyOutput persists to re-creating the UI
     output$outputplot <- renderPlotly(NULL)
   })
+  
   # Enable / Disable options -------------------------------
 
   # based on run ID
-  observe({
-    plotType <- input$inputplottype
-    if (!is.null(filesListData() )) {
-      Granularities <- unique(filesListData()$Granularity)
-      Losstypes <- unique(filesListData()$Losstype)
-      Variables <- unique(filesListData()$Variable)
-      .reactiveUpdateSelectGroupInput(Losstypes, losstypes, "chkboxgrplosstypes", plotType)
-      .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", plotType)
-      .reactiveUpdateSelectGroupInput(Variables, variables, "chkboxgrpvariables", plotType)
-    }
-  })
-
-  #based on plot type
-  observeEvent(input$inputplottype, {
-    .reactiveUpdateSelectGroupInput(plottypeslist[[input$inputplottype]]$Variables, variables, "chkboxgrpvariables", "Variables")
-  })
-
-  #No policiy if only GUL is selected
-  observeEvent(input$chkboxgrplosstypes, {
+  observe(if (active()) {
+    print("input$chkboxgrplosstypes")
     print(input$chkboxgrplosstypes)
-    currlostypes <- paste(input$chkboxgrplosstypes, collapse = "")
-    if (currlostypes == "GUL") {
-      updateCheckboxGroupInput(session = session, inputId = "chkboxgrpgranularities", selected = granularities[which(granularities != "Policy")] )
-      js$disableCheckboxes(checkboxGroupInputId = ns("chkboxgrpgranularities"),
-                           disableIdx = which(granularities == "Policy") - 1)
+    # observeEvent( input$inputplottype, 
+    if (!is.null(filesListData() )) {
+      result$Granularities <- unique(filesListData()$Granularity)
+      result$Losstypes <- unique(filesListData()$Losstype)
+      result$Variables <- unique(filesListData()$Variable)
+    } else {
+      result$Granularities <- NULL
+      result$Losstypes <- NULL
+      result$Variables <- NULL
+    }
+    if (!is.null(input$inputplottype)) {
+      plotType <- input$inputplottype
+      .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", plotType)
+      .reactiveUpdateSelectGroupInput(result$Granularities, granularities, "chkboxgrpgranularities", plotType)
+      .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
+      .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
     }
   })
+  
 
+
+  # based on  inputs
+  observeEvent(input$chkboxgrplosstypes, {
+    plotType <- input$inputplottype
+    #if no losstype selected, then all inactive
+    if (length(input$chkboxgrplosstypes) == 0) {
+      .reactiveUpdateSelectGroupInput(NULL, granularities, "chkboxgrpgranularities", plotType)
+      .reactiveUpdateSelectGroupInput(NULL, variables, "chkboxgrpvariables", plotType)
+    } else {
+      #if losstype = GUL then policy inactive
+      currlostypes <- paste(input$chkboxgrplosstypes, collapse = "")
+      if (currlostypes == "GUL") {
+        Granularities <- result$Granularities[which(result$Granularities != "Policy")]
+      } else {
+        Granularities <- result$Granularities
+      }
+      .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", plotType)
+      .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
+    }
+  })
+  
 
   #Disable Cumulative if Aggregate and/or multiple variables are selected
-
-  observeEvent( input$inputplottype, {
-    if (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1 ) {
-      disable(id = "chkboxcumulate")
-    } else {
-      enable(id = "chkboxcumulate")
-    }
+  
+  observeEvent(input$chkboxaggregate, {
+    .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
+  })
+  
+  observeEvent(input$chkboxgrpvariables, {
+    .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
   })
 
   # Extract dataframe to plot ----------------------------------------------
@@ -655,10 +692,23 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       # N.B.: JavaScript array indices start at 0
       js$disableCheckboxes(checkboxGroupInputId = ns(inputid),
                            disableIdx = which(listvalues %in% setdiff(listvalues, selected)) - 1)
+      if (result$chkboxes) {
+        updateCheckboxGroupInput(session = session, inputId = inputid, selected = selected)
+      }
+      result$chkboxes <- FALSE
     } else {
-      updateCheckboxGroupInput(session = session, inputId = inputid, selected = FALSE)
+      updateCheckboxGroupInput(session = session, inputId = inputid, selected = NULL)
       js$disableCheckboxes(checkboxGroupInputId = ns(inputid),
                            disableIdx = seq_along(listvalues) - 1)
+      result$chkboxes <- TRUE
+    }
+  }
+  
+  .enableDisableUponCondition <- function(ID, condition){
+    if (condition ) {
+      disable(id = ID)
+    } else {
+      enable(id = ID)
     }
   }
 
@@ -724,7 +774,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
 #' @param selectRunID selected runID
 #' @return null
 #' @rdname panelSummaryTableModule
-#' @importFrom DT renderDataTable datatable
+#' @importFrom DT renderDT datatable
 #' @export
 panelSummaryTableModule <- function(input, output, session, dbSettings,
                                     apiSettings, userId, logMessage = message, selectRunID ) {
@@ -741,7 +791,7 @@ panelSummaryTableModule <- function(input, output, session, dbSettings,
   })
 
   observe({
-    output$outputsummarytable <- renderDataTable({
+    output$outputsummarytable <- renderDT({
       outputSummaryData <- executeDbQuery(dbSettings,
                                           paste("exec getOutputSummary", result$selectRunID))
       if (!is.null(outputSummaryData)) {
