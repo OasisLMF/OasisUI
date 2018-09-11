@@ -1163,7 +1163,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # Go to browse section
   observeEvent(input$abuttondisplayoutput, {
-    updateNavigation(navigation_state, "BR")
+    updateNavigation(navigation_state, "BRS")
   })
 
   ### Hide Output Configuration panel
