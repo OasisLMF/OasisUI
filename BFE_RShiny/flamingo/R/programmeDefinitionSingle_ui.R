@@ -98,7 +98,7 @@ panelDefineProgramme <- function(id) {
     show = FALSE,
     ns("progdef"),
     heading = tagAppendChildren(
-      h4("Define Programme"),
+      h4("New Programme"),
       actionButton(inputId = ns("abuttonhidedefineprogpanel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     defineProgramme(id)
@@ -136,6 +136,7 @@ panelProgrammeDetails <- function(id) {
     ns("progdtl"),
     heading = tagAppendChildren(
       h4("Programme Details"),
+      uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE), 
       actionButton(inputId = ns("abuttondefprogrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
