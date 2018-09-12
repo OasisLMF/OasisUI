@@ -78,8 +78,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   observeEvent(active(), {
-    print("preselPanel")
-    print(preselPanel())
     if (!is.null(preselPanel())) {
       workflowSteps$update(preselPanel())
     } else {
@@ -456,6 +454,14 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       options = .getPRTableOptions()
     )
   })
+  
+  output$paneltitleProgrammeDetails <- renderUI({
+    if (length(result$DPProgData_selected_rows) == 1 ) {
+      progId <- result$DPProgData[result$DPProgData_selected_rows, 1]
+      progName <- result$DPProgData[result$DPProgData_selected_rows, 2]
+      paste0("- ", progName, " (id: ", progId, ")" )
+    } 
+  })
 
   # Show Programme Details
   observeEvent(input$buttonprogdetails, {
@@ -474,6 +480,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (active()) {
       if (workflowSteps$step() == "2") {
         .defaultAssociateModel()
+      }
+      if (workflowSteps$step() == "1") {
+        .defaultCreateProg()
       }
     }
     if (result$DPProgData_selected_rows != 0) {
@@ -510,12 +519,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                             isolate(input$sinputookprogid),
                                             isolate(input$sinputookmodelid),
                                             isolate(input$sinputProgModTransform))
-      showNotification(type = "message",
-                       paste("Prog Oasis id:", result$progOasisId,  " created."))
-      .clearOOKSidebar()
-      workflowSteps$update("3")
-      .reloadPOData()
-      if (result$POData_selected_rows != 0) {
+      if (is.null(result$progOasisId)) {
+        showNotification(type = "error",
+                         paste("No Prog Oasis created"))
+      } else {
+        showNotification(type = "message",
+                         paste("Prog Oasis id:", result$progOasisId,  " created."))
+        .clearOOKSidebar()
+        workflowSteps$update("3")
+        .reloadPOData()
+        result$POData_selected_rows <-  match(result$progOasisId, result$POData[,1])
         loadprogmodel <- loadProgrammeModel(apiSettings,
                                             progOasisId = toString(result$POData[result$POData_selected_rows,1]))
         if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
