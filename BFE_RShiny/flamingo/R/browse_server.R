@@ -48,7 +48,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
 
   #number of plot output panels
   n_panels <- 5
-  
+
   #clean value
   observeEvent(active(), {
     result$preselPanel <- "1"
@@ -142,7 +142,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
         if (status == StatusCompleted) {
           result$filesListData <- getFileList(dbSettings, input$selectRunID)
           result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))        }
-      } 
+      }
       else {
         result$filesListData <- NULL
       }
@@ -151,7 +151,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
     }
   }
   })
-  
+
 
   sub_modules$panelViewOutputFilesModule <- callModule(
     panelViewOutputFilesModule,
@@ -218,7 +218,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
       preselPanel = reactive({result$preselPanel})
     )
   )
-  
+
   moduleOutput
 }
 
@@ -281,7 +281,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
         width = "100%",
         options = list(searchHighlight = TRUE))
     }
-    
+
     )
 
   output$FLTdownloadexcel <- downloadHandler(
@@ -480,7 +480,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     # plotlyOutput persists to re-creating the UI
     output$outputplot <- renderPlotly(NULL)
   })
-  
+
   # Enable / Disable options -------------------------------
 
   # based on run ID
@@ -496,9 +496,15 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
   })
   
-  observeEvent(input$inputplottype, {
-    if (!is.null(input$inputplottype)) {
-      plotType <- input$inputplottype
+  inputplottype <- reactive({
+    if (active()) {
+      input$inputplottype
+    }
+  })
+  
+  observeEvent(inputplottype(), {
+    if (!is.null(inputplottype())) {
+      plotType <- inputplottype()
       .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", plotType)
       .reactiveUpdateSelectGroupInput(result$Granularities, granularities, "chkboxgrpgranularities", plotType)
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
@@ -509,7 +515,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
 
   # based on  inputs
   observeEvent(input$chkboxgrplosstypes, {
-    plotType <- input$inputplottype
+    plotType <- inputplottype()
     #if no losstype selected, then all inactive
     if (length(input$chkboxgrplosstypes) == 0) {
       .reactiveUpdateSelectGroupInput(NULL, granularities, "chkboxgrpgranularities", plotType)
@@ -517,7 +523,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     } else {
       #if losstype = GUL then policy inactive
       currlostypes <- paste(input$chkboxgrplosstypes, collapse = "")
-      if (currlostypes == "GUL") {
+      if ( "GUL" %in% currlostypes) {
         Granularities <- result$Granularities[which(result$Granularities != "Policy")]
       } else {
         Granularities <- result$Granularities
@@ -526,14 +532,14 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
     }
   })
-  
+
 
   #Disable Cumulative if Aggregate and/or multiple variables are selected
-  
+
   observeEvent(input$chkboxaggregate, {
     .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
   })
-  
+
   observeEvent(input$chkboxgrpvariables, {
     .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
   })
@@ -545,7 +551,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   observeEvent(input$abuttondraw, {
 
     # > print current selection
-    logMessage(paste0("Plotting ", input$inputplottype,
+    logMessage(paste0("Plotting ", inputplottype(),
                       " for loss types: ", input$chkboxgrplosstypes,
                       ", variables: ", input$chkboxgrpvariables,
                       ", granularities: ",input$chkboxgrpgranularities ))
@@ -557,14 +563,14 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     filesToPlot <- NULL
 
     # > Plot parameters ----
-    key <- plottypeslist[[input$inputplottype]]$keycols
+    key <- plottypeslist[[inputplottype()]]$keycols
     suffix <- c("Losstype", "Variable", "Granularity" )
-    key <- plottypeslist[[input$inputplottype]]$keycols
-    x <- plottypeslist[[input$inputplottype]]$x
-    colsToDrop <- plottypeslist[[input$inputplottype]]$extracols
+    key <- plottypeslist[[inputplottype()]]$keycols
+    x <- plottypeslist[[inputplottype()]]$x
+    colsToDrop <- plottypeslist[[inputplottype()]]$extracols
     colsToPlot <- c("xaxis", "key", "value")
-    xlabel <- plottypeslist[[input$inputplottype]]$xlabel
-    ylabel <- plottypeslist[[input$inputplottype]]$ylabel
+    xlabel <- plottypeslist[[inputplottype()]]$xlabel
+    ylabel <- plottypeslist[[inputplottype()]]$ylabel
 
     # > DF indicating structure of the plot -----
     plotstrc <- data.frame("Loss" = NULL, "Variable" = NULL, "Granularity" = NULL)
@@ -622,7 +628,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
         } else {
           newname <- paste0(key, ".", filesToPlot[i, suffix[3]])
         }
-        oldname <- plottypeslist[[input$inputplottype]]$keycols
+        oldname <- plottypeslist[[inputplottype()]]$keycols
         names(currfileData)[names(currfileData) == oldname] <- newname
         #Join data
         if (is.null(fileData)) {
@@ -659,18 +665,17 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
         }
       }
       fileData$colour <- gsub(paste0(key, "."), "", fileData$colour)
-      print(paste0("fileData is"))
-      print(fileData)
+      # print(paste0("fileData is"))
+      # print(fileData)
     }
 
     # > Draw plot ----
     if (input$textinputtitle != "") {
       result$Title <- input$textinputtitle
     }
-    result$Title <- toupper(result$Title)
     if (!is.null(fileData)) {
-      if (plottypeslist[[input$inputplottype]]$plottype == "line") {
-        p <- .linePlotDF(xlabel, ylabel, result$Title, fileData,
+      if (plottypeslist[[inputplottype()]]$plottype == "line") {
+        p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), fileData,
                          multipleplots = multipleplots, cumulative = cumulate)
       }
       # https://github.com/rstudio/rstudio/issues/2919
@@ -707,7 +712,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       result$chkboxes <- TRUE
     }
   }
-  
+
   .enableDisableUponCondition <- function(ID, condition){
     if (condition ) {
       disable(id = ID)
