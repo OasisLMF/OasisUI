@@ -48,7 +48,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
 
   #number of plot output panels
   n_panels <- 5
-  
+
   #clean value
   observeEvent(active(), {
     result$preselPanel <- "1"
@@ -142,7 +142,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
         if (status == StatusCompleted) {
           result$filesListData <- getFileList(dbSettings, input$selectRunID)
           result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))        }
-      } 
+      }
       else {
         result$filesListData <- NULL
       }
@@ -151,7 +151,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
     }
   }
   })
-  
+
 
   sub_modules$panelViewOutputFilesModule <- callModule(
     panelViewOutputFilesModule,
@@ -218,7 +218,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
       preselPanel = reactive({result$preselPanel})
     )
   )
-  
+
   moduleOutput
 }
 
@@ -281,7 +281,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
         width = "100%",
         options = list(searchHighlight = TRUE))
     }
-    
+
     )
 
   output$FLTdownloadexcel <- downloadHandler(
@@ -480,7 +480,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     # plotlyOutput persists to re-creating the UI
     output$outputplot <- renderPlotly(NULL)
   })
-  
+
   # Enable / Disable options -------------------------------
 
   # based on run ID
@@ -532,14 +532,14 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
     }
   })
-  
+
 
   #Disable Cumulative if Aggregate and/or multiple variables are selected
-  
+
   observeEvent(input$chkboxaggregate, {
     .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
   })
-  
+
   observeEvent(input$chkboxgrpvariables, {
     .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
   })
@@ -673,10 +673,9 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     if (input$textinputtitle != "") {
       result$Title <- input$textinputtitle
     }
-    result$Title <- toupper(result$Title)
     if (!is.null(fileData)) {
       if (plottypeslist[[inputplottype()]]$plottype == "line") {
-        p <- .linePlotDF(xlabel, ylabel, result$Title, fileData,
+        p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), fileData,
                          multipleplots = multipleplots, cumulative = cumulate)
       }
       # https://github.com/rstudio/rstudio/issues/2919
@@ -713,7 +712,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       result$chkboxes <- TRUE
     }
   }
-  
+
   .enableDisableUponCondition <- function(ID, condition){
     if (condition ) {
       disable(id = ID)

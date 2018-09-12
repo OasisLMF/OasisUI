@@ -52,7 +52,7 @@ panelSummaryTable <-  function(id){
   flamingoPanel(
     id = ns("flamingoPanelSummaryTable"),
     collapsible = TRUE,
-    heading = "Process Run Summary Table",
+    heading = "Summary Table",
     panelSummaryTableModuleUI(ns( "panelSummaryTableModule"))
   )
 }
@@ -76,7 +76,7 @@ panelOutput <-  function(id){
   ns <- NS(id)
   flamingoIncrementalPanelUI(
     id = ns("flamingoIncrementalPanelOutput-0"),
-    # heading = "Process Run Output Custom Plot",
+    heading = "New Plot",
     collapsible = FALSE, show = FALSE, removable = FALSE)
 }
 
@@ -133,7 +133,7 @@ panelViewOutputFiles <-  function(id){
   flamingoPanel(
     id = ns("flamingoPanelViewOutputFiles"),
     collapsible = TRUE,
-    heading = "Process Run Output Files Table",
+    heading = "Files Table",
     panelViewOutputFilesModuleUI(ns("panelViewOutputFilesModule"))
   )
 }
