@@ -496,7 +496,13 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
   })
   
-  observeEvent(input$inputplottype, {
+  inputplottype <- reactive({
+    if (active()) {
+      input$inputplottype
+    }
+  })
+  
+  observeEvent(inputplottype(), {
     if (!is.null(input$inputplottype)) {
       plotType <- input$inputplottype
       .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", plotType)
@@ -517,7 +523,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     } else {
       #if losstype = GUL then policy inactive
       currlostypes <- paste(input$chkboxgrplosstypes, collapse = "")
-      if (currlostypes == "GUL") {
+      if ( "GUL" %in% currlostypes) {
         Granularities <- result$Granularities[which(result$Granularities != "Policy")]
       } else {
         Granularities <- result$Granularities
