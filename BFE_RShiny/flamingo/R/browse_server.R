@@ -503,8 +503,8 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   })
   
   observeEvent(inputplottype(), {
-    if (!is.null(input$inputplottype)) {
-      plotType <- input$inputplottype
+    if (!is.null(inputplottype())) {
+      plotType <- inputplottype()
       .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", plotType)
       .reactiveUpdateSelectGroupInput(result$Granularities, granularities, "chkboxgrpgranularities", plotType)
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
@@ -515,7 +515,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
 
   # based on  inputs
   observeEvent(input$chkboxgrplosstypes, {
-    plotType <- input$inputplottype
+    plotType <- inputplottype()
     #if no losstype selected, then all inactive
     if (length(input$chkboxgrplosstypes) == 0) {
       .reactiveUpdateSelectGroupInput(NULL, granularities, "chkboxgrpgranularities", plotType)
@@ -551,7 +551,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   observeEvent(input$abuttondraw, {
 
     # > print current selection
-    logMessage(paste0("Plotting ", input$inputplottype,
+    logMessage(paste0("Plotting ", inputplottype(),
                       " for loss types: ", input$chkboxgrplosstypes,
                       ", variables: ", input$chkboxgrpvariables,
                       ", granularities: ",input$chkboxgrpgranularities ))
@@ -563,14 +563,14 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     filesToPlot <- NULL
 
     # > Plot parameters ----
-    key <- plottypeslist[[input$inputplottype]]$keycols
+    key <- plottypeslist[[inputplottype()]]$keycols
     suffix <- c("Losstype", "Variable", "Granularity" )
-    key <- plottypeslist[[input$inputplottype]]$keycols
-    x <- plottypeslist[[input$inputplottype]]$x
-    colsToDrop <- plottypeslist[[input$inputplottype]]$extracols
+    key <- plottypeslist[[inputplottype()]]$keycols
+    x <- plottypeslist[[inputplottype()]]$x
+    colsToDrop <- plottypeslist[[inputplottype()]]$extracols
     colsToPlot <- c("xaxis", "key", "value")
-    xlabel <- plottypeslist[[input$inputplottype]]$xlabel
-    ylabel <- plottypeslist[[input$inputplottype]]$ylabel
+    xlabel <- plottypeslist[[inputplottype()]]$xlabel
+    ylabel <- plottypeslist[[inputplottype()]]$ylabel
 
     # > DF indicating structure of the plot -----
     plotstrc <- data.frame("Loss" = NULL, "Variable" = NULL, "Granularity" = NULL)
@@ -628,7 +628,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
         } else {
           newname <- paste0(key, ".", filesToPlot[i, suffix[3]])
         }
-        oldname <- plottypeslist[[input$inputplottype]]$keycols
+        oldname <- plottypeslist[[inputplottype()]]$keycols
         names(currfileData)[names(currfileData) == oldname] <- newname
         #Join data
         if (is.null(fileData)) {
@@ -674,7 +674,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       result$Title <- input$textinputtitle
     }
     if (!is.null(fileData)) {
-      if (plottypeslist[[input$inputplottype]]$plottype == "line") {
+      if (plottypeslist[[inputplottype()]]$plottype == "line") {
         p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), fileData,
                          multipleplots = multipleplots, cumulative = cumulate)
       }
