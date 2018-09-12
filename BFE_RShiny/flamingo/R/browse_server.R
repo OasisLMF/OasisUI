@@ -659,8 +659,8 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
         }
       }
       fileData$colour <- gsub(paste0(key, "."), "", fileData$colour)
-      print(paste0("fileData is"))
-      print(fileData)
+      # print(paste0("fileData is"))
+      # print(fileData)
     }
 
     # > Draw plot ----
