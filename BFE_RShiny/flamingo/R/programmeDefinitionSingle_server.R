@@ -105,6 +105,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         logMessage("showing panelDefineIDs panelProgrammeModelTable panelDefineOutputs")
         .hideDivs()
         .defaultConfigOutput()
+        .defaultview(session)
         #.reloadPOData()
       },
       "4" = {
@@ -728,20 +729,21 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   # Select/deselect IL
-  observeEvent(input$chkinputIL, {
-    if (input$chkinputIL == FALSE) {
-      .clearchkboxILgrp()
-    } else {
-      illistlength <- length(input$chkilprog) + length(input$chkilstate) +
-        length(input$chkilcounty) + length(input$chkilloc) +
-        length(input$chkillob) + length(input$chkilpolicy)
-      if (illistlength == 0) {
-        for (i in checkilgrplist) {
-          updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesIL)
-        }
-      }
-    }
-  })
+  # observeEvent(input$chkinputIL, {
+  #   if (input$chkinputIL == FALSE) {
+  #     .clearchkboxILgrp()
+  #   } 
+  #   # else {
+  #   #   illistlength <- length(input$chkilprog) + length(input$chkilstate) +
+  #   #     length(input$chkilcounty) + length(input$chkilloc) +
+  #   #     length(input$chkillob) + length(input$chkilpolicy)
+  #   #   if (illistlength == 0) {
+  #   #     for (i in checkilgrplist) {
+  #   #       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesIL)
+  #   #     }
+  #   #   }
+  #   # }
+  # })
 
   # reactive expression yielding the output options as a list
   outputOptionsList <- reactive(paste(collapse = ",", c(
@@ -765,6 +767,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                    buildDbQuery("getOutputOptionOutputs", input$sinoutputoptions))
 
       if (nrow(outputlist) > 0) {
+        print(paste0("outputlist"))
+        print(outputlist)
         for (i in 1:nrow(outputlist)) {
           grpid <- paste0("chk",outputlist$Group[i])
           grpinputid <- strsplit(toString(grpid), " ")[[1]]
@@ -926,6 +930,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                            sprintf("Created Process Run ID: %s and process run is executing.",
                                    runId))
           .reloadRunData()
+          result$prcrundata_selected_rows <-  match(runId, result$prcrundata[,1])
         } else {
           showNotification(type = "warning",
                            sprintf("Created Process Run ID: %s. But process run executing failed.",
@@ -1078,6 +1083,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (result$prcrundata_selected_rows != 0) {
       logMessage(paste("result$prcrundata_selected_rows is", result$prcrundata_selected_rows))
       result$prrunid <- result$prcrundata[result$prcrundata_selected_rows, 1][1]
+    } else {
+      result$prrunid <- -1
     }
   })
 

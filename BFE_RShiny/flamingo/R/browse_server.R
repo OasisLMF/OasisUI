@@ -459,7 +459,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
 #' @importFrom shinyjs show hide enable disable hidden
 #' @importFrom dplyr rename left_join filter group_by summarise intersect
 #' @importFrom tidyr gather
-#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area
+#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area facet_wrap
 #' @importFrom plotly ggplotly  renderPlotly
 #' @export
 panelOutputModule <- function(input, output, session, logMessage = message, filesListData, active) {
