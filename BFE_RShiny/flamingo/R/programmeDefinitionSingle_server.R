@@ -98,6 +98,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         logMessage("showing panelProgrammeTable panelAssociateModel")
         .hideDivs()
         .defaultAssociateModel()
+        .defaultOOKSidebar()
         #.reloadDPProgData()
       },
       "3" = {
@@ -480,6 +481,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (active()) {
       if (workflowSteps$step() == "2") {
         .defaultAssociateModel()
+        .defaultOOKSidebar()
       }
       if (workflowSteps$step() == "1") {
         .defaultCreateProg()
