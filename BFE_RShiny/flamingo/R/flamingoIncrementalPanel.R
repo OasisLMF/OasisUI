@@ -33,13 +33,14 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state,
     cat("add", new_id, "\n")
     if (length(new_id) > 0) {
       taken[new_id] <- TRUE
-      panels_state(taken)
       new_content_id <- new_content_IDs[new_i]
       insertUI(
+        immediate = TRUE,
         sprintf("#%s", id), "beforeBegin",
         flamingoIncrementalPanelUI(new_id, new_content_fun(new_content_id, ...), heading = new_headings[[new_i]],
                                    collapsible = collapsible, show = show)
       )
+      panels_state(taken)
     } else {
       showNotification("Reached maximum number of panels", type = "warning")
     }
@@ -85,7 +86,7 @@ callIncrementalPanelModules <- function(IDs, ID_0,
     new_headings = headings,
     collapsible = collapsible, show = show
   )
-
+  
   list(
     state = panels_state,
     remove_all = function() {
@@ -114,7 +115,7 @@ if (FALSE) {
       )
     }
     examplePanel <- function(input, output, session, reset = reactive(FALSE)) {
-
+      
       if (FALSE) {
         txt <- eventReactive(input$upd, {
           input$txt_in
@@ -179,8 +180,8 @@ if (FALSE) {
         all_panels$remove_all()
       })
     }
-
+    
     shinyApp(ui = ui, server = server)
-
+    
   }
 }
