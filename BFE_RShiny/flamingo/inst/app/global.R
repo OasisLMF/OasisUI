@@ -99,6 +99,6 @@ plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full 
 )
 
 #Output options
-granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
+granularities <- c("LOB", "Location", "County","State", "Policy") #, "Portfolio")
 losstypes <- c("GUL", "IL")
 variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")
