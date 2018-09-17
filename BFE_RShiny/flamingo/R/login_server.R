@@ -25,52 +25,52 @@ loginDialog <- function(input, output, session, dbSettings, logout,
   )
   
   observeEvent(logout(), {
-        result$userId <- FLAMINGO_GUEST_ID
-        updateTextInput(session, "userid", label = "", value = "")
-        updateTextInput(session, "password", label = "", value = "")
-      })
+    js$reset()
+    result$userId <- FLAMINGO_GUEST_ID
+    updateTextInput(session, "userid", label = "", value = "")
+    updateTextInput(session, "password", label = "", value = "")
+  })
   
   observeEvent(input$loginbutton, {
-
-        if (input$loginbutton > 0) {
-          
-          userId <- FLAMINGO_GUEST_ID
-          
-          tryCatch({
-                userId <- flamingoDBLogin(
-                    dbSettings,
-                    pwd = isolate(input$password),
-                    uid = isolate(input$userid))
-              }, error = function(e) {
-                logError(e$message)
-              })
-          
-          if ( userId == FLAMINGO_GUEST_ID ) {
-            
-            showNotification("Login Failed, please check your credentials.",
-                type = "error")
-            
-          } else {
-            
-            stmt <- paste("SELECT BFEUserName FROM [dbo].[BFEUser] WHERE BFEUserID =", userId)
-            result$userName <- executeDbQuery(dbSettings, stmt)[1,1]
-            
-          }
-          
-          result$userId <- userId
-          
-        }
-
-        logMessage(paste("In Login Userid: ", result$userId))  
-        
+    
+    if (input$loginbutton > 0) {
+      
+      userId <- FLAMINGO_GUEST_ID
+      
+      tryCatch({
+        userId <- flamingoDBLogin(
+          dbSettings,
+          pwd = isolate(input$password),
+          uid = isolate(input$userid))
+      }, error = function(e) {
+        logError(e$message)
       })
+      
+      if ( userId == FLAMINGO_GUEST_ID ) {
+        
+        showNotification("Login Failed, please check your credentials.",
+                         type = "error")
+        
+      } else {
+        
+        stmt <- paste("SELECT BFEUserName FROM [dbo].[BFEUser] WHERE BFEUserID =", userId)
+        result$userName <- executeDbQuery(dbSettings, stmt)[1,1]
+        
+      }
+      
+      result$userId <- userId
+      
+    }
+    
+    logMessage(paste("In Login Userid: ", result$userId))  
+  })
   
   
   ### Module Output
   
   moduleOutput <- list(
-      userId = reactive(result$userId),
-      userName = reactive(result$userName)
+    userId = reactive(result$userId),
+    userName = reactive(result$userName)
   )
   
   return(moduleOutput)
