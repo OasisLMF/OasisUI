@@ -254,10 +254,12 @@ div.flamingo-page-division {
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button.previousStepButton {
   background-color: #eacbcb;
+  color: #3d3f3f;
 }
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button.activeStepButton {
   background-color: #bb252c;
+  background-image: linear-gradient(#d41f29, #8b2129 50%, #8b2129);
   border: 1px solid #8b2129;
   color: #ffffff;
   font-weight: bold;
@@ -265,4 +267,5 @@ div.flamingo-page-division {
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button.nextStepButton {
   background-color: #ffffff;
+  color: #8b2129;
 }
