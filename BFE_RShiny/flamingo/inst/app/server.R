@@ -75,7 +75,7 @@ server <- function(input, output, session) {
     landingPage, "landingPage",
     userId = reactive(result$userId),
     userName = reactive(result$userName),
-    reloadMillis = reloadMillis,
+    reloadMillis = reloadMillis/10,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "LP")
   )
