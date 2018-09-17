@@ -1159,6 +1159,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
           updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
         }
       }
+      .clearOutputOptions()
     } else {
       showNotification(type = "warning", "Please select Process Run")
     }
