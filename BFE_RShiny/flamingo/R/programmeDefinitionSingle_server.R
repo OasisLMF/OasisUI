@@ -952,6 +952,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   observeEvent(input$selectprogOasisID, {
     # TODO: switch to selectRows(dataTableProxy(""), rowToSelect)
     .reloadRunData()
+    if (!is.null(result$prcrundata)) {
+      result$prcrundata_selected_rows <- 1
+    } else {
+      result$prcrundata_selected_rows <- 0
+    }
     if (workflowSteps$step() == "4") {
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
@@ -1051,6 +1056,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
+ 
   # hide process run section if DC returns empty table
   observeEvent(result$prcrundata, {
     #if (!is.null(result$prcrundata)) {
@@ -1440,7 +1446,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     } else {
       hide("panelProcessRunTable")
     }
-    result$prcrundata_selected_rows <- 1
+    # result$prcrundata_selected_rows <- 1
     invisible()
   }
 
