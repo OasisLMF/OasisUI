@@ -727,23 +727,30 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       }
     }
   })
-
+  
   # Select/deselect IL
-  # observeEvent(input$chkinputIL, {
-  #   if (input$chkinputIL == FALSE) {
-  #     .clearchkboxILgrp()
-  #   } 
-  #   # else {
-  #   #   illistlength <- length(input$chkilprog) + length(input$chkilstate) +
-  #   #     length(input$chkilcounty) + length(input$chkilloc) +
-  #   #     length(input$chkillob) + length(input$chkilpolicy)
-  #   #   if (illistlength == 0) {
-  #   #     for (i in checkilgrplist) {
-  #   #       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesIL)
-  #   #     }
-  #   #   }
-  #   # }
-  # })
+  observeEvent(input$chkinputIL, {
+    if (input$chkinputIL == FALSE) {
+      .clearchkboxILgrp()
+    } else {
+      print("(input$chkinputIL")
+      print(input$chkinputIL)
+      print("(length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
+               length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
+               length(input$chkillob) == 0 & length(input$chkilpolicy) == 0)")
+      print((length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
+               length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
+               length(input$chkillob) == 0 & length(input$chkilpolicy) == 0))
+      if (length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
+          length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
+          length(input$chkillob) == 0 & length(input$chkilpolicy) == 0) {
+        for (i in checkilgrplist) {
+          updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesIL)
+        }
+      }
+    }
+  })
+  
 
   # reactive expression yielding the output options as a list
   outputOptionsList <- reactive(paste(collapse = ",", c(
