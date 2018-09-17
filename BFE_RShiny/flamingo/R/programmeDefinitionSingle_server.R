@@ -1041,16 +1041,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(result$prcrundata_selected_rows, {
     if (result$prcrundata_selected_rows != 0 & !is.null(result$prcrundata)) {
-      hide("panelDefineOutputs")
-      if (result$prcrundata[result$prcrundata_selected_rows, "ProcessRunStatus"] != StatusCompleted) {
-        hide("abuttondisplayoutput")
-        hide("abuttonshowlog")
-        show("panelProcessRunLogs")
-        logMessage("showing prrunlogtable")
-      } else {
-        show("abuttondisplayoutput")
-        show("abuttonshowlog")
-        hide("panelProcessRunLogs")
+      if (workflowSteps$step() == "4") {
+        hide("panelDefineOutputs")
+        if (result$prcrundata[result$prcrundata_selected_rows, "ProcessRunStatus"] != StatusCompleted) {
+          hide("abuttondisplayoutput")
+          hide("abuttonshowlog")
+          show("panelProcessRunLogs")
+          logMessage("showing prrunlogtable")
+        } else {
+          show("abuttondisplayoutput")
+          show("abuttonshowlog")
+          hide("panelProcessRunLogs")
+        }
       }
     }
   })
