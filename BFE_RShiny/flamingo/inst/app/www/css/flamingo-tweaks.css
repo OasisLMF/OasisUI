@@ -177,6 +177,11 @@ div.flamingo-page-division {
         display: table-row;
 }
 
+.InlineSelectInput  .selectize-input {
+        width: 150%;
+}
+
+
 .InlineSelectInput.selectize-control.single div.item {
         padding-right: 15px;
 }
