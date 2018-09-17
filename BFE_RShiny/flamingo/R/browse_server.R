@@ -492,8 +492,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   
   
   # Enable / Disable options -------------------------------
-  observe(str(filesListData()))
-  
+
   # based on run ID
   observe(if (active()) {
     updateCheckboxGroupInput(session = session, inputId = "chkboxgrplosstypes", selected = NULL)
