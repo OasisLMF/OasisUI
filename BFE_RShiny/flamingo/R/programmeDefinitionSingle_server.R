@@ -733,14 +733,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (input$chkinputIL == FALSE) {
       .clearchkboxILgrp()
     } else {
-      print("(input$chkinputIL")
-      print(input$chkinputIL)
-      print("(length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
-               length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
-               length(input$chkillob) == 0 & length(input$chkilpolicy) == 0)")
-      print((length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
-               length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
-               length(input$chkillob) == 0 & length(input$chkilpolicy) == 0))
       if (length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
           length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
           length(input$chkillob) == 0 & length(input$chkilpolicy) == 0) {
