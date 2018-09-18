@@ -186,6 +186,18 @@ div.flamingo-page-division {
         padding-right: 15px;
 }
 
+.InlineTextInput label{
+        display: table-cell; 
+        text-align: center; 
+        vertical-align: middle;
+        padding-right: 10px;
+} 
+
+.InlineTextInput .form-group { 
+        display: table-row;
+}
+
+
 /* Button to collapse flamingo panels */
 .collapsebtn:after {
   font-family: "FontAwesome"; font-weight: 900; content: "\f068";
