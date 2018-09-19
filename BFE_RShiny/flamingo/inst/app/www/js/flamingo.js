@@ -50,4 +50,6 @@ shinyjs.updateStepColors = function(params) {
   }
 };
 
-shinyjs.reset = function() {history.go(0)}
+shinyjs.reset = function() {
+  history.go(0);
+};
