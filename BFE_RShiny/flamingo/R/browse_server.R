@@ -139,9 +139,9 @@ browseprogrammes <- function(input, output, session, dbSettings,
       index <- match(c(input$selectRunID), runIdList()$RunID)
       status <- runIdList()[index, "Status"]
       if (!is.na(status) && status == StatusCompleted) {
-          result$filesListData <- getFileList(dbSettings, input$selectRunID)
-          result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))        
-        } else {
+        result$filesListData <- getFileList(dbSettings, input$selectRunID)
+        result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))        
+      } else {
         result$filesListData <- NULL
       }
     } else {
@@ -474,7 +474,15 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     Variables = character(0)
   )
   
-  
+  # reactive values holding checkbox state
+  chkbox <- list(
+    chkboxgrplosstypes = reactiveVal(NULL),
+    chkboxgrpgranularities = reactiveVal(NULL), 
+    chkboxgrpvariables = reactiveVal(NULL)
+  )
+  lapply(names(isolate(chkbox)), function(id) {
+    observe(chkbox[[id]](input[[id]]))
+  })
   
   observe(if (!active()) {
     result$Title <- ""
@@ -483,6 +491,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     result$Variables <- character(0)
     # plotlyOutput persists to re-creating the UI
     output$outputplot <- renderPlotly(NULL)
+    for (id in names(chkbox)) chkbox[[id]](NULL)
   })
   
   inputplottype <- reactive(if (active()) {
@@ -495,9 +504,6 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
 
   # based on run ID
   observe(if (active()) {
-    updateCheckboxGroupInput(session = session, inputId = "chkboxgrplosstypes", selected = NULL)
-    updateCheckboxGroupInput(session = session, inputId = "chkboxgrpgranularities", selected = NULL)
-    updateCheckboxGroupInput(session = session, inputId = "chkboxgrpvariables", selected = NULL)
     if (!is.null(filesListData() )) {
       result$Granularities <- unique(filesListData()$Granularity)
       result$Losstypes <- unique(filesListData()$Losstype)
@@ -509,7 +515,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
   })
   
-
+  
   observeEvent({
     inputplottype()
     result$Losstypes
@@ -527,23 +533,25 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   
   
   # based on  inputs
-  observeEvent(input$chkboxgrplosstypes, {
-    plotType <- inputplottype()
-    #if no losstype selected, then all inactive
-    if (length(input$chkboxgrplosstypes) == 0) {
-      .reactiveUpdateSelectGroupInput(NULL, granularities, "chkboxgrpgranularities", plotType)
-      .reactiveUpdateSelectGroupInput(NULL, variables, "chkboxgrpvariables", plotType)
-    } else {
-      #if losstype = GUL then policy inactive
-      if ( "GUL" %in% input$chkboxgrplosstypes) {
-        Granularities <- result$Granularities[which(result$Granularities != "Policy")]
+  observeEvent(
+    chkbox$chkboxgrplosstypes(),
+    ignoreNULL = FALSE, {
+      plotType <- inputplottype()
+      #if no losstype selected, then all inactive
+      if (length(chkbox$chkboxgrplosstypes()) == 0) {
+        .reactiveUpdateSelectGroupInput(NULL, granularities, "chkboxgrpgranularities", plotType)
+        .reactiveUpdateSelectGroupInput(NULL, variables, "chkboxgrpvariables", plotType)
       } else {
-        Granularities <- result$Granularities
+        #if losstype = GUL then policy inactive
+        if ("GUL" %in% chkbox$chkboxgrplosstypes()) {
+          Granularities <- result$Granularities[which(result$Granularities != "Policy")]
+        } else {
+          Granularities <- result$Granularities
+        }
+        .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", plotType)
+        .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
       }
-      .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", plotType)
-      .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
-    }
-  })
+    })
   
   
   #Disable Cumulative if Aggregate and/or multiple variables are selected
@@ -708,7 +716,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     } else {
       selectable <- reactivelistvalues
     }
-    selected <- intersect(selectable, input[[inputid]])
+    selected <- intersect(selectable, chkbox[[inputid]]())
     updateCheckboxGroupInput(session = session, inputId = inputid, selected = selected)
     # N.B.: JavaScript array indices start at 0
     js$disableCheckboxes(checkboxGroupInputId = ns(inputid),

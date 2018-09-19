@@ -157,14 +157,14 @@ server <- function(input, output, session) {
   auth_modules$userAdminDefinition <- .callModule(
     userAdminDefinition,
     id = "userAdminDefinition",
-    active = reactive(authenticated() && input$ua == "defineuser"),
+    active = reactive(authenticated() && main_visible() == "UA" && input$ua == "defineuser"),
     userId = reactive(result$userId)
   )
 
   auth_modules$companyDefinition <- .callModule(
     companyDefinition,
     id = "companyDefinition",
-    active = reactive(authenticated() && input$ua == "definecompany")
+    active = reactive(authenticated() && main_visible() == "UA" && input$ua == "definecompany")
   )
 
   ### authentication ----

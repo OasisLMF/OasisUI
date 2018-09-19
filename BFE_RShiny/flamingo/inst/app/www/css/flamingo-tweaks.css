@@ -114,7 +114,7 @@ div.flamingo-page-division {
   background-color: rgba(0, 0, 0, 0);
   font-size: 1%;
   height: 1px;
-  border-style: none; 
+  border-style: none;
 }
 
 
@@ -163,17 +163,17 @@ div.flamingo-page-division {
   background: #8b2129 !important;
 }
 
-.InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single { 
-         display: table-cell; 
-         text-align: center; 
-         vertical-align: middle; 
-} 
+.InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single {
+         display: table-cell;
+         text-align: center;
+         vertical-align: middle;
+}
 
 .InlineSelectInput  label.control-label {
         padding-right: 10px;
 }
 
-.InlineSelectInput .form-group { 
+.InlineSelectInput .form-group {
         display: table-row;
 }
 
@@ -187,13 +187,13 @@ div.flamingo-page-division {
 }
 
 .InlineTextInput label{
-        display: table-cell; 
-        text-align: center; 
+        display: table-cell;
+        text-align: center;
         vertical-align: middle;
         padding-right: 10px;
-} 
+}
 
-.InlineTextInput .form-group { 
+.InlineTextInput .form-group {
         display: table-row;
 }
 
@@ -264,9 +264,10 @@ div.flamingo-page-division {
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button {
   background-image: none;
-  border-radius: 20px;
+  border-radius: 9999px; /* circular border */
   color: #000000bf;
-  border: 1px solid #000000;
+  border: 1px solid #8b2129;
+  text-shadow: none;
 }
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button.previousStepButton {
@@ -277,7 +278,6 @@ div.flamingo-page-division {
 #programmeDefinitionSingle-workflowsteps-radiobuttons button.activeStepButton {
   background-color: #bb252c;
   background-image: linear-gradient(#d41f29, #8b2129 50%, #8b2129);
-  border: 1px solid #8b2129;
   color: #ffffff;
   font-weight: bold;
 }

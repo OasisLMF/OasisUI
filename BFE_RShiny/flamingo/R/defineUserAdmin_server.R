@@ -181,7 +181,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   ###  Permission Checking ####################################################
 
-  observe(if(active()) {
+  observeEvent({active(); userId()}, if(active()) {
 
     # the user Id here is the user id of the logged in user, not of the
     # currently selected user
