@@ -84,6 +84,7 @@ panelOutput <-  function(id){
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyWidgets panel
+#' @importFrom shinyjs hidden
 #' @importFrom plotly plotlyOutput
 #' @export
 panelOutputModuleUI <-  function(id){
@@ -95,7 +96,7 @@ panelOutputModuleUI <-  function(id){
       heading = "Custom Plot",
       h4("Data to plot"),
       column(12,
-             div( id = ns("inputplottype"), class = "InlineSelectInput",
+             div( class = "InlineSelectInput",
                   selectInput(inputId = ns("inputplottype"), label = "Select a plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1]))
              ),
       br(),
@@ -109,11 +110,10 @@ panelOutputModuleUI <-  function(id){
       br(),
       h4("Customize Plot"),
       column(4,
-             textInput(ns("textinputtitle"), "Title", "")),
+             div(class = "InlineTextInput",
+             textInput(ns("textinputtitle"), "Title", ""))),
       column(4,
-             checkboxInput(ns("chkboxaggregate"), "Aggregate to Portfolio level", TRUE)),
-      column(4,
-             checkboxInput(ns("chkboxcumulate"), "Cumulate plot", FALSE)),
+             hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
       actionButton(inputId = ns("abuttondraw"), label = "Draw Plot",  class = "btn btn-primary", style = "float:right")
     ),
 

@@ -91,14 +91,24 @@ defaultSelectChoicesIL <- c(
 plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP",
                                                                       "LEC Full Uncertainty AEP"),
                                                       "keycols" = c("loss"),
+                                                      "uncertaintycols" = c(),
                                                       "x" = c("return_period"),
                                                       "extracols" = c("X", "summary_id"),
                                                       "plottype" = "line",
                                                       "xlabel" = c("Return Period"),
-                                                      "ylabel" = c("Loss"))
+                                                      "ylabel" = c("Loss")),
+                      "AAL" = list("Variables" = c("AAL"),
+                                   "keycols" = c("mean",  "standard_deviation", "exposure_value"),
+                                   "uncertaintycols" = c("standard_deviation"),
+                                   "x" = c("type"),
+                                   "extracols" = c("X", "summary_id"),
+                                   "plottype" = "bar",
+                                   "xlabel" = c("Type"),
+                                   "ylabel" = c("Loss")
+                                   )
 )
 
 #Output options
-granularities <- c("LOB", "Location", "County","State", "Policy") #, "Portfolio")
+granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
 losstypes <- c("GUL", "IL")
 variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")

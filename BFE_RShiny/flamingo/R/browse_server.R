@@ -454,10 +454,10 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
 #' @param filesListData table of output files for a given runID
 #' @return reactive value of the title
 #' @rdname panelOutputModule
-#' @importFrom shinyjs show hide enable disable hidden
+#' @importFrom shinyjs enable disable
 #' @importFrom dplyr rename left_join filter group_by summarise intersect
-#' @importFrom tidyr gather
-#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area facet_wrap
+#' @importFrom tidyr gather separate spread
+#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area facet_wrap scale_x_continuous geom_bar geom_errorbar
 #' @importFrom plotly ggplotly  renderPlotly
 #' @export
 panelOutputModule <- function(input, output, session, logMessage = message, filesListData, active) {
@@ -477,13 +477,22 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   # reactive values holding checkbox state
   chkbox <- list(
     chkboxgrplosstypes = reactiveVal(NULL),
-    chkboxgrpgranularities = reactiveVal(NULL), 
-    chkboxgrpvariables = reactiveVal(NULL)
+    chkboxgrpvariables = reactiveVal(NULL),
+    chkboxgrpgranularities = reactiveVal(NULL) 
   )
+  
   lapply(names(isolate(chkbox)), function(id) {
     observe(chkbox[[id]](input[[id]]))
   })
   
+  #reactive triggered by the existence of the input$plottype and the changes in the data. It hoplds the selected plottype
+  inputplottype <- reactive(if (active()) {
+    filesListData()
+    input$inputplottype
+  })
+
+  
+  #clean up panel objects when inactive
   observe(if (!active()) {
     result$Title <- ""
     result$Granularities <- character(0)
@@ -494,16 +503,24 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     for (id in names(chkbox)) chkbox[[id]](NULL)
   })
   
-  inputplottype <- reactive(if (active()) {
-    filesListData()
-    input$inputplottype
+  observeEvent(inputplottype(), {
+    result$Title <- ""
+    # plotlyOutput persists to re-creating the UI
+    output$outputplot <- renderPlotly(NULL)
+    if (length( plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
+      show("chkboxuncertainty")
+    } else {
+      updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
+      hide("chkboxuncertainty")
+    }
   })
   
-  
+ 
   # Enable / Disable options -------------------------------
-
-  # based on run ID
-  observe(if (active()) {
+  
+  # > based on run ID ----
+  #Gather the Granularities, Variables and Losstypes based on the runID output presets
+   observe(if (active()) {
     if (!is.null(filesListData() )) {
       result$Granularities <- unique(filesListData()$Granularity)
       result$Losstypes <- unique(filesListData()$Losstype)
@@ -514,56 +531,40 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       result$Variables <-  character(0)
     }
   })
-  
-  
+
   observeEvent({
     inputplottype()
     result$Losstypes
     result$Granularities
     result$Variables
-  }, {
+  }, ignoreNULL = FALSE, {
     if (!is.null(inputplottype())) {
-      plotType <- inputplottype()
-      .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", plotType)
-      .reactiveUpdateSelectGroupInput(result$Granularities, granularities, "chkboxgrpgranularities", plotType)
-      .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
-      .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
+      .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", inputplottype())
+      .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
+      .reactiveUpdateSelectGroupInput(result$Granularities, granularities, "chkboxgrpgranularities", inputplottype())
+      # Check length(result$Variables) != 0 necessary because this part is triggered two times if inputplottype changes, once when the reactives are cleared and once with the updated reactives
+      if ( length(result$Variables) != 0 && length(intersect(result$Variables, plottypeslist[[inputplottype()]][["Variables"]])) == 0) {
+        showNotification("No data available for this plot type", type = "error")
+      }
     }
   })
   
-  
-  # based on  inputs
+  # > based on inputs ----
+
+  #GUL does not have policy
   observeEvent(
     chkbox$chkboxgrplosstypes(),
     ignoreNULL = FALSE, {
-      plotType <- inputplottype()
-      #if no losstype selected, then all inactive
-      if (length(chkbox$chkboxgrplosstypes()) == 0) {
-        .reactiveUpdateSelectGroupInput(NULL, granularities, "chkboxgrpgranularities", plotType)
-        .reactiveUpdateSelectGroupInput(NULL, variables, "chkboxgrpvariables", plotType)
-      } else {
         #if losstype = GUL then policy inactive
-        if ("GUL" %in% chkbox$chkboxgrplosstypes()) {
+        if ( "GUL" %in% chkbox$chkboxgrplosstypes()) {
           Granularities <- result$Granularities[which(result$Granularities != "Policy")]
         } else {
           Granularities <- result$Granularities
         }
-        .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", plotType)
-        .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", plotType)
-      }
+        .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", inputplottype())
+        .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
     })
-  
-  
-  #Disable Cumulative if Aggregate and/or multiple variables are selected
-  
-  observeEvent(input$chkboxaggregate, {
-    .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
-  })
-  
-  observeEvent(input$chkboxgrpvariables, {
-    .enableDisableUponCondition(ID = "chkboxcumulate", condition = (input$chkboxaggregate | length(input$chkboxgrpvariables) > 1))
-  })
-  
+
   # Extract dataframe to plot ----------------------------------------------
   
   #Logic to filter the files to plot
@@ -572,137 +573,156 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     
     # > print current selection
     logMessage(paste0("Plotting ", inputplottype(),
-                      " for loss types: ", input$chkboxgrplosstypes,
-                      ", variables: ", input$chkboxgrpvariables,
-                      ", granularities: ",input$chkboxgrpgranularities ))
+                      " for loss types: ", chkbox$chkboxgrplosstypes(),
+                      ", variables: ", chkbox$chkboxgrpvariables(),
+                      ", granularities: ",chkbox$chkboxgrpgranularities()
+                      # ", aggregated to Portfolio Level: ", input$chkboxaggregate
+    ))
     
-    # > clear data ----
+    # > clear data
+    # Content to plot
     fileData <- NULL
-    cumulate <- FALSE
-    multipleplots <- FALSE
+    # List of files to plot
     filesToPlot <- NULL
+    # DF indicating structure of the plot
+    plotstrc <- data.frame("Loss" = NULL, "Variable" = NULL, "Granularity" = NULL)
+    # single plot or grid
+    multipleplots = FALSE
     
-    # > Plot parameters ----
-    key <- plottypeslist[[inputplottype()]]$keycols
-    suffix <- c("Losstype", "Variable", "Granularity" )
-    key <- plottypeslist[[inputplottype()]]$keycols
+    # > Plot parameters
+    key <- plottypeslist[[inputplottype()]]$keycols[1]
+    keycols <- plottypeslist[[inputplottype()]]$keycols
     x <- plottypeslist[[inputplottype()]]$x
-    colsToDrop <- plottypeslist[[inputplottype()]]$extracols
-    colsToPlot <- c("xaxis", "key", "value")
+    suffix <- c("Losstype", "Variable", "Granularity" )
+    extracols <- plottypeslist[[inputplottype()]]$extracols
     xlabel <- plottypeslist[[inputplottype()]]$xlabel
     ylabel <- plottypeslist[[inputplottype()]]$ylabel
+    uncertainty <- plottypeslist[[inputplottype()]]$uncertaintycols
+    plottype <- plottypeslist[[inputplottype()]]$plottype
     
-    # > DF indicating structure of the plot -----
-    plotstrc <- data.frame("Loss" = NULL, "Variable" = NULL, "Granularity" = NULL)
-    
-    
-    # Not allowed to have no choices or multiple granularities in one plot
-    if (length(input$chkboxgrplosstypes) == 0 | length(input$chkboxgrpgranularities) == 0 | length(input$chkboxgrpvariables) == 0 | length(input$chkboxgrpgranularities) > 1) {
-      showNotification("Select the loss type(s), the variable(s) and the granularity to plot", type = "error")
+    # > sanity checks ----
+    #If no data to plot show error
+    if (length(chkbox$chkboxgrplosstypes()) == 0    | 
+        length(chkbox$chkboxgrpvariables()) == 0    | 
+        length(chkbox$chkboxgrpgranularities()) == 0) {
+      showNotification("Select the loss type(s), the variable(s) and the granularity of the data to plot", type = "error")
     } else {
-      if (length(input$chkboxgrplosstypes) > 1 ) {
-        if (length(input$chkboxgrpvariables) > 1) {
-          showNotification("With multiple loss types only one variable per plot is allowed", type = "error")
-        } else {
-          plotstrc <- data.frame("Loss" = c(2), "Variable" = c(1), "Granularity" = c(1))
-          result$Title <- paste0(key, " per ", input$chkboxgrpgranularities)
-        }
+      #If data to plot
+      #Only one granularity is allowed
+      if (length(chkbox$chkboxgrpgranularities()) > 1) {
+        showNotification("Select only one granularity to plot", type = "error")
       } else {
-        result$Title <- paste0(input$chkboxgrplosstypes, " ", input$chkboxgrpvariables, " per ", input$chkboxgrpgranularities)
-        if (length(input$chkboxgrpvariables) > 1) {
-          plotstrc <- data.frame("Loss" = c(1), "Variable" = c(length(input$chkboxgrpvariables)), "Granularity" = c(1))
+        # Max 2 variables are allowed
+        if (length(chkbox$chkboxgrpvariables()) > 2) {
+          showNotification("Select max two variables to plot", type = "error")
         } else {
-          plotstrc <- data.frame("Loss" = c(1), "Variable" = c(1), "Granularity" = c(1))
-        }
-      }
-    }
+          # If 2 loss types
+          if (length(chkbox$chkboxgrplosstypes()) > 1) {
+            #With 2 loss types only one variable is allowed
+            if (length(chkbox$chkboxgrpvariables()) > 1) {
+              showNotification("Select only one variable to plot", type = "error")
+            } else {
+              plotstrc <- data.frame("Loss" = c(2), "Variable" = c(1), "Granularity" = c(1))
+              result$Title <- paste0(key, " per ", chkbox$chkboxgrpgranularities())
+            } # One variable
+          } else {
+            # If one loss type
+            # if 2 variables
+            if (length(chkbox$chkboxgrpvariables()) > 1) {
+              plotstrc <- data.frame("Loss" = c(1), "Variable" = c(2), "Granularity" = c(1))
+              result$Title <- paste0(chkbox$chkboxgrplosstypes(), " per ", chkbox$chkboxgrpgranularities())
+            } else {
+              result$Title <- paste0(chkbox$chkboxgrpvariables(), " of ", chkbox$chkboxgrplosstypes(), "per ", chkbox$chkboxgrpgranularities())
+              plotstrc <- data.frame("Loss" = c(1), "Variable" = c(1), "Granularity" = c(1)) 
+            } # One variable
+          }# One loss type
+        } # Variables < 3
+      } # Granularity is one
+    } # End of sanity checksThere is data to plot
     
-    # > get table of files to plot ----
+    
+    # > filter out files ----
     if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
-      filesToPlot <- filesListData()  %>% filter(Losstype %in% input$chkboxgrplosstypes,
-                                                 Variable %in% input$chkboxgrpvariables,
-                                                 Granularity %in% input$chkboxgrpgranularities)
+      filesToPlot <- filesListData()  %>% filter(Losstype %in% chkbox$chkboxgrplosstypes(),
+                                                 Variable %in% chkbox$chkboxgrpvariables(),
+                                                 Granularity %in%  chkbox$chkboxgrpgranularities())
       if (nrow(filesToPlot) !=  prod(plotstrc)) {
         showNotification("The run did not produce the selected output. Please check the logs", type = "error")
         filesToPlot <- NULL
       }
     }
     
-    # > Read files to plot ---------
     if (!is.null(filesToPlot)) {
-      
-      #get data to show in modal table
-      for (i in seq(nrow(filesToPlot))) {
-        #read file
+      # > read files to plot ---------
+      for (i in seq(nrow(filesToPlot))) { # i<- 1
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
-        # if (TRUE) {
-        #   oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
-        # }
-        currfileData <- .readFile(fileName)
-        logMessage(paste0("Reading file ", fileName))
-        #replace names with standards
-        if (any(which(plotstrc == 2))) {
-          newname <- paste0(key, ".", filesToPlot[i, suffix[which(plotstrc == 2)]])
-        } else {
-          newname <- paste0(key, ".", filesToPlot[i, suffix[3]])
+        if (TRUE) {
+          oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+          # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+          fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
         }
-        oldname <- plottypeslist[[inputplottype()]]$keycols
-        names(currfileData)[names(currfileData) == oldname] <- newname
+        currfileData <- .readFile(fileName)
+        nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
+        gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) & !(names(currfileData) %in% extracols) & !(names(currfileData) %in% x)]
+        if (any(which(plotstrc == 2))) {
+          extension <- filesToPlot[i, suffix[which(plotstrc == 2)]]
+        } else {
+          extension <- filesToPlot[i, suffix[3]]
+        }
+        for (k in keycols) {
+          newnamekey <- paste0(k, ".", extension)
+          names(currfileData)[names(currfileData) == k] <- newnamekey
+        }
         #Join data
         if (is.null(fileData)) {
           fileData <- currfileData
         } else {
-          bycol <- names(currfileData)[ !grepl(key, names(currfileData))]
-          fileData <- left_join(fileData, currfileData, by = bycol )
+          fileData <- left_join(fileData, currfileData, by = nonkey )
         }
       }
-      
-      # > make ggplot friendly ------
-      nonkey <- names(fileData)[ !grepl(key, names(fileData))]
-      fileData <- fileData %>% gather( key = key, value = "value", -nonkey)
-      names(fileData)[names(fileData) == x] <- "xaxis"
-      if (input$chkboxaggregate | input$chkboxgrpgranularities == "Portfolio") {
-        fileData <- fileData %>%
-          group_by(xaxis, key) %>%
-          summarise(value = sum(value))
-        result$Title <- paste0("Aggregated ", result$Title)
-        multipleplots <- FALSE
-        names(fileData)[names(fileData) == "key"] <- "colour"
-      } else {
-        colsToGrid <- names(fileData)[!(names(fileData) %in% c(colsToPlot, colsToDrop))]
-        names(fileData)[names(fileData) == colsToGrid] <- "gridCol"
-        if (any(plotstrc == 2)) {
-          multipleplots <- TRUE
-          names(fileData)[names(fileData) == "key"] <- "colour"
-        } else {
-          multipleplots <- FALSE
-          names(fileData)[names(fileData) == "gridCol"] <- "colour"
-          if (input$chkboxcumulate) {
-            cumulate <- TRUE
-          }
-        }
-      }
-      fileData$colour <- gsub(paste0(key, "."), "", fileData$colour)
-      # print(paste0("fileData is"))
-      # print(fileData)
     }
     
-    # > Draw plot ----
-    if (input$textinputtitle != "") {
-      result$Title <- input$textinputtitle
-    }
     if (!is.null(fileData)) {
-      if (plottypeslist[[inputplottype()]]$plottype == "line") {
-        p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), fileData,
-                         multipleplots = multipleplots, cumulative = cumulate)
+      # > make ggplot friendly ------
+      data <- fileData %>% gather(key = variables, value = value, -nonkey) %>% separate(variables, into = c("variables", "keyval"), sep = "\\.") %>% spread(variables, value)
+      if (length(gridcol) > 0) {
+        data <- data %>% rename("gridcol" = gridcol)
       }
-      # https://github.com/rstudio/rstudio/issues/2919
-      output$outputplot <- renderPlotly({ggplotly(p)})
-    } else {
-      showNotification("No data to plot", type = "error")
+      data <- data %>% rename("value" = key)
+      data <- data %>% rename("xaxis" = x)
+      if (length(uncertainty) > 0) {
+        data <- data %>% rename("uncertainty" = uncertainty)
+      }
+      if (any(plotstrc == 2) & length(gridcol) > 0) {
+        multipleplots <- TRUE
+        data <- data %>% rename("colour" = keyval)
+      } else {
+        multipleplots <- FALSE
+        if (length(gridcol) > 0) {
+          data <- data %>% rename("colour" = gridcol)
+        }  else {
+          data <- data %>% rename("colour" = keyval)
+        }
+      }
+      print("data")
+      print(data)
+      # > draw plot ----
+      if (input$textinputtitle != "") {
+        result$Title <- input$textinputtitle
+      }
+      if (!is.null(data)) {
+        if (plottype == "line") {
+          p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
+                           multipleplots = multipleplots)
+        } else if (plottype == "bar"){
+          p <- .barPlotDF (xlabel, ylabel, toupper(result$Title), data, wuncertainty = input$chkboxuncertainty, multipleplots = multipleplots)
+        }
+        output$outputplot <- renderPlotly({ggplotly(p)})
+      } else {
+        showNotification("No data to plot", type = "error")
+      }
     }
+    
   })
   
   
@@ -716,11 +736,12 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     } else {
       selectable <- reactivelistvalues
     }
-    selected <- intersect(selectable, chkbox[[inputid]]())
-    updateCheckboxGroupInput(session = session, inputId = inputid, selected = selected)
+    selection <- intersect(selectable, chkbox[[inputid]]())
+    updateCheckboxGroupInput(session = session, inputId = inputid, selected = FALSE)
     # N.B.: JavaScript array indices start at 0
     js$disableCheckboxes(checkboxGroupInputId = ns(inputid),
                          disableIdx = which(listvalues %in% setdiff(listvalues, selectable)) - 1)
+    updateCheckboxGroupInput(session = session, inputId = inputid, selected = selection)
   }
   
   .enableDisableUponCondition <- function(ID, condition){
@@ -731,41 +752,11 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
   }
   
-  #Helper function to plot DF
-  #Expected DF with columns:
-  # xaxis : column for aes x
-  # value : column for aes y
-  # color : column for the aes col
-  # flag multipleplots generates grid
-  # flag cumulative is a fill area plot
-  .linePlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE, cumulative = FALSE){
-    p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
-      labs(title = titleToUse, x = xlabel, y = ylabel) +
-      theme(
-        plot.title = element_text(color = "grey45", size = 18, face = "bold.italic", hjust = 0.5),
-        text = element_text(size = 18),
-        panel.background = element_blank(),
-        axis.line.x = element_line(color = "grey45", size = 0.5),
-        axis.line.y = element_line(color = "grey45", size = 0.5),
-        legend.title =  element_blank(),
-        legend.position = "top"
-      )
-    if (cumulative) {
-      p <- p + geom_area(aes(fill = colour), alpha = 0.2)
-    } else {
-      p <- p +
-        geom_line(size = 1) +
-        geom_point(size = 2)
-      if (multipleplots) {
-        p <- p + facet_wrap(.~ gridCol)
-      }
-    }
-    p
-  }
   
   #Helper function to read one file from DB
   .readFile <- function(fileName){
     if (!is.na(fileName)) {
+      logMessage(paste0("Reading file ", fileName))
       tryCatch({
         fileData <- read.csv(fileName, header = TRUE, sep = ",",
                              quote = "\"", dec = ".", fill = TRUE, comment.char = "")
@@ -780,6 +771,62 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       fileData <- NULL
     }
     return(fileData)
+  }
+  
+  #Helper functions to plot DF
+  #Expected DF with columns:
+  # xaxis : column for aes x
+  # value : column for aes y
+  # colour : column for the aes col
+  # flag multipleplots generates grid over col gridcol
+  
+  .basicplot <- function(xlabel, ylabel, titleToUse, data){
+    p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
+      labs(title = titleToUse, x = xlabel, y = ylabel) +
+      scale_x_continuous(breaks = data$xaxis, labels = data$xaxis) +
+      theme(
+        plot.title = element_text(color = "grey45", size = 18, face = "bold.italic", hjust = 0.5),
+        text = element_text(size = 18),
+        panel.background = element_blank(),
+        axis.line.x = element_line(color = "grey45", size = 0.5),
+        axis.line.y = element_line(color = "grey45", size = 0.5),
+        legend.title =  element_blank(),
+        legend.position = "top"
+      )
+    p
+  }
+  
+  .multiplot <- function(p, multipleplots = FALSE){
+    if (multipleplots) {
+      p <- p + facet_wrap(.~ gridcol)
+    }
+    p
+  }
+  
+  #Line plot
+  .linePlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE){
+    p <- .basicplot(xlabel, ylabel, titleToUse, data)
+    p <- p +
+      geom_line(size = 1) +
+      geom_point(size = 2)
+    p <- .multiplot(p, multipleplots)
+    p
+  }
+  
+  #Bar Plot
+  .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE, multipleplots = FALSE){
+    p <- .basicplot(xlabel, ylabel, titleToUse, data)
+    p <- p +
+      geom_bar(position = position_dodge(), stat = "identity", aes(fill = as.factor(colour))) 
+    if (wuncertainty){
+      p <- p +
+        geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
+                         size = .3,
+                         width = .2,                    # Width of the error bars
+                         position = position_dodge(.9)) 
+    }
+    p <- .multiplot(p,multipleplots)
+    p
   }
   
   # Module Output -----------------------
