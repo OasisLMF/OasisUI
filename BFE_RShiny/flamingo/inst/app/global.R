@@ -88,24 +88,27 @@ defaultSelectChoicesIL <- c(
 
 
 ### Plots types ------
-plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP",
-                                                                      "LEC Full Uncertainty AEP"),
+plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
                                                       "keycols" = c("loss"),
                                                       "uncertaintycols" = c(),
+                                                      "referencecols" = c(),
                                                       "x" = c("return_period"),
+                                                      "xtickslabels" = list(),
                                                       "extracols" = c("X", "summary_id"),
                                                       "plottype" = "line",
                                                       "xlabel" = c("Return Period"),
                                                       "ylabel" = c("Loss")),
-                      "AAL" = list("Variables" = c("AAL"),
-                                   "keycols" = c("mean",  "standard_deviation", "exposure_value"),
-                                   "uncertaintycols" = c("standard_deviation"),
-                                   "x" = c("type"),
-                                   "extracols" = c("X", "summary_id"),
-                                   "plottype" = "bar",
-                                   "xlabel" = c("Type"),
-                                   "ylabel" = c("Loss")
-                                   )
+                      "AAL bar plot" = list("Variables" = c("AAL"),
+                                            "keycols" = c("mean"),
+                                            "uncertaintycols" = c("standard_deviation"),
+                                            "referencecols" = c("exposure_value"),
+                                            "x" = c("type"),
+                                            "xtickslabels" = c("Numerically Integrated", "Sample Statistics"),
+                                            "extracols" = c("X", "summary_id"),
+                                            "plottype" = "bar",
+                                            "xlabel" = c("Type"),
+                                            "ylabel" = c("Loss")
+                      )
 )
 
 #Output options

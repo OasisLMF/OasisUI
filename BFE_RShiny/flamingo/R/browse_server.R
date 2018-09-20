@@ -457,7 +457,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
 #' @importFrom shinyjs enable disable
 #' @importFrom dplyr rename left_join filter group_by summarise intersect
 #' @importFrom tidyr gather separate spread
-#' @importFrom ggplot2 geom_line ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area facet_wrap scale_x_continuous geom_bar geom_errorbar
+#' @importFrom ggplot2 geom_line geom_hline ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area facet_wrap scale_x_continuous geom_bar geom_errorbar
 #' @importFrom plotly ggplotly  renderPlotly
 #' @export
 panelOutputModule <- function(input, output, session, logMessage = message, filesListData, active) {
@@ -590,14 +590,16 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     multipleplots = FALSE
     
     # > Plot parameters
-    key <- plottypeslist[[inputplottype()]]$keycols[1]
-    keycols <- plottypeslist[[inputplottype()]]$keycols
+    key <- plottypeslist[[inputplottype()]]$keycols
+    uncertainty <- plottypeslist[[inputplottype()]]$uncertaintycols
+    reference <- plottypeslist[[inputplottype()]]$referencecols
+    keycols <- c(key, uncertainty, reference)
     x <- plottypeslist[[inputplottype()]]$x
+    xtickslabels <- plottypeslist[[inputplottype()]]$xtickslabels
     suffix <- c("Losstype", "Variable", "Granularity" )
     extracols <- plottypeslist[[inputplottype()]]$extracols
     xlabel <- plottypeslist[[inputplottype()]]$xlabel
     ylabel <- plottypeslist[[inputplottype()]]$ylabel
-    uncertainty <- plottypeslist[[inputplottype()]]$uncertaintycols
     plottype <- plottypeslist[[inputplottype()]]$plottype
     
     # > sanity checks ----
@@ -656,11 +658,11 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       # > read files to plot ---------
       for (i in seq(nrow(filesToPlot))) { # i<- 1
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
-        if (TRUE) {
-          oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-          # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-          fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
-        }
+        # if (TRUE) {
+        #   oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+        #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+        #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
+        # }
         currfileData <- .readFile(fileName)
         nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
         gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) & !(names(currfileData) %in% extracols) & !(names(currfileData) %in% x)]
@@ -693,6 +695,9 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       if (length(uncertainty) > 0) {
         data <- data %>% rename("uncertainty" = uncertainty)
       }
+      if (length(reference) > 0) {
+        data <- data %>% rename("reference" = reference)
+      }
       if (any(plotstrc == 2) & length(gridcol) > 0) {
         multipleplots <- TRUE
         data <- data %>% rename("colour" = keyval)
@@ -715,7 +720,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
           p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
                            multipleplots = multipleplots)
         } else if (plottype == "bar"){
-          p <- .barPlotDF (xlabel, ylabel, toupper(result$Title), data, wuncertainty = input$chkboxuncertainty, multipleplots = multipleplots)
+          p <- .barPlotDF (xlabel, ylabel, toupper(result$Title), data, wuncertainty = input$chkboxuncertainty, multipleplots = multipleplots, xtickslabels = xtickslabels)
         }
         output$outputplot <- renderPlotly({ggplotly(p)})
       } else {
@@ -783,7 +788,6 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   .basicplot <- function(xlabel, ylabel, titleToUse, data){
     p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
       labs(title = titleToUse, x = xlabel, y = ylabel) +
-      scale_x_continuous(breaks = data$xaxis, labels = data$xaxis) +
       theme(
         plot.title = element_text(color = "grey45", size = 18, face = "bold.italic", hjust = 0.5),
         text = element_text(size = 18),
@@ -793,6 +797,13 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
         legend.title =  element_blank(),
         legend.position = "top"
       )
+    p
+  }
+  
+  .addRefLine <- function(p, reference){
+    if (!is.null(reference)) {
+      p <- p + geom_hline(yintercept = reference)
+    }
     p
   }
   
@@ -808,16 +819,17 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
       geom_line(size = 1) +
-      geom_point(size = 2)
+      geom_point(size = 2) +
     p <- .multiplot(p, multipleplots)
     p
   }
   
   #Bar Plot
-  .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE, multipleplots = FALSE){
+  .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE, multipleplots = FALSE, xtickslabels = NULL ){
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
-      geom_bar(position = position_dodge(), stat = "identity", aes(fill = as.factor(colour))) 
+      geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) +
+      scale_x_continuous(breaks = data$xaxis, labels = xtickslabels[1:length(data$xaxis)])
     if (wuncertainty){
       p <- p +
         geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
@@ -825,6 +837,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
                          width = .2,                    # Width of the error bars
                          position = position_dodge(.9)) 
     }
+    # p <- .addRefLine(p, unique(data$reference))
     p <- .multiplot(p,multipleplots)
     p
   }
