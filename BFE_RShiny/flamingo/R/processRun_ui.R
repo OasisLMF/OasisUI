@@ -395,7 +395,104 @@ processRunParamUI <- function(id) {
                       selected = NULL)
               )
           ),#end of fluidrow FM
-          
+
+          fluidRow(
+              column(4,
+                  h4("Net RI Loss", style="font-size: 18px; font-weight: bold;"),
+                  h5("Full Sample", style="font-size: 16.5px;"), 
+                  h5("ELT", style="font-size: 16.5px;"),
+                  tags$div(class = "h5-align", h5("AEP", style="font-size: 16.5px;")), 
+                  tags$div(class = "h5-align", h5("OEP", style="font-size: 16.5px;")),
+                  tags$div(class = "h5-align", h5("Multi AEP", style="font-size: 16.5px;")),
+                  h5("Multi OEP", style="font-size: 16.5px;"),  
+                  # h5("WS Mean AEP", style="font-size: 16.5px;"),
+                  # tags$div(class = "h5-align", h5("WS Mean OEP", style="font-size: 16.5px;")),  
+                  # tags$div(class = "h5-align",h5("Sample Mean AEP", style="font-size: 16.5px;")),
+                  # h5("Sample Mean OEP", style="font-size: 16.5px;"), 
+                  h5("AAL", style="font-size: 16.5px;"),
+                  tags$div(class = "h5-align",h5("PLT", style="font-size: 16.5px;"))),
+              
+              tags$div(class = "multicol", 
+                  checkboxGroupInput(ns("chkriprog"),
+                      label = h5("Prog", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "riprogSummary",
+                          " " = "riprogELT",
+                          " " = "riprogFullUncAEP",
+                          " " = "riprogFullUncOEP",
+                          " " = "riprogAEPWheatsheaf",
+                          " " = "riprogOEPWheatsheaf",  
+                          " " = "riprogAAL",
+                          " " = "riprogPLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkripolicy"),
+                      label = h5("Policy", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "ripolicySummary",
+                          " " = "ripolicyELT",
+                          " " = "ripolicyFullUncAEP",
+                          " " = "ripolicyFullUncOEP",
+                          " " = "ripolicyAEPWheatsheaf",
+                          " " = "ripolicyOEPWheatsheaf", 
+                          " " = "ripolicyAAL",
+                          " " = "ripolicyPLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkristate"),
+                      label = h5("State", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "ristateSummary",
+                          " " = "ristateELT",
+                          " " = "ristateFullUncAEP",
+                          " " = "ristateFullUncOEP",
+                          " " = "ristateAEPWheatsheaf",
+                          " " = "ristateOEPWheatsheaf", 
+                          " " = "ristateAAL", 
+                          " " = "ristatePLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkricounty"),
+                      label = h5("County", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "ricountySummary",
+                          " " = "ricountyELT",
+                          " " = "ricountyFullUncAEP",
+                          " " = "ricountyFullUncOEP",
+                          " " = "ricountyAEPWheatsheaf",
+                          " " = "ricountyOEPWheatsheaf", 
+                          " " = "ricountyAAL", 
+                          " " = "ricountyPLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkriloc"),
+                      label = h5("Location", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "rilocSummary",
+                          " " = "rilocELT",
+                          " " = "rilocFullUncAEP",
+                          " " = "rilocFullUncOEP",
+                          " " = "rilocAEPWheatsheaf",
+                          " " = "rilocOEPWheatsheaf", 
+                          " " = "rilocAAL",
+                          " " = "rilocPLT"),
+                      selected = NULL),
+                  
+                  checkboxGroupInput(ns("chkrilob"),
+                      label = h5("LOB", style="font-size: 15.0px;"), 
+                      choices = list(
+                          " " = "rilobSummary",
+                          " " = "rilobELT",
+                          " " = "rilobFullUncAEP",
+                          " " = "rilobFullUncOEP",
+                          " " = "rilobAEPWheatsheaf",
+                          " " = "rilobOEPWheatsheaf", 
+                          " " = "rilobAAL",
+                          " " = "rilobPLT"),
+                      selected = NULL)
+              )
+          ),#end of fluidrow RI
+
           actionButton(ns("abuttonexecuteprrun"), "Execute Run",
               class = "btn btn-primary"),
           actionButton(ns("abuttonsaveoutput"), "Save Output",

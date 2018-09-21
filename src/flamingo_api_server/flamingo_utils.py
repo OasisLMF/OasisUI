@@ -20,6 +20,9 @@ import pandas as pd
 # Oasis imports
 from oasislmf.api_client.client import OasisAPIClient
 from oasislmf.exposures.csv_trans import Translator
+from oasislmf.exposures.oed import OedValidator
+from oasislmf.exposures.oed import load_oed_dfs
+from oasislmf.exposures.reinsurance_layer import generate_files_for_reinsurance
 from oasislmf.utils import status as status_code
 from oasislmf.utils import (
     log,
@@ -190,6 +193,14 @@ def do_run_prog_oasis(processrunid):
             create_il_bins = analysis_settings_json['analysis_settings']['il_output']
         else:
             create_il_bins = False
+        if 'ri_output' in analysis_settings_json['analysis_settings']:
+            create_ri_bins = analysis_settings_json['analysis_settings']['ri_output']
+            create_il_bins = True
+        else:
+            create_ri_bins = False
+        logging.getLogger().debug(
+            "create_il_bins: {}, create_ri_bins: {}".format(create_il_bins,create_ri_bins))
+
         analysis_poll_interval_in_seconds = 5
         client = OasisAPIClient(base_url, logging.getLogger())
 
@@ -197,6 +208,7 @@ def do_run_prog_oasis(processrunid):
         input_location = client.upload_inputs_from_directory(
             upload_directory,
             do_il=create_il_bins,
+            do_ri=create_ri_bins,
             do_build=True,
             do_clean=True)
         logging.getLogger().info(
@@ -327,8 +339,23 @@ def generate_summary_files(processrunid):
         else:
             shutil.copy(source_file, target_file)
 
+    input_dir_list = os.listdir(prog_oasis_location)
+    ri_dir_list = []
+    for dirs in input_dir_list:
+        if dirs.startswith('RI_'):
+            ri_dir_list.append(dirs)
+
+    for dirs in ri_dir_list:
+        ri_full_path = prog_oasis_location + '/' + dirs
+        ri_target_path = input_location + '/' + dirs
+        if not IS_WINDOWS_HOST:
+            os.symlink(ri_full_path, ri_target_path)
+        else:
+            shutil.copytree(ri_full_path, ri_target_path)
+
     db.bcp("OasisGULSUMMARYXREF", input_location+ "/gulsummaryxref_temp.csv")
     db.bcp("OasisFMSUMMARYXREF", input_location + "/fmsummaryxref_temp.csv")
+    db.bcp("OasisRISUMMARYXREF", input_location + "/risummaryxref_temp.csv")
 
     gulsummaryxref = input_location + "/gulsummaryxref.csv"
     destination = open(gulsummaryxref, 'wb')
@@ -347,6 +374,24 @@ def generate_summary_files(processrunid):
         destination)
     destination.close()
     os.remove(input_location + "/fmsummaryxref_temp.csv")
+
+    risummaryxref = input_location + "/risummaryxref.csv"
+    destination = open(risummaryxref, 'wb')
+    destination.write("output_id,summary_id,summaryset_id\n")
+    shutil.copyfileobj(
+        open(input_location + "/risummaryxref_temp.csv", 'rb'),
+        destination)
+    destination.close()
+    os.remove(input_location + "/risummaryxref_temp.csv")
+
+    dirs = os.listdir(input_location)
+    ri_dirs = []
+    for dir in dirs:
+        if dir.startswith('RI_'):
+            ri_dirs.append(dir)
+    for dir in ri_dirs:
+        full_dir = os.path.join(input_location,dir)
+        shutil.copy(os.path.join(input_location,"risummaryxref.csv"), os.path.join(full_dir,"fmsummaryxref.csv"))
 
     process_run_locationid = flamingo_db_utils.get_process_run_locationid(
         prog_oasis_location, process_dir, processrunid)
@@ -368,6 +413,8 @@ def get_analysis_settings_json(processrunid):
         flamingo_db_utils.get_gul_summaries(processrunid)
     il_summaries_data = \
         flamingo_db_utils.get_il_summaries(processrunid)
+    ri_summaries_data = \
+        flamingo_db_utils.get_ri_summaries(processrunid)
 
     analysis_settings = dict()
     general_settings = dict()
@@ -429,9 +476,31 @@ def get_analysis_settings_json(processrunid):
         il_summaries_dict[id]['id'] = id
         il_summaries.append(il_summaries_dict[id])
 
+    ri_summaries_dict = dict()
+    for row in ri_summaries_data:
+        id = int(row[0])
+        if not ri_summaries_dict.has_key(id):
+            ri_summaries_dict[id] = dict()
+        if row[3] == 1:
+            if not ri_summaries_dict[id].has_key('leccalc'):
+                ri_summaries_dict[id]['leccalc'] = dict()
+                ri_summaries_dict[id]['leccalc']['outputs'] = dict()
+            if row[1] == 'return_period_file':
+                ri_summaries_dict[id]['leccalc'][row[1]] = bool(row[2])
+            else:
+                ri_summaries_dict[id]['leccalc']['outputs'][row[1]] = bool(row[2])
+        else:
+            ri_summaries_dict[id][row[1]] = bool(row[2])
+
+    ri_summaries = list()
+    for id in ri_summaries_dict.keys():
+        ri_summaries_dict[id]['id'] = id
+        ri_summaries.append(ri_summaries_dict[id])
+
     general_settings['model_settings'] = model_settings
     general_settings['gul_summaries'] = gul_summaries
     general_settings['il_summaries'] = il_summaries
+    general_settings['ri_summaries'] = ri_summaries
     analysis_settings['analysis_settings'] = general_settings
     apijson = jsonpickle.encode(analysis_settings)
     return json.loads(apijson)
@@ -641,3 +710,115 @@ def do_generate_oasis_files(progoasisid):
     os.remove(OASIS_FILES_DIRECTORY + "/FMDict_temp.csv")
 
     flamingo_db_utils.generate_oasis_file_records(progoasisid, location_id)
+
+    # oed files
+    oed_location = input_location + '/oed_files'
+    if not os.path.isdir(oed_location):
+        os.mkdir(oed_location)
+    progid = flamingo_db_utils.get_ProgId_For_ProgOasis(progoasisid)[0]
+    
+    # location
+    location_file = flamingo_db_utils.get_source_loc_file_for_prog(progid)[0]
+    source_file = "/var/www/oasis/Files/Exposures/{}".format(location_file)
+    target_file = "{}/location.csv".format(oed_location)
+    if not IS_WINDOWS_HOST:
+        os.symlink(source_file, target_file)
+    else:
+        shutil.copy(source_file, target_file)
+
+    # account
+    account_file = flamingo_db_utils.get_source_acc_file_for_prog(progid)[0]
+    source_file = "/var/www/oasis/Files/Exposures/{}".format(account_file)
+    target_file = "{}/account.csv".format(oed_location)
+    if not IS_WINDOWS_HOST:
+        os.symlink(source_file, target_file)
+    else:
+        shutil.copy(source_file, target_file)
+
+    # reinsurance info
+    reins_info_file = flamingo_db_utils.get_source_reinsurance_file_for_prog(progid)[0]
+    source_file = "/var/www/oasis/Files/Exposures/{}".format(reins_info_file)
+    target_file = "{}/ri_info.csv".format(oed_location)
+    if not IS_WINDOWS_HOST:
+        os.symlink(source_file, target_file)
+    else:
+        shutil.copy(source_file, target_file)
+
+    # reinsurance scope
+    reins_scope_file = flamingo_db_utils.get_source_reinsurance_scope_file_for_prog(progid)[0]
+    source_file = "/var/www/oasis/Files/Exposures/{}".format(reins_scope_file)
+    target_file = "{}/ri_scope.csv".format(oed_location)
+    if not IS_WINDOWS_HOST:
+        os.symlink(source_file, target_file)
+    else:
+        shutil.copy(source_file, target_file)
+
+    # xref description
+    item_dict_file = input_location + '/ItemDict.csv'
+    item_dict = pd.read_csv(item_dict_file)
+    fm_dict_file = input_location + '/FMDict.csv'
+    fm_dict = pd.read_csv(fm_dict_file)
+    combined_dict = item_dict.merge(fm_dict, on=('item_id'))
+    xref_description = combined_dict[['layer_name','policy_name','location_desc']]
+    xref_description.columns = ['policy_number','account_number','location_number']
+    xref_description['xref_id'] = xref_description.index + 1
+    xref_description['coverage_type_id'] = 1
+    xref_description['peril_id'] = 1
+    xref_description['tiv'] = 1
+    xref_description = xref_description[['xref_id','policy_number','account_number','location_number','coverage_type_id','peril_id','tiv']]
+    xref_description_file = input_location + '/xref_descriptions.csv'
+    xref_description.to_csv(xref_description_file, index=False)
+
+    # generate dfs
+    (account_df, location_df, ri_info_df, ri_scope_df, do_reinsurance) = load_oed_dfs(oed_location)
+
+    # direct layers
+    items = pd.read_csv(input_location + "/items.csv")
+    coverages = pd.read_csv(input_location + "/coverages.csv")
+    fm_xrefs = pd.read_csv(input_location + "/fm_xref.csv")
+    xref_descriptions = pd.read_csv(input_location + "/xref_descriptions.csv")
+
+    validate_inst = OedValidator()
+    (main_is_valid, inuring_layers) = validate_inst.validate(account_df, location_df, ri_info_df, ri_scope_df)
+
+    logging.getLogger().info("main_is_valid: {}".format(main_is_valid))
+    logging.getLogger().info("inuring_layers: {}".format(inuring_layers))
+
+#    if not main_is_valid:
+#        print("Reinsuarnce structure not valid")
+#        for inuring_layer in inuring_layers:
+#            if not inuring_layers.is_valid:
+#                print("Inuring layer {} invalid:".format(
+#                    inuring_layer.inuring_priority))
+#                for validation_message in inuring_layer.validation_messages:
+#                    print("\t{}".format(validation_message))
+#                exit(0)
+
+    generate_files_for_reinsurance(
+            account_df,
+            location_df,
+            items,
+            coverages,
+            fm_xrefs,
+            xref_descriptions,
+            ri_info_df,
+            ri_scope_df,
+            input_location)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
