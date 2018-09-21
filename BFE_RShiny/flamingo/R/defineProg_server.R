@@ -553,6 +553,39 @@ programmeDefinition <- function(input, output, session, dbSettings,
         }
       })
   
+  observe(if (active()) {
+        if (input$sinputSRFile == "U") {
+          options(shiny.maxRequestSize = 1024*1024^2)
+          inFile <- input$SRFile
+          if (!is.null(inFile)) {
+            enable("abuttonSRFileUpload")
+          }
+        } else {
+          if (input$sinputSRFile == "S"){
+            SRfiles <- getFileSourceReinsuranceFile(dbSettings)
+            updateSelectInput(session, "sinputselectSRFile",
+                choices = createSelectOptions(SRfiles, labelCol = 1,
+                    valueCol = 2))
+          }
+        }
+      })
+
+  observe(if (active()) {
+        if (input$sinputSRSFile == "U") {
+          options(shiny.maxRequestSize = 1024*1024^2)
+          inFile <- input$SRSFile
+          if (!is.null(inFile)) {
+            enable("abuttonSRSFileUpload")
+          }
+        } else {
+          if (input$sinputSRSFile == "S"){
+            SRSfiles <- getFileSourceReinsuranceScopeFile(dbSettings)
+            updateSelectInput(session, "sinputselectSRSFile",
+                choices = createSelectOptions(SRSfiles, labelCol = 1,
+                    valueCol = 2))
+          }
+        }
+      })
   
   
   ### Programme Model Table (previously OOK)

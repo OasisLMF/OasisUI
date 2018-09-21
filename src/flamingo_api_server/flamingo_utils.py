@@ -355,6 +355,7 @@ def generate_summary_files(processrunid):
 
     db.bcp("OasisGULSUMMARYXREF", input_location+ "/gulsummaryxref_temp.csv")
     db.bcp("OasisFMSUMMARYXREF", input_location + "/fmsummaryxref_temp.csv")
+    db.bcp("OasisRISUMMARYXREF", input_location + "/risummaryxref_temp.csv")
 
     gulsummaryxref = input_location + "/gulsummaryxref.csv"
     destination = open(gulsummaryxref, 'wb')
@@ -373,6 +374,24 @@ def generate_summary_files(processrunid):
         destination)
     destination.close()
     os.remove(input_location + "/fmsummaryxref_temp.csv")
+
+    risummaryxref = input_location + "/risummaryxref.csv"
+    destination = open(risummaryxref, 'wb')
+    destination.write("output_id,summary_id,summaryset_id\n")
+    shutil.copyfileobj(
+        open(input_location + "/risummaryxref_temp.csv", 'rb'),
+        destination)
+    destination.close()
+    os.remove(input_location + "/risummaryxref_temp.csv")
+
+    dirs = os.listdir(input_location)
+    ri_dirs = []
+    for dir in dirs:
+        if dir.startswith('RI_'):
+            ri_dirs.append(dir)
+    for dir in ri_dirs:
+        full_dir = os.path.join(input_location,dir)
+        shutil.copy(os.path.join(input_location,"risummaryxref.csv"), os.path.join(full_dir,"fmsummaryxref.csv"))
 
     process_run_locationid = flamingo_db_utils.get_process_run_locationid(
         prog_oasis_location, process_dir, processrunid)
@@ -476,7 +495,7 @@ def get_analysis_settings_json(processrunid):
     ri_summaries = list()
     for id in ri_summaries_dict.keys():
         ri_summaries_dict[id]['id'] = id
-        ri_summaries.append(il_summaries_dict[id])
+        ri_summaries.append(ri_summaries_dict[id])
 
     general_settings['model_settings'] = model_settings
     general_settings['gul_summaries'] = gul_summaries
