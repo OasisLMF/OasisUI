@@ -562,7 +562,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
           }
         } else {
           if (input$sinputSRFile == "S"){
-            SRfiles <- getFileSourceAccountFile(dbSettings)
+            SRfiles <- getFileSourceReinsuranceFile(dbSettings)
             updateSelectInput(session, "sinputselectSRFile",
                 choices = createSelectOptions(SRfiles, labelCol = 1,
                     valueCol = 2))
@@ -579,7 +579,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
           }
         } else {
           if (input$sinputSRSFile == "S"){
-            SRSfiles <- getFileSourceAccountFile(dbSettings)
+            SRSfiles <- getFileSourceReinsuranceScopeFile(dbSettings)
             updateSelectInput(session, "sinputselectSRSFile",
                 choices = createSelectOptions(SRSfiles, labelCol = 1,
                     valueCol = 2))
