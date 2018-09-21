@@ -368,7 +368,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
         logMessage(file.path(flc,inFile[1,1]))
         if (flcopy == TRUE){
           recordId <- createFileRecord(dbSettings,
-              inFile[1,1], "Source Reinsurance File", 301, flc, userId(),
+              inFile[1,1], "Source Reinsurance File", 401, flc, userId(),
               "Prog", result$DPProgData[input$tableDPprog_rows_selected,1])
           if (!is.null(recordId)) {
             showNotification(type = "message",
@@ -390,7 +390,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
         logMessage(file.path(flc,inFile[1,1]))
         if (flcopy == TRUE){
           recordId <- createFileRecord(dbSettings,
-              inFile[1,1], "Source Reinsurance Scope File", 302, flc, userId(),
+              inFile[1,1], "Source Reinsurance Scope File", 402, flc, userId(),
               "Prog", result$DPProgData[input$tableDPprog_rows_selected,1])
           if (!is.null(recordId)) {
             showNotification(type = "message",
