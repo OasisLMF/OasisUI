@@ -241,23 +241,38 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
   # Reactive values & parameters --------------------------------------------
   
   result <- reactiveValues(
-    #current selected row
-    currentrows = 0,
+    #reactive of the input list of files
+    filesListData = NULL,
+    #current status of vrows buttons
+    currentv_rows = NULL,
+    #previous status of vrows buttons
+    previousv_rows = NULL,
     #View output file content
     currentFile = NULL,
+    #content of curr file
     fileData = NULL
   )
   
-  observeEvent(filesListData(), {
-    result$filesListData <- filesListData()
-    if (nrow(result$filesListData) > 0) {
-      result$filesListData <- cbind(result$filesListData, data.frame(View = .shinyInput(actionButton, "vrows_", nrow(result$filesListData), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+  
+  
+  observeEvent(filesListData(), ignoreNULL = FALSE, {
+    #result$filesListData <- NULL
+    filesListData <- filesListData()
+    if (length(filesListData) > 0) {
+      result$filesListData <- cbind(filesListData, data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+      result$previousv_rows <- data.frame("vrows" = rep(0, nrow(result$filesListData)))
+      result$currentv_rows <- data.frame("vrows" = rep(0, nrow(result$filesListData)))
+    } else {
+      result$filesListData <- NULL
     }
+    #clean up reactives
+    result$currentFile <- NULL
+    result$fileData <- NULL
   })
   
   
   output$outputfilestable <- renderDT(
-    if (!is.null(result$filesListData)) {
+    if (!is.null(result$filesListData) && nrow(result$filesListData) > 0) {
       filesListDataFiltered <- result$filesListData %>% select(-contains("Location")) %>% select(-c("Variable", "Granularity", "Losstype"))
       datatable(
         filesListDataFiltered,
@@ -293,7 +308,7 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
   
   # Exposure table
   output$tableFVExposureSelected <- renderDT(
-    if (!is.null(result$fileData)) {
+    if (!is.null(result$fileData) && nrow(result$fileData) > 0 ) {
       datatable(
         result$fileData,
         class = "flamingo-table display",
@@ -319,21 +334,25 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
   )
   
   #identify selected rows
-  observe({
-    currentrows <- input$outputfilestable_rows_selected
-    if (is.null(currentrows)) {
-      result$currentrows <- 0
-    } else {
-      result$currentrows <- currentrows
-    }
+  observeEvent({
+    input$outputfilestable_rows_selected
+    input$outputfilestable_rows_current
+    lapply(input$outputfilestable_rows_current, function(i){input[[paste0("vrows_", i)]]})}, {
+     if (!is.null(input$outputfilestable_rows_current) && !is.null(result$currentv_rows) ) {
+      for (i in 1:nrow(result$currentv_rows)) {
+        result$currentv_rows$vrows[i] <- ifelse(!is.null(input[[paste0("vrows_", i)]]), input[[paste0("vrows_", i)]], 0)
+      }
+     }
   })
+
   
   #if one row is selected/unselected, update checkbox and sow/hide buttons
-  observeEvent( result$currentrows, {
-    if (all(result$currentrows != 0 )) {
-      lapply(result$currentrows, function(i){
+  observeEvent( input$outputfilestable_rows_selected, ignoreNULL = FALSE, {
+    # if (all(result$currentrows != 0 )) {
+    if (length( input$outputfilestable_rows_selected) > 0) {
+      lapply(input$outputfilestable_rows_selected, function(i){
         .enableButton(i)})
-      lapply(setdiff(input$outputfilestable_rows_current, result$currentrows), function(i) {
+      lapply(setdiff(input$outputfilestable_rows_current, input$outputfilestable_rows_selected), function(i) {
         .hideButtons(i)})
     } else {
       lapply(input$outputfilestable_rows_current, function(i){
@@ -364,37 +383,37 @@ panelViewOutputFilesModule <- function(input, output, session, logMessage = mess
   
   
   #Show content in Modal
-  observe({
-    if (!is.null(result$filesListData)) {
-      lapply(
-        X = 1:nrow(result$filesListData),
-        FUN = function(i){
-          observeEvent(input[[paste0("vrows_", i)]], {
-            if (input[[paste0("vrows_", i)]] > 0) {
-              result$currentFile <-  paste0(result$filesListData[i, 2])
-              showModal(FileContent)
-              # Extra info table
-              output$tableFVExposureSelectedInfo <- renderUI({
-                str1 <- paste("File Name: ", result$filesListData[i,2])
-                str2 <- paste("Resource Key ", result$filesListData[i,10])
-                HTML(paste(str1, str2, sep = '<br/>'))
-              })
-              # get data to show in modal table
-              fileName <- file.path(result$filesListData[i, 5], result$filesListData[i, 2])
-              tryCatch({
-                result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-                                            quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-              }, error = function(e) {
-                showNotification(type = "error",
-                                 paste("Could not read file:", e$message))
-                result$fileData <- NULL
-              }) # end try catch
-            } # end check on input vrous_i
-          }) # End observer
-        }) # end lapply
-    } #end if
-  })
   
+  observeEvent(result$currentv_rows, {
+    if (!is.null(result$currentv_rows) && nrow(result$currentv_rows) > 0) {
+      #idx is the index of the button clicked
+    idx <- seq(nrow(result$filesListData))[result$currentv_rows != result$previousv_rows]
+    if (length(idx) > 1) {
+      #this happens when changing run. the inputs are not reset, wherease the result$previousv_rows is all 0.  Can be avoided with better initialization of result$previousv_rows 
+      result$previousv_rows <- result$currentv_rows
+    } else  if ( length(idx) ==  1) {
+      #this is the case when a button has been clicked
+      result$previousv_rows <- result$currentv_rows
+      showModal(FileContent)
+      # Extra info table
+      output$tableFVExposureSelectedInfo <- renderUI({
+        str1 <- paste("File Name: ", result$filesListData[idx,2])
+        str2 <- paste("Resource Key ", result$filesListData[idx,10])
+        HTML(paste(str1, str2, sep = '<br/>'))
+      })
+      # get data to show in modal table
+      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+      tryCatch({
+        result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
+                                    quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+      }, error = function(e) {
+        showNotification(type = "error",
+                         paste("Could not read file:", e$message))
+        result$fileData <- NULL
+      }) # end try catch
+    }
+    }
+  })
   
   # Helper functions -------------------------
   
@@ -709,8 +728,8 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
           data <- data %>% rename("colour" = keyval)
         }
       }
-      print("data")
-      print(data)
+      # print("data")
+      # print(data)
       # > draw plot ----
       if (input$textinputtitle != "") {
         result$Title <- input$textinputtitle
