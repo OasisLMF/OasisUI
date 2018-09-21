@@ -1,7 +1,7 @@
 requests==2.18.4
 requests-toolbelt==0.8.0
 shutilwhich==1.1.0
-Flask==0.12
+Flask==0.12.3
 jsonpickle==0.9.3
 pandas==0.21.0
 oasislmf
