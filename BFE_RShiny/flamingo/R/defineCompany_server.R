@@ -4,7 +4,6 @@
 #' @param userId reactive expression yielding user id
 #' @return empty list
 #' @importFrom DT renderDT
-#' @importFrom shinyBS toggleModal
 #' @rdname companyDefinition
 #' @export
 companyDefinition <- function(input, output, session, dbSettings, userId,
@@ -23,8 +22,9 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
       compFlag = c("", "U", "C")[1]
   )
 
-  reloadCompData <- function() {
-    result$compDataCounter <- isolate(result$compDataCounter + 1)
+  .reloadCompData <- function() {
+    result$compDataCounter <- result$compDataCounter + 1
+    invisible()
   }
 
 
@@ -32,13 +32,10 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
 
   # update company table when:
   # - module activated (e.g. when switching to tab)
-  # - reloadCompData() called
+  # - .reloadCompData() called
   observe(if (active()) {
-
         force(result$compDataCounter)
-
         result$compData <- getCompanyList(dbSettings)
-
       })
 
   # draw company table with custom format options, queries the database every
@@ -59,37 +56,45 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
           )
         })
 
-
-  ### Company Create / Update / Delete ###
-
-  # Clear Side Bar Panel
-  clearCmpnySideBar <- function() {
-    updateTextInput(session, "tinputCompName", value = "")
-    updateTextInput(session, "tinputCompDom", value = "")
-    updateTextInput(session, "tinputCompLegName", value = "")
-    updateTextInput(session, "tinputCompRegNo", value = "")
+  # Modal dialog of create button in main panel
+  .compcrtupmodal <- function() {
+    ns <- session$ns
+    modalDialog(label = ".compcrtupmodal",
+                title = "Company Details",
+                textInput(ns("tinputCompName"), "Company Name"),
+                textInput(ns("tinputCompDom"), "Company Domicile"),
+                textInput(ns("tinputCompLegName"), "Company Legal Name"),
+                textInput(ns("tinputCompRegNo"), "Company Registration Number"),
+                footer = tagList(
+                  actionButton(ns("abuttonsubcomp"),  class="btn btn-primary",
+                               label = "Submit", align = "left"),
+                  actionButton(ns("abuttonccancel"), class = "btn btn-default",
+                               label = "Cancel", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
   }
 
   # onclick of cancel button in pop-up
   onclick("abuttonccancel", {
-        toggleModal(session, "compcrtupmodal", toggle = "close")
-        clearCmpnySideBar()
-        reloadCompData()
+        removeModal()
+        .reloadCompData()
       })
 
   # onclick of create button in main panel
   onclick("abuttoncompcrt", {
 
         result$compFlag <- "C"
-        clearCmpnySideBar()
 
-        toggleModal(session, "compcrtupmodal", toggle = "open")
+        showModal(.compcrtupmodal())
 
       })
 
   # on click of update button in main panel
   onclick("abuttoncompupdate", {
         if(length(input$tablecompanylist_rows_selected) > 0){
+	  showModal(.compcrtupmodal())
           result$compFlag <- "U"
           updateTextInput(session, "tinputCompName",
               value = result$compData[input$tablecompanylist_rows_selected, 2])
@@ -99,17 +104,33 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
               value = result$compData[input$tablecompanylist_rows_selected, 4])
           updateTextInput(session, "tinputCompRegNo",
               value = result$compData[input$tablecompanylist_rows_selected, 5])
-          toggleModal(session, "compcrtupmodal", toggle = "open")
         } else{
           showNotification(type = "warning",
               "Please select the company to update.")
         }
       })
 
+  # modalDialog of delete button in main panel
+  .compdelmodal <- function() {
+    ns <- session$ns
+    modalDialog(label = ".compdelmodal",
+                title = "Delete selection",
+                paste0("Are you sure you want to delete?"),
+                footer = tagList(
+                  actionButton(ns("abuttoncconfirmdel"), class="btn btn-primary",
+                               label = "Confirm", align = "center"),
+                  actionButton(ns("abuttonccanceldel"), class = "btn btn-default",
+                               label = "Cancel", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+
   # on click of delete button in main panel
   onclick("abuttoncompdel", {
         if(length(input$tablecompanylist_rows_selected) > 0){
-          toggleModal(session, "compdelmodal", toggle = "open")
+          showModal(.compdelmodal())
         } else{
           showNotification(type = "warning",
               "Please select the company to delete")
@@ -118,8 +139,8 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
 
   # on click of cancel button in delete modal
   onclick("abuttonccanceldel", {
-        toggleModal(session, "compdelmodal", toggle = "close")
-        reloadCompData()
+        removeModal()
+        .reloadCompData()
       })
 
 
@@ -166,13 +187,13 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
             }
           }}
         result$compFlag <- ""
-        toggleModal(session, "compcrtupmodal", toggle = "close")
-        reloadCompData()
+        removeModal()
+        .reloadCompData()
       })
 
   # confirm delete
   onclick("abuttoncconfirmdel", {
-        toggleModal(session, "compdelmodal", toggle = "close")
+        removeModal()
         if(length(input$tablecompanylist_rows_selected) > 0){
 
           stmt <- buildDbQuery("deleteCompany",
@@ -188,8 +209,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
                 sprintf("Company - %s deleted.",
                     result$compData[input$tablecompanylist_rows_selected, 2]))
           }
-          clearCmpnySideBar()
-          reloadCompData()
+          .reloadCompData()
         }
       })
 

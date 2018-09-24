@@ -3,7 +3,6 @@
 #' @importFrom shinyBS bsTooltip
 #' @export
 landingPageUI <- function(id) {
-
   ns <- NS(id)
 
   tagList(
@@ -26,11 +25,10 @@ landingPageUI <- function(id) {
 }
 
 #' @rdname pagestructure
-#' @importFrom shinyBS bsButton
+#' @importFrom shinyBS bsTooltip
 #' @importFrom shinyWidgets dropdownButton
 #' @export
 pageheaderUI <- function(id) {
-
   ns <- NS(id)
   tagList(
     div( id = ns("accountDDmenu"),
@@ -40,26 +38,25 @@ pageheaderUI <- function(id) {
                         size = "s",
                         right = TRUE,
                         textOutput(ns("textOutputHeaderData2")),
-                        bsButton(ns("abuttonuseradmin"), "User Administration",
-                                 style = "btn btn-primary", size = "default", type = "action",
-                                 block = TRUE),
-                        bsButton(ns("abuttondefineaccount"), "Define Account",
-                                 style = "btn btn-primary", size = "default", type = "action",
-                                 block = TRUE),
+                        actionButton(ns("abuttonuseradmin"), class = "btn btn-primary",
+                                     label = "User Administration", align = "center", width = "100%"),
+                        
+                        actionButton(ns("abuttondefineaccount"), class = "btn btn-primary",
+                                     label = "Define Account", align = "center", width = "100%"),
                         bsTooltip(ns("abuttondefineaccount"),
                                   landing_page$abuttondefineaccount,
                                   placement = "left",
                                   options   = list(container = "body")),
-                        bsButton(ns("abuttonsysconf"), "System Configuration",
-                                 style = "btn btn-primary", size = "default", type = "action",
-                                 block = TRUE),
+                        
+                        actionButton(ns("abuttonsysconf"), class = "btn btn-primary",
+                                     label = "System Configuration", align = "center", width = "100%"),
                         bsTooltip(ns("abuttonsysconf"),
                                   landing_page$abuttonsysconf,
                                   placement = "left",
                                   options   = list(container = "body")),
-                        bsButton(ns("abuttonlogout"), "Logout",
-                                 style = "btn btn-primary", size = "default", type = "action",
-                                 block = TRUE)
+
+			actionButton(ns("abuttonlogout"), class = "btn btn-primary",
+                                     label = "Logout", align = "center", width = "100%")
          )
     )
   )
@@ -70,11 +67,9 @@ pageheaderUI <- function(id) {
 #' @rdname pagestructure
 #' @export
 pagestructureUI <- function(id) {
-
   ns <- NS(id)
 
   tagList(
     uiOutput(ns("sidebar"))
   )
-
 }

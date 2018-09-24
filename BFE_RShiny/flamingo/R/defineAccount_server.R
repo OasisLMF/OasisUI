@@ -3,10 +3,8 @@
 #' @inheritParams executeDbQuery
 #' @inheritParams flamingoModule
 #' @return empty list
-#' @import shiny
 #' @importFrom shinyjs onclick show disable enable hide
 #' @importFrom DT renderDT datatable
-#' @importFrom shinyBS toggleModal
 #' @rdname accountDefinition
 #' @export
 accountDefinition <- function(input, output, session, dbSettings,
@@ -22,8 +20,9 @@ accountDefinition <- function(input, output, session, dbSettings,
       DAAccountDataCounter = 0
   )
 
-  reloadDAAccountData <- function() {
-    result$DAAccountDataCounter <- isolate(result$DAAccountDataCounter) + 1
+  .reloadDAAccountData <- function() {
+    result$DAAccountDataCounter <- result$DAAccountDataCounter + 1
+    invisible()
   }
 
   ### Account Table ###
@@ -60,23 +59,38 @@ accountDefinition <- function(input, output, session, dbSettings,
   )
 
   ### Create/Amend Account
+  
+ .crtupModal <- function() {
+    ns <- session$ns
+    modalDialog(label = ".crtupModal",
+                title = "Create/Amend Account",
+                textInput(ns("tinputDAAccountName"), "Account Name"),
+                footer = tagList(
+                  actionButton(ns("abuttonAccSubmit"), class = "btn btn-primary",
+                               label = "Submit", align = "left"),
+                  actionButton(ns("abuttonAccCancel"), class = "btn btn-default",
+                               label = "Cancel", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+  
   onclick("buttoncreateac", {
-
-        result$accFlag <- "C"
-        updateTextInput(session, "tinputDAAccountName", value = "")
-
-        toggleModal(session, "crtupModal", toggle = "open")
-
-      })
+    # "C" for create
+    result$accFlag <- "C"
+    showModal(.crtupModal())
+    updateTextInput(session, "tinputDAAccountName", value = "")
+  })
 
   onclick("buttonamendac", {
         if (length(row <- input$tableDAAccount_rows_selected) > 0) {
 
           result$accFlag <- "A"
-          updateTextInput(session, "tinputDAAccountName",
-              value = result$DAAccountData[row, 2])
 
-          toggleModal(session, "crtupModal", toggle = "open")
+          showModal(.crtupModal())
+	  updateTextInput(session, "tinputDAAccountName",
+              value = result$DAAccountData[row, 2])
 
         } else {
           showNotification(type = "warning",
@@ -121,29 +135,42 @@ accountDefinition <- function(input, output, session, dbSettings,
 
         }
 
-        toggleModal(session, "crtupModal", toggle = "close")
-
-        updateTextInput(session, "tinputDAAccountName", value = "")
         result$accFlag <- ""
-
-        reloadDAAccountData()
+        removeModal()
+        .reloadDAAccountData()
 
       })
 
   onclick("abuttonAccCancel",{
 
         result$accFlag <- ""
-        updateTextInput(session, "tinputDAAccountName", value = "")
 
-        toggleModal(session, "crtupModal", toggle = "close")
+        removeModal()
 
       })
 
   ### Delete Account
+  
+  .delModal <- function() {
+    ns <- session$ns
+    modalDialog(label = ".delModal",
+                title = "Delete Account",
+                paste0("Are you sure you want to delete?"),
+                footer = tagList(
+                  actionButton(ns("btnConfirmDel"), class="btn btn-primary",
+                               label = "Confirm", align = "center"),
+                  actionButton(ns("btnCancelDel"), class = "btn btn-default",
+                               label = "Cancel", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+  
   onclick("buttondeleteac", {
 
-        if (length(row <- input$tableDAAccount_rows_selected) > 0) {
-          toggleModal(session, "delModal", toggle = "open")
+        if (length(input$tableDAAccount_rows_selected) > 0) {
+          showModal(.delModal())
         } else {
           showNotification(type = "warning",
               "Please select an Account to Delete")
@@ -152,11 +179,11 @@ accountDefinition <- function(input, output, session, dbSettings,
       })
 
   observeEvent(input$btnCancelDel, {
-        toggleModal(session, "delModal", toggle = "close")
+        removeModal()
       })
 
   observeEvent(input$btnConfirmDel, {
-        toggleModal(session, "delModal", toggle = "close")
+        removeModal()
 
         if (length(row <- input$tableDAAccount_rows_selected) > 0) {
 
@@ -175,7 +202,7 @@ accountDefinition <- function(input, output, session, dbSettings,
 
         }
 
-        reloadDAAccountData()
+        .reloadDAAccountData()
 
       })
 

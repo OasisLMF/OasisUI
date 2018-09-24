@@ -689,6 +689,7 @@ createModelResource <- function(
 #' @inheritParams createModelResource
 #' @param modresid model resource id
 #' @return model resource id
+#' @export
 updateModelResource <- function(
     dbSettings,
     modresid,
