@@ -15,19 +15,7 @@ fileViewerUI <- function(id) {
 
     h4("File List", class = "flamingo-table-title"),
 
-    checkboxInput(inputId = ns("tableFVfileListSelectall"), label = "Select all", value = FALSE),
-    DTOutput(ns("tableFVfileList")),
-
-    downloadButton(ns("FVfileListdownloadzip"), label = "Export to zip"),
-    bsTooltip(ns("FVfileListdownloadzip"),
-              file_Viewer$FVfileListdownloadzip,
-              placement = "right",
-              options   = list(container = "body"))
-    # downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
-    # bsTooltip(ns("FVFLdownloadexcel"),
-    #             file_Viewer$FVFLdownloadexcel,
-    #             placement = "right",
-    #             options   = list(container = "body"))
+    ViewFilesModuleUI(id  = ns("ViewFilesModule"), includechkbox = TRUE)
 
   )
 

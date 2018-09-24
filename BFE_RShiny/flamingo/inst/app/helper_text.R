@@ -3,7 +3,7 @@
 # Naming convention: buttonname
 
 file_Viewer <- list(
-  FVfileListdownloadzip = "Download all checked files"
+  FLdownloadzip = "Download all checked files"
   #FVFLdownloadexcel = "Download files table"
 )
 

@@ -150,13 +150,29 @@ browseprogrammes <- function(input, output, session, dbSettings,
   }
   })
   
+  filesListDatatoview <- reactive({
+    if (!is.null(result$filesListData)) {
+      result$filesListData %>% select(-c("Variable", "Granularity", "Losstype"))
+    } else {
+      result$filesListData
+    }
+    })
   
-  sub_modules$panelViewOutputFilesModule <- callModule(
-    panelViewOutputFilesModule,
-    id = "panelViewOutputFilesModule",
-    filesListData =  reactive(result$filesListData),
-    logMessage = logMessage)
+  sub_modules$ViewFilesModule <- callModule(
+    ViewFilesModule,
+    id = "ViewFilesModule",
+    filesListData =  filesListDatatoview,
+    logMessage = logMessage,
+    includemrows = FALSE,
+    includechkbox = FALSE)
+
   
+  # sub_modules$panelViewOutputFilesModule <- callModule(
+  #   panelViewOutputFilesModule,
+  #   id = "panelViewOutputFilesModule",
+  #   filesListData =  reactive(result$filesListData),
+  #   logMessage = logMessage)
+  # 
   
   # panelOutputModule module -----------------------------------------------------
   
@@ -221,251 +237,6 @@ browseprogrammes <- function(input, output, session, dbSettings,
 }
 
 
-
-# panelViewOutputFilesModule Module -----------------------
-#' Module for the Panel to View Output Files
-#' @description Server logic to view output files
-#' @inheritParams flamingoModule
-#' @param filesListData table of output files for a given runID
-#' @return list of reactives:
-#' @rdname panelViewOutputFilesModule
-#' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDT datatable DTOutput
-#' @importFrom dplyr mutate select contains filter
-#' @export
-panelViewOutputFilesModule <- function(input, output, session, logMessage = message, filesListData) {
-  
-  ns <- session$ns
-  
-  
-  # Reactive values & parameters --------------------------------------------
-  
-  result <- reactiveValues(
-    #reactive of the input list of files
-    filesListData = NULL,
-    #current status of vrows buttons
-    currentv_rows = NULL,
-    #previous status of vrows buttons
-    previousv_rows = NULL,
-    #View output file content
-    currentFile = NULL,
-    #content of curr file
-    fileData = NULL
-  )
-  
-  
-  
-  observeEvent(filesListData(), ignoreNULL = FALSE, {
-    #result$filesListData <- NULL
-    filesListData <- filesListData()
-    if (length(filesListData) > 0) {
-      result$filesListData <- cbind(filesListData, data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
-      result$previousv_rows <- data.frame("vrows" = rep(0, nrow(result$filesListData)))
-      result$currentv_rows <- data.frame("vrows" = rep(0, nrow(result$filesListData)))
-    } else {
-      result$filesListData <- NULL
-    }
-    #clean up reactives
-    result$currentFile <- NULL
-    result$fileData <- NULL
-  })
-  
-  
-  output$outputfilestable <- renderDT(
-    if (!is.null(result$filesListData) && nrow(result$filesListData) > 0) {
-      filesListDataFiltered <- result$filesListData %>% select(-contains("Location")) %>% select(-c("Variable", "Granularity", "Losstype"))
-      datatable(
-        filesListDataFiltered,
-        class = "flamingo-table display",
-        rownames = TRUE,
-        escape = FALSE,
-        selection = "single",
-        colnames = c('Row Number' = 1),
-        options = .getFLTableOptions()
-      )
-    } else {
-      datatable(
-        data.frame(content = "nothing to show"),
-        class = "flamingo-table display",
-        selection = "none",
-        rownames = FALSE,
-        filter = 'bottom',
-        colnames = c(""),
-        width = "100%",
-        options = list(searchHighlight = TRUE))
-    }
-    
-  )
-  
-  output$FLTdownloadexcel <- downloadHandler(
-    filename = "outputfilestable.csv",
-    content = function(file) {
-      write.csv(result$filesListData, file)
-    }
-  )
-  
-  # File content view ---------------------------------------------------
-  
-  # Exposure table
-  output$tableFVExposureSelected <- renderDT(
-    if (!is.null(result$fileData) && nrow(result$fileData) > 0 ) {
-      datatable(
-        result$fileData,
-        class = "flamingo-table display",
-        rownames = TRUE,
-        selection = "none",
-        filter = 'bottom',
-        colnames = c("Row Number" = 1),
-        width = "100%",
-        options = list(searchHighlight = TRUE,
-                       scrollX = TRUE))
-    } else {
-      datatable(
-        data.frame(content = "nothing to show"),
-        class = "flamingo-table display",
-        selection = "none",
-        rownames = FALSE,
-        filter = 'bottom',
-        colnames = c(""),
-        width = "100%",
-        options = list(searchHighlight = TRUE,
-                       scrollX = TRUE))
-    }
-  )
-  
-  #identify selected rows
-  observeEvent({
-    input$outputfilestable_rows_selected
-    input$outputfilestable_rows_current
-    lapply(input$outputfilestable_rows_current, function(i){input[[paste0("vrows_", i)]]})}, {
-     if (!is.null(input$outputfilestable_rows_current) && !is.null(result$currentv_rows) ) {
-      for (i in 1:nrow(result$currentv_rows)) {
-        result$currentv_rows$vrows[i] <- ifelse(!is.null(input[[paste0("vrows_", i)]]), input[[paste0("vrows_", i)]], 0)
-      }
-     }
-  })
-
-  
-  #if one row is selected/unselected, update checkbox and sow/hide buttons
-  observeEvent( input$outputfilestable_rows_selected, ignoreNULL = FALSE, {
-    # if (all(result$currentrows != 0 )) {
-    if (length( input$outputfilestable_rows_selected) > 0) {
-      lapply(input$outputfilestable_rows_selected, function(i){
-        .enableButton(i)})
-      lapply(setdiff(input$outputfilestable_rows_current, input$outputfilestable_rows_selected), function(i) {
-        .hideButtons(i)})
-    } else {
-      lapply(input$outputfilestable_rows_current, function(i){
-        .hideButtons(i)})
-    }
-  })
-  
-  
-  # Export to .csv
-  output$FVEdownloadexcel <- downloadHandler(
-    filename = result$currentFile,
-    content = function(file) {
-      write.csv(result$fileData, file)}
-  )
-  
-  # Modal Panel
-  FileContent <- modalDialog(
-    easyClose = TRUE,
-    size = "l",
-    fluidPage(
-      h4("File Contents", class = "flamingo-table-title"),
-      htmlOutput(ns("tableFVExposureSelectedInfo")),
-      DTOutput(ns("tableFVExposureSelected")),
-      br(),
-      downloadButton(ns("FVEdownloadexcel"), label = "Export to csv")
-    )
-  )
-  
-  
-  #Show content in Modal
-  
-  observeEvent(result$currentv_rows, {
-    if (!is.null(result$currentv_rows) && nrow(result$currentv_rows) > 0) {
-      #idx is the index of the button clicked
-    idx <- seq(nrow(result$filesListData))[result$currentv_rows != result$previousv_rows]
-    if (length(idx) > 1) {
-      #this happens when changing run. the inputs are not reset, wherease the result$previousv_rows is all 0.  Can be avoided with better initialization of result$previousv_rows 
-      result$previousv_rows <- result$currentv_rows
-    } else  if ( length(idx) ==  1) {
-      #this is the case when a button has been clicked
-      result$previousv_rows <- result$currentv_rows
-      showModal(FileContent)
-      # Extra info table
-      output$tableFVExposureSelectedInfo <- renderUI({
-        str1 <- paste("File Name: ", result$filesListData[idx,2])
-        str2 <- paste("Resource Key ", result$filesListData[idx,10])
-        HTML(paste(str1, str2, sep = '<br/>'))
-      })
-      # get data to show in modal table
-      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-      tryCatch({
-        result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-                                    quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-      }, error = function(e) {
-        showNotification(type = "error",
-                         paste("Could not read file:", e$message))
-        result$fileData <- NULL
-      }) # end try catch
-    }
-    }
-  })
-  
-  # Helper functions -------------------------
-  
-  .getFLTableOptions <- function() {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
-      processing = 0,
-      scrollX = TRUE,
-      pageLength = 10,
-      preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
-      drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } '),
-      autoWidth = TRUE)
-    return(options)
-  }
-  
-  # Check permission row by row
-  .enableButton <- function(i) {
-    FVid <- result$filesListData[i, 1]
-    validButtons <- executeDbQuery(dbSettings,
-                                   buildDbQuery("TellOperationsValidOnFileID", FVid))
-    manageButtons <- c("FO_btn_show_raw_content" = paste0("vrows_", i))
-    # lapply(t(validButtons), function(btnIDs){enable(manageButtons[btnIDs])})
-    lapply(t(validButtons), function(btnIDs){shinyjs::show(manageButtons[btnIDs])})
-  }
-  
-  #hide buttons in a row
-  .hideButtons <- function(i=NULL){
-    shinyjs::hide(paste0("vrows_", i))
-  }
-  
-  
-  # utility function to add input Id to buttons in table
-  .shinyInput <- function(FUN, id, num, Label = NULL, hidden = FALSE,  ...) {
-    inputs <- character(num)
-    for (i in seq_len(num)) {
-      if (hidden) {
-        inputs[i] <- as.character(shinyjs::hidden(FUN(inputId = ns(paste0(id,i)), label = Label, ...)))
-      } else {
-        inputs[i] <- as.character(FUN(inputId = ns(paste0(id,i)), label = Label, ...))
-      }
-    }
-    inputs
-  }
-  
-  # Module Output -----------------------
-  invisible()
-  
-}
-
-
 # panelOutputModule Module -----------------------
 #' Module for Output Panel
 #' @description Server logic to show graphical output such as plots
@@ -509,7 +280,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     filesListData()
     input$inputplottype
   })
-
+  
   
   #clean up panel objects when inactive
   observe(if (!active()) {
@@ -534,12 +305,12 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
   })
   
- 
+  
   # Enable / Disable options -------------------------------
   
   # > based on run ID ----
   #Gather the Granularities, Variables and Losstypes based on the runID output presets
-   observe(if (active()) {
+  observe(if (active()) {
     if (!is.null(filesListData() )) {
       result$Granularities <- unique(filesListData()$Granularity)
       result$Losstypes <- unique(filesListData()$Losstype)
@@ -550,7 +321,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       result$Variables <-  character(0)
     }
   })
-
+  
   observeEvent({
     inputplottype()
     result$Losstypes
@@ -569,21 +340,21 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   })
   
   # > based on inputs ----
-
+  
   #GUL does not have policy
   observeEvent(
     chkbox$chkboxgrplosstypes(),
     ignoreNULL = FALSE, {
-        #if losstype = GUL then policy inactive
-        if ( "GUL" %in% chkbox$chkboxgrplosstypes()) {
-          Granularities <- result$Granularities[which(result$Granularities != "Policy")]
-        } else {
-          Granularities <- result$Granularities
-        }
-        .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", inputplottype())
-        .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
+      #if losstype = GUL then policy inactive
+      if ( "GUL" %in% chkbox$chkboxgrplosstypes()) {
+        Granularities <- result$Granularities[which(result$Granularities != "Policy")]
+      } else {
+        Granularities <- result$Granularities
+      }
+      .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", inputplottype())
+      .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
     })
-
+  
   # Extract dataframe to plot ----------------------------------------------
   
   #Logic to filter the files to plot
@@ -677,11 +448,11 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       # > read files to plot ---------
       for (i in seq(nrow(filesToPlot))) { # i<- 1
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
-        # if (TRUE) {
-        #   oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
-        # }
+        if (TRUE) {
+          oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+          # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+          fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
+        }
         currfileData <- .readFile(fileName)
         nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
         gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) & !(names(currfileData) %in% extracols) & !(names(currfileData) %in% x)]
@@ -839,7 +610,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     p <- p +
       geom_line(size = 1) +
       geom_point(size = 2) +
-    p <- .multiplot(p, multipleplots)
+      p <- .multiplot(p, multipleplots)
     p
   }
   
@@ -852,9 +623,9 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     if (wuncertainty){
       p <- p +
         geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
-                         size = .3,
-                         width = .2,                    # Width of the error bars
-                         position = position_dodge(.9)) 
+                      size = .3,
+                      width = .2,                    # Width of the error bars
+                      position = position_dodge(.9)) 
     }
     # p <- .addRefLine(p, unique(data$reference))
     p <- .multiplot(p,multipleplots)

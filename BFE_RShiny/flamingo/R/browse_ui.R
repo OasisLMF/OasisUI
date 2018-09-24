@@ -20,7 +20,6 @@ browseprogrammesUI <- function(id) {
 
 # Functions for UI Panels ------------------------------------------------------------------------------
 
-#' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyBS bsTooltip
@@ -44,7 +43,7 @@ panelDefineRunID <-  function(id){
 }
 
 
-#' Function wrapping panel to define prgramme and model IDs
+
 #' @inheritParams flamingoModuleUI
 #' @export
 panelSummaryTable <-  function(id){
@@ -57,7 +56,7 @@ panelSummaryTable <-  function(id){
   )
 }
 
-#' Function wrapping panel to define prgramme and model IDs
+
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -81,7 +80,6 @@ panelOutput <-  function(id){
 }
 
 
-#' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
@@ -125,7 +123,6 @@ panelOutputModuleUI <-  function(id){
 }
 
 
-#' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
 #' @export
 panelViewOutputFiles <-  function(id){
@@ -134,18 +131,7 @@ panelViewOutputFiles <-  function(id){
     id = ns("flamingoPanelViewOutputFiles"),
     collapsible = TRUE,
     heading = "Files Table",
-    panelViewOutputFilesModuleUI(ns("panelViewOutputFilesModule"))
+    ViewFilesModuleUI(id  = ns("ViewFilesModule"), includechkbox = FALSE)
   )
 }
 
-#' Function wrapping panel to define prgramme and model IDs
-#' @inheritParams flamingoModuleUI
-#' @importFrom DT DTOutput
-#' @export
-panelViewOutputFilesModuleUI <-  function(id){
-  ns <- NS(id)
-  tagList(
-    DTOutput(ns("outputfilestable")),
-    downloadButton(ns("FLTdownloadexcel"), label = "Export to csv")
-  )
-}
