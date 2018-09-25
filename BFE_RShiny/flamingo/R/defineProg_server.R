@@ -67,10 +67,16 @@ programmeDefinition <- function(input, output, session, dbSettings,
         hide("divSLFileSelect")
         hide("divSAFileUpload")
         hide("divSAFileSelect")
+        hide("divSRFileUpload")
+        hide("divSRFileSelect")
+        hide("divSRSFileUpload")
+        hide("divSRSFileSelect")
         hide("divdefprogdetails")
         hide("divprogoasisfiles")
         updateSelectInput(session, "sinputSLFile", selected="")
         updateSelectInput(session, "sinputSAFile", selected="")
+        updateSelectInput(session, "sinputSRFile", selected="")
+        updateSelectInput(session, "sinputSRSFile", selected="")
         
       })
   
@@ -308,7 +314,7 @@ programmeDefinition <- function(input, output, session, dbSettings,
   
   
   
-  ### Upload Location/Account File
+  ### Upload Location/Account/Reinsurance Files
   
   onclick("abuttonSLFileUpload", {
         inFile <- input$SLFile
@@ -353,7 +359,51 @@ programmeDefinition <- function(input, output, session, dbSettings,
           showNotification(type = "error", "File transfer failed.")
         }
       })
+    
+  onclick("abuttonSRFileUpload", {
+        inFile <- input$SRFile
+        flc <- getFileLocationPath(dbSettings, "Exposure File")
+        flcopy <- file.copy(inFile$datapath,
+            file.path(flc, inFile[1,1]), overwrite = TRUE)
+        logMessage(file.path(flc,inFile[1,1]))
+        if (flcopy == TRUE){
+          recordId <- createFileRecord(dbSettings,
+              inFile[1,1], "Source Reinsurance File", 401, flc, userId(),
+              "Prog", result$DPProgData[input$tableDPprog_rows_selected,1])
+          if (!is.null(recordId)) {
+            showNotification(type = "message",
+                paste("New File record id: ", recordId, " created."))
+            reloadProgDetails()
+          } else {
+            showNotification(type = "error", "Could not create file record.")
+          }
+        } else{
+          showNotification(type = "error", "File transfer failed.")
+        }
+      })
   
+  onclick("abuttonSRSFileUpload", {
+        inFile <- input$SRSFile
+        flc <- getFileLocationPath(dbSettings, "Exposure File")
+        flcopy <- file.copy(inFile$datapath,
+            file.path(flc, inFile[1,1]), overwrite = TRUE)
+        logMessage(file.path(flc,inFile[1,1]))
+        if (flcopy == TRUE){
+          recordId <- createFileRecord(dbSettings,
+              inFile[1,1], "Source Reinsurance Scope File", 402, flc, userId(),
+              "Prog", result$DPProgData[input$tableDPprog_rows_selected,1])
+          if (!is.null(recordId)) {
+            showNotification(type = "message",
+                paste("New File record id: ", recordId, " created."))
+            reloadProgDetails()
+          } else {
+            showNotification(type = "error", "Could not create file record.")
+          }
+        } else{
+          showNotification(type = "error", "File transfer failed.")
+        }
+      })
+
   
   
   ### Link Location/Account File
@@ -440,7 +490,32 @@ programmeDefinition <- function(input, output, session, dbSettings,
         
       })
   
+    observe(if (active()) {
+
+        if(input$sinputSRFile == "U") {
+          show("divSRFileUpload")
+          disable("abuttonSLFileUpload")
+          hide("divSRFileSelect")
+        } else if(input$sinputSRFile == "S") {
+          show("divSRFileSelect")
+          hide("divSRFileUpload")
+        }
+
+      })
   
+  observe(if (active()) {
+
+        if(input$sinputSRSFile == "U") {
+          show("divSRSFileUpload")
+          disable("abuttonSRSFileUpload")
+          hide("divSRSFileSelect")
+        } else if(input$sinputSRSFile == "S") {
+          show("divSRSFileSelect")
+          hide("divSRSFileUpload")
+        }
+
+      })
+
   
   ### On change Location/Account file upload dropdown
   
@@ -478,6 +553,39 @@ programmeDefinition <- function(input, output, session, dbSettings,
         }
       })
   
+  observe(if (active()) {
+        if (input$sinputSRFile == "U") {
+          options(shiny.maxRequestSize = 1024*1024^2)
+          inFile <- input$SRFile
+          if (!is.null(inFile)) {
+            enable("abuttonSRFileUpload")
+          }
+        } else {
+          if (input$sinputSRFile == "S"){
+            SRfiles <- getFileSourceReinsuranceFile(dbSettings)
+            updateSelectInput(session, "sinputselectSRFile",
+                choices = createSelectOptions(SRfiles, labelCol = 1,
+                    valueCol = 2))
+          }
+        }
+      })
+
+  observe(if (active()) {
+        if (input$sinputSRSFile == "U") {
+          options(shiny.maxRequestSize = 1024*1024^2)
+          inFile <- input$SRSFile
+          if (!is.null(inFile)) {
+            enable("abuttonSRSFileUpload")
+          }
+        } else {
+          if (input$sinputSRSFile == "S"){
+            SRSfiles <- getFileSourceReinsuranceScopeFile(dbSettings)
+            updateSelectInput(session, "sinputselectSRSFile",
+                choices = createSelectOptions(SRSfiles, labelCol = 1,
+                    valueCol = 2))
+          }
+        }
+      })
   
   
   ### Programme Model Table (previously OOK)

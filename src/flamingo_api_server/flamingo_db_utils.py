@@ -32,6 +32,30 @@ def get_transform_file_names_progoasis(progoasisid):
     return db.fetch_one(
         "exec dbo.getTransformInputFilesForProgOasis ?", progoasisid)
 
+@oasis_log()
+def get_source_loc_file_for_prog(progid):
+    return db.fetch_one(
+        "exec dbo.getSourceFileLocForProg ?", progid)
+
+@oasis_log()
+def get_source_acc_file_for_prog(progid):
+    return db.fetch_one(
+        "exec dbo.getSourceFileAccForProg ?", progid)
+
+@oasis_log()
+def get_source_reinsurance_file_for_prog(progid):
+    return db.fetch_one(
+        "exec dbo.getSourceFileReinsuranceForProg ?", progid)
+
+@oasis_log()
+def get_source_reinsurance_scope_file_for_prog(progid):
+    return db.fetch_one(
+        "exec dbo.getSourceFileReinsuranceScopeForProg ?", progid)
+
+@oasis_log()
+def get_ProgId_For_ProgOasis(progoasisid):
+    return db.fetch_one(
+        "exec dbo.getProgIdForProgOasis ?", progoasisid)
 
 @oasis_log()
 def generate_output_transform_file_records_for_prog(progid, canlocfilename, canaccfilename):
@@ -147,6 +171,11 @@ def get_il_summaries(processrunid):
     return db.fetchall(
         "exec dbo.getParametersJSONSummariesIL ?", processrunid)
 
+
+@oasis_log()
+def get_ri_summaries(processrunid): 
+    return db.fetchall(
+        "exec dbo.getParametersJSONSummariesRI ?", processrunid)
 
 @oasis_log()
 def log_element_run_to_db(element_run_id, status, description):

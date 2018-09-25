@@ -495,7 +495,9 @@ processRunPage <- function(
               input$chkgulstate, input$chkgulcounty, input$chkgulloc,
               input$chkgullob, input$chkilprog, input$chkilpolicy,
               input$chkilstate, input$chkilcounty, input$chkilloc,
-              input$chkillob)))
+              input$chkillob, input$chkriprog, input$chkripolicy,
+              input$chkristate, input$chkricounty, input$chkriloc,
+              input$chkrilob)))
   
   # Update button in sidebar panel to update checkboxes for pre-populated values
   observe(if (active()) {
@@ -635,6 +637,10 @@ processRunPage <- function(
     outputsStringIL <- paste(collapse = ", ",
         c(input$chkilprog, input$chkilpolicy, input$chkilstate,
             input$chkilcounty, input$chkilloc, input$chkillob))
+
+    outputsStringRI <- paste(collapse = ", ",
+        c(input$chkriprog, input$chkripolicy, input$chkristate,
+            input$chkricounty, input$chkriloc, input$chkrilob))
     
     stmt <- paste0("exec dbo.WorkflowFlattener ",
         "@ProgOasisID= ", progOasisID, ", ",
@@ -644,6 +650,7 @@ processRunPage <- function(
         "@UseRandomNumberFile= 0, ",
         "@OutputsStringGUL= '", outputsStringGUL, "', ",
         "@OutputsStringIL= '", outputsStringIL, "', ",
+        "@OutputsStringRI= '", outputsStringRI, "', ",
         "@EventSetID= '", eventsetid ,"', ",
         "@EventOccurrenceID= '", eventoccid, "', ", 
         "@PerilWind = '", windperil ,"', ",
@@ -774,6 +781,13 @@ processRunPage <- function(
         updateCheckboxGroupInput(session, inputId ="chkilcounty", selected = "None")
         updateCheckboxGroupInput(session, inputId ="chkilloc", selected = "None")
         updateCheckboxGroupInput(session, inputId ="chkillob", selected = "None")
+        # RI group
+        updateCheckboxGroupInput(session, inputId ="chkriprog", selected = "None")
+        updateCheckboxGroupInput(session, inputId ="chkripolicy", selected = "None")
+        updateCheckboxGroupInput(session, inputId ="chkristate", selected = "None")
+        updateCheckboxGroupInput(session, inputId ="chkricounty", selected = "None")
+        updateCheckboxGroupInput(session, inputId ="chkriloc", selected = "None")
+        updateCheckboxGroupInput(session, inputId ="chkrilob", selected = "None")
         
       }
       
