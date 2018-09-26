@@ -16,7 +16,7 @@ fileViewer <- function(
   dbSettings,
   userId,
   preselRunId = reactive(-1),
-  active = reactive(TRUE),
+  active, #= reactive(TRUE),
   logMessage = message) {
 
   # Reactive Values -----
@@ -26,6 +26,8 @@ fileViewer <- function(
   )
 
   ns <- session$ns
+  
+  navigation_state <- reactiveNavigation()
 
   ### File List Table ----
 
@@ -56,6 +58,14 @@ fileViewer <- function(
     includemrows = TRUE,
     includechkbox = TRUE)
 
-  invisible()
-
+  ### Module Output ###########################################################
+  
+ # Module Outout ------------------------------------------------------------
+ 
+ moduleOutput <- c(
+   outputNavigation(navigation_state),
+   list()
+ )
+ 
+ moduleOutput
 }
