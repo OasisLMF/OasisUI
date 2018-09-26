@@ -170,7 +170,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 
   .logoutModal <- function() {
     ns <- session$ns
-    modalDialog(label = ".modaldialoguelogout",
+    modalDialog(label = "modaldialoguelogout",
                 title = "Important message",
                 "Are you sure you want to log out?",
                 footer = tagList(
