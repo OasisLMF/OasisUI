@@ -21,12 +21,12 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 
   # Reactive Values and parameters -----
   navigation_state <- reactiveNavigation()
-  
+
   result <- reactiveValues(
     inbox = NULL,
     runIdList = NULL
   )
-  
+
   # navigation -----
   observeEvent(input$abuttongotorun,
                updateNavigation(navigation_state, "SBR"))
@@ -48,28 +48,28 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   # })
 
   observe(if (active()) {
-    
+
     # invalidate if the refresh button updates
     force(input$refreshInbox)
-    
+
     # reload automatically every so often
     invalidateLater(reloadMillis)
-    
+
     landingPageButtonUpdate(session, dbSettings, userId())
-    
+
     data <- getInboxData(dbSettings, userId())
     result$inbox <-  data %>%
       mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
       mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
       mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
       as.data.frame()
-    
+
     logMessage("inbox refreshed")
-    
+
     result$runIdList <- result$inbox[, c("RunID", "Status")]
     #logMessage(paste0("result$runIdList ", names(result$runIdList)))
   })
-  
+
   output$tableInbox <- renderDT(if (userId() != FLAMINGO_GUEST_ID) {
     datatable(
       # inbox(),
@@ -118,7 +118,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
       runIdList = reactive(result$runIdList)
     )
   )
-  
+
   moduleOutput
 
 }
@@ -168,7 +168,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
     toggleDropdownButton(ns("accountDDmenu"))
   })
 
-  LogoutModal <- function(){
+  .logoutModal <- function() {
     ns <- session$ns
     modalDialog(label = "modaldialoguelogout",
                 title = "Important message",
@@ -182,7 +182,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
   }
 
   observeEvent(input$abuttonlogout,
-               showModal(LogoutModal())
+               showModal(.logoutModal())
   )
 
   observeEvent(input$abuttonlogoutcontinue,
@@ -284,24 +284,10 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 }
 
 
-#' sidebar_button
-#' @description function containing the sidebar UI
-#' @inheritParams pagestructure
-#' @importFrom shinyBS bsButton
-#' @export
-sidebar_button <- function(ID, Label = NULL, Icon = NULL, Block = TRUE, Style = "btn btn-primary"){
-  fluidRow(
-    bsButton(inputId = ID, label = Label, icon = Icon, style = Style,
-             color = "primary", size = "default", type = "action", block = Block),
-    style = "margin:2%;"
-  )
-}
-
-
 #' Landing Page Access Control
 #' @description Disable/Enable menu buttons based on permissions in database
 #' @inheritParams pagestructure
-#' @importFrom shinyBS updateButton
+#' @importFrom shinyjs enable disable
 #' @export
 landingPageButtonUpdate <- function(session, dbSettings, userId,
                                     logMessage = message) {
@@ -310,14 +296,16 @@ landingPageButtonUpdate <- function(session, dbSettings, userId,
 
   if (userId == FLAMINGO_GUEST_ID) return(NULL)
 
-  .updateButton <- function(db_resourceId, btn_inputId) {
-    permission <- flamingoDBCheckPermissions(dbSettings, userId, db_resourceId)
-    if (identical(permission, character(0))) {
-      updateButton(session, session$ns(btn_inputId), disabled = TRUE)
-    } else {
-      updateButton(session, session$ns(btn_inputId), disabled = TRUE)
-    }
-  }
+  # TODO: use shinyjs enable / disable on actionButtons according to permissions
+
+  # .updateButton <- function(db_resourceId, btn_inputId) {
+  #   permission <- flamingoDBCheckPermissions(dbSettings, userId, db_resourceId)
+  #   if (identical(permission, character(0))) {
+  #     updateButton(session, session$ns(btn_inputId), disabled = TRUE)
+  #   } else {
+  #     updateButton(session, session$ns(btn_inputId), disabled = TRUE)
+  #   }
+  # }
 
   # Not used anywhere else, probably just forgotten
   # ("600", "abuttonenquiry")
@@ -330,7 +318,7 @@ landingPageButtonUpdate <- function(session, dbSettings, userId,
   # Not used anywhere else, probably just forgotten
   # ("950", "abuttonworkflowadmin")
 
-  .updateButton("200", "abuttonsysconf")
+  # .updateButton("200", "abuttonsysconf")
 
   #.updateButton("300", "abuttonfilemngt")
 

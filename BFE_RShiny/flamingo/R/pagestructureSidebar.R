@@ -71,10 +71,5 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
               landing_page$abuttonfilemngt,
               placement = "right",
               options   = list(container = "body"))#,
-    # sidebar_button(ID = ns("abuttonsysconf"),  Label =  if (collapsed) "SC" else "System Configuration"),
-    # bsTooltip(ns("abuttonsysconf"),
-    #           landing_page$abuttonsysconf,
-    #           placement = "right",
-    #           options   = list(container = "body"))
   )
 }

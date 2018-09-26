@@ -9,7 +9,6 @@
 #' @rdname userAdminDefinition
 #' @importFrom DT renderDT
 #' @importFrom shinyjs enable disable
-#' @importFrom shinyBS toggleModal
 #' @export
 userAdminDefinition <- function(input, output, session, dbSettings, userId,
                                 active = reactive(TRUE)) {
@@ -31,36 +30,38 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     selUserId = -1 # reset to -1 when no user is selected
   )
 
-  reloadCULData <- function() {
-    result$CULDataCounter <- isolate(result$CULDataCounter + 1)
+  .reloadCULData <- function() {
+    result$CULDataCounter <- result$CULDataCounter + 1
+    invisible()
   }
 
-  reloadCUAULData <- function() {
-    result$CUAULDataCounter <- isolate(result$CUAULDataCounter + 1)
+  .reloadCUAULData <- function() {
+    result$CUAULDataCounter <- result$CUAULDataCounter + 1
+    invisible()
   }
 
-  reloadUSGData <- function() {
-    result$USGDataCounter <- isolate(result$USGDataCounter + 1)
+  .reloadUSGData <- function() {
+    result$USGDataCounter <- result$USGDataCounter + 1
+    invisible()
   }
 
 
   ### Helper Functions
-
-  clearCompanySelection <- function() {
+  .clearCompanySelection <- function() {
     companies <- getCompanyList(dbSettings)
     updateSelectInput(session, "sinputCompany",
                       choices = createSelectOptions(companies, "Select Company"),
                       selected = c("Select Company" = 0))
   }
 
-  clearSecurityGroupSelection <- function() {
+  .clearSecurityGroupSelection <- function() {
     securityGroups <- getSecurityGroups(dbSettings)
     updateSelectInput(session, "sinputSecurity",
                       choices = createSelectOptions(securityGroups, "All"),
                       selected = c("All" = 0))
   }
 
-  clearOasisUserSelection <- function() {
+  .clearOasisUserSelection <- function() {
     oasisUsers <- getOasisUsers(dbSettings)
     updateSelectInput(session, "sinputOasisID",
                       choices = createSelectOptions(oasisUsers, "Select Oasis User ID"),
@@ -68,17 +69,10 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   }
 
   ### When Activated (e.g. tab is openened)
-
   observe(if (active()) {
-
-    clearCompanySelection()
-    clearSecurityGroupSelection()
-    clearOasisUserSelection()
-
     hide("usgroups")
     hide("ulicenses")
-    clearFields()
-
+    result$selUserId <- -1
   })
 
 
@@ -222,72 +216,87 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   ### Text Input Updating #####################################################
 
   # Function that:
-  # - clears the information fields on the left hand side
-  # - resets the selected user id to -1
-  clearFields <- function(){
-    result$selUserId <- -1
-    updateTextInput(session, "tinputUserName", value = "")
-    updateSelectInput(session, "sinputCompany", selected = c("Select Company"= 0))
-    updateTextInput(session, "tinputDepartment", value = "")
-    updateTextInput(session, "tinputLogin", value = "")
-    updateTextInput(session, "tinputPassword", value = "")
-  }
-
-
-  # updates the details on the left hand side every time a row is clicked
-  # uses the list of rows selected to attain row index
-  # row index is used to access data in table and render it to the left hand side
-  observe(if (active()) {
-    if(length(input$tablecompanyuserlist_rows_selected) > 0){
+  # - updates information fields in Modal Dialog
+  .getCompUserDetails <- function() {
 
       result$selUserId <- result$CULData[input$tablecompanyuserlist_rows_selected, 3]
-      updateTextInput(session, "tinputID", value = result$selUserId)
       updateTextInput(session, "tinputUserName",
                       value = result$CULData[input$tablecompanyuserlist_rows_selected, 4])
       updateSelectInput(session, "sinputCompany",
-                        selected = result$CULData[(input$tablecompanyuserlist_rows_selected),1])
+                        selected = result$CULData[(input$tablecompanyuserlist_rows_selected), 1])
       deptData <- getDeptData(dbSettings, result$selUserId)
       updateTextInput(session, "tinputDepartment", value = deptData[[3]])
       updateTextInput(session, "tinputLogin", value = deptData[[1]])
       updateTextInput(session, "tinputPassword", value = deptData[[2]])
 
-      reloadUSGData()
+  }
+
+  # updates the details on the left hand side every time a row is clicked
+  # uses the list of rows selected to attain row index
+  # row index is used to access data in table and render it to the left hand side
+  observe(if (active()) {
+    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
+      result$selUserId <- result$CULData[input$tablecompanyuserlist_rows_selected, 3]
+      .reloadUSGData()
       show("ulicenses")
-      reloadCUAULData()
+      .reloadCUAULData()
       show("usgroups")
-
     } else {
-
       hide("usgroups")
       hide("ulicenses")
-      clearFields()
-
+      result$selUserId <- -1
     }
   })
 
   ### User Create / Update / Delete ###########################################
 
+  # Modal dialog of create and update buttons
+
+  .useradmincrtupmodal <- function() {
+    ns <- session$ns
+    modalDialog(label = ".useradmincrtupmodal",
+                title = "User Details",
+                textInput(ns("tinputUserName"), "User Name"),
+                selectInput(ns("sinputCompany"), "Company Name", choices = c("")),
+                textInput(ns("tinputDepartment"), "Department"),
+                textInput(ns("tinputLogin"), "Login"),
+                passwordInput(ns("tinputPassword"), "Password"),
+                footer = tagList(
+                  actionButton(ns("abuttonusersubmit"), class = "btn btn-primary",
+                               label = "Submit", align = "right"),
+
+                  actionButton(ns("abuttonusercancel"), class = "btn btn-default",
+                               label = "Cancel", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+
   # onclick of create button
   onclick("abuttonnewUser", {
     result$useradminflg <- "C"
-    clearFields()
-    toggleModal(session, "useradmincrtupmodal", toggle = "open")
+    showModal(.useradmincrtupmodal())
+    result$selUserId <- -1
+    .clearCompanySelection()
   })
 
   # cancel new user
   # clears the fields, hides confirm cancel, shows CRUD buttons
   onclick("abuttonusercancel",{
-    toggleModal(session, "useradmincrtupmodal", toggle = "close")
-    clearFields()
-    reloadCULData()
+    removeModal()
+    result$selUserId <- -1
+    .reloadCULData()
   })
 
   #on click of update button
   onclick("abuttonuserupdate", {
-    if(length(input$tablecompanyuserlist_rows_selected) > 0){
+    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       result$useradminflg <- "U"
-      toggleModal(session, "useradmincrtupmodal", toggle = "open")
-    } else{
+      showModal(.useradmincrtupmodal())
+      .clearCompanySelection()
+      .getCompUserDetails()
+    } else {
       showNotification(type = "warning",
                        "Please select a user to update details.")
     }
@@ -328,14 +337,31 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
       }
     }
     result$useradminflg <- ""
-    toggleModal(session, "useradmincrtupmodal", toggle = "close")
-    reloadCULData()
+    removeModal()
+    .reloadCULData()
   })
+
+  # Modal dialog of delete button
+  .userdelmodal <- function() {
+    ns <- session$ns
+    modalDialog(label = ".userdelmodal",
+                title = "Delete selection",
+                paste0("Are you sure you want to delete?"),
+                footer = tagList(
+                  actionButton(ns("abuttonuconfirmdel"), class="btn btn-primary",
+                               label = "Confirm", align = "center"),
+                  actionButton(ns("abuttonucanceldel"), class = "btn btn-default",
+                               label = "Cancel", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
 
   # onclick of delete button
   onclick("abuttonuserdelete", {
     if (length(input$tablecompanyuserlist_rows_selected) > 0) {
-      toggleModal(session, "userdelmodal", toggle = "open")
+      showModal(.userdelmodal())
     } else {
       showNotification(type = "warning", "Please select a user to delete")
     }
@@ -343,8 +369,8 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   # onclick of cancel delete button
   onclick("abuttonucanceldel", {
-    toggleModal(session, "userdelmodal", toggle = "close")
-    reloadCULData()
+    removeModal()
+    .reloadCULData()
   })
 
   # onclick of confirm delete button
@@ -362,22 +388,37 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
                                                  result$CULData[input$tablecompanyuserlist_rows_selected, 4]))
     }
 
-    clearFields()
-    toggleModal(session, "userdelmodal", toggle = "close")
-    reloadCULData()
+    removeModal()
+    result$selUserId <- -1
+    .reloadCULData()
   })
 
 
 
   ### Security Group Add/Delete ###############################################
 
+  # modal dialog of add/remove security button
+  .usersecuritymodal <- function() {
+    ns <- session$ns
+    modalDialog(label = ".usersecuritymodal",
+                title = "Add/Remove Security Groups",
+                selectInput(ns("sinputSecurity"), "Select Security Group",
+                            choices = c("")),
+                footer = tagList(
+                  actionButton(ns("abuttonaddsecurity"), class="btn btn-primary",
+                               label = "Add", align = "left"),
+                  actionButton(ns("abuttonrmvsecurity"), class="btn btn-primary",
+                               label = "Remove", align = "right")),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+
   # onclick of add/remove security button
   onclick("abuttonusersecurity", {
-    if(length(input$tablecompanyuserlist_rows_selected) > 0) {
-
-      clearSecurityGroupSelection()
-      toggleModal(session, "usersecuritymodal", toggle = "open")
-
+    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
+      showModal(.usersecuritymodal())
+      .clearSecurityGroupSelection()
     } else {
       showNotification(type = "warning",
                        "Please select a user to add security group")
@@ -390,8 +431,8 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("addSecurityGroup",
                          as.character(result$selUserId), as.character(input$sinputSecurity))
     executeDbQuery(dbSettings, stmt)
-    reloadUSGData()
-    toggleModal(session, "usersecuritymodal", toggle = "close")
+    .reloadUSGData()
+    removeModal()
   })
 
   # onclick of remove security button
@@ -399,22 +440,37 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("removeSecurityGroup",
                          as.character(result$selUserId), as.character(input$sinputSecurity))
     executeDbQuery(dbSettings, stmt)
-    reloadUSGData()
-    toggleModal(session, "usersecuritymodal", toggle = "close")
+    .reloadUSGData()
+    removeModal()
   })
 
 
 
   ### Oasis User Id (License) Add/Delete ######################################
 
+  # modal dialog of add/remove license button
+  .userlicensemodal <- function() {
+    ns <- session$ns
+    modalDialog(label = ".userlicensemodal",
+                title = "Add/Remove User Licenses",
+                selectInput(ns("sinputOasisID"), "Select Oasis User ID",
+                            choices = c("")),
+                footer = tagList(
+                  actionButton(ns("abuttonaddoasisid"), class="btn btn-primary",
+                               label = "Add", align = "left"),
+                  actionButton(ns("abuttonrmvoasisid"), class="btn btn-primary",
+                               label = "Remove", align = "right")),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+
   # onclick of add/remove license button
   onclick("abuttonuseroasis", {
-    if(length(input$tablecompanyuserlist_rows_selected) > 0) {
-
-      clearOasisUserSelection()
-      toggleModal(session, "userlicensemodal", toggle = "open")
-
-    } else{
+    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
+      showModal(.userlicensemodal())
+      .clearOasisUserSelection()
+    } else {
       showNotification(type = "warning",
                        "Please select a user to add license")
     }
@@ -426,8 +482,8 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("addUserLicense",
                          as.character(result$selUserId), as.character(input$sinputOasisID))
     executeDbQuery(dbSettings, query)
-    reloadCUAULData()
-    toggleModal(session, "userlicensemodal", toggle = "close")
+    .reloadCUAULData()
+    removeModal()
   })
 
   # onclick of remove license button in pop-up
@@ -435,30 +491,32 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("removeUserLicense",
                          as.character(result$selUserId), as.character(input$sinputOasisID))
     executeDbQuery(dbSettings, query)
-    reloadCUAULData()
-    toggleModal(session, "userlicensemodal", toggle = "close")
+    .reloadCUAULData()
+    removeModal()
   })
 
 
-  ### Export to Excel #########################################################
-
+  ### Export to CSV ###########################################################
   # User List
   output$CUACULdownloadexcel <- downloadHandler(
     filename ="companyuserlist.csv",
     content = function(file) {
-      write.csv(result$CULData, file)}
+      write.csv(result$CULData, file)
+    }
   )
   # User Security Groups
   output$CUAUUSGdownloadexcel <- downloadHandler(
     filename ="usersecuritygroups.csv",
     content = function(file) {
-      write.csv(result$USGdata, file)}
+      write.csv(result$USGdata, file)
+    }
   )
   # User Licenses
   output$CUAULdownloadexcel <- downloadHandler(
     filename ="userlicenses.csv",
     content = function(file) {
-      write.csv(result$CUAULData, file)}
+      write.csv(result$CUAULData, file)
+    }
   )
 
 

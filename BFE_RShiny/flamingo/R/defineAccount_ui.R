@@ -6,7 +6,6 @@
 #' @importFrom shiny actionButton helpText textInput sidebarLayout sidebarPanel
 #' downloadButton
 #' @importFrom DT DTOutput
-#' @importFrom shinyBS bsModal
 #' @export
 accountDefinitionUI <- function(id) {
 
@@ -34,26 +33,7 @@ accountDefinitionUI <- function(id) {
                               class="btn btn-primary", align = "right")
              )
       )
-    ),
-
-    tagAppendAttributes(class = "modal-footless",
-                        bsModal(ns("crtupModal"), "Create/Amend Account",
-                                trigger = "", size = "medium",
-
-                                textInput(ns("tinputDAAccountName"), "Account Name"),
-                                actionButton(ns("abuttonAccSubmit"), class = "btn btn-primary",
-                                             label = "Submit", align = "left"),
-                                actionButton(ns("abuttonAccCancel"), class = "btn btn-primary",
-                                             label = "Cancel", align = "right"))),
-
-    tagAppendAttributes(class = "modal-footless",
-                        bsModal(ns("delModal"), "Are you sure you want to delete?",
-                                trigger = "", size = "medium",
-
-                                actionButton(ns("btnConfirmDel"), class="btn btn-primary",
-                                             label = "Confirm", align = "center"),
-                                actionButton(ns("btnCancelDel"), class = "btn btn-primary",
-                                             label = "Cancel", align = "right")))
+    )
 
   )
 

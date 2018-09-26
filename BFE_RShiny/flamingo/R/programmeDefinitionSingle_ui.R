@@ -3,7 +3,6 @@
 #' @inheritParams flamingoModuleUI
 #' @return list of tags
 #' @importFrom DT DTOutput
-#' @importFrom shinyBS bsModal
 #' @export
 programmeDefinitionSingleUI <- function(id) {
 
@@ -11,18 +10,6 @@ programmeDefinitionSingleUI <- function(id) {
 
   tagList(
     singleProgrammeWorkflowStepsUI(ns("workflowsteps")),
-
-    #Modals
-    bsModal(ns("bsmodalsaveoutput"), "Save Configuration", trigger = "", size = "small",
-            textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
-            actionButton(inputId = ns("abuttonsubmitoutput"), label = "Submit", class = "btn btn-primary")
-    ),
-    bsModal(ns("bsmodalviewSLfile"), "Source Location File View", trigger = "", size = "large",
-            DTOutput(ns("tableviewSLfile"))
-    ),
-    bsModal(ns("bsmodalviewSAfile"), "Source Account File View", trigger = "", size = "large",
-            DTOutput(ns("tableviewSAfile"))
-    ),
 
     # Hidden/visible panels
     hidden(div(id = ns("panelProgrammeTable"), panelProgrammeTable(id))),

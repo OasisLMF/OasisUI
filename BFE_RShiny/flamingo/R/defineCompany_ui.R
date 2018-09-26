@@ -4,7 +4,6 @@
 #' @return list of tags
 #' @rdname companyDefinition
 #' @importFrom DT DTOutput
-#' @importFrom shinyBS bsModal
 #' @export
 companyDefinitionUI <- function(id) {
 
@@ -30,29 +29,8 @@ companyDefinitionUI <- function(id) {
                       label = "Delete", align = "left")
               )
           )
-      ),
-
-      tagAppendAttributes(class = "modal-footless",
-          bsModal(ns("compcrtupmodal"), "Company Details",
-              trigger = "", size = "medium",
-
-              textInput(ns("tinputCompName"), "Company Name"),
-              textInput(ns("tinputCompDom"), "Company Domicile"),
-              textInput(ns("tinputCompLegName"), "Company Legal Name"),
-              textInput(ns("tinputCompRegNo"), "Company Registration Number"),
-              actionButton(ns("abuttonsubcomp"),  class="btn btn-primary",
-                  label = "Submit", align = "left"),
-              actionButton(ns("abuttonccancel"), class = "btn btn-primary",
-                  label = "Cancel", align = "right"))),
-
-      tagAppendAttributes(class = "modal-footless",
-          bsModal(ns("compdelmodal"), "Are you sure you want to delete?",
-              trigger = "", size = "medium",
-
-              actionButton(ns("abuttoncconfirmdel"), class="btn btn-primary",
-                  label = "Confirm", align = "center"),
-              actionButton(ns("abuttonccanceldel"), class = "btn btn-primary",
-                  label = "Cancel", align = "right")))
+      )
+      
 
   )
 

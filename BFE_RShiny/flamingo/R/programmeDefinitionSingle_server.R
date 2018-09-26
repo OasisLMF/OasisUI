@@ -7,9 +7,8 @@
 #' @template return-outputNavigation
 #' @rdname programmeDefinitionSingle
 #' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDT dataTableProxy selectRows
+#' @importFrom DT renderDT dataTableProxy selectRows DTOutput
 #' @importFrom dplyr mutate select
-#' @importFrom shinyBS toggleModal
 #' @importFrom shinyjs onclick js
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,
@@ -73,15 +72,15 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Panels switch ------------------------------------------------------------
   # Make sure the first view is reset to first panel
   observe(if (active()) {
-       workflowSteps$update("1") 
+       workflowSteps$update("1")
    .reloadDPProgData()
   })
-  
+
   observeEvent(active(), {
     if (!is.null(preselPanel())) {
       workflowSteps$update(preselPanel())
     } else {
-      workflowSteps$update("1") 
+      workflowSteps$update("1")
     }
     .reloadDPProgData()
   })
@@ -329,11 +328,21 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   ### View source files
   # Source Location
+  .modalviewSLfile <- function() {
+    ns <- session$ns
+    modalDialog(label = ".modalviewSLfile",
+                title = "Source Location File View",
+                DTOutput(ns("tableviewSLfile")),
+                size = "l",
+                easyClose = TRUE
+    )
+  }
+
   onclick("abuttonSLFileView", {
     if (input$sinputselectSLFile != "") {
-      toggleModal(session, "bsmodalviewSLfile", toggle = "open")
+      showModal(.modalviewSLfile())
     } else {
-      toggleModal(session, "bsmodalviewSLfile", toggle = "close")
+      removeModal()
       showNotification(type = "warning", "Please select source file")
     }
   })
@@ -354,11 +363,21 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   # Source Account
+  .modalviewSAfile <- function() {
+    ns <- session$ns
+    modalDialog(label = ".modalviewSAfile",
+                title = "Source Location File View",
+                DTOutput(ns("tableviewSAfile")),
+                size = "l",
+                easyClose = TRUE
+    )
+  }
+
   onclick("abuttonSAFileView", {
     if (input$sinputselectSLFile != "") {
-      toggleModal(session, "bsmodalviewSAfile", toggle = "open")
+      showModal(.modalviewSAfile())
     } else {
-      toggleModal(session, "bsmodalviewSAfile", toggle = "close")
+      removeModal()
       showNotification(type = "warning", "Please select source file")
     }
   })
@@ -456,13 +475,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       options = .getPRTableOptions()
     )
   })
-  
+
   output$paneltitleProgrammeDetails <- renderUI({
     if (length(result$DPProgData_selected_rows) == 1 ) {
       progId <- result$DPProgData[result$DPProgData_selected_rows, 1]
       progName <- result$DPProgData[result$DPProgData_selected_rows, 2]
       paste0("- ", progName, " (id: ", progId, ")" )
-    } 
+    }
   })
 
   # Show Programme Details
@@ -727,7 +746,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       }
     }
   })
-  
+
   # Select/deselect IL
   observeEvent(input$chkinputIL, {
     if (input$chkinputIL == FALSE) {
@@ -742,7 +761,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       }
     }
   })
-  
+
 
   # reactive expression yielding the output options as a list
   outputOptionsList <- reactive(paste(collapse = ",", c(
@@ -797,11 +816,25 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
 
   # Save output for later use as presets
+  .modalsaveoutput <- function() {
+    ns <- session$ns
+    modalDialog(label = ".modalsaveoutput",
+                title = "Save Configuration",
+                textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
+                footer = tagList(
+                  actionButton(inputId = ns("abuttonsubmitoutput"),
+                               label = "Submit", class = "btn btn-primary")
+                ),
+                size = "s",
+                easyClose = TRUE
+    )
+  }
+
   onclick("abuttonsaveoutput", {
     if (outputOptionsList() != "") {
-      toggleModal(session, "bsmodalsaveoutput", toggle = "open")
+      showModal(.modalsaveoutput())
     } else {
-      toggleModal(session, "bsmodalsaveoutput", toggle = "close")
+      removeModal()
       showNotification(type = "warning", "Please select Output")
     }
   })
@@ -817,9 +850,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       executeDbQuery(dbSettings, stmt)
       updateTextInput(session, "tinputoutputname", value = "")
       showNotification(type = "message", "Output saved.")
-      toggleModal(session, "bsmodalsaveoutput", toggle = "close")
+      removeModal()
       .clearOutputOptions()
-      toggleModal(session, "bsmodalrunparam", toggle = "close")
       #.defaultview(session)
     }
   })
@@ -1057,7 +1089,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
- 
+
   # hide process run section if DC returns empty table
   observeEvent(result$prcrundata, {
     #if (!is.null(result$prcrundata)) {
