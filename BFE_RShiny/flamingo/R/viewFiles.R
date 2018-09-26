@@ -3,6 +3,7 @@
 # UI ---------------
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
+#' @importFrom shinyBS bsTooltip
 #' @export
 ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
   ns <- NS(id)
@@ -13,11 +14,14 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
     DTOutput(ns("outputFLtable")),
     if (includechkbox) {
       downloadButton(ns("FLdownloadzip"), label = "Export to zip")
+    },
+    if (includechkbox) {
       bsTooltip(ns("FLdownloadzip"),
                 file_Viewer$FLdownloadzip,
                 placement = "right",
                 options   = list(container = "body"))
-    } else {
+    }, 
+    if (!includechkbox) {
       downloadButton(ns("FLdownloadexcel"), label = "Export to csv")
     }
   )
@@ -33,6 +37,7 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 #' @importFrom shinyjs show hide enable disable hidden
 #' @importFrom DT renderDT datatable DTOutput
 #' @importFrom dplyr mutate select contains filter
+#' @importFrom leaflet renderLeaflet leafletOutput
 #' @export
 ViewFilesModule <- function(input, output, session, logMessage = message, filesListData, includemrows = FALSE, includechkbox = FALSE) {
   
@@ -41,55 +46,62 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   
   # Reactive values & parameters --------------------------------------------
   
+  maxrowsperpage <- 10
+  
   result <- reactiveValues(
     #reactive of the input list of files
     filesListData = NULL,
     #df to show in table
     filesListDataButtons = NULL,
-    #current status of vrows buttons
-    currentv_rows = NULL,
-    #previous status of vrows buttons
-    previousv_rows = NULL,
-    #current status of mrows buttons
-    currentm_rows = NULL,
-    #previous status of mrows buttons
-    previousm_rows = NULL,
     #View output file content
     currentFile = NULL,
     #content of curr file
     fileData = NULL
   )
-  # 
+  
+  
   # observe({
+  #   filesListData()
   #   print("names")
   #   print(names(input))
   # })
+  # 
+  observeEvent(input$vrows_1, {
+    print("vrows_1")
+    print(input$vrows_1) 
+  })
   
+  # observe({
+  #   print("input$outputFLtable_rows_selected")
+  #   print(input$outputFLtable_rows_selected)
+  # })
+  # 
+  # observe({
+  #   print("input$outputFLtable_rows_current")
+  #   print(input$outputFLtable_rows_current)
+  # })
+  # 
   
   # Add buttons -------------------------------------
   observeEvent(filesListData(), ignoreNULL = FALSE, {
     #result$filesListData <- NULL
     filesListData <- filesListData()
+    # print("removeUI")
+    # removeUI(selector = "#vrows_1", immediate = TRUE)
+    # Sys.sleep(5)
     if (length(filesListData) > 0) {
       result$filesListData <- filesListData
       if (includechkbox) {
         filesListData <- cbind(data.frame(Selected = .shinyInput(checkboxInput,"srows_", nrow(filesListData), value = FALSE, width = 1)), filesListData)
       }
-      filesListData <- cbind(filesListData, data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
-      result$previousv_rows <- data.frame("vrows" = rep(0, nrow(filesListData)))
-      result$currentv_rows <- data.frame("vrows" = rep(0, nrow(filesListData)))
+      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       if (includemrows) {
-        filesListData <- cbind(filesListData, data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(filesListData), Label = "Map", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
-        result$previousm_rows <- data.frame("mrows" = rep(0, nrow(filesListData)))
-        result$currentm_rows <- data.frame("mrows" = rep(0, nrow(filesListData)))
+        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(filesListData), Label = "Map", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       }
       result$filesListDataButtons <- filesListData %>% select(-contains("Location") )
     } else {
       result$filesListData <- NULL
     }
-    #clean up reactives
-    result$currentFile <- NULL
-    result$fileData <- NULL
   })
   
   
@@ -133,6 +145,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     }
     files
   })
+
   
   # Download zip button
   output$FLdownloadzip <- downloadHandler(
@@ -152,28 +165,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   
   # Selected Row --------------------------------------------------------
   
-  #identify selected rows
-  observeEvent({
-    input$outputFLtable_rows_selected
-    input$outputFLtable_rows_current
-    lapply(input$outputFLtable_rows_current, function(i){input[[paste0("vrows_", i)]]})
-    lapply(input$outputFLtable_rows_current, function(i){input[[paste0("mrows_", i)]]})
-  }, {
-    if (!is.null(input$outputFLtable_rows_current)) {
-      if (!is.null(result$currentv_rows)) {
-        for (i in 1:nrow(result$currentv_rows)) {
-          result$currentv_rows$vrows[i] <- ifelse(!is.null(input[[paste0("vrows_", i)]]), input[[paste0("vrows_", i)]], 0)
-        }
-      }
-      if (!is.null(result$currentm_rows)) {
-        for (i in 1:nrow(result$currentm_rows)) {
-          result$currentm_rows$mrows[i] <- ifelse(!is.null(input[[paste0("mrows_", i)]]), input[[paste0("mrows_", i)]], 0)
-        }
-      }
-    }
-  })
-  
-  
+
   #if one row is selected/unselected, update checkbox and sow/hide buttons
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
@@ -262,41 +254,29 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     )
   )
   
-  observeEvent(result$currentv_rows, {
-    if (!is.null(result$currentv_rows) && nrow(result$currentv_rows) > 0) {
-      #idx is the index of the button clicked
-      # print("result$currentv_rows")
-      # print(result$currentv_rows)
-      # print("result$previousv_rows")
-      # print(result$previousv_rows)
-      idx <- seq(nrow(result$filesListData))[result$currentv_rows != result$previousv_rows]
-      if (length(idx) > 1) {
-        #this happens when changing run. the inputs are not reset, wherease the result$previousv_rows is all 0.  Can be avoided with better initialization of result$previousv_rows
-        result$previousv_rows <- result$currentv_rows
-      } else  if ( length(idx) ==  1) {
-        #this is the case when a button has been clicked
-        result$previousv_rows <- result$currentv_rows
-        showModal(FileContent)
-        # Extra info table
-        output$tableFVExposureSelectedInfo <- renderUI({
-          str1 <- paste("File Name: ", result$filesListData[idx,2])
-          str2 <- paste("Resource Key ", result$filesListData[idx,10])
-          HTML(paste(str1, str2, sep = '<br/>'))
-        })
-        # get data to show in modal table
-        fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-        tryCatch({
-          result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-                                      quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-        }, error = function(e) {
-          showNotification(type = "error",
-                           paste("Could not read file:", e$message))
-          result$fileData <- NULL
-        }) # end try catch
-      }
-    }
+  lapply(seq(maxrowsperpage), function(idx){
+    observeEvent({input[[paste0("vrows_", idx)]]},{
+      showModal(FileContent)
+      # Extra info table
+      output$tableFVExposureSelectedInfo <- renderUI({
+        str1 <- paste("File Name: ", result$filesListData[idx,2])
+        str2 <- paste("Resource Key ", result$filesListData[idx,10])
+        HTML(paste(str1, str2, sep = '<br/>'))
+      }) 
+      # get data to show in modal table
+      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+      tryCatch({
+        result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
+                                    quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+      }, error = function(e) {
+        showNotification(type = "error",
+                         paste("Could not read file:", e$message))
+        result$fileData <- NULL
+      }) # end try catch
+    })#end observeEvent
   })
   
+
   # File content map -------------------------
   
   Map <- modalDialog(
@@ -304,39 +284,32 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     size = "l",
     fluidPage(
       h4("Map", class = "flamingo-table-title"),
-      htmlOutput(ns("tableFVExposureSelectedInfo")),
+      htmlOutput(ns("tableFVMapSelectedInfo")),
       leafletOutput(ns("plainmap"))
     )
   )
   
-  observeEvent(result$currentm_rows, {
-    if (!is.null(result$currentm_rows) && nrow(result$currentm_rows) > 0) {
-      #idx is the index of the button clicked
-      idx <- seq(nrow(result$filesListData))[result$currentm_rows != result$previousm_rows]
-      if (length(idx) > 1) {
-        #this happens when changing run. the inputs are not reset, wherease the result$previousv_rows is all 0.  Can be avoided with better initialization of result$previousv_rows
-        result$previousm_rows <- result$currentm_rows
-      } else  if ( length(idx) ==  1) {
-        #this is the case when a button has been clicked
-        result$previousm_rows <- result$currentm_rows
-        showModal(Map)
-        # Extra info table
-        output$tableFVExposureSelectedInfo <- renderUI({
-          str1 <- paste("File Name: ", result$filesListData[idx,2])
-          str2 <- paste("Resource Key ", result$filesListData[idx,10])
-          HTML(paste(str1, str2, sep = '<br/>'))
-        })
-        # get data to show in modal table
-        fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-        tryCatch({
-          output$plainmap <- renderLeaflet({createPlainMap(fileName)})
-        }, error = function(e) {
-          showNotification(type = "error",
-                           paste("Could not read file:", e$message))
-        }) # end try catch
-      }
-    }
+  lapply(seq(maxrowsperpage), function(idx){
+    observeEvent({input[[paste0("mrows_", idx)]]},{
+      showModal(FileContent)
+      # Extra info table
+      output$tableFVMapSelectedInfo <- renderUI({
+        str1 <- paste("File Name: ", result$filesListData[idx,2])
+        str2 <- paste("Resource Key ", result$filesListData[idx,10])
+        HTML(paste(str1, str2, sep = '<br/>'))
+      }) 
+      # get data to show in modal table
+      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+      tryCatch({
+        routput$plainmap <- renderLeaflet({createPlainMap(fileName)})
+      }, error = function(e) {
+        showNotification(type = "error",
+                         paste("Could not read file:", e$message))
+        result$fileData <- NULL
+      }) # end try catch
+    })#end observeEvent
   })
+
   
   # Helper functions -------------------------
   
@@ -346,8 +319,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       searchHighlight = TRUE,
       columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
       processing = 0,
-      scrollX = TRUE,
-      pageLength = 10,
+      scrollX = FALSE,
+      pageLength = maxrowsperpage,
       preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
       drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } '),
       autoWidth = TRUE)
