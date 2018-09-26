@@ -15,6 +15,7 @@ fileViewerUI <- function(id) {
 
     h4("File List", class = "flamingo-table-title"),
 
+    actionButton(inputId = ns("refreshtable"), label = "Refresh", style = "float:right"),
     ViewFilesModuleUI(id  = ns("ViewFilesModule"), includechkbox = TRUE)
 
   )
