@@ -8,6 +8,10 @@
 ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
   ns <- NS(id)
   tagList(
+    tags$script("Shiny.addCustomMessageHandler('resetInputValue', function(variableName){
+                Shiny.onInputChange(variableName, null);
+                });
+                "),
     if (includechkbox) {
       checkboxInput(inputId = ns("chkboxselectall"), label = "Select all", value = FALSE)
     },
@@ -66,16 +70,16 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   #   print(names(input))
   # })
   # 
-  observeEvent(input$vrows_1, {
-    print("vrows_1")
-    print(input$vrows_1) 
-  })
-  
-  # observe({
-  #   print("input$outputFLtable_rows_selected")
-  #   print(input$outputFLtable_rows_selected)
+  # observeEvent(input$vrows_1, {
+  #   print("vrows_1")
+  #   print(input$vrows_1) 
   # })
   # 
+  observe({
+    print("input$outputFLtable_rows_selected")
+    print(input$outputFLtable_rows_selected)
+  })
+
   # observe({
   #   print("input$outputFLtable_rows_current")
   #   print(input$outputFLtable_rows_current)
@@ -94,9 +98,9 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       if (includechkbox) {
         filesListData <- cbind(data.frame(Selected = .shinyInput(checkboxInput,"srows_", nrow(filesListData), value = FALSE, width = 1)), filesListData)
       }
-      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(shiny::actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onclick = 'Shiny.onInputChange(\"select_button\",  this.id)', onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       if (includemrows) {
-        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(filesListData), Label = "Map", hidden = TRUE, onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(shiny::actionButton, "mrows_", nrow(filesListData), Label = "Map", hidden = TRUE, onclick = 'Shiny.onInputChange(\"select_button\",  this.id)', onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       }
       result$filesListDataButtons <- filesListData %>% select(-contains("Location") )
     } else {
@@ -357,6 +361,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     }
     inputs
   }
+
   
   # Module Output -----------------------
   invisible()
