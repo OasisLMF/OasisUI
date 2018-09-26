@@ -37,6 +37,11 @@ fileViewer <- function(
     stmt <- buildDbQuery("getFileViewerTable")
     result$FLdata <- executeDbQuery(dbSettings, stmt)
   })
+  
+  observeEvent(input$refreshtable, {
+    stmt <- buildDbQuery("getFileViewerTable")
+    result$FLdata <- executeDbQuery(dbSettings, stmt)
+  })
 
   # Pre-select the correct runId
   initialSelection <- reactive({
