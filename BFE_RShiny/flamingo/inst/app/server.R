@@ -75,7 +75,7 @@ server <- function(input, output, session) {
     landingPage, "landingPage",
     userId = reactive(result$userId),
     userName = reactive(result$userName),
-    reloadMillis = reloadMillis/10,
+    reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "LP")
   )
@@ -122,7 +122,7 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "SBR")
   )
 
-  auth_modules$visualizationBBR<- .callModule(
+  auth_modules$visualizationBBR <- .callModule(
     visualizationBBR,
     id = "visualizationBBR",
     apiSettings = apiSettings,
@@ -145,13 +145,13 @@ server <- function(input, output, session) {
     fileViewer,
     id = "fileViewer",
     logMessage = logMessage,
-    active = reactive(authenticated()) #&& input$fm == "fileviewer"))
+    active = reactive(authenticated() ) # && main_visible() == "FM" ) #&& input$fm == "fileviewer"))
   )
 
   auth_modules$modelSupplierPage <- .callModule(
     modelSupplierPage,
     id = "modelSupplierPage",
-    active = reactive(authenticated())# && input$sc == "Model"))
+    active = reactive(authenticated()) # && main_visible() == "SC" )# && input$sc == "Model"))
   )
 
   auth_modules$userAdminDefinition <- .callModule(
