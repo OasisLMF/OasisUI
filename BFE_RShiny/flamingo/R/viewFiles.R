@@ -64,21 +64,21 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   )
   
   
-  # observe({
-  #   filesListData()
-  #   print("names")
-  #   print(names(input))
-  # })
-  # 
-  # observeEvent(input$vrows_1, {
-  #   print("vrows_1")
-  #   print(input$vrows_1) 
-  # })
-  # 
   observe({
-    print("input$outputFLtable_rows_selected")
-    print(input$outputFLtable_rows_selected)
+    filesListData()
+    print("names")
+    print(names(input))
   })
+  # 
+  observeEvent(input$vrows_1, {
+    print("vrows_1")
+    print(input$vrows_1)
+  })
+
+  # observe({
+  #   print("input$outputFLtable_rows_selected")
+  #   print(input$outputFLtable_rows_selected)
+  # })
 
   # observe({
   #   print("input$outputFLtable_rows_current")
@@ -98,9 +98,9 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       if (includechkbox) {
         filesListData <- cbind(data.frame(Selected = .shinyInput(checkboxInput,"srows_", nrow(filesListData), value = FALSE, width = 1)), filesListData)
       }
-      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(shiny::actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onclick = 'Shiny.onInputChange(\"select_button\",  this.id)', onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(shiny::actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       if (includemrows) {
-        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(shiny::actionButton, "mrows_", nrow(filesListData), Label = "Map", hidden = TRUE, onclick = 'Shiny.onInputChange(\"select_button\",  this.id)', onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(shiny::actionButton, "mrows_", nrow(filesListData), Label = "Map", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_mbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       }
       result$filesListDataButtons <- filesListData %>% select(-contains("Location") )
     } else {
@@ -258,27 +258,50 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     )
   )
   
-  lapply(seq(maxrowsperpage), function(idx){
-    observeEvent({input[[paste0("vrows_", idx)]]},{
+  # lapply(seq(maxrowsperpage), function(idx){
+  #   observeEvent({input[[paste0("vrows_", idx)]]},{
+  #     showModal(FileContent)
+  #     # Extra info table
+  #     output$tableFVExposureSelectedInfo <- renderUI({
+  #       str1 <- paste("File Name: ", result$filesListData[idx,2])
+  #       str2 <- paste("Resource Key ", result$filesListData[idx,10])
+  #       HTML(paste(str1, str2, sep = '<br/>'))
+  #     }) 
+  #     # get data to show in modal table
+  #     fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+  #     tryCatch({
+  #       result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
+  #                                   quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+  #     }, error = function(e) {
+  #       showNotification(type = "error",
+  #                        paste("Could not read file:", e$message))
+  #       result$fileData <- NULL
+  #     }) # end try catch
+  #   })#end observeEvent
+  # })
+  
+  # lapply(seq(maxrowsperpage), function(idx){
+    observeEvent({input[["select_vbutton"]]},{
       showModal(FileContent)
-      # Extra info table
-      output$tableFVExposureSelectedInfo <- renderUI({
-        str1 <- paste("File Name: ", result$filesListData[idx,2])
-        str2 <- paste("Resource Key ", result$filesListData[idx,10])
-        HTML(paste(str1, str2, sep = '<br/>'))
-      }) 
-      # get data to show in modal table
-      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-      tryCatch({
-        result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-                                    quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-      }, error = function(e) {
-        showNotification(type = "error",
-                         paste("Could not read file:", e$message))
-        result$fileData <- NULL
-      }) # end try catch
+      session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_vbutton"))
+      # # Extra info table
+      # output$tableFVExposureSelectedInfo <- renderUI({
+      #   str1 <- paste("File Name: ", result$filesListData[idx,2])
+      #   str2 <- paste("Resource Key ", result$filesListData[idx,10])
+      #   HTML(paste(str1, str2, sep = '<br/>'))
+      # })
+      # # get data to show in modal table
+      # fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+      # tryCatch({
+      #   result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
+      #                               quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+      # }, error = function(e) {
+      #   showNotification(type = "error",
+      #                    paste("Could not read file:", e$message))
+      #   result$fileData <- NULL
+      # }) # end try catch
     })#end observeEvent
-  })
+  # })
   
 
   # File content map -------------------------
@@ -293,26 +316,49 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     )
   )
   
-  lapply(seq(maxrowsperpage), function(idx){
-    observeEvent({input[[paste0("mrows_", idx)]]},{
-      showModal(FileContent)
-      # Extra info table
-      output$tableFVMapSelectedInfo <- renderUI({
-        str1 <- paste("File Name: ", result$filesListData[idx,2])
-        str2 <- paste("Resource Key ", result$filesListData[idx,10])
-        HTML(paste(str1, str2, sep = '<br/>'))
-      }) 
-      # get data to show in modal table
-      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-      tryCatch({
-        routput$plainmap <- renderLeaflet({createPlainMap(fileName)})
-      }, error = function(e) {
-        showNotification(type = "error",
-                         paste("Could not read file:", e$message))
-        result$fileData <- NULL
-      }) # end try catch
+  # lapply(seq(maxrowsperpage), function(idx){
+  #   observeEvent({input[[paste0("mrows_", idx)]]},{
+  #     showModal(Map)
+  #     # Extra info table
+  #     output$tableFVMapSelectedInfo <- renderUI({
+  #       str1 <- paste("File Name: ", result$filesListData[idx,2])
+  #       str2 <- paste("Resource Key ", result$filesListData[idx,10])
+  #       HTML(paste(str1, str2, sep = '<br/>'))
+  #     }) 
+  #     # get data to show in modal table
+  #     fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+  #     tryCatch({
+  #       routput$plainmap <- renderLeaflet({createPlainMap(fileName)})
+  #     }, error = function(e) {
+  #       showNotification(type = "error",
+  #                        paste("Could not read file:", e$message))
+  #       result$fileData <- NULL
+  #     }) # end try catch
+  #   })#end observeEvent
+  # })
+    
+    # lapply(seq(maxrowsperpage), function(idx){
+    observeEvent({input[["select_mbutton"]]},{
+      showModal(Map)
+      session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_mbutton"))
+      # # Extra info table
+      # output$tableFVExposureSelectedInfo <- renderUI({
+      #   str1 <- paste("File Name: ", result$filesListData[idx,2])
+      #   str2 <- paste("Resource Key ", result$filesListData[idx,10])
+      #   HTML(paste(str1, str2, sep = '<br/>'))
+      # })
+      # # get data to show in modal table
+      # fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+      # tryCatch({
+      #   result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
+      #                               quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+      # }, error = function(e) {
+      #   showNotification(type = "error",
+      #                    paste("Could not read file:", e$message))
+      #   result$fileData <- NULL
+      # }) # end try catch
     })#end observeEvent
-  })
+    # })
 
   
   # Helper functions -------------------------

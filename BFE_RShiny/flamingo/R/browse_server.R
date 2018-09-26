@@ -164,7 +164,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
     filesListData =  filesListDatatoview,
     logMessage = logMessage,
     includemrows = FALSE,
-    includechkbox = FALSE)
+    includechkbox = TRUE)
 
   
   # sub_modules$panelViewOutputFilesModule <- callModule(
@@ -448,11 +448,11 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       # > read files to plot ---------
       for (i in seq(nrow(filesToPlot))) { # i<- 1
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
-        if (TRUE) {
-          oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-          # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-          fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
-        }
+        # if (TRUE) {
+        #   oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+        #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+        #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
+        # }
         currfileData <- .readFile(fileName)
         nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
         gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) & !(names(currfileData) %in% extracols) & !(names(currfileData) %in% x)]
