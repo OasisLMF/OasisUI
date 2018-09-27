@@ -12,6 +12,14 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
                 Shiny.onInputChange(variableName, null);
                 });
                 "),
+    tags$script("Shiny.addCustomMessageHandler('resetcheckboxValueFalse', function(variableName){
+                document.getElementById(variableName).checked = false;
+                });
+                "),
+    tags$script("Shiny.addCustomMessageHandler('resetcheckboxValueTrue', function(variableName){
+                document.getElementById(variableName).checked = true;
+                });
+                "),
     if (includechkbox) {
       checkboxInput(inputId = ns("chkboxselectall"), label = "Select all", value = FALSE)
     },
@@ -64,35 +72,9 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   )
   
   
-  observe({
-    filesListData()
-    print("names")
-    print(names(input))
-  })
-  # 
-  observeEvent(input$vrows_1, {
-    print("vrows_1")
-    print(input$vrows_1)
-  })
-
-  # observe({
-  #   print("input$outputFLtable_rows_selected")
-  #   print(input$outputFLtable_rows_selected)
-  # })
-
-  # observe({
-  #   print("input$outputFLtable_rows_current")
-  #   print(input$outputFLtable_rows_current)
-  # })
-  # 
-  
   # Add buttons -------------------------------------
   observeEvent(filesListData(), ignoreNULL = FALSE, {
-    #result$filesListData <- NULL
     filesListData <- filesListData()
-    # print("removeUI")
-    # removeUI(selector = "#vrows_1", immediate = TRUE)
-    # Sys.sleep(5)
     if (length(filesListData) > 0) {
       result$filesListData <- filesListData
       if (includechkbox) {
@@ -168,30 +150,36 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   )
   
   # Selected Row --------------------------------------------------------
-  
 
-  #if one row is selected/unselected, update checkbox and sow/hide buttons
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
       lapply(input$outputFLtable_rows_selected, function(i){
-        updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = TRUE) 
+        session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
         .enableButton(i)})
       lapply(setdiff(input$outputFLtable_rows_current, input$outputFLtable_rows_selected), function(i) {
-        updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = FALSE)
+        session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
         .hideButtons(i)})
-    } else {
+    }else {
       lapply(input$outputFLtable_rows_current, function(i){
-        updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = FALSE)
+        session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
         .hideButtons(i)})
     }
+    
   })
+
   
   # Select All Functionality --------------------------------------------
   
   #If page in table is changed, update rows selection based on select all value
   observe({
     if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
-      lapply(input$outputFLtable_rows_current, function(i){updateCheckboxInput(session = session, inputId = paste0("srows_", i), value = input$chkboxselectall)})
+      lapply(input$outputFLtable_rows_current, function(i){
+        if (input$chkboxselectall) {
+          session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
+        } else {
+          session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+        }
+        })
       selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
     }
   })
@@ -258,51 +246,25 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     )
   )
   
-  # lapply(seq(maxrowsperpage), function(idx){
-  #   observeEvent({input[[paste0("vrows_", idx)]]},{
-  #     showModal(FileContent)
-  #     # Extra info table
-  #     output$tableFVExposureSelectedInfo <- renderUI({
-  #       str1 <- paste("File Name: ", result$filesListData[idx,2])
-  #       str2 <- paste("Resource Key ", result$filesListData[idx,10])
-  #       HTML(paste(str1, str2, sep = '<br/>'))
-  #     }) 
-  #     # get data to show in modal table
-  #     fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-  #     tryCatch({
-  #       result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-  #                                   quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-  #     }, error = function(e) {
-  #       showNotification(type = "error",
-  #                        paste("Could not read file:", e$message))
-  #       result$fileData <- NULL
-  #     }) # end try catch
-  #   })#end observeEvent
-  # })
-  
-  # lapply(seq(maxrowsperpage), function(idx){
+
     observeEvent({input[["select_vbutton"]]},{
+      idx <- as.numeric(strsplit(input$select_vbutton, "_")[[1]][2])
       showModal(FileContent)
       session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_vbutton"))
-      # # Extra info table
-      # output$tableFVExposureSelectedInfo <- renderUI({
-      #   str1 <- paste("File Name: ", result$filesListData[idx,2])
-      #   str2 <- paste("Resource Key ", result$filesListData[idx,10])
-      #   HTML(paste(str1, str2, sep = '<br/>'))
-      # })
-      # # get data to show in modal table
-      # fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-      # tryCatch({
-      #   result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-      #                               quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-      # }, error = function(e) {
-      #   showNotification(type = "error",
-      #                    paste("Could not read file:", e$message))
-      #   result$fileData <- NULL
-      # }) # end try catch
+      # Extra info table
+      output$tableFVExposureSelectedInfo <- renderUI({.getDetailsFile(idx)})
+      # get data to show in modal table
+      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+      tryCatch({
+        result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
+                                    quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+      }, error = function(e) {
+        showNotification(type = "error",
+                         paste("Could not read file:", e$message))
+        result$fileData <- NULL
+      }) # end try catch
     })#end observeEvent
-  # })
-  
+
 
   # File content map -------------------------
   
@@ -315,54 +277,28 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       leafletOutput(ns("plainmap"))
     )
   )
-  
-  # lapply(seq(maxrowsperpage), function(idx){
-  #   observeEvent({input[[paste0("mrows_", idx)]]},{
-  #     showModal(Map)
-  #     # Extra info table
-  #     output$tableFVMapSelectedInfo <- renderUI({
-  #       str1 <- paste("File Name: ", result$filesListData[idx,2])
-  #       str2 <- paste("Resource Key ", result$filesListData[idx,10])
-  #       HTML(paste(str1, str2, sep = '<br/>'))
-  #     }) 
-  #     # get data to show in modal table
-  #     fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-  #     tryCatch({
-  #       routput$plainmap <- renderLeaflet({createPlainMap(fileName)})
-  #     }, error = function(e) {
-  #       showNotification(type = "error",
-  #                        paste("Could not read file:", e$message))
-  #       result$fileData <- NULL
-  #     }) # end try catch
-  #   })#end observeEvent
-  # })
     
-    # lapply(seq(maxrowsperpage), function(idx){
     observeEvent({input[["select_mbutton"]]},{
       showModal(Map)
       session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_mbutton"))
-      # # Extra info table
-      # output$tableFVExposureSelectedInfo <- renderUI({
-      #   str1 <- paste("File Name: ", result$filesListData[idx,2])
-      #   str2 <- paste("Resource Key ", result$filesListData[idx,10])
-      #   HTML(paste(str1, str2, sep = '<br/>'))
-      # })
-      # # get data to show in modal table
-      # fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-      # tryCatch({
-      #   result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-      #                               quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-      # }, error = function(e) {
-      #   showNotification(type = "error",
-      #                    paste("Could not read file:", e$message))
-      #   result$fileData <- NULL
-      # }) # end try catch
+      idx <- as.numeric(strsplit(input$select_mbutton, "_")[[1]][2])
+      # Extra info table
+      output$tableFVExposureSelectedInfo <- renderUI({.getDetailsFile(idx)})
+      # get data to show in modal table
+      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+      tryCatch({
+        result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
+                                    quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+      }, error = function(e) {
+        showNotification(type = "error",
+                         paste("Could not read file:", e$message))
+        result$fileData <- NULL
+      }) # end try catch
     })#end observeEvent
-    # })
-
   
   # Helper functions -------------------------
   
+  # default table options
   .getFLTableOptions <- function() {
     options <- list(
       search = list(caseInsensitive = TRUE),
@@ -377,7 +313,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     return(options)
   }
   
-  # Check permission row by row
+  # Check permission row by row and show buttons
   .enableButton <- function(i) {
     FVid <- result$filesListData[i, 1]
     validButtons <- executeDbQuery(dbSettings,
@@ -395,7 +331,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   }
   
   
-  # utility function to add input Id to buttons in table
+  # utility function to add to buttons in table
   .shinyInput <- function(FUN, id, num, Label = NULL, hidden = FALSE,  ...) {
     inputs <- character(num)
     for (i in seq_len(num)) {
@@ -408,6 +344,11 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     inputs
   }
 
+  .getDetailsFile <- function(idx){
+    str1 <- paste("File Name: ", result$filesListData[idx,2])
+    str2 <- paste("Resource Key ", result$filesListData[idx,10])
+    HTML(paste(str1, str2, sep = '<br/>')) 
+  }
   
   # Module Output -----------------------
   invisible()
