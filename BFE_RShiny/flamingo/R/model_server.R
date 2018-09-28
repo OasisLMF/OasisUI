@@ -119,7 +119,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
 
   .crtAmModal <- function() {
     ns <- session$ns
-    modalDialog(label = ".crtAmModal",
+    modalDialog(label = "crtAmModal",
                 title = "Create/Amend Model Resource",
                 textInput(ns("tinmodelresname"), label = "Model Resource Name:",
                           value = ""),
@@ -159,7 +159,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
 
   .delModal <- function(){
     ns <- session$ns
-    modalDialog(label = ".delModal",
+    modalDialog(label = "delModal",
                 title = "Delete Selection",
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(

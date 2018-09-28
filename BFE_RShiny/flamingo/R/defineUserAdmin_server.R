@@ -252,7 +252,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   .useradmincrtupmodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".useradmincrtupmodal",
+    modalDialog(label = "useradmincrtupmodal",
                 title = "User Details",
                 textInput(ns("tinputUserName"), "User Name"),
                 selectInput(ns("sinputCompany"), "Company Name", choices = c("")),
@@ -342,7 +342,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # Modal dialog of delete button
   .userdelmodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".userdelmodal",
+    modalDialog(label = "userdelmodal",
                 title = "Delete selection",
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
@@ -398,7 +398,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # modal dialog of add/remove security button
   .usersecuritymodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".usersecuritymodal",
+    modalDialog(label = "usersecuritymodal",
                 title = "Add/Remove Security Groups",
                 selectInput(ns("sinputSecurity"), "Select Security Group",
                             choices = c("")),
@@ -449,7 +449,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # modal dialog of add/remove license button
   .userlicensemodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".userlicensemodal",
+    modalDialog(label = "userlicensemodal",
                 title = "Add/Remove User Licenses",
                 selectInput(ns("sinputOasisID"), "Select Oasis User ID",
                             choices = c("")),
