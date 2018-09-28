@@ -85,7 +85,7 @@ defineProgramme <- function(id) {
       ## Source Reinsurance Scope File
       column(4,
              selectInput(inputId = ns("sinputSRSFile"), label = "Source Reinsurance Scope File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
-             hidden(div(id = ns("divSRFileUpload"),
+             hidden(div(id = ns("divSRSFileUpload"),
                         fileInput(inputId = ns("SRSFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
                         actionButton(inputId = ns("abuttonSRSFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
              hidden(div(id = ns("divSRSFileSelect"),
@@ -95,7 +95,7 @@ defineProgramme <- function(id) {
     ),
     fluidRow(
       column(12,
-             actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", class = "btn btn-primary", style = "inline: true;float:right;"),
+             actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", style = "inline: true;float:right;"),
              actionButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", class = "btn btn-primary", style = "inline: true;float:right;margin-right: 10px;")))
   )
 }
