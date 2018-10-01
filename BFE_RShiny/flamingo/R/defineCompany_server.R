@@ -59,7 +59,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # Modal dialog of create button in main panel
   .compcrtupmodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".compcrtupmodal",
+    modalDialog(label = "compcrtupmodal",
                 title = "Company Details",
                 textInput(ns("tinputCompName"), "Company Name"),
                 textInput(ns("tinputCompDom"), "Company Domicile"),
@@ -113,7 +113,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # modalDialog of delete button in main panel
   .compdelmodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".compdelmodal",
+    modalDialog(label = "compdelmodal",
                 title = "Delete selection",
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(

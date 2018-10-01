@@ -62,7 +62,7 @@ accountDefinition <- function(input, output, session, dbSettings,
   
  .crtupModal <- function() {
     ns <- session$ns
-    modalDialog(label = ".crtupModal",
+    modalDialog(label = "crtupModal",
                 title = "Create/Amend Account",
                 textInput(ns("tinputDAAccountName"), "Account Name"),
                 footer = tagList(
@@ -153,7 +153,7 @@ accountDefinition <- function(input, output, session, dbSettings,
   
   .delModal <- function() {
     ns <- session$ns
-    modalDialog(label = ".delModal",
+    modalDialog(label = "delModal",
                 title = "Delete Account",
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(

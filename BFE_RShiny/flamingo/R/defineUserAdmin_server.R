@@ -145,15 +145,13 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   observe(if (active()) {
 
     force(result$CUAULDataCounter)
-
     stmt <- buildDbQuery("getUserLicenses", result$selUserId)
     result$CUAULData <- executeDbQuery(dbSettings, stmt)
-
   })
-
+  
   # draw User License table with custom format options
   output$tableuserlicenses <- renderDT({
-    if (length(input$tablecompanyuserlist_rows_selected) > 0){
+    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       datatable(
         result$CUAULData,
         rownames = TRUE,
@@ -175,7 +173,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   ###  Permission Checking ####################################################
 
-  observeEvent({active(); userId()}, if(active()) {
+  observeEvent({active(); userId()}, if (active()) {
 
     # the user Id here is the user id of the logged in user, not of the
     # currently selected user
@@ -231,12 +229,12 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   }
 
-  # updates the details on the left hand side every time a row is clicked
+  # updates the details oevery time a row is clicked
   # uses the list of rows selected to attain row index
-  # row index is used to access data in table and render it to the left hand side
-  observe(if (active()) {
+  # row index is used to access data in table and render it 
+  observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, {
     if (length(input$tablecompanyuserlist_rows_selected) > 0) {
-      result$selUserId <- result$CULData[input$tablecompanyuserlist_rows_selected, 3]
+      .getCompUserDetails()
       .reloadUSGData()
       show("ulicenses")
       .reloadCUAULData()
@@ -254,7 +252,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   .useradmincrtupmodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".useradmincrtupmodal",
+    modalDialog(label = "useradmincrtupmodal",
                 title = "User Details",
                 textInput(ns("tinputUserName"), "User Name"),
                 selectInput(ns("sinputCompany"), "Company Name", choices = c("")),
@@ -344,7 +342,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # Modal dialog of delete button
   .userdelmodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".userdelmodal",
+    modalDialog(label = "userdelmodal",
                 title = "Delete selection",
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
@@ -400,7 +398,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # modal dialog of add/remove security button
   .usersecuritymodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".usersecuritymodal",
+    modalDialog(label = "usersecuritymodal",
                 title = "Add/Remove Security Groups",
                 selectInput(ns("sinputSecurity"), "Select Security Group",
                             choices = c("")),
@@ -451,7 +449,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # modal dialog of add/remove license button
   .userlicensemodal <- function() {
     ns <- session$ns
-    modalDialog(label = ".userlicensemodal",
+    modalDialog(label = "userlicensemodal",
                 title = "Add/Remove User Licenses",
                 selectInput(ns("sinputOasisID"), "Select Oasis User ID",
                             choices = c("")),

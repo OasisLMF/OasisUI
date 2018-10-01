@@ -54,6 +54,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
 
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
+  
+  checkrigrplist <- c("chkriprog", "chkristate", "chkricounty", "chkriloc", "chkrilob", "chkripolicy")
 
   # Newly created account needs to be added to choices
   observe(if (active()) {
@@ -65,7 +67,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   # Panels switch ------------------------------------------------------------
-  # Make sure the first view is reset to first panel
+  # Make sure the first view is reset to first panel if accessing directly and to panel 4 if coming from Browse
   observe(if (active()) {
     workflowSteps$update(preselPanel())
     .reloadDPProgData()
@@ -178,16 +180,17 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   ### > Source Files ----
+  
+  
   ### Upload Location/Account File
-  onclick("abuttonSLFileUpload", {
-    inFile <- input$SLFile
+  .uploadSourceFile <- function(inFile, recordIdString, recordIdCode){
     flc <- getFileLocationPath(dbSettings, "Exposure File")
     flcopy <- file.copy(inFile$datapath, file.path(flc, inFile[1, 1]), overwrite = TRUE)
     logMessage(file.path(flc, inFile[1, 1]))
     if (length(input$tableDPprog_rows_selected) > 0) {
       if (flcopy == TRUE) {
         recordId <- createFileRecord(
-          dbSettings, inFile[1, 1], "Source Loc File", 101, flc, userId(),
+          dbSettings, inFile[1, 1], recordIdString, recordIdCode, flc, userId(),
           "Prog", result$DPProgData[input$tableDPprog_rows_selected, 1]
         )
         if (!is.null(recordId)) {
@@ -201,40 +204,33 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         showNotification(type = "error", "File transfer failed.")
       }
     }
+  }
+  
+  onclick("abuttonSLFileUpload", {
+    .uploadSourceFile(inFile = input$SLFile, recordIdString = "Source Loc File", recordIdCode = 101)
   })
 
   onclick("abuttonSAFileUpload", {
-    inFile <- input$SAFile
-    flc <- getFileLocationPath(dbSettings, "Exposure File")
-    flcopy <- file.copy(inFile$datapath, file.path(flc, inFile[1, 1]), overwrite = TRUE)
-    logMessage(file.path(flc, inFile[1, 1]))
-    if (length(input$tableDPprog_rows_selected) > 0) {
-      if (flcopy == TRUE) {
-        recordId <- createFileRecord(
-          dbSettings, inFile[1, 1], "Source Acc File", 102, flc, userId(),
-          "Prog", result$DPProgData[input$tableDPprog_rows_selected, 1]
-        )
-        if (!is.null(recordId)) {
-          showNotification(type = "message",
-                           paste("New File record id: ", recordId, " created."))
-          .reloadProgDetails()
-        } else {
-          showNotification(type = "error", "Could not create file record.")
-        }
-      } else {
-        showNotification(type = "error", "File transfer failed.")
-      }
-    }
+    .uploadSourceFile(inFile = input$SAFile, recordIdString = "Source Acc File", recordIdCode = 102)
   })
-
+  
+  onclick("abuttonSRFileUpload", {
+    .uploadSourceFile(inFile = input$SRFile, recordIdString = "Source Reinsurance File", recordIdCode = 401)
+  })
+  
+  onclick("abuttonSRSFileUpload", {
+    .uploadSourceFile(inFile = input$SRSFile, recordIdString = "Source Reinsurance Scope File", recordIdCode = 402)
+  })
+  
   ### Link Location/Account File
-  onclick("abuttonSLFileLink", {
+  
+  .linkSourceFile <- function(query, inputID) {
     if (length(input$tableDPprog_rows_selected) > 0) {
       res <- executeDbQuery(dbSettings,
-                            paste("exec dbo.updateSourceLocationFileForProg ",
-                                  input$sinputselectSLFile, ", ",
+                            paste(query,
+                                  inputID, ", ",
                                   result$DPProgData[input$tableDPprog_rows_selected, 1]))
-      if (input$sinputselectSLFile != "") {
+      if (inputID != "") {
         if (is.null(res)) {
           showNotification(type = "error", "Failed to link the File!")
         } else {
@@ -245,28 +241,27 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         showNotification(type = "warning", "Please select a file to Link")
       }
     }
+  }
+  
+  
+  onclick("abuttonSLFileLink", {
+    .linkSourceFile(query = "exec dbo.updateSourceLocationFileForProg ", inputID = input$sinputselectSLFile)
   })
 
   onclick("abuttonSAFileLink", {
-    if (length(input$tableDPprog_rows_selected) > 0) {
-      res <- executeDbQuery(dbSettings,
-                            paste("exec dbo.updateSourceAccountFileForProg ",
-                                  input$sinputselectSAFile, ", ", result$DPProgData[input$tableDPprog_rows_selected, 1]))
-      if (input$sinputselectSAFile != "") {
-        if (is.null(res)) {
-          showNotification(type = "error", "Failed to link the File!")
-        } else {
-          showNotification(type = "message",
-                           paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, 2]))
-        }
-      } else {
-        showNotification(type = "warning", "Please select a file to Link")
-      }
-    }
+    .linkSourceFile(query = "exec dbo.updateSourceAccountFileForProg ", inputID = input$sinputselectSAFile)
   })
 
-  # Display file upload / link options ----
-  # Location file upload or dropdown
+  # onclick("abuttonSRFileLink", {
+  #   .linkSourceFile(query = "exec dbo.updateSourceAccountFileForProg ", inputID = input$sinputselectSRFile)
+  # })
+
+  # onclick("abuttonSRSFileLink", {
+  #   .linkSourceFile(query = "exec dbo.updateSourceAccountFileForProg ", inputID = input$sinputselectSRSFile)
+  # })
+  
+  # File upload or select from dropdown
+  # Location file
   observe(if (active()) {
     if (input$sinputSLFile == "U") {
       show("divSLFileUpload")
@@ -288,7 +283,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  # Account file upload or dropdown
+  # Account file
   observe(if (active()) {
     if (input$sinputSAFile == "U") {
       show("divSAFileUpload")
@@ -309,77 +304,126 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       )
     }
   })
+  
+  # SR file
+  observe(if (active()) {
+    if (input$sinputSRFile == "U") {
+      show("divSRFileUpload")
+      disable("abuttonSRFileUpload")
+      hide("divSRFileSelect")
+      options(shiny.maxRequestSize = 1024*1024^2)
+      inFile <- input$SRFile
+      if (!is.null(inFile)) {
+        enable("abuttonSRFileUpload")
+      }
+    } else if (input$sinputSRFile == "S") {
+      show("divSRFileSelect")
+      hide("divSRFileUpload")
+      #*********SRfiles <- getFileSourceAccountFile(dbSettings)
+      #********* updateSelectInput(
+      #*********  session, "sinputselectSRFile",
+      #*********  choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
+      #*********)
+    }
+  })
+  
+  # SRS file
+  observe(if (active()) {
+    if (input$sinputSRSFile == "U") {
+      show("divSRSFileUpload")
+      disable("abuttonSRSFileUpload")
+      hide("divSRSFileSelect")
+      options(shiny.maxRequestSize = 1024*1024^2)
+      inFile <- input$SRSFile
+      if (!is.null(inFile)) {
+        enable("abuttonSRSFileUpload")
+      }
+    } else if (input$sinputSRSFile == "S") {
+      show("divSRSFileSelect")
+      hide("divSRSFileUpload")
+      #*********SRfiles <- getFileSourceAccountFile(dbSettings)
+      #********* updateSelectInput(
+      #*********  session, "sinputselectSRFile",
+      #*********  choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
+      #*********)
+    }
+  })
 
   ### View source files
-  # Source Location
-  .modalviewSLfile <- function() {
+  .modalviewSourcefile <- function(Label, Title, InputID) {
     ns <- session$ns
-    modalDialog(label = ".modalviewSLfile",
-                title = "Source Location File View",
-                DTOutput(ns("tableviewSLfile")),
+    modalDialog(label = Label,
+                title = Title,
+                DTOutput(ns(InputID)),
                 size = "l",
                 easyClose = TRUE
     )
   }
-
+  
+  .renderDTSourceFile <- function(SourceFile){
+    renderDT({
+      if (!is.null(SourceFile)) {
+        datatable(
+          SourceFile,
+          class = "flamingo-table display",
+          rownames = TRUE,
+          filter = "none",
+          escape = FALSE,
+          selection = list(mode = 'none'),
+          colnames = c('Row Number' = 1),
+          options = .getPRTableOptions()
+        )
+      }
+    })
+  }
+  
+  # Source Location
   onclick("abuttonSLFileView", {
     if (input$sinputselectSLFile != "") {
-      showModal(.modalviewSLfile())
+      showModal(.modalviewSourcefile(Label = "modalviewSLfile", Title = "Source Location File View", InputID = "tableviewSLfile"))
     } else {
       removeModal()
       showNotification(type = "warning", "Please select source file")
     }
   })
 
-  output$tableviewSLfile <- renderDT({
-    if (!is.null(result$viewSLfile)) {
-      datatable(
-        result$viewSLfile,
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = list(mode = 'none'),
-        colnames = c('Row Number' = 1),
-        options = .getPRTableOptions()
-      )
-    }
-  })
+  output$tableviewSLfile <- .renderDTSourceFile(SourceFile = result$viewSLfile)
 
   # Source Account
-  .modalviewSAfile <- function() {
-    ns <- session$ns
-    modalDialog(label = ".modalviewSAfile",
-                title = "Source Location File View",
-                DTOutput(ns("tableviewSAfile")),
-                size = "l",
-                easyClose = TRUE
-    )
-  }
-
   onclick("abuttonSAFileView", {
     if (input$sinputselectSLFile != "") {
-      showModal(.modalviewSAfile())
+      showModal(.modalviewSourcefile(Label = "modalviewSAfile", Title = "Source Account File View", InputID = "tableviewSAfile"))
     } else {
       removeModal()
       showNotification(type = "warning", "Please select source file")
     }
   })
 
-  output$tableviewSAfile <- renderDT({
-    if (!is.null(result$viewSAfile)) {
-      datatable(
-        result$viewSAfile,
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = list(mode = 'none'),
-        colnames = c('Row Number' = 1),
-        options = .getPRTableOptions()
-      )
+  output$tableviewSAfile <- .renderDTSourceFile(SourceFile = result$viewSAfile)
+  
+  # Source Reinsurance
+  onclick("abuttonSRFileView", {
+    if (input$sinputselectSRFile != "") {
+      showModal(.modalviewSourcefile(Label = "modalviewSRfile", Title = "Source Reinsurance File View", InputID = "tableviewSRfile"))
+    } else {
+      removeModal()
+      showNotification(type = "warning", "Please select source file")
     }
   })
+  
+  output$tableviewSRfile <- .renderDTSourceFile(SourceFile = result$viewSRfile)
+
+  # Source Reinsurance Scope
+  onclick("abuttonSRSFileView", {
+    if (input$sinputselectSRSFile != "") {
+      showModal(.modalviewSourcefile(Label = "modalviewSRSfile", Title = "Source Reinsurance Scope File View", InputID = "tableviewSRSfile"))
+    } else {
+      removeModal()
+      showNotification(type = "warning", "Please select source file")
+    }
+  })
+  
+  output$tableviewSRSfile <-  .renderDTSourceFile(SourceFile = result$viewSRSfile)
 
   # Panel Associate Model -----------------------------------------------------
 
@@ -486,17 +530,19 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       if (workflowSteps$step() == "2") {
         .defaultAssociateModel()
         .defaultOOKSidebar()
+        .reloadProgDetails()
       }
       if (workflowSteps$step() == "1") {
         .defaultCreateProg()
+        .reloadProgDetails()
       }
     }
     if (length(input$tableDPprog_rows_selected) > 0) {
-      if (active()) {
-        if (workflowSteps$step() == "3") {
-          #show("panelAssociateModel")
-        }
-      }
+      # if (active()) {
+      #   if (workflowSteps$step() == "3") {
+      #     #show("panelAssociateModel")
+      #   }
+      # }
       .defaultOOKSidebar()
       if (result$DPProgData[input$tableDPprog_rows_selected, "Status"] == StatusCompleted &&
           workflowSteps$step() == "2") {
@@ -575,7 +621,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       if (!is.null(result$DPProgData) && !bl_dirty) {
         logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
         rowToSelect <- which(result$DPProgData[, 1] == input$selectprogrammeID)
-        if (rowToSelect != input$tableDPprog_rows_selected)
+        if(is.null(input$tableDPprog_rows_selected)){
+          selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+        } else if (rowToSelect != input$tableDPprog_rows_selected)
           selectRows(dataTableProxy("tableDPprog"), rowToSelect)
           # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
       }
@@ -602,6 +650,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
           if (active()) {
             if (workflowSteps$step() == "3") {
               .defaultview(session)
+              show("panelDefineOutputs")
             }
           }
           # Show perils according to programme
@@ -703,6 +752,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         length(input$chkillob) > 0 | length(input$chkilpolicy) > 0) {
       updateCheckboxInput(session, "chkinputIL", value = TRUE)
     }
+    if (length(input$chkriprog) > 0 |  length(input$chkristate) > 0 |
+        length(input$chkricounty) > 0 |  length(input$chkriloc) > 0 |
+        length(input$chkrilob) > 0 | length(input$chkripolicy) > 0) {
+      updateCheckboxInput(session, "chkinputRI", value = TRUE)
+    }
   })
 
   # Select/deselect GUL
@@ -722,7 +776,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  # Select/deselect IL
+  # Select/deselect IL 
   observeEvent(input$chkinputIL, {
     if (input$chkinputIL == FALSE) {
       .clearchkboxILgrp()
@@ -736,6 +790,21 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       }
     }
   })
+  
+  # Select/deselect RI
+  observeEvent(input$chkinputRI, {
+    if (input$chkinputRI == FALSE) {
+      .clearchkboxRIgrp()
+    } else {
+      if (length(input$chkriprog) == 0 &  length(input$chkristate) == 0 &
+          length(input$chkricounty) == 0 &  length(input$chkriloc) == 0 &
+          length(input$chkrilob) == 0 & length(input$chkripolicy) == 0) {
+        for (i in checkrigrplist) {
+          updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesRI)
+        }
+      }
+    }
+  })
 
 
   # reactive expression yielding the output options as a list
@@ -745,7 +814,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     input$chkgullob,
     input$chkinputIL, input$chkilprog, input$chkilpolicy,
     input$chkilstate, input$chkilcounty, input$chkilloc,
-    input$chkillob)))
+    input$chkillob,
+    input$chkinputRI, input$chkriprog, input$chkripolicy,
+    input$chkristate, input$chkricounty, input$chkriloc,
+    input$chkrilob
+    )))
 
   # Update button in sidebar panel to update checkboxes for pre-populated values
   observe(if (active()) {
@@ -754,14 +827,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     .defaultchkboxGULgrp(session)
     updateCheckboxInput(session, "chkinputIL", value = FALSE)
     .clearchkboxILgrp()
+    updateCheckboxInput(session, "chkinputRI", value = FALSE)
+    .clearchkboxRIgrp()
 
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "<Select>") {
       outputlist <- executeDbQuery(dbSettings,
                                    buildDbQuery("getOutputOptionOutputs", input$sinoutputoptions))
 
       if (nrow(outputlist) > 0) {
-        print(paste0("outputlist"))
-        print(outputlist)
+        # print(paste0("outputlist"))
+        # print(outputlist)
         for (i in 1:nrow(outputlist)) {
           grpid <- paste0("chk",outputlist$Group[i])
           grpinputid <- strsplit(toString(grpid), " ")[[1]]
@@ -793,7 +868,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Save output for later use as presets
   .modalsaveoutput <- function() {
     ns <- session$ns
-    modalDialog(label = ".modalsaveoutput",
+    modalDialog(label = "modalsaveoutput",
                 title = "Save Configuration",
                 textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
                 footer = tagList(
@@ -859,29 +934,37 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     rows <- nrow(runparamlist)
     if (rows > 0) {
       for (i in 1:rows) {
-        if (runparamlist[i, 1] == 'demand_surge') {
-          dmdsurge <- tolower(isolate(input$chkinputdsurge))
-          next
-        }
-        if (runparamlist[i, 1] == 'peril_wind') {
-          windperil <- tolower(isolate(input$chkinputprwind))
-          next
-        }
-        if (runparamlist[i, 1] == 'peril_surge') {
-          surgeperil <- tolower(isolate(input$chkinputprstsurge))
-          next
-        }
-        if (runparamlist[i, 1] == 'peril_quake') {
-          quakeperil <- tolower(isolate(input$chkinputprquake))
-          next
-        }
-        if (runparamlist[i, 1] == 'peril_flood') {
-          floodperil <- tolower(isolate(input$chkinputprflood))
-          next
-        }
-        if (runparamlist[i, 1] == 'leakage_factor') {
-          leakagefactor <- isolate(input$sliderleakagefac)
-        }
+        switch(runparamlist[i, 1],
+               'demand_surge'   = {dmdsurge <- tolower(isolate(input$chkinputdsurge))},
+               'peril_wind'     = {windperil <- tolower(isolate(input$chkinputprwind))},
+               'peril_surge'    = {surgeperil <- tolower(isolate(input$chkinputprstsurge))},
+               'peril_quake'    = {quakeperil <- tolower(isolate(input$chkinputprquake))},
+               'peril_flood'    = {floodperil <- tolower(isolate(input$chkinputprflood))},
+               'leakage_factor' = {leakagefactor <- isolate(input$sliderleakagefac)}
+        )
+        # if (runparamlist[i, 1] == 'demand_surge') {
+        #   dmdsurge <- tolower(isolate(input$chkinputdsurge))
+        #   next
+        # }
+        # if (runparamlist[i, 1] == 'peril_wind') {
+        #   windperil <- tolower(isolate(input$chkinputprwind))
+        #   next
+        # }
+        # if (runparamlist[i, 1] == 'peril_surge') {
+        #   surgeperil <- tolower(isolate(input$chkinputprstsurge))
+        #   next
+        # }
+        # if (runparamlist[i, 1] == 'peril_quake') {
+        #   quakeperil <- tolower(isolate(input$chkinputprquake))
+        #   next
+        # }
+        # if (runparamlist[i, 1] == 'peril_flood') {
+        #   floodperil <- tolower(isolate(input$chkinputprflood))
+        #   next
+        # }
+        # if (runparamlist[i, 1] == 'leakage_factor') {
+        #   leakagefactor <- isolate(input$sliderleakagefac)
+        # }
       }
     }
 
@@ -892,6 +975,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     outputsStringIL <- paste(collapse = ", ",
                              c(input$chkilprog, input$chkilpolicy, input$chkilstate,
                                input$chkilcounty, input$chkilloc, input$chkillob))
+    
+    outputsStringRI <- paste(collapse = ", ",
+                             c(input$chkriprog, input$chkripolicy, input$chkristate,
+                               input$chkricounty, input$chkriloc, input$chkrilob))
 
     stmt <- paste0("exec dbo.WorkflowFlattener ",
                    "@ProgOasisID= ", result$progOasisID, ", ",
@@ -901,6 +988,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                    "@UseRandomNumberFile= 0, ",
                    "@OutputsStringGUL= '", outputsStringGUL, "', ",
                    "@OutputsStringIL= '", outputsStringIL, "', ",
+                   "@OutputsStringRI= '", outputsStringRI, "', ",
                    "@EventSetID= '", eventsetid ,"', ",
                    "@EventOccurrenceID= '", eventoccid, "', ",
                    "@PerilWind = '", windperil ,"', ",
@@ -1123,46 +1211,59 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
       if (nrow(runparamsforpr) > 0) {
         for (i in 1:nrow(runparamsforpr)) {
-          if (runparamsforpr[i,1] == "number_of_samples") {
-            updateTextInput(session, "tinputnoofsample", value = runparamsforpr[i,2])
-            next
-          }
-          if (runparamsforpr[i,1] == "gul_threshold") {
-            updateTextInput(session, "tinputthreshold", value = runparamsforpr[i,2])
-            next
-          }
-          if (runparamsforpr[i,1] == "event_set") {
-            updateSelectInput(session, "sinputeventset", selected = runparamsforpr[i,2])
-            next
-          }
-          if (runparamsforpr[i,1] == "event_occurrence_id") {
-            updateSelectInput(session, "sinputeventocc", selected = runparamsforpr[i,2])
-            next
-          }
-          if (runparamsforpr[i,1] == "peril_wind") {
-            updateCheckboxInput(session, "chkinputprwind", value = eval(parse(text = toString(runparamsforpr[i,2]))))
-            next
-          }
-          if (runparamsforpr[i,1] == "peril_surge") {
-            updateCheckboxInput(session, "chkinputprstsurge", value = eval(parse(text = toString(runparamsforpr[i,2]))))
-            next
-          }
-          if (runparamsforpr[i,1] == "peril_quake") {
-            updateCheckboxInput(session, "chkinputprquake", value = eval(parse(text = toString(runparamsforpr[i,2]))))
-            next
-          }
-          if (runparamsforpr[i,1] == "peril_flood") {
-            updateCheckboxInput(session, "chkinputprflood", value = eval(parse(text = toString(runparamsforpr[i,2]))))
-            next
-          }
-          if (runparamsforpr[i,1] == "demand_surge") {
-            updateCheckboxInput(session, "chkinputdsurge", value = eval(parse(text = toString(runparamsforpr[i,2]))))
-            next
-          }
-          if (runparamsforpr[i,1] == "leakage_factor") {
-            updateSliderInput(session, "sliderleakagefac", value = runparamsforpr[i,2])
-            next
-          }
+          switch(runparamsforpr[i,1],
+                 "number_of_samples" = {updateTextInput(session, "tinputnoofsample", value = runparamsforpr[i,2])},
+                 "gul_threshold" = {updateTextInput(session, "tinputthreshold", value = runparamsforpr[i,2])},
+                 "event_set" = {updateSelectInput(session, "sinputeventocc", selected = runparamsforpr[i,2])},
+                 "event_occurrence_id" = {updateSelectInput(session, "sinputeventocc", selected = runparamsforpr[i,2])},
+                 "peril_wind" = {updateCheckboxInput(session, "chkinputprwind", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
+                 "peril_surge" = {updateCheckboxInput(session, "chkinputprstsurge", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
+                 "peril_quake" = {updateCheckboxInput(session, "chkinputprquake", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
+                 "peril_flood" = {updateCheckboxInput(session, "chkinputprflood", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
+                 "demand_surge" = {updateCheckboxInput(session, "chkinputdsurge", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
+                 "leakage_factor" = {updateSliderInput(session, "sliderleakagefac", value = runparamsforpr[i,2])}
+                 )
+# 
+#           if (runparamsforpr[i,1] == "number_of_samples") {
+#             updateTextInput(session, "tinputnoofsample", value = runparamsforpr[i,2])
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "gul_threshold") {
+#             updateTextInput(session, "tinputthreshold", value = runparamsforpr[i,2])
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "event_set") {
+#             updateSelectInput(session, "sinputeventset", selected = runparamsforpr[i,2])
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "event_occurrence_id") {
+#             updateSelectInput(session, "sinputeventocc", selected = runparamsforpr[i,2])
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "peril_wind") {
+#             updateCheckboxInput(session, "chkinputprwind", value = eval(parse(text = toString(runparamsforpr[i,2]))))
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "peril_surge") {
+#             updateCheckboxInput(session, "chkinputprstsurge", value = eval(parse(text = toString(runparamsforpr[i,2]))))
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "peril_quake") {
+#             updateCheckboxInput(session, "chkinputprquake", value = eval(parse(text = toString(runparamsforpr[i,2]))))
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "peril_flood") {
+#             updateCheckboxInput(session, "chkinputprflood", value = eval(parse(text = toString(runparamsforpr[i,2]))))
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "demand_surge") {
+#             updateCheckboxInput(session, "chkinputdsurge", value = eval(parse(text = toString(runparamsforpr[i,2]))))
+#             next
+#           }
+#           if (runparamsforpr[i,1] == "leakage_factor") {
+#             updateSliderInput(session, "sliderleakagefac", value = runparamsforpr[i,2])
+#             next
+#           }
         }
       }
       orows <- nrow(outputlist)
@@ -1245,13 +1346,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
 
   observeEvent(input$tableProgOasisOOK_rows_selected, {
-    # this if not strictly needed, because ignoreNULL = TRUE
-    if (length(input$tableProgOasisOOK_rows_selected) > 0) {
       # note that tableProgOasisOOK has selection-mode "single"
       prgId <- result$POData[input$tableProgOasisOOK_rows_selected, 1]
       logMessage(paste("updating selectprogOasisID because selection in programme model table changed to",  prgId))
       updateSelectInput(session, inputId = "selectprogOasisID", selected = prgId)
-    }
   })
 
   # refresh buttons  --------------------------------------------------------
@@ -1321,6 +1419,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     hide("abtnclroutopt")
     hide("configureAdvancedGUL")
     hide("configureAdvancedIL")
+    hide("configureAdvancedRI")
     hide("abuttonehidepanelconfigureoutput")
     hide("configureModelParamsAdvanced")
     show("panelDefineIDs")
@@ -1390,6 +1489,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     } else {
       if (active()) {
         showNotification(type = "warning", "Please select a Programme first")
+        result$progDetails  <- NULL
       }
     }
     invisible()
@@ -1469,10 +1569,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   .clearSourceFilesSelection <- function() {
     updateSelectInput(session, "sinputSLFile", selected = "")
     updateSelectInput(session, "sinputSAFile", selected = "")
+    updateSelectInput(session, "sinputSRFile", selected = "")
+    updateSelectInput(session, "sinputSRSFile", selected = "")
     hide("divSLFileSelect")
     hide("divSLFileUpload")
     hide("divSAFileSelect")
     hide("divSAFileUpload")
+    hide("divSRFileSelect")
+    hide("divSRFileUpload")
+    hide("divSRSFileSelect")
+    hide("divSRSFileUpload")
   }
 
   .clearTransformNameSelection <- function() {
@@ -1547,7 +1653,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   }
 
   # Helper Functions Configure Output ---------------------------------------
-  # Clear checkboxgroups
+  # Clear checkboxgroups GUL
   .clearchkboxGULgrp <- function() {
     for (i in checkgulgrplist) {
       updateCheckboxGroupInput(session, inputId = i, selected = "None")
@@ -1555,9 +1661,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     disable("chkgulpolicy")
   }
 
-  # Clear checkboxgroup
+  # Clear checkboxgroup IL
   .clearchkboxILgrp <- function() {
     for (i in checkilgrplist) {
+      updateCheckboxGroupInput(session, inputId = i, selected = "None")
+    }
+  }
+  
+  # Clear checkboxgroup RI
+  .clearchkboxRIgrp <- function() {
+    for (i in checkrigrplist) {
       updateCheckboxGroupInput(session, inputId = i, selected = "None")
     }
   }
@@ -1594,6 +1707,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     logMessage("showing advanced view")
     show("configureAdvancedGUL")
     show("configureAdvancedIL")
+    show("configureAdvancedRI")
     show("configureModelParamsAdvanced")
     show("abtnbasic")
     hide("abtnadvanced")
@@ -1605,6 +1719,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     logMessage("showing basic view")
     hide("configureAdvancedGUL")
     hide("configureAdvancedIL")
+    hide("configureAdvancedRI")
     hide("configureModelParamsAdvanced")
     hide("abtnbasic")
     show("abtnadvanced")
@@ -1623,11 +1738,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     .clearchkboxILgrp()
   }
 
+  .defaultchkboxRIgrp <- function() {
+    .clearchkboxRIgrp()
+  }
+  
+  
   .defaultview <- function(session) {
     updateCheckboxInput(session, "chkinputGUL", value = TRUE)
     .defaultchkboxGULgrp(session)
     updateCheckboxInput(session, "chkinputIL", value = FALSE)
     .defaultchkboxILgrp()
+    updateCheckboxInput(session, "chkinputRI", value = FALSE)
+    .defaultchkboxRIgrp()
     .clearotherparams()
     .clearOutputOptions()
     .basicview()
@@ -1635,7 +1757,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   }
 
   .shownconfigOutputView <- function() {
-    show("panelDefineOutputs")
+    #show("panelDefineOutputs")
     disable("chkgulpolicy")
   }
 

@@ -5,12 +5,12 @@
 #' @importFrom DT DTOutput
 #' @export
 programmeDefinitionSingleUI <- function(id) {
-
+  
   ns <- NS(id)
-
+  
   tagList(
     singleProgrammeWorkflowStepsUI(ns("workflowsteps")),
-
+    
     # Hidden/visible panels
     hidden(div(id = ns("panelProgrammeTable"), panelProgrammeTable(id))),
     hidden(div(id = ns("panelProgrammeDetails"), panelProgrammeDetails(id))),
@@ -35,6 +35,7 @@ defineProgramme <- function(id) {
   ns <- NS(id)
   fluidPage(
     fluidRow(
+      column(12, h4("Programme metadata")),
       column(4,
              selectInput(inputId = ns("sinputDPAccountName"), label = "Account Name", choices = "")),
       column(4,
@@ -46,8 +47,9 @@ defineProgramme <- function(id) {
                        placement = "right",
                        options = list(container = "body")))),
     fluidRow(column(4,
-                    actionButton(ns("abuttonProgSubmit"), "Create Programme", class = "btn btn-primary"))),
+                    actionButton(ns("abuttonProgSubmit"), "Create Programme", class = "btn btn-primary")), style = "float:right"),
     fluidRow(
+      column(12, h4("Link input files to programme")),
       # Source Location File
       column(4,
              selectInput(inputId = ns("sinputSLFile"), label = "Source Location File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
@@ -60,7 +62,7 @@ defineProgramme <- function(id) {
                         actionButton(inputId = ns("abuttonSLFileView"), class = "btn btn-primary", label = "View", align = "left")))),
       ## Source Account File
       column(4,
-             selectInput(inputId = ns("sinputSAFile"), label = "Select Option", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
+             selectInput(inputId = ns("sinputSAFile"), label = "Source Account File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
              hidden(div(id = ns("divSAFileUpload"),
                         fileInput(inputId = ns("SAFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
                         actionButton(inputId = ns("abuttonSAFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
@@ -69,10 +71,32 @@ defineProgramme <- function(id) {
                         actionButton(inputId = ns("abuttonSAFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
                         actionButton(inputId = ns("abuttonSAFileView"), class = "btn btn-primary", label = "View", align = "left"))))),
     fluidRow(
-      column(11,
-             align = "right",
-             actionButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", class = "btn btn-primary", align = "left"),
-             actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", class = "btn btn-primary", align = "left")))
+      column(12, h4("Link reinsurance input files to programme")),
+      ## Source Reinsurance File
+      column(4,
+             selectInput(inputId = ns("sinputSRFile"), label = "Source Reinsurance File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
+             hidden(div(id = ns("divSRFileUpload"),
+                        fileInput(inputId = ns("SRFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
+                        actionButton(inputId = ns("abuttonSRFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
+             hidden(div(id = ns("divSRFileSelect"),
+                        selectInput(inputId = ns("sinputselectSRFile"), label = "Select existing File", choices = ""),
+                        actionButton(inputId = ns("abuttonSRFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
+                        actionButton(inputId = ns("abuttonSRFileView"), class = "btn btn-primary", label = "View", align = "left")))),
+      ## Source Reinsurance Scope File
+      column(4,
+             selectInput(inputId = ns("sinputSRSFile"), label = "Source Reinsurance Scope File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
+             hidden(div(id = ns("divSRSFileUpload"),
+                        fileInput(inputId = ns("SRSFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
+                        actionButton(inputId = ns("abuttonSRSFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
+             hidden(div(id = ns("divSRSFileSelect"),
+                        selectInput(inputId = ns("sinputselectSRSFile"), label = "Select existing File", choices = ""),
+                        actionButton(inputId = ns("abuttonSRSFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
+                        actionButton(inputId = ns("abuttonSRSFileView"), class = "btn btn-primary", label = "View", align = "left"))))
+    ),
+    fluidRow(
+      column(12,
+             actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", style = "inline: true;float:right;"),
+             actionButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", class = "btn btn-primary", style = "inline: true;float:right;margin-right: 10px;")))
   )
 }
 
@@ -151,7 +175,7 @@ panelAssociateModel <- function(id) {
                        programme_Definition_Single$sinputProgModTransform,
                        placement = "right",
                        options = list(container = "body")))),
-
+    
     actionButton(inputId = ns("abuttoncrprogoasis"), label = "Create", class = "btn btn-primary")
   )
 }
@@ -163,7 +187,7 @@ panelAssociateModel <- function(id) {
 #' @export
 panelDefineIDs <- function(id) {
   ns <- NS(id)
-
+  
   panel(
     status = "primary",
     #heading = fluidRow(column(11, h4("Filter"))),
@@ -296,6 +320,8 @@ panelDefineOutputConfiguration <- function(id) {
     hidden(div(id = ns("configureAdvancedGUL"), configureAdvancedGUL(id))),
     checkboxInput(ns("chkinputIL"), label = "Insured Loss", value = FALSE),
     hidden(div(id = ns("configureAdvancedIL"), configureAdvancedIL(id))),
+    checkboxInput(ns("chkinputRI"), label = "Net RI Loss", value = FALSE),
+    hidden(div(id = ns("configureAdvancedRI"), configureAdvancedRI(id))),
     actionButton(inputId = ns("abtnadvanced"), label = "Advanced", class = "btn btn-primary"),
     hidden(actionButton(inputId = ns("abtnbasic"), label = "Basic", class = "btn btn-primary")),
     hidden(actionButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration", class = "btn btn-primary")),
@@ -324,7 +350,7 @@ configureAdvancedGUL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-
+    
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkgulprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
@@ -342,7 +368,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulprogAAL",
                                   " " = "gulprogPLT"),
                                 selected = defaultSelectChoicesGUL),
-
+             
              checkboxGroupInput(ns("chkgulstate"),
                                 label = h6("State", class = "flamingo-granularity"),
                                 choices = list(
@@ -359,7 +385,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulstateAAL",
                                   " " = "gulstatePLT"),
                                 selected = defaultSelectChoicesGUL),
-
+             
              checkboxGroupInput(ns("chkgulcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
                                 choices = list(
@@ -376,7 +402,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulcountyAAL",
                                   " " = "gulcountyPLT"),
                                 selected = defaultSelectChoicesGUL),
-
+             
              checkboxGroupInput(ns("chkgulloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
                                 choices = list(
@@ -393,7 +419,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gullocAAL",
                                   " " = "gullocPLT"),
                                 selected = defaultSelectChoicesGUL),
-
+             
              checkboxGroupInput(ns("chkgullob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
                                 choices = list(
@@ -410,7 +436,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gullobAAL",
                                   " " = "gullobPLT"),
                                 selected = defaultSelectChoicesGUL),
-
+             
              checkboxGroupInput(ns("chkgulpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
                                 choices = list(
@@ -450,7 +476,7 @@ configureAdvancedIL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-
+    
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkilprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
@@ -468,7 +494,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "ilprogAAL",
                                   " " = "ilprogPLT"),
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilstate"),
                                 label = h6("State", class = "flamingo-granularity"),
                                 choices = list(
@@ -484,7 +510,7 @@ configureAdvancedIL <- function(id) {
                                   # " " = "ilstateSampleMeanOEP",
                                   " " = "ilstateAAL", " " = "ilstatePLT"),
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
                                 choices = list(
@@ -500,7 +526,7 @@ configureAdvancedIL <- function(id) {
                                   # " " = "ilcountySampleMeanOEP",
                                   " " = "ilcountyAAL", " " = "ilcountyPLT"),
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
                                 choices = list(
@@ -517,7 +543,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "illocAAL",
                                   " " = "illocPLT"),
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkillob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
                                 choices = list(
@@ -534,7 +560,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "illobAAL",
                                   " " = "illobPLT"),
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
                                 choices = list(
@@ -553,6 +579,109 @@ configureAdvancedIL <- function(id) {
                                 selected = NULL)
     )
   )
+}
+
+#' Function wrapping sub-panel to define outputs advanced configuration IL
+#' @inheritParams flamingoModuleUI
+#' @export
+configureAdvancedRI <- function(id) {
+  ns <- NS(id)
+  fluidRow(
+    column(4,
+           h4("Net RI Loss", style = "font-size: 18px; font-weight: bold;"),
+           h5("Full Sample", style = "font-size: 16.5px;"), 
+           h5("ELT", style="font-size: 16.5px;"),
+           tags$div(class = "h5-align", h5("AEP", style="font-size: 16.5px;")), 
+           tags$div(class = "h5-align", h5("OEP", style="font-size: 16.5px;")),
+           tags$div(class = "h5-align", h5("Multi AEP", style="font-size: 16.5px;")),
+           h5("Multi OEP", style = "font-size: 16.5px;"),  
+           # h5("WS Mean AEP", style="font-size: 16.5px;"),
+           # tags$div(class = "h5-align", h5("WS Mean OEP", style="font-size: 16.5px;")),  
+           # tags$div(class = "h5-align",h5("Sample Mean AEP", style="font-size: 16.5px;")),
+           # h5("Sample Mean OEP", style="font-size: 16.5px;"), 
+           h5("AAL", style="font-size: 16.5px;"),
+           tags$div(class = "h5-align",h5("PLT", style="font-size: 16.5px;"))),
+    
+    tags$div(class = "multicol", 
+             checkboxGroupInput(ns("chkriprog"),
+                                label = h5("Prog", style = "font-size: 15.0px;"), 
+                                choices = list(
+                                  " " = "riprogSummary",
+                                  " " = "riprogELT",
+                                  " " = "riprogFullUncAEP",
+                                  " " = "riprogFullUncOEP",
+                                  " " = "riprogAEPWheatsheaf",
+                                  " " = "riprogOEPWheatsheaf",  
+                                  " " = "riprogAAL",
+                                  " " = "riprogPLT"),
+                                selected = NULL),
+             
+             checkboxGroupInput(ns("chkristate"),
+                                label = h5("State", style = "font-size: 15.0px;"), 
+                                choices = list(
+                                  " " = "ristateSummary",
+                                  " " = "ristateELT",
+                                  " " = "ristateFullUncAEP",
+                                  " " = "ristateFullUncOEP",
+                                  " " = "ristateAEPWheatsheaf",
+                                  " " = "ristateOEPWheatsheaf", 
+                                  " " = "ristateAAL", 
+                                  " " = "ristatePLT"),
+                                selected = NULL),
+             
+             checkboxGroupInput(ns("chkricounty"),
+                                label = h5("County", style = "font-size: 15.0px;"), 
+                                choices = list(
+                                  " " = "ricountySummary",
+                                  " " = "ricountyELT",
+                                  " " = "ricountyFullUncAEP",
+                                  " " = "ricountyFullUncOEP",
+                                  " " = "ricountyAEPWheatsheaf",
+                                  " " = "ricountyOEPWheatsheaf", 
+                                  " " = "ricountyAAL", 
+                                  " " = "ricountyPLT"),
+                                selected = NULL),
+             
+             checkboxGroupInput(ns("chkriloc"),
+                                label = h5("Location", style = "font-size: 15.0px;"), 
+                                choices = list(
+                                  " " = "rilocSummary",
+                                  " " = "rilocELT",
+                                  " " = "rilocFullUncAEP",
+                                  " " = "rilocFullUncOEP",
+                                  " " = "rilocAEPWheatsheaf",
+                                  " " = "rilocOEPWheatsheaf", 
+                                  " " = "rilocAAL",
+                                  " " = "rilocPLT"),
+                                selected = NULL),
+             
+             checkboxGroupInput(ns("chkrilob"),
+                                label = h5("LOB", style = "font-size: 15.0px;"), 
+                                choices = list(
+                                  " " = "rilobSummary",
+                                  " " = "rilobELT",
+                                  " " = "rilobFullUncAEP",
+                                  " " = "rilobFullUncOEP",
+                                  " " = "rilobAEPWheatsheaf",
+                                  " " = "rilobOEPWheatsheaf", 
+                                  " " = "rilobAAL",
+                                  " " = "rilobPLT"),
+                                selected = NULL),
+             
+             checkboxGroupInput(ns("chkripolicy"),
+                                label = h5("Policy", style = "font-size: 15.0px;"), 
+                                choices = list(
+                                  " " = "ripolicySummary",
+                                  " " = "ripolicyELT",
+                                  " " = "ripolicyFullUncAEP",
+                                  " " = "ripolicyFullUncOEP",
+                                  " " = "ripolicyAEPWheatsheaf",
+                                  " " = "ripolicyOEPWheatsheaf", 
+                                  " " = "ripolicyAAL",
+                                  " " = "ripolicyPLT"),
+                                selected = NULL)
+    )
+  )#end of fluidrow RI
 }
 
 #' Function wrapping panel to show process run table

@@ -164,7 +164,7 @@ browseprogrammes <- function(input, output, session, dbSettings,
     filesListData =  filesListDatatoview,
     logMessage = logMessage,
     includemrows = FALSE,
-    includechkbox = TRUE)
+    includechkbox = FALSE)
 
   
   # sub_modules$panelViewOutputFilesModule <- callModule(

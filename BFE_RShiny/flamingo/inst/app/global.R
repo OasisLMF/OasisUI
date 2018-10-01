@@ -85,6 +85,11 @@ defaultSelectChoicesIL <- c(
   "ilprogFullUncAEP", "ilprogFullUncOEP", "ilpolicyELT", "ilpolicyAAL",
   "ilpolicyPLT", "ilpolicyFullUncAEP", "ilpolicyFullUncOEP"
 )
+defaultSelectChoicesRI <- c(
+  "riprogSummary", "riprogELT", "riprogAAL", "riprogPLT",
+  "riprogFullUncAEP", "riprogFullUncOEP", "ripolicyELT", "ripolicyAAL",
+  "ripolicyPLT", "ripolicyFullUncAEP", "ripolicyFullUncOEP"
+)
 
 
 ### Plots types ------
