@@ -5,8 +5,8 @@
 \alias{modelSupplierPageUI}
 \title{Module For The Model Supplier Page}
 \usage{
-modelSupplierPage(input, output, session, dbSettings, logMessage = message,
-  active = reactive(TRUE))
+modelSupplierPage(input, output, session, dbSettings,
+  logMessage = message, active = reactive(TRUE))
 
 modelSupplierPageUI(id)
 }

@@ -9,9 +9,9 @@ plotIL(outputPlotData, interactive = FALSE, ...)
 \arguments{
 \item{outputPlotData}{data for plot}
 
-\item{interactive}{create interactive plot using \link{plotly::plot_ly}}
+\item{interactive}{create interactive plot using \code{\link[plotly:plot_ly]{plotly::plot_ly()}}}
 
-\item{...}{extra arguments to \link{plot}}
+\item{...}{extra arguments to \code{\link[=plot]{plot()}}}
 }
 \value{
 nothing; the interactive plot object if \code{interactive = TRUE}

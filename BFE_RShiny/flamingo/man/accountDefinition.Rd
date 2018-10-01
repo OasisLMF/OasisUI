@@ -5,7 +5,8 @@
 \alias{accountDefinitionUI}
 \title{Account Definition Module}
 \usage{
-accountDefinition(input, output, session, dbSettings, active = reactive(TRUE))
+accountDefinition(input, output, session, dbSettings,
+  active = reactive(TRUE))
 
 accountDefinitionUI(id)
 }
@@ -16,7 +17,7 @@ accountDefinitionUI(id)
 
 \item{session}{shiny session object}
 
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

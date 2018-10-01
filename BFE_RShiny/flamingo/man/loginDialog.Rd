@@ -5,8 +5,8 @@
 \alias{loginDialogUI}
 \title{Login Dialog Module}
 \usage{
-loginDialog(input, output, session, dbSettings, logout, logMessage = message,
-  logError = logMessage)
+loginDialog(input, output, session, dbSettings, logout,
+  logMessage = message, logError = logMessage)
 
 loginDialogUI(id)
 }
@@ -17,7 +17,7 @@ loginDialogUI(id)
 
 \item{session}{shiny session object}
 
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
 \item{logout}{reactive yielding logout signal}
 

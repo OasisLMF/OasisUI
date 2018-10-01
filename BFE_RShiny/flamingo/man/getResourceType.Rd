@@ -7,14 +7,14 @@
 getResourceType(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
 resource types; \code{data.frame} of 3 variables:
 \itemize{
-		\item \code{ResourceTypeID}
-		\item \code{ResourceTypeName}
-   \item \code{Source}
+\item \code{ResourceTypeID}
+\item \code{ResourceTypeName}
+\item \code{Source}
 }
 }
 \description{

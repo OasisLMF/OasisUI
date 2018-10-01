@@ -6,8 +6,7 @@
 \title{File Viewer Module}
 \usage{
 fileViewer(input, output, session, dbSettings, userId,
-  preselRunId = reactive(-1), active = reactive(TRUE),
-  logMessage = message)
+  preselRunId = reactive(-1), active, logMessage = message)
 
 fileViewerUI(id)
 }
