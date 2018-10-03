@@ -286,14 +286,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       output$tableFVExposureSelectedInfo <- renderUI({.getDetailsFile(idx)})
       # get data to show in modal table
       fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-      tryCatch({
-        result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-                                    quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-      }, error = function(e) {
-        showNotification(type = "error",
-                         paste("Could not read file:", e$message))
-        result$fileData <- NULL
-      }) # end try catch
+      output$plainmap <- renderLeaflet({createPlainMap(fileName)})
     })#end observeEvent
   
   # Helper functions -------------------------
