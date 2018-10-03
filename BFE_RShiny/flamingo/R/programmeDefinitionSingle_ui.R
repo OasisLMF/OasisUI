@@ -1,3 +1,5 @@
+# programmeDefinitionSingle Module UI -----------------------
+
 #' @rdname programmeDefinitionSingle
 #' @description UI/View for the process run page
 #' @inheritParams flamingoModuleUI
@@ -12,109 +14,26 @@ programmeDefinitionSingleUI <- function(id) {
     singleProgrammeWorkflowStepsUI(ns("workflowsteps")),
     
     # Hidden/visible panels
-    hidden(div(id = ns("panelProgrammeTable"), panelProgrammeTable(id))),
+    # Section "Choose Programme" = "1"
+    div(id = ns("panelProgrammeTable"), panelProgrammeTable(id)),
     hidden(div(id = ns("panelProgrammeDetails"), panelProgrammeDetails(id))),
-    div(id = ns("panelDefineProgramme"), panelDefineProgramme(id)),
-    hidden(div(id = ns("panelAssociateModel"), panelAssociateModel(id))),
+    hidden(div(id = ns("panelDefineProgramme"), panelDefineProgramme(id))),
+    #Section "Choose Model" = "2"
     hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
     hidden(div(id = ns("panelProgrammeModelTable"), panelProgrammeModelTable(id))),
     hidden(div(id = ns("panelModelDetails"), panelModelDetails(id))),
+    hidden(div(id = ns("panelAssociateModel"), panelAssociateModel(id))),
+    #Section  "Configure Output & Run" = "3"
     hidden(div(id = ns("panelProcessRunTable"), panelProcessRunTable(id))),
     hidden(div(id = ns("panelDefineOutputs"), panelDefineOutputs(id))),
     hidden(div(id = ns("panelProcessRunLogs"), panelProcessRunLogs(id)))
   )
 }
 
-# Functions for UI Panels ------------------------------------------------------------------------------
 
-#'  Function defining panel elements to define a programme
-#' @inheritParams flamingoModuleUI
-#' @importFrom shinyjs hidden
-#' @export
-defineProgramme <- function(id) {
-  ns <- NS(id)
-  fluidPage(
-    fluidRow(
-      column(12, h4("Programme metadata")),
-      column(4,
-             selectInput(inputId = ns("sinputDPAccountName"), label = "Account Name", choices = "")),
-      column(4,
-             textInput(inputId = ns("tinputDPProgName"), label = "Programme Name")),
-      column(4,
-             selectInput(inputId = ns("sinputTransformname"), label = "Transform Name", choices = ""),
-             bsTooltip(ns("sinputTransformname"),
-                       programme_Definition_Single$sinputTransformname,
-                       placement = "right",
-                       options = list(container = "body")))),
-    fluidRow(column(4,
-                    actionButton(ns("abuttonProgSubmit"), "Create Programme", class = "btn btn-primary")), style = "float:right"),
-    fluidRow(
-      column(12, h4("Link input files to programme")),
-      # Source Location File
-      column(4,
-             selectInput(inputId = ns("sinputSLFile"), label = "Source Location File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
-             hidden(div(id = ns("divSLFileUpload"),
-                        fileInput(inputId = ns("SLFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
-                        actionButton(inputId = ns("abuttonSLFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left", enable = FALSE))),
-             hidden(div(id = ns("divSLFileSelect"),
-                        selectInput(inputId = ns("sinputselectSLFile"), label = "Select existing File", choices = ""),
-                        actionButton(inputId = ns("abuttonSLFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
-                        actionButton(inputId = ns("abuttonSLFileView"), class = "btn btn-primary", label = "View", align = "left")))),
-      ## Source Account File
-      column(4,
-             selectInput(inputId = ns("sinputSAFile"), label = "Source Account File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
-             hidden(div(id = ns("divSAFileUpload"),
-                        fileInput(inputId = ns("SAFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
-                        actionButton(inputId = ns("abuttonSAFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
-             hidden(div(id = ns("divSAFileSelect"),
-                        selectInput(inputId = ns("sinputselectSAFile"), label = "Select existing File", choices = ""),
-                        actionButton(inputId = ns("abuttonSAFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
-                        actionButton(inputId = ns("abuttonSAFileView"), class = "btn btn-primary", label = "View", align = "left"))))),
-    fluidRow(
-      column(12, h4("Link reinsurance input files to programme")),
-      ## Source Reinsurance File
-      column(4,
-             selectInput(inputId = ns("sinputSRFile"), label = "Source Reinsurance File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
-             hidden(div(id = ns("divSRFileUpload"),
-                        fileInput(inputId = ns("SRFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
-                        actionButton(inputId = ns("abuttonSRFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
-             hidden(div(id = ns("divSRFileSelect"),
-                        selectInput(inputId = ns("sinputselectSRFile"), label = "Select existing File", choices = ""),
-                        actionButton(inputId = ns("abuttonSRFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
-                        actionButton(inputId = ns("abuttonSRFileView"), class = "btn btn-primary", label = "View", align = "left")))),
-      ## Source Reinsurance Scope File
-      column(4,
-             selectInput(inputId = ns("sinputSRSFile"), label = "Source Reinsurance Scope File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
-             hidden(div(id = ns("divSRSFileUpload"),
-                        fileInput(inputId = ns("SRSFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
-                        actionButton(inputId = ns("abuttonSRSFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
-             hidden(div(id = ns("divSRSFileSelect"),
-                        selectInput(inputId = ns("sinputselectSRSFile"), label = "Select existing File", choices = ""),
-                        actionButton(inputId = ns("abuttonSRSFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
-                        actionButton(inputId = ns("abuttonSRSFileView"), class = "btn btn-primary", label = "View", align = "left"))))
-    ),
-    fluidRow(
-      column(12,
-             actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", style = "inline: true;float:right;"),
-             actionButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", class = "btn btn-primary", style = "inline: true;float:right;margin-right: 10px;")))
-  )
-}
+# Functions for Panels programmeDefinitionSingle -----------------------
 
-#' Function wrapping panel to create/amend programme
-#' @export
-panelDefineProgramme <- function(id) {
-  ns <- NS(id)
-  flamingoPanel(
-    collapsible = TRUE,
-    show = FALSE,
-    ns("progdef"),
-    heading = tagAppendChildren(
-      h4("New Programme"),
-      actionButton(inputId = ns("abuttonhidedefineprogpanel"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
-    defineProgramme(id)
-  )
-}
+# > Section "Choose Programme" = "1" -----------------------
 
 #' Function wrapping panel to show created programmes table
 #' @inheritParams flamingoModuleUI
@@ -124,6 +43,7 @@ panelProgrammeTable <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = TRUE,
+    show = TRUE,
     ns("progtbl"),
     heading = tagAppendChildren(
       h4("Programme Table"),
@@ -155,30 +75,90 @@ panelProgrammeDetails <- function(id) {
   )
 }
 
-#' Function wrapping panel to associate model
-#' @inheritParams flamingoModuleUI
+#' Function wrapping panel to create/amend programme
 #' @export
-panelAssociateModel <- function(id) {
+panelDefineProgramme <- function(id) {
   ns <- NS(id)
   flamingoPanel(
+    # collapsible = TRUE,
+    # show = TRUE,
     collapsible = FALSE,
-    ns("progmodel"),
-    heading = h4("Associate Model"),
+    ns("progdef"),
+    heading = tagAppendChildren(
+      h4("New Programme"),
+      actionButton(inputId = ns("abuttonhidedefineprogpanel"), label = NULL, icon = icon("times"), style = "float: right;")
+    ),
+    fluidRow(
+      column(12, h4("Programme metadata"))),
     fluidRow(
       column(4,
-             selectInput(ns("sinputookprogid"), "Programme:", choices = c(""))),
+             selectInput(inputId = ns("sinputDPAccountName"), label = "Account Name", choices = "")),
       column(4,
-             selectInput(ns("sinputookmodelid"), "Model:", choices = c(""))),
+             textInput(inputId = ns("tinputDPProgName"), label = "Programme Name")),
       column(4,
-             selectInput(ns("sinputProgModTransform"), "Transform Name", choices = ""),
-             bsTooltip(ns("sinputProgModTransform"),
-                       programme_Definition_Single$sinputProgModTransform,
+             selectInput(inputId = ns("sinputTransformname"), label = "Transform Name", choices = ""),
+             bsTooltip(ns("sinputTransformname"),
+                       programme_Definition_Single$sinputTransformname,
                        placement = "right",
                        options = list(container = "body")))),
-    
-    actionButton(inputId = ns("abuttoncrprogoasis"), label = "Create", class = "btn btn-primary")
+    fluidRow(column(4,
+                    actionButton(ns("abuttonProgSubmit"), "Create Programme", class = "btn btn-primary")), style = "float:right"),
+    fluidRow(
+      column(12, h4("Link input files to programme"))),
+    fluidRow(
+      # Source Location File
+      column(4,
+             selectInput(inputId = ns("sinputSLFile"), label = "Source Location File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
+             hidden(div(id = ns("divSLFileUpload"),
+                        fileInput(inputId = ns("SLFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
+                        actionButton(inputId = ns("abuttonSLFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left", enable = FALSE))),
+             hidden(div(id = ns("divSLFileSelect"),
+                        selectInput(inputId = ns("sinputselectSLFile"), label = "Select existing File", choices = ""),
+                        actionButton(inputId = ns("abuttonSLFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
+                        actionButton(inputId = ns("abuttonSLFileView"), class = "btn btn-primary", label = "View", align = "left")))),
+      ## Source Account File
+      column(4,
+             selectInput(inputId = ns("sinputSAFile"), label = "Source Account File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
+             hidden(div(id = ns("divSAFileUpload"),
+                        fileInput(inputId = ns("SAFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
+                        actionButton(inputId = ns("abuttonSAFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
+             hidden(div(id = ns("divSAFileSelect"),
+                        selectInput(inputId = ns("sinputselectSAFile"), label = "Select existing File", choices = ""),
+                        actionButton(inputId = ns("abuttonSAFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
+                        actionButton(inputId = ns("abuttonSAFileView"), class = "btn btn-primary", label = "View", align = "left"))))),
+    fluidRow(
+      column(12, h4("Link reinsurance input files to programme"))),
+    fluidRow(
+      ## Source Reinsurance File
+      column(4,
+             selectInput(inputId = ns("sinputSRFile"), label = "Source Reinsurance File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
+             hidden(div(id = ns("divSRFileUpload"),
+                        fileInput(inputId = ns("SRFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
+                        actionButton(inputId = ns("abuttonSRFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
+             hidden(div(id = ns("divSRFileSelect"),
+                        selectInput(inputId = ns("sinputselectSRFile"), label = "Select existing File", choices = ""),
+                        actionButton(inputId = ns("abuttonSRFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
+                        actionButton(inputId = ns("abuttonSRFileView"), class = "btn btn-primary", label = "View", align = "left")))),
+      ## Source Reinsurance Scope File
+      column(4,
+             selectInput(inputId = ns("sinputSRSFile"), label = "Source Reinsurance Scope File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
+             hidden(div(id = ns("divSRSFileUpload"),
+                        fileInput(inputId = ns("SRSFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
+                        actionButton(inputId = ns("abuttonSRSFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
+             hidden(div(id = ns("divSRSFileSelect"),
+                        selectInput(inputId = ns("sinputselectSRSFile"), label = "Select existing File", choices = ""),
+                        actionButton(inputId = ns("abuttonSRSFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
+                        actionButton(inputId = ns("abuttonSRSFileView"), class = "btn btn-primary", label = "View", align = "left"))))
+    ),
+    fluidRow(
+      column(12,
+             actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", style = "inline: true;float:right;"),
+             actionButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", class = "btn btn-primary", style = "inline: true;float:right;margin-right: 10px;")))
   )
 }
+
+
+# > Section "Choose Model" = "2" -----------------------
 
 #' Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
@@ -194,14 +174,14 @@ panelDefineIDs <- function(id) {
     fluidRow(
       div(id = ns("divselectprogrammeID"),
           column(3,
-                 selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = "", selected = NULL),
+                 selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = c("<Select>"), selected = "<Select>"),
                  bsTooltip(ns("selectprogrammeID"),
                            programme_Definition_Single$selectprogrammeID,
                            placement = "right",
                            options = list(container = "body")))),
       hidden(div(id = ns("divselectprogOasisID"),
                  column(3,
-                        selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = "", selected = NULL),
+                        selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
                         bsTooltip(ns("selectprogOasisID"),
                                   programme_Definition_Single$selectprogOasisID,
                                   placement = "right",
@@ -217,18 +197,19 @@ panelDefineIDs <- function(id) {
 panelProgrammeModelTable <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    collapsible = FALSE,
+    collapsible = TRUE,
+    show = TRUE,
     ns("progmodeltbl"),
     heading = tagAppendChildren(
       h4("Programme Model Table"),
       actionButton(inputId = ns("abuttonookrefresh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableProgOasisOOK")),
-    fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Programme Model Details", class = "btn btn-primary"), align = "right"))
+    fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Programme Model Details", class = "btn btn-primary"))) #, align = "right"
   )
 }
 
-#' Function wrapping panel to show programme details table
+#' Function wrapping panel to show programme model details table
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -246,6 +227,82 @@ panelModelDetails <- function(id) {
   )
 }
 
+#' Function wrapping panel to associate model
+#' @inheritParams flamingoModuleUI
+#' @export
+panelAssociateModel <- function(id) {
+  ns <- NS(id)
+  flamingoPanel(
+    collapsible = TRUE,
+    show = FALSE,
+    ns("progmodel"),
+    heading = h4("Associate Model"),
+    fluidRow(
+      column(4,
+             selectInput(ns("sinputookprogid"), "Programme:", choices = c(""))),
+      column(4,
+             selectInput(ns("sinputookmodelid"), "Model:", choices = c(""))),
+      column(4,
+             selectInput(ns("sinputProgModTransform"), "Transform Name", choices = ""),
+             bsTooltip(ns("sinputProgModTransform"),
+                       programme_Definition_Single$sinputProgModTransform,
+                       placement = "right",
+                       options = list(container = "body")))),
+    
+    div(actionButton(inputId = ns("abuttoncrprogoasis"), label = "Create", class = "btn btn-primary"), style="float:right;")
+  )
+}
+
+# >  Section "Configure Output & Run" = "3" -----------------------
+
+#' Function wrapping panel to show process run table
+#' @inheritParams flamingoModuleUI
+#' @importFrom DT DTOutput
+#' @export
+panelProcessRunTable <- function(id) {
+  ns <- NS(id)
+  flamingoPanel(
+    collapsible = TRUE,
+    show = TRUE,
+    ns("runs"),
+    heading = tagAppendChildren(
+      h4("Process Runs"),
+      actionButton(inputId = ns("abuttonrefreshprrun"), label = "Refresh", style = "float: right;")
+    ),
+    div(id = "divProcessRun",
+        fluidRow(column(12,
+                        radioButtons(inputId = ns("radioprrunsAllOrInProgress"), "Processes' Status", list("All", "In_Progress"), inline = TRUE))),
+        DTOutput(ns("tableprocessrundata")),
+        fluidRow(column(12,
+                        div(id = ns("divprocessRunButtons"),
+                            actionButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration", class = "btn btn-primary"),
+                            actionButton(inputId = ns("abuttonrerunpr"), label = "Rerun", class = "btn btn-primary"),
+                            actionButton(inputId = ns("abuttonshowlog"), label = "Show Process Run Log", class = "btn btn-primary"),
+                            div(
+                              actionButton(inputId = ns("abuttondisplayoutput"), label = "Go To Display Output", class = "btn btn-primary")
+                              , style = "inline: true;float: right;")
+                        )))
+    )
+  )
+}
+
+#' Function wrapping panel to show Process Run logs table
+#' @inheritParams flamingoModuleUI
+#' @importFrom DT DTOutput
+#' @export
+panelProcessRunLogs <- function(id) {
+  ns <- NS(id)
+  flamingoPanel(
+    collapsible = FALSE,
+    ns("runlogs"),
+    heading = tagAppendChildren(
+      h4("Process Run Logs"), actionButton(inputId = ns("abuttonrefreshprrunlogs"), label = "Refresh", style = "float: right;"),
+      actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
+    ),
+    DTOutput(ns("tablelog"))
+  )
+}
+
 #' Function wrapping panel to define outputs
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyjs hidden
@@ -257,7 +314,7 @@ panelDefineOutputs <- function(id) {
     ns("progout"),
     heading = tagAppendChildren(
       h4("Define Programme Output"),
-      hidden(actionButton(inputId = ns("abuttonehidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;"))
+      actionButton(inputId = ns("abuttonehidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     fluidRow(
       column(4,
@@ -581,7 +638,7 @@ configureAdvancedIL <- function(id) {
   )
 }
 
-#' Function wrapping sub-panel to define outputs advanced configuration IL
+#' Function wrapping sub-panel to define outputs advanced configuration RI
 #' @inheritParams flamingoModuleUI
 #' @export
 configureAdvancedRI <- function(id) {
@@ -684,46 +741,3 @@ configureAdvancedRI <- function(id) {
   )#end of fluidrow RI
 }
 
-#' Function wrapping panel to show process run table
-#' @inheritParams flamingoModuleUI
-#' @importFrom DT DTOutput
-#' @export
-panelProcessRunTable <- function(id) {
-  ns <- NS(id)
-  flamingoPanel(
-    collapsible = FALSE,
-    ns("runs"),
-    heading = tagAppendChildren(
-      h4("Process Runs"),
-      actionButton(inputId = ns("abuttonrefreshprrun"), label = "Refresh", style = "float: right;")
-    ),
-    div(id = "divProcessRun",
-        fluidRow(column(12,
-                        radioButtons(inputId = ns("radioprrunsAllOrInProgress"), "Processes' Status", list("All", "In_Progress"), inline = TRUE))),
-        DTOutput(ns("tableprocessrundata")),
-        fluidRow(column(12,
-                        div(id = ns("divprocessRunButtons"),
-                            actionButton(inputId = ns("abuttondisplayoutput"), label = "Go To Display Output", class = "btn btn-primary"),
-                            actionButton(inputId = ns("abuttonrerunpr"), label = "Rerun", class = "btn btn-primary"),
-                            actionButton(inputId = ns("abuttonshowlog"), label = "Show Process Run Log", class = "btn btn-primary")
-                        )))
-    )
-  )
-}
-
-#' Function wrapping panel to show Process Run logs table
-#' @inheritParams flamingoModuleUI
-#' @importFrom DT DTOutput
-#' @export
-panelProcessRunLogs <- function(id) {
-  ns <- NS(id)
-  flamingoPanel(
-    collapsible = FALSE,
-    ns("runlogs"),
-    heading = tagAppendChildren(
-      h4("Process Run Logs"), actionButton(inputId = ns("abuttonrefreshprrunlogs"), label = "Refresh", style = "float: right;"),
-      actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
-    DTOutput(ns("tablelog"))
-  )
-}

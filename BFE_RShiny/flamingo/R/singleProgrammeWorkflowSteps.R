@@ -1,10 +1,13 @@
 ### Panels Programme Workflow -----
 # N.B.: checkbox values need to have type = "character", otherwise jQuery errors
 # are thrown when programmatically setting choices
+# programmeWorkflowSteps <- list("Choose Programme" = "1",
+#                                "Associate Model" = "2",
+#                                "Configure Output & Run" = "3",
+#                                "Browse & Re-run" = "4")
 programmeWorkflowSteps <- list("Choose Programme" = "1",
-                               "Associate Model" = "2",
-                               "Configure Output & Run" = "3",
-                               "Browse & Re-run" = "4")
+                               "Choose Model" = "2",
+                               "Configure Output & Run" = "3")
 
 #' @importFrom shinyWidgets radioGroupButtons
 singleProgrammeWorkflowStepsUI <- function(id) {
