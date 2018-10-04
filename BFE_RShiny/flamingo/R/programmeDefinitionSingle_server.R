@@ -1149,13 +1149,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                             prworkflow) {
     if (active()) {
       prtable <- getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
-      # Rule is, for one process ID, pass that process ID in, for all
-      # processes pass a null. For processes in all states (completed,
-      # created, in progress etc), pass 'All', for just in progress pass
-      # 'In Progress'
-      prcid <- input$selectprogOasisID
 
-      prcrundata <- getProcessRun(dbSettings, prcid, AllOrInProgress)
+      prcid <- input$selectprogOasisID
+      # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
+      # 'In Progress' (not handled by stored procedure in the DB due to bug!)
+      prcrundata <- getProcessRun(dbSettings, prcid, input$radioprrunsAllOrInProgress)
 
       StatusGood <- "Completed"
       StatusBad <- c("Failed", "Cancelled", NA_character_)
@@ -1173,7 +1171,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                                 ProcessRunStatus %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
             as.data.frame()
           if (input$radioprrunsAllOrInProgress == "In_Progress") {
-            prcrundata <- prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
+            result$prcrundata <- result$prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
           }
         } else {
           hide("tableprocessrundata")
