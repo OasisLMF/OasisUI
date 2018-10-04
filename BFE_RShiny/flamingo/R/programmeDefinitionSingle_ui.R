@@ -133,11 +133,11 @@ panelProgrammeTable <- function(id) {
     actionButton(ns("buttoncreatepr"), "Create Programme", class = "btn btn-primary", align = "centre"),
     actionButton(ns("buttonamendpr"), "Amend Programme", class = "btn btn-primary", align = "centre"),
     actionButton(ns("buttondeletepr"), "Delete Programme", class = "btn btn-primary", align = "right"),
-    actionButton(ns("buttonprogdetails"), "Show Details Programme", class = "btn btn-primary", align = "right")
+    actionButton(ns("buttonprogdetails"), "Show Details", class = "btn btn-primary", align = "right")
   )
 }
 
-#' Function wrapping panel to show details programme table
+#' Function wrapping panel to show details of programme
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -147,7 +147,7 @@ panelProgrammeDetails <- function(id) {
     collapsible = FALSE,
     ns("progdtl"),
     heading = tagAppendChildren(
-      h4("Details Programme"),
+      h4("Details of Programme"),
       uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttondefprogrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times"), style = "float: right;")
@@ -229,11 +229,11 @@ panelProgrammeModelTable <- function(id) {
       actionButton(inputId = ns("abuttonookrefresh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableProgOasisOOK")),
-    fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Details Programme Model", class = "btn btn-primary"), align = "right"))
+    fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Details", class = "btn btn-primary"), align = "right"))
   )
 }
 
-#' Function wrapping panel to show details programme table
+#' Function wrapping panel to show details of programme table
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -714,13 +714,13 @@ panelProcessRunTable <- function(id) {
                             actionButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration", class = "btn btn-primary"),
                             actionButton(inputId = ns("abuttondisplayoutput"), label = "Browse Run Outputs", class = "btn btn-primary"),
                             actionButton(inputId = ns("abuttonrerunpr"), label = "Rerun", class = "btn btn-primary"),
-                            actionButton(inputId = ns("abuttonshowlog"), label = "Show Log Process Run", class = "btn btn-primary")
+                            actionButton(inputId = ns("abuttonshowlog"), label = "Show Log", class = "btn btn-primary")
                         )))
     )
   )
 }
 
-#' Function wrapping panel to show Log Process Run table
+#' Function wrapping panel to show table for specific Process Run
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export

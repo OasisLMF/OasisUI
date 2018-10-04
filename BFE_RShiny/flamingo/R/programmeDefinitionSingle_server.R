@@ -456,7 +456,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   output$paneltitleAssociateModel <- renderUI({
     progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
     progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
-    paste0("Associate Model to Programme", " - ", progName, " (id: ", progId, ")" )
+    paste0("Associate Model to Programme", " - ", progName, " (id: ", progId, ")")
   })
 
   #  Programme Model Table title
@@ -464,14 +464,14 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   output$paneltitleProgrammeModelTable <- renderUI({
     progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
     progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
-    paste0("Models Table Programme", " - ", progName," (id: ", progId, ")" )
+    paste0("Models Table Programme", " - ", progName," (id: ", progId, ")")
   })
 
   #  Details Programme Model title
 
   output$paneltitleProgrammeModelDetails <- renderUI({
     progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
-    paste0("Details Programme Model", " - ", progName, " (id: ", result$progOasisId, ")" )
+    paste0("Details Programme Model", " - ", progName, " (id: ", result$progOasisId, ")")
   })
 
 
@@ -480,12 +480,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Create/Amend programme title
 
   output$paneltitleDefineProgramme <- renderUI({
-    if (result$prog_flag == "C"| is.null(input$tableDPprog_rows_selected)) {
+    if (result$prog_flag == "C" || is.null(input$tableDPprog_rows_selected)) {
       "Create Programme"
     } else if (result$prog_flag == "A") {
       progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
       progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
-      paste0("Amend Programme", "- ", progName, " (id: ", progId, ")" )
+      paste0("Amend Programme", "- ", progName, " (id: ", progId, ")")
     }
 
   })
@@ -573,7 +573,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   output$paneltitleProgrammeDetails <- renderUI({
     progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
     progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
-    paste0("- ", progName, " (id: ", progId, ")" )
+    paste0("- ", progName, " (id: ", progId, ")")
   })
 
   # Show Details Programme
@@ -1140,7 +1140,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   output$paneltitlepanelProcessRunTable <- renderUI({
     progOasisId <- result$POData[input$tableProgOasisOOK_rows_selected, 1]
     progOasisName <- result$POData[input$tableProgOasisOOK_rows_selected, 2]
-    paste0("Process Runs", " - ", progOasisName," (id: ", progOasisId, ")" )
+    paste0("Process Runs", " - ", progOasisName," (id: ", progOasisId, ")")
   })
 
   observeEvent(input$radioprrunsAllOrInProgress, {
@@ -1260,7 +1260,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
   # Go to browse section
   observeEvent(input$abuttondisplayoutput, {
-    if (length(row <- input$tableprocessrundata_rows_selected) > 0) {
+    if (length(input$tableprocessrundata_rows_selected) > 0) {
       updateNavigation(navigation_state, "SBR")
     } else {
       showNotification(type = "warning", "Please select a Process Run first")
@@ -1280,12 +1280,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 #     updateNavigation(navigation_state, "SBR")
 #   })
 
-# configuration title
+  # configuration title
   output$paneltitleReDefineProgramme <- renderUI({
     if (length(input$tableprocessrundata_rows_selected) > 0) {
       processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
       processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, 2]
-      paste0("Re-Define Programme Output", " - ", processRunName, " (id: ", processRunId, ")" )
+      paste0("Re-Define Programme Output", " - ", processRunName, " (id: ", processRunId, ")")
     } else {
       "New Output Configuration"
     }
@@ -1321,8 +1321,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   onclick("abuttonrerunpr", {
     if (length(input$tableprocessrundata_rows_selected) > 0) {
 
-      outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid ))
-      runparamsforpr <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$prrunid ))
+      outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid))
+      runparamsforpr <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$prrunid))
 
       show("panelDefineOutputs")
       show("abuttonhidepanelconfigureoutput")
@@ -1424,7 +1424,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   output$paneltitleProcessRunLogs <- renderUI({
     processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
     processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, 2]
-    paste0("Logs Process Run", " - ", processRunName, " (id: ", processRunId, ")" )
+    paste0("Logs Process Run", " - ", processRunName, " (id: ", processRunId, ")")
   })
 
   ### Log Table
@@ -1601,7 +1601,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     invisible()
   }
 
-  # Reload Programme Details table
+  # Reload table of Deatils of Programme
   .reloadProgDetails <- function() {
     if (length(input$tableDPprog_rows_selected) > 0) {
       progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
@@ -1626,7 +1626,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     invisible()
   }
 
-  # Reload Programme Model table
+  # Reload table of Programme Model
   .reloadPOData <- function() {
     if (!is.null(input$selectprogrammeID)) {
       POData <- getProgOasisForProgdata(dbSettings, input$selectprogrammeID)
