@@ -9,7 +9,7 @@ browseprogrammesUI <- function(id) {
   ns <- NS(id)
   tagList(
 
-    h4("Browse Processes outputs", class = "flamingo-page-title") ,
+    h4("Browse Run Outputs", class = "flamingo-page-title") ,
     panelDefineRunID(id),
     panelSummaryTable(id),
     panelOutput(id),

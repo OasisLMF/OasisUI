@@ -9,7 +9,7 @@ landingPageUI <- function(id) {
     wellPanel(
       h4("Process Runs Inbox"),
       DTOutput(ns("tableInbox")),
-      actionButton(ns("abuttongotorun"), "Goto Run Details",
+      actionButton(ns("abuttongotorun"), "Browse Processes Outputs",
                    class = "btn btn-primary", align = "right"),
       bsTooltip(ns("abuttongotorun"), landing_page$abuttongotorun,
                 placement = "right", options = list(container = "body")),
@@ -39,14 +39,14 @@ pageheaderUI <- function(id) {
                         textOutput(ns("textOutputHeaderData2")),
                         actionButton(ns("abuttonuseradmin"), class = "btn btn-primary",
                                      label = "User Administration", align = "center", width = "100%"),
-                        
+
                         actionButton(ns("abuttondefineaccount"), class = "btn btn-primary",
                                      label = "Define Account", align = "center", width = "100%"),
                         bsTooltip(ns("abuttondefineaccount"),
                                   landing_page$abuttondefineaccount,
                                   placement = "left",
                                   options   = list(container = "body")),
-                        
+
                         actionButton(ns("abuttonsysconf"), class = "btn btn-primary",
                                      label = "System Configuration", align = "center", width = "100%"),
                         bsTooltip(ns("abuttonsysconf"),

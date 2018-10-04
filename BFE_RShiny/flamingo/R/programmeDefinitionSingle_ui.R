@@ -5,16 +5,16 @@
 #' @importFrom DT DTOutput
 #' @export
 programmeDefinitionSingleUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   tagList(
     singleProgrammeWorkflowStepsUI(ns("workflowsteps")),
-    
+
     # Hidden/visible panels
     hidden(div(id = ns("panelProgrammeTable"), panelProgrammeTable(id))),
     hidden(div(id = ns("panelProgrammeDetails"), panelProgrammeDetails(id))),
-    div(id = ns("panelDefineProgramme"), panelDefineProgramme(id)),
+    hidden(div(id = ns("panelDefineProgramme"), panelDefineProgramme(id))),
     hidden(div(id = ns("panelAssociateModel"), panelAssociateModel(id))),
     hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
     hidden(div(id = ns("panelProgrammeModelTable"), panelProgrammeModelTable(id))),
@@ -47,7 +47,7 @@ defineProgramme <- function(id) {
                        placement = "right",
                        options = list(container = "body")))),
     fluidRow(column(4,
-                    actionButton(ns("abuttonProgSubmit"), "Create Programme", class = "btn btn-primary")), style = "float:right"),
+                    actionButton(ns("abuttonProgSubmit"), label = "Submit", class = "btn btn-primary")), style = "float:right"),
     fluidRow(
       column(12, h4("Link input files to programme")),
       # Source Location File
@@ -105,12 +105,12 @@ defineProgramme <- function(id) {
 panelDefineProgramme <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    collapsible = TRUE,
-    show = FALSE,
+    collapsible = FALSE,
     ns("progdef"),
     heading = tagAppendChildren(
-      h4("New Programme"),
-      actionButton(inputId = ns("abuttonhidedefineprogpanel"), label = NULL, icon = icon("times"), style = "float: right;")
+      h4(""),
+      uiOutput(ns("paneltitleDefineProgramme"), inline = TRUE),
+      actionButton(inputId = ns("abuttonhidecreatepr"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     defineProgramme(id)
   )
@@ -130,13 +130,14 @@ panelProgrammeTable <- function(id) {
       actionButton(inputId = ns("abuttonprgtblrfsh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableDPprog")),
+    actionButton(ns("buttoncreatepr"), "Create Programme", class = "btn btn-primary", align = "centre"),
     actionButton(ns("buttonamendpr"), "Amend Programme", class = "btn btn-primary", align = "centre"),
     actionButton(ns("buttondeletepr"), "Delete Programme", class = "btn btn-primary", align = "right"),
-    actionButton(ns("buttonprogdetails"), "Show Programme Details", class = "btn btn-primary", align = "right")
+    actionButton(ns("buttonprogdetails"), "Show Details", class = "btn btn-primary", align = "right")
   )
 }
 
-#' Function wrapping panel to show programme details table
+#' Function wrapping panel to show details of programme
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -146,8 +147,8 @@ panelProgrammeDetails <- function(id) {
     collapsible = FALSE,
     ns("progdtl"),
     heading = tagAppendChildren(
-      h4("Programme Details"),
-      uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE), 
+      h4("Details of Programme"),
+      uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttondefprogrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
@@ -161,9 +162,12 @@ panelProgrammeDetails <- function(id) {
 panelAssociateModel <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    collapsible = FALSE,
+    collapsible = TRUE,
     ns("progmodel"),
-    heading = h4("Associate Model"),
+    heading = tagAppendChildren(
+      h4(""),
+      uiOutput(ns("paneltitleAssociateModel"), inline = TRUE)
+      ),
     fluidRow(
       column(4,
              selectInput(ns("sinputookprogid"), "Programme:", choices = c(""))),
@@ -175,7 +179,7 @@ panelAssociateModel <- function(id) {
                        programme_Definition_Single$sinputProgModTransform,
                        placement = "right",
                        options = list(container = "body")))),
-    
+
     actionButton(inputId = ns("abuttoncrprogoasis"), label = "Create", class = "btn btn-primary")
   )
 }
@@ -187,7 +191,7 @@ panelAssociateModel <- function(id) {
 #' @export
 panelDefineIDs <- function(id) {
   ns <- NS(id)
-  
+
   panel(
     status = "primary",
     #heading = fluidRow(column(11, h4("Filter"))),
@@ -217,18 +221,19 @@ panelDefineIDs <- function(id) {
 panelProgrammeModelTable <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    collapsible = FALSE,
+    collapsible = TRUE,
     ns("progmodeltbl"),
     heading = tagAppendChildren(
-      h4("Programme Model Table"),
+      h4(""),
+      uiOutput(ns("paneltitleProgrammeModelTable"), inline = TRUE),
       actionButton(inputId = ns("abuttonookrefresh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableProgOasisOOK")),
-    fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Programme Model Details", class = "btn btn-primary"), align = "right"))
+    fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Details", class = "btn btn-primary"), align = "right"))
   )
 }
 
-#' Function wrapping panel to show programme details table
+#' Function wrapping panel to show details of programme table
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -238,7 +243,8 @@ panelModelDetails <- function(id) {
     collapsible = FALSE,
     ns("progmodeldtl"),
     heading = tagAppendChildren(
-      h4("Programme Model Details"),
+      h4(""),
+      uiOutput(ns("paneltitleProgrammeModelDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttonprgoasisrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
@@ -256,8 +262,9 @@ panelDefineOutputs <- function(id) {
     collapsible = FALSE,
     ns("progout"),
     heading = tagAppendChildren(
-      h4("Define Programme Output"),
-      hidden(actionButton(inputId = ns("abuttonehidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;"))
+      h4(""),
+      uiOutput(ns("paneltitleReDefineProgramme"), inline = TRUE),
+      hidden(actionButton(inputId = ns("abuttonhidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;"))
     ),
     fluidRow(
       column(4,
@@ -350,7 +357,7 @@ configureAdvancedGUL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-    
+
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkgulprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
@@ -368,7 +375,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulprogAAL",
                                   " " = "gulprogPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulstate"),
                                 label = h6("State", class = "flamingo-granularity"),
                                 choices = list(
@@ -385,7 +392,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulstateAAL",
                                   " " = "gulstatePLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
                                 choices = list(
@@ -402,7 +409,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulcountyAAL",
                                   " " = "gulcountyPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
                                 choices = list(
@@ -419,7 +426,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gullocAAL",
                                   " " = "gullocPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgullob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
                                 choices = list(
@@ -436,7 +443,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gullobAAL",
                                   " " = "gullobPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
                                 choices = list(
@@ -476,7 +483,7 @@ configureAdvancedIL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-    
+
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkilprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
@@ -494,7 +501,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "ilprogAAL",
                                   " " = "ilprogPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilstate"),
                                 label = h6("State", class = "flamingo-granularity"),
                                 choices = list(
@@ -510,7 +517,7 @@ configureAdvancedIL <- function(id) {
                                   # " " = "ilstateSampleMeanOEP",
                                   " " = "ilstateAAL", " " = "ilstatePLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
                                 choices = list(
@@ -526,7 +533,7 @@ configureAdvancedIL <- function(id) {
                                   # " " = "ilcountySampleMeanOEP",
                                   " " = "ilcountyAAL", " " = "ilcountyPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
                                 choices = list(
@@ -543,7 +550,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "illocAAL",
                                   " " = "illocPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkillob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
                                 choices = list(
@@ -560,7 +567,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "illobAAL",
                                   " " = "illobPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
                                 choices = list(
@@ -589,94 +596,94 @@ configureAdvancedRI <- function(id) {
   fluidRow(
     column(4,
            h4("Net RI Loss", style = "font-size: 18px; font-weight: bold;"),
-           h5("Full Sample", style = "font-size: 16.5px;"), 
+           h5("Full Sample", style = "font-size: 16.5px;"),
            h5("ELT", style="font-size: 16.5px;"),
-           tags$div(class = "h5-align", h5("AEP", style="font-size: 16.5px;")), 
+           tags$div(class = "h5-align", h5("AEP", style="font-size: 16.5px;")),
            tags$div(class = "h5-align", h5("OEP", style="font-size: 16.5px;")),
            tags$div(class = "h5-align", h5("Multi AEP", style="font-size: 16.5px;")),
-           h5("Multi OEP", style = "font-size: 16.5px;"),  
+           h5("Multi OEP", style = "font-size: 16.5px;"),
            # h5("WS Mean AEP", style="font-size: 16.5px;"),
-           # tags$div(class = "h5-align", h5("WS Mean OEP", style="font-size: 16.5px;")),  
+           # tags$div(class = "h5-align", h5("WS Mean OEP", style="font-size: 16.5px;")),
            # tags$div(class = "h5-align",h5("Sample Mean AEP", style="font-size: 16.5px;")),
-           # h5("Sample Mean OEP", style="font-size: 16.5px;"), 
+           # h5("Sample Mean OEP", style="font-size: 16.5px;"),
            h5("AAL", style="font-size: 16.5px;"),
            tags$div(class = "h5-align",h5("PLT", style="font-size: 16.5px;"))),
-    
-    tags$div(class = "multicol", 
+
+    tags$div(class = "multicol",
              checkboxGroupInput(ns("chkriprog"),
-                                label = h5("Prog", style = "font-size: 15.0px;"), 
+                                label = h5("Prog", style = "font-size: 15.0px;"),
                                 choices = list(
                                   " " = "riprogSummary",
                                   " " = "riprogELT",
                                   " " = "riprogFullUncAEP",
                                   " " = "riprogFullUncOEP",
                                   " " = "riprogAEPWheatsheaf",
-                                  " " = "riprogOEPWheatsheaf",  
+                                  " " = "riprogOEPWheatsheaf",
                                   " " = "riprogAAL",
                                   " " = "riprogPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkristate"),
-                                label = h5("State", style = "font-size: 15.0px;"), 
+                                label = h5("State", style = "font-size: 15.0px;"),
                                 choices = list(
                                   " " = "ristateSummary",
                                   " " = "ristateELT",
                                   " " = "ristateFullUncAEP",
                                   " " = "ristateFullUncOEP",
                                   " " = "ristateAEPWheatsheaf",
-                                  " " = "ristateOEPWheatsheaf", 
-                                  " " = "ristateAAL", 
+                                  " " = "ristateOEPWheatsheaf",
+                                  " " = "ristateAAL",
                                   " " = "ristatePLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkricounty"),
-                                label = h5("County", style = "font-size: 15.0px;"), 
+                                label = h5("County", style = "font-size: 15.0px;"),
                                 choices = list(
                                   " " = "ricountySummary",
                                   " " = "ricountyELT",
                                   " " = "ricountyFullUncAEP",
                                   " " = "ricountyFullUncOEP",
                                   " " = "ricountyAEPWheatsheaf",
-                                  " " = "ricountyOEPWheatsheaf", 
-                                  " " = "ricountyAAL", 
+                                  " " = "ricountyOEPWheatsheaf",
+                                  " " = "ricountyAAL",
                                   " " = "ricountyPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkriloc"),
-                                label = h5("Location", style = "font-size: 15.0px;"), 
+                                label = h5("Location", style = "font-size: 15.0px;"),
                                 choices = list(
                                   " " = "rilocSummary",
                                   " " = "rilocELT",
                                   " " = "rilocFullUncAEP",
                                   " " = "rilocFullUncOEP",
                                   " " = "rilocAEPWheatsheaf",
-                                  " " = "rilocOEPWheatsheaf", 
+                                  " " = "rilocOEPWheatsheaf",
                                   " " = "rilocAAL",
                                   " " = "rilocPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkrilob"),
-                                label = h5("LOB", style = "font-size: 15.0px;"), 
+                                label = h5("LOB", style = "font-size: 15.0px;"),
                                 choices = list(
                                   " " = "rilobSummary",
                                   " " = "rilobELT",
                                   " " = "rilobFullUncAEP",
                                   " " = "rilobFullUncOEP",
                                   " " = "rilobAEPWheatsheaf",
-                                  " " = "rilobOEPWheatsheaf", 
+                                  " " = "rilobOEPWheatsheaf",
                                   " " = "rilobAAL",
                                   " " = "rilobPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkripolicy"),
-                                label = h5("Policy", style = "font-size: 15.0px;"), 
+                                label = h5("Policy", style = "font-size: 15.0px;"),
                                 choices = list(
                                   " " = "ripolicySummary",
                                   " " = "ripolicyELT",
                                   " " = "ripolicyFullUncAEP",
                                   " " = "ripolicyFullUncOEP",
                                   " " = "ripolicyAEPWheatsheaf",
-                                  " " = "ripolicyOEPWheatsheaf", 
+                                  " " = "ripolicyOEPWheatsheaf",
                                   " " = "ripolicyAAL",
                                   " " = "ripolicyPLT"),
                                 selected = NULL)
@@ -691,10 +698,11 @@ configureAdvancedRI <- function(id) {
 panelProcessRunTable <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    collapsible = FALSE,
+    collapsible = TRUE,
     ns("runs"),
     heading = tagAppendChildren(
-      h4("Process Runs"),
+      h4(""),
+      uiOutput(ns("paneltitlepanelProcessRunTable"), inline = TRUE),
       actionButton(inputId = ns("abuttonrefreshprrun"), label = "Refresh", style = "float: right;")
     ),
     div(id = "divProcessRun",
@@ -703,15 +711,16 @@ panelProcessRunTable <- function(id) {
         DTOutput(ns("tableprocessrundata")),
         fluidRow(column(12,
                         div(id = ns("divprocessRunButtons"),
-                            actionButton(inputId = ns("abuttondisplayoutput"), label = "Go To Display Output", class = "btn btn-primary"),
+                            actionButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration", class = "btn btn-primary"),
+                            actionButton(inputId = ns("abuttondisplayoutput"), label = "Browse Run Outputs", class = "btn btn-primary"),
                             actionButton(inputId = ns("abuttonrerunpr"), label = "Rerun", class = "btn btn-primary"),
-                            actionButton(inputId = ns("abuttonshowlog"), label = "Show Process Run Log", class = "btn btn-primary")
+                            actionButton(inputId = ns("abuttonshowlog"), label = "Show Log", class = "btn btn-primary")
                         )))
     )
   )
 }
 
-#' Function wrapping panel to show Process Run logs table
+#' Function wrapping panel to show table for specific Process Run
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -721,7 +730,9 @@ panelProcessRunLogs <- function(id) {
     collapsible = FALSE,
     ns("runlogs"),
     heading = tagAppendChildren(
-      h4("Process Run Logs"), actionButton(inputId = ns("abuttonrefreshprrunlogs"), label = "Refresh", style = "float: right;"),
+      h4(""),
+      uiOutput(ns("paneltitleProcessRunLogs"), inline = TRUE),
+      actionButton(inputId = ns("abuttonrefreshprrunlogs"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("tablelog"))
