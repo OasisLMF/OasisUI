@@ -771,12 +771,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     
-    .reloadRunData()
     .reloadProgFiles()
     show("buttonmodeldetails")
     hide("panelModelDetails")
-    .defaultview(session)
-    hide("panelDefineOutputs")
     
     # Show perils according to programme model
     if (length(input$tableProgOasisOOK_rows_selected) > 0 ) {
@@ -833,10 +830,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     logMessage(paste0(" #### selectprogOasisID changed to ", input$selectprogOasisID))
     bl_dirty1 <- stop_selProgOasisID > check_selProgOasisID
     if (active()) {
+      .defaultview(session)
       show("buttonmodeldetails")
       hide("panelModelDetails")
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
+      .reloadRunData()
       if (input$selectprogOasisID != "<Select>") {
         if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
           logMessage(paste("updating prcrundata select because selectprogOasisID changed to", input$selectprogOasisID))
@@ -850,8 +849,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         result$prcrundata <- NULL
         selectRows(dataTableProxy("tableProgOasisOOK"), NULL)
       }
-      # reload set of runs
-      .reloadRunData()
     }
     if (bl_dirty1) check_selProgOasisID <<- check_selProgOasisID + 1
   })
@@ -926,8 +923,15 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Process Run Table Title
   output$paneltitlepanelProcessRunTable <- renderUI({
-    progOasisId <- result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisId()]
-    progOasisName <- result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisName()]
+    # initialize so that the title would look nice even if rowToSelect is NA
+    progOasisId <- NULL
+    progOasisName <- NULL
+    rowToSelect <- match(input$selectprogOasisID, result$POData[, ProgOasisId()])
+    #rowToSelect can be temporarly NA if selectprogrammeID changes but selectprogOasisID is not yet updated
+    if (!is.na(rowToSelect)) {
+      progOasisId <- result$POData[rowToSelect, ProgOasisId()]
+      progOasisName <- result$POData[rowToSelect, ProgOasisName()]
+    }
     paste0("Process Runs for Model", " - ", progOasisName," (id: ", progOasisId, ")")
   })
   
