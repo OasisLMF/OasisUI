@@ -88,17 +88,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Section 'Choose Programme' = '1' ------------------------------------------
   
-  ### Creating reactive for selectors of Programme Table
-  #result$DPProgData
-  #"Programme ID", "Programme Name", "Account ID", "Account Name", "Transform ID", "Transform", "Status"
-  ProgrammeID <- reactive(names(result$DPProgData)[1])
-  ProgrammeName <- reactive(names(result$DPProgData)[2])
-  ProgrammeAccountID <- reactive(names(result$DPProgData)[3])
-  ProgrammeAccountName <- reactive(names(result$DPProgData)[4])
-  ProgrammeTranformID <- reactive(names(result$DPProgData)[5])
-  ProgrammeTranform <- reactive(names(result$DPProgData)[6])
-  ProgrammeStatus <- reactive(names(result$DPProgData)[7])
-  
   ### > Programme Table ------
   output$tableDPprog <- renderDT({
     print(names(result$DPProgData))
@@ -647,17 +636,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (bl_dirty) check_selProgID <<- check_selProgID + 1
   })
   
-  ### Creating reactive for selectors of Programme Model Table
-  # result$POData
-  #"ProgOasisId", ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status"
-  ProgOasisId <- reactive(names(result$POData)[1])
-  ProgOasisName <- reactive(names(result$POData)[2])
-  ProgOasisModelName <- reactive(names(result$POData)[3])
-  ProgOasisTransformName <- reactive(names(result$POData)[4])
-  ProgOasisSourceFileId <- reactive(names(result$POData)[5])
-  ProgOasisFileID <- reactive(names(result$POData)[6])
-  ProgOasisStatus <- reactive(names(result$POData)[7])
-  
   # > Programme Model Table --------------------------
   
   output$tableProgOasisOOK <- renderDT(
@@ -665,8 +643,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       
       # manual refresh button
       invisible(input$abuttonookrefresh)
-      
-      print(names(result$POData))
       
       if (isolate(input$selectprogOasisID) != "<Select>") {
         rowToSelect <- match(isolate(input$selectprogOasisID), result$POData[,ProgOasisId()])
@@ -918,14 +894,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       }
     }
   }
-  
-  ### Creating reactive for selectors of Process Runs Table
-  # result$prcrundata
-  #"ProcessRunID", "ProcessRunName", "ProgOasisID", "ProcessRunStatus"
-  ProcessRunID <- reactive(names(result$prcrundata)[1])
-  ProcessRunName <- reactive(names(result$prcrundata)[2])
-  ProcessRunProgOasisID <- reactive(names(result$prcrundata)[3])
-  ProcessRunStatus <- reactive(names(result$prcrundata)[4])
   
   output$tableprocessrundata <- renderDT(
     
@@ -1510,6 +1478,37 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     )
   }
   
+  # Reactives for cols positions -----------------------------------------------
+  
+  ### Creating reactive for selectors of Programme Table
+  #result$DPProgData
+  #"Programme ID", "Programme Name", "Account ID", "Account Name", "Transform ID", "Transform", "Status"
+  ProgrammeID <- reactive(names(result$DPProgData)[1])
+  ProgrammeName <- reactive(names(result$DPProgData)[2])
+  ProgrammeAccountID <- reactive(names(result$DPProgData)[3])
+  ProgrammeAccountName <- reactive(names(result$DPProgData)[4])
+  ProgrammeTranformID <- reactive(names(result$DPProgData)[5])
+  ProgrammeTranform <- reactive(names(result$DPProgData)[6])
+  ProgrammeStatus <- reactive(names(result$DPProgData)[7])
+  
+  ### Creating reactive for selectors of Programme Model Table
+  # result$POData
+  #"ProgOasisId", ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status"
+  ProgOasisId <- reactive(names(result$POData)[1])
+  ProgOasisName <- reactive(names(result$POData)[2])
+  ProgOasisModelName <- reactive(names(result$POData)[3])
+  ProgOasisTransformName <- reactive(names(result$POData)[4])
+  ProgOasisSourceFileId <- reactive(names(result$POData)[5])
+  ProgOasisFileID <- reactive(names(result$POData)[6])
+  ProgOasisStatus <- reactive(names(result$POData)[7])
+  
+  ### Creating reactive for selectors of Process Runs Table
+  # result$prcrundata
+  #"ProcessRunID", "ProcessRunName", "ProgOasisID", "ProcessRunStatus"
+  ProcessRunID <- reactive(names(result$prcrundata)[1])
+  ProcessRunName <- reactive(names(result$prcrundata)[2])
+  ProcessRunProgOasisID <- reactive(names(result$prcrundata)[3])
+  ProcessRunStatus <- reactive(names(result$prcrundata)[4])
   
   # Help Functions General ----------------------------------------------------
   # hide all panels
