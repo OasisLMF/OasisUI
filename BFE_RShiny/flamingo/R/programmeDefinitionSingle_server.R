@@ -8,7 +8,7 @@
 #' @rdname programmeDefinitionSingle
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDT dataTableProxy selectRows DTOutput
-#' @importFrom dplyr mutate select
+#' @importFrom dplyr mutate select case_when
 #' @importFrom shinyjs onclick js removeClass addClass
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,
@@ -32,13 +32,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     viewSLfile = NULL,
     # SA file to view
     viewSAfile = NULL,
-    # reactive value for the programme details table
+    # reactive value for details of programme table
     progDetails = NULL,
-    # reactive values for the programme model table
+    # reactive values for model table
     POData = NULL,
-    # reactive value for the programme model detail table
+    # reactive value for detail of model table
     progFiles = NULL,
-    # reactive values for the process runs table
+    # reactive values for process runs table
     prcrundata = NULL,
     #Id of the Programme Model
     progOasisId = -1,
@@ -117,6 +117,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
   
+  #  Programme Table title
+  output$paneltitleProgrammeModelTable <- renderUI({
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
+    paste0("Models Table", " - ", progName," (id: ", progId, ")")
+  })
+  
   # > Programme Details Table-----
   output$tableprogdetails <- renderDT({
     if (!is.null(result$progDetails) && nrow(result$progDetails) > 0) {
@@ -143,7 +150,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   output$paneltitleProgrammeDetails <- renderUI({
     progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
     progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
-    paste0("- ", progName, " (id: ", progId, ")" )
+    paste0("- ", progName, " (id: ", progId, ")")
   })
   
   # Show Programme Details
@@ -165,12 +172,33 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   # > Create / Amend Programme sub-panel -----------------------------------------------
-  
-  ### ************ TODO: Integrate Nikkis Part to show/hide Create Programme Panel
+
+  # Create/Amend programme title
+  output$paneltitleDefineProgramme <- renderUI({
+    if (result$prog_flag == "C" || is.null(input$tableDPprog_rows_selected)) {
+      "Create Programme"
+    } else if (result$prog_flag == "A") {
+      progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
+      progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
+      paste0("Amend Programme", "- ", progName, " (id: ", progId, ")")
+    }
+  })
   
   # Hide Programme Definition Panel
   onclick("abuttonhidedefineprogpanel", {
     hide("panelDefineProgramme")
+  })
+  
+  # Create Programme
+  onclick("buttoncreatepr", {
+    result$prog_flag <- "C"
+    #clear fields
+    .clearDPAccountSelection()
+    .clearProgrammeName()
+    .clearSourceFilesSelection()
+    .clearTransformNameSelection()
+    show("panelDefineProgramme")
+    logMessage("showing panelDefineProgramme")
   })
   
   ### Amend Programme
@@ -181,6 +209,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       #clear fields
       .updateDPAccountSelection()
       .updateProgrammeName()
+      .clearSourceFilesSelection()
       .updateTransformNameSelection()
       show("panelDefineProgramme")
       logMessage("showing panelDefineProgramme")
@@ -588,13 +617,15 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(input$selectprogrammeID, ignoreInit = TRUE, {
+    bl_dirty <- stop_selProgID > check_selProgID
+    logMessage(paste("--- stop_selProgID is:", stop_selProgID))
     if (active()) {
     if (input$selectprogrammeID != "<Select ProgID>") {
-      bl_dirty <- stop_selProgID > check_selProgID
-      logMessage(paste("--- stop_selProgID is:", stop_selProgID))
       if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
         logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
         rowToSelect <- which(result$DPProgData[, 1] == input$selectprogrammeID)
+        print("rowToSelect")
+        print(rowToSelect)
         #backward propagation
         # if (is.null(input$tableDPprog_rows_selected)) {
         #   selectRows(dataTableProxy("tableDPprog"), rowToSelect)
@@ -609,6 +640,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
     .reloadPOData()
     }
+    if (bl_dirty) check_selProgID <<- check_selProgID + 1
   })
   
   # > Programme Model Table --------------------------
@@ -635,6 +667,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   )
   
+  # Programme Model Table Title
+  output$paneltitleAssociateModel <- renderUI({
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
+    paste0("Associate Model to Programme", " - ", progName, " (id: ", progId, ")")
+  })
+  
   # > Model Details Table -----
   output$tabledisplayprogoasisfiles <- renderDT(
     if (!is.null(result$progFiles) && nrow(result$progFiles) > 0 ) {
@@ -656,7 +695,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", input$selectprogOasisID ))
     })
   
-  ### Programme Model Details
+  # Details Model title
+  output$paneltitleProgrammeModelDetails <- renderUI({
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
+    paste0("Details Programme Model", " - ", progName, " (id: ", result$progOasisId, ")")
+  })
+  
+  ### Show/hide Programme Model Details Panel
   onclick("buttonmodeldetails", {
     logMessage("showing panelModelDetails")
     .reloadProgFiles()
@@ -814,29 +859,27 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                             prworkflow) {
     if (active()) {
       prtable <- getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
-      # Rule is, for one process ID, pass that process ID in, for all
-      # processes pass a null. For processes in all states (completed,
-      # created, in progress etc), pass 'All', for just in progress pass
-      # 'In Progress'
       prcid <- input$selectprogOasisID
-      
-      AllOrInProgress <- isolate(input$radioprrunsAllOrInProgress)
-      if (AllOrInProgress == "In_Progress") {
-        AllOrInProgress = "In Progress"
-      }
-      
-      prcrundata <- getProcessRun(dbSettings, prcid, AllOrInProgress)
-      
+      # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
+      # 'In Progress' (not handled by stored procedure in the DB due to bug!)
+      prcrundata <- getProcessRun(dbSettings, prcid, input$radioprrunsAllOrInProgress)
+      StatusGood <- "Completed"
+      StatusBad <- c("Failed", "Cancelled", NA_character_)
+      '%notin%' <- Negate('%in%')
       # RSc TODO: should probably allow NULL to clear connections when selecting
       # a ProgOasisID that has no runs
       if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
         show("tableprocessrundata")
         show("divprocessRunButtons")
         result$prcrundata <- prcrundata %>%
-          mutate(ProcessRunStatus = replace(ProcessRunStatus, grepl("Failed", ProcessRunStatus, ignore.case = TRUE) | grepl("Cancelled", ProcessRunStatus, ignore.case = TRUE) | is.na(ProcessRunStatus), StatusFailed)) %>%
-          mutate(ProcessRunStatus = replace(ProcessRunStatus, !grepl("Completed", ProcessRunStatus, ignore.case = TRUE) & !grepl("Failed", ProcessRunStatus, ignore.case = TRUE) & !grepl("Cancelled", ProcessRunStatus, ignore.case = TRUE) & ProcessRunStatus != StatusFailed & ProcessRunStatus != StatusCompleted, StatusProcessing)) %>%
-          mutate(ProcessRunStatus = replace(ProcessRunStatus, grepl("Completed", ProcessRunStatus, ignore.case = TRUE), StatusCompleted)) %>%
+        mutate(ProcessRunStatus = case_when(ProcessRunStatus %in% StatusGood ~ StatusCompleted,
+                                            ProcessRunStatus %in% StatusBad ~ StatusFailed,
+                                            ProcessRunStatus %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
           as.data.frame()
+        #Handling bug for 'In Progress' 
+        if (input$radioprrunsAllOrInProgress == "In_Progress") {
+          result$prcrundata <- result$prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
+        }
       } else {
         result$prcrundata <- NULL
       }
@@ -873,6 +916,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       .nothingToShowTable(contentMessage = paste0("no runs available for Model ID ", input$selectprogOasisID))
     })
   
+  # Process Run Table Title
+  output$paneltitlepanelProcessRunTable <- renderUI({
+    progOasisId <- result$POData[input$tableProgOasisOOK_rows_selected, 1]
+    progOasisName <- result$POData[input$tableProgOasisOOK_rows_selected, 2]
+    paste0("Process Runs", " - ", progOasisName," (id: ", progOasisId, ")")
+  })
+  
   #Not allow any actions if the process run table is empty
   observeEvent(result$prcrundata, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
@@ -884,10 +934,22 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # > Configure Output ------
   
+  # configuration title
+  output$paneltitleReDefineProgramme <- renderUI({
+    if (length(input$tableprocessrundata_rows_selected) > 0) {
+      processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
+      processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, 2]
+      paste0("Re-Define Programme Output", " - ", processRunName, " (id: ", processRunId, ")")
+    } else {
+      "New Output Configuration"
+    }
+  })
+  
   #Show Output Configuration Panel
   onclick("abuttonconfigoutput", {
     .defaultview(session)
     show("panelDefineOutputs")
+    selectRows(dataTableProxy("tableprocessrundata"), selected = NULL)
   })
   
   onclick("abuttonrerunpr", {
@@ -1226,6 +1288,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
   
+  # run logs title
+  output$paneltitleProcessRunLogs <- renderUI({
+    processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
+    processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, 2]
+    paste0("Logs", " - ", processRunName, " (id: ", processRunId, ")")
+  })
+  
   # > Navigation --------------------------------------------------------------
   
   # hide process run section if DC returns empty table
@@ -1239,7 +1308,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Go to browse section
   onclick("abuttondisplayoutput", {
-    updateNavigation(navigation_state, "SBR")
+    if (length(input$tableprocessrundata_rows_selected) > 0) {
+      updateNavigation(navigation_state, "SBR")
+    } else {
+      showNotification(type = "warning", "Please select a Process Run first")
+    }
   })
   
   # > Updates dependent on changed: tableprocessrundata_rows_selected ---------
@@ -1251,7 +1324,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     hide("panelProcessRunLogs")
     show("abuttondisplayoutput")
     show("abuttonshowlog")
-    ##### TODO: Do I need the second chek in this if????
+    ##### TODO: Do I need the second check in this if????
     if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
       result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
       if (result$prcrundata[input$tableprocessrundata_rows_selected, "ProcessRunStatus"] != StatusCompleted) {
@@ -1344,7 +1417,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
           mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
           as.data.frame()
       }
-      logMessage("programme files table refreshed")
+      logMessage("files table refreshed")
     } else {
       result$progFiles <- NULL
       # if (active()) {
