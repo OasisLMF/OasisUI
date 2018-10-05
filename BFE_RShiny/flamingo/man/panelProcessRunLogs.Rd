@@ -2,7 +2,7 @@
 % Please edit documentation in R/programmeDefinitionSingle_ui.R
 \name{panelProcessRunLogs}
 \alias{panelProcessRunLogs}
-\title{Function wrapping panel to show Process Run logs table}
+\title{Function wrapping panel to show log table for specific Process Run}
 \usage{
 panelProcessRunLogs(id)
 }
@@ -10,5 +10,5 @@ panelProcessRunLogs(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to show Process Run logs table
+Function wrapping panel to show log table for specific Process Run
 }
