@@ -25,6 +25,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   stop_selProgID <- check_selProgID <- 0
   
+  stop_selProgOasisID <- check_selProgOasisID <- 0
+  
   result <- reactiveValues(
     # reactive values for the programme table
     DPProgData = NULL,
@@ -91,17 +93,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     
     # manual refresh button
     invisible(input$abuttonprgtblrfsh)
-    
-    dtOut <- result$DPProgData
+
     logMessage("re-rendering programme table")
-    if (!is.null(dtOut)) {
+    if (!is.null(result$DPProgData)) {
       if (isolate(input$selectprogrammeID) != "<Select>") {
-        rowToSelect <- which(dtOut[, 1] == isolate(input$selectprogrammeID))
+        rowToSelect <- match(isolate(input$selectprogrammeID), result$DPProgData[, 1])
       } else {
         rowToSelect <- 1
       }
       datatable(
-        dtOut,
+        result$DPProgData,
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -623,9 +624,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (input$selectprogrammeID != "<Select ProgID>") {
       if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
         logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
-        rowToSelect <- which(result$DPProgData[, 1] == input$selectprogrammeID)
-        print("rowToSelect")
-        print(rowToSelect)
+        rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, 1])
         #backward propagation
         # if (is.null(input$tableDPprog_rows_selected)) {
         #   selectRows(dataTableProxy("tableDPprog"), rowToSelect)
@@ -651,6 +650,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       # manual refresh button
       invisible(input$abuttonookrefresh)
       
+      if (isolate(input$selectprogOasisID) != "<Select>") {
+        rowToSelect <- match(isolate(input$selectprogOasisID), result$POData[,1])
+      } else {
+        rowToSelect <- 1
+      }
+      
       datatable(
         result$POData,
         class = "flamingo-table display",
@@ -658,7 +663,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'single',
-                         selected = rownames(result$POData)[1]),
+                         selected = rownames(result$POData)[rowToSelect]),
         colnames = c('Row Number' = 1),
         options = .getPRTableOptions()
       )
@@ -721,11 +726,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   ### > Create Model ------
   onclick("abuttoncrprogoasis", {
     if (isolate(input$sinputookprogid) > 0 && isolate(input$sinputookmodelid) > 0) {
-      result$progOasisId <- createProgOasis(dbSettings,
+      progOasisId <- createProgOasis(dbSettings,
                                             isolate(input$sinputookprogid),
                                             isolate(input$sinputookmodelid),
                                             isolate(input$sinputProgModTransform))
-      if (is.null(result$progOasisId)) {
+      ifelse(is.null(progOasisId), -1, result$progOasisId)
+      if (result$progOasisId == -1) {
         showNotification(type = "error",
                          paste("No Prog Oasis created"))
       } else {
@@ -824,13 +830,14 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # If selectprogOasisID changes, reload process run table and set view back to default
   observeEvent(input$selectprogOasisID, ignoreInit = TRUE, {
     logMessage(paste0(" #### selectprogOasisID changed to ", input$selectprogOasisID))
+    bl_dirty1 <- stop_selProgOasisID > check_selProgOasisID
     if (active()) {
       show("buttonmodeldetails")
       hide("panelModelDetails")
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
       if (input$selectprogOasisID != "<Select>") {
-        if (!is.null(result$POData) && nrow(result$POData) > 0 ) {
+        if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
           logMessage(paste("updating prcrundata select because selectprogOasisID changed to", input$selectprogOasisID))
           rowToSelect <- which(result$POData[, 1] == input$selectprogOasisID)
           if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
@@ -845,6 +852,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       # reload set of runs
       .reloadRunData()
     }
+    if (bl_dirty1) check_selProgOasisID <<- check_selProgOasisID + 1
   })
   
 
@@ -1131,7 +1139,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   .generateRun <- function() {
     prTable <- getProcessData(dbSettings, userId(), 0, 0, 0)
     prgId <- result$POData[input$tableProgOasisOOK_rows_selected,1]
-    result$progOasisID <- toString(prgId)
+    if (is.null(prgId)) { 
+      result$progOasisID <- -1
+    } else {
+      result$progOasisID <- toString(prgId)
+    }
     
     processrunname <- isolate(input$tinputprocessrunname)
     nosample <- isolate(input$tinputnoofsample)
