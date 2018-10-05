@@ -919,6 +919,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   }
   
+  ### Creating reactive for selectors of Process Runs Table
+  # result$prcrundata
+  #"ProcessRunID", "ProcessRunName", "ProgOasisID", "ProcessRunStatus"
+  ProcessRunID <- reactive(names(result$prcrundata)[1])
+  ProcessRunName <- reactive(names(result$prcrundata)[2])
+  ProcessRunProgOasisID <- reactive(names(result$prcrundata)[3])
+  ProcessRunStatus <- reactive(names(result$prcrundata)[4])
   
   output$tableprocessrundata <- renderDT(
     
@@ -930,7 +937,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       # if (preselRunId() == -1) {
       #   index <- 1
       # } else {
-      #   index <- match(c(preselRunId()), result$prcrundata[[1]])
+      #   index <- match(c(preselRunId()), result$prcrundata[,ProcessRunID()])
       # }
       index <- 1
       
@@ -970,8 +977,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # configuration title
   output$paneltitleReDefineProgramme <- renderUI({
     if (length(input$tableprocessrundata_rows_selected) > 0) {
-      processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
-      processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, 2]
+      processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, ProcessRunID()]
+      processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, ProcessRunName()]
       paste0("Re-Define Output Configuration for Process", " - ", processRunName, " (id: ", processRunId, ")")
     } else {
       "New Output Configuration"
@@ -1260,7 +1267,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                    runId))
           .reloadRunData()
           logMessage(paste("colnames are:", paste(colnames(result$prcrundata), collapse = ", ")))
-          rowToSelect <- match(runId, result$prcrundata[, 1])
+          rowToSelect <- match(runId, result$prcrundata[, ProcessRunID()])
           selectRows(dataTableProxy("tableprocessrundata"), rowToSelect)
         } else {
           showNotification(type = "warning",
@@ -1327,8 +1334,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # run logs title
   output$paneltitleProcessRunLogs <- renderUI({
-    processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
-    processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, 2]
+    processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, ProcessRunID()]
+    processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, ProcessRunName()]
     paste0("Logs", " - ", processRunName, " (id: ", processRunId, ")")
   })
   
@@ -1363,8 +1370,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     show("abuttonshowlog")
     ##### TODO: Do I need the second check in this if????
     if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
-      result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
-      if (result$prcrundata[input$tableprocessrundata_rows_selected, "ProcessRunStatus"] != StatusCompleted) {
+      result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, ProcessRunID()]
+      if (result$prcrundata[input$tableprocessrundata_rows_selected, ProcessRunStatus()] != StatusCompleted) {
         hide("abuttondisplayoutput")
         hide("abuttonshowlog")
         # This occurs only by changing process run, which is only possible in panel 3
@@ -1696,7 +1703,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid ))
     runparamsforpr <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$prrunid ))
     
-    updateTextInput(session, "tinputprocessrunname", value = result$prcrundata[input$tableprocessrundata_rows_selected, 2])
+    updateTextInput(session, "tinputprocessrunname", value = result$prcrundata[input$tableprocessrundata_rows_selected, ProcessRunName()])
     
     if (nrow(runparamsforpr) > 0) {
       for (i in 1:nrow(runparamsforpr)) {
