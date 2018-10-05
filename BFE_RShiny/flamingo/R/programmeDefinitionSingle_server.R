@@ -7,7 +7,7 @@
 #' @template return-outputNavigation
 #' @rdname programmeDefinitionSingle
 #' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDT dataTableProxy selectRows DTOutput
+#' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
 #' @importFrom dplyr mutate select case_when
 #' @importFrom shinyjs onclick js removeClass addClass
 #' @export
@@ -26,6 +26,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   stop_selProgID <- check_selProgID <- 0
   
   stop_selProgOasisID <- check_selProgOasisID <- 0
+  
+  #number of Rows per Page in a dataable
+  pageLength <- 5
+  
+  '%notin%' <- Negate('%in%')
   
   result <- reactiveValues(
     # reactive values for the programme table
@@ -94,7 +99,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     
     # manual refresh button
     invisible(input$abuttonprgtblrfsh)
-
+    
     logMessage("re-rendering programme table")
     if (!is.null(result$DPProgData)) {
       if (isolate(input$selectprogrammeID) != "<Select>") {
@@ -103,7 +108,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         rowToSelect <- 1
       }
       datatable(
-        result$DPProgData,
+        result$DPProgData %>% select(-c(ProgrammeTranformID(), ProgrammeAccountID())),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -167,7 +172,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   # > Create / Amend Programme sub-panel -----------------------------------------------
-
+  
   # Create/Amend programme title
   output$paneltitleDefineProgramme <- renderUI({
     if (result$prog_flag == "C" || is.null(input$tableDPprog_rows_selected)) {
@@ -231,6 +236,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       }
     } else if (result$prog_flag == "A") { # && length(input$tableDPprog_rows_selected) > 0
       idxSel <- input$tableDPprog_rows_selected
+      pageSel <- ceiling(input$tableDPprog_rows_selected/pageLength)
       query <- paste0("exec dbo.updateProg ", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()],
                       ",[", input$tinputDPProgName,"],", input$sinputDPAccountName,
                       ", [", input$sinputTransformname, "]")
@@ -249,6 +255,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     .reloadDPProgData()
     logMessage(paste("updating tableDPprog select because programme table was reloaded:", idxSel))
     selectRows(dataTableProxy("tableDPprog"), idxSel)
+    selectPage(dataTableProxy("tableDPprog"), pageSel)
     logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
   })
   
@@ -615,23 +622,27 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     bl_dirty <- stop_selProgID > check_selProgID
     logMessage(paste("--- stop_selProgID is:", stop_selProgID))
     if (active()) {
-    if (input$selectprogrammeID != "<Select ProgID>") {
-      if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
-        logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
-        rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, ProgrammeID()])
-        #backward propagation
-        # if (is.null(input$tableDPprog_rows_selected)) {
-        #   selectRows(dataTableProxy("tableDPprog"), rowToSelect)
-        # } else
-        if (!is.null(input$tableDPprog_rows_selected) && rowToSelect != input$tableDPprog_rows_selected) {
-          # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
-          selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+      if (input$selectprogrammeID != "<Select ProgID>") {
+        if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
+          logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
+          rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, ProgrammeID()])
+          pageSel <- ceiling(rowToSelect/pageLength)
+          #backward propagation
+          # if (is.null(input$tableDPprog_rows_selected)) {
+          #   selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+          #   selectPage(dataTableProxy("tableDPprog"), pageSel)
+          # } else
+          if (!is.null(input$tableDPprog_rows_selected) && rowToSelect != input$tableDPprog_rows_selected) {
+            # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
+            selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+            selectPage(dataTableProxy("tableDPprog"), pageSel)
+          }
         }
+      } else {
+        selectRows(dataTableProxy("tableDPprog"), NULL)
+        selectPage(dataTableProxy("tableDPprog"), 1)
       }
-    } else {
-      selectRows(dataTableProxy("tableDPprog"), NULL) 
-    }
-    .reloadPOData()
+      .reloadPOData()
     }
     if (bl_dirty) check_selProgID <<- check_selProgID + 1
   })
@@ -651,7 +662,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       }
       
       datatable(
-        result$POData,
+        result$POData %>% select(-c(ProgOasisSourceFileId(), ProgOasisFileID())),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -728,9 +739,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   onclick("abuttoncrprogoasis", {
     if (isolate(input$sinputookprogid) > 0 && isolate(input$sinputookmodelid) > 0) {
       progOasisId <- createProgOasis(dbSettings,
-                                            isolate(input$sinputookprogid),
-                                            isolate(input$sinputookmodelid),
-                                            isolate(input$sinputProgModTransform))
+                                     isolate(input$sinputookprogid),
+                                     isolate(input$sinputookmodelid),
+                                     isolate(input$sinputProgModTransform))
       ifelse(is.null(progOasisId), -1, result$progOasisId)
       if (result$progOasisId == -1) {
         showNotification(type = "error",
@@ -742,7 +753,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         workflowSteps$update("3")
         .reloadPOData()
         idxSel <- match(result$progOasisId, result$POData[, ProgOasisId()])
+        pageSel <- ceiling(idxSel/pageLength)
         selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
+        selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
         loadprogmodel <- loadProgrammeModel(
           apiSettings,
           progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisId()])
@@ -840,20 +853,23 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
           logMessage(paste("updating prcrundata select because selectprogOasisID changed to", input$selectprogOasisID))
           rowToSelect <- match(input$selectprogOasisID, result$POData[, ProgOasisId()])
+          pageSel <- ceiling(rowToSelect/pageLength)
           if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
             # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
-          selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
+            selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
+            selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
           }
         } 
       } else {
         result$prcrundata <- NULL
         selectRows(dataTableProxy("tableProgOasisOOK"), NULL)
+        selectPage(dataTableProxy("tableProgOasisOOK"), 1)
       }
     }
     if (bl_dirty1) check_selProgOasisID <<- check_selProgOasisID + 1
   })
   
-
+  
   ### > Process Run Table -----
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioprrunsAllOrInProgress, ignoreInit = TRUE, {
@@ -871,16 +887,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       prcrundata <- getProcessRun(dbSettings, prcid, input$radioprrunsAllOrInProgress)
       StatusGood <- "Completed"
       StatusBad <- c("Failed", "Cancelled", NA_character_)
-      '%notin%' <- Negate('%in%')
       # RSc TODO: should probably allow NULL to clear connections when selecting
       # a ProgOasisID that has no runs
       if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
         show("tableprocessrundata")
         show("divprocessRunButtons")
         result$prcrundata <- prcrundata %>%
-        mutate(ProcessRunStatus = case_when(ProcessRunStatus %in% StatusGood ~ StatusCompleted,
-                                            ProcessRunStatus %in% StatusBad ~ StatusFailed,
-                                            ProcessRunStatus %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
+          select(-ProcessRunStatus) %>%
+          mutate(ProcessRunStatus = case_when(ProcessRunStatus %in% StatusGood ~ StatusCompleted,
+                                              ProcessRunStatus %in% StatusBad ~ StatusFailed,
+                                              ProcessRunStatus %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
           as.data.frame()
         #Handling bug for 'In Progress' 
         if (input$radioprrunsAllOrInProgress == "In_Progress") {
@@ -962,6 +978,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     .defaultview(session)
     show("panelDefineOutputs")
     selectRows(dataTableProxy("tableprocessrundata"), selected = NULL)
+    selectPage(dataTableProxy("tableprocessrundata"), 1)
   })
   
   onclick("abuttonrerunpr", {
@@ -1240,7 +1257,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
           .reloadRunData()
           logMessage(paste("colnames are:", paste(colnames(result$prcrundata), collapse = ", ")))
           rowToSelect <- match(runId, result$prcrundata[, ProcessRunID()])
+          pageSel <- ceiling(rowToSelect/pageLength)
           selectRows(dataTableProxy("tableprocessrundata"), rowToSelect)
+          selectPage(dataTableProxy("tableprocessrundata"), pageSel)
         } else {
           showNotification(type = "warning",
                            sprintf("Created Process Run ID: %s. But process run executing failed.",
@@ -1357,7 +1376,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       result$prrunid <- -1
     }
   }) 
-
+  
   
   # reload functions --------------------------------------------------------
   # Reload Programme table
@@ -1383,12 +1402,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       
       stmt <- buildDbQuery("getProgFileDetails", progId)
       progDetails <- executeDbQuery(dbSettings, stmt)
-      
+      StatusGood <- "Loaded"
+      StatusBad <- c("Failed", "Cancelled", NA_character_)
       if (!is.null(progDetails)) {
         result$progDetails  <- progDetails %>%
-          mutate(Status = replace(Status, Status == "Failed", StatusFailed)) %>%
-          mutate(Status = replace(Status, Status != "Loaded" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
-          mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
+          mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
+                                    Status %in% StatusBad ~ StatusFailed,
+                                    Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
           as.data.frame()
       }
       logMessage("programme details table refreshed")
@@ -1403,12 +1423,14 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   .reloadPOData <- function() {
     if (input$selectprogrammeID != "<Select>") {
       POData <- getProgOasisForProgdata(dbSettings, input$selectprogrammeID)
+      StatusGood <- "Loaded"
+      StatusBad <- c("Failed", "Cancelled", NA_character_)
       if (!is.null(POData)) {
         result$POData <- POData %>%
           select(c("ProgOasisId", "ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status")) %>%
-          mutate(Status = replace(Status, Status == "Failed" | is.na(Status), StatusFailed)) %>%
-          mutate(Status = replace(Status, Status != "Loaded" & Status != "Failed" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
-          mutate(Status = replace(Status, Status == "Loaded", StatusCompleted)) %>%
+          mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
+                                    Status %in% StatusBad ~ StatusFailed,
+                                    Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
           as.data.frame()
       }
       logMessage("programme model table refreshed")
@@ -1462,7 +1484,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       search = list(caseInsensitive = TRUE),
       searchHighlight = TRUE,
       processing = 0,
-      pageLength = 5,
+      pageLength = pageLength,
       autoWidth = TRUE,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
