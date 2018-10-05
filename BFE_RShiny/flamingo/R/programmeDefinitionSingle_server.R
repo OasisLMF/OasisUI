@@ -647,6 +647,17 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (bl_dirty) check_selProgID <<- check_selProgID + 1
   })
   
+  ### Creating reactive for selectors of Programme Model Table
+  # result$POData
+  #"ProgOasisId", ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status"
+  ProgOasisId <- reactive(names(result$POData)[1])
+  ProgOasisName <- reactive(names(result$POData)[2])
+  ProgOasisModelName <- reactive(names(result$POData)[3])
+  ProgOasisTransformName <- reactive(names(result$POData)[4])
+  ProgOasisSourceFileId <- reactive(names(result$POData)[5])
+  ProgOasisFileID <- reactive(names(result$POData)[6])
+  ProgOasisStatus <- reactive(names(result$POData)[7])
+  
   # > Programme Model Table --------------------------
   
   output$tableProgOasisOOK <- renderDT(
@@ -655,8 +666,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       # manual refresh button
       invisible(input$abuttonookrefresh)
       
+      print(names(result$POData))
+      
       if (isolate(input$selectprogOasisID) != "<Select>") {
-        rowToSelect <- match(isolate(input$selectprogOasisID), result$POData[,1])
+        rowToSelect <- match(isolate(input$selectprogOasisID), result$POData[,ProgOasisId()])
       } else {
         rowToSelect <- 1
       }
@@ -752,11 +765,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         .clearOOKSidebar()
         workflowSteps$update("3")
         .reloadPOData()
-        idxSel <- match(result$progOasisId, result$POData[, 1])
+        idxSel <- match(result$progOasisId, result$POData[, ProgOasisId()])
         selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
         loadprogmodel <- loadProgrammeModel(
           apiSettings,
-          progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, 1])
+          progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisId()])
         )
         if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
           showNotification(type = "message", "Initiating load programme model.")
@@ -791,13 +804,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     
     # Show perils according to programme model
     if (length(input$tableProgOasisOOK_rows_selected) > 0 ) {
-      prgId <- result$POData[input$tableProgOasisOOK_rows_selected, 1]
+      prgId <- result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisId()]
       procId <- toString(prgId)
       
       logMessage(paste("updating selectprogOasisID because selection in programme model table changed to",  prgId))
       updateSelectInput(session, inputId = "selectprogOasisID", selected = prgId)
       
-      if (result$POData[input$tableProgOasisOOK_rows_selected, "Status"] == StatusCompleted) {
+      if (result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisStatus()] == StatusCompleted) {
         paramlist <- executeDbQuery(dbSettings,
                                     buildDbQuery("getRuntimeParamList", procId))
         hide("perilwind")
@@ -825,12 +838,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Add choices possibilities to selectprogOasisID
   observeEvent(result$POData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(result$POData) && nrow(result$POData) > 0) {
-      updateSelectInput(session, inputId = "selectprogOasisID", choices =  c("<Select>",result$POData[, 1]))
+      updateSelectInput(session, inputId = "selectprogOasisID", choices =  c("<Select>",result$POData[, ProgOasisId()]))
       if (input$selectprogrammeID != "<Select>") {
         logMessage(paste("updating selectprogOasisID choices based on Programme Model Table"))
-        print(" result$POData[1, 1]")
-        print( result$POData[1, 1])
-        updateSelectInput(session, inputId = "selectprogOasisID", selected = result$POData[1, 1])
+        print(" result$POData[1, ProgOasisId()]")
+        print( result$POData[1, ProgOasisId()])
+        updateSelectInput(session, inputId = "selectprogOasisID", selected = result$POData[1, ProgOasisId()])
       } else {
         updateSelectInput(session, inputId = "selectprogOasisID", selected = "<Select>")
       }
@@ -851,7 +864,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       if (input$selectprogOasisID != "<Select>") {
         if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
           logMessage(paste("updating prcrundata select because selectprogOasisID changed to", input$selectprogOasisID))
-          rowToSelect <- which(result$POData[, 1] == input$selectprogOasisID)
+          rowToSelect <- match(input$selectprogOasisID, result$POData[, ProgOasisId()])
           if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
             # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
           selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
@@ -938,8 +951,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Process Run Table Title
   output$paneltitlepanelProcessRunTable <- renderUI({
-    progOasisId <- result$POData[input$tableProgOasisOOK_rows_selected, 1]
-    progOasisName <- result$POData[input$tableProgOasisOOK_rows_selected, 2]
+    progOasisId <- result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisId()]
+    progOasisName <- result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisName()]
     paste0("Process Runs for Model", " - ", progOasisName," (id: ", progOasisId, ")")
   })
   
@@ -1150,7 +1163,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # A function to generate process run
   .generateRun <- function() {
     prTable <- getProcessData(dbSettings, userId(), 0, 0, 0)
-    prgId <- result$POData[input$tableProgOasisOOK_rows_selected,1]
+    prgId <- result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisId()]
     if (is.null(prgId)) { 
       result$progOasisID <- -1
     } else {
@@ -1431,7 +1444,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   .reloadProgFiles <- function() {
     if (length(input$tableProgOasisOOK_rows_selected) > 0) {
       # result$progOasisId is updated when creating a model or when selecting a model
-      result$progOasisId <- toString(result$POData[input$tableProgOasisOOK_rows_selected, 1])
+      result$progOasisId <- toString(result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisId()])
       stmt <- buildDbQuery("getProgOasisFileDetails", result$progOasisId)
       progFiles <- executeDbQuery(dbSettings, stmt)
       if (!is.null(progFiles)) {
