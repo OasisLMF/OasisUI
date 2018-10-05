@@ -50,13 +50,14 @@ panelProgrammeTable <- function(id) {
       actionButton(inputId = ns("abuttonprgtblrfsh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableDPprog")),
+    actionButton(ns("buttoncreatepr"), "Create Programme", class = "btn btn-primary", align = "centre"),
     actionButton(ns("buttonamendpr"), "Amend Programme", class = "btn btn-primary", align = "centre"),
     actionButton(ns("buttondeletepr"), "Delete Programme", class = "btn btn-primary", align = "right"),
-    actionButton(ns("buttonprogdetails"), "Show Programme Details", class = "btn btn-primary", align = "right")
+    actionButton(ns("buttonprogdetails"), "Show Details", class = "btn btn-primary", align = "right")
   )
 }
 
-#' Function wrapping panel to show programme details table
+#' Function wrapping panel to show details of programme
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -66,8 +67,8 @@ panelProgrammeDetails <- function(id) {
     collapsible = FALSE,
     ns("progdtl"),
     heading = tagAppendChildren(
-      h4("Programme Details"),
-      uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE), 
+      h4("Details of Programme"),
+      uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttondefprogrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
@@ -80,12 +81,12 @@ panelProgrammeDetails <- function(id) {
 panelDefineProgramme <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    # collapsible = TRUE,
-    # show = TRUE,
+    
     collapsible = FALSE,
     ns("progdef"),
     heading = tagAppendChildren(
-      h4("New Programme"),
+      h4(""),
+      uiOutput(ns("paneltitleDefineProgramme"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidedefineprogpanel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     fluidRow(
@@ -102,7 +103,7 @@ panelDefineProgramme <- function(id) {
                        placement = "right",
                        options = list(container = "body")))),
     fluidRow(column(4,
-                    actionButton(ns("abuttonProgSubmit"), "Create Programme", class = "btn btn-primary")), style = "float:right"),
+                    actionButton(ns("abuttonProgSubmit"), "Submit", class = "btn btn-primary")), style = "float:right"),
     fluidRow(
       column(12, h4("Link input files to programme"))),
     fluidRow(
@@ -201,15 +202,16 @@ panelProgrammeModelTable <- function(id) {
     show = TRUE,
     ns("progmodeltbl"),
     heading = tagAppendChildren(
-      h4("Programme Model Table"),
+      h4(""),
+      uiOutput(ns("paneltitleProgrammeModelTable"), inline = TRUE),
       actionButton(inputId = ns("abuttonookrefresh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableProgOasisOOK")),
-    fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Programme Model Details", class = "btn btn-primary"))) #, align = "right"
+    fluidRow(column(12, actionButton(ns("buttonmodeldetails"), "Show Details", class = "btn btn-primary"))) #, align = "right"
   )
 }
 
-#' Function wrapping panel to show programme model details table
+#' Function wrapping panel to show details of programme table
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -219,7 +221,8 @@ panelModelDetails <- function(id) {
     collapsible = FALSE,
     ns("progmodeldtl"),
     heading = tagAppendChildren(
-      h4("Programme Model Details"),
+      h4(""),
+      uiOutput(ns("paneltitleProgrammeModelDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttonprgoasisrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
@@ -236,7 +239,10 @@ panelAssociateModel <- function(id) {
     collapsible = TRUE,
     show = FALSE,
     ns("progmodel"),
-    heading = h4("Associate Model"),
+    heading = tagAppendChildren(
+      h4(""),
+      uiOutput(ns("paneltitleAssociateModel"), inline = TRUE)
+    ),
     fluidRow(
       column(4,
              selectInput(ns("sinputookprogid"), "Programme:", choices = c(""))),
@@ -266,7 +272,8 @@ panelProcessRunTable <- function(id) {
     show = TRUE,
     ns("runs"),
     heading = tagAppendChildren(
-      h4("Process Runs"),
+      h4(""),
+      uiOutput(ns("paneltitlepanelProcessRunTable"), inline = TRUE),
       actionButton(inputId = ns("abuttonrefreshprrun"), label = "Refresh", style = "float: right;")
     ),
     div(id = "divProcessRun",
@@ -276,8 +283,9 @@ panelProcessRunTable <- function(id) {
         fluidRow(column(12,
                         div(id = ns("divprocessRunButtons"),
                             actionButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration", class = "btn btn-primary"),
+                            actionButton(inputId = ns("abuttondisplayoutput"), label = "Browse Run Outputs", class = "btn btn-primary"),
                             actionButton(inputId = ns("abuttonrerunpr"), label = "Rerun", class = "btn btn-primary"),
-                            actionButton(inputId = ns("abuttonshowlog"), label = "Show Process Run Log", class = "btn btn-primary"),
+                            actionButton(inputId = ns("abuttonshowlog"), label = "Show Log", class = "btn btn-primary"),
                             div(
                               actionButton(inputId = ns("abuttondisplayoutput"), label = "Go To Display Output", class = "btn btn-primary")
                               , style = "inline: true;float: right;")
@@ -286,7 +294,7 @@ panelProcessRunTable <- function(id) {
   )
 }
 
-#' Function wrapping panel to show Process Run logs table
+#' Function wrapping panel to show log table for specific Process Run
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -296,7 +304,8 @@ panelProcessRunLogs <- function(id) {
     collapsible = FALSE,
     ns("runlogs"),
     heading = tagAppendChildren(
-      h4("Process Run Logs"), actionButton(inputId = ns("abuttonrefreshprrunlogs"), label = "Refresh", style = "float: right;"),
+      h4(""),
+      uiOutput(ns("paneltitleProcessRunLogs"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("tablelog"))
@@ -313,9 +322,10 @@ panelDefineOutputs <- function(id) {
     collapsible = FALSE,
     ns("progout"),
     heading = tagAppendChildren(
-      h4("Define Programme Output"),
-      actionButton(inputId = ns("abuttonehidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
+      h4(""),
+      uiOutput(ns("paneltitleReDefineProgramme"), inline = TRUE),
+      actionButton(inputId = ns("abuttonhidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;")
+      ),
     fluidRow(
       column(4,
              panelDefineOutputsDetails(id)),
