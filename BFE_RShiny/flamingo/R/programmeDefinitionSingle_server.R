@@ -88,8 +88,20 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Section 'Choose Programme' = '1' ------------------------------------------
   
+  ### Creating reactive for selectors of Programme Table
+  #result$DPProgData
+  #"Programme ID", "Programme Name", "Account ID", "Account Name", "Transform ID", "Transform", "Status"
+  ProgrammeID <- reactive(names(result$DPProgData)[1])
+  ProgrammeName <- reactive(names(result$DPProgData)[2])
+  ProgrammeAccountID <- reactive(names(result$DPProgData)[3])
+  ProgrammeAccountName <- reactive(names(result$DPProgData)[4])
+  ProgrammeTranformID <- reactive(names(result$DPProgData)[5])
+  ProgrammeTranform <- reactive(names(result$DPProgData)[6])
+  ProgrammeStatus <- reactive(names(result$DPProgData)[7])
+  
   ### > Programme Table ------
   output$tableDPprog <- renderDT({
+    print(names(result$DPProgData))
     
     # manual refresh button
     invisible(input$abuttonprgtblrfsh)
@@ -97,7 +109,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     logMessage("re-rendering programme table")
     if (!is.null(result$DPProgData)) {
       if (isolate(input$selectprogrammeID) != "<Select>") {
-        rowToSelect <- match(isolate(input$selectprogrammeID), result$DPProgData[, 1])
+        rowToSelect <- match(isolate(input$selectprogrammeID), result$DPProgData[, ProgrammeID()])
       } else {
         rowToSelect <- 1
       }
@@ -116,13 +128,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     } else {
       .nothingToShowTable(contentMessage = "No Programme Available")
     }
-  })
-  
-  #  Programme Table title
-  output$paneltitleProgrammeModelTable <- renderUI({
-    progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
-    paste0("Models Table", " - ", progName," (id: ", progId, ")")
   })
   
   # > Programme Details Table-----
@@ -149,8 +154,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Title Programme Details Panel
   output$paneltitleProgrammeDetails <- renderUI({
-    progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]
     paste0("- ", progName, " (id: ", progId, ")")
   })
   
@@ -179,8 +184,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (result$prog_flag == "C" || is.null(input$tableDPprog_rows_selected)) {
       "Create Programme"
     } else if (result$prog_flag == "A") {
-      progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
-      progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
+      progId <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
+      progName <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]
       paste0("Amend Programme", "- ", progName, " (id: ", progId, ")")
     }
   })
@@ -237,17 +242,17 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       }
     } else if (result$prog_flag == "A") { # && length(input$tableDPprog_rows_selected) > 0
       idxSel <- input$tableDPprog_rows_selected
-      query <- paste0("exec dbo.updateProg ", result$DPProgData[input$tableDPprog_rows_selected, 1],
+      query <- paste0("exec dbo.updateProg ", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()],
                       ",[", input$tinputDPProgName,"],", input$sinputDPAccountName,
                       ", [", input$sinputTransformname, "]")
       res <- executeDbQuery(dbSettings, query)
       message(paste("A res is:", res))
       if (is.null(res)) {
         showNotification(type = "error",
-                         paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, 2]))
+                         paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]))
       } else {
         showNotification(type = "message",
-                         paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, 2], " amended."))
+                         paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()], " amended."))
       }
     } 
     
@@ -271,11 +276,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   onclick("buttonloadcanmodpr", {
     # if (length(input$tableDPprog_rows_selected) > 0) {
     #loadprogdata <- "success"
-    #progId = result$DPProgData[input$tableDPprog_rows_selected, 1]
+    #progId = result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
     #logMessage(paste("loading programme - progId is:", progId))
     loadprogdata <- loadProgrammeData(
       apiSettings,
-      progId = result$DPProgData[input$tableDPprog_rows_selected, 1]
+      progId = result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
     )
     if (loadprogdata == 'success' || loadprogdata == 'Success') {
       showNotification(type = "message", "Initiating load programme data...")
@@ -292,10 +297,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Delete Programme
   onclick("buttondeletepr",{
     if (length(input$tableDPprog_rows_selected) > 0) {
-      stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, 1])
+      stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()])
       executeDbQuery(dbSettings, stmt)
       showNotification(type = "message",
-                       sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, 2]))
+                       sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]))
       .reloadDPProgData()
     } else {
       showNotification(type = "warning", "Please select a Programme to Delete")
@@ -313,7 +318,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       if (flcopy == TRUE) {
         recordId <- createFileRecord(
           dbSettings, inFile[1, 1], recordIdString, recordIdCode, flc, userId(),
-          "Prog", result$DPProgData[input$tableDPprog_rows_selected, 1]
+          "Prog", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
         )
         if (!is.null(recordId)) {
           showNotification(type = "message",
@@ -351,13 +356,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       res <- executeDbQuery(dbSettings,
                             paste(query,
                                   inputID, ", ",
-                                  result$DPProgData[input$tableDPprog_rows_selected, 1]))
+                                  result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]))
       if (inputID != "") {
         if (is.null(res)) {
           showNotification(type = "error", "Failed to link the File!")
         } else {
           showNotification(type = "message",
-                           paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, 2]))
+                           paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]))
         }
       } else {
         showNotification(type = "warning", "Please select a file to Link")
@@ -586,7 +591,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (length(input$tableDPprog_rows_selected) > 0) {
       logMessage(paste("input$tableDPprog_rows_selected is:", input$tableDPprog_rows_selected))
       # note that tableDPprog allows single row selection only
-      prgId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
+      prgId <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
       if (prgId != input$selectprogrammeID) {
         # re-selecting the same programme ID in the drop-down would not re-trigger
         # any of the observers of the drop-down, however we then also want to be
@@ -608,12 +613,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     logMessage(paste0("updating selectprogrammeID choices because programme table was reloaded - contains ", nrow(result$DPProgData), " rows"))
     if (input$selectprogrammeID == "<Select>") {
       # initial selection last programme created
-      prgId <- result$DPProgData[1, 1]
+      prgId <- result$DPProgData[1, ProgrammeID()]
     } else {
       # keep current selection
       prgId <- input$selectprogrammeID
     }
-    updateSelectInput(session, inputId = "selectprogrammeID", choices = c("<Select>", result$DPProgData[, 1]), selected = prgId)
+    updateSelectInput(session, inputId = "selectprogrammeID", choices = c("<Select>", result$DPProgData[, ProgrammeID()]), selected = prgId)
   })
   
   # If selectprogrammeID changes, reload programme model table and set view back to default
@@ -624,7 +629,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (input$selectprogrammeID != "<Select ProgID>") {
       if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
         logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
-        rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, 1])
+        rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, ProgrammeID()])
         #backward propagation
         # if (is.null(input$tableDPprog_rows_selected)) {
         #   selectRows(dataTableProxy("tableDPprog"), rowToSelect)
@@ -672,10 +677,17 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   )
   
-  # Programme Model Table Title
+  #  Programme Model Table title
+  output$paneltitleProgrammeModelTable <- renderUI({
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]
+    paste0("Models Table for Programme", " - ", progName," (id: ", progId, ")")
+  })
+  
+  # Associate Model Table Title
   output$paneltitleAssociateModel <- renderUI({
-    progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]
     paste0("Associate Model to Programme", " - ", progName, " (id: ", progId, ")")
   })
   
@@ -702,7 +714,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Details Model title
   output$paneltitleProgrammeModelDetails <- renderUI({
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, 2]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]
     paste0("Details Programme Model", " - ", progName, " (id: ", result$progOasisId, ")")
   })
   
@@ -928,7 +940,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   output$paneltitlepanelProcessRunTable <- renderUI({
     progOasisId <- result$POData[input$tableProgOasisOOK_rows_selected, 1]
     progOasisName <- result$POData[input$tableProgOasisOOK_rows_selected, 2]
-    paste0("Process Runs", " - ", progOasisName," (id: ", progOasisId, ")")
+    paste0("Process Runs for Model", " - ", progOasisName," (id: ", progOasisId, ")")
   })
   
   #Not allow any actions if the process run table is empty
@@ -947,7 +959,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (length(input$tableprocessrundata_rows_selected) > 0) {
       processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, 1]
       processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, 2]
-      paste0("Re-Define Programme Output", " - ", processRunName, " (id: ", processRunId, ")")
+      paste0("Re-Define Output Configuration for Process", " - ", processRunName, " (id: ", processRunId, ")")
     } else {
       "New Output Configuration"
     }
@@ -1375,7 +1387,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Reload Programme Details table
   .reloadProgDetails <- function() {
     if (length(input$tableDPprog_rows_selected) > 0) {
-      progId <- result$DPProgData[input$tableDPprog_rows_selected, 1]
+      progId <- result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
       
       stmt <- buildDbQuery("getProgFileDetails", progId)
       progDetails <- executeDbQuery(dbSettings, stmt)
@@ -1563,12 +1575,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     accounts <- getAccountName(dbSettings)
     updateSelectInput(session, "sinputDPAccountName",
                       choices = createSelectOptions(accounts, "Select Account"),
-                      selected = toString(result$DPProgData[input$tableDPprog_rows_selected, 3]))
+                      selected = toString(result$DPProgData[input$tableDPprog_rows_selected, ProgrammeAccountID()]))
   }
   
   .updateProgrammeName <- function() {
     updateTextInput(session, "tinputDPProgName",
-                    value = result$DPProgData[input$tableDPprog_rows_selected, 2])
+                    value = result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()])
   }
   
   .updateTransformNameSelection <- function() {
@@ -1576,7 +1588,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     updateSelectInput(session, "sinputTransformname",
                       choices = createSelectOptions(transforms, "Select Transform",
                                                     labelCol = 1, valueCol = 2),
-                      selected = toString(result$DPProgData[input$tableDPprog_rows_selected, 5]))
+                      selected = toString(result$DPProgData[input$tableDPprog_rows_selected, ProgrammeTranformID()]))
   }
   
   
@@ -1607,7 +1619,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   .updateOOKProgrammeSelection <- function() {
     programmes <- getProgrammeList(dbSettings)
     if (length(input$tableDPprog_rows_selected) > 0 ) {
-      selection <- toString(result$DPProgData[input$tableDPprog_rows_selected, 1])
+      selection <- toString(result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()])
     } else {
       selection <- "Select Programme"
     }
