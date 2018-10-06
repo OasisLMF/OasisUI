@@ -1485,7 +1485,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       searchHighlight = TRUE,
       processing = 0,
       pageLength = pageLength,
-      autoWidth = TRUE,
+      #width = "100%",
+      #autoWidth = TRUE,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }

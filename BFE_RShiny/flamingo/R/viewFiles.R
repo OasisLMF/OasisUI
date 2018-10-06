@@ -301,8 +301,9 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       scrollX = FALSE,
       pageLength = maxrowsperpage,
       preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
-      drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } '),
-      autoWidth = TRUE)
+      drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
+      #autoWidth = TRUE
+      )
     return(options)
   }
   
