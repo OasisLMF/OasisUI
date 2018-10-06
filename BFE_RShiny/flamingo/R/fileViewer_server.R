@@ -35,12 +35,15 @@ fileViewer <- function(
   # queries the database every time to update its dataset
   observe(if (active()) {
     stmt <- buildDbQuery("getFileViewerTable")
-    result$FLdata <- executeDbQuery(dbSettings, stmt)
+    FLdata <- executeDbQuery(dbSettings, stmt)
+    result$FLdata <- FLdata %>% select(-c(FileID, Source))
+    print(names(FLdata))
   })
   
   observeEvent(input$refreshtable, {
     stmt <- buildDbQuery("getFileViewerTable")
-    result$FLdata <- executeDbQuery(dbSettings, stmt)
+   FLdata <- executeDbQuery(dbSettings, stmt)
+   result$FLdata <- FLdata %>% select(-c(FileID, Source))
   })
 
   # Pre-select the correct runId
@@ -63,7 +66,6 @@ fileViewer <- function(
     includemrows = TRUE,
     includechkbox = TRUE)
 
-  ### Module Output ###########################################################
   
  # Module Outout ------------------------------------------------------------
  
