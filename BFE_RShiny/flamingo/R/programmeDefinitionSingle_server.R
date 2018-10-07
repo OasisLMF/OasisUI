@@ -155,11 +155,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Show Programme Details
   onclick("buttonprogdetails", {
-    logMessage("showing panelProgrammeDetails")
-    .reloadProgDetails()
     if (length(input$tableDPprog_rows_selected) > 0) {
       show("panelProgrammeDetails")
       hide("buttonprogdetails")
+      logMessage("showing panelProgrammeDetails")
+      .reloadProgDetails()
     } else {
       showNotification(type = "warning", "Please select a Programme first")
     }
@@ -270,24 +270,20 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   ### Load Programme Button
   onclick("buttonloadcanmodpr", {
-    # if (length(input$tableDPprog_rows_selected) > 0) {
-    #loadprogdata <- "success"
-    #progId = result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
-    #logMessage(paste("loading programme - progId is:", progId))
+    progId = result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
+    logMessage(paste("loading programme - progId is:", progId))
     loadprogdata <- loadProgrammeData(
       apiSettings,
-      progId = result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]
+      progId = progId
     )
     if (loadprogdata == 'success' || loadprogdata == 'Success') {
       showNotification(type = "message", "Initiating load programme data...")
+      # Going to next step when programme load is successful (but not completed)
       workflowSteps$update("2")
     } else {
-      showNotification(type = "error", "Failed to load programme data.")
+      showNotification(type = "error", "Failed to load programme data")
     }
     .reloadDPProgData()
-    # } else {
-    #   showNotification(type = "warning", "Please select a Programme to load programme data.")
-    # }
   })
   
   # Delete Programme
@@ -318,13 +314,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         )
         if (!is.null(recordId)) {
           showNotification(type = "message",
-                           paste("New File record id: ", recordId, " created."))
-          .reloadProgDetails()
+                           paste("New File record id: ", recordId, " created"))
+          #.reloadProgDetails()
         } else {
-          showNotification(type = "error", "Could not create file record.")
+          showNotification(type = "error", "Could not create file record")
         }
       } else {
-        showNotification(type = "error", "File transfer failed.")
+        showNotification(type = "error", "File transfer failed")
       }
     }
   }
@@ -355,7 +351,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                   result$DPProgData[input$tableDPprog_rows_selected, ProgrammeID()]))
       if (inputID != "") {
         if (is.null(res)) {
-          showNotification(type = "error", "Failed to link the File!")
+          showNotification(type = "error", "Failed to link the File")
         } else {
           showNotification(type = "message",
                            paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, ProgrammeName()]))
@@ -574,7 +570,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     logMessage("Updating many things because input$tableDPprog_rows_selected changed")
     # Update Programme Detail table if row selected changes
-    .reloadProgDetails()
+    #.reloadProgDetails()
     # Update Associate Model Panel
     .updateOOKProgrammeSelection()
     .clearOOKModelSelection()
@@ -742,15 +738,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                      isolate(input$sinputookprogid),
                                      isolate(input$sinputookmodelid),
                                      isolate(input$sinputProgModTransform))
-      ifelse(is.null(progOasisId), -1, result$progOasisId)
+      result$progOasisId <- ifelse(is.null(progOasisId), -1, progOasisId)
       if (result$progOasisId == -1) {
-        showNotification(type = "error",
-                         paste("No Prog Oasis created"))
+        showNotification(type = "error", paste("No Prog Oasis created"))
       } else {
-        showNotification(type = "message",
-                         paste("Prog Oasis id:", result$progOasisId,  " created."))
+        showNotification(type = "message", paste("Prog Oasis id:", result$progOasisId,  " created"))
         .clearOOKSidebar()
-        workflowSteps$update("3")
         .reloadPOData()
         idxSel <- match(result$progOasisId, result$POData[, ProgOasisId()])
         pageSel <- ceiling(idxSel/pageLength)
@@ -761,14 +754,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
           progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, ProgOasisId()])
         )
         if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
-          showNotification(type = "message", "Initiating load programme model.")
-          .reloadProgFiles()
+          showNotification(type = "message", "Initiating load programme model...")
+          #.reloadProgFiles()
+          # Going to next step when model load is successful (but not completed)
+          workflowSteps$update("3")
         } else {
-          showNotification(type = "error", "Failed to load programme model.")
+          showNotification(type = "error", "Failed to load programme model")
         }
       }
     } else{
-      showNotification(type = "warning", "Please select both the fields.")
+      showNotification(type = "warning", "Please select both the fields")
     }
   })
   
@@ -784,7 +779,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     
-    .reloadProgFiles()
+    #.reloadProgFiles()
     show("buttonmodeldetails")
     hide("panelModelDetails")
     
@@ -988,7 +983,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       .updateOutputConfig()
     } else {
       hide("panelDefineOutputs")
-      showNotification(type = "warning", "Please select Process Run")
+      showNotification(type = "warning", "Please select Process Run first")
     }
   })
   
@@ -1132,21 +1127,21 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       showModal(.modalsaveoutput())
     } else {
       removeModal()
-      showNotification(type = "warning", "Please select Output")
+      showNotification(type = "warning", "Please select Output Configuration")
     }
   })
   
   # Submit output configuration (to be saved)
   onclick("abuttonsubmitoutput", {
     if (input$tinputoutputname == "") {
-      showNotification(type = "warning", "Please enter Output Name")
+      showNotification(type = "warning", "Please enter Output Configuration Name")
     } else {
       stmt <- paste0("exec dbo.saveoutputoption @OutputOptionName = '",
                      input$tinputoutputname, "',@OutputOptionsList = '",
                      outputOptionsList(), "'")
       executeDbQuery(dbSettings, stmt)
+      showNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
       updateTextInput(session, "tinputoutputname", value = "")
-      showNotification(type = "message", "Output saved.")
       removeModal()
       .clearOutputOptions()
       #.defaultview(session)
@@ -1241,18 +1236,17 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Execute Process run: When "Execute Run" button is clicked - switsches view to Run panel
   onclick("abuttonexecuteprrun", {
     if (outputOptionsList() == "") {
-      showNotification(type = "warning", "Please select Output")
+      showNotification(type = "warning", "Please select Output Configuration")
     } else {
       runId <- .generateRun()
       if (is.null(runId)) {
         showNotification(type = "error",
-                         "Process Run ID could not be generated. So process run cannot be executed.")
+                         "Process Run ID could not be generated. So process run cannot be executed")
       } else {
         status <- runProcess(apiSettings, runId)
-        workflowSteps$update("4")
         if (grepl("success", status, ignore.case = TRUE)) {
           showNotification(type = "message",
-                           sprintf("Created Process Run ID: %s and process run is executing.",
+                           sprintf("Created Process Run ID: %s and process run is executing",
                                    runId))
           .reloadRunData()
           logMessage(paste("colnames are:", paste(colnames(result$prcrundata), collapse = ", ")))
@@ -1262,7 +1256,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
           selectPage(dataTableProxy("tableprocessrundata"), pageSel)
         } else {
           showNotification(type = "warning",
-                           sprintf("Created Process Run ID: %s. But process run executing failed.",
+                           sprintf("Created Process Run ID: %s. But process run executing failed",
                                    runId))
           hide("abuttondisplayoutput")
           show("panelProcessRunLogs")
@@ -1458,9 +1452,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       logMessage("files table refreshed")
     } else {
       result$progFiles <- NULL
-      # if (active()) {
-      #   showNotification(type = "warning", "Please select a Programme Model first")
-      # }
     }
     logMessage(".reloadProgFiles called")
     invisible()
