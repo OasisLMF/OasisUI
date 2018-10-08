@@ -37,7 +37,6 @@ fileViewer <- function(
     stmt <- buildDbQuery("getFileViewerTable")
     FLdata <- executeDbQuery(dbSettings, stmt)
     result$FLdata <- FLdata %>% select(-c(FileID, Source))
-    print(names(FLdata))
   })
   
   observeEvent(input$refreshtable, {
