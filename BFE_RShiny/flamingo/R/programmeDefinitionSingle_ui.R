@@ -93,11 +93,21 @@ panelDefineProgramme <- function(id) {
       column(12, h4("Programme metadata"))),
     fluidRow(
       column(4,
-             selectInput(inputId = ns("sinputDPAccountName"), label = "Account Name", choices = "")),
+             selectizeInput(ns("sinputDPAccountName"), "Account Name", choices = c(""), selected=character(0),
+                            options = list(
+                              allowEmptyOption = TRUE,
+                              placeholder = 'Select',
+                              onInitialize = I('function() { this.setValue(""); }'))
+             )),
       column(4,
              textInput(inputId = ns("tinputDPProgName"), label = "Programme Name")),
       column(4,
-             selectInput(inputId = ns("sinputTransformname"), label = "Transform Name", choices = ""),
+             selectizeInput(ns("sinputTransformname"), "Transform Name", choices = c(""), selected=character(0),
+                            options = list(
+                              allowEmptyOption = TRUE,
+                              placeholder = 'Select',
+                              onInitialize = I('function() { this.setValue(""); }'))
+             ),
              bsTooltip(ns("sinputTransformname"),
                        programme_Definition_Single$sinputTransformname,
                        placement = "right",
@@ -175,14 +185,30 @@ panelDefineIDs <- function(id) {
     fluidRow(
       div(id = ns("divselectprogrammeID"),
           column(3,
-                 selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = c("<Select>"), selected = "<Select>"),
+                 #selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = c("<Select>"), selected = "<Select>"),
+                 selectizeInput(inputId = ns("selectprogrammeID"), label = "Programme ID", 
+                                choices = c(), 
+                                selected=character(0),
+                                options = list(
+                                  allowEmptyOption = TRUE,
+                                  placeholder = 'Select',
+                                  onInitialize = I('function() { this.setValue(""); }'))
+                                ),
                  bsTooltip(ns("selectprogrammeID"),
                            programme_Definition_Single$selectprogrammeID,
                            placement = "right",
                            options = list(container = "body")))),
       hidden(div(id = ns("divselectprogOasisID"),
                  column(3,
-                        selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
+                        #selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
+                        selectizeInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", 
+                                       choices = c(), 
+                                       selected=character(0),
+                                       options = list(
+                                         allowEmptyOption = TRUE,
+                                         placeholder = 'Select',
+                                         onInitialize = I('function() { this.setValue(""); }'))
+                        ),
                         bsTooltip(ns("selectprogOasisID"),
                                   programme_Definition_Single$selectprogOasisID,
                                   placement = "right",
@@ -245,15 +271,30 @@ panelAssociateModel <- function(id) {
     ),
     fluidRow(
       column(4,
-             selectInput(ns("sinputookprogid"), "Programme:", choices = c(""))),
+             selectizeInput(ns("sinputookprogid"), "Programme:", choices = c(""), selected=character(0),
+                            options = list(
+                              allowEmptyOption = TRUE,
+                              placeholder = 'Select',
+                              onInitialize = I('function() { this.setValue(""); }'))
+                            )),
       column(4,
-             selectInput(ns("sinputookmodelid"), "Model:", choices = c(""))),
+             selectizeInput(ns("sinputookmodelid"), "Model:", choices = c(""), selected=character(0),
+                            options = list(
+                              allowEmptyOption = TRUE,
+                              placeholder = 'Select',
+                              onInitialize = I('function() { this.setValue(""); }'))
+                            )),
       column(4,
-             selectInput(ns("sinputProgModTransform"), "Transform Name", choices = ""),
+             selectizeInput(ns("sinputProgModTransform"), "Transform Name", choices = c("") , selected=character(0),
+                         options = list(
+                           allowEmptyOption = TRUE,
+                           placeholder = 'Select',
+                           onInitialize = I('function() { this.setValue(""); }'))
+                         )),
              bsTooltip(ns("sinputProgModTransform"),
                        programme_Definition_Single$sinputProgModTransform,
                        placement = "right",
-                       options = list(container = "body")))),
+                       options = list(container = "body"))),
     
     div(actionButton(inputId = ns("abuttoncrprogoasis"), label = "Create", class = "btn btn-primary"), style="float:right;")
   )
@@ -283,11 +324,10 @@ panelProcessRunTable <- function(id) {
         fluidRow(column(12,
                         div(id = ns("divprocessRunButtons"),
                             actionButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration", class = "btn btn-primary"),
-                            actionButton(inputId = ns("abuttondisplayoutput"), label = "Browse Run Outputs", class = "btn btn-primary"),
                             actionButton(inputId = ns("abuttonrerunpr"), label = "Rerun", class = "btn btn-primary"),
                             actionButton(inputId = ns("abuttonshowlog"), label = "Show Log", class = "btn btn-primary"),
                             div(
-                              actionButton(inputId = ns("abuttondisplayoutput"), label = "Go To Display Output", class = "btn btn-primary")
+                              actionButton(inputId = ns("abuttondisplayoutput"), label = "Browse Run Outputs", class = "btn btn-primary")
                               , style = "inline: true;float: right;")
                         )))
     )
