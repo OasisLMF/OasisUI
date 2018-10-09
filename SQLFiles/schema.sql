@@ -1,8 +1,8 @@
 -- (c) 2013-2016 Oasis LMF Ltd.  Software provided for early adopter evaluation only.
 --Flamingo Database Generation Script
 --Author: Ben Hayes
---Date: 2017-07-27
---Version: 0.394.0
+--Date: 2018-10-09
+--Version: 0.395.0
 
 
 -------------------------------------------------------------------------------
@@ -33,28 +33,28 @@ INSERT #TempVariables ([VariableType], [VariableName]) VALUES ('DBPassword',@DBP
 INSERT #TempVariables ([VariableType], [VariableName]) VALUES ('FileLocation',@EnvironmentName)
 INSERT #TempVariables ([VariableType], [VariableName]) VALUES ('Version',@Version)
 
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = 'IF EXISTS(SELECT * FROM sys.databases WHERE name = '''+(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'DatabaseName')+''') alter database '+ (SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'DatabaseName') + ' set single_user with rollback immediate'
 EXEC sp_executesql @SQL
 GO
 
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = 'IF EXISTS(SELECT * FROM sys.databases WHERE name = '''+(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'DatabaseName')+''') DROP Database ' + (SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'DatabaseName')
 EXEC sp_executesql @SQL
 GO
 
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = 'CREATE DATABASE [' + (SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'DatabaseName') + ']'
 EXEC sp_executesql @SQL
 GO
 
 --User Details
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = 'IF EXISTS (SELECT * FROM sys.syslogins WHERE name = '''+(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'LoginName')+''') DROP Login ' + (SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'LoginName')
 EXEC sp_executesql @SQL
 GO
 
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = '
 CREATE LOGIN ['+(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'LoginName')+'] 
 WITH PASSWORD=N''' + (SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'DBPassword') + ''', 
@@ -62,7 +62,7 @@ DEFAULT_DATABASE=['+(SELECT [VariableName] FROM #TempVariables WHERE [VariableTy
 CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF'
 EXEC sp_executesql @SQL
 GO
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = 'ALTER SERVER ROLE [sysadmin] ADD MEMBER [' +(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'LoginName')+']'
 EXEC sp_executesql @SQL
 GO
@@ -72,16 +72,16 @@ USE [Flamingo_%ENVIRONMENT_NAME%]   --------------------------------------------
 GO
 -----------------------------------------------------------------
 ------------------------------------------------------------------------------
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = 'CREATE USER ['+(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'LoginName')+'] FOR LOGIN ['+(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'LoginName')+']'
 EXEC sp_executesql @SQL
 GO
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = 'ALTER ROLE [db_owner] ADD MEMBER ['+(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'LoginName')+']'
 EXEC sp_executesql @SQL
 GO
 --configure to allow assemblies
-DECLARE @SQL NVARCHAR(2500)
+DECLARE @SQL NVARCHAR(max)
 SET @SQL = 'ALTER DATABASE ['+(SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'DatabaseName')+'] SET TRUSTWORTHY ON;'
 EXEC sp_executesql @SQL
 GO
@@ -103,22 +103,6 @@ CREATE TABLE [dbo].[Account]
 	[AccountName] [nvarchar](255) NULL,
 	[Deleted] [bit] NULL
 	)
-/*
-CREATE TABLE [dbo].[Correlation]
-	(
-	[CorrelationID] [int] PRIMARY KEY,
-	[CorrelationName] [nvarchar](255) NULL,
-	[ProgID] [int] NOT NULL
-	)
-CREATE TABLE [dbo].[CorrelationItem]
-	(
-	[CorrelationItemID] [int] PRIMARY KEY,
-	[CorrelationID] [int] NOT NULL,
-	[InterestRiskID] [int] NOT NULL,
-	[InterestSubRiskID] [int] NOT NULL,
-	[InterestExposureID] [int] NOT NULL
-	)
-*/
 CREATE TABLE [dbo].[CoverageItem]
 	(
 	[CoverageItemID] [int] PRIMARY KEY,
@@ -493,33 +477,16 @@ CREATE TABLE [dbo].[OasisFM_POLICYTC]
 	)
 CREATE TABLE [dbo].[OasisFM_PROFILE]
 	(
-	[policytc_id] [int] NOT NULL, 
-	[calcrule_id] [int] NOT NULL, 
-	[allocrule_id] [int] NOT NULL, 
-	[ccy_id] [int] NULL, 
-	[deductible] [float] NULL, 
-	[limit] [float] NULL, 
-	[share_prop_of_lim] [float] NULL, 
-	[deductible_prop_of_loss] [float] NULL, 
-	[limit_prop_of_loss] [float] NULL, 
-	[deductible_prop_of_tiv] [float] NULL, 
-	[limit_prop_of_tiv] [float] NULL, 
-	[deductible_prop_of_limit] [float] NULL
-	)
-CREATE TABLE [dbo].[OasisFM_PROFILE_ALLOC]
-	(
-	[policytc_id] [int] NOT NULL, 
-	[calcrule_id] [int] NOT NULL, 
-	[allocrule_id] [int] NOT NULL, 
-	[ccy_id] [int] NULL, 
-	[deductible] [float] NULL, 
-	[limit] [float] NULL, 
-	[share_prop_of_lim] [float] NULL, 
-	[deductible_prop_of_loss] [float] NULL, 
-	[limit_prop_of_loss] [float] NULL, 
-	[deductible_prop_of_tiv] [float] NULL, 
-	[limit_prop_of_tiv] [float] NULL, 
-	[deductible_prop_of_limit] [float] NULL
+	[profile_id] [int] NOT NULL,
+	[calcrule_id] [int] NOT NULL,
+	[deductible1] [float] NOT NULL,
+	[deductible2] [float] NOT NULL,
+	[deductible3] [float] NOT NULL,
+	[attachment1] [float] NOT NULL,
+	[limit1] [float] NOT NULL,
+	[share1] [float] NOT NULL,
+	[share2] [float] NOT NULL,
+	[share3] [float] NOT NULL
 	)
 CREATE TABLE [dbo].[OasisFM_XREF]
 	(
@@ -534,6 +501,12 @@ CREATE TABLE [dbo].[OasisFM_XREF_ALLOC]
 	[layer_id] [int] NOT NULL
 	)
 CREATE TABLE [dbo].[OasisFMSUMMARYXREF]
+	(
+	[output_id] [int] NOT NULL,
+	[summary_id] [int] NOT NULL,
+	[summaryset_id] [int] NOT NULL
+	)
+CREATE TABLE [dbo].[OasisRISUMMARYXREF]
 	(
 	[output_id] [int] NOT NULL,
 	[summary_id] [int] NOT NULL,
@@ -814,14 +787,6 @@ CREATE TABLE [dbo].[Field]
 	[FieldRule] [int] NULL,
 	[IsOasisField] [bit] NULL
 	)
-/*
-CREATE TABLE [dbo].[FieldRule]
-	(
-	[FieldRuleID] [int]  PRIMARY KEY,
-	[FieldID] [int] NOT NULL,
-	[RuleID] [int] NOT NULL
-	)
-*/
 CREATE TABLE [dbo].[Format]
 	(
 	[FormatID] [int] PRIMARY KEY,
@@ -867,16 +832,6 @@ CREATE TABLE [dbo].[ProfileValueDetail]
 	[CoverageTypeID] [int],
 	[ElementDimensionID] [int]
 	)
-/*
-CREATE TABLE [dbo].[Rule]
-	(
-	[RuleID] [int] PRIMARY KEY,
-	[RuleName] [nvarchar](255) NULL,
-	[RuleCode] [nvarchar](255) NULL,
-	[RuleErrorType] [nvarchar](255) NULL,
-	[RuleErrorMessage] [nvarchar](255) NULL
-	)
-*/
 CREATE TABLE [dbo].[Table]
 	(
 	[TableID] [int] PRIMARY KEY,
@@ -926,18 +881,11 @@ GO
 --Foreign Keys
 -------------------------------------------------------------------------------
 ALTER TABLE [dbo].[BFEUser] WITH CHECK ADD  CONSTRAINT [FK_BFEUser_CompanyID] FOREIGN KEY([CompanyID]) REFERENCES [dbo].[Company] ([CompanyID])
---ALTER TABLE [dbo].[Correlation] WITH CHECK ADD  CONSTRAINT [FK_Correlation_ProgID] FOREIGN KEY([ProgID]) REFERENCES [dbo].[Prog] ([ProgID])
---ALTER TABLE [dbo].[CorrelationItem] WITH CHECK ADD  CONSTRAINT [FK_CorrelationItem_CorrelationID] FOREIGN KEY([CorrelationID]) REFERENCES [dbo].[Correlation] ([CorrelationID])
---ALTER TABLE [dbo].[CorrelationItem] WITH CHECK ADD  CONSTRAINT [FK_CorrelationItem_InterestExposureID] FOREIGN KEY([InterestExposureID]) REFERENCES [dbo].[InterestExposure] ([InterestExposureID])
---ALTER TABLE [dbo].[CorrelationItem] WITH CHECK ADD  CONSTRAINT [FK_CorrelationItem_InterestRiskID] FOREIGN KEY([InterestRiskID]) REFERENCES [dbo].[InterestRisk] ([InterestRiskID])
---ALTER TABLE [dbo].[CorrelationItem] WITH CHECK ADD  CONSTRAINT [FK_CorrelationItem_InterestSubRiskID] FOREIGN KEY([InterestSubRiskID]) REFERENCES [dbo].[InterestSubRisk] ([InterestSubRiskID])
 ALTER TABLE [dbo].[CoverageItem] WITH CHECK ADD  CONSTRAINT [FK_CoverageItem_InterestExposureID] FOREIGN KEY([InterestExposureID]) REFERENCES [dbo].[InterestExposure] ([InterestExposureID])
 ALTER TABLE [dbo].[CoverageItem] WITH CHECK ADD  CONSTRAINT [FK_CoverageItem_InterestRiskID] FOREIGN KEY([InterestRiskID]) REFERENCES [dbo].[InterestRisk] ([InterestRiskID])
 ALTER TABLE [dbo].[CoverageItem] WITH CHECK ADD  CONSTRAINT [FK_CoverageItem_InterestSubRiskID] FOREIGN KEY([InterestSubRiskID]) REFERENCES [dbo].[InterestSubRisk] ([InterestSubRiskID])
 ALTER TABLE [dbo].[CoverageItem] WITH CHECK ADD  CONSTRAINT [FK_CoverageItem_PolicyCoverageID] FOREIGN KEY([PolicyCoverageID]) REFERENCES [dbo].[PolicyCoverage] ([PolicyCoverageID])
 ALTER TABLE [dbo].[Field] WITH CHECK ADD  CONSTRAINT [FK_Field_FormatID] FOREIGN KEY([FormatID]) REFERENCES [dbo].[Format] ([FormatID])
---ALTER TABLE [dbo].[FieldRule] WITH CHECK ADD  CONSTRAINT [FK_FieldRule_FieldID] FOREIGN KEY([FieldID]) REFERENCES [dbo].[Field] ([FieldID])
---ALTER TABLE [dbo].[FieldRule] WITH CHECK ADD  CONSTRAINT [FK_FieldRule_RuleID] FOREIGN KEY([RuleID]) REFERENCES [dbo].[Rule] ([RuleID])
 ALTER TABLE [dbo].[File] WITH CHECK ADD  CONSTRAINT [FK_File_FileTypeId] FOREIGN KEY([FileTypeId]) REFERENCES [dbo].[FileType] ([FileTypeId])
 ALTER TABLE [dbo].[File] WITH CHECK ADD  CONSTRAINT [FK_File_LocationID] FOREIGN KEY([LocationID]) REFERENCES [dbo].[Location] ([LocationID])
 ALTER TABLE [dbo].[File] WITH CHECK ADD  CONSTRAINT [FK_File_OwnerID] FOREIGN KEY([OwnerID]) REFERENCES [dbo].[Owner] ([OwnerID])
@@ -986,8 +934,6 @@ ALTER TABLE [dbo].[ProfileResource] WITH CHECK ADD  CONSTRAINT [FK_ProfileResour
 ALTER TABLE [dbo].[ProfileElement] WITH CHECK ADD  CONSTRAINT [FK_ProfileElement_FieldID] FOREIGN KEY([FieldID]) REFERENCES [dbo].[Field] ([FieldID])
 ALTER TABLE [dbo].[ProfileElement] WITH CHECK ADD  CONSTRAINT [FK_ProfileElement_ProfileID] FOREIGN KEY([ProfileID]) REFERENCES [dbo].[Profile] ([ProfileID])
 ALTER TABLE [dbo].[ProfileElement] WITH CHECK ADD  CONSTRAINT [FK_ProfileElement_TableID] FOREIGN KEY([TableID]) REFERENCES [dbo].[Table] ([TableID])
---ALTER TABLE [dbo].[ProfileElementRule] WITH CHECK ADD  CONSTRAINT [FK_ProfileElementRule_ProfileElementID] FOREIGN KEY([ProfileElementID]) REFERENCES [dbo].[ProfileElement] ([ProfileElementID])
---ALTER TABLE [dbo].[ProfileElementRule] WITH CHECK ADD  CONSTRAINT [FK_ProfileElementRule_RuleID] FOREIGN KEY([RuleID]) REFERENCES [dbo].[Rule] ([RuleID])
 ALTER TABLE [dbo].[ProfileValueDetail] WITH CHECK ADD  CONSTRAINT [FK_ProfileValueDetail_ProfileElementID] FOREIGN KEY([ProfileElementID]) REFERENCES [dbo].[ProfileElement] ([ProfileElementID])
 ALTER TABLE [dbo].[ProfileValueDetail] WITH CHECK ADD  CONSTRAINT [FK_ProfileValueDetail_PerilID] FOREIGN KEY([PerilID]) REFERENCES [dbo].[ModelPeril] ([ModelPerilID])
 ALTER TABLE [dbo].[ProfileValueDetail] WITH CHECK ADD  CONSTRAINT [FK_ProfileValueDetail_CoverageTypeID] FOREIGN KEY([CoverageTypeID]) REFERENCES [dbo].[ModelCoverageType] ([ModelCoverageTypeID])
@@ -1073,32 +1019,7 @@ GO
 -------------------------------------------------------------------------------
 --Stored Procedures
 -------------------------------------------------------------------------------
-
-
-/****** Object:  StoredProcedure [dbo].[updateLogDatabaseUsage]    Script Date: 30/09/2016 14:24:34 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[updateLogDatabaseUsage] 
-	(
-	@ProcedureName nvarchar(255),
-	@ParameterList nvarchar(2500) = NULL,
-	@LogTimestamp datetime
-	)
-AS
-SET NOCOUNT ON;
---declare @LogID int = (Select isnull(max(LogID),0) From LogDatabaseUsage) +1
-insert into LogDatabaseUsage (--LogID,
-				ProcedureName,ParameterList,LogTimestamp)
-select	--@logid,
-	@ProcedureName,@ParameterList,@LogTimestamp
---select @LogID
-GO
-
-
-
-/****** Object:  StoredProcedure [dbo].[addSecurityGroup]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[addSecurityGroup]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1129,9 +1050,9 @@ ELSE
 		INSERT INTO		[dbo].[UserSecurityGroup]
 		SELECT			@UserSecurityGroupID,@BFEUserID, @SecurityGroupID
 	END
-GO
 
-/****** Object:  StoredProcedure [dbo].[BFELogin]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[BFELogin]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1155,9 +1076,9 @@ BEGIN
 	
 	SELECT	@userid
 END
-GO
 
-/****** Object:  StoredProcedure [dbo].[createAccount]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[createAccount]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1182,9 +1103,9 @@ end
 
 INSERT INTO Account(AccountID,AccountName,Deleted)
 SELECT		@AccountID, @AccountName, 0
-GO
 
-/****** Object:  StoredProcedure [dbo].[createAPIErrorFileRecord]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[createAPIErrorFileRecord]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1233,8 +1154,9 @@ Update [FileResource] Set ResourceID = @LegacyResourceId Where ResourceID = @Res
 Insert Into [FileResource] Select @FileResourceId,@FileId,@ResourceId
 --update progoasisrecord
 Update ProgOasis Set API1bDateTime = getdate() Where ProgOasisID = @ProgOasisID
+
 GO
-/****** Object:  StoredProcedure [dbo].[createCompany]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[createCompany]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1261,9 +1183,9 @@ INSERT INTO [dbo].[Company]
            (@CompanyID, @CompanyName, @CompanyDomicile, @CompanyLegalName,@CompanyRegistrationNo, 0)
 SELECT @CompanyID
 END
-GO
 
-/****** Object:  StoredProcedure [dbo].[createFileRecord]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[createFileRecord]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1274,7 +1196,9 @@ SET NOCOUNT ON;
 ----------------------------------------------------------------------------
 --log database usage
 declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = ''
+declare	@ParameterList nvarchar(2500) = '@FileName: ' + @FileName + ', @FileDesc: ' + @FileDesc + ', @FileTypeID: ' + convert(varchar,@FileTypeID) + 
+							', @BFEUserID: ' + convert(varchar,@BFEUserID) + ', @LocationPathUnix: ' + @LocationPathUnix + ', @ResourceTable: ' + @ResourceTable + 
+							', @ResourceKey: ' + convert(varchar,@ResourceKey)
 declare	@LogTimestamp datetime = getdate()
 exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 ----------------------------------------------------------------------------
@@ -1285,6 +1209,8 @@ DECLARE @ResourceId int				= (SELECT ResourceId FROM [Resource] WHERE ResourceTa
 																	Case 
 																		When @FileTypeID = 101 THEN 101
 																		When @FileTypeID = 102 THEN 102
+																		When @FileTypeID = 401 THEN 401
+																		When @FileTypeID = 402 THEN 402
 																		End)
 DECLARE @LocationID int             = (SELECT LocationID from dbo.Location where LocationPathUnix = @LocationPathUnix)
 DECLARE @BFEUserName nvarchar(255)	= (SELECT BFEUserName from dbo.BFEUser where BFEUserID = @BFEUserID)
@@ -1304,9 +1230,9 @@ Insert Into [File] (FileId, [FileName],FileDesc,SourceID,OwnerID,LocationID,Date
 		Values(@FileId, @FileName, @FileDesc , 1, 1, @LocationID, getdate(), getdate(), NULL, @BFEUserName, @BFEUserName, NULL, @FileTypeID)
 Insert Into [FileResource] (FileResourceId, FileId, ResourceId) Select @FileResourceId, @FileId, @ResourceId
 SELECT @FileId
-GO
 
-/****** Object:  StoredProcedure [dbo].[createModelResource]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[createModelResource]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1334,8 +1260,9 @@ BEGIN
            (@ModelResourceID,@ModelResourceName,@ResourceTypeID,@OasisSystemID,@ModelID,@ModelResourceValue)
 	SELECT @ModelResourceID
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[createNewUser]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[createNewUser]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1354,9 +1281,9 @@ DECLARE @UserId int = (SELECT isnull(MAX(BFEUSERID),0) + 1 FROM dbo.BFEUSER)
 INSERT INTO BFEUser (BFEUserID, BFEUserName, CompanyID, BFEUserLogin, BFEUserPassword, BFEUserDept, Deleted)
 SELECT	@UserId, @BFEUserName, @CompanyID, @BFEUserLogin, HASHBYTES('SHA2_256',@BFEUserPassword), @BFEUserDept, 0
 SELECT	@UserId
-GO
 
-/****** Object:  StoredProcedure [dbo].[createProg]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[createProg]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1401,8 +1328,15 @@ Set	@ResourceId =  @ResourceId+1
 --Canonical Account File
 Insert Into Resource Values (@ResourceId,'Prog',@ProgID,NULL,104) 
 Set	@ResourceId =  @ResourceId+1
+--Source Reinsurance File
+Insert Into Resource Values (@ResourceId,'Prog',@ProgID,NULL,401) 
+Set	@ResourceId =  @ResourceId+1
+--Source Reinsurance Scope File
+Insert Into Resource Values (@ResourceId,'Prog',@ProgID,NULL,402) 
+Set	@ResourceId =  @ResourceId+1
+
 GO
-/****** Object:  StoredProcedure [dbo].[createProgOasis]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[createProgOasis]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1458,14 +1392,9 @@ Set	@ResourceId =  @ResourceId+1
 Insert Into Resource Values (@ResourceId,'ProgOasis',@ProgOasisID,NULL,127) 
 Set	@ResourceId =  @ResourceId+1
 select @progoasisid
-GO
-/****** Object:  StoredProcedure [dbo].[createSecurityGroup]    Script Date: 30/09/2016 14:24:34 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 
-/****** Object:  StoredProcedure [dbo].[deleteAccount]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[deleteAccount]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1493,8 +1422,9 @@ And		Deleted = 0
 
 SELECT	@AccountID 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[deleteCompany]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[deleteCompany]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1512,9 +1442,9 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 UPDATE	dbo.Company
 SET		Deleted = 1 
 WHERE	CompanyID = @companyid
-GO
 
-/****** Object:  StoredProcedure [dbo].[deleteModelResource]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[deleteModelResource]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1533,9 +1463,9 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 DELETE FROM dbo.ModelResource
 WHERE ModelResourceID = @ModResID
 Select @ModResID
-GO
 
-/****** Object:  StoredProcedure [dbo].[deleteProg]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[deleteProg]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1554,9 +1484,9 @@ UPDATE	dbo.Prog
 SET		Deleted = 1,
 		ProgName = ProgName + ': deleted ' + convert(nvarchar,getdate(),113)
 WHERE	ProgID=@ProgID
-GO
 
-/****** Object:  StoredProcedure [dbo].[deleteUser]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[deleteUser]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1579,8 +1509,9 @@ UPDATE	dbo.BFEUser
 SET		Deleted = 1 
 WHERE	BFEUserID = @BFEUserID
 SELECT	@BFEUserID
+
 GO
-/****** Object:  StoredProcedure [dbo].[generateCanonicalModel]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[generateCanonicalModel]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1590,7 +1521,7 @@ AS
 SET NOCOUNT ON;
 SET ANSI_NULLS ON;
 SET ANSI_WARNINGS ON;
---declare @ProgId int = 1
+--declare @ProgId int = 10
 ----------------------------------------------------------------------------
 --log database usage
 declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
@@ -1601,16 +1532,16 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 --Declare Variables
 Declare @int int
 Declare @Rows int
-Declare	@SQL nvarchar(2500)
-Declare	@SQL0 nvarchar(2500)
-Declare	@SQL1 nvarchar(2500)
-Declare	@SQL2 nvarchar(2500)
-Declare	@SQL3 nvarchar(2500)
-Declare	@SQL4 nvarchar(2500)
-Declare	@SQL5 nvarchar(2500)
-Declare	@SQL6 nvarchar(2500)
-Declare	@Location nvarchar(2500)
-Declare	@File nvarchar(2500)
+Declare	@SQL nvarchar(max)
+Declare	@SQL0 nvarchar(max)
+Declare	@SQL1 nvarchar(max)
+Declare	@SQL2 nvarchar(max)
+Declare	@SQL3 nvarchar(max)
+Declare	@SQL4 nvarchar(max)
+Declare	@SQL5 nvarchar(max)
+Declare	@SQL6 nvarchar(max)
+Declare	@Location nvarchar(max)
+Declare	@File nvarchar(max)
 Declare @DisaggregationFlag bit = 1
 Declare	@DimensionId int
 Declare	@TransformID int = (Select TransformID From Prog Where ProgID = @ProgId)
@@ -1797,8 +1728,11 @@ end
 Set		@SQL = replace(@SQL,'ORDER BY ,','ORDER BY ')
 Set		@SQL = replace(@SQL,',)',')')
 --populate TempCanLoc
+
 Insert Into TempCanLoc
 exec sp_executesql @SQL
+
+
 Update TempCanLoc Set InterestGroupID = InterestGroupID + @InterestGroupId
 Update TempCanLoc Set InterestRiskID = InterestRiskID + @InterestRiskID
 Update TempCanLoc Set InterestSubRiskID = InterestSubRiskID + @InterestSubRiskID
@@ -1960,6 +1894,7 @@ Select @LayerFieldName = ProfileElementName From ProfileElement Where ProfileID 
 
 if @LayerFieldName is not null
 begin
+
 	Set @SQL = '
 	insert into policylayer (PolicyLayerId, PolicyLayerName, PolicyID, LayerNumber)
 		select	Distinct PolicyLayerId, '+@LayerFieldName+', PolicyID, DENSE_RANK() OVER (PARTITION BY PolicyId ORDER BY PolicyLayerId) as LayerNumber From TempCanAcc where PolicyId is not null'
@@ -2019,9 +1954,9 @@ else
 		update prog set [status] = 'Failed' where ProgID = @ProgId
 	end
 Select 'Done' AS ReturnMessage
-GO
 
-/****** Object:  StoredProcedure [dbo].[generateLocationRecord]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[generateLocationRecord]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2054,10 +1989,9 @@ begin
 end
 --Return
 Select @NewLocationID AS LocationID
+
 GO
-
-
-/****** Object:  StoredProcedure [dbo].[generateOasisFiles2]    Script Date: 2/24/2017 4:46:48 PM ******/
+/****** Object:  StoredProcedure [dbo].[generateOasisFiles2]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2076,7 +2010,7 @@ declare	@LogTimestamp datetime = getdate()
 exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 ----------------------------------------------------------------------------
 
---declare @ProgOasisId int = 5
+--declare @ProgOasisId int = 33
 --Declare Variables
 Declare @ProgId int = (Select ProgID From ProgOasis Where ProgOasisId = @ProgOasisID)
 Declare @ModelId int = (Select ModelID From ProgOasis Where ProgOasisId = @ProgOasisID)
@@ -2332,7 +2266,7 @@ if @modeltypeid = 2
 		set		AltItemID = A.AltItemID
 		From	(
 				select	itemid,
-						DENSE_RANK() OVER (ORDER BY locid, perilid, CoverageTypeId) AS AltItemID
+						DENSE_RANK() OVER (ORDER BY locid, perilid, CoverageTypeId, areaperilid, vulnerabilityid) AS AltItemID
 				from	#item
 				) AS A
 		where	#item.itemid = A.itemid
@@ -2395,7 +2329,6 @@ insert into LogDatabaseUsage values ('generateOasisFiles2','deleted from #item',
 --coverage id
 Update #Item Set CoverageId = A.CoverageId From (Select ItemID, DENSE_RANK() OVER (ORDER BY LocId,CoverageTypeId) AS CoverageId From #Item) AS A Where #Item.ItemID = A.ItemID
 
-
 --PolicyID
 Create Table #TempPolicy (PolicyId int null, InterestExposureID int null)
 
@@ -2434,7 +2367,6 @@ Join	PolicyCoverage AS PC on CI.PolicyCoverageID = PC.PolicyCoverageID
 Join	PolicyCoverageValues AS PCV on PC.PolicyCoverageID = PCV.PolicyCoverageID
 Where	PCV.ProfileElementID = (Select ProfileElementID From ProfileElement Where ProfileID = @CanLocProfileID and FieldID = @SubLimitRef)
 And		#Item.InterestExposureID = CI.InterestExposureID
-
 
 Truncate Table OasisITEMS
 Truncate Table OasisCOVERAGES
@@ -2497,7 +2429,8 @@ Insert Into OasisITEMDICT
 Select	Distinct AltItemID AS item_id,
 		CoverageID AS coverage_id,
 		dense_rank() over (order by AccountNumber + '-' + SourceLocNumber) AS location_id,
-		AccountNumber + '-' + SourceLocNumber AS location_desc,
+		--AccountNumber + '-' + SourceLocNumber AS location_desc,
+		SourceLocNumber AS location_desc,
 		dense_rank() over (order by LineOfBusiness) AS lob_id,
 		LineOfBusiness AS lob_desc,
 		dense_rank() over (order by CountyCode) AS county_id,
@@ -2881,12 +2814,17 @@ update	#FM set SHARE_PROP_OF_LIM = 0 where SHARE_PROP_OF_LIM is null
 update	#FM set limit = 0 where limit is null
 update	#FM set DEDUCTIBLE = 0 where DEDUCTIBLE is null
 update  #FM set SHARE_PROP_OF_LIM = 
-				case when SHARE_PROP_OF_LIM >= 1 and LIMIT > 1 then SHARE_PROP_OF_LIM/LIMIT
+				case when SHARE_PROP_OF_LIM > 1 and LIMIT > 1 then SHARE_PROP_OF_LIM/LIMIT
 				else SHARE_PROP_OF_LIM end
 update  #FM set LIMIT = SHARE_PROP_OF_LIM,
 				SHARE_PROP_OF_LIM = 0
 			where SHARE_PROP_OF_LIM > 1
 			and	 LIMIT = 0
+update  #FM set LIMIT = SHARE_PROP_OF_LIM/LIMIT,
+				SHARE_PROP_OF_LIM = LIMIT
+			where SHARE_PROP_OF_LIM > 1
+			and		LIMIT < 1
+
 
 ---------------------
 update	#FM
@@ -2897,7 +2835,7 @@ set		CALCRULE_ID = CASE
 			WHEN DEDUCTIBLE_TYPE = 'MI' Then 11
 			WHEN DEDUCTIBLE_TYPE = 'MA' Then 10
 			ELSE 2 END
-			
+
 --update % values
 Select	LEVEL_ID, LAYER_ID, AGG_ID, sum(TIV) AS TOTAL_TIV
 into	#tivtotals
@@ -3014,38 +2952,30 @@ Select	Distinct LAYER_ID,
 From	#FM
 
 --FM_Profile
-Insert into OasisFM_PROFILE ([policytc_id]
-      ,[calcrule_id]
-      ,[allocrule_id]
-      ,[ccy_id]
-      ,[deductible]
-      ,[limit]
-      ,[share_prop_of_lim]
-      ,[deductible_prop_of_loss]
-      ,[limit_prop_of_loss]
-      ,[deductible_prop_of_tiv]
-      ,[limit_prop_of_tiv]
-      ,[deductible_prop_of_limit])
+Insert into OasisFM_PROFILE (profile_id,
+	calcrule_id,
+	deductible1,
+ 	deductible2,
+	deductible3,
+	attachment1,
+	limit1,
+	share1,
+	share2,
+	share3)
 Select	Distinct POLICYTC_ID,
 		CALCRULE_ID, --0 AS CALCRULE_ID,
-		1 AS ALLOCRULE_ID, --Case When LEVEL_ID in (1,2,3) then 1 else 0 end as ALLOCRULE_ID,
-		1 AS CCY_ID,
+		--1 AS ALLOCRULE_ID, --Case When LEVEL_ID in (1,2,3) then 1 else 0 end as ALLOCRULE_ID,
+		--1 AS CCY_ID,
 		DEDUCTIBLE,
+		0,
+		0,
+		0, --LIMIT,
 		LIMIT,
 		SHARE_PROP_OF_LIM,
-		0 AS [deductible_prop_of_loss],
-		0 AS [limit_prop_of_loss],
-		0 AS [deductible_prop_of_tiv],
-		0 AS [limit_prop_of_tiv],
-		0 AS [deductible_prop_of_limit]
+		0,
+		0
 From	#FM
 
-
-
-update	OasisFM_PROFILE
-set		limit_prop_of_loss = SHARE_PROP_OF_LIM,
-		SHARE_PROP_OF_LIM = 0
-where	CALCRULE_ID = 15
 
 --FM_XRef
 Create Table #FMXRef (Item_Id int null, OUTPUT_ID int null,AGG_ID int null,LAYER_ID int null,PolicyID int null, policy_name nvarchar(255) null,layer_name nvarchar(255) null)
@@ -3144,10 +3074,9 @@ Select 'Done'
 
 
 
+
 GO
-
-
-/****** Object:  StoredProcedure [dbo].[generateOasisFilesOutputs]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[generateOasisFilesOutputs]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3283,13 +3212,51 @@ begin
 	set @summarysetid = @summarysetid + 1
 end
 
+--ri
+set	@perspectiveid = 3
+Truncate Table #outputs
+
+Insert Into #outputs
+select	distinct s.SummaryLevelId, SummarySetId, PerspectiveId, o.OutputID
+from	SummaryLevelRun as s
+join	outputrun as o on s.SummaryLevelRunID = o.SummaryLevelRunID
+where	ProcessRunID = @processrunid 
+and		PerspectiveId = @perspectiveid
+order by 
+		PerspectiveId,SummarySetID
+
+Truncate Table OasisRISUMMARYXREF
+
+set @summarysetid = 1
+while @summarysetid <= (select max(summarysetid) from #outputs where perspectiveid = @perspectiveid)
+begin
+	set @SummaryLevelID = (select SummaryLevelID from #outputs where summarysetid = @summarysetid)
+	set @SummaryLevelName = case when @SummaryLevelID = 1 then '1' else (select SummaryLevelName from SummaryLevel where SummaryLevelID = @SummaryLevelID) + '_id' end
+
+	if @SummaryLevelName = 'Policy_Id'
+		begin
+			set @sql = 'select distinct output_id, agg_id as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
+						join TempFMDict on TempItemDict.item_id = TempFMDict.agg_id'
+		end
+	else
+		begin
+			set @sql = 'select distinct TempFMDict.output_id, ' + @SummaryLevelName + ' as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
+						join TempFMDict on TempItemDict.item_id = TempFMDict.item_id'
+		end
+		--print @sql
+	insert into OasisRISUMMARYXREF (output_id, summary_id, summaryset_id)
+	exec sp_executesql @SQL
+
+	set @summarysetid = @summarysetid + 1
+end
+
 drop table TempItemDict
 drop table TempFMDict
 drop table #outputs
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[generateOasisFilesRecords]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[generateOasisFilesRecords]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3423,8 +3390,9 @@ END
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[generateOasisFilesRecordsOutputs]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[generateOasisFilesRecordsOutputs]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3469,8 +3437,98 @@ SELECT * FROM resourcetype
 	select 'Done'
 END
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getAccount]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[generateOutputTransformFileRecordsForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[generateOutputTransformFileRecordsForProg] @ProgId int, @CanLocFileName nvarchar(255), @CanAccFileName nvarchar(255)
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = '@ProgId = ' + convert(nvarchar,@ProgId) + ', @CanLocFileName = ' + @CanLocFileName + ', @CanAccFileName = ' + @CanAccFileName
+declare	@LogTimestamp datetime = getdate()
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+--loc records
+	Declare @ResourceId int = (Select ResourceId From [Resource] Where ResourceTable = 'Prog' And ResourceKey = @ProgId And ResourceTypeID = 103) 
+	Declare @LegacyResourceId int = (Select isnull(MAX(ResourceId),0)+1 From [Resource])
+	Declare	@FileId int = (Select isnull(MAX(FileId),0) + 1 From [File])
+	Declare	@FileResourceID int = (Select isnull(MAX(FileResourceID),0) + 1 From FileResource)
+	Declare @FileDesc nvarchar(255) = 'Canonical Loc File: Prog ' + convert(nvarchar,@ProgId)
+
+	--insert new resource row for legacy resource record
+	Insert into [resource] (ResourceId, ResourceTable, ResourceKey, ResourceQualifier, ResourceTypeID) values (@LegacyResourceId,'Prog',@ProgId,NULL,203) 
+
+	--set resource id for existing file (if exists) set to legacy resource id
+	update [fileresource] set resourceid = @LegacyResourceId Where resourceid = @ResourceId
+
+	--insert new file record for generated file
+	insert into [file] values (@FileId, @CanLocFileName, @FileDesc, 1, 1, 103, getdate(), getdate(), null, 'Sys', 'Sys', NULL, 103) 
+	insert into [fileresource] values (@FileResourceID, @FileID, @ResourceID)
+
+
+--acc records
+	Set @ResourceId = (Select ResourceId From [Resource] Where ResourceTable = 'Prog' And ResourceKey = @ProgId And ResourceTypeID = 104) 
+	Set @LegacyResourceId = (Select isnull(MAX(ResourceId),0)+1 From [Resource])
+	Set	@FileId = (Select isnull(MAX(FileId),0) + 1 From [File])
+	Set	@FileResourceID = (Select isnull(MAX(FileResourceID),0) + 1 From FileResource)
+	Set @FileDesc = 'Canonical Acc File: Prog ' + convert(nvarchar,@ProgId)
+
+	--insert new resource row for legacy resource record
+	Insert into [resource] (ResourceId, ResourceTable, ResourceKey, ResourceQualifier, ResourceTypeID) values (@LegacyResourceId,'Prog',@ProgId,NULL,204)
+
+	--set resource id for existing file (if exists) set to legacy resource id
+	update [fileresource] set resourceid = @LegacyResourceId Where resourceid = @ResourceId
+
+	--insert new file record for generated file
+	insert into [file] values (@FileId, @CanAccFileName, @FileDesc, 1, 1, 103, getdate(), getdate(), null, 'Sys', 'Sys', NULL, 104)
+	insert into [fileresource] values (@FileResourceID, @FileID, @ResourceID)
+
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[generateOutputTransformFileRecordsForProgOasos]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[generateOutputTransformFileRecordsForProgOasos] @ProgOasisId int, @ModelLocFileName nvarchar(255)
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = '@ProgOasisId = ' + convert(nvarchar,@ProgOasisId) + ', @ModelLocFileName = ' + @ModelLocFileName 
+declare	@LogTimestamp datetime = getdate()
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+--loc records
+	Declare @ResourceId int = (Select ResourceId From [Resource] Where ResourceTable = 'ProgOasis' And ResourceKey = @ProgOasisId And ResourceTypeID = 105) 
+	Declare @LegacyResourceId int = (Select isnull(MAX(ResourceId),0)+1 From [Resource])
+	Declare	@FileId int = (Select isnull(MAX(FileId),0) + 1 From [File])
+	Declare	@FileResourceID int = (Select isnull(MAX(FileResourceID),0) + 1 From FileResource)
+	Declare @FileDesc nvarchar(255) = 'Model Loc File: ProgOasis ' + convert(nvarchar,@ProgOasisId)
+
+	--insert new resource row for legacy resource record
+	Insert into [resource] (ResourceId, ResourceTable, ResourceKey, ResourceQualifier, ResourceTypeID) values (@LegacyResourceId,'ProgOasis',@ProgOasisId,NULL,205) 
+
+	--set resource id for existing file (if exists) set to legacy resource id
+	update [fileresource] set resourceid = @LegacyResourceId Where resourceid = @ResourceId
+
+	--insert new file record for generated file
+	insert into [file] values (@FileId, @ModelLocFileName, @FileDesc, 1, 1, 101, getdate(), getdate(), null, 'Sys', 'Sys', NULL, 105) 
+	insert into [fileresource] values (@FileResourceID, @FileID, @ResourceID)
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getAccount]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3494,9 +3552,9 @@ FROM	[dbo].[Account] where Deleted = 0
 ORDER BY
 		[AccountName]
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getAPI1aReturnData]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getAPI1aReturnData]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3599,8 +3657,9 @@ Select 'Done'
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getAPI1bReturnData]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getAPI1bReturnData]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3631,8 +3690,9 @@ And		SessionId = @SessionId
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getAPIURL]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getAPIURL]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3656,10 +3716,9 @@ Join	ModelResource AS MR on OS.OasisSystemID = MR.OasisSystemID
 Where	MR.ModelID = @modelid
 And		MR.ResourceTypeID = 1000 --api url resource type
 
+
 GO
-
-
-/****** Object:  StoredProcedure [dbo].[getCompanies]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getCompanies]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3683,9 +3742,9 @@ CompanyLegalName AS "Company Legal Name",
 CompanyRegistrationNo AS "Company Registration Number"
 FROM Company where Deleted = 0 ORDER BY CompanyID DESC
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getEventOccurrence]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getEventOccurrence]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3713,8 +3772,9 @@ And		ResourceTypeID = 304
 Order By
 		ModelResourceID
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getEventSet]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getEventSet]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3742,9 +3802,9 @@ And		ResourceTypeID = 303
 Order By
 		ModelResourceID
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getFileDataForFile]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getFileDataForFile]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3780,9 +3840,9 @@ exec sp_executesql @SQL
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getFileLocationPath]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getFileLocationPath]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3820,9 +3880,9 @@ END
 
 select * from location
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getFileSourceAccountFile]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getFileSourceAccountFile]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3847,8 +3907,9 @@ Order By
 		[FileName]
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getFileSourceLocationFile]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getFileSourceLocationFile]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3873,9 +3934,61 @@ Order By
 		[FileName]
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getFileViewerTable]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getFileSourceReinsuranceFile]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE Procedure [dbo].[getFileSourceReinsuranceFile]
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+Select	[FileName],
+		[FileId]
+From	[File]
+Where	[FileTypeId] = 401
+Order By
+		[FileName]
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getFileSourceReinsuranceScopeFile]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE Procedure [dbo].[getFileSourceReinsuranceScopeFile]
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+Select	[FileName],
+		[FileId]
+From	[File]
+Where	[FileTypeId] = 402
+Order By
+		[FileName]
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getFileViewerTable]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3985,9 +4098,9 @@ Drop Table #DirTree
 Drop Table #FileTable
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getLocationNameForProcessRunId]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getLocationNameForProcessRunId]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4015,9 +4128,9 @@ From	Location
 Where	LocationID = @LocationID
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getModel]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getModel]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4042,9 +4155,9 @@ Where	Deleted = 0
 order by 
 		ModelName asc
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getModelFileExtension]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getModelFileExtension]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4067,9 +4180,9 @@ Declare @Ret nvarchar(255) = (Select ModelResourceValue from modelresource where
 Select	@Ret AS ReturnValue
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getModelResource]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getModelResource]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4096,9 +4209,36 @@ From ModelResource
 Where @ModelID=ModelID
 order by ModelResourceID
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getOasisSystemID]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getModelTransformForModel]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[getModelTransformForModel] @ModelId int
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+SELECT ModelTransform.TransformId
+FROM ModelTransform
+JOIN Transform ON ModelTransform.TransformID=Transform.TransformID
+WHERE
+    @ModelId = ModelID
+AND
+    TransformTypeID = 2
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getOasisSystemID]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4121,9 +4261,9 @@ FROM	OasisSystem
 ORDER BY
 		OasisSystemName
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getOasisURL]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getOasisURL]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4163,9 +4303,9 @@ declare @oasissystemid int = (select oasissystemid from OasisSystemService where
 	select @url
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getOutputOptionOutputs]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getOutputOptionOutputs]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4272,8 +4412,9 @@ drop table #GroupParameterReturn
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getOutputOptions]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getOutputOptions]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4298,8 +4439,9 @@ select distinct OutputOption from OutputOptions order by OutputOption
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getOutputSummary]    Script Date: 10/10/2016 14:00:40 ******/
+/****** Object:  StoredProcedure [dbo].[getOutputSummary]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4517,7 +4659,13 @@ drop table #Summary
 drop table #return
 
 
-go
+
+GO
+/****** Object:  StoredProcedure [dbo].[getOutputSummaryEP]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 
 CREATE PROCEDURE [dbo].[getOutputSummaryEP] @ProcessRunID int
 AS
@@ -4651,6 +4799,10 @@ drop table #output
 
 /****** Object:  StoredProcedure [dbo].[getOutputSummaryEP2]    Script Date: 30/09/2016 14:24:34 ******/
 SET ANSI_NULLS ON
+
+GO
+/****** Object:  StoredProcedure [dbo].[getOutputSummaryEP2]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
@@ -4783,9 +4935,9 @@ drop table #ep
 drop table #Files
 drop table #output
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getParametersJSONGeneral]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getParametersJSONGeneral]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4838,6 +4990,24 @@ Begin
 	Insert Into #General Values ('il_output','1','bool')
 End
 
+Truncate Table #Outputs
+
+declare @progoasisid int = (select progoasisid from ProcessRun where ProcessRunID = @processrunid)
+declare @progid int = (select progid from ProgOasis where ProgOasisId  = @progoasisid)
+
+create table #rifiles (rifile nvarchar(255))
+insert into #rifiles exec getSourceFileReinsuranceForProg @progid
+insert into #rifiles exec getSourceFileReinsuranceScopeForProg @progid
+
+if (select isnull(count(*),0) from #rifiles) = 2
+Begin
+	Insert Into #Outputs exec getParametersJSONSummariesRI @ProcessRunId
+	If (Select Count(*) From #Outputs) > 0
+	Begin
+		Insert Into #General Values ('ri_output','1','bool')
+	End
+End
+
 Select * From #General
 
 Drop Table #General
@@ -4848,8 +5018,9 @@ Drop Table #Outputs
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getParametersJSONModel]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getParametersJSONModel]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4882,8 +5053,9 @@ And		PR.ParameterRunValue is not null --temp fix, to be removed
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getParametersJSONSummariesGUL]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getParametersJSONSummariesGUL]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4945,8 +5117,9 @@ drop table #output
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getParametersJSONSummariesIL]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getParametersJSONSummariesIL]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5003,9 +5176,68 @@ select * from #output
 
 drop table #output
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getProcessData]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getParametersJSONSummariesRI]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[getParametersJSONSummariesRI] (@ProcessRunId int)
+AS 
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+
+create table #output (SummarySetID int, [Output] nvarchar(255), [Flag] nvarchar(255), LECFlag int)
+
+insert into #output
+Select	O.OutputId AS SummarySetID,
+		lower(AT.AnalysisFileNameStub) AS [Output],
+		'1' as [Flag],
+		AT.LECFlag
+From	ElementRun AS ER
+Join	OutputRun AS O on ER.ElementRunID = O.ElementRunID
+Join	OutputType AS OT on OT.OutputTypeID = O.OutputTypeID
+Join	Perspective AS P on OT.PerspectiveID = P.PerspectiveID
+Join	AnalysisType AS AT on OT.AnalysisTypeID = AT.AnalysisTypeID
+Where	ER.ProcessRunID = @ProcessRunID
+And		P.PerspectiveID = 3 --RI
+Order By
+		P.PerspectiveID,
+		O.OutputID,
+		JSONLevel
+
+insert into #output
+select	distinct SummarySetID,
+		'lec_output' AS [Output],
+		1 as [Flag],
+		0 as LECFlag
+from	#output
+where	lecflag = 1
+		
+insert into #output
+select	distinct SummarySetID,
+		'return_period_file' AS [Output],
+		1 as [Flag],
+		1 as LECFlag
+from	#output
+where	lecflag = 1
+
+select * from #output
+
+drop table #output
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getProcessData]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5033,8 +5265,9 @@ and		p.deleted = 0
 order by 		
 		ProgOasisId desc
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getProcessRunDetails]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getProcessRunDetails]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5111,9 +5344,9 @@ END
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getProcessRunParams]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getProcessRunParams]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5165,8 +5398,9 @@ END
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getProfileDetailsForIni]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getProfileDetailsForIni]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5296,9 +5530,9 @@ drop table #return
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getProgData]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getProgData]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5335,8 +5569,9 @@ order by
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getProgFileDetails]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getProgFileDetails]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5360,9 +5595,11 @@ Create Table #Staging ([ObjectId] int, [Object] nvarchar(255), [FileId] int NULL
 
 Insert Into #Staging Values (1,'Source Location File', NULL,  'Not Loaded', NULL)
 Insert Into #Staging Values (2,'Source Account File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (3,'Canonical Location File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (4,'Canonical Account File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (5,'Canonical Model', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (3,'Source Reinsurance File', NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (4,'Source Reinsurance Scope File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (5,'Canonical Location File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (6,'Canonical Account File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (7,'Canonical Model', NULL, 'Not Loaded', NULL)
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
 	Select F.[FileName], F.FileID From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 101) AS A --SourceLocationFile
@@ -5373,16 +5610,24 @@ Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
 Where	#Staging.[ObjectId] = 2
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 103) AS A --
+	Select F.[FileName], F.FileID From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 401) AS A
 Where	#Staging.[ObjectId] = 3
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 104) AS A --
+	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 402) AS A --
 Where	#Staging.[ObjectId] = 4
+
+Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
+	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 103) AS A --
+Where	#Staging.[ObjectId] = 5
+
+Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
+	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 104) AS A --
+Where	#Staging.[ObjectId] = 6
 
 Update #Staging Set Detail = 'InterestGroupId: ' + convert(nvarchar, InterestGroupId) From (
 	Select InterestGroupId From InterestGroup Where ProgID = @ProgId) AS A --SourceLocationFile
-Where	#Staging.[ObjectId] = 5
+Where	#Staging.[ObjectId] = 7
 
 
 Update #Staging Set [Status] = 'Loaded' Where Detail IS NOT NULL
@@ -5391,9 +5636,37 @@ Select [Object], [FileId], [Status], Detail From #Staging
 
 Drop Table #Staging
 
+
+GO
+/****** Object:  StoredProcedure [dbo].[getProgIdForProgOasis]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
 GO
 
-/****** Object:  StoredProcedure [dbo].[getProgOasisDetails]    Script Date: 30/09/2016 14:24:34 ******/
+CREATE PROCEDURE [dbo].[getProgIdForProgOasis] @ProgOasisId int
+AS
+
+SET ANSI_NULLS ON;
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+Declare @ProgId int 
+Select @ProgId = ProgId From ProgOasis Where ProgOasisId = @ProgOasisId
+
+
+Select @ProgId as ProgId
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getProgOasisDetails]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5427,8 +5700,9 @@ Select @ProgId AS ProgId, @ModelId AS ModelId, @FileId AS FileId
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getProgOasisFileDetails]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getProgOasisFileDetails]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5454,21 +5728,23 @@ Create Table #Staging ([ObjectId] int, [Object] nvarchar(255), [FileId] int NULL
 
 Insert Into #Staging Values (1,'Source Location File', NULL,  'Not Loaded', NULL)
 Insert Into #Staging Values (2,'Source Account File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (3,'Canonical Location File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (4,'Canonical Account File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (5,'Canonical Model', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (3,'Source Reinsurance File', NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (4,'Source Reinsurance Scope File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (5,'Canonical Location File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (6,'Canonical Account File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (7,'Canonical Model', NULL, 'Not Loaded', NULL)
 
-Insert Into #Staging Values (6,'Model Format Location Lookup File', NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (7,'Lookup Service Return File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (8,'Lookup Service Return Error File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (9,'Oasis Items File',NULL,  'Not Loaded', NULL)
-Insert Into #Staging Values (10,'Oasis Coverages File', NULL, 'Not Loaded', NULL)
-Insert Into #Staging Values (11,'Oasis Item Dictionary File', NULL, 'Not Loaded', NULL)
-Insert Into #Staging Values (12,'Oasis FM Programme File', NULL, 'Not Loaded', NULL)
-Insert Into #Staging Values (13,'Oasis FM Policy TC File', NULL, 'Not Loaded', NULL)
-Insert Into #Staging Values (14,'Oasis FM Profile File', NULL, 'Not Loaded', NULL)
-Insert Into #Staging Values (15,'Oasis FM XRef File', NULL, 'Not Loaded', NULL)
-Insert Into #Staging Values (16,'Oasis FM Dict File', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (8,'Model Format Location Lookup File', NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (9,'Lookup Service Return File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (10,'Lookup Service Return Error File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (11,'Oasis Items File',NULL,  'Not Loaded', NULL)
+Insert Into #Staging Values (12,'Oasis Coverages File', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (13,'Oasis Item Dictionary File', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (14,'Oasis FM Programme File', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (15,'Oasis FM Policy TC File', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (16,'Oasis FM Profile File', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (17,'Oasis FM XRef File', NULL, 'Not Loaded', NULL)
+Insert Into #Staging Values (18,'Oasis FM Dict File', NULL, 'Not Loaded', NULL)
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
 	Select F.[FileName], F.FileID From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 101) AS A --SourceLocationFile
@@ -5479,60 +5755,68 @@ Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
 Where	#Staging.[ObjectId] = 2
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 103) AS A --
+	Select F.[FileName], F.FileID From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 401) AS A
 Where	#Staging.[ObjectId] = 3
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 104) AS A --
+	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 402) AS A --
 Where	#Staging.[ObjectId] = 4
 
-Update #Staging Set Detail = 'InterestGroupId: ' + convert(nvarchar, InterestGroupId) From (
-	Select InterestGroupId From InterestGroup Where ProgID = @ProgId) AS A --SourceLocationFile
+Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
+	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 103) AS A --
 Where	#Staging.[ObjectId] = 5
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 105) AS A --SourceLocationFile
+	Select F.[FileName], F.FileID  From [Resource] AS R Join	FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 104) AS A --
 Where	#Staging.[ObjectId] = 6
 
-Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 106) AS A --SourceLocationFile
+Update #Staging Set Detail = 'InterestGroupId: ' + convert(nvarchar, InterestGroupId) From (
+	Select InterestGroupId From InterestGroup Where ProgID = @ProgId) AS A --SourceLocationFile
 Where	#Staging.[ObjectId] = 7
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 108) AS A --SourceLocationFile
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 105) AS A --SourceLocationFile
 Where	#Staging.[ObjectId] = 8
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 111) AS A --Oasis Items File
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 106) AS A --SourceLocationFile
 Where	#Staging.[ObjectId] = 9
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 112) AS A --Oasis Coverages File
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 108) AS A --SourceLocationFile
 Where	#Staging.[ObjectId] = 10
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 113) AS A --Oasis Item Dictionary File
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 111) AS A --Oasis Items File
 Where	#Staging.[ObjectId] = 11
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 114) AS A --Oasis FM Programme File
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 112) AS A --Oasis Coverages File
 Where	#Staging.[ObjectId] = 12
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 115) AS A --Oasis FM Policy TC File
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 113) AS A --Oasis Item Dictionary File
 Where	#Staging.[ObjectId] = 13
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 116) AS A --Oasis FM Profile File
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 114) AS A --Oasis FM Programme File
 Where	#Staging.[ObjectId] = 14
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 117) AS A --Oasis FM XRef File
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 115) AS A --Oasis FM Policy TC File
 Where	#Staging.[ObjectId] = 15
 
 Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
-	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 127) AS A --Oasis FM Dict File
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 116) AS A --Oasis FM Profile File
 Where	#Staging.[ObjectId] = 16
+
+Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 117) AS A --Oasis FM XRef File
+Where	#Staging.[ObjectId] = 17
+
+Update #Staging Set [FileId] = A.[FileId], Detail = A.[FileName] From (
+	Select F.[FileName], F.FileID From [Resource] AS R Join [FileResource] AS FR on R.ResourceID = FR.ResourceID Join [File] AS F on F.FileID = FR.FileID Where R.ResourceTable = 'ProgOasis' And R.ResourceKey = @ProgOasisId And R.ResourceTypeID = 127) AS A --Oasis FM Dict File
+Where	#Staging.[ObjectId] = 18
 
 Update #Staging Set [Status] = 'Loaded' Where Detail IS NOT NULL
 
@@ -5546,8 +5830,9 @@ Drop Table #Staging
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getProgOasisForProg]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getProgOasisForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5583,9 +5868,9 @@ WHERE	ProgOasis.ProgId = (ISNULL(@ProgID,ProgOasis.ProgId))
 order by 
 		[ProgOasisId] desc
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getResourceModeUser]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getResourceModeUser]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5612,8 +5897,9 @@ AND		@BFEUserID = B.BFEUserID
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getResourceType]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getResourceType]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5642,9 +5928,9 @@ FROM	[dbo].[ResourceType]
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getRuntimeParamList]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getRuntimeParamList]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5671,9 +5957,9 @@ END
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getSecurityGroups]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getSecurityGroups]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5703,8 +5989,9 @@ Order By
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getSecurityGroupsForUser]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getSecurityGroupsForUser]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5737,9 +6024,250 @@ Order By
 
 
 
+
+GO
+/****** Object:  StoredProcedure [dbo].[getSourceFileAccForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
 GO
 
-/****** Object:  StoredProcedure [dbo].[getTransformNameCanModel]    Script Date: 30/09/2016 14:24:34 ******/
+Create PROCEDURE [dbo].[getSourceFileAccForProg] @ProgId int
+AS
+
+SET ANSI_NULLS ON;
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+Select F.[FileName] From [Resource] AS R Join FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 102
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getSourceFileLocForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create PROCEDURE [dbo].[getSourceFileLocForProg] @ProgId int
+AS
+
+SET ANSI_NULLS ON;
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+Select F.[FileName] From [Resource] AS R Join FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 101
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getSourceFileReinsuranceForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create PROCEDURE [dbo].[getSourceFileReinsuranceForProg] @ProgId int
+AS
+
+SET ANSI_NULLS ON;
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+Select F.[FileName] From [Resource] AS R Join FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 401
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getSourceFileReinsuranceScopeForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create PROCEDURE [dbo].[getSourceFileReinsuranceScopeForProg] @ProgId int
+AS
+
+SET ANSI_NULLS ON;
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+Select F.[FileName] From [Resource] AS R Join FileResource AS FR on FR.ResourceID = R.ResourceID Join [File] AS F on FR.FileID = F.FileID Where R.ResourceTable = 'Prog' And R.ResourceKey = @ProgId And R.ResourceTypeID = 402
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getSourceTransformForModel]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[getSourceTransformForModel] @ModelId int
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+SELECT ModelTransform.TransformId
+FROM ModelTransform
+JOIN Transform ON ModelTransform.TransformID=Transform.TransformID
+WHERE
+    @ModelId = ModelID
+AND
+    TransformTypeID = 1
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getTransformInputFilesForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[getTransformInputFilesForProg] @ProgId int
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = '@ProgId = ' + convert(nvarchar,@ProgId)
+declare	@LogTimestamp datetime = getdate()
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+--get transform
+DECLARE @TransformID int = (Select TransformID From Prog Where ProgID = @ProgID)
+
+DECLARE @SourceLoc nvarchar(255)
+DECLARE @ValidationFileLoc nvarchar(255)
+DECLARE @TransformationFileLoc nvarchar(255)
+
+DECLARE @SourceAcc nvarchar(255)
+DECLARE @ValidationFileAcc nvarchar(255)
+DECLARE @TransformationFileAcc nvarchar(255)
+
+--source loc file
+Select @SourceLoc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Prog' And ResourceKey = @ProgId and R.ResourceTypeID = 101 --source loc
+
+--validation loc file
+Select @ValidationFileLoc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 121 --To Location XSD
+
+--transformation loc file
+Select @TransformationFileLoc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 124 --Location XSLT
+
+--source acc file
+Select @SourceAcc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Prog' And ResourceKey = @ProgId and R.ResourceTypeID = 102
+
+--validation acc file
+Select @ValidationFileAcc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 122 --To Location XSD
+
+--transformation acc file
+Select @TransformationFileAcc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 125 --Location XSLT
+
+
+Select	@SourceLoc AS SourceLoc,
+		@ValidationFileLoc AS ValidationLoc,
+		@TransformationFileLoc AS TransformationLoc,
+		@SourceAcc AS SourceAcc,
+		@ValidationFileAcc AS ValidationAcc,
+		@TransformationFileAcc AS TransformationAcc
+
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getTransformInputFilesForProgOasis]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[getTransformInputFilesForProgOasis] @ProgOasisId int
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = '@ProgOasisId = ' + convert(nvarchar,@ProgOasisId)
+declare	@LogTimestamp datetime = getdate()
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+
+--get transform
+DECLARE @TransformID int = (Select TransformID From ProgOasis Where ProgOasisID = @ProgOasisId)
+DECLARE @ProgID int = (Select ProgId From ProgOasis Where ProgOasisID = @ProgOasisId)
+
+DECLARE @SourceLoc nvarchar(255)
+DECLARE @ValidationFileLoc nvarchar(255)
+DECLARE @TransformationFileLoc nvarchar(255)
+
+
+--source loc file
+Select @SourceLoc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Prog' And ResourceKey = @ProgId and R.ResourceTypeID = 103 --can loc
+
+--validation loc file
+Select @ValidationFileLoc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 120 --From Location XSD
+
+--transformation loc file
+Select @TransformationFileLoc = L.LocationPathUnix + '/' + F.[FileName] 
+From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
+Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 124 --Location XSLT
+
+Select	@SourceLoc AS SourceLoc,
+		@ValidationFileLoc AS ValidationLoc,
+		@TransformationFileLoc AS TransformationLoc
+
+
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[getTransformNameCanModel]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5770,8 +6298,9 @@ ORDER BY
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getTransformNameSourceCan]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getTransformNameSourceCan]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5802,9 +6331,9 @@ ORDER BY
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getUserDepartment]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getUserDepartment]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5834,9 +6363,9 @@ Where	BFEUserID = ISNULL(@BFEUserId,0)
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getUserLicenses]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getUserLicenses]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5877,9 +6406,9 @@ Where	BU.BFEUserID = isnull(@BFEUserID,0)
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[getUserProcessDetails]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[getUserProcessDetails]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5987,8 +6516,9 @@ END
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[getUsersForCompany]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[getUsersForCompany]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6025,14 +6555,14 @@ Order By
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[linkOutputFileToProcessRun]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[linkOutputFileToProcessRun]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE Procedure [dbo].[linkOutputFileToProcessRun] @ProcessRunId int, @OutputFiles nvarchar(max)
+CREATE Procedure [dbo].[linkOutputFileToProcessRun] @ProcessRunId int, @OutputFiles nvarchar(2500)
 AS
 
 SET NOCOUNT ON;
@@ -6053,7 +6583,7 @@ declare @fileid int = (select isnull(max(fileid),0) from [file])
 declare @resourceid int = (select isnull(max(resourceid),0) from [resource])
 declare @fileresourceid int = (select isnull(max(fileresourceid),0) from [fileresource])
 declare @locationid int = (select isnull(max(locationid),0) +1 from [location])
-declare @sql nvarchar(max)
+declare @sql nvarchar(2500)
 
 set @OutputFiles =  replace(@OutputFiles,',',''',''') 
 
@@ -6091,6 +6621,20 @@ create table #files (RowId int identity(1,1), [FileName] nvarchar(255), FileDesc
 insert into #files
 exec sp_executesql @sql
 
+
+declare @progoasisid int = (select progoasisid from ProcessRun where ProcessRunID = @processrunid)
+declare @progid int = (select progid from ProgOasis where ProgOasisId  = @progoasisid)
+
+create table #rifiles (rifile nvarchar(255))
+insert into #rifiles exec getSourceFileReinsuranceForProg @progid
+insert into #rifiles exec getSourceFileReinsuranceScopeForProg @progid
+
+if (select isnull(count(*),0) from #rifiles) < 2
+Begin
+	delete from #files where [filename] like 'ri%'
+End
+
+
 insert into [file]		select RowId+@fileid,[FileName],FileDesc,1,1,@locationid,getdate(),getdate(),NULL,'Sys','Sys,',NULL,121 from #files
 insert into [resource]	select RowId+@resourceid,'ProcessRun',@processrunid,NULL,128 from #files
 insert into FileResource select RowId+@fileresourceid,RowId+@fileid,RowId+@resourceid from #files
@@ -6103,8 +6647,9 @@ select 'Done'
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[listProcessRun]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[listProcessRun]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6133,9 +6678,9 @@ order by
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[logElementRun]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[logElementRun]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6195,9 +6740,9 @@ END
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[removeSecurityGroup]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[removeSecurityGroup]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6233,22 +6778,17 @@ else
 
 
 
-GO
 
-/****** Object:  StoredProcedure [dbo].[saveoutputoption]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[saveoutputoption]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[saveoutputoption] 
 	-- Add the parameters for the stored procedure here
 	@OutputOptionName nvarchar(255), 
-	@OutputOptionsList nvarchar(2500)
+	@OutputOptionsList nvarchar(max)
 
 AS
 SET NOCOUNT ON;
@@ -6305,8 +6845,9 @@ END
 
 
 
+
 GO
-/****** Object:  StoredProcedure [dbo].[tellOperationsValidOnFileID]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[tellOperationsValidOnFileID]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6380,10 +6921,9 @@ end
 
 
 
+
 GO
-
-
-/****** Object:  StoredProcedure [dbo].[updateAccount]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[updateAccount]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6402,9 +6942,9 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 UPDATE dbo.Account
 SET AccountName  = @AccountName
 WHERE 	AccountID = @AccountID
-GO
 
-/****** Object:  StoredProcedure [dbo].[updateCompany]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[updateCompany]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6432,10 +6972,30 @@ SET CompanyID = @CompanyID,
 	CompanyRegistrationNo = @CompanyRegistrationNo
 WHERE CompanyID = @CompanyID
 select @CompanyID
+
 GO
+/****** Object:  StoredProcedure [dbo].[updateLogDatabaseUsage]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[updateLogDatabaseUsage] 
+	(
+	@ProcedureName nvarchar(255),
+	@ParameterList nvarchar(2500) = NULL,
+	@LogTimestamp datetime
+	)
+AS
+SET NOCOUNT ON;
+--declare @LogID int = (Select isnull(max(LogID),0) From LogDatabaseUsage) +1
+insert into LogDatabaseUsage (--LogID,
+				ProcedureName,ParameterList,LogTimestamp)
+select	--@logid,
+	@ProcedureName,@ParameterList,@LogTimestamp
+--select @LogID
 
-
-/****** Object:  StoredProcedure [dbo].[updateModelResource]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[updateModelResource]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6464,9 +7024,9 @@ SET ModelResourceName = @ModelResourceName,
 	ModelResourceValue = @ModelResourceValue
 WHERE ModelResourceID = @ModelResourceID
 Select @ModelResourceID
-GO
 
-/****** Object:  StoredProcedure [dbo].[updateProg]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[updateProg]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6495,30 +7055,9 @@ SET ProgName  = @ProgName,
 	AccountID = @AccountID,
 	TransformID = @TransformID
 WHERE ProgID=@ProgID
-GO
 
-/****** Object:  StoredProcedure [dbo].[updateProgStatus]    Script Date: 30/09/2016 14:24:34 ******/
-SET ANSI_NULLS ON
 GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[updateProgStatus] @ProgID int,
-								@Status nvarchar(255)
-AS
-SET NOCOUNT ON;
-----------------------------------------------------------------------------
---log database usage
-declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = ''
-declare	@LogTimestamp datetime = getdate()
-exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
-----------------------------------------------------------------------------
-UPDATE dbo.Prog
-SET [Status]  = @Status
-WHERE ProgID=@ProgID
-GO
-
-/****** Object:  StoredProcedure [dbo].[updateProgOasisStatus]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[updateProgOasisStatus]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6537,9 +7076,30 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 UPDATE dbo.ProgOasis
 SET [Status]  = @Status
 WHERE ProgOasisID=@ProgOasisID
-GO
 
-/****** Object:  StoredProcedure [dbo].[updateSourceAccountFileForProg]    Script Date: 30/09/2016 14:24:34 ******/
+GO
+/****** Object:  StoredProcedure [dbo].[updateProgStatus]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[updateProgStatus] @ProgID int,
+								@Status nvarchar(255)
+AS
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+UPDATE dbo.Prog
+SET [Status]  = @Status
+WHERE ProgID=@ProgID
+
+GO
+/****** Object:  StoredProcedure [dbo].[updateSourceAccountFileForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6570,8 +7130,9 @@ ELSE
 	BEGIN
 		Insert Into [FileResource] values (@FileResourceId,@FileId,@ResourceId)
 	END
+
 GO
-/****** Object:  StoredProcedure [dbo].[updateSourceLocationFileForProg]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[updateSourceLocationFileForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6594,7 +7155,7 @@ Declare @FileResourceId int		= (Select ISNULL(Max(FileResourceId),0) + 1 From [F
 --set existing file to legacy resource if exists
 IF @ExistingFileId IS NOT NULL
 	BEGIN
-		Insert Into [Resource] values (@LegacyResourceId,'Prog',@ProgId,NULL,202)
+		Insert Into [Resource] values (@LegacyResourceId,'Prog',@ProgId,NULL,201)
 		Update [FileResource] Set ResourceId = @LegacyResourceId Where [FileId] = @ExistingFileId
 		Update [FileResource] Set ResourceId = @ResourceId		 Where [FileId] = @FileId
 	END
@@ -6602,8 +7163,77 @@ ELSE
 	BEGIN
 		Insert Into [FileResource] values (@FileResourceId,@FileId,@ResourceId)
 	END
+
 GO
-/****** Object:  StoredProcedure [dbo].[updateUser]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[updateSourceReinsuranceFileForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[updateSourceReinsuranceFileForProg] @FileId int, @ProgId int
+AS
+SET ANSI_NULLS ON;
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+Declare @ResourceId int			= (Select ResourceId From [Resource] Where ResourceTable = 'Prog' And ResourceKey = @ProgId And ResourceTypeID = 401)
+Declare @ExistingFileId int		= (Select FileID From [FileResource] Where ResourceId = @ResourceId)
+Declare @LegacyResourceId int	= (Select ISNULL(Max(ResourceId),0) + 1 From [Resource])
+Declare @FileResourceId int		= (Select ISNULL(Max(FileResourceId),0) + 1 From [FileResource])
+--set existing file to legacy resource if exists
+IF @ExistingFileId IS NOT NULL
+	BEGIN
+		Insert Into [Resource] values (@LegacyResourceId,'Prog',@ProgId,NULL,501)
+		Update [FileResource] Set ResourceId = @LegacyResourceId Where [FileId] = @ExistingFileId
+		Update [FileResource] Set ResourceId = @ResourceId		 Where [FileId] = @FileId
+	END
+ELSE
+	BEGIN
+		Insert Into [FileResource] values (@FileResourceId,@FileId,@ResourceId)
+	END
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[updateSourceReinsuranceScopeFileForProg]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[updateSourceReinsuranceScopeFileForProg] @FileId int, @ProgId int
+AS
+SET ANSI_NULLS ON;
+SET NOCOUNT ON;
+----------------------------------------------------------------------------
+--log database usage
+declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
+declare	@ParameterList nvarchar(2500) = ''
+declare	@LogTimestamp datetime = getdate()
+exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
+----------------------------------------------------------------------------
+Declare @ResourceId int			= (Select ResourceId From [Resource] Where ResourceTable = 'Prog' And ResourceKey = @ProgId And ResourceTypeID = 402)
+Declare @ExistingFileId int		= (Select FileID From [FileResource] Where ResourceId = @ResourceId)
+Declare @LegacyResourceId int	= (Select ISNULL(Max(ResourceId),0) + 1 From [Resource])
+Declare @FileResourceId int		= (Select ISNULL(Max(FileResourceId),0) + 1 From [FileResource])
+--set existing file to legacy resource if exists
+IF @ExistingFileId IS NOT NULL
+	BEGIN
+		Insert Into [Resource] values (@LegacyResourceId,'Prog',@ProgId,NULL,502)
+		Update [FileResource] Set ResourceId = @LegacyResourceId Where [FileId] = @ExistingFileId
+		Update [FileResource] Set ResourceId = @ResourceId		 Where [FileId] = @FileId
+	END
+ELSE
+	BEGIN
+		Insert Into [FileResource] values (@FileResourceId,@FileId,@ResourceId)
+	END
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[updateUser]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6632,10 +7262,9 @@ SET BFEUserName = @BFEUserName,
 	BFEUserDept = @BFEUserDept
 WHERE BFEUserID = @BFEUserID
 select @BFEUserID
+
 GO
-
-
-/****** Object:  StoredProcedure [dbo].[workflowFlattener]    Script Date: 30/09/2016 14:24:34 ******/
+/****** Object:  StoredProcedure [dbo].[workflowFlattener]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -6649,6 +7278,7 @@ CREATE PROCEDURE [dbo].[workflowFlattener]
 		@UseRandomNumberFile int = null,
 		@OutputsStringGUL nvarchar(max) = null,
 		@OutputsStringIL nvarchar(max) = null,
+		@OutputsStringRI nvarchar(max) = null,
 		@EventSetID nvarchar(255)  = null,
 		@EventOccurrenceID nvarchar(255)  = null,
 		@DemandSurge bit  = null,
@@ -6674,6 +7304,7 @@ declare	@ParameterList nvarchar(max) = '@ProgOasisID = ' + convert(nvarchar,@Pro
 										'@UseRandomNumberFile = ' + convert(nvarchar,@UseRandomNumberFile) + ', ' +
 										'@OutputsStringGUL = ' + @OutputsStringGUL + ', ' +
 										'@OutputsStringIL = ' + @OutputsStringIL + ', ' +
+										'@OutputsStringRI = ' + @OutputsStringRI + ', ' +
 										'@EventSetID = ' + @EventSetID + ', ' +
 										'@EventOccurrenceID = ' + @EventOccurrenceID + ', ' +
 										'@DemandSurge = ' + convert(nvarchar,@DemandSurge) + ', ' +
@@ -6746,14 +7377,46 @@ begin
 			set @OutputsStringIL = @OutputsStringIL + ', ilprogAAL'
 		end
 	end
+	--Add in summary outputs where appropriate RI
+	if len(@OutputsStringRI) > 0
+	begin
+		if @OutputsStringRI not like '%riprogFullUncAEP%'
+		begin
+			set @OutputsStringRI = @OutputsStringRI + ', riprogFullUncAEP'
+		end
+		if @OutputsStringRI not like '%riprogFullUncOEP%'
+		begin
+			set @OutputsStringRI = @OutputsStringRI + ', riprogFullUncOEP'
+		end
+		if @OutputsStringRI not like '%riprogAAL%'
+		begin
+			set @OutputsStringRI = @OutputsStringRI + ', riprogAAL'
+		end
+	end
+	--remove @OutputsStringRI if no RI inputs
+	create table #rifiles (rifile nvarchar(255))
+	insert into #rifiles exec getSourceFileReinsuranceForProg @progid
+	insert into #rifiles exec getSourceFileReinsuranceScopeForProg @progid
+
+	if (select isnull(count(*),0) from #rifiles) < 2
+	begin
+		set @OutputsStringRI = ''
+	end
+
 end
 --Add quotation marks into Outputs String Params
 Set @OutputsStringGUL = '''' + @OutputsStringGUL + ''''
 Set @OutputsStringIL = '''' + @OutputsStringIL + ''''
+Set @OutputsStringRI = '''' + @OutputsStringRI + ''''
 Set @OutputsStringGUL = REPLACE(@OutputsStringGUL,' ','')
-Set @OutputsStringIL = REPLACE(@OutputsStringIL,' ', '')
+Set @OutputsStringIL = REPLACE(@OutputsStringIL,' ','')
+Set @OutputsStringRI = REPLACE(@OutputsStringRI,' ','')
 Set @OutputsStringGUL = REPLACE(@OutputsStringGUL,',',''',''')
-Set @OutputsStringIL = REPLACE(@OutputsStringIL,',', ''',''')
+Set @OutputsStringIL = REPLACE(@OutputsStringIL,',',''',''')
+Set @OutputsStringRI = REPLACE(@OutputsStringRI,',',''',''')
+
+
+
 --Workflow
 Create Table #WorkflowElements (RowID int identity(1,1), ElementRunID int null, ElementRunName nvarchar(255) null, WorkflowElementID int null,
 								ParameterRunName nvarchar(255) null, WorkflowParameterID int null, ParameterRunSource nvarchar(255) null, 
@@ -6842,7 +7505,8 @@ Join	AnalysisType AS AT on OT.AnalysisTypeID = AT.AnalysisTypeID
 Join	SummaryLevel AS SL on OT.SummaryLevelID = SL.SummaryLevelID
 Join	Perspective AS P on OT.PerspectiveID = P.PerspectiveID
 Where	lower(P.PerspectiveName) + SL.ParameterStub + AT.ParameterStub in (' + @OutputsStringGUL + ')
-Or		lower(P.PerspectiveName) + SL.ParameterStub + AT.ParameterStub in (' + @OutputsStringIL + ')'
+Or		lower(P.PerspectiveName) + SL.ParameterStub + AT.ParameterStub in (' + @OutputsStringIL + ')
+Or		lower(P.PerspectiveName) + SL.ParameterStub + AT.ParameterStub in (' + @OutputsStringRI + ')'
 Insert Into #OutputRun
 Exec sp_executesql @SQL
 Insert Into SummaryLevelRun (SummaryLevelRunID, SummaryLevelID, ProcessRunID, SummarySetID, PerspectiveID)
@@ -6860,272 +7524,11 @@ Select	@OutputRunID + RowId AS OutputRunID,
 		@SummaryLevelRunID + RowId AS SummaryLevelRunID
 From	#OutputRun
 Drop Table #OutputRun
-Drop Table #ModelParameters
-Drop Table #WorkflowElements
 Select @ProcessRunId AS ReturnValue
-GO
-						     
-						     
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[getTransformInputFilesForProg] @ProgId int
-AS
-SET NOCOUNT ON;
-----------------------------------------------------------------------------
---log database usage
-declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = '@ProgId = ' + convert(nvarchar,@ProgId)
-declare	@LogTimestamp datetime = getdate()
-exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
-----------------------------------------------------------------------------
-
---get transform
-DECLARE @TransformID int = (Select TransformID From Prog Where ProgID = @ProgID)
-
-DECLARE @SourceLoc nvarchar(255)
-DECLARE @ValidationFileLoc nvarchar(255)
-DECLARE @TransformationFileLoc nvarchar(255)
-
-DECLARE @SourceAcc nvarchar(255)
-DECLARE @ValidationFileAcc nvarchar(255)
-DECLARE @TransformationFileAcc nvarchar(255)
-
---source loc file
-Select @SourceLoc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Prog' And ResourceKey = @ProgId and R.ResourceTypeID = 101 --source loc
-
---validation loc file
-Select @ValidationFileLoc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 121 --To Location XSD
-
---transformation loc file
-Select @TransformationFileLoc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 124 --Location XSLT
-
---source acc file
-Select @SourceAcc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Prog' And ResourceKey = @ProgId and R.ResourceTypeID = 102
-
---validation acc file
-Select @ValidationFileAcc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 122 --To Location XSD
-
---transformation acc file
-Select @TransformationFileAcc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 125 --Location XSLT
-
-
-Select	@SourceLoc AS SourceLoc,
-		@ValidationFileLoc AS ValidationLoc,
-		@TransformationFileLoc AS TransformationLoc,
-		@SourceAcc AS SourceAcc,
-		@ValidationFileAcc AS ValidationAcc,
-		@TransformationFileAcc AS TransformationAcc
-
 
 GO
 
 
-
-
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-CREATE PROCEDURE [dbo].[getTransformInputFilesForProgOasis] @ProgOasisId int
-AS
-SET NOCOUNT ON;
-----------------------------------------------------------------------------
---log database usage
-declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = '@ProgOasisId = ' + convert(nvarchar,@ProgOasisId)
-declare	@LogTimestamp datetime = getdate()
-exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
-----------------------------------------------------------------------------
-
---get transform
-DECLARE @TransformID int = (Select TransformID From ProgOasis Where ProgOasisID = @ProgOasisId)
-DECLARE @ProgID int = (Select ProgId From ProgOasis Where ProgOasisID = @ProgOasisId)
-
-DECLARE @SourceLoc nvarchar(255)
-DECLARE @ValidationFileLoc nvarchar(255)
-DECLARE @TransformationFileLoc nvarchar(255)
-
-
---source loc file
-Select @SourceLoc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Prog' And ResourceKey = @ProgId and R.ResourceTypeID = 103 --can loc
-
---validation loc file
-Select @ValidationFileLoc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 120 --From Location XSD
-
---transformation loc file
-Select @TransformationFileLoc = L.LocationPathUnix + '/' + F.[FileName] 
-From [File] AS F Join Location AS L on F.LocationID = L.LocationID Join FileResource AS FR on F.FileID = FR.FileID Join [Resource] AS R on FR.ResourceID = R.ResourceID 
-Where R.ResourceTable = 'Transform' And ResourceKey = @TransformID and R.ResourceTypeID = 124 --Location XSLT
-
-Select	@SourceLoc AS SourceLoc,
-		@ValidationFileLoc AS ValidationLoc,
-		@TransformationFileLoc AS TransformationLoc
-
-
-
-GO
-
-
-
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[generateOutputTransformFileRecordsForProg] @ProgId int, @CanLocFileName nvarchar(255), @CanAccFileName nvarchar(255)
-AS
-SET NOCOUNT ON;
-----------------------------------------------------------------------------
---log database usage
-declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = '@ProgId = ' + convert(nvarchar,@ProgId) + ', @CanLocFileName = ' + @CanLocFileName + ', @CanAccFileName = ' + @CanAccFileName
-declare	@LogTimestamp datetime = getdate()
-exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
-----------------------------------------------------------------------------
-
---loc records
-	Declare @ResourceId int = (Select ResourceId From [Resource] Where ResourceTable = 'Prog' And ResourceKey = @ProgId And ResourceTypeID = 103) 
-	Declare @LegacyResourceId int = (Select isnull(MAX(ResourceId),0)+1 From [Resource])
-	Declare	@FileId int = (Select isnull(MAX(FileId),0) + 1 From [File])
-	Declare	@FileResourceID int = (Select isnull(MAX(FileResourceID),0) + 1 From FileResource)
-	Declare @FileDesc nvarchar(255) = 'Canonical Loc File: Prog ' + convert(nvarchar,@ProgId)
-
-	--insert new resource row for legacy resource record
-	Insert into [resource] (ResourceId, ResourceTable, ResourceKey, ResourceQualifier, ResourceTypeID) values (@LegacyResourceId,'Prog',@ProgId,NULL,203) 
-
-	--set resource id for existing file (if exists) set to legacy resource id
-	update [fileresource] set resourceid = @LegacyResourceId Where resourceid = @ResourceId
-
-	--insert new file record for generated file
-	insert into [file] values (@FileId, @CanLocFileName, @FileDesc, 1, 1, 103, getdate(), getdate(), null, 'Sys', 'Sys', NULL, 103) 
-	insert into [fileresource] values (@FileResourceID, @FileID, @ResourceID)
-
-
---acc records
-	Set @ResourceId = (Select ResourceId From [Resource] Where ResourceTable = 'Prog' And ResourceKey = @ProgId And ResourceTypeID = 104) 
-	Set @LegacyResourceId = (Select isnull(MAX(ResourceId),0)+1 From [Resource])
-	Set	@FileId = (Select isnull(MAX(FileId),0) + 1 From [File])
-	Set	@FileResourceID = (Select isnull(MAX(FileResourceID),0) + 1 From FileResource)
-	Set @FileDesc = 'Canonical Acc File: Prog ' + convert(nvarchar,@ProgId)
-
-	--insert new resource row for legacy resource record
-	Insert into [resource] (ResourceId, ResourceTable, ResourceKey, ResourceQualifier, ResourceTypeID) values (@LegacyResourceId,'Prog',@ProgId,NULL,204)
-
-	--set resource id for existing file (if exists) set to legacy resource id
-	update [fileresource] set resourceid = @LegacyResourceId Where resourceid = @ResourceId
-
-	--insert new file record for generated file
-	insert into [file] values (@FileId, @CanAccFileName, @FileDesc, 1, 1, 103, getdate(), getdate(), null, 'Sys', 'Sys', NULL, 104)
-	insert into [fileresource] values (@FileResourceID, @FileID, @ResourceID)
-
-
-GO
-
-
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[generateOutputTransformFileRecordsForProgOasos] @ProgOasisId int, @ModelLocFileName nvarchar(255)
-AS
-SET NOCOUNT ON;
-----------------------------------------------------------------------------
---log database usage
-declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = '@ProgOasisId = ' + convert(nvarchar,@ProgOasisId) + ', @ModelLocFileName = ' + @ModelLocFileName 
-declare	@LogTimestamp datetime = getdate()
-exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
-----------------------------------------------------------------------------
-
---loc records
-	Declare @ResourceId int = (Select ResourceId From [Resource] Where ResourceTable = 'ProgOasis' And ResourceKey = @ProgOasisId And ResourceTypeID = 105) 
-	Declare @LegacyResourceId int = (Select isnull(MAX(ResourceId),0)+1 From [Resource])
-	Declare	@FileId int = (Select isnull(MAX(FileId),0) + 1 From [File])
-	Declare	@FileResourceID int = (Select isnull(MAX(FileResourceID),0) + 1 From FileResource)
-	Declare @FileDesc nvarchar(255) = 'Model Loc File: ProgOasis ' + convert(nvarchar,@ProgOasisId)
-
-	--insert new resource row for legacy resource record
-	Insert into [resource] (ResourceId, ResourceTable, ResourceKey, ResourceQualifier, ResourceTypeID) values (@LegacyResourceId,'ProgOasis',@ProgOasisId,NULL,205) 
-
-	--set resource id for existing file (if exists) set to legacy resource id
-	update [fileresource] set resourceid = @LegacyResourceId Where resourceid = @ResourceId
-
-	--insert new file record for generated file
-	insert into [file] values (@FileId, @ModelLocFileName, @FileDesc, 1, 1, 101, getdate(), getdate(), null, 'Sys', 'Sys', NULL, 105) 
-	insert into [fileresource] values (@FileResourceID, @FileID, @ResourceID)
-
-GO
-/****** Object:  StoredProcedure [dbo].[getModelTransformForModel]    Script Date: 19/01/2018 14:25:28 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[getModelTransformForModel] @ModelId int
-AS
-SET NOCOUNT ON;
-----------------------------------------------------------------------------
---log database usage
-declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = ''
-declare	@LogTimestamp datetime = getdate()
-
-exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
-----------------------------------------------------------------------------
-
-SELECT ModelTransform.TransformId
-FROM ModelTransform
-JOIN Transform ON ModelTransform.TransformID=Transform.TransformID
-WHERE
-    @ModelId = ModelID
-AND
-    TransformTypeID = 2
-
-GO
-/****** Object:  StoredProcedure [dbo].[getSourceTransformForModel]    Script Date: 19/01/2018 14:30:27 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[getSourceTransformForModel] @ModelId int
-AS
-SET NOCOUNT ON;
-----------------------------------------------------------------------------
---log database usage
-declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = ''
-declare	@LogTimestamp datetime = getdate()
-
-exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
-----------------------------------------------------------------------------
-
-SELECT ModelTransform.TransformId
-FROM ModelTransform
-JOIN Transform ON ModelTransform.TransformID=Transform.TransformID
-WHERE
-    @ModelId = ModelID
-AND
-    TransformTypeID = 1
-
-GO
 ---------------------------------------------------------------------------------
 --Table Values
 ---------------------------------------------------------------------------------
@@ -7274,6 +7677,10 @@ INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VAL
 INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (303, N'Event Set', N'Model')
 INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (304, N'Event Occurrence', N'Model')
 INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (305, N'File Extension', N'Model')
+INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (401, N'Source Reinsurance File', N'Prog')
+INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (402, N'Source Reinsurance Scope File', N'Prog')
+INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (501, N'Legacy Source Reinsurance File', N'Prog')
+INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (502, N'Legacy Source Reinsurance Scope File', N'Prog')
 INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (900, N'Menu', N'System')
 INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (999, N'Dummy', N'Dummy')
 INSERT [dbo].[ResourceType] ([ResourceTypeID], [ResourceTypeName], [Source]) VALUES (1000, N'API', N'OasisSystem')
@@ -7347,6 +7754,7 @@ INSERT [dbo].[SummaryLevel] ([SummaryLevelID], [SummaryLevelName], [SummaryLevel
 INSERT [dbo].[SummaryLevel] ([SummaryLevelID], [SummaryLevelName], [SummaryLevelSequence], [ParameterStub]) VALUES (7, N'Zip', 7, N'zip')
 INSERT [dbo].[Perspective] ([PerspectiveID], [PerspectiveName]) VALUES (1, N'GUL')
 INSERT [dbo].[Perspective] ([PerspectiveID], [PerspectiveName]) VALUES (2, N'IL')
+INSERT [dbo].[Perspective] ([PerspectiveID], [PerspectiveName]) VALUES (3, N'RI')
 INSERT [dbo].[AnalysisType] ([AnalysisTypeID], [AnalysisTypeName], [AnalysisFileNameStub], [JSONLevel], [ParameterStub], [LECFlag]) VALUES (1, N'Samples', N'summarycalc', 2, N'Summary',0)
 INSERT [dbo].[AnalysisType] ([AnalysisTypeID], [AnalysisTypeName], [AnalysisFileNameStub], [JSONLevel], [ParameterStub], [LECFlag]) VALUES (2, N'ELT', N'eltcalc', 2, N'ELT',0)
 INSERT [dbo].[AnalysisType] ([AnalysisTypeID], [AnalysisTypeName], [AnalysisFileNameStub], [JSONLevel], [ParameterStub], [LECFlag]) VALUES (3, N'LEC Full Uncertainty AEP', N'full_uncertainty_aep', 3, N'FullUncAEP',1)
@@ -7359,14 +7767,6 @@ INSERT [dbo].[AnalysisType] ([AnalysisTypeID], [AnalysisTypeName], [AnalysisFile
 INSERT [dbo].[AnalysisType] ([AnalysisTypeID], [AnalysisTypeName], [AnalysisFileNameStub], [JSONLevel], [ParameterStub], [LECFlag]) VALUES (10, N'LEC Sample Mean OEP', N'sample_mean_oep', 3, N'SampleMeanOEP',1)
 INSERT [dbo].[AnalysisType] ([AnalysisTypeID], [AnalysisTypeName], [AnalysisFileNameStub], [JSONLevel], [ParameterStub], [LECFlag]) VALUES (11, N'AAL', N'aalcalc', 2, N'AAL',0)
 INSERT [dbo].[AnalysisType] ([AnalysisTypeID], [AnalysisTypeName], [AnalysisFileNameStub], [JSONLevel], [ParameterStub], [LECFlag]) VALUES (12, N'PLT', N'pltcalc', 2, N'PLT',0)
-INSERT [dbo].[OutputOptions] ([OutputOptionID], [OutputOption], [OutputTypeID]) VALUES (1, N'MyOutputs1', 1)
-INSERT [dbo].[OutputOptions] ([OutputOptionID], [OutputOption], [OutputTypeID]) VALUES (2, N'MyOutputs1', 10)
-INSERT [dbo].[OutputOptions] ([OutputOptionID], [OutputOption], [OutputTypeID]) VALUES (3, N'MyOutputs1', 90)
-INSERT [dbo].[OutputOptions] ([OutputOptionID], [OutputOption], [OutputTypeID]) VALUES (4, N'MyOutputs2', 31)
-INSERT [dbo].[OutputOptions] ([OutputOptionID], [OutputOption], [OutputTypeID]) VALUES (5, N'MyOutputs2', 70)
-INSERT [dbo].[OutputOptions] ([OutputOptionID], [OutputOption], [OutputTypeID]) VALUES (6, N'MyOutputs2', 40)
-INSERT [dbo].[OutputOptions] ([OutputOptionID], [OutputOption], [OutputTypeID]) VALUES (7, N'MyOutputs2', 100)
-INSERT [dbo].[OutputOptions] ([OutputOptionID], [OutputOption], [OutputTypeID]) VALUES (8, N'MyOutputs2', 75)
 INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (1, 1, 1, 1)
 INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (2, 1, 2, 1)
 INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (3, 1, 3, 1)
@@ -7511,6 +7911,78 @@ INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [S
 INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (142, 2, 10, 6)
 INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (143, 2, 11, 6)
 INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (144, 2, 12, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (145, 3, 1, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (146, 3, 2, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (147, 3, 3, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (148, 3, 4, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (149, 3, 5, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (150, 3, 6, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (151, 3, 7, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (152, 3, 8, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (153, 3, 9, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (154, 3, 10, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (155, 3, 11, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (156, 3, 12, 1)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (157, 3, 1, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (158, 3, 2, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (159, 3, 3, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (160, 3, 4, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (161, 3, 5, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (162, 3, 6, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (163, 3, 7, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (164, 3, 8, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (165, 3, 9, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (166, 3, 10, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (167, 3, 11, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (168, 3, 12, 2)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (169, 3, 1, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (170, 3, 2, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (171, 3, 3, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (172, 3, 4, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (173, 3, 5, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (174, 3, 6, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (175, 3, 7, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (176, 3, 8, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (177, 3, 9, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (178, 3, 10, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (179, 3, 11, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (180, 3, 12, 3)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (181, 3, 1, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (182, 3, 2, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (183, 3, 3, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (184, 3, 4, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (185, 3, 5, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (186, 3, 6, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (187, 3, 7, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (188, 3, 8, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (189, 3, 9, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (190, 3, 10, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (191, 3, 11, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (192, 3, 12, 4)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (193, 3, 1, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (194, 3, 2, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (195, 3, 3, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (196, 3, 4, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (197, 3, 5, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (198, 3, 6, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (199, 3, 7, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (200, 3, 8, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (201, 3, 9, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (202, 3, 10, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (203, 3, 11, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (204, 3, 12, 5)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (205, 3, 1, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (206, 3, 2, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (207, 3, 3, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (208, 3, 4, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (209, 3, 5, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (210, 3, 6, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (211, 3, 7, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (212, 3, 8, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (213, 3, 9, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (214, 3, 10, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (215, 3, 11, 6)
+INSERT [dbo].[OutputType] ([OutputTypeID], [PerspectiveID], [AnalysisTypeID], [SummaryLevelID]) VALUES (216, 3, 12, 6)
 INSERT [dbo].[CoverageType] ([CoverageTypeID], [CoverageTypeName], [CoverageTypeDesc]) VALUES (0, N'ALL', N'All Coverages')
 INSERT [dbo].[CoverageType] ([CoverageTypeID], [CoverageTypeName], [CoverageTypeDesc]) VALUES (1, N'Buildings', N'Buildings')
 INSERT [dbo].[CoverageType] ([CoverageTypeID], [CoverageTypeName], [CoverageTypeDesc]) VALUES (2, N'Other', N'Other Structures')
@@ -7537,6 +8009,9 @@ INSERT [dbo].[FileType] ([FileTypeId], [FileTypeDesc]) VALUES (118, N'Oasis GUL 
 INSERT [dbo].[FileType] ([FileTypeId], [FileTypeDesc]) VALUES (119, N'Oasis IL Summary Xref File')
 INSERT [dbo].[FileType] ([FileTypeId], [FileTypeDesc]) VALUES (120, N'Oasis FM Dictionary File')
 INSERT [dbo].[FileType] ([FileTypeId], [FileTypeDesc]) VALUES (121, N'Oasis Output File')
+INSERT [dbo].[FileType] ([FileTypeId], [FileTypeDesc]) VALUES (401, N'Source Reinsurance File')
+INSERT [dbo].[FileType] ([FileTypeId], [FileTypeDesc]) VALUES (402, N'Source Reinsurance Scope File')
+
 declare @FileLocationSQL nvarchar(255)		= (SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'FileLocationSQL')
 declare @FileLocationShiny nvarchar(255)		= (SELECT [VariableName] FROM #TempVariables WHERE [VariableType] = 'FileLocationShiny')
 INSERT 
