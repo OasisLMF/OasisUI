@@ -288,3 +288,64 @@ div.flamingo-page-division {
   background-color: #ffffff;
   color: #8b2129;
 }
+
+/*Remove Browse Checkbox */
+input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+/*Default text color */
+input[type="checkbox"] + span {
+   color:black;
+}
+
+
+/*Replace checkbox with an hack: I have an icon of the same color as the background so that it is not visible. the icon is needed to have the same height for the checed box and the unchecked one */
+input[type="checkbox"] + span:before {
+  content: '\f0c8';
+  display: inline-block;
+  width: 10pt;
+  font-size:8px;
+  padding: 2px 0 0 2px;
+  margin-right: 0.5em;
+  border: 1px solid black;
+    background-color:white;
+    color:white;
+    cursor: default;
+  
+}
+
+/*Make the box checked using an icon */
+input[type="checkbox"]:checked + span:before {
+  content: '\2714';
+    left: 0;
+    font-size:8px;
+     color:#8b2129;
+}
+
+/*Change text color of checked box */
+input[type="checkbox"]:checked + span {
+   color:#8b2129;
+}
+
+
+/*Custom disabled checkbox */
+input[type="checkbox"]:disabled + span {
+   color:#999;
+}
+
+/*Same hack as before for the disabled checkbox. Hidden icon used */
+input[type="checkbox"]:disabled + span:before {
+  content: '\f0c8';
+  display: inline-block;
+  width: 10pt;
+  font-size:8px;
+  padding: 2px 0 0 2px;
+  margin-right: 0.5em;
+  border: 1px solid #333;
+    background-color:#999;
+    color:#999;
+    cursor: no-drop;
+}
