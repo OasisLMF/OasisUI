@@ -658,36 +658,32 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       updateSelectizeInput(session, inputId = "sinputookprogid", selected = input$selectprogrammeID)
     }
     bl_dirty <- stop_selProgID > check_selProgID
-    print("bl_dirty")
-    print(bl_dirty)
     logMessage(paste("--- stop_selProgID is:", stop_selProgID))
-    if (active()) {
-      logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
-      if (input$selectprogrammeID != "") {
-        if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
-          rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, DPProgData.ProgrammeID])
-          pageSel <- ceiling(rowToSelect/pageLength)
-          #backward propagation
-          if (is.null(input$tableDPprog_rows_selected)) {
-            if (workflowSteps$step() == '2'){
-              selectRows(dataTableProxy("tableDPprog"), rowToSelect)
-              selectPage(dataTableProxy("tableDPprog"), pageSel)
-              logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
-            }
-          } else if (rowToSelect != input$tableDPprog_rows_selected) {
-            # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
+    logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
+    if (input$selectprogrammeID != "") {
+      if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
+        rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, DPProgData.ProgrammeID])
+        pageSel <- ceiling(rowToSelect/pageLength)
+        #backward propagation
+        if (is.null(input$tableDPprog_rows_selected)) {
+          if (workflowSteps$step() == '2'){
             selectRows(dataTableProxy("tableDPprog"), rowToSelect)
             selectPage(dataTableProxy("tableDPprog"), pageSel)
             logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
           }
+        } else if (rowToSelect != input$tableDPprog_rows_selected) {
+          # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
+          selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+          selectPage(dataTableProxy("tableDPprog"), pageSel)
+          logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
         }
-      } else {
-        selectRows(dataTableProxy("tableDPprog"), NULL)
-        selectPage(dataTableProxy("tableDPprog"), 1)
-        logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
       }
-      .reloadPOData()
+    } else {
+      selectRows(dataTableProxy("tableDPprog"), NULL)
+      selectPage(dataTableProxy("tableDPprog"), 1)
+      logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
     }
+    .reloadPOData()
     if (bl_dirty) check_selProgID <<- check_selProgID + 1
   })
   
@@ -893,31 +889,29 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # If selectprogOasisID changes, reload process run table and set view back to default
   observeEvent(input$selectprogOasisID, ignoreInit = TRUE, {
     bl_dirty1 <- stop_selProgOasisID > check_selProgOasisID
-    if (active()) {
-      .defaultview(session)
-      show("buttonmodeldetails")
-      hide("panelModelDetails")
-      hide("panelDefineOutputs")
-      hide("panelProcessRunLogs")
-      .reloadRunData()
-      logMessage(paste("updating prcrundata select because selectprogOasisID changed to", input$selectprogOasisID))
-      if (input$selectprogOasisID != "") {
-        if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
-          rowToSelect <- match(input$selectprogOasisID, result$POData[, POData.ProgOasisId])
-          pageSel <- ceiling(rowToSelect/pageLength)
-          if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
-            # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
-            selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
-            selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
-            logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
-          }
-        } 
-      } else {
-        result$prcrundata <- NULL
-        selectRows(dataTableProxy("tableProgOasisOOK"), NULL)
-        selectPage(dataTableProxy("tableProgOasisOOK"), 1)
-        logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
-      }
+    #.defaultview(session)
+    show("buttonmodeldetails")
+    hide("panelModelDetails")
+    hide("panelDefineOutputs")
+    hide("panelProcessRunLogs")
+    .reloadRunData()
+    logMessage(paste("updating prcrundata select because selectprogOasisID changed to", input$selectprogOasisID))
+    if (input$selectprogOasisID != "") {
+      if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
+        rowToSelect <- match(input$selectprogOasisID, result$POData[, POData.ProgOasisId])
+        pageSel <- ceiling(rowToSelect/pageLength)
+        if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
+          # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
+          selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
+          selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
+          logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+        }
+      } 
+    } else {
+      result$prcrundata <- NULL
+      selectRows(dataTableProxy("tableProgOasisOOK"), NULL)
+      selectPage(dataTableProxy("tableProgOasisOOK"), 1)
+      logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
     }
     if (bl_dirty1) check_selProgOasisID <<- check_selProgOasisID + 1
   })
@@ -932,31 +926,30 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   #Content of the process run table
   .getProcessRunWithUserChoices <- function(pruser, prmodel, prprogramme,
                                             prworkflow) {
-    if (active()) {
-      #prtable <- getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
-      prcid <- input$selectprogOasisID
-      # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
-      # 'In Progress' (not handled by stored procedure in the DB due to bug!)
-      prcrundata <- getProcessRun(dbSettings, prcid, input$radioprrunsAllOrInProgress)
-      StatusGood <- "Completed"
-      StatusBad <- c("Failed", "Cancelled", NA_character_)
-      # RSc TODO: should probably allow NULL to clear connections when selecting
-      # a ProgOasisID that has no runs
-      if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
-        show("tableprocessrundata")
-        show("divprocessRunButtons")
-        result$prcrundata <- prcrundata %>%
-          mutate(ProcessRunStatus = case_when(ProcessRunStatus %in% StatusGood ~ StatusCompleted,
-                                              ProcessRunStatus %in% StatusBad ~ StatusFailed,
-                                              ProcessRunStatus %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-          as.data.frame()
-        #Handling bug for 'In Progress' 
-        if (input$radioprrunsAllOrInProgress == "In_Progress") {
-          result$prcrundata <- result$prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
-        }
-      } else {
-        result$prcrundata <- NULL
+    logMessage(".getProcessRunWithUserChoices called")
+    #prtable <- getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
+    prcid <- input$selectprogOasisID
+    # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
+    # 'In Progress' (not handled by stored procedure in the DB due to bug!)
+    prcrundata <- getProcessRun(dbSettings, prcid, input$radioprrunsAllOrInProgress)
+    StatusGood <- "Completed"
+    StatusBad <- c("Failed", "Cancelled", NA_character_)
+    # RSc TODO: should probably allow NULL to clear connections when selecting
+    # a ProgOasisID that has no runs
+    if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
+      show("tableprocessrundata")
+      show("divprocessRunButtons")
+      result$prcrundata <- prcrundata %>%
+        mutate(ProcessRunStatus = case_when(ProcessRunStatus %in% StatusGood ~ StatusCompleted,
+                                            ProcessRunStatus %in% StatusBad ~ StatusFailed,
+                                            ProcessRunStatus %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
+        as.data.frame()
+      #Handling bug for 'In Progress' 
+      if (input$radioprrunsAllOrInProgress == "In_Progress") {
+        result$prcrundata <- result$prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
       }
+    } else {
+      result$prcrundata <- NULL
     }
   }
   
@@ -1060,7 +1053,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   # simplified view selection
-  observe(if (active()) {
+  observe({
     if (length(input$chkgulprog) > 0 |  length(input$chkgulstate) > 0 |
         length(input$chkgulcounty) > 0 |  length(input$chkgulloc) > 0 |
         length(input$chkgullob) > 0 | length(input$chkgulpolicy) > 0) {
