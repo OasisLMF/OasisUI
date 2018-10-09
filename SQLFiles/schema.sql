@@ -2130,6 +2130,8 @@ else
 	begin
 		Update #Item Set CountyCode = 'XX'
 	end
+	
+Update #item set CountyCode = StateCode + '-' +  CountyCode
 
 --PostCode
 Set @ProfileElementID = (Select ProfileElementID From ProfileElement Where ProfileID = @CanLocProfileID and FieldID = @PostCode)
