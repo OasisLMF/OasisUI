@@ -163,6 +163,7 @@ div.flamingo-page-division {
 
 .irs-single, .irs-bar-edge, .irs-bar {
   background: #8b2129 !important;
+  border:#8b2129 !important;
 }
 
 .InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single {
@@ -348,4 +349,44 @@ input[type="checkbox"]:disabled + span:before {
     background-color:#999;
     color:#999;
     cursor: no-drop;
+}
+
+/*Custom Radio Buttons not selected*/
+input[type='radio']:after {
+        width: 15px;
+        height: 15px;
+        border-radius: 15px;
+        top: -2px;
+        left: -1px;
+        position: relative;
+        background-color: white;
+        content: '';
+        display: inline-block;
+        visibility: visible;
+        border: 1px solid #333;
+}
+
+/*Custom Radio Buttons selected*/
+input[type='radio']:checked:after {
+        width: 15px;
+        height: 15px;
+        border-radius: 15px;
+        top: -2px;
+        left: -1px;
+        position: relative;
+        background-color: #8b2129;
+        content: '';
+        display: inline-block;
+        visibility: visible;
+        border: 1px solid #333;
+}
+
+/*Custom Radio Buttons text not selected*/
+input[type='radio'] + span{
+  color:black;
+}
+
+/*Custom Radio Buttons text selected*/
+input[type='radio']:checked + span{
+  color: #8b2129;
 }
