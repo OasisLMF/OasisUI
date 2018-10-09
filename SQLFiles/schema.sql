@@ -6562,28 +6562,24 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE Procedure [dbo].[linkOutputFileToProcessRun] @ProcessRunId int, @OutputFiles nvarchar(2500)
+CREATE Procedure [dbo].[linkOutputFileToProcessRun] @ProcessRunId int, @OutputFiles nvarchar(max)
 AS
 
 SET NOCOUNT ON;
 ----------------------------------------------------------------------------
 --log database usage
 declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(2500) = ''
+declare	@ParameterList nvarchar(max) = ''
 declare	@LogTimestamp datetime = getdate()
 
 exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 ----------------------------------------------------------------------------
 
-----debug
---declare @processrunid int = 48
---declare @OutputFiles nvarchar(2500) = 'gul_2_eltcalc.csv,gul_eltcalc.csv'
-
 declare @fileid int = (select isnull(max(fileid),0) from [file])
 declare @resourceid int = (select isnull(max(resourceid),0) from [resource])
 declare @fileresourceid int = (select isnull(max(fileresourceid),0) from [fileresource])
 declare @locationid int = (select isnull(max(locationid),0) +1 from [location])
-declare @sql nvarchar(2500)
+declare @sql nvarchar(max)
 
 set @OutputFiles =  replace(@OutputFiles,',',''',''') 
 
