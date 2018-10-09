@@ -2130,8 +2130,6 @@ else
 	begin
 		Update #Item Set CountyCode = 'XX'
 	end
-	
-Update #item set CountyCode = StateCode + '-' +  CountyCode
 
 --PostCode
 Set @ProfileElementID = (Select ProfileElementID From ProfileElement Where ProfileID = @CanLocProfileID and FieldID = @PostCode)
@@ -7526,6 +7524,9 @@ Select	@OutputRunID + RowId AS OutputRunID,
 		@SummaryLevelRunID + RowId AS SummaryLevelRunID
 From	#OutputRun
 Drop Table #OutputRun
+Drop Table #ModelParameters
+Drop Table #WorkflowElements
+
 Select @ProcessRunId AS ReturnValue
 
 GO
