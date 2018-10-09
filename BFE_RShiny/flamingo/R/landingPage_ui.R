@@ -1,61 +1,74 @@
-
 #' @rdname landingPage
-#' @importFrom shinyBS bsButton
-#' @importFrom DT dataTableOutput
+#' @importFrom DT DTOutput
+#' @importFrom shinyBS bsTooltip
 #' @export
 landingPageUI <- function(id) {
-  
   ns <- NS(id)
-  
+
   tagList(
-      fluidRow(
-          column(10,
-              h1("Flamingo 1.0"),
-              h4("Oasis Business Front End")
-          ),
-          column(2,
-              br(),
-              wellPanel(
-                  textOutput(ns("textOutputHeaderData2"))
-              ))
-      ),
-      fluidRow(
-          column(2,
-              bsButton(ns("abuttonexpmngt"), "Exposure Management",
-                  style = "btn btn-primary", size = "default", type = "action",
-                  block = TRUE),
-              bsButton(ns("abuttonprmngt"), "Process Management",
-                  style = "btn btn-primary", size = "default", type = "action",
-                  block = TRUE),
-              bsButton(ns("abuttonfilemngt"), "File Management",
-                  style = "btn btn-primary", size = "default", type = "action",
-                  block = TRUE),
-              bsButton(ns("abuttonsysconf"), "System Configuration",
-                  style = "btn btn-primary", size = "default", type = "action",
-                  block = TRUE),
-              bsButton(ns("abuttonuseradmin"), "User Administration",
-                  style = "btn btn-primary", size = "default", type = "action",
-                  block = TRUE),
-              bsButton(ns("abuttonlogout"), "Logout",
-                  style = "btn btn-primary", size = "default", type = "action",
-                  block = TRUE)
-          ),
-          column(10,
-              
-              wellPanel(
-                  h4("Process Runs Inbox"),
-                  dataTableOutput(ns("tableInbox")),
-                  actionButton(ns("abuttongotorun"), "Goto Run Details",
-                      class = "btn btn-primary", align = "right"),
-                  actionButton(ns("refreshInbox"), "Refresh",
-                      class = "btn btn-primary", align = "right"),
-                  downloadButton(ns("PRIdownloadexcel"),
-                      label="Export to Excel")
-              )),
-          
-          column(12, align = 'right',
-              em("Powered by RShiny", style = "color:gray; font-size:10pt"))
-      )
+    wellPanel(
+      h4("Process Runs Inbox"),
+      DTOutput(ns("tableInbox")),
+      actionButton(ns("abuttongotorun"), "Browse Processes Outputs",
+                   class = "btn btn-primary", align = "right"),
+      bsTooltip(ns("abuttongotorun"), landing_page$abuttongotorun,
+                placement = "right", options = list(container = "body")),
+      actionButton(inputId = ns("refreshInbox"), label = "Refresh", align = "right"),
+      downloadButton(ns("PRIdownloadexcel"),
+                     label = "Export to csv"),
+      bsTooltip(ns("PRIdownloadexcel"), landing_page$PRIdownloadexcel,
+                placement = "right", options = list(container = "body"))
+    )
+    # img(src = "landingpage.png", width = "70%") # to be replaced with proper image
   )
-  
+}
+
+#' @rdname pagestructure
+#' @importFrom shinyBS bsTooltip
+#' @importFrom shinyWidgets dropdownButton
+#' @export
+pageheaderUI <- function(id) {
+  ns <- NS(id)
+  tagList(
+    div( id = ns("accountDDmenu"),
+         dropdownButton(inputId = ns("accountDD"),
+                        circle = TRUE, status = "default",
+                        icon = icon("user"),
+                        size = "s",
+                        right = TRUE,
+                        textOutput(ns("textOutputHeaderData2")),
+                        actionButton(ns("abuttonuseradmin"), class = "btn btn-primary",
+                                     label = "User Administration", align = "center", width = "100%"),
+
+                        actionButton(ns("abuttondefineaccount"), class = "btn btn-primary",
+                                     label = "Define Account", align = "center", width = "100%"),
+                        bsTooltip(ns("abuttondefineaccount"),
+                                  landing_page$abuttondefineaccount,
+                                  placement = "left",
+                                  options   = list(container = "body")),
+
+                        actionButton(ns("abuttonsysconf"), class = "btn btn-primary",
+                                     label = "System Configuration", align = "center", width = "100%"),
+                        bsTooltip(ns("abuttonsysconf"),
+                                  landing_page$abuttonsysconf,
+                                  placement = "left",
+                                  options   = list(container = "body")),
+
+			actionButton(ns("abuttonlogout"), class = "btn btn-primary",
+                                     label = "Logout", align = "center", width = "100%")
+         )
+    )
+  )
+}
+
+
+
+#' @rdname pagestructure
+#' @export
+pagestructureUI <- function(id) {
+  ns <- NS(id)
+
+  tagList(
+    uiOutput(ns("sidebar"))
+  )
 }

@@ -9,14 +9,14 @@ buildDbQuery(dbFunc, ..., dboPrefix = TRUE, squareBrackets = FALSE)
 \arguments{
 \item{dbFunc}{database function to call}
 
-\item{...}{arguments to \code{dbFunc}. \code{character()} args are quoted
-with single quotes (').}
+\item{...}{arguments to \code{dbFunc}. \code{character()} args are quoted with single
+quotes (').}
 
 \item{dboPrefix}{prefix \code{dbFunc} with \code{"dbo."}}
 
-\item{squareBrackets}{surround the argument list with [ and ]}
+\item{squareBrackets}{surround the argument list with square brackets}
 }
 \description{
 Constructs query statements that can be executed with
-\link{dbExecute}.
+\code{\link[DBI:dbExecute]{DBI::dbExecute()}}.
 }

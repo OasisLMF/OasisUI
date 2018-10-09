@@ -16,9 +16,9 @@ runProcess(apiSettings, runId, logWarning = warning, ...)
 \item{...}{further arguments to \link{GET}}
 }
 \value{
-http status category
+http status category warn_for_status
 }
 \description{
-Submit a GET request to the Flamingo API Server to execute 
+Submit a GET request to the Flamingo API Server to execute
 the workflow.
 }

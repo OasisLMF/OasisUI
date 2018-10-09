@@ -7,16 +7,16 @@
 getCompanyList(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
 companies; \code{data.frame} of 5 variables:
 \itemize{
-		\item \code{Company ID}
-		\item \code{Company Name}
-   \item \code{Company Domicile}
-		\item \code{Company Legal Name}
-		\item \code{Company Registration Number}
+\item \code{Company ID}
+\item \code{Company Name}
+\item \code{Company Domicile}
+\item \code{Company Legal Name}
+\item \code{Company Registration Number}
 }
 }
 \description{

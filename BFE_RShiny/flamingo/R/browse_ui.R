@@ -1,0 +1,137 @@
+#' Browse programmes UI
+#' @rdname browseprogrammesUI
+#' @description UI/View for the process run page
+#' @inheritParams flamingoModuleUI
+#' @return list of tags
+#' @export
+browseprogrammesUI <- function(id) {
+
+  ns <- NS(id)
+  tagList(
+
+    h4("Browse Run Outputs", class = "flamingo-page-title") ,
+    panelDefineRunID(id),
+    panelSummaryTable(id),
+    panelOutput(id),
+    panelViewOutputFiles(id)
+  )
+}
+
+
+# Functions for UI Panels ------------------------------------------------------------------------------
+
+#' @inheritParams flamingoModuleUI
+#' @importFrom shinyWidgets panel
+#' @importFrom shinyBS bsTooltip
+#' @export
+panelDefineRunID <-  function(id){
+  ns <- NS(id)
+  panel(
+    status = "primary",
+    fluidRow(
+      column(6,
+             selectInput(inputId =  ns("selectRunID"), label = "Run ID", choices = "", selected = NULL),
+             bsTooltip(ns("selectRunID"),
+                       browse_programmes$selectRunID,
+                       placement = "right",
+                       options   = list(container = "body"))),
+      column(6,
+             align = "right",
+             actionButton(inputId = ns("abuttongotoconfig"), label = "Go to Configure Output",  class = "btn btn-primary"))
+    )
+  )
+}
+
+
+
+#' @inheritParams flamingoModuleUI
+#' @export
+panelSummaryTable <-  function(id){
+  ns <- NS(id)
+  flamingoPanel(
+    id = ns("flamingoPanelSummaryTable"),
+    collapsible = TRUE,
+    heading = "Summary Table",
+    panelSummaryTableModuleUI(ns( "panelSummaryTableModule"))
+  )
+}
+
+
+#' @inheritParams flamingoModuleUI
+#' @importFrom DT DTOutput
+#' @export
+panelSummaryTableModuleUI <-  function(id){
+  ns <- NS(id)
+  tagList(
+    DTOutput(ns("outputsummarytable"))
+  )
+}
+
+
+#' Function wrapping panel to define prgramme and model IDs
+#' @inheritParams flamingoModuleUI
+#' @export
+panelOutput <-  function(id){
+  ns <- NS(id)
+  flamingoIncrementalPanelUI(
+    id = ns("flamingoIncrementalPanelOutput-0"),
+    heading = "New Plot",
+    collapsible = FALSE, show = FALSE, removable = FALSE)
+}
+
+
+#' @inheritParams flamingoModuleUI
+#' @importFrom shinyWidgets panel
+#' @importFrom shinyjs hidden
+#' @importFrom plotly plotlyOutput
+#' @export
+panelOutputModuleUI <-  function(id){
+  ns <- NS(id)
+  tagList(
+    flamingoPanel(
+      id = ns("flamingoPanelOutputModule"),
+      collapsible = TRUE,
+      heading = "Custom Plot",
+      h4("Data to plot"),
+      column(12,
+             div( class = "InlineSelectInput",
+                  selectInput(inputId = ns("inputplottype"), label = "Select a plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1]))
+             ),
+      br(),
+      column(4,
+             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = losstypes, inline = TRUE)),
+      column(8,
+             checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Summary Level", choices = granularities, inline = TRUE)),
+      br(),
+      column(12,
+      checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Report", choices = variables, inline = TRUE)),
+      br(),
+      h4("Customize Plot"),
+      column(4,
+             div(class = "InlineTextInput",
+             textInput(ns("textinputtitle"), "Title", ""))),
+      column(4,
+             hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
+      actionButton(inputId = ns("abuttondraw"), label = "Draw Plot",  class = "btn btn-primary", style = "float:right")
+    ),
+
+    panel(
+      # heading = h4("Plot"),
+      plotlyOutput(ns("outputplot"))
+    )
+  )
+}
+
+
+#' @inheritParams flamingoModuleUI
+#' @export
+panelViewOutputFiles <-  function(id){
+  ns <- NS(id)
+  flamingoPanel(
+    id = ns("flamingoPanelViewOutputFiles"),
+    collapsible = TRUE,
+    heading = "Files Table",
+    ViewFilesModuleUI(id  = ns("ViewFilesModule"), includechkbox = FALSE)
+  )
+}
+

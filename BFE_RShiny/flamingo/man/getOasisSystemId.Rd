@@ -7,13 +7,13 @@
 getOasisSystemId(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
 oasis systems; \code{data.frame} of 2 variables:
 \itemize{
-		\item \code{OasisSystemID}
-		\item \code{OasisSystemName}
+\item \code{OasisSystemID}
+\item \code{OasisSystemName}
 }
 }
 \description{

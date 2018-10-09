@@ -7,13 +7,13 @@
 getTransformNameSourceCan(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 }
 \value{
 transforms; \code{data.frame} of 2 variables:
 \itemize{
-		\item \code{TransformName}
-		\item \code{TransformID} 
+\item \code{TransformName}
+\item \code{TransformID}
 }
 }
 \description{
