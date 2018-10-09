@@ -463,6 +463,36 @@ getFileSourceLocationFile <- function(dbSettings){
   return(res)
 }
 
+#' Get File Source Reinsurance File
+#' @inheritParams executeDbQuery
+#' @return \code{data.frame} of 2 variables:
+#' \itemize{
+#'              \item \code{FileName}
+#'              \item \code{FileId}
+#' }
+#' @export
+getFileSourceReinsuranceFile <- function(dbSettings){
+
+  res <- executeDbQuery(dbSettings, buildDbQuery("getFileSourceReinsuranceFile"))
+
+  return(res)
+}
+
+#' Get File Source Reinsurance Scope File
+#' @inheritParams executeDbQuery
+#' @return \code{data.frame} of 2 variables:
+#' \itemize{
+#'              \item \code{FileName}
+#'              \item \code{FileId}
+#' }
+#' @export 
+getFileSourceReinsuranceScopeFile <- function(dbSettings){
+
+  res <- executeDbQuery(dbSettings, buildDbQuery("getFileSourceReinsuranceScopeFile"))
+
+  return(res)
+}
+
 #' Get Programme Oasis for a given Programme Id
 #' @description Run getProgOasisForProg against the database.
 #' @inheritParams executeDbQuery
