@@ -95,23 +95,46 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   )
   
   # Observers for debugging -------------------------------------------------
-  observe({print("input$tableDPprog_rows_selected")
-    print(input$tableDPprog_rows_selected)})
+  observe(
+    if (active()) {
+      {print("input$tableDPprog_rows_selected")
+        print(input$tableDPprog_rows_selected)
+      }
+    })
   
-  observe({print("input$tableProgOasisOOK_rows_selected")
-    print(input$tableProgOasisOOK_rows_selected)})
+  observe({
+    if (active()) {
+      print("input$tableProgOasisOOK_rows_selected")
+      print(input$tableProgOasisOOK_rows_selected)
+    }
+  })
   
-  observe({print("input$tableprocessrundata_rows_selected")
-    print(input$tableprocessrundata_rows_selected)})
+  observe({
+    if (active()) {
+      print("input$tableprocessrundata_rows_selected")
+      print(input$tableprocessrundata_rows_selected)
+    }
+  })
   
-  observe({print("input$selectprogrammeID")
-    print(input$selectprogrammeID)})
+  observe({
+    if (active()) {
+      print("input$selectprogrammeID")
+      print(input$selectprogrammeID)
+    }
+  })
   
-  observe({print("input$selectprogOasisID")
-    print(input$selectprogOasisID)})
+  observe({
+    if (active()) {
+      print("input$selectprogOasisID")
+      print(input$selectprogOasisID)
+    }
+  })
   
-  observe({print("result$prrunid")
-    print(result$prrunid)
+  observe({
+    if (active()) {
+      print("result$prrunid")
+      print(result$prrunid)
+    }
   })
   
   observeEvent({
@@ -122,14 +145,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     input$tableProgOasisOOK_rows_selected
     input$tableDPprog_rows_selected
   }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    print("current status of reactives")
-    print(paste0("input$tableDPprog_rows_selected: ", input$tableDPprog_rows_selected))
-    print(paste0("input$tableProgOasisOOK_rows_selected: ", input$tableProgOasisOOK_rows_selected))
-    print(paste0("input$tableprocessrundata_rows_selected: ", input$tableprocessrundata_rows_selected))
-    print(paste0("input$selectprogrammeID: ", input$selectprogrammeID))
-    print(paste0("input$selectprogOasisID: ", input$selectprogOasisID))
-    print(paste0("iresult$prrunid: ", result$prrunid))
-    })
+    if (active()) {
+      print("current status of reactives")
+      print(paste0("input$tableDPprog_rows_selected: ", input$tableDPprog_rows_selected))
+      print(paste0("input$tableProgOasisOOK_rows_selected: ", input$tableProgOasisOOK_rows_selected))
+      print(paste0("input$tableprocessrundata_rows_selected: ", input$tableprocessrundata_rows_selected))
+      print(paste0("input$selectprogrammeID: ", input$selectprogrammeID))
+      print(paste0("input$selectprogOasisID: ", input$selectprogOasisID))
+      print(paste0("result$prrunid: ", result$prrunid))
+    }
+  })
   
   # Panels switch ------------------------------------------------------------
   # Module to control colors of radio buttons in the singleProgrammeWorkflowSteps
@@ -616,31 +641,33 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # > Updates dependent on changed: tableDPprog_rows_selected -------------------
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
-    # Update Programme Detail table if row selected changes
-    #.reloadProgDetails()
-    # Update Associate Model Panel
-    .updateOOKProgrammeSelection()
-    .clearOOKModelSelection()
-    .clearOOKTransformSelection()
-    hide("panelProgrammeDetails")
-    show("buttonprogdetails")
-    hide("panelDefineProgramme")
-    
-    
-    if (length(input$tableDPprog_rows_selected) > 0) {
-      # note that tableDPprog allows single row selection only
-      prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-      logMessage(paste("updating selectprogrammeID because selection in programme table changed to", prgId))
-      if (prgId != input$selectprogrammeID) {
-        # re-selecting the same programme ID in the drop-down would not re-trigger
-        # any of the observers of the drop-down, however we then also want to be
-        # sure not to increase stop_selProgID!
-        stop_selProgID <<- stop_selProgID + 1
-        updateSelectizeInput(session, inputId = "selectprogrammeID", selected = prgId)
+    if (active()) {
+      logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
+      # Update Programme Detail table if row selected changes
+      #.reloadProgDetails()
+      # Update Associate Model Panel
+      .updateOOKProgrammeSelection()
+      .clearOOKModelSelection()
+      .clearOOKTransformSelection()
+      hide("panelProgrammeDetails")
+      show("buttonprogdetails")
+      hide("panelDefineProgramme")
+      
+      
+      if (length(input$tableDPprog_rows_selected) > 0) {
+        # note that tableDPprog allows single row selection only
+        prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+        if (prgId != input$selectprogrammeID) {
+          logMessage(paste("updating selectprogrammeID because selection in programme table changed to", prgId))
+          # re-selecting the same programme ID in the drop-down would not re-trigger
+          # any of the observers of the drop-down, however we then also want to be
+          # sure not to increase stop_selProgID!
+          stop_selProgID <<- stop_selProgID + 1
+          updateSelectizeInput(session, inputId = "selectprogrammeID", selected = prgId)
+        }
+      } else {
+        updateSelectizeInput(session, inputId = "selectprogrammeID", selected = character(0))
       }
-    } else {
-      updateSelectizeInput(session, inputId = "selectprogrammeID", selected = character(0))
     }
   })
   
@@ -648,15 +675,17 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   ### > Define selectprogrammeID ----
   # Add choices to selectprogrammeID, update selectprogrammeID
   observeEvent(result$DPProgData, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    logMessage(paste0("updating selectprogrammeID choices because programme table was reloaded - contains ", nrow(result$DPProgData), " rows"))
-    if (input$selectprogrammeID == "") {
-      # initial selection last programme created
-      prgId <- result$DPProgData[1, DPProgData.ProgrammeID]
-    } else {
-      # keep current selection
-      prgId <- input$selectprogrammeID
+    if (active()) {
+      logMessage(paste0("updating selectprogrammeID choices because programme table was reloaded - contains ", nrow(result$DPProgData), " rows"))
+      if (input$selectprogrammeID == "") {
+        # initial selection last programme created
+        prgId <- result$DPProgData[1, DPProgData.ProgrammeID]
+      } else {
+        # keep current selection
+        prgId <- input$selectprogrammeID
+      }
+      updateSelectizeInput(session, inputId = "selectprogrammeID", choices = c(result$DPProgData[, DPProgData.ProgrammeID]), selected = prgId)
     }
-    updateSelectizeInput(session, inputId = "selectprogrammeID", choices = c(result$DPProgData[, DPProgData.ProgrammeID]), selected = prgId)
   })
   
   observeEvent( input$sinputookprogid, {
@@ -870,38 +899,39 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    
-    #.reloadProgFiles()
-    show("buttonmodeldetails")
-    hide("panelModelDetails")
-    
-    # Show perils according to programme model
-    if (length(input$tableProgOasisOOK_rows_selected) > 0 ) {
-      prgId <- result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId]
-      procId <- toString(prgId)
+    if (active()) {
+      #.reloadProgFiles()
+      show("buttonmodeldetails")
+      hide("panelModelDetails")
       
-      logMessage(paste("updating selectprogOasisID because selection in programme model table changed to",  prgId))
-      updateSelectizeInput(session, inputId = "selectprogOasisID", selected = prgId)
-      
-      if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {
-        paramlist <- executeDbQuery(dbSettings,
-                                    buildDbQuery("getRuntimeParamList", procId))
-        hide("perilwind")
-        hide("perilsurge")
-        hide("perilquake")
-        hide("perilflood")
-        hide("demandsurge")
-        hide("leakagefactor")
-        if (nrow(paramlist) > 0) {
-          for (i in 1:nrow(paramlist)) {
-            ctrname <- gsub("_", "", paramlist[i, 1], fixed = TRUE)
-            show(ctrname)
+      # Show perils according to programme model
+      if (length(input$tableProgOasisOOK_rows_selected) > 0 ) {
+        prgId <- result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId]
+        procId <- toString(prgId)
+        
+        logMessage(paste("updating selectprogOasisID because selection in programme model table changed to",  prgId))
+        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = prgId)
+        
+        if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {
+          paramlist <- executeDbQuery(dbSettings,
+                                      buildDbQuery("getRuntimeParamList", procId))
+          hide("perilwind")
+          hide("perilsurge")
+          hide("perilquake")
+          hide("perilflood")
+          hide("demandsurge")
+          hide("leakagefactor")
+          if (nrow(paramlist) > 0) {
+            for (i in 1:nrow(paramlist)) {
+              ctrname <- gsub("_", "", paramlist[i, 1], fixed = TRUE)
+              show(ctrname)
+            }
           }
         }
+        
+      } else {
+        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0))
       }
-      
-    } else {
-      updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0))
     }
   })
   
@@ -909,54 +939,61 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   ### > Define selectprogOasisID ----
   # Add choices possibilities to selectprogOasisID
   observeEvent(result$POData, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (!is.null(result$POData) && nrow(result$POData) > 0) {
-      updateSelectizeInput(session, inputId = "selectprogOasisID", choices = c(result$POData[, POData.ProgOasisId]))
-      if (input$selectprogrammeID != "") {
-        logMessage(paste("updating selectprogOasisID choices based on Programme Model Table"))
-        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = result$POData[1, POData.ProgOasisId])
+    if (active()) {
+      if (!is.null(result$POData) && nrow(result$POData) > 0) {
+        updateSelectizeInput(session, inputId = "selectprogOasisID", choices = c(result$POData[, POData.ProgOasisId]))
+        if (input$selectprogrammeID != "") {
+          logMessage(paste("updating selectprogOasisID choices based on Programme Model Table"))
+          updateSelectizeInput(session, inputId = "selectprogOasisID", selected = result$POData[1, POData.ProgOasisId])
+        } else {
+          updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0))
+        }
       } else {
-        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0))
+        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0)) 
       }
-    } else {
-      updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0)) 
     }
   })
   
   # If selectprogOasisID changes, reload process run table and set view back to default
   observeEvent(input$selectprogOasisID, ignoreInit = TRUE, {
-    bl_dirty1 <- stop_selProgOasisID > check_selProgOasisID
-    #.defaultview(session)
-    show("buttonmodeldetails")
-    hide("panelModelDetails")
-    hide("panelDefineOutputs")
-    hide("panelProcessRunLogs")
-    .reloadRunData()
-    logMessage(paste("updating prcrundata select because selectprogOasisID changed to", input$selectprogOasisID))
-    if (input$selectprogOasisID != "") {
-      if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
-        rowToSelect <- match(input$selectprogOasisID, result$POData[, POData.ProgOasisId])
-        pageSel <- ceiling(rowToSelect/pageLength)
-        if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
-          # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
-          selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
-          selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
-          logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
-        }
-      } 
-    } else {
-      result$prcrundata <- NULL
-      selectRows(dataTableProxy("tableProgOasisOOK"), NULL)
-      selectPage(dataTableProxy("tableProgOasisOOK"), 1)
-      logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+    if (active()) {
+      bl_dirty1 <- stop_selProgOasisID > check_selProgOasisID
+      #.defaultview(session)
+      show("buttonmodeldetails")
+      hide("panelModelDetails")
+      hide("panelDefineOutputs")
+      hide("panelProcessRunLogs")
+      .reloadRunData()
+      if (input$selectprogOasisID != "") {
+        logMessage(paste("updating prcrundata select because selectprogOasisID changed to", input$selectprogOasisID))
+        if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
+          rowToSelect <- match(input$selectprogOasisID, result$POData[, POData.ProgOasisId])
+          pageSel <- ceiling(rowToSelect/pageLength)
+          if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
+            # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
+            selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
+            selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
+            logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+          }
+        } 
+      } else {
+        result$prcrundata <- NULL
+        selectRows(dataTableProxy("tableProgOasisOOK"), NULL)
+        selectPage(dataTableProxy("tableProgOasisOOK"), 1)
+        logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+      }
+      if (bl_dirty1) check_selProgOasisID <<- check_selProgOasisID + 1
     }
-    if (bl_dirty1) check_selProgOasisID <<- check_selProgOasisID + 1
   })
   
   
   ### > Process Run Table -----
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioprrunsAllOrInProgress, ignoreInit = TRUE, {
-    .reloadRunData()
+    if (active()) {
+      logMessage(paste0("filter changed to ", input$radioprrunsAllOrInProgress))
+      .reloadRunData()
+    }
   })
   
   #Content of the process run table
@@ -1045,10 +1082,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   #Not allow any actions if the process run table is empty
   observeEvent(result$prcrundata, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
-      show("divprocessRunButtons")
-    } else {
-      hide("divprocessRunButtons")
+    if (active()) {
+      if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
+        show("divprocessRunButtons")
+      } else {
+        hide("divprocessRunButtons")
+      }
     }
   })
   
@@ -1124,47 +1163,54 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   # Select/deselect GUL
-  observeEvent(input$chkinputGUL, {
-    if (input$chkinputGUL == FALSE) {
-      .clearchkboxGULgrp()
-    }  else {
-      disable("chkgulpolicy")
-      gullistlength <- length(input$chkgulprog) + length(input$chkgulstate) +
-        length(input$chkgulcounty) + length(input$chkgulloc) +
-        length(input$chkgullob) + length(input$chkgulpolicy)
-      if (gullistlength == 0) {
-        for (i in checkgulgrplist) {
-          updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesGUL)
+  observeEvent(input$chkinputGUL, ignoreInit = TRUE,  {
+    if (active()) {
+      if (input$chkinputGUL == FALSE) {
+        .clearchkboxGULgrp()
+      }  else {
+        disable("chkgulpolicy")
+        gullistlength <- length(input$chkgulprog) + length(input$chkgulstate) +
+          length(input$chkgulcounty) + length(input$chkgulloc) +
+          length(input$chkgullob) + length(input$chkgulpolicy)
+        if (gullistlength == 0) {
+          for (i in checkgulgrplist) {
+            updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesGUL)
+          }
         }
       }
     }
   })
   
   # Select/deselect IL 
-  observeEvent(input$chkinputIL, {
-    if (input$chkinputIL == FALSE) {
-      .clearchkboxILgrp()
-    } else {
-      if (length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
-          length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
-          length(input$chkillob) == 0 & length(input$chkilpolicy) == 0) {
-        for (i in checkilgrplist) {
-          updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesIL)
+  #Note: the ignoreInit = TRUE does not prevent the trigger once logged in
+  observeEvent(input$chkinputIL, ignoreInit = TRUE, {
+    if (active()) {
+      if (input$chkinputIL == FALSE) {
+        .clearchkboxILgrp()
+      } else {
+        if (length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
+            length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
+            length(input$chkillob) == 0 & length(input$chkilpolicy) == 0) {
+          for (i in checkilgrplist) {
+            updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesIL)
+          }
         }
       }
     }
   })
   
   # Select/deselect RI
-  observeEvent(input$chkinputRI, {
-    if (input$chkinputRI == FALSE) {
-      .clearchkboxRIgrp()
-    } else {
-      if (length(input$chkriprog) == 0 &  length(input$chkristate) == 0 &
-          length(input$chkricounty) == 0 &  length(input$chkriloc) == 0 &
-          length(input$chkrilob) == 0 & length(input$chkripolicy) == 0) {
-        for (i in checkrigrplist) {
-          updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesRI)
+  observeEvent(input$chkinputRI, ignoreInit = TRUE, {
+    if (active()) {
+      if (input$chkinputRI == FALSE) {
+        .clearchkboxRIgrp()
+      } else {
+        if (length(input$chkriprog) == 0 &  length(input$chkristate) == 0 &
+            length(input$chkricounty) == 0 &  length(input$chkriloc) == 0 &
+            length(input$chkrilob) == 0 & length(input$chkripolicy) == 0) {
+          for (i in checkrigrplist) {
+            updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesRI)
+          }
         }
       }
     }
@@ -1463,27 +1509,29 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # > Updates dependent on changed: tableprocessrundata_rows_selected ---------
   # Allow display output option only if run successful. Otherwise default view is logs
-  observeEvent(input$tableprocessrundata_rows_selected, ignoreNULL = FALSE, {
-    logMessage(paste("input$tableprocessrundata_rows_selected is changed to:", input$tableprocessrundata_rows_selected))
-    hide("panelDefineOutputs")
-    hide("panelProcessRunLogs")
-    show("abuttondisplayoutput")
-    show("abuttonshowlog")
-    ##### TODO: Do I need the second check in this if????
-    if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
-      result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
-      if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
-        hide("abuttondisplayoutput")
-        hide("abuttonshowlog")
-        # This occurs only by changing process run, which is only possible in panel 3
-        show("panelProcessRunLogs")
-        logMessage("showing prrunlogtable")
+  observeEvent(input$tableprocessrundata_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (active()) {
+      logMessage(paste("input$tableprocessrundata_rows_selected is changed to:", input$tableprocessrundata_rows_selected))
+      hide("panelDefineOutputs")
+      hide("panelProcessRunLogs")
+      show("abuttondisplayoutput")
+      show("abuttonshowlog")
+      ##### TODO: Do I need the second check in this if????
+      if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
+        result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
+        if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
+          hide("abuttondisplayoutput")
+          hide("abuttonshowlog")
+          # This occurs only by changing process run, which is only possible in panel 3
+          show("panelProcessRunLogs")
+          logMessage("showing prrunlogtable")
+        } else {
+          show("abuttondisplayoutput")
+          show("abuttonshowlog")
+        }
       } else {
-        show("abuttondisplayoutput")
-        show("abuttonshowlog")
+        result$prrunid <- -1
       }
-    } else {
-      result$prrunid <- -1
     }
   }) 
   
@@ -1705,11 +1753,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   .updateDPAccountSelection <- function() {
     logMessage(".updateDPAccountSelection called")
-    if (length(setdiff(accounts,prev_accounts)) > 0 ) {
-      updateSelectizeInput(session, "sinputDPAccountName",
-                           choices = createSelectOptions(accounts),
-                           selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.AccountID]))
-    }
+    accounts <- getAccountName(dbSettings)
+    updateSelectizeInput(session, "sinputDPAccountName",
+                         choices = createSelectOptions(accounts),
+                         selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.AccountID]))
   }
   
   .updateProgrammeName <- function() {
