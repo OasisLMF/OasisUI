@@ -185,33 +185,35 @@ panelDefineIDs <- function(id) {
     #heading = fluidRow(column(11, h4("Filter"))),
     fluidRow(
       div(id = ns("divselectprogrammeID"),
-          column(3,
-                 #selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = c("<Select>"), selected = "<Select>"),
-                 selectizeInput(inputId = ns("selectprogrammeID"), label = "Programme ID", 
-                                choices = c(), 
-                                selected = character(0),
-                                options = list(
-                                  allowEmptyOption = TRUE,
-                                  placeholder = 'Select',
-                                  onInitialize = I('function() { this.setValue(""); }'))
-                 )  %>%
-                   bs_embed_tooltip(title = programme_Definition_Single$selectprogammeID,
-                                    placement = "right")
-          )),
+          column(4,
+                 div(class = "InlineSelectInputSmall",
+                     #selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = c("<Select>"), selected = "<Select>"),
+                     selectizeInput(inputId = ns("selectprogrammeID"), label = "Programme ID", 
+                                    choices = c(), 
+                                    selected = character(0),
+                                    options = list(
+                                      allowEmptyOption = TRUE,
+                                      placeholder = 'Select',
+                                      onInitialize = I('function() { this.setValue(""); }'))
+                     )  %>%
+                       bs_embed_tooltip(title = programme_Definition_Single$selectprogammeID,
+                                        placement = "right")
+                 ))),
       hidden(div(id = ns("divselectprogOasisID"),
-                 column(3,
-                        #selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
-                        selectizeInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", 
-                                       choices = c(), 
-                                       selected = character(0),
-                                       options = list(
-                                         allowEmptyOption = TRUE,
-                                         placeholder = 'Select',
-                                         onInitialize = I('function() { this.setValue(""); }'))
-                        ) %>%
-                          bs_embed_tooltip(title = programme_Definition_Single$selectprogOasisID,
-                                           placement = "right")
-                 )))
+                 column(5,
+                        div(class = "InlineSelectInputSmall", 
+                            #selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
+                            selectizeInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", 
+                                           choices = c(), 
+                                           selected = character(0),
+                                           options = list(
+                                             allowEmptyOption = TRUE,
+                                             placeholder = 'Select',
+                                             onInitialize = I('function() { this.setValue(""); }'))
+                            ) %>%
+                              bs_embed_tooltip(title = programme_Definition_Single$selectprogOasisID,
+                                               placement = "right")
+                        ))))
     )
   )
 }
