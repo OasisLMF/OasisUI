@@ -110,8 +110,8 @@ panelDefineProgramme <- function(id) {
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
              ) %>%
-             bs_embed_tooltip(title = programme_Definition_Single$sinputTransformname,
-                              placement = "right"))),
+               bs_embed_tooltip(title = programme_Definition_Single$sinputTransformname,
+                                placement = "right"))),
     fluidRow(column(4,
                     actionButton(ns("abuttonProgSubmit"), "Submit", class = "btn btn-primary")), style = "float:right"),
     fluidRow(
@@ -194,9 +194,10 @@ panelDefineIDs <- function(id) {
                                   allowEmptyOption = TRUE,
                                   placeholder = 'Select',
                                   onInitialize = I('function() { this.setValue(""); }'))
-                 ) %>%
-                 bs_embed_tooltip(title = programme_Definition_Single$selectprogrammeID,
-                                  placement = "right"))),
+                 )  %>%
+                   bs_embed_tooltip(title = programme_Definition_Single$selectprogammeID,
+                                    placement = "right")
+          )),
       hidden(div(id = ns("divselectprogOasisID"),
                  column(3,
                         #selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
@@ -208,8 +209,9 @@ panelDefineIDs <- function(id) {
                                          placeholder = 'Select',
                                          onInitialize = I('function() { this.setValue(""); }'))
                         ) %>%
-                        bs_embed_tooltip(title = programme_Definition_Single$selectprogOasisID,
-                                         placement = "right"))))
+                          bs_embed_tooltip(title = programme_Definition_Single$selectprogOasisID,
+                                           placement = "right")
+                 )))
     )
   )
 }
@@ -289,8 +291,8 @@ panelAssociateModel <- function(id) {
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
              )) %>%
-      bs_embed_tooltip(title = programme_Definition_Single$sinputProgModTransform,
-                       placement = "right")),
+        bs_embed_tooltip(title = programme_Definition_Single$sinputProgModTransform,
+                         placement = "right")),
     
     div(actionButton(inputId = ns("abuttoncrprogoasis"), label = "Create", class = "btn btn-primary"), style="float:right;")
   )
