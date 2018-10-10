@@ -5,6 +5,7 @@
 #' @inheritParams flamingoModuleUI
 #' @return list of tags
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
 #' @export
 programmeDefinitionSingleUI <- function(id) {
   
@@ -107,11 +108,9 @@ panelDefineProgramme <- function(id) {
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
-             ),
-             bsTooltip(ns("sinputTransformname"),
-                       programme_Definition_Single$sinputTransformname,
-                       placement = "right",
-                       options = list(container = "body")))),
+             ) %>%
+             bs_embed_tooltip(title = programme_Definition_Single$sinputTransformname,
+                              placement = "right"))),
     fluidRow(column(4,
                     actionButton(ns("abuttonProgSubmit"), "Submit", class = "btn btn-primary")), style = "float:right"),
     fluidRow(
@@ -193,11 +192,9 @@ panelDefineIDs <- function(id) {
                                   allowEmptyOption = TRUE,
                                   placeholder = 'Select',
                                   onInitialize = I('function() { this.setValue(""); }'))
-                                ),
-                 bsTooltip(ns("selectprogrammeID"),
-                           programme_Definition_Single$selectprogrammeID,
-                           placement = "right",
-                           options = list(container = "body")))),
+                 ) %>%
+                 bs_embed_tooltip(title = programme_Definition_Single$selectprogrammeID,
+                                  placement = "right"))),
       hidden(div(id = ns("divselectprogOasisID"),
                  column(3,
                         #selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
@@ -208,11 +205,9 @@ panelDefineIDs <- function(id) {
                                          allowEmptyOption = TRUE,
                                          placeholder = 'Select',
                                          onInitialize = I('function() { this.setValue(""); }'))
-                        ),
-                        bsTooltip(ns("selectprogOasisID"),
-                                  programme_Definition_Single$selectprogOasisID,
-                                  placement = "right",
-                                  options = list(container = "body")))))
+                        ) %>%
+                        bs_embed_tooltip(title = programme_Definition_Single$selectprogOasisID,
+                                         placement = "right"))))
     )
   )
 }
@@ -276,25 +271,23 @@ panelAssociateModel <- function(id) {
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
-                            )),
+             )),
       column(4,
              selectizeInput(ns("sinputookmodelid"), "Model:", choices = c(""), selected=character(0),
                             options = list(
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
-                            )),
+             )),
       column(4,
              selectizeInput(ns("sinputProgModTransform"), "Transform Name", choices = c("") , selected=character(0),
-                         options = list(
-                           allowEmptyOption = TRUE,
-                           placeholder = 'Select',
-                           onInitialize = I('function() { this.setValue(""); }'))
-                         )),
-             bsTooltip(ns("sinputProgModTransform"),
-                       programme_Definition_Single$sinputProgModTransform,
-                       placement = "right",
-                       options = list(container = "body"))),
+                            options = list(
+                              allowEmptyOption = TRUE,
+                              placeholder = 'Select',
+                              onInitialize = I('function() { this.setValue(""); }'))
+             )) %>%
+      bs_embed_tooltip(title = programme_Definition_Single$sinputProgModTransform,
+                       placement = "right")),
     
     div(actionButton(inputId = ns("abuttoncrprogoasis"), label = "Create", class = "btn btn-primary"), style="float:right;")
   )
@@ -365,7 +358,7 @@ panelDefineOutputs <- function(id) {
       h4(""),
       uiOutput(ns("paneltitleReDefineProgramme"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;")
-      ),
+    ),
     fluidRow(
       column(4,
              panelDefineOutputsDetails(id)),
