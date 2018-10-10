@@ -94,6 +94,43 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     prog_flag = "C"
   )
   
+  # Observers for debugging -------------------------------------------------
+  observe({print("input$tableDPprog_rows_selected")
+    print(input$tableDPprog_rows_selected)})
+  
+  observe({print("input$tableProgOasisOOK_rows_selected")
+    print(input$tableProgOasisOOK_rows_selected)})
+  
+  observe({print("input$tableprocessrundata_rows_selected")
+    print(input$tableprocessrundata_rows_selected)})
+  
+  observe({print("input$selectprogrammeID")
+    print(input$selectprogrammeID)})
+  
+  observe({print("input$selectprogOasisID")
+    print(input$selectprogOasisID)})
+  
+  observe({print("result$prrunid")
+    print(result$prrunid)
+  })
+  
+  observeEvent({
+    result$prrunid
+    input$selectprogOasisID
+    input$selectprogrammeID
+    input$tableprocessrundata_rows_selected
+    input$tableProgOasisOOK_rows_selected
+    input$tableDPprog_rows_selected
+  }, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    print("current status of reactives")
+    print(paste0("input$tableDPprog_rows_selected: ", input$tableDPprog_rows_selected))
+    print(paste0("input$tableProgOasisOOK_rows_selected: ", input$tableProgOasisOOK_rows_selected))
+    print(paste0("input$tableprocessrundata_rows_selected: ", input$tableprocessrundata_rows_selected))
+    print(paste0("input$selectprogrammeID: ", input$selectprogrammeID))
+    print(paste0("input$selectprogOasisID: ", input$selectprogOasisID))
+    print(paste0("iresult$prrunid: ", result$prrunid))
+    })
+  
   # Panels switch ------------------------------------------------------------
   # Module to control colors of radio buttons in the singleProgrammeWorkflowSteps
   workflowSteps <- callModule(singleProgrammeWorkflowSteps, "workflowsteps")
@@ -578,25 +615,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   
   # > Updates dependent on changed: tableDPprog_rows_selected -------------------
-  observe({print("input$tableDPprog_rows_selected")
-    print(input$tableDPprog_rows_selected)})
-  
-  observe({print("input$tableProgOasisOOK_rows_selected")
-    print(input$tableProgOasisOOK_rows_selected)})
-  
-  observe({print("input$tableprocessrundata_rows_selected")
-    print(input$tableprocessrundata_rows_selected)})
-  
-  observe({print("input$selectprogrammeID")
-    print(input$selectprogrammeID)})
-  
-  observe({print("input$selectprogOasisID")
-    print(input$selectprogOasisID)})
-  
-  observe({print("result$prrunid")
-    print(result$prrunid)
-  })
-  
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
     # Update Programme Detail table if row selected changes
@@ -718,10 +736,17 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   #  Programme Model Table title
   output$paneltitleProgrammeModelTable <- renderUI({
-    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
     if (input$selectprogrammeID != "") {
-      paste0("Models Table for Programme", " - ", progName," (id: ", progId, ")")
+      progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+      progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
+      if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusCompleted) {
+        progStatus <- "- Status: Completed"
+      } else if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusProcessing) {
+        progStatus <- "- Status: in Progress"
+      } else if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusFailed) {
+        progStatus <- "- Status: Failed"
+      }
+      paste0("Models Table for Programme", " - ", progName," (id: ", progId, ") ", progStatus)
     } else {
       paste0("Models Table")
     }
@@ -729,14 +754,20 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # Associate Model Table Title
   output$paneltitleAssociateModel <- renderUI({
-    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
     if (input$selectprogrammeID != "") {
-      paste0("Associate Model to Programme", " - ", progName, " (id: ", progId, ")")
+      progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+      progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
+      if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusCompleted) {
+        progStatus <- "- Status: Completed"
+      } else if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusProcessing) {
+        progStatus <- "- Status: in Progress"
+      } else if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusFailed) {
+        progStatus <- "- Status: Failed"
+      }
+      paste0("Associate Model to Programme", " - ", progName, " (id: ", progId, ") ", progStatus)
     } else {
       paste0("Associate Model to Programme")
     }
-    
   })
   
   # > Model Details Table -----
@@ -788,43 +819,48 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   ### > Create Model ------
   onclick("abuttoncrprogoasis", {
-    if (isolate(input$sinputookprogid) > 0 && isolate(input$sinputookmodelid) > 0) {
-      prgId <- createProgOasis(dbSettings,
-                               isolate(input$sinputookprogid),
-                               isolate(input$sinputookmodelid),
-                               isolate(input$sinputProgModTransform))
-      prgId <- ifelse(is.null(prgId), -1, prgId)
-      if (prgId == -1) {
-        showNotification(type = "error", paste("No Prog Oasis created"))
-      } else {
-        showNotification(type = "message", paste("Prog Oasis id:",prgId, " created"))
-        .clearOOKSidebar()
-        .reloadPOData()
-        logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
-        idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
-        pageSel <- ceiling(idxSel/pageLength)
-        selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
-        selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
-        logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
-        loadprogmodel <- loadProgrammeModel(
-          apiSettings,
-          progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId])
-        )
-        if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
-          showNotification(type = "message", "Initiating load programme model...")
-          #.reloadProgFiles()
-          # Going to next step when model load is successful (but not completed)
-          workflowSteps$update("3")
+    if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusCompleted) {
+      if (isolate(input$sinputookprogid) > 0 && isolate(input$sinputookmodelid) > 0) {
+        prgId <- createProgOasis(dbSettings,
+                                 isolate(input$sinputookprogid),
+                                 isolate(input$sinputookmodelid),
+                                 isolate(input$sinputProgModTransform))
+        prgId <- ifelse(is.null(prgId), -1, prgId)
+        if (prgId == -1) {
+          showNotification(type = "error", paste("No Prog Oasis created"))
         } else {
-          showNotification(type = "error", "Failed to load programme model")
+          showNotification(type = "message", paste("Prog Oasis id:",prgId, " created"))
+          .clearOOKSidebar()
+          .reloadPOData()
+          logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
+          idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
+          pageSel <- ceiling(idxSel/pageLength)
+          selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
+          selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
+          logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+          loadprogmodel <- loadProgrammeModel(
+            apiSettings,
+            progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId])
+          )
+          if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
+            showNotification(type = "message", "Initiating load programme model...")
+            #.reloadProgFiles()
+            # Going to next step when model load is successful (but not completed)
+            workflowSteps$update("3")
+          } else {
+            showNotification(type = "error", "Failed to load programme model")
+          }
         }
+      } else{
+        showNotification(type = "warning", "Please select both the fields")
       }
-    } else{
-      showNotification(type = "warning", "Please select both the fields")
+    } else {
+      showNotification(type = "error", "Please select a completed Programme first")
     }
   })
   
   # > Updates dependent on changed: tableProgOasisOOK_rows_selected ------------
+  #collapse associate panel when row selected changes 
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreInit = TRUE, {
     #force collapsed state of Associate Model flamingo panel
     removeClass(id = paste0("progmodel-body"), class = "in")
@@ -987,12 +1023,20 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     # initialize so that the title would look nice even if rowToSelect is NA
     progOasisId <- NULL
     progOasisName <- NULL
+    progOasisStatus <- NULL
     rowToSelect <- match(input$selectprogOasisID, result$POData[, POData.ProgOasisId])
     #rowToSelect can be temporarly NA if selectprogrammeID changes but selectprogOasisID is not yet updated
     if (!is.na(rowToSelect)) {
       progOasisId <- result$POData[rowToSelect, POData.ProgOasisId]
       progOasisName <- result$POData[rowToSelect, POData.ProgName]
-      paste0("Process Runs for Model", " - ", progOasisName," (id: ", progOasisId, ")")
+      if (result$POData[rowToSelect, POData.Status] == StatusCompleted) {
+        progOasisStatus <- "- Status: Completed"
+      } else if (result$POData[rowToSelect, POData.Status] == StatusProcessing) {
+        progOasisStatus <- "- Status: in Progress"
+      } else if (result$POData[rowToSelect, POData.Status] == StatusFailed) {
+        progOasisStatus <- "- Status: Failed"
+      }
+      paste0("Process Runs for Model", " - ", progOasisName," (id: ", progOasisId, ") ", progOasisStatus)
     } else {
       paste0("Process Runs")
     }
@@ -1022,28 +1066,35 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   #Show Output Configuration Panel
   onclick("abuttonconfigoutput", {
-    if (input$selectprogOasisID != "") {
-      .defaultview(session)
-      show("panelDefineOutputs")
-      logMessage("showing panelDefineOutputs")
-      logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
-      selectRows(dataTableProxy("tableprocessrundata"), selected = NULL)
-      selectPage(dataTableProxy("tableprocessrundata"), 1)
-      logMessage(paste("selected row is:", input$tableprocessrundata_rows_selected))
+    if (result$POData[match(input$selectprogOasisID,result$POData[, POData.ProgOasisId]), POData.Status] == StatusCompleted) {
+      if (input$selectprogOasisID != "") {
+        .defaultview(session)
+        show("panelDefineOutputs")
+        logMessage("showing panelDefineOutputs")
+        logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
+        selectRows(dataTableProxy("tableprocessrundata"), selected = NULL)
+        selectPage(dataTableProxy("tableprocessrundata"), 1)
+        logMessage(paste("selected row is:", input$tableprocessrundata_rows_selected))
+      } else {
+        showNotification(type = "error", "Please select a Programme Model first")
+      }
     } else {
-      showNotification(type = "error", "Please select a Programme Model first")
+      showNotification(type = "warning", "Please select a completed Programme Model first")
     }
-    
   })
   
   onclick("abuttonrerunpr", {
-    .defaultview(session)
-    if (length(input$tableprocessrundata_rows_selected) > 0) {
-      show("panelDefineOutputs")
-      logMessage("showing panelDefineOutputs")
-      .updateOutputConfig()
+    if (result$POData[match(input$selectprogOasisID,result$POData[, POData.ProgOasisId]), POData.Status] == StatusCompleted) {
+      if (length(input$tableprocessrundata_rows_selected) > 0) {
+        .defaultview(session)
+        show("panelDefineOutputs")
+        logMessage("showing panelDefineOutputs")
+        .updateOutputConfig()
+      } else {
+        showNotification(type = "warning", "Please select Process Run first")
+      }
     } else {
-      showNotification(type = "warning", "Please select Process Run first")
+      showNotification(type = "warning", "Please select a completed Programme Model first")
     }
   })
   
@@ -1654,10 +1705,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   .updateDPAccountSelection <- function() {
     logMessage(".updateDPAccountSelection called")
-    accounts <- getAccountName(dbSettings)
-    updateSelectizeInput(session, "sinputDPAccountName",
-                         choices = createSelectOptions(accounts),
-                         selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.AccountID]))
+    if (length(setdiff(accounts,prev_accounts)) > 0 ) {
+      updateSelectizeInput(session, "sinputDPAccountName",
+                           choices = createSelectOptions(accounts),
+                           selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.AccountID]))
+    }
   }
   
   .updateProgrammeName <- function() {
