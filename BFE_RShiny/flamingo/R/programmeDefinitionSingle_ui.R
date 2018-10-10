@@ -78,6 +78,7 @@ panelProgrammeDetails <- function(id) {
 }
 
 #' Function wrapping panel to create/amend programme
+#' @importFrom bsplus bs_embed_tooltip
 #' @export
 panelDefineProgramme <- function(id) {
   ns <- NS(id)
@@ -174,6 +175,7 @@ panelDefineProgramme <- function(id) {
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
+#' @importFrom bsplus bs_embed_tooltip
 #' @export
 panelDefineIDs <- function(id) {
   ns <- NS(id)
@@ -253,6 +255,7 @@ panelModelDetails <- function(id) {
 
 #' Function wrapping panel to associate model
 #' @inheritParams flamingoModuleUI
+#' @importFrom bsplus bs_embed_tooltip
 #' @export
 panelAssociateModel <- function(id) {
   ns <- NS(id)
