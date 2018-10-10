@@ -1,4 +1,4 @@
-FROM coreoasis/oasis_base:RI4
+FROM coreoasis/oasis_base:0.395.1_RI1
 
 # Create and switch to jenkins user
 #ARG USER_ID

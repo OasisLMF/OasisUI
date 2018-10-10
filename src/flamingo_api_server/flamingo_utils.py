@@ -576,7 +576,6 @@ def process_keys_response(progoasisid, modelid, apiJSON, sessionid):
     flamingo_db_utils.create_api_error_file_record(
         "ExposureKeysError_" + str(ts) + ".csv", progoasisid)
 
-
 @log.oasis_log()
 def do_call_keys_service(progoasisid):
 
@@ -623,7 +622,7 @@ def do_call_keys_service(progoasisid):
 def do_generate_oasis_files(progoasisid):
 
     location_id = -1
-
+    progid = flamingo_db_utils.get_ProgId_For_ProgOasis(progoasisid)[0]
     status = flamingo_db_utils.generate_oasis_files(progoasisid)
 
     if status != "Done":
@@ -684,9 +683,7 @@ def do_generate_oasis_files(progoasisid):
     os.remove(OASIS_FILES_DIRECTORY + "/FMPolicyTC_temp.csv")
 
     destination = open(fm_profile, 'wb')
-    destination.write("policytc_id,calcrule_id,allocrule_id,ccy_id,deductible," + \
-        "limit,share_prop_of_lim,deductible_prop_of_loss,limit_prop_of_loss," + \
-        "deductible_prop_of_tiv,limit_prop_of_tiv,deductible_prop_of_limit\n")
+    destination.write("policytc_id,calcrule_id,deductible1,deductible2,deductible3,attachment1,limit1,share1,share2,share3\n")
     shutil.copyfileobj(open(OASIS_FILES_DIRECTORY + "/FMProfile_temp.csv", 'rb'), destination)
     destination.close()
     os.remove(OASIS_FILES_DIRECTORY + "/FMProfile_temp.csv")
@@ -710,6 +707,23 @@ def do_generate_oasis_files(progoasisid):
     os.remove(OASIS_FILES_DIRECTORY + "/FMDict_temp.csv")
 
     flamingo_db_utils.generate_oasis_file_records(progoasisid, location_id)
+
+    try:
+        reins_info_file = flamingo_db_utils.get_source_reinsurance_file_for_prog(progid)[0]
+        reins_scope_file = flamingo_db_utils.get_source_reinsurance_scope_file_for_prog(progid)[0]
+        is_reinsurance = True
+    except:
+        is_reinsurance = False
+    logging.getLogger().info("is_reinsurance: {}".format(is_reinsurance))
+
+    if is_reinsurance:
+        do_generate_reinsurance_files(progoasisid)
+
+@log.oasis_log()
+def do_generate_reinsurance_files(progoasisid):
+
+    progoasis_dir = "ProgOasis_" + progoasisid
+    input_location = OASIS_FILES_DIRECTORY + "/" + progoasis_dir
 
     # oed files
     oed_location = input_location + '/oed_files'
@@ -736,22 +750,28 @@ def do_generate_oasis_files(progoasisid):
         shutil.copy(source_file, target_file)
 
     # reinsurance info
-    reins_info_file = flamingo_db_utils.get_source_reinsurance_file_for_prog(progid)[0]
-    source_file = "/var/www/oasis/Files/Exposures/{}".format(reins_info_file)
-    target_file = "{}/ri_info.csv".format(oed_location)
-    if not IS_WINDOWS_HOST:
-        os.symlink(source_file, target_file)
-    else:
-        shutil.copy(source_file, target_file)
+    try:
+        reins_info_file = flamingo_db_utils.get_source_reinsurance_file_for_prog(progid)[0]
+        source_file = "/var/www/oasis/Files/Exposures/{}".format(reins_info_file)
+        target_file = "{}/ri_info.csv".format(oed_location)
+        if not IS_WINDOWS_HOST:
+            os.symlink(source_file, target_file)
+        else:
+            shutil.copy(source_file, target_file)
+    except:
+        reins_info_file = None
 
     # reinsurance scope
-    reins_scope_file = flamingo_db_utils.get_source_reinsurance_scope_file_for_prog(progid)[0]
-    source_file = "/var/www/oasis/Files/Exposures/{}".format(reins_scope_file)
-    target_file = "{}/ri_scope.csv".format(oed_location)
-    if not IS_WINDOWS_HOST:
-        os.symlink(source_file, target_file)
-    else:
-        shutil.copy(source_file, target_file)
+    try:
+        reins_scope_file = flamingo_db_utils.get_source_reinsurance_scope_file_for_prog(progid)[0]
+        source_file = "/var/www/oasis/Files/Exposures/{}".format(reins_scope_file)
+        target_file = "{}/ri_scope.csv".format(oed_location)
+        if not IS_WINDOWS_HOST:
+            os.symlink(source_file, target_file)
+        else:
+            shutil.copy(source_file, target_file)
+    except:
+        reins_scope_file = None
 
     # xref description
     item_dict_file = input_location + '/ItemDict.csv'
@@ -770,7 +790,8 @@ def do_generate_oasis_files(progoasisid):
     xref_description.to_csv(xref_description_file, index=False)
 
     # generate dfs
-    (account_df, location_df, ri_info_df, ri_scope_df, do_reinsurance) = load_oed_dfs(oed_location)
+    #(account_df, location_df, ri_info_df, ri_scope_df, do_reinsurance) = load_oed_dfs(oed_location)
+    (ri_info_df, ri_scope_df, do_reinsurance) = load_oed_dfs(oed_location)
 
     # direct layers
     items = pd.read_csv(input_location + "/items.csv")
@@ -779,7 +800,8 @@ def do_generate_oasis_files(progoasisid):
     xref_descriptions = pd.read_csv(input_location + "/xref_descriptions.csv")
 
     validate_inst = OedValidator()
-    (main_is_valid, inuring_layers) = validate_inst.validate(account_df, location_df, ri_info_df, ri_scope_df)
+    #(main_is_valid, inuring_layers) = validate_inst.validate(account_df, location_df, ri_info_df, ri_scope_df)
+    (main_is_valid, inuring_layers) = validate_inst.validate(ri_info_df, ri_scope_df)
 
     logging.getLogger().info("main_is_valid: {}".format(main_is_valid))
     logging.getLogger().info("inuring_layers: {}".format(inuring_layers))
@@ -795,8 +817,8 @@ def do_generate_oasis_files(progoasisid):
 #                exit(0)
 
     generate_files_for_reinsurance(
-            account_df,
-            location_df,
+            #account_df,
+            #location_df,
             items,
             coverages,
             fm_xrefs,
