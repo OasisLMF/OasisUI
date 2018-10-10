@@ -1,7 +1,7 @@
 -- (c) 2013-2016 Oasis LMF Ltd.  Software provided for early adopter evaluation only.
 --Flamingo Database Generation Script
 --Author: Ben Hayes
---Date: 2018-10-09
+--Date: 2018-10-10
 --Version: 0.395.0
 
 
@@ -1012,13 +1012,36 @@ CREATE CLUSTERED INDEX Idx_CoverageOrder ON OasisCoverages (Coverage_ID)
 CREATE CLUSTERED INDEX Idx_GulSummaryXrefOrder ON OasisGulSummaryXref (SummarySet_ID, Coverage_ID)
 CREATE CLUSTERED INDEX Idx_FMProgrammeOrder ON OasisFM_Programme (Level_ID, From_Agg_ID)
 CREATE CLUSTERED INDEX Idx_FMPolicyTC ON OasisFM_PolicyTC (Level_ID, Agg_ID, Layer_ID)
-CREATE CLUSTERED INDEX Idx_FMProfile ON OasisFM_Profile (PolicyTC_ID)
+CREATE CLUSTERED INDEX Idx_FMProfile ON OasisFM_Profile (Profile_ID)
 CREATE CLUSTERED INDEX Idx_FMXref ON OasisFM_Xref (Output_ID)
 CREATE CLUSTERED INDEX Idx_FMSummaryXref ON OasisFMSummaryXref (SummarySet_ID, Output_ID)
 GO
 -------------------------------------------------------------------------------
 --Stored Procedures
 -------------------------------------------------------------------------------
+
+/****** Object:  StoredProcedure [dbo].[updateLogDatabaseUsage]    Script Date: 10/9/2018 10:21:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[updateLogDatabaseUsage] 
+	(
+	@ProcedureName nvarchar(255),
+	@ParameterList nvarchar(2500) = NULL,
+	@LogTimestamp datetime
+	)
+AS
+SET NOCOUNT ON;
+--declare @LogID int = (Select isnull(max(LogID),0) From LogDatabaseUsage) +1
+insert into LogDatabaseUsage (--LogID,
+				ProcedureName,ParameterList,LogTimestamp)
+select	--@logid,
+	@ProcedureName,@ParameterList,@LogTimestamp
+--select @LogID
+
+GO
+
 /****** Object:  StoredProcedure [dbo].[addSecurityGroup]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
@@ -6569,11 +6592,15 @@ SET NOCOUNT ON;
 ----------------------------------------------------------------------------
 --log database usage
 declare	@ProcedureName nvarchar(255)  = (Select OBJECT_NAME(@@PROCID))
-declare	@ParameterList nvarchar(max) = ''
+declare	@ParameterList nvarchar(2500) = ''
 declare	@LogTimestamp datetime = getdate()
 
 exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 ----------------------------------------------------------------------------
+
+----debug
+--declare @processrunid int = 48
+--declare @OutputFiles nvarchar(2500) = 'gul_2_eltcalc.csv,gul_eltcalc.csv'
 
 declare @fileid int = (select isnull(max(fileid),0) from [file])
 declare @resourceid int = (select isnull(max(resourceid),0) from [resource])
@@ -6970,27 +6997,7 @@ WHERE CompanyID = @CompanyID
 select @CompanyID
 
 GO
-/****** Object:  StoredProcedure [dbo].[updateLogDatabaseUsage]    Script Date: 10/9/2018 10:21:12 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[updateLogDatabaseUsage] 
-	(
-	@ProcedureName nvarchar(255),
-	@ParameterList nvarchar(2500) = NULL,
-	@LogTimestamp datetime
-	)
-AS
-SET NOCOUNT ON;
---declare @LogID int = (Select isnull(max(LogID),0) From LogDatabaseUsage) +1
-insert into LogDatabaseUsage (--LogID,
-				ProcedureName,ParameterList,LogTimestamp)
-select	--@logid,
-	@ProcedureName,@ParameterList,@LogTimestamp
---select @LogID
 
-GO
 /****** Object:  StoredProcedure [dbo].[updateModelResource]    Script Date: 10/9/2018 10:21:12 AM ******/
 SET ANSI_NULLS ON
 GO
