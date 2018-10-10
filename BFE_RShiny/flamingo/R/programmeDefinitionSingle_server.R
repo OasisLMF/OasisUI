@@ -95,47 +95,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   )
   
   # Observers for debugging -------------------------------------------------
-  observe(
-    if (active()) {
-      {print("input$tableDPprog_rows_selected")
-        print(input$tableDPprog_rows_selected)
-      }
-    })
-  
-  observe({
-    if (active()) {
-      print("input$tableProgOasisOOK_rows_selected")
-      print(input$tableProgOasisOOK_rows_selected)
-    }
-  })
-  
-  observe({
-    if (active()) {
-      print("input$tableprocessrundata_rows_selected")
-      print(input$tableprocessrundata_rows_selected)
-    }
-  })
-  
-  observe({
-    if (active()) {
-      print("input$selectprogrammeID")
-      print(input$selectprogrammeID)
-    }
-  })
-  
-  observe({
-    if (active()) {
-      print("input$selectprogOasisID")
-      print(input$selectprogOasisID)
-    }
-  })
-  
-  observe({
-    if (active()) {
-      print("result$prrunid")
-      print(result$prrunid)
-    }
-  })
   
   observeEvent({
     result$prrunid
@@ -167,24 +126,26 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   observeEvent(workflowSteps$step(), ignoreInit = TRUE, {
-    switch(
-      workflowSteps$step(),
-      "1" = {
-        logMessage("showing Section 'Choose Programme' = '1'")
-        .hideDivs()
-        .defaultCreateProg()
-      },
-      "2" = {
-        logMessage("showing Section 'Choose Model' = '2'")
-        .hideDivs()
-        .defaultAssociateModel()
-      },
-      "3" = {
-        logMessage("showing Section 'Configure Output & Run' = '3'")
-        .hideDivs()
-        .defaultRun()
-      }
-    )
+    if (active()) {
+      switch(
+        workflowSteps$step(),
+        "1" = {
+          logMessage("showing Section 'Choose Programme' = '1'")
+          .hideDivs()
+          .defaultCreateProg()
+        },
+        "2" = {
+          logMessage("showing Section 'Choose Model' = '2'")
+          .hideDivs()
+          .defaultAssociateModel()
+        },
+        "3" = {
+          logMessage("showing Section 'Configure Output & Run' = '3'")
+          .hideDivs()
+          .defaultRun()
+        }
+      )
+    }
   })
   
   # Section 'Choose Programme' = '1' ------------------------------------------
@@ -700,38 +661,40 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(input$selectprogrammeID, ignoreInit = TRUE, {
-    #Making sure the two selectize inputs are the same
-    if (input$selectprogrammeID != input$sinputookprogid) {
-      updateSelectizeInput(session, inputId = "sinputookprogid", selected = input$selectprogrammeID)
-    }
-    bl_dirty <- stop_selProgID > check_selProgID
-    logMessage(paste("--- stop_selProgID is:", stop_selProgID))
-    logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
-    if (input$selectprogrammeID != "") {
-      if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
-        rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, DPProgData.ProgrammeID])
-        pageSel <- ceiling(rowToSelect/pageLength)
-        #backward propagation
-        if (is.null(input$tableDPprog_rows_selected)) {
-          if (workflowSteps$step() == '2'){
+    if (active()) {
+      #Making sure the two selectize inputs are the same
+      if (input$selectprogrammeID != input$sinputookprogid) {
+        updateSelectizeInput(session, inputId = "sinputookprogid", selected = input$selectprogrammeID)
+      }
+      bl_dirty <- stop_selProgID > check_selProgID
+      logMessage(paste("--- stop_selProgID is:", stop_selProgID))
+      logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", input$selectprogrammeID))
+      if (input$selectprogrammeID != "") {
+        if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
+          rowToSelect <- match(input$selectprogrammeID, result$DPProgData[, DPProgData.ProgrammeID])
+          pageSel <- ceiling(rowToSelect/pageLength)
+          #backward propagation
+          if (is.null(input$tableDPprog_rows_selected)) {
+            if (workflowSteps$step() == '2'){
+              selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+              selectPage(dataTableProxy("tableDPprog"), pageSel)
+              logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+            }
+          } else if (rowToSelect != input$tableDPprog_rows_selected) {
+            # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
             selectRows(dataTableProxy("tableDPprog"), rowToSelect)
             selectPage(dataTableProxy("tableDPprog"), pageSel)
             logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
           }
-        } else if (rowToSelect != input$tableDPprog_rows_selected) {
-          # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
-          selectRows(dataTableProxy("tableDPprog"), rowToSelect)
-          selectPage(dataTableProxy("tableDPprog"), pageSel)
-          logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
         }
+      } else {
+        selectRows(dataTableProxy("tableDPprog"), NULL)
+        selectPage(dataTableProxy("tableDPprog"), 1)
+        logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
       }
-    } else {
-      selectRows(dataTableProxy("tableDPprog"), NULL)
-      selectPage(dataTableProxy("tableDPprog"), 1)
-      logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+      .reloadPOData()
+      if (bl_dirty) check_selProgID <<- check_selProgID + 1
     }
-    .reloadPOData()
-    if (bl_dirty) check_selProgID <<- check_selProgID + 1
   })
   
   # > Programme Model Table --------------------------
@@ -943,7 +906,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       if (!is.null(result$POData) && nrow(result$POData) > 0) {
         updateSelectizeInput(session, inputId = "selectprogOasisID", choices = c(result$POData[, POData.ProgOasisId]))
         if (input$selectprogrammeID != "") {
-          logMessage(paste("updating selectprogOasisID choices based on Programme Model Table"))
+          logMessage(paste0("updating selectprogOasisID choices because Programme Model Table was reloaded - contains ", nrow(result$POData), " rows"))
           updateSelectizeInput(session, inputId = "selectprogOasisID", selected = result$POData[1, POData.ProgOasisId])
         } else {
           updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0))
@@ -1539,6 +1502,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # reload functions --------------------------------------------------------
   # Reload Programme table
   .reloadDPProgData <- function() {
+    logMessage(".reloadDPProgData called")
     stmt <- buildDbQuery("getProgData")
     DPProgData <- executeDbQuery(dbSettings, stmt)
     StatusGood <- "Loaded"
@@ -1551,12 +1515,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
         as.data.frame()
       logMessage("programme table refreshed")
     }
-    logMessage(".reloadDPProgData called")
     invisible()
   }
   
   # Reload Programme Details table
   .reloadProgDetails <- function() {
+    logMessage(".reloadProgDetails called")
     if (length(input$tableDPprog_rows_selected) > 0) {
       progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
       
@@ -1575,7 +1539,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     } else {
       result$progDetails  <- NULL
     }
-    logMessage(".reloadProgDetails called")
     invisible()
   }
   
@@ -1778,10 +1741,14 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # Helper Functions 'Choose Model' = '2' ---------------------------------
   .clearOOKProgrammeSelection <- function() {
     logMessage(".clearOOKProgrammeSelection called")
-    programmes <- getProgrammeList(dbSettings)
+    #Trying to avoid colling the stored procedure if possible
+    #programmes <- getProgrammeList(dbSettings)
+    if (!is.null(result$DPProgData)) {
+      programmes <- result$DPProgData[, DPProgData.ProgrammeID]
     updateSelectizeInput(session, "sinputookprogid",
                          choices = createSelectOptions(programmes),
                          selected = character(0))
+    }
   }
   
   .clearOOKModelSelection <- function() {
@@ -1802,15 +1769,20 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   .updateOOKProgrammeSelection <- function() {
     logMessage(".updateOOKProgrammeSelection called")
-    programmes <- getProgrammeList(dbSettings)
+    #Trying to avoid colling the stored procedure if possible
+    #programmes <- getProgrammeList(dbSettings)
+    if (!is.null(result$DPProgData)) {
+      programmes <- result$DPProgData[, DPProgData.ProgrammeID]
+    # Remove selection if input$tableDPprog_rows_selected is null
     if (length(input$tableDPprog_rows_selected) > 0 ) {
       selection <- toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
     } else {
       selection <- character(0)
     }
     updateSelectizeInput(session, "sinputookprogid",
-                         choices = createSelectOptions(programmes),
+                         choices = programmes, #createSelectOptions(programmes),
                          selected = selection)
+    }
   }
   
   # Helper Functions 'Configure Output & Run' = '3' ---------------------------------
