@@ -189,7 +189,7 @@ panelDefineIDs <- function(id) {
                  #selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = c("<Select>"), selected = "<Select>"),
                  selectizeInput(inputId = ns("selectprogrammeID"), label = "Programme ID", 
                                 choices = c(), 
-                                selected=character(0),
+                                selected = character(0),
                                 options = list(
                                   allowEmptyOption = TRUE,
                                   placeholder = 'Select',
@@ -203,7 +203,7 @@ panelDefineIDs <- function(id) {
                         #selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
                         selectizeInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", 
                                        choices = c(), 
-                                       selected=character(0),
+                                       selected = character(0),
                                        options = list(
                                          allowEmptyOption = TRUE,
                                          placeholder = 'Select',
