@@ -1,6 +1,7 @@
 # ViewFilesModule Module -----------------------
-#' Module to View Files
+# Module to View Files
 # UI ---------------
+#' UI for ViewFilesModule
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @importFrom shinyBS bsTooltip
@@ -41,11 +42,12 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 
 
 # Server -----------
+#' Server logic for ViewFilesModule
 #' @description Server logic to view  files
 #' @inheritParams flamingoModule
 #' @param filesListData table of output files for a given runID
 #' @return list of reactives:
-#' @rdname panelViewOutputFilesModule
+#' @rdname ViewOutputFilesModule
 #' @importFrom shinyjs show hide enable disable hidden
 #' @importFrom DT renderDT datatable DTOutput
 #' @importFrom dplyr mutate select contains filter
