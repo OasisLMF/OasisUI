@@ -165,26 +165,30 @@ div.flamingo-page-division {
   background: #8b2129 !important;
 }
 
-.InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single {
+.InlineSelectInput label.control-label, .InlineSelectInputSmall label.control-label, .InlineSelectInput .selectize-control.single, .InlineSelectInputSmall .selectize-control.single {
          display: table-cell;
          text-align: center;
          vertical-align: middle;
 }
 
-.InlineSelectInput  label.control-label {
+.InlineSelectInput  label.control-label, .InlineSelectInputSmall  label.control-label {
         padding-right: 10px;
 }
 
-.InlineSelectInput .form-group {
+.InlineSelectInput .form-group, .InlineSelectInputSmall .form-group {
         display: table-row;
 }
 
-.InlineSelectInput  .selectize-input {
+.InlineSelectInput .selectize-input {
         width: 300px;
 }
 
+.InlineSelectInputSmall .selectize-input {
+        width: 80px;
+}
 
-.InlineSelectInput.selectize-control.single div.item {
+
+.InlineSelectInput.selectize-control.single div.item, .InlineSelectInputSmall.selectize-control.single div.item {
         padding-right: 15px;
 }
 
