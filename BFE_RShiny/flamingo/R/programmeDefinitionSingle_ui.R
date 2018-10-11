@@ -196,7 +196,7 @@ panelDefineIDs <- function(id) {
                                       placeholder = 'Select',
                                       onInitialize = I('function() { this.setValue(""); }'))
                      )  %>%
-                       bs_embed_tooltip(title = programme_Definition_Single$selectprogammeID,
+                       bs_embed_tooltip(title = programme_Definition_Single$selectprogrammeID,
                                         placement = "right")
                  ))),
       hidden(div(id = ns("divselectprogOasisID"),
