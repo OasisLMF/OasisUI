@@ -25,7 +25,7 @@ landing_page <- list(
 programme_Definition_Single <- list(
   sinputTransformname = "Transformation Description to be added here",
   sinputProgModTransform = "Transformation Description to be added here",
-  selectprogammeID = "Select a programme ID to which associate a model",
+  selectprogrammeID = "Select a programme ID to which associate a model",
   selectprogOasisID = "Select the Oasis Programme to Run"
 )
 
