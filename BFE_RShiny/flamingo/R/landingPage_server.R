@@ -216,7 +216,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' @param userName reactive expression yielding user name
 #' @return For \code{pagestructure()}, list of reactives.
 #' @template return-outputNavigation
-#' @importFrom shinyBS bsTooltip
+#' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyWidgets panel tooltipOptions toggleDropdownButton
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,

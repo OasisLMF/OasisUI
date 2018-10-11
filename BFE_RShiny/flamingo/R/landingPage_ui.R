@@ -1,6 +1,6 @@
 #' @rdname landingPage
 #' @importFrom DT DTOutput
-#' @importFrom shinyBS bsTooltip
+#' @importFrom bsplus bs_embed_tooltip
 #' @export
 landingPageUI <- function(id) {
   ns <- NS(id)
@@ -10,21 +10,19 @@ landingPageUI <- function(id) {
       h4("Process Runs Inbox"),
       DTOutput(ns("tableInbox")),
       actionButton(ns("abuttongotorun"), "Browse Processes Outputs",
-                   class = "btn btn-primary", align = "right"),
-      bsTooltip(ns("abuttongotorun"), landing_page$abuttongotorun,
-                placement = "right", options = list(container = "body")),
+                   class = "btn btn-primary", align = "right") %>%
+        bs_embed_tooltip(title = landing_page$abuttongotorun, placement = "right"),
       actionButton(inputId = ns("refreshInbox"), label = "Refresh", align = "right"),
       downloadButton(ns("PRIdownloadexcel"),
-                     label = "Export to csv"),
-      bsTooltip(ns("PRIdownloadexcel"), landing_page$PRIdownloadexcel,
-                placement = "right", options = list(container = "body"))
+                     label = "Export to csv") %>%
+        bs_embed_tooltip(title = landing_page$PRIdownloadexcel, placement = "right")
     )
     # img(src = "landingpage.png", width = "70%") # to be replaced with proper image
   )
 }
 
 #' @rdname pagestructure
-#' @importFrom shinyBS bsTooltip
+#' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyWidgets dropdownButton
 #' @export
 pageheaderUI <- function(id) {
@@ -41,20 +39,14 @@ pageheaderUI <- function(id) {
                                      label = "User Administration", align = "center", width = "100%"),
 
                         actionButton(ns("abuttondefineaccount"), class = "btn btn-primary",
-                                     label = "Define Account", align = "center", width = "100%"),
-                        bsTooltip(ns("abuttondefineaccount"),
-                                  landing_page$abuttondefineaccount,
-                                  placement = "left",
-                                  options   = list(container = "body")),
+                                     label = "Define Account", align = "center", width = "100%") %>%
+                          bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "right"),
 
                         actionButton(ns("abuttonsysconf"), class = "btn btn-primary",
-                                     label = "System Configuration", align = "center", width = "100%"),
-                        bsTooltip(ns("abuttonsysconf"),
-                                  landing_page$abuttonsysconf,
-                                  placement = "left",
-                                  options   = list(container = "body")),
+                                     label = "System Configuration", align = "center", width = "100%") %>%
+                          bs_embed_tooltip(title = landing_page$abuttonsysconf, placement = "right"),
 
-			actionButton(ns("abuttonlogout"), class = "btn btn-primary",
+                        actionButton(ns("abuttonlogout"), class = "btn btn-primary",
                                      label = "Logout", align = "center", width = "100%")
          )
     )

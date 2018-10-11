@@ -22,7 +22,7 @@ browseprogrammesUI <- function(id) {
 
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyWidgets panel
-#' @importFrom shinyBS bsTooltip
+#' @importFrom bsplus bs_embed_tooltip
 #' @export
 panelDefineRunID <-  function(id){
   ns <- NS(id)
@@ -30,11 +30,8 @@ panelDefineRunID <-  function(id){
     status = "primary",
     fluidRow(
       column(6,
-             selectInput(inputId =  ns("selectRunID"), label = "Run ID", choices = "", selected = NULL),
-             bsTooltip(ns("selectRunID"),
-                       browse_programmes$selectRunID,
-                       placement = "right",
-                       options   = list(container = "body"))),
+             selectInput(inputId =  ns("selectRunID"), label = "Run ID", choices = "", selected = NULL) %>%
+               bs_embed_tooltip(title = browse_programmes$selectRunID, placement = "right")),
       column(6,
              align = "right",
              actionButton(inputId = ns("abuttongotoconfig"), label = "Go to Configure Output",  class = "btn btn-primary"))
@@ -96,7 +93,7 @@ panelOutputModuleUI <-  function(id){
       column(12,
              div( class = "InlineSelectInput",
                   selectInput(inputId = ns("inputplottype"), label = "Select a plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1]))
-             ),
+      ),
       br(),
       column(4,
              checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = losstypes, inline = TRUE)),
@@ -104,12 +101,12 @@ panelOutputModuleUI <-  function(id){
              checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Summary Level", choices = granularities, inline = TRUE)),
       br(),
       column(12,
-      checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Report", choices = variables, inline = TRUE)),
+             checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Report", choices = variables, inline = TRUE)),
       br(),
       h4("Customize Plot"),
       column(4,
              div(class = "InlineTextInput",
-             textInput(ns("textinputtitle"), "Title", ""))),
+                 textInput(ns("textinputtitle"), "Title", ""))),
       column(4,
              hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
       actionButton(inputId = ns("abuttondraw"), label = "Draw Plot",  class = "btn btn-primary", style = "float:right")

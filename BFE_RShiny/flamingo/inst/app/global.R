@@ -10,7 +10,7 @@
 
 #library(httr)
 #suppressPackageStartupMessages(library(shinyjs, warn.conflicts = FALSE))
-#library(shinyBS)
+#library(bsplus)
 #library(DT, warn.conflicts = FALSE)
 #library(DBI)
 #library(shinyWidgets)

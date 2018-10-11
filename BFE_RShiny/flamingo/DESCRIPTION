@@ -15,7 +15,6 @@ Imports:
   httr,
   odbc,
   DBI,
-  shinyBS,
   shinyjs,
   shinyWidgets,
   bsplus,
