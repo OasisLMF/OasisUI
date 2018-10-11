@@ -1001,10 +1001,6 @@ CREATE INDEX Idx_ProgOasis_ProgID ON ProgOasis (ProgID);
 CREATE INDEX Idx_ProgOasisKeys_LocID ON ProgOasisKeys (LocID);
 CREATE INDEX Idx_ProgOasisKeys_PerilID ON ProgOasisKeys (PerilID);
 CREATE INDEX Idx_ProgOasisKeys_CoverageID ON ProgOasisKeys (CoverageID);
---CREATE INDEX Idx_CorrelationItem_InterestRiskID ON CorrelationItem (InterestRiskID);
---CREATE INDEX Idx_CorrelationItem_InterestSubRiskID ON CorrelationItem (InterestSubRiskID);
---CREATE INDEX Idx_CorrelationItem_InterestExposureID ON CorrelationItem (InterestExposureID);
---CREATE INDEX Idx_CorrelationItem_CorrelationID ON CorrelationItem (CorrelationID);
 CREATE INDEX Idx_Policy_ProgID ON Policy (ProgID);
 CREATE INDEX Idx_InterestGroup_ProgID ON InterestGroup (ProgID);
 CREATE CLUSTERED INDEX Idx_ItemOrder ON OasisItems (Item_ID)
