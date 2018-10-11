@@ -6829,7 +6829,7 @@ BEGIN
     -- Insert statements for procedure here
 	Set @OutputOptionsList = '''' + @OutputOptionsList + ''''
 	Set @OutputOptionsList = REPLACE(@OutputOptionsList,',',''',''')
-	Declare @SQL nvarchar(2500)
+	Declare @SQL nvarchar(max)
 
 	--select @OutputOptionsList
 	Create Table #outoptids (OutputTypeID int)
@@ -6844,14 +6844,14 @@ BEGIN
 	insert into #outoptids
 	Exec sp_executesql @SQL
 
-	--select * from #outoptids
-
+	declare @outputoptionid int
 	Declare @count int = 0
 	declare @loopcnt int = (select count(*) from #outoptids)
 	while @count < @loopcnt
 	begin
+		select @outputoptionid = isnull((select max(OutputOptionID) from OutputOptions),0)+1
 		INSERT INTO dbo.OutputOptions (OutputOptionID,OutputOption,OutputTypeID)
-		VALUES ((select max(OutputOptionID)+1 from OutputOptions), @OutputOptionName, (select top(1) OutputTypeID from #outoptids))
+		VALUES (@outputoptionid, @OutputOptionName, (select top(1) OutputTypeID from #outoptids))
 		--select * from OutputOptions
 		delete top(1) from #outoptids
 		set @count = @count + 1
