@@ -440,7 +440,37 @@ programmeDefinition <- function(input, output, session, dbSettings,
         }
       })
   
+  onclick("abuttonSRFileLink",{
+        res <- executeDbQuery(dbSettings,
+            paste("exec dbo.updateSourceReinsuranceFileForProg ",
+                input$sinputselectSRFile, ", ", result$DPProgData[input$tableDPprog_rows_selected,1]))
+        if(input$sinputselectSRFile != ""){
+          if (is.null(res)){
+            showNotification(type = "error", "Failed to link the File!")
+          }else {
+            showNotification(type = "message",
+                paste("Reinsurance File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected,2]))
+          }
+        }else{
+          showNotification(type = "warning", "Please select a file to Link")
+        }
+      })
   
+  onclick("abuttonSRSFileLink",{
+        res <- executeDbQuery(dbSettings,
+            paste("exec dbo.updateSourceReinsuranceScopeFileForProg ",
+                input$sinputselectSRSFile, ", ", result$DPProgData[input$tableDPprog_rows_selected,1]))
+        if(input$sinputselectSRSFile != ""){
+          if (is.null(res)){
+            showNotification(type = "error", "Failed to link the File!")
+          }else {
+            showNotification(type = "message",
+                paste("Reinsurance Scope File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected,2]))
+          }
+        }else{
+          showNotification(type = "warning", "Please select a file to Link")
+        }
+      })
   
   ### Load Programme data
   
