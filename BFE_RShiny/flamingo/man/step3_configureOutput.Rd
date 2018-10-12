@@ -11,7 +11,7 @@ step3_configureOutput(input, output, session, dbSettings, apiSettings,
   userId, active = reactive(TRUE), logMessage = message,
   currstep = reactive(-1), selectprogrammeID = reactive(""),
   selectprogOasisID = reactive(""), progOasisName = reactive(""),
-  progOasisStatus = reactive(""))
+  progOasisStatus = reactive(""), POData_rowselected = reactive(NULL))
 }
 \arguments{
 \item{id}{module id}
