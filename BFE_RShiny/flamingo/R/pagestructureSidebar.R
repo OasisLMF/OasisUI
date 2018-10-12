@@ -36,7 +36,6 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       circle = FALSE,
       right = FALSE,
       width = "100%",
-      tooltip = tooltipOptions(title = landing_page$abuttonbrowse, placement = "right"),
       actionButton(ns("abuttonbrowseSBR"),
                    label = if (!collapsed) "Single Browse" else "Single",
                    icon = if (collapsed) icon("eye"),

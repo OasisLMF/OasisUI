@@ -29,6 +29,7 @@ programmeDefinitionSingleUI <- function(id) {
 
 #'  Function defining panel elements to define a programme
 #' @inheritParams flamingoModuleUI
+#' @importFrom shinyBS bsTooltip
 #' @importFrom shinyjs hidden
 #' @export
 defineProgramme <- function(id) {
@@ -188,6 +189,7 @@ panelAssociateModel <- function(id) {
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
+#' @importFrom shinyBS bsTooltip
 #' @export
 panelDefineIDs <- function(id) {
   ns <- NS(id)
