@@ -38,6 +38,7 @@ pageheaderUI <- function(id) {
                         actionButton(ns("abuttonuseradmin"), class = "btn btn-primary",
                                      label = "User Administration", align = "center", width = "100%"),
 
+                        ### TODO: recheck allignment of the comment after fixing dtyle of action buttons
                         actionButton(ns("abuttondefineaccount"), class = "btn btn-primary",
                                      label = "Define Account", align = "center", width = "100%") %>%
                           bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "left"),
