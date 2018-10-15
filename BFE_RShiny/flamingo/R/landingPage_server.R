@@ -217,7 +217,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' @return For \code{pagestructure()}, list of reactives.
 #' @template return-outputNavigation
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom shinyWidgets panel tooltipOptions toggleDropdownButton
+#' @importFrom shinyWidgets panel toggleDropdownButton
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
                           reloadMillis = 10000, logMessage = message,

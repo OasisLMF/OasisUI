@@ -15,7 +15,6 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       circle = FALSE,
       right = FALSE,
       width = "100%",
-      tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
       actionButton(ns("abuttondefineprogrammesingle"),
                    label = if (!collapsed) "Single Process" else "Single",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
@@ -26,7 +25,7 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
                    class = "btn btn-primary", align = "left",  width = "100%") %>%
         bs_embed_tooltip(title = landing_page$abuttondefineprogrammebatch, placement = "right")
-    ),
+    ) %>% bs_embed_tooltip(title = landing_page$abuttonrun, placement = "right"),
 
     dropdownButton(
       inputId = ns("abuttonbrowse"),
@@ -46,7 +45,7 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
                    icon = if (collapsed) icon("eye"),
                    class = "btn btn-primary", align = "left",  width = "100%") %>%
         bs_embed_tooltip(title = landing_page$abuttonbrowseBBR, placement = "right")
-    ),
+    ) %>% bs_embed_tooltip(title = landing_page$abuttonbrowse, placement = "right"),
 
     actionButton(
       ns("abuttonfilemngt"),
