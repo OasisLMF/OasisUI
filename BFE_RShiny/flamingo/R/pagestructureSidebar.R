@@ -15,24 +15,17 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       circle = FALSE,
       right = FALSE,
       width = "100%",
-      tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
       actionButton(ns("abuttondefineprogrammesingle"),
                    label = if (!collapsed) "Single Process" else "Single",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
-                   class = "btn btn-primary", align = "left",  width = "100%"),
-      bsTooltip(ns("abuttondefineprogrammesingle"),
-                landing_page$abuttondefineprogrammesingle,
-                placement = "right",
-                options   = list(container = "body")),
+                   class = "btn btn-primary", align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttondefineprogrammesingle, placement = "right"),
       actionButton(ns("abuttondefineprogrammebatch"),
                    label = if (!collapsed) "Batch Process" else "Batch",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
-                   class = "btn btn-primary", align = "left",  width = "100%"),
-      bsTooltip(ns("abuttondefineprogrammebatch"),
-                landing_page$abuttondefineprogrammebatch,
-                placement = "right",
-                options   = list(container = "body"))
-    ),
+                   class = "btn btn-primary", align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttondefineprogrammebatch, placement = "right")
+    ) %>% bs_embed_tooltip(title = landing_page$abuttonrun, placement = "right"),
 
     dropdownButton(
       inputId = ns("abuttonbrowse"),
@@ -42,34 +35,24 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       circle = FALSE,
       right = FALSE,
       width = "100%",
-      tooltip = tooltipOptions(title = landing_page$abuttonbrowse, placement = "right"),
       actionButton(ns("abuttonbrowseSBR"),
                    label = if (!collapsed) "Single Browse" else "Single",
                    icon = if (collapsed) icon("eye"),
-                   class = "btn btn-primary", align = "left",  width = "100%"),
-      bsTooltip(ns("abuttonbrowseSBR"),
-                landing_page$abuttonbrowseSBR,
-                placement = "right",
-                options   = list(container = "body")),
+                   class = "btn btn-primary", align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttonbrowseSBR, placement = "right"),
       actionButton(ns("abuttonbrowseBBR"),
                    label = if (!collapsed) "Batch Browse" else "Batch",
                    icon = if (collapsed) icon("eye"),
-                   class = "btn btn-primary", align = "left",  width = "100%"),
-      bsTooltip(ns("abuttonbrowseBBR"),
-                landing_page$abuttonbrowseBBR,
-                placement = "right",
-                options   = list(container = "body"))
-    ),
+                   class = "btn btn-primary", align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttonbrowseBBR, placement = "right")
+    ) %>% bs_embed_tooltip(title = landing_page$abuttonbrowse, placement = "right"),
 
     actionButton(
       ns("abuttonfilemngt"),
       label = if (!collapsed) "File Management",
       icon = if (collapsed) icon("file", lib = "glyphicon"),
       class = "btn btn-primary", align = "left",  width = "100%"
-    ),
-    bsTooltip(ns("abuttonfilemngt"),
-              landing_page$abuttonfilemngt,
-              placement = "right",
-              options   = list(container = "body"))#,
+    ) %>%
+      bs_embed_tooltip(title = landing_page$abuttonfilemngt, placement = "right")
   )
 }
