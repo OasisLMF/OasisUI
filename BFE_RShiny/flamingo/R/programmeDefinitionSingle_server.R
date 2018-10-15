@@ -34,7 +34,27 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # Id of the Process Run
-    prrunid = -1
+    prrunid = -1,
+    # Prog table
+    DPProgData = NULL,
+    # Prog table row selected
+    DPProgData_rowselected = NULL,
+    # Prog Name
+    progName = "",
+    # List of Prog IDs
+    progChoices = NULL,
+    # Prog status
+    progStatus = "",
+    # Model table
+    POData = NULL,
+    # Model table row selected
+    POData_rowselected = NULL,
+    # Model Name
+    progOasisName = "",
+    # List of Model IDs
+    progOasisChoices = NULL,
+    # Model status
+    progOasisStatus = ""
   )
   
   
@@ -43,28 +63,28 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   observeEvent({
     input$selectprogOasisID
     input$selectprogrammeID
-    POData_rowselected()
-    progOasisName()
-    progOasisChoices()
-    progOasisStatus()
-    DPProgData_rowselected()
-    progName()
-    progChoices()
-    progStatus()
+    result$POData_rowselected
+    result$progOasisName
+    result$progOasisChoices
+    result$progOasisStatus
+    result$DPProgData_rowselected
+    result$progName
+    result$progChoices
+    result$progStatus
   }, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       print("current status of reactives")
       print(paste0("input$selectprogrammeID: ", input$selectprogrammeID))
       print(paste0("input$selectprogOasisID: ", input$selectprogOasisID))
       print(paste0("result$prrunid: ", result$prrunid))
-      print(paste0("POData_rowselected(): ", POData_rowselected()))
-      print(paste0("progOasisName(): ", progOasisName()))
-      print(paste0("progOasisChoices(): ", progOasisChoices()))
-      print(paste0("progOasisStatus(): ", progOasisStatus()))
-      print(paste0("DPProgData_rowselected(): ", DPProgData_rowselected()))
-      print(paste0("progName(): ", progName()))
-      print(paste0("progChoices(): ", progChoices()))
-      print(paste0("progStatus(): ", progStatus()))
+      print(paste0("POData_rowselected: ", result$POData_rowselected))
+      print(paste0("progOasisName: ", result$progOasisName))
+      print(paste0("progOasisChoices: ", result$progOasisChoices))
+      print(paste0("progOasisStatus: ", result$progOasisStatus))
+      print(paste0("DPProgData_rowselected: ", result$DPProgData_rowselected))
+      print(paste0("progName: ", result$progName))
+      print(paste0("progChoices: ", result$progChoices))
+      print(paste0("progStatus: ", result$progStatus))
     }
   })
   
@@ -125,8 +145,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     currstep = reactive(workflowSteps$step()),
     selectprogrammeID = reactive(input$selectprogrammeID),
     selectprogOasisID = reactive(input$selectprogOasisID),
-    progName = reactive({progName()}),
-    progStatus = reactive({progStatus()})
+    progName = reactive({result$progName}),
+    progStatus = reactive({result$progStatus})
   )
   
   submodulesList$step3_configureOutput <- callModule(
@@ -140,9 +160,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     currstep = reactive(workflowSteps$step()),
     selectprogrammeID = reactive(input$selectprogrammeID),
     selectprogOasisID = reactive(input$selectprogOasisID),
-    progOasisName = reactive({progOasisName()}),
-    progOasisStatus = reactive({progOasisStatus()}),
-    POData_rowselected = reactive({POData_rowselected()})
+    progOasisName = reactive({result$progOasisName}),
+    progOasisStatus = reactive({result$progOasisStatus}),
+    POData_rowselected = reactive({result$POData_rowselected})
   )
   
   # Sub-Modules output ----------------------------------------------------------
@@ -159,68 +179,71 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   # > prog Table reactives ----
-  DPProgData <- reactive({submodulesList$step1_chooseProgramme$DPProgData()})
-  DPProgData_rowselected <- reactive({match(input$selectprogrammeID, progChoices())})
-  progName <- reactive({DPProgData()[DPProgData_rowselected(), DPProgData.ProgrammeName]})
-  progChoices <- reactive({DPProgData()[, DPProgData.ProgrammeID]})
-  progStatus <- reactive({
+  observeEvent(submodulesList$step1_chooseProgramme$DPProgData(), {
+    result$DPProgData <- submodulesList$step1_chooseProgramme$DPProgData()
+    result$progChoices <- result$DPProgData[, DPProgData.ProgrammeID]
+    result$DPProgData_rowselected <- match(input$selectprogrammeID, result$progChoices)
+    result$progName <- result$DPProgData[result$DPProgData_rowselected, DPProgData.ProgrammeName]
     progStatus <- ""
-    if (!is.na(DPProgData_rowselected()) && !is.na(DPProgData()) && length(DPProgData_rowselected()) > 0) {
-      if (DPProgData()[DPProgData_rowselected(), DPProgData.Status] == StatusCompleted) {
+    if (!is.na(result$DPProgData_rowselected) && !is.na(result$DPProgData) && length(result$DPProgData_rowselected) > 0) {
+      if (result$DPProgData[result$DPProgData_rowselected, DPProgData.Status] == StatusCompleted) {
         progStatus <- "- Status: Completed"
-      } else if (DPProgData()[DPProgData_rowselected(), DPProgData.Status] == StatusProcessing) {
+      } else if (result$DPProgData[result$DPProgData_rowselected, DPProgData.Status] == StatusProcessing) {
         progStatus <- "- Status: in Progress"
-      } else if (DPProgData()[DPProgData_rowselected(), DPProgData.Status] == StatusFailed) {
+      } else if (result$DPProgData[result$DPProgData_rowselected, DPProgData.Status] == StatusFailed) {
         progStatus <- "- Status: Failed"
       }
     }
-    progStatus
+    result$progStatus <- progStatus
   })
-  
+
   # > update of input$selectprogrammeID ----
-  observeEvent(submodulesList$step1_chooseProgramme$selectprogrammeID(), {
-    choices <- progChoices()
-    prgId <- submodulesList$step1_chooseProgramme$selectprogrammeID()
-    #Avoid updating input if not necessary
-    if (!is.null(choices)) {
-      updateSelectizeInput(session, inputId = "selectprogrammeID", selected = character(0), choices = progChoices())
-    }
-    if (prgId != "" && input$selectprogrammeID != prgId) {
-      if (prgId != "") {
-        updateSelectizeInput(session, inputId = "selectprogrammeID", selected = prgId)
-      } else {
-        updateSelectizeInput(session, inputId = "selectprogrammeID", selected = character(0))
+  observeEvent({
+    submodulesList$step1_chooseProgramme$selectprogrammeID()
+    result$progChoices
+    workflowSteps$step()
+  }, {
+    if (active() && workflowSteps$step() != 1 ) {
+      prgId <- submodulesList$step1_chooseProgramme$selectprogrammeID()
+      #Avoid updating input if not necessary
+      if (!is.null(result$progChoices)) {
+        updateSelectizeInput(session, inputId = "selectprogrammeID", selected = character(0), choices = result$progChoices)
+      }
+      if (prgId != "" && input$selectprogrammeID != prgId) {
+        if (prgId != "") {
+          updateSelectizeInput(session, inputId = "selectprogrammeID", selected = prgId)
+        } else {
+          updateSelectizeInput(session, inputId = "selectprogrammeID", selected = character(0))
+        }
       }
     }
   })
   
   # > prog Model Table reactives ----
-  POData <- reactive({submodulesList$step2_chooseModel$POData()})
-  POData_rowselected <- reactive({match(input$selectprogOasisID, progOasisChoices())})
-  progOasisName <- reactive({POData()[POData_rowselected(), POData.ProgName]})
-  progOasisChoices <- reactive({
-    progOasisChoices <- NULL
-    if (!is.na(POData()) && !is.null(POData())) {
-      progOasisChoices <- POData()[, POData.ProgOasisId]
+  observeEvent(submodulesList$step2_chooseModel$POData(), {
+    result$POData <- submodulesList$step2_chooseModel$POData()
+    models = ""
+    if (!is.na(result$POData) && !is.null(result$POData)) {
+      models <-  result$POData[, POData.ProgOasisId]
     } else {
-      models <- getModelList(dbSettings)
-      progOasisChoices <- createSelectOptions(models, "Model ID")
+      models <- getModelList(dbSettings)[, "Model ID"]
     }
-    progOasisChoices
-    })
-  progOasisStatus <- reactive({
+    result$progOasisChoices <- models
+    result$POData_rowselected <- match(input$selectprogOasisID, result$progOasisChoices)
+    result$progOasisName <- result$POData[result$POData_rowselected, POData.ProgName]
     progOasisStatus <- ""
-    if(!is.na(POData()) && !is.na(POData_rowselected()) && length(POData_rowselected()) > 0){
-      if (POData()[POData_rowselected(), POData.Status] == StatusCompleted) {
+    if (!is.na(result$POData) && !is.na(result$POData_rowselected) && length(result$POData_rowselected) > 0) {
+      if (result$POData[result$POData_rowselected, POData.Status] == StatusCompleted) {
         progOasisStatus <- "- Status: Completed"
-      } else if (POData()[POData_rowselected(), POData.Status] == StatusProcessing) {
+      } else if (result$POData[result$POData_rowselected, POData.Status] == StatusProcessing) {
         progOasisStatus <- "- Status: in Progress"
-      } else if (POData()[POData_rowselected(), POData.Status] == StatusFailed) {
+      } else if (result$POData[result$POData_rowselected, POData.Status] == StatusFailed) {
         progOasisStatus <- "- Status: Failed"
       }
     }
-    progOasisStatus
+    result$progOasisStatus <- progOasisStatus
   })
+
   
   observeEvent( submodulesList$step2_chooseModel$selectprogrammeID(), {
     prgId <- submodulesList$step2_chooseModel$selectprogrammeID()
@@ -231,16 +254,25 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   # > update of input$selectprogOasisID ----
-  observeEvent(submodulesList$step2_chooseModel$selectprogOasisID(), {
-    choiches <- progOasisChoices()
-    prgId <- submodulesList$step2_chooseModel$selectprogOasisID()
-    if (!is.null(choiches)) {
-      updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0), choices = choiches)
-    }
-    if (!is.na(prgId) && prgId != "") {
-      updateSelectizeInput(session, inputId = "selectprogOasisID", selected = prgId)
-    } else {
-      updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0))
+  observeEvent({
+    submodulesList$step2_chooseModel$selectprogOasisID()
+    result$progOasisChoices
+    workflowSteps$step()
+  }, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (active() &&  workflowSteps$step() == 3) {
+      prgId <- submodulesList$step2_chooseModel$selectprogOasisID()
+      print("I am here")
+      if (!is.null(result$progOasisChoices)) {
+        print("I am here 1")
+        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0), choices = result$progOasisChoices)
+      }
+      if (!is.na(prgId) && prgId != "") {
+        print("I am here 2")
+        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = prgId)
+      } else {
+        print("I am here 3")
+        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = character(0))
+      }
     }
   })
   
