@@ -574,14 +574,16 @@ step3_configureOutput <- function(input, output, session,
       print("reactive values step 3")
       print(paste0("input$tableprocessrundata_rows_selected: ", input$tableprocessrundata_rows_selected))
       print(paste0("result$prrunid: ", result$prrunid))
+      print(paste0("selectprogOasisID(): ", selectprogOasisID()))
     }
   })
   
   # Panels Visualization ----------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
-    if (currstep() == 3 ){
+    if (currstep() == 3 ) {
       .defaultRun()
+      .reloadRunData()
     }
   })
   

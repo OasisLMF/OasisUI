@@ -123,7 +123,8 @@ step2_chooseModel <- function(input, output, session,
                               selectprogrammeID = reactive({""}),
                               selectprogOasisID = reactive({""}),
                               progName = reactive({""}),
-                              progStatus = reactive({""})
+                              progStatus = reactive({""}),
+                              DPProgData = reactive(NULL)
                               
                               ) {
   
@@ -163,7 +164,7 @@ step2_chooseModel <- function(input, output, session,
   })
   
   observe(if (active()) {
-    result$selectprogOasisID <- isolate(selectprogOasisID())
+    result$selectprogOasisID <- selectprogOasisID()
   })
   
   # Observers for debugging -------------------------------------------------
@@ -184,14 +185,16 @@ step2_chooseModel <- function(input, output, session,
   # Panels Visualization -----------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
-    if (currstep() == 2 ){
+    if (currstep() == 2 ) {
       .defaultAssociateModel()
+      .reloadPOData()
+      .updateOOKProgrammeSelection()
     }
   })
   
   ### > Define selectprogrammeID ----
   observeEvent( input$sinputookprogid, {
-    if (result$selectprogrammeID != input$sinputookprogid && !is.null(input$sinputookprogid)){
+    if (result$selectprogrammeID != input$sinputookprogid && !is.null(input$sinputookprogid)) {
       #Making sure the two selectize inputs are the same
       result$selectprogrammeID <- input$sinputookprogid
     }
@@ -200,16 +203,13 @@ step2_chooseModel <- function(input, output, session,
   
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
+    logMessage(paste0("updating Programme Model Table because result$selectprogrammeID changed to ", result$selectprogrammeID))
     if (active()) {
+      .reloadPOData()
       # Update Associate Model Panel
       .updateOOKProgrammeSelection()
       .clearOOKModelSelection()
       .clearOOKTransformSelection()
-      #Making sure the two selectize inputs are the same
-      if (!is.null(input$sinputookprogid) && result$selectprogrammeID != input$sinputookprogid) {
-        updateSelectizeInput(session, inputId = "sinputookprogid", selected = result$selectprogrammeID)
-      }
-      .reloadPOData()
     }
   })
   
@@ -226,15 +226,15 @@ step2_chooseModel <- function(input, output, session,
   })
   
   # If selectprogOasisID changes, reload process run table and set view back to default
-  observeEvent(selectprogOasisID(), ignoreInit = TRUE, {
+  observeEvent(result$selectprogOasisID, ignoreInit = TRUE, {
     if (active()) {
       bl_dirty1 <- stop_selProgOasisID > check_selProgOasisID
       #.defaultview(session)
       show("buttonmodeldetails")
       hide("panelModelDetails")
-      if (selectprogOasisID() != "") {
+      if (result$selectprogOasisID != "") {
         if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
-          rowToSelect <- match(selectprogOasisID(), result$POData[, POData.ProgOasisId])
+          rowToSelect <- match(result$selectprogOasisID, result$POData[, POData.ProgOasisId])
           pageSel <- ceiling(rowToSelect/pageLength)
           if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
             # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
@@ -394,6 +394,7 @@ step2_chooseModel <- function(input, output, session,
     removeClass(id = paste0("progmodel-body"), class = "in")
     removeClass(id = paste0("progmodel-collapse-button"), class = "collapsed")
     addClass(id = paste0("progmodel-collapse-button"), class = "collapsed")
+    .updateOOKProgrammeSelection()
   })
   
   # Output configuration: manage what to show based on  status of row selected in programme Model table
@@ -558,11 +559,14 @@ step2_chooseModel <- function(input, output, session,
   
   .updateOOKProgrammeSelection <- function() {
     logMessage(".updateOOKProgrammeSelection called")
+    rowSelected <- match(result$selectprogrammeID, DPProgData()[, DPProgData.ProgrammeID])
+    print("DPProgData()[rowSelected, DPProgData.ProgrammeName]")
+    print(DPProgData()[rowSelected, DPProgData.ProgrammeName])
     #Trying to avoid colling the stored procedure if possible
     programmes <- getProgrammeList(dbSettings)
     updateSelectizeInput(session, "sinputookprogid",
-                           choices = createSelectOptions(programmes, "Select Programme"),
-                           selected = toString(result$DPProgData[input$tableDPprog_rows_selected, 1]))
+                           choices =  createSelectOptions(programmes),
+                           selected = toString(DPProgData()[rowSelected, DPProgData.ProgrammeName]))
   }
   
   # Model Outout ------------------------------------------------------------

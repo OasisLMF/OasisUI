@@ -172,12 +172,12 @@ step1_chooseProgramme <- function(input, output, session,
                                   currstep = reactive(-1),
                                   selectprogrammeID = reactive("")
                                   
-                                  ) {
+) {
   
   ns <- session$ns
   
   # Reactive Values and parameters -------------------------------------------
-
+  
   #number of Rows per Page in a dataable
   pageLength <- 5
   
@@ -220,7 +220,7 @@ step1_chooseProgramme <- function(input, output, session,
       print(paste0("result$selectprogrammeID: ", result$selectprogrammeID))
     }
   })
-    
+  
   # Panels Visualization -----------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
@@ -280,7 +280,7 @@ step1_chooseProgramme <- function(input, output, session,
       .nothingToShowTable(contentMessage = paste0("No files available for Programme ID ", result$selectprogrammeID))
     }
   })
-
+  
   # Title Programme Details Panel
   output$paneltitleProgrammeDetails <- renderUI({
     progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
@@ -504,13 +504,13 @@ step1_chooseProgramme <- function(input, output, session,
     .linkSourceFile(query = "exec dbo.updateSourceAccountFileForProg ", inputID = input$sinputselectSAFile)
   })
   
-  # onclick("abuttonSRFileLink", {
-  #   .linkSourceFile(query = "exec dbo.updateSourceAccountFileForProg ", inputID = input$sinputselectSRFile)
-  # })
+  onclick("abuttonSRFileLink", {
+    .linkSourceFile(query = "exec dbo.updateSourceReinsuranceFileForProg ", inputID = input$sinputselectSRFile)
+  })
   
-  # onclick("abuttonSRSFileLink", {
-  #   .linkSourceFile(query = "exec dbo.updateSourceAccountFileForProg ", inputID = input$sinputselectSRSFile)
-  # })
+  onclick("abuttonSRSFileLink", {
+    .linkSourceFile(query = "exec dbo.updateSourceReinsuranceScopeFileForProg ", inputID = input$sinputselectSRSFile)
+  })
   
   # File upload or select from dropdown
   # Location file
@@ -699,33 +699,36 @@ step1_chooseProgramme <- function(input, output, session,
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
     if (active()) {
-      bl_dirty <- stop_selProgID > check_selProgID
-      logMessage(paste("--- stop_selProgID is:", stop_selProgID))
-      logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", selectprogrammeID()))
-      if (result$selectprogrammeID != "") {
-        if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
-          rowToSelect <- match(result$selectprogrammeID, result$DPProgData[, DPProgData.ProgrammeID])
-          pageSel <- ceiling(rowToSelect/pageLength)
-          #backward propagation
-          if (is.null(input$tableDPprog_rows_selected)) {
-            if (workflowSteps$step() == '2'){
+      prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+      if (result$selectprogrammeID != prgId) {
+        bl_dirty <- stop_selProgID > check_selProgID
+        logMessage(paste("--- stop_selProgID is:", stop_selProgID))
+        logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", result$selectprogrammeID))
+        if (result$selectprogrammeID != "") {
+          if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
+            rowToSelect <- match(result$selectprogrammeID, result$DPProgData[, DPProgData.ProgrammeID])
+            pageSel <- ceiling(rowToSelect/pageLength)
+            #backward propagation
+            if (is.null(input$tableDPprog_rows_selected)) {
+              if (workflowSteps$step() == '2'){
+                selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+                selectPage(dataTableProxy("tableDPprog"), pageSel)
+                logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+              }
+            } else if (rowToSelect != input$tableDPprog_rows_selected) {
+              # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
               selectRows(dataTableProxy("tableDPprog"), rowToSelect)
               selectPage(dataTableProxy("tableDPprog"), pageSel)
               logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
             }
-          } else if (rowToSelect != input$tableDPprog_rows_selected) {
-            # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
-            selectRows(dataTableProxy("tableDPprog"), rowToSelect)
-            selectPage(dataTableProxy("tableDPprog"), pageSel)
-            logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
           }
+        } else {
+          selectRows(dataTableProxy("tableDPprog"), NULL)
+          selectPage(dataTableProxy("tableDPprog"), 1)
+          logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
         }
-      } else {
-        selectRows(dataTableProxy("tableDPprog"), NULL)
-        selectPage(dataTableProxy("tableDPprog"), 1)
-        logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+        if (bl_dirty) check_selProgID <<- check_selProgID + 1
       }
-      if (bl_dirty) check_selProgID <<- check_selProgID + 1
     }
   })
   
@@ -773,7 +776,7 @@ step1_chooseProgramme <- function(input, output, session,
     show("buttonprogdetails")
   }
   
-
+  
   # Reload Programme table
   .reloadDPProgData <- function() {
     logMessage(".reloadDPProgData called")
