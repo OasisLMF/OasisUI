@@ -163,6 +163,7 @@ div.flamingo-page-division {
 
 .irs-single, .irs-bar-edge, .irs-bar {
   background: #8b2129 !important;
+  border:#8b2129 !important;
 }
 
 .InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single {
@@ -288,3 +289,105 @@ div.flamingo-page-division {
   background-color: #ffffff;
   color: #8b2129;
 }
+
+/*Remove Browse Checkbox */
+input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+/*Default text color */
+input[type="checkbox"] + span {
+   color:black;
+}
+
+/* Custom checkbox, including a check icon with transparent color,
+to become visible when checked */
+input[type="checkbox"] + span:before {
+  font-family: "FontAwesome";
+  content: '\f00c';
+  color: transparent;
+  font-size: 10px;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  text-align: center;
+  margin-right: 6px;
+  border: 1px solid black;
+  border-radius: 2px;
+  background-color: white;
+  cursor: default;
+}
+
+/* Custom checkbox text color when checked */
+input[type="checkbox"]:checked + span {
+   color: #8b2129;
+}
+/* Checkbox icon visible with the desired color when checked */
+input[type="checkbox"]:checked + span:before {
+  color: #8b2129;
+}
+
+/* Custom checkbox text color when disabled */
+input[type="checkbox"]:disabled + span {
+   color:#999;
+}
+/* Checkbox style when disabled */
+input[type="checkbox"]:disabled + span:before {
+  border: 1px solid #333;
+  background-color:#999;
+  cursor: no-drop;
+}
+/* Remove browser radio */
+input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+/* Default radio text style */
+input[type="radio"] + span{
+  color: black;
+  position: relative;
+  padding-left: 22px;
+  display: inline-block;
+  line-height: 14px; /* controls vertical alignment */
+}
+/* Checked radio text style */
+input[type="radio"]:checked + span{
+  color: #8b2129;
+}
+
+/* Custom radio button */
+[type="radio"] + span:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 14px;
+    top: 0;
+    height: 14px;
+    border: 1px solid black;
+    border-radius: 9999px; /* circle */
+    background: #fff;
+}
+[type="radio"] + span:after {
+    content: '';
+    left: 3px;
+    width: 8px;
+    top: 3px;
+    height: 8px;
+    background: transparent; /* transparent by default */
+    position: absolute;
+    border-radius: 9999px; /* circle */
+
+}
+/* Radio button selection circle with actual color when checked */
+[type="radio"]:checked + span:after {
+    background: #8b2129;
+}
+
+.checkbox label, .radio label, .checkbox-inline, .radio-inline {
+  padding-left: 0; /* controls indention */
+}
+
