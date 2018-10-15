@@ -40,11 +40,11 @@ pageheaderUI <- function(id) {
 
                         actionButton(ns("abuttondefineaccount"), class = "btn btn-primary",
                                      label = "Define Account", align = "center", width = "100%") %>%
-                          bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "right"),
+                          bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "left"),
 
                         actionButton(ns("abuttonsysconf"), class = "btn btn-primary",
                                      label = "System Configuration", align = "center", width = "100%") %>%
-                          bs_embed_tooltip(title = landing_page$abuttonsysconf, placement = "right"),
+                          bs_embed_tooltip(title = landing_page$abuttonsysconf, placement = "left"),
 
                         actionButton(ns("abuttonlogout"), class = "btn btn-primary",
                                      label = "Logout", align = "center", width = "100%")
