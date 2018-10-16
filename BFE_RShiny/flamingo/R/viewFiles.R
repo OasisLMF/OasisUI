@@ -1,6 +1,7 @@
 # ViewFilesModule Module -----------------------
-#' Module to View Files
+# Module to View Files
 # UI ---------------
+#' UI for ViewFilesModule
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
@@ -36,11 +37,12 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 
 
 # Server -----------
+#' Server logic for ViewFilesModule
 #' @description Server logic to view  files
 #' @inheritParams flamingoModule
 #' @param filesListData table of output files for a given runID
 #' @return list of reactives:
-#' @rdname panelViewOutputFilesModule
+#' @rdname ViewOutputFilesModule
 #' @importFrom shinyjs show hide enable disable hidden
 #' @importFrom DT renderDT datatable DTOutput
 #' @importFrom dplyr mutate select contains filter
@@ -272,25 +274,18 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       leafletOutput(ns("plainmap"))
     )
   )
-
-  observeEvent({input[["select_mbutton"]]},{
-    showModal(Map)
-    session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_mbutton"))
-    idx <- as.numeric(strsplit(input$select_mbutton, "_")[[1]][2])
-    # Extra info table
-    output$tableFVExposureSelectedInfo <- renderUI({.getDetailsFile(idx)})
-    # get data to show in modal table
-    fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-    tryCatch({
-      result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
-                                  quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-    }, error = function(e) {
-      showNotification(type = "error",
-                       paste("Could not read file:", e$message))
-      result$fileData <- NULL
-    }) # end try catch
-  })#end observeEvent
-
+    
+    observeEvent({input[["select_mbutton"]]},{
+      showModal(Map)
+      session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_mbutton"))
+      idx <- as.numeric(strsplit(input$select_mbutton, "_")[[1]][2])
+      # Extra info table
+      output$tableFVExposureSelectedInfo <- renderUI({.getDetailsFile(idx)})
+      # get data to show in modal table
+      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+      output$plainmap <- renderLeaflet({createPlainMap(fileName)})
+    })#end observeEvent
+  
   # Helper functions -------------------------
 
   # default table options
@@ -303,8 +298,9 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       scrollX = FALSE,
       pageLength = maxrowsperpage,
       preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
-      drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } '),
-      autoWidth = TRUE)
+      drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
+      #autoWidth = TRUE
+      )
     return(options)
   }
 
