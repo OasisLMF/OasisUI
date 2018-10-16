@@ -523,15 +523,15 @@ configureAdvancedRI <- function(id) {
 #' @importFrom shinyjs onclick js removeClass addClass
 #' @export
 step3_configureOutput <- function(input, output, session, 
-                              dbSettings,apiSettings, userId, 
-                              active = reactive(TRUE), 
-                              logMessage = message,
-                              currstep = reactive(-1),
-                              selectprogrammeID = reactive(""),
-                              selectprogOasisID = reactive(""),
-                              progOasisName = reactive(""),
-                              progOasisStatus = reactive(""),
-                              POData_rowselected  = reactive(NULL)
+                                  dbSettings,apiSettings, userId, 
+                                  active = reactive(TRUE), 
+                                  logMessage = message,
+                                  currstep = reactive(-1),
+                                  selectprogrammeID = reactive(""),
+                                  selectprogOasisID = reactive(""),
+                                  progOasisName = reactive(""),
+                                  progOasisStatus = reactive(""),
+                                  POData_rowselected  = reactive(NULL)
 ) {
   
   ns <- session$ns
@@ -548,7 +548,7 @@ step3_configureOutput <- function(input, output, session,
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
   checkrigrplist <- c("chkriprog", "chkristate", "chkricounty", "chkriloc", "chkrilob", "chkripolicy")
-
+  
   # > Reactive Values -------------------------------------------------------
   result <- reactiveValues(
     # reactve value for navigation
@@ -558,24 +558,10 @@ step3_configureOutput <- function(input, output, session,
     # Id of the Process Run
     prrunid = -1
   )
-
+  
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
-  })
-
-  # Observers for debugging -------------------------------------------------
-  
-  observeEvent({
-    result$prrunid
-    input$tableprocessrundata_rows_selected
-  }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (active()) {
-      print("reactive values step 3")
-      print(paste0("input$tableprocessrundata_rows_selected: ", input$tableprocessrundata_rows_selected))
-      print(paste0("result$prrunid: ", result$prrunid))
-      print(paste0("selectprogOasisID(): ", selectprogOasisID()))
-    }
   })
   
   # Panels Visualization ----------------------------------------------------
@@ -676,7 +662,7 @@ step3_configureOutput <- function(input, output, session,
   
   # Process Run Table Title
   output$paneltitlepanelProcessRunTable <- renderUI({
-     if (selectprogOasisID() != "") {
+    if (selectprogOasisID() != "") {
       paste0("Process Runs for Model", " - ", toString(progOasisName())," (id: ", toString(selectprogOasisID()), ") ", toString(progOasisStatus()))
     } else {
       paste0("Process Runs")
@@ -709,7 +695,7 @@ step3_configureOutput <- function(input, output, session,
   
   #Show Output Configuration Panel
   onclick("abuttonconfigoutput", {
-    if (progOasisStatus() == StatusCompleted) {
+    if (progOasisStatus() == "- Status: Completed") {
       if (selectprogOasisID() != "") {
         .defaultview(session)
         show("panelDefineOutputs")
@@ -727,7 +713,7 @@ step3_configureOutput <- function(input, output, session,
   })
   
   onclick("abuttonrerunpr", {
-    if (progOasisStatus() == StatusCompleted) {
+    if (progOasisStatus() == "- Status: Completed") {
       if (length(input$tableprocessrundata_rows_selected) > 0) {
         .defaultview(session)
         show("panelDefineOutputs")
@@ -1123,7 +1109,7 @@ step3_configureOutput <- function(input, output, session,
       showNotification(type = "warning", "Please select a Process Run first")
     }
   })
-
+  
   # Help Functions -----------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
@@ -1141,7 +1127,7 @@ step3_configureOutput <- function(input, output, session,
     show("panelProcessRunTable")
     disable("chkgulpolicy")
   }
-
+  
   # Reload Process Runs table
   .reloadRunData <- function() {
     logMessage(".reloadRunData called")

@@ -75,14 +75,14 @@ panelAssociateModel <- function(id) {
     ),
     fluidRow(
       column(4,
-             selectizeInput(ns("sinputookprogid"), "Programme:", choices = c(""), selected = character(0),
+             selectizeInput(ns("sinputookprogid"), "Programme", choices = c(""), selected = character(0),
                             options = list(
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
              )),
       column(4,
-             selectizeInput(ns("sinputookmodelid"), "Model:", choices = c(""), selected = character(0),
+             selectizeInput(ns("sinputookmodelid"), "Model", choices = c(""), selected = character(0),
                             options = list(
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
@@ -126,7 +126,7 @@ step2_chooseModel <- function(input, output, session,
                               progStatus = reactive({""}),
                               DPProgData = reactive(NULL)
                               
-                              ) {
+) {
   
   ns <- session$ns
   
@@ -140,7 +140,7 @@ step2_chooseModel <- function(input, output, session,
   
   # Help function
   '%notin%' <- Negate('%in%')
-
+  
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
@@ -166,37 +166,24 @@ step2_chooseModel <- function(input, output, session,
   observe(if (active()) {
     result$selectprogOasisID <- selectprogOasisID()
   })
-  
-  # Observers for debugging -------------------------------------------------
-  
-  observeEvent({
-    input$tableProgOasisOOK_rows_selected
-    result$selectprogrammeID
-    result$selectprogOasisID
-  }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (active()) {
-      print("reactive values step 2")
-      print(paste0("input$tableProgOasisOOK_rows_selected: ", input$tableProgOasisOOK_rows_selected))
-      print(paste0("result$selectprogrammeID: ", result$selectprogrammeID))
-      print(paste0("result$selectprogOasisID: ", result$selectprogOasisID))
-    }
-  })
-  
+
   # Panels Visualization -----------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
     if (currstep() == 2 ) {
       .defaultAssociateModel()
       .reloadPOData()
-      .updateOOKProgrammeSelection()
     }
   })
   
+  
   ### > Define selectprogrammeID ----
   observeEvent( input$sinputookprogid, {
-    if (result$selectprogrammeID != input$sinputookprogid && !is.null(input$sinputookprogid)) {
+    rowtoSelect <- match( input$sinputookprogid, DPProgData()[,  DPProgData.ProgrammeName])
+    sinputookprogid <- DPProgData()[rowtoSelect,  DPProgData.ProgrammeID]
+    if (result$selectprogrammeID != sinputookprogid && !is.null(sinputookprogid)) {
       #Making sure the two selectize inputs are the same
-      result$selectprogrammeID <- input$sinputookprogid
+      result$selectprogrammeID <- sinputookprogid
     }
   }
   )
@@ -347,7 +334,7 @@ step2_chooseModel <- function(input, output, session,
   
   ### > Create Model ------
   onclick("abuttoncrprogoasis", {
-    if (progStatus() == StatusCompleted) {
+    if (progStatus() == "- Status: Completed") {
       if (isolate(input$sinputookprogid) > 0 && isolate(input$sinputookmodelid) > 0) {
         prgId <- createProgOasis(dbSettings,
                                  isolate(input$sinputookprogid),
@@ -389,12 +376,13 @@ step2_chooseModel <- function(input, output, session,
   
   # > Updates dependent on changed: tableProgOasisOOK_rows_selected ------------
   #collapse associate panel when row selected changes 
-  observeEvent(input$tableProgOasisOOK_rows_selected, ignoreInit = TRUE, {
+  observeEvent({
+    input$tableProgOasisOOK_rows_selected
+  }, ignoreInit = TRUE, {
     #force collapsed state of Associate Model flamingo panel
     removeClass(id = paste0("progmodel-body"), class = "in")
     removeClass(id = paste0("progmodel-collapse-button"), class = "collapsed")
     addClass(id = paste0("progmodel-collapse-button"), class = "collapsed")
-    .updateOOKProgrammeSelection()
   })
   
   # Output configuration: manage what to show based on  status of row selected in programme Model table
@@ -411,7 +399,7 @@ step2_chooseModel <- function(input, output, session,
         
         logMessage(paste("updating selectprogOasisID because selection in programme model table changed to",  prgId))
         result$selectprogOasisID <- prgId
-
+        
         if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {
           paramlist <- executeDbQuery(dbSettings,
                                       buildDbQuery("getRuntimeParamList", procId))
@@ -453,7 +441,7 @@ step2_chooseModel <- function(input, output, session,
     show("panelProgrammeModelTable")
     show("buttonmodeldetails")
     show("panelAssociateModel")
-    #force collapsed state of Associate Model flamingo panel
+    # #force collapsed state of Associate Model flamingo panel
     removeClass(id = paste0("progmodel-body"), class = "in")
     removeClass(id = paste0("progmodel-collapse-button"), class = "collapsed")
     addClass(id = paste0("progmodel-collapse-button"), class = "collapsed")
@@ -559,14 +547,20 @@ step2_chooseModel <- function(input, output, session,
   
   .updateOOKProgrammeSelection <- function() {
     logMessage(".updateOOKProgrammeSelection called")
-    rowSelected <- match(result$selectprogrammeID, DPProgData()[, DPProgData.ProgrammeID])
-    print("DPProgData()[rowSelected, DPProgData.ProgrammeName]")
-    print(DPProgData()[rowSelected, DPProgData.ProgrammeName])
-    #Trying to avoid colling the stored procedure if possible
-    programmes <- getProgrammeList(dbSettings)
-    updateSelectizeInput(session, "sinputookprogid",
-                           choices =  createSelectOptions(programmes),
-                           selected = toString(DPProgData()[rowSelected, DPProgData.ProgrammeName]))
+    programmes <- c("")
+    if (!is.null(DPProgData())) {
+      programmes <- DPProgData()[,  DPProgData.ProgrammeName]
+      rowSelected <- match(result$selectprogrammeID, DPProgData()[, DPProgData.ProgrammeID])
+      # Remove selection if input$tableDPprog_rows_selected is null
+      if (length(rowSelected) > 0 ) {
+        selection <- toString(DPProgData()[rowSelected, DPProgData.ProgrammeName])
+      } else {
+        selection <- character(0)
+      }
+      updateSelectizeInput(session, "sinputookprogid",
+                           choices = programmes, #createSelectOptions(programmes),
+                           selected = selection)
+    }
   }
   
   # Model Outout ------------------------------------------------------------

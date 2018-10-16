@@ -80,7 +80,7 @@ panelDefineProgramme <- function(id) {
       column(12, h4("Programme metadata"))),
     fluidRow(
       column(4,
-             selectizeInput(ns("sinputDPAccountName"), "Account Name", choices = c(""), selected=character(0),
+             selectizeInput(ns("sinputDPAccountName"), "Account Name", choices = c(""), selected = character(0),
                             options = list(
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
@@ -89,7 +89,7 @@ panelDefineProgramme <- function(id) {
       column(4,
              textInput(inputId = ns("tinputDPProgName"), label = "Programme Name")),
       column(4,
-             selectizeInput(ns("sinputTransformname"), "Transform Name", choices = c(""), selected=character(0),
+             selectizeInput(ns("sinputTransformname"), "Transform Name", choices = c(""), selected = character(0),
                             options = list(
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
@@ -206,19 +206,6 @@ step1_chooseProgramme <- function(input, output, session,
   #Set Params
   observe( if (active()) {
     result$selectprogrammeID <- isolate(selectprogrammeID())
-  })
-  
-  # Observers for debugging -------------------------------------------------
-  
-  observeEvent({
-    input$tableDPprog_rows_selected
-    result$selectprogrammeID
-  }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (active()) {
-      print("reactive values step 1")
-      print(paste0("input$tableDPprog_rows_selected: ", input$tableDPprog_rows_selected))
-      print(paste0("result$selectprogrammeID: ", result$selectprogrammeID))
-    }
   })
   
   # Panels Visualization -----------------------------------------------------
