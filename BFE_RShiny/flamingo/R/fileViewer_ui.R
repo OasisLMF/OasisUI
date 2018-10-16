@@ -3,7 +3,6 @@
 #' @description UI/View to view files
 #' @import leaflet
 #' @importFrom DT DTOutput
-#' @importFrom shinyBS bsTooltip
 #' @export
 fileViewerUI <- function(id) {
 

@@ -8,7 +8,7 @@
 #' @importFrom bsplus bs_embed_tooltip
 #' @export
 programmeDefinitionSingleUI <- function(id) {
-
+  
 ns <- NS(id)
 
 tagList(

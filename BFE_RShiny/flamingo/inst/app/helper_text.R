@@ -1,5 +1,5 @@
-# Helper texts to show explanations next to buttons. 
-# A list per file. 
+# Helper texts to show explanations next to buttons.
+# A list per file.
 # Naming convention: buttonname
 
 file_Viewer <- list(
@@ -29,7 +29,7 @@ programme_Definition_Single <- list(
   selectprogOasisID = "Select the Oasis Programme to Run"
 )
 
-### Panel Browse ----  
+### Panel Browse ----
 
 browse_programmes <- list(
   selectRunID = "Selecct RunID",
