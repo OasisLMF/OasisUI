@@ -184,9 +184,6 @@ step1_chooseProgramme <- function(input, output, session,
   #values to stop ping pong effect
   stop_selProgID <- check_selProgID <- 0
   
-  # Help function
-  '%notin%' <- Negate('%in%')
-  
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
@@ -771,14 +768,9 @@ step1_chooseProgramme <- function(input, output, session,
     logMessage(".reloadDPProgData called")
     stmt <- buildDbQuery("getProgData")
     DPProgData <- executeDbQuery(dbSettings, stmt)
-    StatusGood <- "Loaded"
-    StatusBad <- c("Failed", "Cancelled", NA_character_)
     if (!is.null(DPProgData)) {
       result$DPProgData <- DPProgData %>%
-        mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                  Status %in% StatusBad ~ StatusFailed,
-                                  Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-        as.data.frame()
+        replaceWithIcons()
       logMessage("programme table refreshed")
     }
     invisible()
@@ -792,14 +784,9 @@ step1_chooseProgramme <- function(input, output, session,
       
       stmt <- buildDbQuery("getProgFileDetails", progId)
       progDetails <- executeDbQuery(dbSettings, stmt)
-      StatusGood <- "Loaded"
-      StatusBad <- c("Failed", "Cancelled", NA_character_)
       if (!is.null(progDetails)) {
         result$progDetails  <- progDetails %>%
-          mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                    Status %in% StatusBad ~ StatusFailed,
-                                    Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-          as.data.frame()
+          replaceWithIcons()
       }
       logMessage("programme details table refreshed")
     } else {

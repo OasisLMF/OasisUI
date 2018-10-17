@@ -132,9 +132,6 @@ step2_chooseModel <- function(input, output, session,
   #values to stop ping pong effect
   stop_selProgOasisID <- check_selProgOasisID <- 0
   
-  # Help function
-  '%notin%' <- Negate('%in%')
-  
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
@@ -438,15 +435,10 @@ step2_chooseModel <- function(input, output, session,
     logMessage(".reloadPOData called")
     if (result$selectprogrammeID != "") {
       POData <- getProgOasisForProgdata(dbSettings, result$selectprogrammeID)
-      StatusGood <- "Loaded"
-      StatusBad <- c("Failed", "Cancelled", NA_character_)
       if (!is.null(POData)) {
         result$POData <- POData %>%
           select(c(POData.ProgOasisId, POData.ProgName, POData.ModelName, POData.TransformName, POData.SourceFileId, POData.FileID, POData.Status)) %>%
-          mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                    Status %in% StatusBad ~ StatusFailed,
-                                    Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-          as.data.frame()
+          replaceWithIcons()
       }
       logMessage("programme model table refreshed")
     } else {
@@ -462,14 +454,9 @@ step2_chooseModel <- function(input, output, session,
       prgId <- result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId]
       stmt <- buildDbQuery("getProgOasisFileDetails", prgId)
       progFiles <- executeDbQuery(dbSettings, stmt)
-      StatusGood <- "Loaded"
-      StatusBad <- c("Failed", "Cancelled", NA_character_)
       if (!is.null(progFiles)) {
         result$progFiles <-  progFiles %>%
-          mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                    Status %in% StatusBad ~ StatusFailed,
-                                    Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-          as.data.frame()
+          replaceWithIcons()
       }
       logMessage("files table refreshed")
     } else {
