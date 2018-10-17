@@ -199,7 +199,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # > prog Table reactives ----
   observeEvent(submodulesList$step1_chooseProgramme$DPProgData(), ignoreInit = TRUE,{
-    if (is.null(submodulesList$step1_chooseProgramme$DPProgData())) {
+    if (is.null(submodulesList$step1_chooseProgramme$DPProgData()) || nrow(submodulesList$step1_chooseProgramme$DPProgData()) == 0) {
       stmt <- buildDbQuery("getProgData")
       result$DPProgData <- executeDbQuery(dbSettings, stmt) %>%
         mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
@@ -245,15 +245,19 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     input$selectprogrammeID
     }, ignoreInit = TRUE, {
     #Avoid updating input if not necessary
-    if (result$selectprogOasisID != input$selectprogOasisID) {
+    if (input$selectprogOasisID != "" && result$selectprogOasisID != input$selectprogOasisID) {
       logMessage(paste0("updating result$selectprogOasisID because input$selectprogOasisID changed to: ", input$selectprogOasisID ))
       result$selectprogOasisID <- input$selectprogOasisID
     }
   })
   
+  #If programmeID changes, then we select the first progOasis 
   observeEvent(result$DPProgData_rowselected, ignoreInit = TRUE, {
-    progOasisId <- result$POData[result$POData_rowselected, POData.ProgOasisId]
-    if (!is.null(progOasisId) && progOasisId != result$selectprogOasisID) {
+    progOasisId <- NULL
+    if (!is.null(result$POData) && nrow(result$POData) > 0) {
+      progOasisId <- result$POData[result$POData_rowselected, POData.ProgOasisId]
+    } 
+    if (!is.null(progOasisId) && !is.na(progOasisId) && progOasisId != result$selectprogOasisID) {
       logMessage(paste0("updating result$selectprogOasisID because result$POData_rowselected changed to: ", result$POData_rowselected ))
       result$selectprogOasisID <- progOasisId
     }
@@ -282,7 +286,12 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                   Status %in% StatusBad ~ StatusFailed,
                                   Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
         as.data.frame() 
-      result$progOasisChoices <-  result$POData[, POData.ProgOasisId]
+      if (nrow(result$POData) != 0) {
+        result$progOasisChoices <-  result$POData[, POData.ProgOasisId]
+      } else {
+        result$progOasisChoices <- c("")
+      }
+      
     }
   })
   
@@ -294,9 +303,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     prgOasisId <- result$selectprogOasisID
     rowToSelect <- match(prgOasisId, result$progOasisChoices)
     result$POData_rowselected <- ifelse(is.na(rowToSelect), 1, rowToSelect)
-    result$progOasisName <- result$POData[result$POData_rowselected, POData.ProgName]
+    result$progOasisName <- ifelse(nrow(result$POData) > 0, result$POData[result$POData_rowselected, POData.ProgName], "")
     progOasisStatus <- ""
-    if (!is.na(result$POData) && !is.na(result$POData_rowselected) && length(result$POData_rowselected) > 0) {
+    if (!is.na(result$POData) && nrow(result$POData) > 0 && length(result$POData_rowselected) > 0) {
       if (result$POData[result$POData_rowselected, POData.Status] == StatusCompleted) {
         progOasisStatus <- "- Status: Completed"
       } else if (result$POData[result$POData_rowselected, POData.Status] == StatusProcessing) {
