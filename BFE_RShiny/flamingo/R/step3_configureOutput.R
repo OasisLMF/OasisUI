@@ -664,7 +664,7 @@ step3_configureOutput <- function(input, output, session,
   output$paneltitlepanelProcessRunTable <- renderUI({
     if (selectprogOasisID() != "") {
       progOasisName <- ifelse(toString(progOasisName()) == " " | toString(progOasisName()) == "" | toString(progOasisName()) == "NA", "", paste0('"',  toString(progOasisName()), '"'))
-      paste0('Runs for Model ', progOasisName,' (id: ', toString(selectprogOasisID()), ') ', toString(progOasisStatus()))
+      paste0('Runs for Model id ', toString(selectprogOasisID()), ' ', progOasisName,' ', toString(progOasisStatus()))
     } else {
       paste0("Runs")
     }
@@ -689,7 +689,7 @@ step3_configureOutput <- function(input, output, session,
       processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
       processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName]
       processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
-      paste0('Re-Define Output Configuration for Run ', processRunName, ' (id: ', processRunId, ')')
+      paste0('Re-Define Output Configuration for Run id ', processRunId, ' ', processRunName)
     } else {
       "New Output Configuration"
     }
@@ -1071,7 +1071,7 @@ step3_configureOutput <- function(input, output, session,
     processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
     processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName]
     processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
-    paste0('Logs ', processRunName, ' (id: ', processRunId, ')')
+    paste0('Logs for Run id ', processRunId, ' ', processRunName)
   })
   
   # > Updates dependent on changed: tableprocessrundata_rows_selected ---------

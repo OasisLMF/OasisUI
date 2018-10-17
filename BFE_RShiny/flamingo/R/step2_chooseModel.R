@@ -257,7 +257,7 @@ step2_chooseModel <- function(input, output, session,
   output$paneltitleProgrammeModelTable <- renderUI({
     if (result$selectprogrammeID != "") {
       progName <- ifelse(toString(progName()) == " " | toString(progName()) == "" | toString(progName()) == "NA", "", paste0('"', toString(progName()), '"'))
-      paste0('Model Associations for Programme ', progName,' (id: ', toString(result$selectprogrammeID), ') ', toString(progStatus()))
+      paste0('Model Associations for Programme id ', toString(result$selectprogrammeID), ' ', progName,' ', toString(progStatus()))
     } else {
       paste0("Models")
     }
@@ -267,9 +267,9 @@ step2_chooseModel <- function(input, output, session,
   output$paneltitleAssociateModel <- renderUI({
     if (result$selectprogrammeID != "") {
       progName <- ifelse(toString(progName()) == " " | toString(progName()) == "" | toString(progName()) == "NA", "", paste0('"', toString(progName()), '"'))
-      paste0('New Model Association to Programme ', progName, ' (id: ', toString(result$selectprogrammeID), ') ', toString(progStatus()))
+      paste0('Create Model Association to Programme id ', toString(result$selectprogrammeID), ' ', progName,' ', toString(progStatus()))
     } else {
-      paste0("New Model Association")
+      paste0("Create Model Association")
     }
   })
   
@@ -299,7 +299,7 @@ step2_chooseModel <- function(input, output, session,
     progOasisId <- result$POData[ input$tableProgOasisOOK_rows_selected,POData.ProgOasisId]
     progOasisName <- result$POData[ input$tableProgOasisOOK_rows_selected,POData.ProgName]
     progOasisName <- ifelse(progOasisName == " " | progOasisName == "", "", paste0('"', progOasisName, '"'))
-    paste0('Details of Model Association ', progOasisName, ' (id: ', progOasisId, ')')
+    paste0('Details of Model Association id ', progOasisId, ' ', progOasisName)
   })
   
   ### Show/hide Programme Model Details Panel

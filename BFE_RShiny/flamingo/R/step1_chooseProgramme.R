@@ -273,7 +273,7 @@ step1_chooseProgramme <- function(input, output, session,
     progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
     progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
     progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
-    paste0('Details of Programme ', progName, ' (id: ', progId, ')')
+    paste0('Details of Programme id ', progId, ' ', progName)
   })
   
   # Show Programme Details
@@ -304,7 +304,7 @@ step1_chooseProgramme <- function(input, output, session,
       progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
       progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
       progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
-      paste0('Amend Programme ', progName, ' (id: ', progId, ')')
+      paste0('Amend Programme id ', progId, ' ', progName)
     }
   })
   
