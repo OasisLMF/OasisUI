@@ -31,13 +31,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   stop_selProgID <- check_selProgID <- 0
   stop_selProgOasisID <- check_selProgOasisID <- 0
   
-  #Statuses to be replaced
-  StatusGood <- "Loaded"
-  StatusBad <- c("Failed", "Cancelled", NA_character_)
-  
-  # Help function
-  '%notin%' <- Negate('%in%')
-  
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # Id of the Process Run
@@ -193,10 +186,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (is.null(submodulesList$step1_chooseProgramme$DPProgData()) || nrow(submodulesList$step1_chooseProgramme$DPProgData()) == 0) {
       stmt <- buildDbQuery("getProgData")
       result$DPProgData <- executeDbQuery(dbSettings, stmt) %>%
-        mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                  Status %in% StatusBad ~ StatusFailed,
-                                  Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-        as.data.frame()
+        replaceWithIcons()
     } else {
       result$DPProgData <- submodulesList$step1_chooseProgramme$DPProgData()
     }
@@ -233,7 +223,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   observeEvent({
     input$selectprogOasisID
-    input$selectprogrammeID
     }, ignoreInit = TRUE, {
     #Avoid updating input if not necessary
     if (input$selectprogOasisID != "" && result$selectprogOasisID != input$selectprogOasisID) {
@@ -243,8 +232,11 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   #If programmeID changes, then we select the first progOasis 
-  observeEvent(result$DPProgData_rowselected, ignoreInit = TRUE, {
-    progOasisId <- NULL
+  observeEvent({
+    result$POData_rowselected
+    result$selectprogrammeID
+    }, ignoreInit = TRUE, {
+    progOasisId <- ""
     if (!is.null(result$POData) && nrow(result$POData) > 0) {
       progOasisId <- result$POData[result$POData_rowselected, POData.ProgOasisId]
     } 
@@ -273,10 +265,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   }, ignoreInit = TRUE, {
     if (result$selectprogrammeID != "" & !is.null(result$selectprogrammeID)) {
       result$POData <- getProgOasisForProgdata(dbSettings, result$selectprogrammeID) %>%
-        mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                  Status %in% StatusBad ~ StatusFailed,
-                                  Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-        as.data.frame() 
+        replaceWithIcons()
       if (nrow(result$POData) != 0) {
         result$progOasisChoices <-  result$POData[, POData.ProgOasisId]
       } else {
@@ -287,7 +276,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   observeEvent({
-    input$selectprogrammeID
+    result$selectprogrammeID
     result$selectprogOasisID
     result$progOasisChoices
   }, ignoreInit = TRUE, {
@@ -319,4 +308,28 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   moduleOutput
   
+}
+
+#Function to replace status with icons in table
+#' @param df dataframe
+#' @importFrom dplyr mutate case_when
+#' @export
+
+replaceWithIcons <- function(df){
+  #Status
+  StatusGood <- c("success", "completed", "loaded")
+  StatusBad <- c("cancelled", "failed",  NA_character_)
+  
+  # Help function
+  '%notin%' <- Negate('%in%')
+  
+  #Replace Status in df
+  logMessage(paste0("replacing icons"))
+  df <- df %>%
+    mutate(Status = tolower(Status)) %>%
+    mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
+                              Status %in% StatusBad ~ StatusFailed,
+                              Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
+    as.data.frame()
+  df
 }
