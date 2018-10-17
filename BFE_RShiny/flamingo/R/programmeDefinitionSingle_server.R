@@ -310,7 +310,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
 }
 
-#Function to replace status with icons in table
+#' Function to replace status with icons in table
 #' @param df dataframe
 #' @importFrom dplyr mutate case_when
 #' @export
