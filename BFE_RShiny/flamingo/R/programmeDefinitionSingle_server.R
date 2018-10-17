@@ -169,15 +169,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
   
-  observeEvent(submodulesList$step2_chooseModel$selectprogrammeID(), ignoreInit = TRUE, {
-    prgId <- submodulesList$step2_chooseModel$selectprogrammeID()
-    #Avoid updating input if not necessary
-    if (prgId != "" && !is.na(prgId) && result$selectprogrammeID != prgId) {
-      logMessage(paste0("updating result$selectprogrammeID because submodulesList$step2_chooseModel$selectprogrammeID() changed to: ", prgId ))
-      result$selectprogrammeID <- prgId
-    }
-  })
-  
   observeEvent(input$selectprogrammeID, ignoreInit = TRUE,{
     #Avoid updating input if not necessary
     if (input$selectprogrammeID != result$selectprogrammeID) {
