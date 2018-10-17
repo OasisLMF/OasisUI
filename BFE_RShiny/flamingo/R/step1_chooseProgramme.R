@@ -53,7 +53,7 @@ panelProgrammeDetails <- function(id) {
     collapsible = FALSE,
     ns("progdtl"),
     heading = tagAppendChildren(
-      h4("Details of Programme"),
+      h4(""),
       uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttondefprogrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times"), style = "float: right;")
@@ -272,7 +272,8 @@ step1_chooseProgramme <- function(input, output, session,
   output$paneltitleProgrammeDetails <- renderUI({
     progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
     progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
-    paste0("- ", progName, " (id: ", progId, ")")
+    progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
+    paste0('Details of Programme ', progName, ' (id: ', progId, ')')
   })
   
   # Show Programme Details
@@ -302,7 +303,8 @@ step1_chooseProgramme <- function(input, output, session,
     } else if (result$prog_flag == "A") {
       progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
       progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
-      paste0("Amend Programme", "- ", progName, " (id: ", progId, ")")
+      progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
+      paste0('Amend Programme ', progName, ' (id: ', progId, ')')
     }
   })
   

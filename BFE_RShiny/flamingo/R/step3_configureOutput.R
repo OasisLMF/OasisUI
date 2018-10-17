@@ -663,9 +663,10 @@ step3_configureOutput <- function(input, output, session,
   # Process Run Table Title
   output$paneltitlepanelProcessRunTable <- renderUI({
     if (selectprogOasisID() != "") {
-      paste0("Process Runs for Model", " - ", toString(progOasisName())," (id: ", toString(selectprogOasisID()), ") ", toString(progOasisStatus()))
+      progOasisName <- ifelse(toString(progOasisName()) == " " | toString(progOasisName()) == "" | toString(progOasisName()) == "NA", "", paste0('"',  toString(progOasisName()), '"'))
+      paste0('Runs for Model ', progOasisName,' (id: ', toString(selectprogOasisID()), ') ', toString(progOasisStatus()))
     } else {
-      paste0("Process Runs")
+      paste0("Runs")
     }
     
   })
@@ -687,7 +688,8 @@ step3_configureOutput <- function(input, output, session,
     if (length(input$tableprocessrundata_rows_selected) > 0) {
       processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
       processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName]
-      paste0("Re-Define Output Configuration for Process", " - ", processRunName, " (id: ", processRunId, ")")
+      processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
+      paste0('Re-Define Output Configuration for Run ', processRunName, ' (id: ', processRunId, ')')
     } else {
       "New Output Configuration"
     }
@@ -1068,7 +1070,8 @@ step3_configureOutput <- function(input, output, session,
   output$paneltitleProcessRunLogs <- renderUI({
     processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
     processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName]
-    paste0("Logs", " - ", processRunName, " (id: ", processRunId, ")")
+    processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
+    paste0('Logs ', processRunName, ' (id: ', processRunId, ')')
   })
   
   # > Updates dependent on changed: tableprocessrundata_rows_selected ---------

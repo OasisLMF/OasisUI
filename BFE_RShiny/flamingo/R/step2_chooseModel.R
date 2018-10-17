@@ -272,16 +272,18 @@ step2_chooseModel <- function(input, output, session,
   #  Programme Model Table title
   output$paneltitleProgrammeModelTable <- renderUI({
     if (result$selectprogrammeID != "") {
-      paste0("Models Table for Programme", " - ", toString(progName())," (id: ", toString(result$selectprogrammeID), ") ", toString(progStatus()))
+      progName <- ifelse(toString(progName()) == " " | toString(progName()) == "" | toString(progName()) == "NA", "", paste0('"', toString(progName()), '"'))
+      paste0('Models for Programme ', progName,' (id: ', toString(result$selectprogrammeID), ') ', toString(progStatus()))
     } else {
-      paste0("Models Table")
+      paste0("Models")
     }
   })
   
   # Associate Model Table Title
   output$paneltitleAssociateModel <- renderUI({
     if (result$selectprogrammeID != "") {
-      paste0("Associate Model to Programme", " - ", toString(progName()), " (id: ", toString(result$selectprogrammeID), ") ", toString(progStatus()))
+      progName <- ifelse(toString(progName()) == " " | toString(progName()) == "" | toString(progName()) == "NA", "", paste0('"', toString(progName()), '"'))
+      paste0('Associate Model to Programme ', progName, ' (id: ', toString(result$selectprogrammeID), ') ', toString(progStatus()))
     } else {
       paste0("Associate Model to Programme")
     }
@@ -310,7 +312,10 @@ step2_chooseModel <- function(input, output, session,
   
   # Details Model title
   output$paneltitleProgrammeModelDetails <- renderUI({
-    paste0("Details Programme Model", " - ", toString(progName()), " (id: ", toString(result$selectprogrammeID), ")")
+    progOasisId <- result$POData[ input$tableProgOasisOOK_rows_selected,POData.ProgOasisId]
+    progOasisName <- result$POData[ input$tableProgOasisOOK_rows_selected,POData.ProgName]
+    progOasisName <- ifelse(progOasisName == " " | progOasisName == "", "", paste0('"', progOasisName, '"'))
+    paste0('Details of Model ', progOasisName, ' (id: ', progOasisId, ')')
   })
   
   ### Show/hide Programme Model Details Panel
