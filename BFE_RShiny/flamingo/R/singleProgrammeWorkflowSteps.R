@@ -13,8 +13,8 @@ programmeWorkflowSteps <- list("Choose Programme" = "1",
 singleProgrammeWorkflowStepsUI <- function(id) {
   ns <- NS(id)
   tagList(
-    h4("Process Definition Steps"),
-    br(),
+    # h4("Process Definition Steps"),
+    # br(),
     radioGroupButtons(
       inputId = ns("radiobuttons"), label = NULL,
       choices = programmeWorkflowSteps,

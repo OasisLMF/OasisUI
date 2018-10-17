@@ -11,7 +11,7 @@ modelSupplierPageUI <- function(id) {
 
   tagList(
 
-    h3("Model", class = "flamingo-page-title"),
+    # h3("Model", class = "flamingo-page-title"),
     
     fluidRow(
       column(12,

@@ -11,7 +11,7 @@ companyDefinitionUI <- function(id) {
 
   tagList(
 
-      h3("Company", class = "flamingo-page-title"),
+      # h3("Company", class = "flamingo-page-title"),
 
       fluidRow(
           column(12,

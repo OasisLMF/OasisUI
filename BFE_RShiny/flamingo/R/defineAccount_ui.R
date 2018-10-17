@@ -13,7 +13,7 @@ accountDefinitionUI <- function(id) {
 
   tagList(
 
-    h3("Define Account", class = "flamingo-page-title"),
+    # h3("Define Account", class = "flamingo-page-title"),
 
     fluidRow(
       column(12,

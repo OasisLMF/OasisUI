@@ -10,7 +10,7 @@ fileViewerUI <- function(id) {
 
   tagList(
 
-    h3("File Viewer", class = "flamingo-page-title"),
+    # h3("File Viewer", class = "flamingo-page-title"),
 
     h4("File List", class = "flamingo-table-title"),
 
