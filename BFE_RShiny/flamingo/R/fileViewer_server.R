@@ -1,4 +1,5 @@
 #' File Viewer Module
+#' @rdname fileViewer
 #' @description Server logic to view files
 #' @inheritParams flamingoModule
 #' @param userId user id
@@ -26,7 +27,7 @@ fileViewer <- function(
   )
 
   ns <- session$ns
-  
+
   navigation_state <- reactiveNavigation()
 
   ### File List Table ----
@@ -38,11 +39,11 @@ fileViewer <- function(
     FLdata <- executeDbQuery(dbSettings, stmt)
     result$FLdata <- FLdata %>% select(-c(FileID, Source))
   })
-  
+
   observeEvent(input$refreshtable, {
     stmt <- buildDbQuery("getFileViewerTable")
-   FLdata <- executeDbQuery(dbSettings, stmt)
-   result$FLdata <- FLdata %>% select(-c(FileID, Source))
+    FLdata <- executeDbQuery(dbSettings, stmt)
+    result$FLdata <- FLdata %>% select(-c(FileID, Source))
   })
 
   # Pre-select the correct runId
@@ -57,7 +58,7 @@ fileViewer <- function(
     return(initialSelection)
   })
 
- ViewFilesModule <- callModule(
+  ViewFilesModule <- callModule(
     ViewFilesModule,
     id = "ViewFilesModule",
     filesListData =  reactive({result$FLdata}),
@@ -65,13 +66,13 @@ fileViewer <- function(
     includemrows = TRUE,
     includechkbox = TRUE)
 
-  
- # Module Outout ------------------------------------------------------------
- 
- moduleOutput <- c(
-   outputNavigation(navigation_state),
-   list()
- )
- 
- moduleOutput
+
+  # Module Outout ------------------------------------------------------------
+
+  moduleOutput <- c(
+    outputNavigation(navigation_state),
+    list()
+  )
+
+  moduleOutput
 }

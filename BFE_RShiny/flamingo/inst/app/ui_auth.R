@@ -77,6 +77,9 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
             # DefineBrowse Batch
             BBR = visualizationBBRUI("visualizationBBR"),
 
+            # Compare run Batch
+            CBR = visualizationCBRUI("visualizationCBR"),
+
             ## File Management
             FM =
               fileViewerUI("fileViewer"),

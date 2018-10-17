@@ -2,7 +2,7 @@
 % Please edit documentation in R/viewFiles.R
 \name{ViewFilesModuleUI}
 \alias{ViewFilesModuleUI}
-\title{UI for ViewFilesModule}
+\title{Module to View Files}
 \usage{
 ViewFilesModuleUI(id, includechkbox = FALSE)
 }
@@ -10,5 +10,5 @@ ViewFilesModuleUI(id, includechkbox = FALSE)
 \item{id}{module id}
 }
 \description{
-UI for ViewFilesModule
+UI logic to view  files
 }

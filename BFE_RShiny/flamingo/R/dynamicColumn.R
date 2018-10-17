@@ -1,15 +1,12 @@
 # Module server function ----
-
 #' Resizable UI column
-#'
 #' Shiny module providing support for dynamic UI [column][shiny::column] width
 #' without re-rendering the column content.
-#'
+#' @rdname dynamicColumn
 #' @template params-module
 #' @param width Width of the column, a reactive value for `dynamicColumn()`,
 #'   non-reactive (or [isolated][shiny::isolate]) for `dynamicColumnUI()`.
 #' @inheritParams shiny::column
-#'
 #' @details
 #' Dynamic column width via `renderUI()` based on a reactive value forces the
 #' re-rendering of the column content. This has the following undesired effects:
@@ -17,18 +14,13 @@
 #'   lost.
 #'   * Depending on the complexity of the content, rendering can slow-down the
 #'   re-sizing.
-#'
 #' The _dynamicColumn_ Shiny module prevents re-rendering based on reactive column
 #' width. Instead, it changes the class of the existing column UI element
 #' (`"col-sm-<WIDTH>"`) depending on a reactive `width` value.
-#'
 #' @templateVar shinyjsdep [shinyjs::addClass()] and [shinyjs::removeClass()]
 #' @template note-shinyjs
-#'
 #' @example man-roxygen/ex-dynamicColumn.R
-#'
 #' @export
-#'
 #' @md
 dynamicColumn <- function(input, output, session, width) {
   state <- reactiveValues(
@@ -45,6 +37,9 @@ dynamicColumn <- function(input, output, session, width) {
 # Module UI function ----
 
 #' @rdname dynamicColumn
+#' @param id id
+#' @param width width
+#' @param ... other inputs
 #' @export
 dynamicColumnUI <- function(id, width, ...) {
   ns <- NS(id)

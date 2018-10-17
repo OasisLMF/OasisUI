@@ -9,7 +9,11 @@ programmeWorkflowSteps <- list("Choose Programme" = "1",
                                "Choose Model" = "2",
                                "Configure Output & Run" = "3")
 
+#' @title singleProgrammeWorkflowStepsUI
+#' @rdname singleProgrammeWorkflowStepsUI
+#' @param id id
 #' @importFrom shinyWidgets radioGroupButtons
+#' @export
 singleProgrammeWorkflowStepsUI <- function(id) {
   ns <- NS(id)
   tagList(
@@ -24,7 +28,11 @@ singleProgrammeWorkflowStepsUI <- function(id) {
   )
 }
 
+#' @title singleProgrammeWorkflowSteps
+#' @rdname singleProgrammeWorkflowSteps
+#' @inheritParams flamingoModule
 #' @importFrom shinyWidgets updateRadioGroupButtons
+#' @export
 singleProgrammeWorkflowSteps <- function(input, output, session) {
   observeEvent(input$radiobuttons, {
     # update steps colors

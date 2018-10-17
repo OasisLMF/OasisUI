@@ -2,7 +2,7 @@
 % Please edit documentation in R/viewFiles.R
 \name{ViewFilesModule}
 \alias{ViewFilesModule}
-\title{Server logic for ViewFilesModule}
+\title{Module to View Files}
 \usage{
 ViewFilesModule(input, output, session, logMessage = message,
   filesListData, includemrows = FALSE, includechkbox = FALSE)
@@ -19,8 +19,8 @@ ViewFilesModule(input, output, session, logMessage = message,
 \item{filesListData}{table of output files for a given runID}
 }
 \value{
-list of reactives:
+list of reactives
 }
 \description{
-Server logic to view  files
+Server logic to view files
 }

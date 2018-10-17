@@ -1,5 +1,4 @@
 #' Reactive navigation
-#'
 #' Set of utilities for storing reactive navigation state and propagating it as
 #' module output or retrieving it from module outputs, supporting navigation
 #' across nested modules. This provides a common, aligned way of handling
@@ -80,15 +79,13 @@ updateNavigation <- function(state, value, force_react = TRUE) {
   invisible()
 }
 
-
-#' @rdname reactiveNavigation
-#'
+#' @title outputNavigation
+#' @rdname outputNavigation
+#' @inheritParams updateNavigation
 #' @return `outputNavigation()` returns a list containing the reactive
 #'   navigation state, to be possibliy `c`ombined with other module outputs. The
 #'   reactive navigation state can then be extracted using `getNavigation()`.
-#'
 #' @export
-#'
 #' @md
 outputNavigation <- function(state, force_react = TRUE) {
   if (force_react) {

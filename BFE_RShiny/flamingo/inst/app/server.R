@@ -132,6 +132,16 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "BBR")
   )
 
+  auth_modules$visualizationCBR <- .callModule(
+    visualizationCBR,
+    id = "visualizationCBR",
+    apiSettings = apiSettings,
+    userId = reactive(result$userId),
+    logMessage = logMessage,
+    reloadMillis = reloadMillis,
+    active = reactive(authenticated() && main_visible() == "CBR")
+  )
+
 
   # preselected panel
   observe({if (!is.null(auth_modules$visualizationSBR$preselPanel)) {
@@ -243,6 +253,11 @@ server <- function(input, output, session) {
 
            "BBR" = { # go to Batch browse submenu
              loginfo(paste("Navigate to Batch browse, userId: ", result$userId),
+                     logger = "flamingo.module")
+           },
+
+           "CBR" = { # go to Compare Runs submenu
+             loginfo(paste("Navigate to compare runs, userId: ", result$userId),
                      logger = "flamingo.module")
            },
 

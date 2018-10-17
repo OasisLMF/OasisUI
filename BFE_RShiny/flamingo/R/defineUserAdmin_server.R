@@ -1,12 +1,12 @@
 
 #' User Admin Definition Module
+#' @rdname userAdminDefinition
 #' @description Server logic for accessing the Company User List for Flamingo
 #' in association with OASIS LMF
 #' @inheritParams flamingoModule
 #' @param userId reactive yielding user id (of the logged in user)
 #' @return For \code{userAdminDefinition()}, list of reactives.
 #' @template return-outputNavigation
-#' @rdname userAdminDefinition
 #' @importFrom DT renderDT
 #' @importFrom shinyjs enable disable
 #' @export
@@ -148,7 +148,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("getUserLicenses", result$selUserId)
     result$CUAULData <- executeDbQuery(dbSettings, stmt)
   })
-  
+
   # draw User License table with custom format options
   output$tableuserlicenses <- renderDT({
     if (length(input$tablecompanyuserlist_rows_selected) > 0) {
@@ -182,7 +182,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
     if(length(permission) == 0){
 
-      showNotification(type = "warning",
+      flamingoNotification(type = "warning",
                        "You do not have the required permissions to view this page")
 
       updateNavigation(navigation_state, "LP")
@@ -205,7 +205,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
     } else {
 
-      showNotification(type = "warning", "Neither CRUD nor R")
+      flamingoNotification(type = "warning", "Neither CRUD nor R")
 
     }
   })
@@ -217,21 +217,21 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # - updates information fields in Modal Dialog
   .getCompUserDetails <- function() {
 
-      result$selUserId <- result$CULData[input$tablecompanyuserlist_rows_selected, 3]
-      updateTextInput(session, "tinputUserName",
-                      value = result$CULData[input$tablecompanyuserlist_rows_selected, 4])
-      updateSelectInput(session, "sinputCompany",
-                        selected = result$CULData[(input$tablecompanyuserlist_rows_selected), 1])
-      deptData <- getDeptData(dbSettings, result$selUserId)
-      updateTextInput(session, "tinputDepartment", value = deptData[[3]])
-      updateTextInput(session, "tinputLogin", value = deptData[[1]])
-      updateTextInput(session, "tinputPassword", value = deptData[[2]])
+    result$selUserId <- result$CULData[input$tablecompanyuserlist_rows_selected, 3]
+    updateTextInput(session, "tinputUserName",
+                    value = result$CULData[input$tablecompanyuserlist_rows_selected, 4])
+    updateSelectInput(session, "sinputCompany",
+                      selected = result$CULData[(input$tablecompanyuserlist_rows_selected), 1])
+    deptData <- getDeptData(dbSettings, result$selUserId)
+    updateTextInput(session, "tinputDepartment", value = deptData[[3]])
+    updateTextInput(session, "tinputLogin", value = deptData[[1]])
+    updateTextInput(session, "tinputPassword", value = deptData[[2]])
 
   }
 
   # updates the details oevery time a row is clicked
   # uses the list of rows selected to attain row index
-  # row index is used to access data in table and render it 
+  # row index is used to access data in table and render it
   observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, {
     if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       .getCompUserDetails()
@@ -260,10 +260,10 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
                 textInput(ns("tinputLogin"), "Login"),
                 passwordInput(ns("tinputPassword"), "Password"),
                 footer = tagList(
-                  actionButton(ns("abuttonusersubmit"), class = "btn btn-primary",
+                  flamingoButton(ns("abuttonusersubmit"),
                                label = "Submit", align = "right"),
 
-                  actionButton(ns("abuttonusercancel"), class = "btn btn-default",
+                  actionButton(ns("abuttonusercancel"),
                                label = "Cancel", align = "right")
                 ),
                 size = "m",
@@ -295,7 +295,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
       .clearCompanySelection()
       .getCompUserDetails()
     } else {
-      showNotification(type = "warning",
+      flamingoNotification(type = "warning",
                        "Please select a user to update details.")
     }
   })
@@ -312,10 +312,10 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
       res <- executeDbQuery(dbSettings, stmt)
 
       if (is.null(res)) {
-        showNotification(type = "error",
+        flamingoNotification(type = "error",
                          paste("Failed to create new user - ", input$tinputUserName))
       } else {
-        showNotification(type = "message",
+        flamingoNotification(type = "message",
                          paste("User ", input$tinputUserName, " created. User id: ", res))
       }
 
@@ -327,10 +327,10 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
       res <- executeDbQuery(dbSettings, stmt)
 
       if (is.null(res)) {
-        showNotification(type = "error",
+        flamingoNotification(type = "error",
                          paste("Failed to update user - ",input$tinputUserName))
       }else{
-        showNotification(type = "message",
+        flamingoNotification(type = "message",
                          paste("User -", input$tinputUserName, " updated."))
       }
     }
@@ -346,9 +346,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
                 title = "Delete selection",
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
-                  actionButton(ns("abuttonuconfirmdel"), class="btn btn-primary",
+                  flamingoButton(ns("abuttonuconfirmdel"),
                                label = "Confirm", align = "center"),
-                  actionButton(ns("abuttonucanceldel"), class = "btn btn-default",
+                  actionButton(ns("abuttonucanceldel"),
                                label = "Cancel", align = "right")
                 ),
                 size = "m",
@@ -361,7 +361,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       showModal(.userdelmodal())
     } else {
-      showNotification(type = "warning", "Please select a user to delete")
+      flamingoNotification(type = "warning", "Please select a user to delete")
     }
   })
 
@@ -379,10 +379,10 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     res <- executeDbQuery(dbSettings, stmt)
 
     if (is.null(res)) {
-      showNotification(type = "error", sprintf("Failed to delete user - ",
+      flamingoNotification(type = "error", sprintf("Failed to delete user - ",
                                                result$CULData[input$tablecompanyuserlist_rows_selected, 4]))
     } else {
-      showNotification(type = "message", sprintf("User - %s deleted.",
+      flamingoNotification(type = "message", sprintf("User - %s deleted.",
                                                  result$CULData[input$tablecompanyuserlist_rows_selected, 4]))
     }
 
@@ -403,9 +403,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
                 selectInput(ns("sinputSecurity"), "Select Security Group",
                             choices = c("")),
                 footer = tagList(
-                  actionButton(ns("abuttonaddsecurity"), class="btn btn-primary",
+                  flamingoButton(ns("abuttonaddsecurity"),
                                label = "Add", align = "left"),
-                  actionButton(ns("abuttonrmvsecurity"), class="btn btn-primary",
+                  flamingoButton(ns("abuttonrmvsecurity"),
                                label = "Remove", align = "right")),
                 size = "m",
                 easyClose = TRUE
@@ -418,7 +418,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
       showModal(.usersecuritymodal())
       .clearSecurityGroupSelection()
     } else {
-      showNotification(type = "warning",
+      flamingoNotification(type = "warning",
                        "Please select a user to add security group")
     }
   })
@@ -454,9 +454,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
                 selectInput(ns("sinputOasisID"), "Select Oasis User ID",
                             choices = c("")),
                 footer = tagList(
-                  actionButton(ns("abuttonaddoasisid"), class="btn btn-primary",
+                  flamingoButton(ns("abuttonaddoasisid"),
                                label = "Add", align = "left"),
-                  actionButton(ns("abuttonrmvoasisid"), class="btn btn-primary",
+                  flamingoButton(ns("abuttonrmvoasisid"),
                                label = "Remove", align = "right")),
                 size = "m",
                 easyClose = TRUE
@@ -469,7 +469,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
       showModal(.userlicensemodal())
       .clearOasisUserSelection()
     } else {
-      showNotification(type = "warning",
+      flamingoNotification(type = "warning",
                        "Please select a user to add license")
     }
   })

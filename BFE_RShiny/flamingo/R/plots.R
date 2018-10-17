@@ -1,6 +1,7 @@
 
 
 #' AEP Curve
+#' @rdname plotAEPCurve
 #' @description plot EP Curve
 #' @param AEPData AEP data
 #' @param years years
@@ -27,6 +28,7 @@ plotAEPCurve <- function(AEPData, years = 1000) {
 }
 
 #' IL plot
+#' @rdname plotIL
 #' @param outputPlotData data for plot
 #' @description plot IL using the current device
 #' @param ... extra arguments to [plot()]
@@ -68,6 +70,7 @@ plotIL <- function(outputPlotData, interactive = FALSE, ...) {
 }
 
 #' GUL plot
+#' @rdname plotGUL
 #' @description plot GUL using the current device
 #' @param outputPlotData data for plot
 #' @param ... extra arguments to [plot()]
@@ -110,6 +113,8 @@ plotGUL <- function(outputPlotData, interactive = FALSE, ...) {
 
 
 #' funPlotOutput
+#' @rdname funPlotOutput
+#' @param outputPlotData data from output plot
 #' @export
 funPlotOutput <- function(outputPlotData) {
   # years <- 1000
@@ -127,6 +132,8 @@ funPlotOutput <- function(outputPlotData) {
 }
 
 #' funPlotOutput2
+#' @rdname funPlotOutput2
+#' @param outputPlotData data from output plot
 #' @export
 funPlotOutput2 <- function(outputPlotData) {
   AEPData <- NULL

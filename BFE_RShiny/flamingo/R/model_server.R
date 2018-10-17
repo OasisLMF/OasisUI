@@ -1,8 +1,9 @@
 #' Module For The Model Supplier Page
+#' @rdname modelSupplierPage
 #' @description Server logic for the model supplier page
 #' @inheritParams flamingoModule
+#' @inheritParams accountDefinitionUI
 #' @return empty list
-#' @rdname modelSupplierPage
 #' @importFrom DT renderDT
 #' @importFrom shinyjs hide show onclick
 #' @export
@@ -130,9 +131,9 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                 textInput(ns("tinmodelresvalue"), label = "Model Resource Value:",
                           value = ""),
                 footer = tagList(
-                  actionButton(ns("btnSubmitCrtAm"), class = "btn btn-primary",
+                  flamingoButton(ns("btnSubmitCrtAm"),
                                label = "Submit", align = "left"),
-                  actionButton(ns("btnCancelCrtAm"), class = "btn btn-default",
+                  actionButton(ns("btnCancelCrtAm"),
                                label = "Cancel", align = "right")
                 ),
                 size = "m",
@@ -152,7 +153,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
           showModal(.crtAmModal())
           .autoFillCrtAm(row)
         } else {
-          showNotification("Please select a Model Resource to amend.",
+          flamingoNotification("Please select a Model Resource to amend.",
               type = "warning")
         }
       })
@@ -163,9 +164,9 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                 title = "Delete Selection",
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
-                  actionButton(ns("btnConfirmDel"), class="btn btn-primary",
+                  flamingoButton(ns("btnConfirmDel"),
                                label = "Confirm", align = "center"),
-                  actionButton(ns("btnCancelDel"), class = "btn btn-default",
+                  actionButton(ns("btnCancelDel"),
                                label = "Cancel", align = "right")
                 ),
                 size = "m",
@@ -178,7 +179,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
         if (length(row <- input$mrtable_rows_selected) > 0) {
           showModal(.delModal())
         } else {
-          showNotification("Please select a Model Resource to delete.",
+          flamingoNotification("Please select a Model Resource to delete.",
               type = "warning")
         }
 
@@ -201,13 +202,13 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                 isolate(result$MID),
                 input$tinmodelresvalue)
 
-            showNotification(sprintf("Model Resource %s created.", crtmodres),
+            flamingoNotification(sprintf("Model Resource %s created.", crtmodres),
                 type = "message")
 
             .reloadMRData()
 
           } else {
-            showNotification("Please fill all the fields.", type = "error")
+            flamingoNotification("Please fill all the fields.", type = "error")
           }
 
         } else if (result$crtAmFlag == "A") {
@@ -222,13 +223,13 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                 isolate(result$MID),
                 input$tinmodelresvalue)
 
-            showNotification(sprintf("Model Resource %s updated.", updtmodres),
+            flamingoNotification(sprintf("Model Resource %s updated.", updtmodres),
                 type = "message")
 
             .reloadMRData()
 
           } else {
-            showNotification("No Model Resource selected.", type = "error")
+            flamingoNotification("No Model Resource selected.", type = "error")
           }
 
         }
@@ -247,10 +248,10 @@ modelSupplierPage <- function(input, output, session, dbSettings,
           modResId <- deleteModelResource(dbSettings, result$MRData[row,1])
 
           if (!is.null(modResId)) {
-            showNotification(sprintf("Model Resource %s deleted.", modResId),
+            flamingoNotification(sprintf("Model Resource %s deleted.", modResId),
                 type = "message")
           } else {
-            showNotification(sprintf("Model Resource could not be deleted."))
+            flamingoNotification(sprintf("Model Resource could not be deleted."))
           }
           .reloadMRData()
         }

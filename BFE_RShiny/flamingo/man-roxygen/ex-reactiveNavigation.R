@@ -7,7 +7,7 @@ if (interactive()) {
   # navigation button module ----
   navigationButtonUI <- function(id, nav_to) {
     ns <- NS(id)
-    shiny::actionButton(
+    actionButton(
       ns("action"),
       label = sprintf("Navigate to %s", nav_to)
     )

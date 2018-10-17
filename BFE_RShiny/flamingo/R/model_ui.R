@@ -3,6 +3,7 @@
 #' @description UI/View for the model supplier page
 #' @inheritParams accountDefinitionUI
 #' @importFrom shinyjs hidden
+#' @importFrom shiny downloadButton
 #' @importFrom DT DTOutput
 #' @export
 modelSupplierPageUI <- function(id) {
@@ -12,7 +13,7 @@ modelSupplierPageUI <- function(id) {
   tagList(
 
     h3("Model", class = "flamingo-page-title"),
-    
+
     fluidRow(
       column(12,
 
@@ -26,13 +27,13 @@ modelSupplierPageUI <- function(id) {
                div(id = ns("divmr"), class = "flamingo-page-division",
                    h4("Model Resource", class = "flamingo-table-title"),
                    DTOutput(ns("mrtable")),
-                   actionButton(ns("btnCreate"), "Create",
-                                class="btn btn-primary", align = "left"),
-                   actionButton(ns("btnAmend"), "Amend",
-                                class="btn btn-primary", align = "centre"),
-                   actionButton(ns("btnDelete"), "Delete",
-                                class="btn btn-primary", align = "right"),
-                   # actionButton(ns("abuttoncrtudptdelmodres"), "Create/Update/Delete", class="btn btn-primary"),
+                   flamingoButton(ns("btnCreate"), "Create",
+                                align = "left"),
+                   flamingoButton(ns("btnAmend"), "Amend",
+                                align = "centre"),
+                   flamingoButton(ns("btnDelete"), "Delete",
+                                align = "right"),
+                   # flamingoButton(ns("abuttoncrtudptdelmodres"), "Create/Update/Delete"),
                    downloadButton(ns("MRdownloadexcel"), label="Export to csv")
                )
              )

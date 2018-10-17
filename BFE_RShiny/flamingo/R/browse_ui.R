@@ -1,3 +1,4 @@
+#' @title browse_ui
 #' Browse programmes UI
 #' @rdname browseprogrammesUI
 #' @description UI/View for the process run page
@@ -19,7 +20,8 @@ browseprogrammesUI <- function(id) {
 
 
 # Functions for UI Panels ------------------------------------------------------------------------------
-
+#' @title panelDefineRunID
+#' @rdname panelDefineRunID
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyWidgets panel
 #' @importFrom bsplus bs_embed_tooltip
@@ -34,13 +36,13 @@ panelDefineRunID <-  function(id){
                bs_embed_tooltip(title = browse_programmes$selectRunID, placement = "right")),
       column(6,
              align = "right",
-             actionButton(inputId = ns("abuttongotoconfig"), label = "Go to Configure Output",  class = "btn btn-primary"))
+             flamingoButton(inputId = ns("abuttongotoconfig"), label = "Go to Configure Output"))
     )
   )
 }
 
-
-
+#' @title panelSummaryTable
+#' @rdname panelSummaryTable
 #' @inheritParams flamingoModuleUI
 #' @export
 panelSummaryTable <-  function(id){
@@ -53,7 +55,8 @@ panelSummaryTable <-  function(id){
   )
 }
 
-
+#' @title panelSummaryTableModuleUI
+#' @rdname panelSummaryTableModuleUI
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -64,8 +67,9 @@ panelSummaryTableModuleUI <-  function(id){
   )
 }
 
-
-#' Function wrapping panel to define prgramme and model IDs
+#' @title panelSummaryTableModuleUI
+#' @rdname panelOutput
+#' @details Function wrapping panel to define prgramme and model IDs
 #' @inheritParams flamingoModuleUI
 #' @export
 panelOutput <-  function(id){
@@ -76,7 +80,8 @@ panelOutput <-  function(id){
     collapsible = FALSE, show = FALSE, removable = FALSE)
 }
 
-
+#' @title panelOutputModuleUI
+#' @rdname panelOutputModuleUI
 #' @inheritParams flamingoModuleUI
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
@@ -109,7 +114,7 @@ panelOutputModuleUI <-  function(id){
                  textInput(ns("textinputtitle"), "Title", ""))),
       column(4,
              hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
-      actionButton(inputId = ns("abuttondraw"), label = "Draw Plot",  class = "btn btn-primary", style = "float:right")
+      flamingoButton(inputId = ns("abuttondraw"), label = "Draw Plot",  style = "float:right")
     ),
 
     panel(
@@ -119,7 +124,8 @@ panelOutputModuleUI <-  function(id){
   )
 }
 
-
+#' @title panelViewOutputFiles
+#' @rdname panelViewOutputFiles
 #' @inheritParams flamingoModuleUI
 #' @export
 panelViewOutputFiles <-  function(id){

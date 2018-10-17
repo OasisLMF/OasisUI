@@ -2,7 +2,8 @@
 % Please edit documentation in R/browse_ui.R
 \name{browseprogrammesUI}
 \alias{browseprogrammesUI}
-\title{Browse programmes UI}
+\title{browse_ui
+Browse programmes UI}
 \usage{
 browseprogrammesUI(id)
 }

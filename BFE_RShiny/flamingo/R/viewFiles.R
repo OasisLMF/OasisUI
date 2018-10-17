@@ -1,7 +1,6 @@
 # ViewFilesModule Module -----------------------
-# Module to View Files
-# UI ---------------
-#' UI for ViewFilesModule
+#' Module to View Files
+#' @description UI logic to view  files
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
@@ -10,17 +9,11 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
   ns <- NS(id)
   tagList(
     tags$script("Shiny.addCustomMessageHandler('resetInputValue', function(variableName){
-                Shiny.onInputChange(variableName, null);
-});
-                "),
+                Shiny.onInputChange(variableName, null);});"),
     tags$script("Shiny.addCustomMessageHandler('resetcheckboxValueFalse', function(variableName){
-                document.getElementById(variableName).checked = false;
-                });
-                "),
+                document.getElementById(variableName).checked = false;});"),
     tags$script("Shiny.addCustomMessageHandler('resetcheckboxValueTrue', function(variableName){
-                document.getElementById(variableName).checked = true;
-});
-                "),
+                document.getElementById(variableName).checked = true;});"),
     if (includechkbox) {
       checkboxInput(inputId = ns("chkboxselectall"), label = "Select all", value = FALSE)
     },
@@ -36,17 +29,16 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 }
 
 
-# Server -----------
-#' Server logic for ViewFilesModule
-#' @description Server logic to view  files
+#' Module to View Files
+#' @rdname ViewFilesModule
+#' @description Server logic to view files
 #' @inheritParams flamingoModule
 #' @param filesListData table of output files for a given runID
-#' @return list of reactives:
-#' @rdname ViewOutputFilesModule
-#' @importFrom shinyjs show hide enable disable hidden
+#' @importFrom shinyjs show hide hidden
 #' @importFrom DT renderDT datatable DTOutput
-#' @importFrom dplyr mutate select contains filter
+#' @importFrom dplyr select contains filter
 #' @importFrom leaflet renderLeaflet leafletOutput
+#' @return list of reactives
 #' @export
 ViewFilesModule <- function(input, output, session, logMessage = message, filesListData, includemrows = FALSE, includechkbox = FALSE) {
 
@@ -77,9 +69,9 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       if (includechkbox) {
         filesListData <- cbind(data.frame(Selected = .shinyInput(checkboxInput,"srows_", nrow(filesListData), value = FALSE, width = 1)), filesListData)
       }
-      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(shiny::actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       if (includemrows) {
-        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(shiny::actionButton, "mrows_", nrow(filesListData), Label = "Map", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_mbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(filesListData), Label = "Map", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_mbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       }
       result$filesListDataButtons <- filesListData %>% select(-contains("Location") )
     } else {
@@ -256,7 +248,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       result$fileData <- read.csv(fileName, header = TRUE, sep = ",",
                                   quote = "\"", dec = ".", fill = TRUE, comment.char = "")
     }, error = function(e) {
-      showNotification(type = "error",
+      flamingoNotification(type = "error",
                        paste("Could not read file:", e$message))
       result$fileData <- NULL
     }) # end try catch
@@ -274,18 +266,18 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       leafletOutput(ns("plainmap"))
     )
   )
-    
-    observeEvent({input[["select_mbutton"]]},{
-      showModal(Map)
-      session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_mbutton"))
-      idx <- as.numeric(strsplit(input$select_mbutton, "_")[[1]][2])
-      # Extra info table
-      output$tableFVExposureSelectedInfo <- renderUI({.getDetailsFile(idx)})
-      # get data to show in modal table
-      fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
-      output$plainmap <- renderLeaflet({createPlainMap(fileName)})
-    })#end observeEvent
-  
+
+  observeEvent({input[["select_mbutton"]]},{
+    showModal(Map)
+    session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_mbutton"))
+    idx <- as.numeric(strsplit(input$select_mbutton, "_")[[1]][2])
+    # Extra info table
+    output$tableFVExposureSelectedInfo <- renderUI({.getDetailsFile(idx)})
+    # get data to show in modal table
+    fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
+    output$plainmap <- renderLeaflet({createPlainMap(fileName)})
+  })
+
   # Helper functions -------------------------
 
   # default table options

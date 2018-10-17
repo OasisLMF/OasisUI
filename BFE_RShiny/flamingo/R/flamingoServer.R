@@ -1,4 +1,5 @@
 #' Call BFE webservice to load programme data
+#' @rdname loadProgrammeModel
 #' @description A function to load Programme data.
 #' @param apiSettings settings object as returned by [flamingoServer()]
 #' @param progOasisId oasis programme identifier
@@ -30,6 +31,7 @@ loadProgrammeModel <- function(
 
 
 #' Call BFE webservice to load programme data
+#' @rdname loadProgrammeData
 #' @description A function to load Programme data.
 #' @param apiSettings settings object as returned by [flamingoServer()]
 #' @param progId programme identifier
@@ -61,6 +63,7 @@ loadProgrammeData <- function(
 
 
 #' Create a settings object for the Flamingo API Server
+#' @rdname flamingoServer
 #' @description creates a settings object which can then be used to connect
 #' to the Flamingo API Server.
 #' @param server host name
@@ -85,6 +88,7 @@ flamingoServer <- function(host, port, scheme = c("http", "https")) {
 }
 
 #' Flamingo API Server health check
+#' @rdname testFlamingoServer
 #' @description perform a health check on the Flamingo API Server
 #' @param apiSettings settings object as returned by \link{flamingoServer}
 #' @param ... further arguments to \link{GET}
@@ -109,6 +113,7 @@ testFlamingoServer <- function(apiSettings, ...) {
 }
 
 #' Call BFE webservice to initiate a job
+#' @rdname runProcess
 #' @description Submit a GET request to the Flamingo API Server to execute
 #' the workflow.
 #' @param apiSettings settings object as returned by \link{flamingoServer}

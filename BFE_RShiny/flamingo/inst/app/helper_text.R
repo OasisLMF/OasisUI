@@ -16,10 +16,12 @@ landing_page <- list(
   abuttondefineprogrammebatch = "Define batch Process Run",
   abuttonbrowseSBR = "Visualize outputs from single run",
   abuttonbrowseBBR = "Visualize results across runs or from batch runs",
+  abuttonbrowseCBR = "Compare runs",
   abuttongotorun = "Go to run details",
   PRIdownloadexcel = "Download files table",
   abuttonfilemngt = "Access input/output files",
-  abuttonsysconf = "System configuration"
+  abuttonsysconf = "System configuration",
+  accountDD = "User info"
 )
 
 programme_Definition_Single <- list(

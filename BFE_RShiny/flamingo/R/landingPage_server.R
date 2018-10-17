@@ -58,10 +58,15 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     landingPageButtonUpdate(session, dbSettings, userId())
 
     data <- getInboxData(dbSettings, userId())
+
+    StatusGood <- "Completed"
+    StatusBad <- c("Failed", "Cancelled", NA_character_)
+    '%notin%' <- Negate('%in%')
+
     result$inbox <-  data %>%
-      mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
-      mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
-      mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
+      mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
+                                          Status %in% StatusBad ~ StatusFailed,
+                                          Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
       as.data.frame()
 
     logMessage("inbox refreshed")
@@ -174,7 +179,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
                 title = "Important message",
                 "Are you sure you want to log out?",
                 footer = tagList(
-                  actionButton(inputId = ns("abuttonlogoutcontinue"), label = "Continue Logout", class = "btn btn-primary"),
+                  flamingoButton(inputId = ns("abuttonlogoutcontinue"), label = "Continue Logout"),
                   modalButton(label = "Dismiss")
                 ),
                 size = "s",
@@ -263,6 +268,12 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     toggleDropdownButton(ns("abuttonbrowse"))
   })
 
+  observeEvent(input$abuttonbrowseCBR, {
+    updateNavigation(navigation_state, "CBR")
+    toggleDropdownButton(ns("abuttonbrowse"))
+  })
+
+
   observeEvent(input$abuttonhome, {
     updateNavigation(navigation_state, "LP")
   })
@@ -285,6 +296,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 
 
 #' Landing Page Access Control
+#' @rdname landingPageButtonUpdate
 #' @description Disable/Enable menu buttons based on permissions in database
 #' @inheritParams pagestructure
 #' @importFrom shinyjs enable disable

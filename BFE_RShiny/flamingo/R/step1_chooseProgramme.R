@@ -10,7 +10,7 @@
 #' @importFrom bsplus bs_embed_tooltip
 #' @export
 step1_chooseProgrammeUI <- function(id) {
-  
+
   ns <- NS(id)
   tagList(
     # Section "Choose Programme" = "1"
@@ -22,6 +22,7 @@ step1_chooseProgrammeUI <- function(id) {
 
 
 #' Function wrapping panel to show created programmes table
+#' @rdname panelProgrammeTable
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -36,14 +37,15 @@ panelProgrammeTable <- function(id) {
       actionButton(inputId = ns("abuttonprgtblrfsh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableDPprog")),
-    actionButton(ns("buttoncreatepr"), "Create Programme", class = "btn btn-primary", align = "centre"),
-    actionButton(ns("buttonamendpr"), "Amend Programme", class = "btn btn-primary", align = "centre"),
-    actionButton(ns("buttondeletepr"), "Delete Programme", class = "btn btn-primary", align = "right"),
-    actionButton(ns("buttonprogdetails"), "Show Details", class = "btn btn-primary", align = "right")
+    flamingoButton(ns("buttoncreatepr"), "Create Programme", align = "centre"),
+    flamingoButton(ns("buttonamendpr"), "Amend Programme", align = "centre"),
+    flamingoButton(ns("buttondeletepr"), "Delete Programme", align = "right"),
+    flamingoButton(ns("buttonprogdetails"), "Show Details", align = "right")
   )
 }
 
 #' Function wrapping panel to show details of programme
+#' @rdname panelProgrammeDetails
 #' @inheritParams flamingoModuleUI
 #' @importFrom DT DTOutput
 #' @export
@@ -53,7 +55,7 @@ panelProgrammeDetails <- function(id) {
     collapsible = FALSE,
     ns("progdtl"),
     heading = tagAppendChildren(
-      h4(""),
+      h4("Details of Programme"),
       uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttondefprogrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times"), style = "float: right;")
@@ -63,12 +65,15 @@ panelProgrammeDetails <- function(id) {
 }
 
 #' Function wrapping panel to create/amend programme
+#' @rdname panelDefineProgramme
 #' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tagAppendChildren
+#' @importFrom shiny selectizeInput textInput fileInput
 #' @export
 panelDefineProgramme <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-    
+
     collapsible = FALSE,
     ns("progdef"),
     heading = tagAppendChildren(
@@ -98,7 +103,7 @@ panelDefineProgramme <- function(id) {
                bs_embed_tooltip(title = programme_Definition_Single$sinputTransformname,
                                 placement = "right"))),
     fluidRow(column(4,
-                    actionButton(ns("abuttonProgSubmit"), "Submit", class = "btn btn-primary")), style = "float:right"),
+                    flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right"),
     fluidRow(
       column(12, h4("Link input files to programme"))),
     fluidRow(
@@ -107,21 +112,21 @@ panelDefineProgramme <- function(id) {
              selectInput(inputId = ns("sinputSLFile"), label = "Source Location File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
              hidden(div(id = ns("divSLFileUpload"),
                         fileInput(inputId = ns("SLFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
-                        actionButton(inputId = ns("abuttonSLFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left", enable = FALSE))),
+                        flamingoButton(inputId = ns("abuttonSLFileUpload"), label = "Upload File", align = "left", enable = FALSE))),
              hidden(div(id = ns("divSLFileSelect"),
                         selectInput(inputId = ns("sinputselectSLFile"), label = "Select existing File", choices = ""),
-                        actionButton(inputId = ns("abuttonSLFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
-                        actionButton(inputId = ns("abuttonSLFileView"), class = "btn btn-primary", label = "View", align = "left")))),
+                        flamingoButton(inputId = ns("abuttonSLFileLink"), label = "Link", align = "left"),
+                        flamingoButton(inputId = ns("abuttonSLFileView"), label = "View", align = "left")))),
       ## Source Account File
       column(4,
              selectInput(inputId = ns("sinputSAFile"), label = "Source Account File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
              hidden(div(id = ns("divSAFileUpload"),
                         fileInput(inputId = ns("SAFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
-                        actionButton(inputId = ns("abuttonSAFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
+                        flamingoButton(inputId = ns("abuttonSAFileUpload"), label = "Upload File", align = "left"))),
              hidden(div(id = ns("divSAFileSelect"),
                         selectInput(inputId = ns("sinputselectSAFile"), label = "Select existing File", choices = ""),
-                        actionButton(inputId = ns("abuttonSAFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
-                        actionButton(inputId = ns("abuttonSAFileView"), class = "btn btn-primary", label = "View", align = "left"))))),
+                        flamingoButton(inputId = ns("abuttonSAFileLink"), label = "Link", align = "left"),
+                        flamingoButton(inputId = ns("abuttonSAFileView"), label = "View", align = "left"))))),
     fluidRow(
       column(12, h4("Link reinsurance input files to programme"))),
     fluidRow(
@@ -130,63 +135,63 @@ panelDefineProgramme <- function(id) {
              selectInput(inputId = ns("sinputSRFile"), label = "Source Reinsurance File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
              hidden(div(id = ns("divSRFileUpload"),
                         fileInput(inputId = ns("SRFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
-                        actionButton(inputId = ns("abuttonSRFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
+                        flamingoButton(inputId = ns("abuttonSRFileUpload"), label = "Upload File", align = "left"))),
              hidden(div(id = ns("divSRFileSelect"),
                         selectInput(inputId = ns("sinputselectSRFile"), label = "Select existing File", choices = ""),
-                        actionButton(inputId = ns("abuttonSRFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
-                        actionButton(inputId = ns("abuttonSRFileView"), class = "btn btn-primary", label = "View", align = "left")))),
+                        flamingoButton(inputId = ns("abuttonSRFileLink"), label = "Link", align = "left"),
+                        flamingoButton(inputId = ns("abuttonSRFileView"), label = "View", align = "left")))),
       ## Source Reinsurance Scope File
       column(4,
              selectInput(inputId = ns("sinputSRSFile"), label = "Source Reinsurance Scope File", choices = c("Select" = "", "Upload New File" = "U", "Select existing file" = "S")),
              hidden(div(id = ns("divSRSFileUpload"),
                         fileInput(inputId = ns("SRSFile"), label = 'Choose a file to upload:', accept = c('csv', 'comma-separated-values', '.csv')),
-                        actionButton(inputId = ns("abuttonSRSFileUpload"), class = "btn btn-primary", label = "Upload File", align = "left"))),
+                        flamingoButton(inputId = ns("abuttonSRSFileUpload"), label = "Upload File", align = "left"))),
              hidden(div(id = ns("divSRSFileSelect"),
                         selectInput(inputId = ns("sinputselectSRSFile"), label = "Select existing File", choices = ""),
-                        actionButton(inputId = ns("abuttonSRSFileLink"), class = "btn btn-primary", label = "Link", align = "left"),
-                        actionButton(inputId = ns("abuttonSRSFileView"), class = "btn btn-primary", label = "View", align = "left"))))
+                        flamingoButton(inputId = ns("abuttonSRSFileLink"), label = "Link", align = "left"),
+                        flamingoButton(inputId = ns("abuttonSRSFileView"), label = "View", align = "left"))))
     ),
     fluidRow(
       column(12,
              actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", style = "inline: true;float:right;"),
-             actionButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", class = "btn btn-primary", style = "inline: true;float:right;margin-right: 10px;")))
+             flamingoButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", style = "inline: true;float:right;margin-right: 10px;")))
   )
 }
 
 # Server --------------------------------------
 #' step1_chooseProgramme Server
+#' @rdname step1_chooseProgramme
 #' @description Server logic to step1_chooseProgramme
 #' @inheritParams flamingoModule
 #' @return For \code{programmeDefinitionSingle()}, list of reactives.
 #' @template return-outputNavigation
-#' @rdname step1_chooseProgramme
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
 #' @importFrom dplyr mutate select case_when
 #' @importFrom shinyjs onclick js removeClass addClass
 #' @export
-step1_chooseProgramme <- function(input, output, session, 
-                                  dbSettings,apiSettings, userId, 
-                                  active = reactive(TRUE), 
+step1_chooseProgramme <- function(input, output, session,
+                                  dbSettings,apiSettings, userId,
+                                  active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   selectprogrammeID = reactive("")
-                                  
+
 ) {
-  
+
   ns <- session$ns
-  
+
   # Reactive Values and parameters -------------------------------------------
-  
+
   #number of Rows per Page in a dataable
   pageLength <- 5
-  
+
   #values to stop ping pong effect
   stop_selProgID <- check_selProgID <- 0
-  
+
   # Help function
   '%notin%' <- Negate('%in%')
-  
+
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
@@ -202,12 +207,12 @@ step1_chooseProgramme <- function(input, output, session,
     # flag to know if the user is creating or amending a programme
     prog_flag = "C"
   )
-  
+
   #Set Params
   observe( if (active()) {
     result$selectprogrammeID <- isolate(selectprogrammeID())
   })
-  
+
   # Panels Visualization -----------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
@@ -216,12 +221,12 @@ step1_chooseProgramme <- function(input, output, session,
       .reloadDPProgData()
     }
   })
-  
+
   ### Programme Table --------------------------------------------------------
   output$tableDPprog <- renderDT({
     # manual refresh button
     invisible(input$abuttonprgtblrfsh)
-    
+
     logMessage("re-rendering programme table")
     if (!is.null(result$DPProgData)) {
       if (isolate(result$selectprogrammeID) != "") {
@@ -245,11 +250,11 @@ step1_chooseProgramme <- function(input, output, session,
       .nothingToShowTable(contentMessage = "No Programme Available")
     }
   })
-  
+
   # > Programme Details Table-----
   output$tableprogdetails <- renderDT({
     if (!is.null(result$progDetails) && nrow(result$progDetails) > 0) {
-      
+
       # manual refresh button
       invisible(input$abuttondefprogrfsh)
       logMessage("re-rendering programme details table")
@@ -267,7 +272,7 @@ step1_chooseProgramme <- function(input, output, session,
       .nothingToShowTable(contentMessage = paste0("No files available for Programme ID ", result$selectprogrammeID))
     }
   })
-  
+
   # Title Programme Details Panel
   output$paneltitleProgrammeDetails <- renderUI({
     progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
@@ -275,7 +280,7 @@ step1_chooseProgramme <- function(input, output, session,
     progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
     paste0('Details of Programme ', progName, ' (id: ', progId, ')')
   })
-  
+
   # Show Programme Details
   onclick("buttonprogdetails", {
     if (length(input$tableDPprog_rows_selected) > 0) {
@@ -284,17 +289,17 @@ step1_chooseProgramme <- function(input, output, session,
       logMessage("showing panelProgrammeDetails")
       .reloadProgDetails()
     } else {
-      showNotification(type = "warning", "Please select a Programme first")
+      flamingoNotification(type = "warning", "Please select a Programme first")
     }
   })
-  
+
   # Hide Programme Details
   onclick("buttonhideprogdetails", {
     hide("panelProgrammeDetails")
     show("buttonprogdetails")
     logMessage("hiding panelProgrammeDetails")
   })
-  
+
   # > Create / Amend Programme sub-panel -----------------------------------------------
   # Create/Amend programme title
   output$paneltitleDefineProgramme <- renderUI({
@@ -307,12 +312,12 @@ step1_chooseProgramme <- function(input, output, session,
       paste0('Amend Programme ', progName, ' (id: ', progId, ')')
     }
   })
-  
+
   # Hide Programme Definition Panel
   onclick("abuttonhidedefineprogpanel", {
     hide("panelDefineProgramme")
   })
-  
+
   # Create Programme
   onclick("buttoncreatepr", {
     result$prog_flag <- "C"
@@ -324,7 +329,7 @@ step1_chooseProgramme <- function(input, output, session,
     show("panelDefineProgramme")
     logMessage("showing panelDefineProgramme")
   })
-  
+
   ### Amend Programme
   onclick("buttonamendpr", {
     if (length(input$tableDPprog_rows_selected) > 0) {
@@ -338,10 +343,10 @@ step1_chooseProgramme <- function(input, output, session,
       show("panelDefineProgramme")
       logMessage("showing panelDefineProgramme")
     } else {
-      showNotification(type = "warning", "Please select a Programme to Amend")
+      flamingoNotification(type = "warning", "Please select a Programme to Amend")
     }
   })
-  
+
   ### Submit Button
   onclick("abuttonProgSubmit", {
     idxSel <- 1
@@ -352,10 +357,10 @@ step1_chooseProgramme <- function(input, output, session,
                       input$sinputTransformname, "]")
       res <- executeDbQuery(dbSettings, query)
       if (is.null(res)) {
-        showNotification(type = "error",
+        flamingoNotification(type = "error",
                          paste("Failed to create a Programme - ", input$tinputDPProgName))
       } else {
-        showNotification(type = "message",
+        flamingoNotification(type = "message",
                          paste("Programme ", input$tinputDPProgName, " created."))
       }
     } else if (result$prog_flag == "A") { # && length(input$tableDPprog_rows_selected) > 0
@@ -367,14 +372,14 @@ step1_chooseProgramme <- function(input, output, session,
       res <- executeDbQuery(dbSettings, query)
       message(paste("A res is:", res))
       if (is.null(res)) {
-        showNotification(type = "error",
+        flamingoNotification(type = "error",
                          paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
       } else {
-        showNotification(type = "message",
+        flamingoNotification(type = "message",
                          paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName], " amended."))
       }
-    } 
-    
+    }
+
     # Reload Programme Table
     .reloadDPProgData()
     logMessage(paste("updating tableDPprog select because programme table was reloaded:", idxSel))
@@ -382,7 +387,7 @@ step1_chooseProgramme <- function(input, output, session,
     selectPage(dataTableProxy("tableDPprog"), pageSel)
     logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
   })
-  
+
   ### Clear Programme Definition panel
   onclick("abuttonProgCancel", {
     result$prog_flag <- "C"
@@ -391,7 +396,7 @@ step1_chooseProgramme <- function(input, output, session,
     .clearSourceFilesSelection()
     .clearTransformNameSelection()
   })
-  
+
   ### Load Programme Button
   onclick("buttonloadcanmodpr", {
     progId = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
@@ -401,28 +406,28 @@ step1_chooseProgramme <- function(input, output, session,
       progId = progId
     )
     if (loadprogdata == 'success' || loadprogdata == 'Success') {
-      showNotification(type = "message", "Initiating load programme data...")
+      flamingoNotification(type = "message", "Initiating load programme data...")
       # Going to next step when programme load is successful (but not completed)
       workflowSteps$update("2")
     } else {
-      showNotification(type = "error", "Failed to load programme data")
+      flamingoNotification(type = "error", "Failed to load programme data")
     }
     .reloadDPProgData()
   })
-  
+
   # Delete Programme
   onclick("buttondeletepr",{
     if (length(input$tableDPprog_rows_selected) > 0) {
       stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
       executeDbQuery(dbSettings, stmt)
-      showNotification(type = "message",
+      flamingoNotification(type = "message",
                        sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
       .reloadDPProgData()
     } else {
-      showNotification(type = "warning", "Please select a Programme to Delete")
+      flamingoNotification(type = "warning", "Please select a Programme to Delete")
     }
   })
-  
+
   ### > Source Files ----------------------------------------------------------
   ### Upload Location/Account File
   .uploadSourceFile <- function(inFile, recordIdString, recordIdCode){
@@ -436,34 +441,34 @@ step1_chooseProgramme <- function(input, output, session,
           "Prog", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
         )
         if (!is.null(recordId)) {
-          showNotification(type = "message",
+          flamingoNotification(type = "message",
                            paste("New File record id: ", recordId, " created"))
           #.reloadProgDetails()
         } else {
-          showNotification(type = "error", "Could not create file record")
+          flamingoNotification(type = "error", "Could not create file record")
         }
       } else {
-        showNotification(type = "error", "File transfer failed")
+        flamingoNotification(type = "error", "File transfer failed")
       }
     }
   }
-  
+
   onclick("abuttonSLFileUpload", {
     .uploadSourceFile(inFile = input$SLFile, recordIdString = "Source Loc File", recordIdCode = 101)
   })
-  
+
   onclick("abuttonSAFileUpload", {
     .uploadSourceFile(inFile = input$SAFile, recordIdString = "Source Acc File", recordIdCode = 102)
   })
-  
+
   onclick("abuttonSRFileUpload", {
     .uploadSourceFile(inFile = input$SRFile, recordIdString = "Source Reinsurance File", recordIdCode = 401)
   })
-  
+
   onclick("abuttonSRSFileUpload", {
     .uploadSourceFile(inFile = input$SRSFile, recordIdString = "Source Reinsurance Scope File", recordIdCode = 402)
   })
-  
+
   ### Link Location/Account File
   .linkSourceFile <- function(query, inputID) {
     if (length(input$tableDPprog_rows_selected) > 0) {
@@ -473,34 +478,34 @@ step1_chooseProgramme <- function(input, output, session,
                                   result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]))
       if (inputID != "") {
         if (is.null(res)) {
-          showNotification(type = "error", "Failed to link the File")
+          flamingoNotification(type = "error", "Failed to link the File")
         } else {
-          showNotification(type = "message",
+          flamingoNotification(type = "message",
                            paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
         }
       } else {
-        showNotification(type = "warning", "Please select a file to Link")
+        flamingoNotification(type = "warning", "Please select a file to Link")
       }
     }
   }
-  
-  
+
+
   onclick("abuttonSLFileLink", {
     .linkSourceFile(query = "exec dbo.updateSourceLocationFileForProg ", inputID = input$sinputselectSLFile)
   })
-  
+
   onclick("abuttonSAFileLink", {
     .linkSourceFile(query = "exec dbo.updateSourceAccountFileForProg ", inputID = input$sinputselectSAFile)
   })
-  
+
   onclick("abuttonSRFileLink", {
     .linkSourceFile(query = "exec dbo.updateSourceReinsuranceFileForProg ", inputID = input$sinputselectSRFile)
   })
-  
+
   onclick("abuttonSRSFileLink", {
     .linkSourceFile(query = "exec dbo.updateSourceReinsuranceScopeFileForProg ", inputID = input$sinputselectSRSFile)
   })
-  
+
   # File upload or select from dropdown
   # Location file
   observe(if (active()) {
@@ -523,7 +528,7 @@ step1_chooseProgramme <- function(input, output, session,
       )
     }
   })
-  
+
   # Account file
   observe(if (active()) {
     if (input$sinputSAFile == "U") {
@@ -545,7 +550,7 @@ step1_chooseProgramme <- function(input, output, session,
       )
     }
   })
-  
+
   # SR file
   observe(if (active()) {
     if (input$sinputSRFile == "U") {
@@ -567,7 +572,7 @@ step1_chooseProgramme <- function(input, output, session,
       #*********)
     }
   })
-  
+
   # SRS file
   observe(if (active()) {
     if (input$sinputSRSFile == "U") {
@@ -589,7 +594,7 @@ step1_chooseProgramme <- function(input, output, session,
       #*********)
     }
   })
-  
+
   ### View source files
   .modalviewSourcefile <- function(Label, Title, InputID) {
     ns <- session$ns
@@ -600,7 +605,7 @@ step1_chooseProgramme <- function(input, output, session,
                 easyClose = TRUE
     )
   }
-  
+
   .renderDTSourceFile <- function(SourceFile){
     renderDT({
       if (!is.null(SourceFile)) {
@@ -620,55 +625,55 @@ step1_chooseProgramme <- function(input, output, session,
       }
     })
   }
-  
+
   # Source Location
   onclick("abuttonSLFileView", {
     if (input$sinputselectSLFile != "") {
       showModal(.modalviewSourcefile(Label = "modalviewSLfile", Title = "Source Location File View", InputID = "tableviewSLfile"))
     } else {
       removeModal()
-      showNotification(type = "warning", "Please select source file")
+      flamingoNotification(type = "warning", "Please select source file")
     }
   })
-  
+
   output$tableviewSLfile <- .renderDTSourceFile(SourceFile = result$viewSLfile)
-  
+
   # Source Account
   onclick("abuttonSAFileView", {
     if (input$sinputselectSLFile != "") {
       showModal(.modalviewSourcefile(Label = "modalviewSAfile", Title = "Source Account File View", InputID = "tableviewSAfile"))
     } else {
       removeModal()
-      showNotification(type = "warning", "Please select source file")
+      flamingoNotification(type = "warning", "Please select source file")
     }
   })
-  
+
   output$tableviewSAfile <- .renderDTSourceFile(SourceFile = result$viewSAfile)
-  
+
   # Source Reinsurance
   onclick("abuttonSRFileView", {
     if (input$sinputselectSRFile != "") {
       showModal(.modalviewSourcefile(Label = "modalviewSRfile", Title = "Source Reinsurance File View", InputID = "tableviewSRfile"))
     } else {
       removeModal()
-      showNotification(type = "warning", "Please select source file")
+      flamingoNotification(type = "warning", "Please select source file")
     }
   })
-  
+
   output$tableviewSRfile <- .renderDTSourceFile(SourceFile = result$viewSRfile)
-  
+
   # Source Reinsurance Scope
   onclick("abuttonSRSFileView", {
     if (input$sinputselectSRSFile != "") {
       showModal(.modalviewSourcefile(Label = "modalviewSRSfile", Title = "Source Reinsurance Scope File View", InputID = "tableviewSRSfile"))
     } else {
       removeModal()
-      showNotification(type = "warning", "Please select source file")
+      flamingoNotification(type = "warning", "Please select source file")
     }
   })
-  
+
   output$tableviewSRSfile <-  .renderDTSourceFile(SourceFile = result$viewSRSfile)
-  
+
   ### > Define selectprogrammeID ----
   # Add choices to selectprogrammeID, update selectprogrammeID
   observeEvent(result$DPProgData, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -684,7 +689,7 @@ step1_chooseProgramme <- function(input, output, session,
       result$selectprogrammeID <- prgId
     }
   })
-  
+
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
     if (active()) {
@@ -720,7 +725,7 @@ step1_chooseProgramme <- function(input, output, session,
       }
     }
   })
-  
+
   # > Updates dependent on changed: tableDPprog_rows_selected -------------------
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -729,8 +734,8 @@ step1_chooseProgramme <- function(input, output, session,
       hide("panelProgrammeDetails")
       show("buttonprogdetails")
       hide("panelDefineProgramme")
-      
-      
+
+
       if (length(input$tableDPprog_rows_selected) > 0) {
         # note that tableDPprog allows single row selection only
         prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
@@ -747,7 +752,7 @@ step1_chooseProgramme <- function(input, output, session,
       }
     }
   })
-  
+
   # Help Functions -----------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
@@ -757,15 +762,15 @@ step1_chooseProgramme <- function(input, output, session,
     hide("panelProgrammeDetails")
     hide("panelDefineProgramme")
   }
-  
+
   #show default view for Section "Choose Programme" = "1"
   .defaultCreateProg <- function(){
     logMessage(".defaultCreateProg called")
     show("panelProgrammeTable")
     show("buttonprogdetails")
   }
-  
-  
+
+
   # Reload Programme table
   .reloadDPProgData <- function() {
     logMessage(".reloadDPProgData called")
@@ -783,13 +788,13 @@ step1_chooseProgramme <- function(input, output, session,
     }
     invisible()
   }
-  
+
   # Reload Programme Details table
   .reloadProgDetails <- function() {
     logMessage(".reloadProgDetails called")
     if (length(input$tableDPprog_rows_selected) > 0) {
       progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-      
+
       stmt <- buildDbQuery("getProgFileDetails", progId)
       progDetails <- executeDbQuery(dbSettings, stmt)
       StatusGood <- "Loaded"
@@ -807,7 +812,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
     invisible()
   }
-  
+
   # table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function() {
     options <- list(
@@ -820,7 +825,7 @@ step1_chooseProgramme <- function(input, output, session,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }
-  
+
   #empty table
   .nothingToShowTable <- function(contentMessage){
     datatable(
@@ -834,7 +839,7 @@ step1_chooseProgramme <- function(input, output, session,
       options = list(searchHighlight = TRUE)
     )
   }
-  
+
   .clearDPAccountSelection <- function() {
     logMessage(".clearDPAccountSelection called")
     accounts <- getAccountName(dbSettings)
@@ -842,12 +847,12 @@ step1_chooseProgramme <- function(input, output, session,
                          choices = createSelectOptions(accounts),
                          selected = character(0))
   }
-  
+
   .clearProgrammeName <- function() {
     logMessage(".clearProgrammeName called")
     updateTextInput(session, "tinputDPProgName", value = "")
   }
-  
+
   .clearSourceFilesSelection <- function() {
     logMessage(".clearSourceFilesSelection called")
     updateSelectInput(session, "sinputSLFile", selected = "")
@@ -863,7 +868,7 @@ step1_chooseProgramme <- function(input, output, session,
     hide("divSRSFileSelect")
     hide("divSRSFileUpload")
   }
-  
+
   .clearTransformNameSelection <- function() {
     logMessage(".clearTransformNameSelection called")
     transforms <- getTransformNameSourceCan(dbSettings)
@@ -872,7 +877,7 @@ step1_chooseProgramme <- function(input, output, session,
                                                        labelCol = 1, valueCol = 2),
                          selected = character(0))
   }
-  
+
   .updateDPAccountSelection <- function() {
     logMessage(".updateDPAccountSelection called")
     accounts <- getAccountName(dbSettings)
@@ -880,13 +885,13 @@ step1_chooseProgramme <- function(input, output, session,
                          choices = createSelectOptions(accounts),
                          selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.AccountID]))
   }
-  
+
   .updateProgrammeName <- function() {
     logMessage(".updateProgrammeName called")
     updateTextInput(session, "tinputDPProgName",
                     value = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName])
   }
-  
+
   .updateTransformNameSelection <- function() {
     logMessage(".updateTransformNameSelection called")
     transforms <- getTransformNameSourceCan(dbSettings)
@@ -895,16 +900,16 @@ step1_chooseProgramme <- function(input, output, session,
                                                        labelCol = 1, valueCol = 2),
                          selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.TranformID]))
   }
-  
+
   # Model Outout ------------------------------------------------------------
-  
+
   moduleOutput <- c(
     list(
       selectprogrammeID = reactive(result$selectprogrammeID),
       DPProgData = reactive({result$DPProgData})
     )
   )
-  
+
   moduleOutput
-  
+
 }

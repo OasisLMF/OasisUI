@@ -4,7 +4,7 @@
 #' in association with OASIS LMF
 #' @param id shiny module id
 #' @return list of tags
-#' @importFrom shiny actionButton helpText textInput sidebarLayout sidebarPanel
+#' @importFrom shiny helpText textInput sidebarLayout sidebarPanel
 #' downloadButton
 #' @importFrom DT DTOutput
 #' @importFrom shinyjs hidden
@@ -24,16 +24,16 @@ userAdminDefinitionUI <- function(id) {
                  helpText(h4("Company User List", class = "flamingo-table-title")),
                  DTOutput(ns("tablecompanyuserlist")),
                  downloadButton(ns("CUACULdownloadexcel"),label="Export to csv"),
-                 actionButton(ns("abuttonnewUser"), class="btn btn-primary",
+                 flamingoButton(ns("abuttonnewUser"),
                               label = "Create", align = "left"),
-                 actionButton(ns("abuttonuserupdate"), class="btn btn-primary",
+                 flamingoButton(ns("abuttonuserupdate"),
                               label = "Update", align = "center"),
-                 actionButton(ns("abuttonuserdelete"), class="btn btn-primary",
+                 flamingoButton(ns("abuttonuserdelete"),
                               label = "Delete", align = "right"),
 
-                 actionButton(ns("abuttonusersecurity"), class = "btn btn-primary",
+                 flamingoButton(ns("abuttonusersecurity"),
                               label = "Add/Remove Security Group"),
-                 actionButton(ns("abuttonuseroasis"), class = "btn btn-primary",
+                 flamingoButton(ns("abuttonuseroasis"),
                               label = "Add/Remove User License", align = "right")
 
              )

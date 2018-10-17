@@ -1,4 +1,5 @@
 #' Create Plain Map
+#' @rdname createPlainMap
 #' @description creates a plain map using leaflet
 #' @param fileName full file path to marker data
 #' @import leaflet
@@ -23,6 +24,7 @@ createPlainMap <- function(fileName) {
 }
 
 #' Create Footprint Map
+#' @rdname createFootprintMap
 #' @description creates a footprint map using leaflet based on exposure data
 #' stored in the flamingo database.
 #' @inheritParams executeDbQuery

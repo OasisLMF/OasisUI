@@ -3,16 +3,17 @@
 \name{reactiveNavigation}
 \alias{reactiveNavigation}
 \alias{updateNavigation}
-\alias{outputNavigation}
 \alias{getNavigation}
 \alias{observeModuleNavigation}
-\title{Reactive navigation}
+\title{Reactive navigation
+Set of utilities for storing reactive navigation state and propagating it as
+module output or retrieving it from module outputs, supporting navigation
+across nested modules. This provides a common, aligned way of handling
+navigation, abstracting from the specific implementation details.}
 \usage{
 reactiveNavigation(value = NULL)
 
 updateNavigation(state, value, force_react = TRUE)
-
-outputNavigation(state, force_react = TRUE)
 
 getNavigation(output)
 
@@ -45,10 +46,6 @@ other functions, initialized with \code{value}.
 \code{updateNavigation()} returns \code{NULL}, invisibly, and is called for its
 side-effect of updating the input \code{state} with the supplied \code{value}.
 
-\code{outputNavigation()} returns a list containing the reactive
-navigation state, to be possibliy \code{c}ombined with other module outputs. The
-reactive navigation state can then be extracted using \code{getNavigation()}.
-
 \code{getNavigation()} returns the reactive navigation state extracted
 from \code{output} if present, \code{reactive(NULL)} otherwise.
 
@@ -57,6 +54,7 @@ for its side-effect of updating the input navigation \code{state} by observing
 the navigation state of the input \code{modules}.
 }
 \description{
+Reactive navigation
 Set of utilities for storing reactive navigation state and propagating it as
 module output or retrieving it from module outputs, supporting navigation
 across nested modules. This provides a common, aligned way of handling
@@ -102,7 +100,7 @@ if (interactive()) {
   # navigation button module ----
   navigationButtonUI <- function(id, nav_to) {
     ns <- NS(id)
-    shiny::actionButton(
+    actionButton(
       ns("action"),
       label = sprintf("Navigate to \%s", nav_to)
     )
