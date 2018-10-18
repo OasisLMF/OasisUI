@@ -72,7 +72,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
               programmeDefinitionBatchUI("programmeDefinitionBatch"),
 
             # DefineBrowse Single
-            SBR = browseprogrammesUI("browseprogrammes"),
+            SBR = visualizationSBRUI("visualizationSBR"),
 
             # DefineBrowse Batch
             BBR = visualizationBBRUI("visualizationBBR"),
