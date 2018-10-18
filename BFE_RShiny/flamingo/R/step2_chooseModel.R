@@ -38,7 +38,8 @@ panelProgrammeModelTable <- function(id) {
     ),
     DTOutput(ns("tableProgOasisOOK")),
     flamingoButton(ns("buttonmodeldetails"), "Show Details", align = "centre"),
-    flamingoButton(ns("buttonassociatemodel"), "Create Model Association", align = "centre")
+    flamingoButton(ns("buttonassociatemodel"), "Create Model Association", align = "centre"),
+    actionButton(ns("buttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
   )
 }
 
@@ -170,7 +171,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
 
-  ### > Define selectprogrammeID ----
+  ### Define selectprogrammeID ----
   
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
@@ -183,7 +184,7 @@ step2_chooseModel <- function(input, output, session,
     }
   })
 
-  ### > Define selectprogOasisID ----
+  ### Define selectprogOasisID ----
   observeEvent(result$POData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       if (result$selectprogOasisID != "") {
@@ -223,7 +224,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
 
-  # > Programme Model Table --------------------------
+  # Programme Model Table --------------------------
   output$tableProgOasisOOK <- renderDT(
     if (!is.null(result$POData) && nrow(result$POData) > 0 ) {
 
@@ -272,7 +273,7 @@ step2_chooseModel <- function(input, output, session,
     }
   })
 
-  # > Model Details Table -----
+  # Model Details Table -----
   output$tabledisplayprogoasisfiles <- renderDT(
     if (!is.null(result$progFiles) && nrow(result$progFiles) > 0 ) {
 
@@ -320,7 +321,7 @@ step2_chooseModel <- function(input, output, session,
     logMessage("hiding panelModelDetails")
   })
 
-  ### > Create Model ------
+  ### Create Model ------
   onclick("buttonassociatemodel", {
     show("panelAssociateModel")
   })
@@ -338,6 +339,7 @@ step2_chooseModel <- function(input, output, session,
         } else {
           flamingoNotification(type = "message", paste("Prog Oasis id:",prgId, " created"))
           .clearOOKSidebar()
+          .defaultAssociateModel()
           .reloadPOData()
           logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
           idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
@@ -352,8 +354,6 @@ step2_chooseModel <- function(input, output, session,
           if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
             flamingoNotification(type = "message", "Initiating load programme model...")
             #.reloadProgFiles()
-            # Going to next step when model load is successful (but not completed)
-            workflowSteps$update("3")
           } else {
             flamingoNotification(type = "error", "Failed to load programme model")
           }
@@ -371,7 +371,7 @@ step2_chooseModel <- function(input, output, session,
     hide("panelAssociateModel")
   })
   
-  # > Updates dependent on changed: tableProgOasisOOK_rows_selected ------------
+  # Updates dependent on changed: tableProgOasisOOK_rows_selected ------------
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -527,7 +527,8 @@ step2_chooseModel <- function(input, output, session,
   moduleOutput <- c(
     list(
       selectprogOasisID = reactive({result$selectprogOasisID}),
-      POData = reactive({result$POData})
+      POData = reactive({result$POData}),
+      newstep = reactive({input$buttonpgotonextstep})
     )
   )
 

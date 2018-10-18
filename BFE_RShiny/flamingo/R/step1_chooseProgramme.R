@@ -38,8 +38,9 @@ panelProgrammeTable <- function(id) {
     DTOutput(ns("tableDPprog")),
     flamingoButton(ns("buttoncreatepr"), "Create Programme", align = "centre"),
     flamingoButton(ns("buttonamendpr"), "Amend Programme", align = "centre"),
-    flamingoButton(ns("buttondeletepr"), "Delete Programme", align = "right"),
-    flamingoButton(ns("buttonprogdetails"), "Show Details", align = "right")
+    flamingoButton(ns("buttondeletepr"), "Delete Programme", align = "centre"),
+    flamingoButton(ns("buttonprogdetails"), "Show Details", align = "centre"),
+    actionButton(ns("buttonpgotonextstep"), "Proceed to Choose Model", style = "float:right")
   )
 }
 
@@ -246,7 +247,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
-  # > Programme Details Table-----
+  # Programme Details Table-----
   output$tableprogdetails <- renderDT({
     if (!is.null(result$progDetails) && nrow(result$progDetails) > 0) {
 
@@ -295,7 +296,7 @@ step1_chooseProgramme <- function(input, output, session,
     logMessage("hiding panelProgrammeDetails")
   })
 
-  # > Create / Amend Programme sub-panel -----------------------------------------------
+  # Create / Amend Programme sub-panel -----------------------------------------------
   # Create/Amend programme title
   output$paneltitleDefineProgramme <- renderUI({
     if (result$prog_flag == "C" || is.null(input$tableDPprog_rows_selected)) {
@@ -669,7 +670,7 @@ step1_chooseProgramme <- function(input, output, session,
 
   output$tableviewSRSfile <-  .renderDTSourceFile(SourceFile = result$viewSRSfile)
 
-  ### > Define selectprogrammeID ----
+  ### Define selectprogrammeID ----
   # Add choices to selectprogrammeID, update selectprogrammeID
   observeEvent(result$DPProgData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -721,7 +722,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
-  # > Updates dependent on changed: tableDPprog_rows_selected -------------------
+  # Updates dependent on changed: tableDPprog_rows_selected -------------------
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
@@ -891,7 +892,8 @@ step1_chooseProgramme <- function(input, output, session,
   moduleOutput <- c(
     list(
       selectprogrammeID = reactive(result$selectprogrammeID),
-      DPProgData = reactive({result$DPProgData})
+      DPProgData = reactive({result$DPProgData}),
+      newstep = reactive({input$buttonpgotonextstep})
     )
   )
 
