@@ -3,7 +3,9 @@
 \name{dynamicColumn}
 \alias{dynamicColumn}
 \alias{dynamicColumnUI}
-\title{Resizable UI column}
+\title{Resizable UI column
+Shiny module providing support for dynamic UI \link[shiny:column]{column} width
+without re-rendering the column content.}
 \usage{
 dynamicColumn(input, output, session, width)
 
@@ -21,9 +23,14 @@ non-reactive (or \link[shiny:isolate]{isolated}) for \code{dynamicColumnUI()}.}
 
 \item{id}{Namespace ID for the module.}
 
-\item{...}{Elements to include within the column}
+\item{...}{other inputs}
+
+\item{id}{id}
+
+\item{width}{width}
 }
 \description{
+Resizable UI column
 Shiny module providing support for dynamic UI \link[shiny:column]{column} width
 without re-rendering the column content.
 }
@@ -35,11 +42,10 @@ re-rendering of the column content. This has the following undesired effects:
 lost.
 \item Depending on the complexity of the content, rendering can slow-down the
 re-sizing.
-}
-
 The \emph{dynamicColumn} Shiny module prevents re-rendering based on reactive column
 width. Instead, it changes the class of the existing column UI element
 (\code{"col-sm-<WIDTH>"}) depending on a reactive \code{width} value.
+}
 }
 \note{
 The module relies on \code{\link[shinyjs:addClass]{shinyjs::addClass()}} and \code{\link[shinyjs:removeClass]{shinyjs::removeClass()}}, which means

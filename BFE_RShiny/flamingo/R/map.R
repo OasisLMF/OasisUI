@@ -1,20 +1,21 @@
-
 #' Create Plain Map
+#' @rdname createPlainMap
 #' @description creates a plain map using leaflet
 #' @param fileName full file path to marker data
 #' @import leaflet
 #' @importFrom utils read.csv
+#' @importFrom htmltools tagList
 #' @export
 createPlainMap <- function(fileName) {
-  
+
   markerData <- read.csv(fileName, header = TRUE, sep = ",",
       quote = "\"", dec = ".", fill = TRUE, comment.char = "")
-  
+
   popupData <- tagList(
-      strong("Location ID: "), markerData$LOCNUM, 
-      br(), strong("Latitude: "), markerData$LATITUDE, 
+      strong("Location ID: "), markerData$LOCNUM,
+      br(), strong("Latitude: "), markerData$LATITUDE,
       br(), strong("Longitude: "), markerData$LONGITUDE)
-  
+
   leaflet() %>%
       addTiles() %>%
       addMarkers(data = markerData,
@@ -23,6 +24,7 @@ createPlainMap <- function(fileName) {
 }
 
 #' Create Footprint Map
+#' @rdname createFootprintMap
 #' @description creates a footprint map using leaflet based on exposure data
 #' stored in the flamingo database.
 #' @inheritParams executeDbQuery
@@ -30,16 +32,16 @@ createPlainMap <- function(fileName) {
 #' @import leaflet
 #' @export
 createFootprintMap <- function(dbSettings, fileId) {
-  
+
   stmt <- buildDbQuery("getFileDataForFile", fileId)
   exposureData <- executeDbQuery(dbSettings, stmt)
-  
+
   popupData <- tagList(
-      strong("Latitude: "), exposureData$latitude, 
+      strong("Latitude: "), exposureData$latitude,
       br(), strong("Longitude: "), exposureData$longitude,
       br(), strong("Intensity: "), exposureData$intensity,
       br(), strong("Area Peril ID: "), exposureData$AreaPeril)
-  
+
   leaflet() %>%
       addTiles() %>%
       addMarkers(
@@ -47,5 +49,5 @@ createFootprintMap <- function(dbSettings, fileId) {
           clusterOptions = markerClusterOptions(maxClusterRadius = 30),
           popup = toString(popupData)
       )
-  
+
 }

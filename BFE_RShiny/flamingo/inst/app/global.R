@@ -10,7 +10,7 @@
 
 #library(httr)
 #suppressPackageStartupMessages(library(shinyjs, warn.conflicts = FALSE))
-#library(shinyBS)
+#library(bsplus)
 #library(DT, warn.conflicts = FALSE)
 #library(DBI)
 #library(shinyWidgets)
@@ -85,20 +85,71 @@ defaultSelectChoicesIL <- c(
   "ilprogFullUncAEP", "ilprogFullUncOEP", "ilpolicyELT", "ilpolicyAAL",
   "ilpolicyPLT", "ilpolicyFullUncAEP", "ilpolicyFullUncOEP"
 )
+defaultSelectChoicesRI <- c(
+  "riprogSummary", "riprogELT", "riprogAAL", "riprogPLT",
+  "riprogFullUncAEP", "riprogFullUncOEP", "ripolicyELT", "ripolicyAAL",
+  "ripolicyPLT", "ripolicyFullUncAEP", "ripolicyFullUncOEP"
+)
 
 
 ### Plots types ------
-plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP",
-                                                                      "LEC Full Uncertainty AEP"),
+plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
                                                       "keycols" = c("loss"),
+                                                      "uncertaintycols" = c(),
+                                                      "referencecols" = c(),
                                                       "x" = c("return_period"),
+                                                      "xtickslabels" = list(),
                                                       "extracols" = c("X", "summary_id"),
                                                       "plottype" = "line",
                                                       "xlabel" = c("Return Period"),
-                                                      "ylabel" = c("Loss"))
+                                                      "ylabel" = c("Loss")),
+                      "AAL bar plot" = list("Variables" = c("AAL"),
+                                            "keycols" = c("mean"),
+                                            "uncertaintycols" = c("standard_deviation"),
+                                            "referencecols" = c("exposure_value"),
+                                            "x" = c("type"),
+                                            "xtickslabels" = c("Numerically Integrated", "Sample Statistics"),
+                                            "extracols" = c("X", "summary_id"),
+                                            "plottype" = "bar",
+                                            "xlabel" = c("Type"),
+                                            "ylabel" = c("Loss")
+                      )
 )
 
 #Output options
 granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
 losstypes <- c("GUL", "IL")
 variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")
+
+
+# > Variables for cols positions -----------------------------------------------
+### Creating Variables for col names of Programme Table
+#result$DPProgData
+#"Programme ID", "Programme Name", "Account ID", "Account Name", "Transform ID", "Transform", "Status"
+DPProgData.ProgrammeID <- "Programme ID" #reactive(names(result$DPProgData)[1])
+DPProgData.ProgrammeName <- "Programme Name" #reactive(names(result$DPProgData)[2])
+DPProgData.AccountID <- "Account ID" #reactive(names(result$DPProgData)[3])
+DPProgData.AccountName <- "Account Name" #reactive(names(result$DPProgData)[4])
+DPProgData.TranformID <- "Transform ID" #reactive(names(result$DPProgData)[5])
+DPProgData.Tranform <- "Transform" #reactive(names(result$DPProgData)[6])
+DPProgData.Status <-  "Status" #reactive(names(result$DPProgData)[7])
+
+### Creating Variables for col names of Programme Model Table
+# result$POData
+#"ProgOasisId", "ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status"
+POData.ProgOasisId <- "ProgOasisId" #reactive(names(result$POData)[1])
+POData.ProgName <- "ProgName" #reactive(names(result$POData)[2])
+POData.ModelName <- "ModelName" #reactive(names(result$POData)[3])
+POData.TransformName <- "TransformName" #reactive(names(result$POData)[4])
+POData.SourceFileId <- "SourceFileId" #reactive(names(result$POData)[5])
+POData.FileID <- "FileID" #reactive(names(result$POData)[6])
+POData.Status <- "Status" #reactive(names(result$POData)[7])
+
+### Creating Variables for col names of Process Runs Table
+# result$prcrundata
+#"ProcessRunID", "ProcessRunName", "ProgOasisID", "ProcessRunStatus"
+prcrundata.ProcessRunID <- "ProcessRunID" #reactive(names(result$prcrundata)[1])
+prcrundata.ProcessRunName <- "ProcessRunName" #reactive(names(result$prcrundata)[2])
+prcrundata.ProgOasisID <- "ProgOasisID" #reactive(names(result$prcrundata)[3])
+prcrundata.ProcessRunStatus <- "Status" #reactive(names(result$prcrundata)[4])
+prcrundata.ProcessRunStatus.old <- "ProcessRunStatus"

@@ -5,6 +5,7 @@ flamingoModuleUI <- function(id) {}
 
 
 #' Flamingo Module Template
+#' @rdname flamingoModule
 #' @param input shiny input object
 #' @param output shiny output object
 #' @param session shiny session object
@@ -13,6 +14,7 @@ flamingoModuleUI <- function(id) {}
 #' @param apiSettings as returned from \link{flamingoServer}
 #' @param logMessage function that will be passed info messages
 #' @param logError function that will be passed error messages
+#' @export
 flamingoModule <- function(
   input,
   output,
@@ -24,14 +26,26 @@ flamingoModule <- function(
   logError) {}
 
 
-#' Action button/link
+#' Flamingo action button/link version
 #' @description Modified version of the default [shiny::actionButton()]
 #' @param class HTML class attribute
 #' @param ... arguments to [shiny::actionButton()]
+#' @importFrom shiny restoreInput
 #' @export
 #' @md
-actionButton <- function(class = c("btn", "btn-primary", "btn-flamingo"), ...) {
-  shiny::actionButton(class = class, ...)
+flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c("btn", "btn-primary"), ...) {
+  value <- restoreInput(id = inputId, default = NULL)
+  df_class <- c("btn", "btn-default", "action-button")
+  fl_class <- paste(union(class, df_class), collapse = " ")
+  tags$button(
+    id = inputId,
+    style = if (!is.null(width)) paste0("width: ", validateCssUnit(width), ";"),
+    type = "button",
+    class = fl_class,
+    `data-val` = value,
+    list(shiny:::validateIcon(icon), label),
+    ...
+  )
 }
 
 
@@ -40,24 +54,31 @@ actionButton <- function(class = c("btn", "btn-primary", "btn-flamingo"), ...) {
 #' @param ui see [shiny::showNotification()]
 #' @param type see [shiny::showNotification()]
 #' @param ... other arguments to [shiny::showNotification()]
+# @importFrom shiny showNotification icon
 #' @export
 #' @md
-showNotification <- function(ui,
-                             type = c("default", "message", "warning", "error"), ...) {
+flamingoNotification <- function(ui, type = c("default", "message", "warning", "error"), ...) {
 
-  iconName <- switch(type, "warning" = "exclamation-triangle",
-                     "message" = "check-circle", "error" = "minus-circle", "info-circle")
+  iconName <- switch(type,
+                     "warning" = "exclamation-triangle",
+                     "message" = "check-circle",
+                     "error" = "minus-circle",
+                     "info-circle")
 
-  shiny::showNotification(
+  invisible(showNotification(
     ui = tagList(
       div(class = "shiny-notification-side", icon(iconName)),
-      div(class = "shiny-notification-main", ui)),
+      div(class = "shiny-notification-main", ui)
+    ),
     type = type,
-    ...)
+    ...
+  ))
 }
 
 
+
 #' Create Choices For Select Input Widgets
+#' @rdname createSelectOptions
 #' @description Converts a table into a named list of choices for use in
 #' \link{selectInput}.
 #' @param df \code{data.frame} as returned by e.g. \link{getCompanyList}

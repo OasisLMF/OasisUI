@@ -78,9 +78,11 @@ div.flamingo-page-division {
 
 /*** Modal Windows ***/
 
+/***
 .modal-footless .modal-footer {
   display: none;
 }
+***/
 
 /*** Login ***/
 
@@ -114,7 +116,7 @@ div.flamingo-page-division {
   background-color: rgba(0, 0, 0, 0);
   font-size: 1%;
   height: 1px;
-  border-style: none; 
+  border-style: none;
 }
 
 
@@ -161,25 +163,47 @@ div.flamingo-page-division {
 
 .irs-single, .irs-bar-edge, .irs-bar {
   background: #8b2129 !important;
+  border:#8b2129 !important;
 }
 
-.InlineSelectInput label.control-label, .InlineSelectInput .selectize-control.single { 
-         display: table-cell; 
-         text-align: center; 
-         vertical-align: middle; 
-} 
+.InlineSelectInput label.control-label, .InlineSelectInputSmall label.control-label, .InlineSelectInput .selectize-control.single, .InlineSelectInputSmall .selectize-control.single {
+         display: table-cell;
+         text-align: center;
+         vertical-align: middle;
+}
 
-.InlineSelectInput  label.control-label {
+.InlineSelectInput  label.control-label, .InlineSelectInputSmall  label.control-label {
         padding-right: 10px;
 }
 
-.InlineSelectInput .form-group { 
+.InlineSelectInput .form-group, .InlineSelectInputSmall .form-group {
         display: table-row;
 }
 
-.InlineSelectInput.selectize-control.single div.item {
+.InlineSelectInput .selectize-input {
+        width: 300px;
+}
+
+.InlineSelectInputSmall .selectize-input {
+        width: 80px;
+}
+
+
+.InlineSelectInput.selectize-control.single div.item, .InlineSelectInputSmall.selectize-control.single div.item {
         padding-right: 15px;
 }
+
+.InlineTextInput label{
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+        padding-right: 10px;
+}
+
+.InlineTextInput .form-group {
+        display: table-row;
+}
+
 
 /* Button to collapse flamingo panels */
 .collapsebtn:after {
@@ -247,22 +271,127 @@ div.flamingo-page-division {
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button {
   background-image: none;
-  border-radius: 20px;
+  border-radius: 9999px; /* circular border */
   color: #000000bf;
-  border: 1px solid #000000;
+  border: 1px solid #8b2129;
+  text-shadow: none;
 }
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button.previousStepButton {
   background-color: #eacbcb;
+  color: #3d3f3f;
 }
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button.activeStepButton {
   background-color: #bb252c;
-  border: 1px solid #8b2129;
+  background-image: linear-gradient(#d41f29, #8b2129 50%, #8b2129);
   color: #ffffff;
   font-weight: bold;
 }
 
 #programmeDefinitionSingle-workflowsteps-radiobuttons button.nextStepButton {
   background-color: #ffffff;
+  color: #8b2129;
 }
+
+/*Remove Browse Checkbox */
+input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+/*Default text color */
+input[type="checkbox"] + span {
+   color:black;
+}
+
+/* Custom checkbox, including a check icon with transparent color,
+to become visible when checked */
+input[type="checkbox"] + span:before {
+  font-family: "FontAwesome";
+  content: '\f00c';
+  color: transparent;
+  font-size: 10px;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  text-align: center;
+  margin-right: 6px;
+  border: 1px solid black;
+  border-radius: 2px;
+  background-color: white;
+  cursor: default;
+}
+
+/* Custom checkbox text color when checked */
+input[type="checkbox"]:checked + span {
+   color: #8b2129;
+}
+/* Checkbox icon visible with the desired color when checked */
+input[type="checkbox"]:checked + span:before {
+  color: #8b2129;
+}
+
+/* Custom checkbox text color when disabled */
+input[type="checkbox"]:disabled + span {
+   color:#999;
+}
+/* Checkbox style when disabled */
+input[type="checkbox"]:disabled + span:before {
+  border: 1px solid #333;
+  background-color:#999;
+  cursor: no-drop;
+}
+/* Remove browser radio */
+input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+/* Default radio text style */
+input[type="radio"] + span{
+  color: black;
+  position: relative;
+  padding-left: 22px;
+  display: inline-block;
+  line-height: 14px; /* controls vertical alignment */
+}
+/* Checked radio text style */
+input[type="radio"]:checked + span{
+  color: #8b2129;
+}
+
+/* Custom radio button */
+[type="radio"] + span:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 14px;
+    top: 0;
+    height: 14px;
+    border: 1px solid black;
+    border-radius: 9999px; /* circle */
+    background: #fff;
+}
+[type="radio"] + span:after {
+    content: '';
+    left: 3px;
+    width: 8px;
+    top: 3px;
+    height: 8px;
+    background: transparent; /* transparent by default */
+    position: absolute;
+    border-radius: 9999px; /* circle */
+
+}
+/* Radio button selection circle with actual color when checked */
+[type="radio"]:checked + span:after {
+    background: #8b2129;
+}
+
+.checkbox label, .radio label, .checkbox-inline, .radio-inline {
+  padding-left: 0; /* controls indention */
+}
+

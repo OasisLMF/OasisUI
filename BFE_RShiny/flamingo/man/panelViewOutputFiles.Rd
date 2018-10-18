@@ -2,7 +2,7 @@
 % Please edit documentation in R/browse_ui.R
 \name{panelViewOutputFiles}
 \alias{panelViewOutputFiles}
-\title{Function wrapping panel to define prgramme and model IDs}
+\title{panelViewOutputFiles}
 \usage{
 panelViewOutputFiles(id)
 }
@@ -10,5 +10,5 @@ panelViewOutputFiles(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to define prgramme and model IDs
+panelViewOutputFiles
 }

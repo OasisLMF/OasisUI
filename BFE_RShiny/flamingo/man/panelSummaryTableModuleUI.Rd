@@ -2,7 +2,7 @@
 % Please edit documentation in R/browse_ui.R
 \name{panelSummaryTableModuleUI}
 \alias{panelSummaryTableModuleUI}
-\title{Function wrapping panel to define prgramme and model IDs}
+\title{panelSummaryTableModuleUI}
 \usage{
 panelSummaryTableModuleUI(id)
 }
@@ -10,5 +10,5 @@ panelSummaryTableModuleUI(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to define prgramme and model IDs
+panelSummaryTableModuleUI
 }

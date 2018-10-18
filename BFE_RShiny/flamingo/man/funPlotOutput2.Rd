@@ -6,6 +6,9 @@
 \usage{
 funPlotOutput2(outputPlotData)
 }
+\arguments{
+\item{outputPlotData}{data from output plot}
+}
 \description{
 funPlotOutput2
 }

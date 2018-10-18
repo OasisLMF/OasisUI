@@ -1,11 +1,11 @@
 #' Single Browse Definition Module
+#' @rdname visualizationSBR
 #' @description Server logic to define a programme
 #' @inheritParams flamingoModule
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater};
 #' @return For \code{visualizationSBR()}, list of reactives.
 #' @template return-outputNavigation
-#' @rdname visualizationSBR
 #' @export
 visualizationSBR <- function(input, output, session, dbSettings,
                                    apiSettings, userId,

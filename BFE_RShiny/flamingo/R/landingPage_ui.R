@@ -1,66 +1,56 @@
 #' @rdname landingPage
 #' @importFrom DT DTOutput
-#' @importFrom shinyBS bsTooltip
+#' @importFrom bsplus bs_embed_tooltip
 #' @export
 landingPageUI <- function(id) {
-
   ns <- NS(id)
 
   tagList(
     wellPanel(
       h4("Process Runs Inbox"),
       DTOutput(ns("tableInbox")),
-      actionButton(ns("abuttongotorun"), "Goto Run Details",
-                   class = "btn btn-primary", align = "right"),
-      bsTooltip(ns("abuttongotorun"), landing_page$abuttongotorun,
-                placement = "right", options = list(container = "body")),
-      actionButton(ns("refreshInbox"), "Refresh",
-                   class = "btn btn-primary", align = "right"),
+      flamingoButton(ns("abuttongotorun"), "Browse Processes Outputs",
+                   align = "right") %>%
+        bs_embed_tooltip(title = landing_page$abuttongotorun, placement = "right"),
+      actionButton(inputId = ns("refreshInbox"), label = "Refresh", align = "right"),
       downloadButton(ns("PRIdownloadexcel"),
-                     label = "Export to csv"),
-      bsTooltip(ns("PRIdownloadexcel"), landing_page$PRIdownloadexcel,
-                placement = "right", options = list(container = "body"))
+                     label = "Export to csv") %>%
+        bs_embed_tooltip(title = landing_page$PRIdownloadexcel, placement = "right")
     )
     # img(src = "landingpage.png", width = "70%") # to be replaced with proper image
   )
 }
 
 #' @rdname pagestructure
-#' @importFrom shinyBS bsButton
+#' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyWidgets dropdownButton
 #' @export
 pageheaderUI <- function(id) {
-
   ns <- NS(id)
   tagList(
-    div( id = ns("accountDDmenu"),
+    div(id = ns("accountDDmenu"),
          dropdownButton(inputId = ns("accountDD"),
                         circle = TRUE, status = "default",
                         icon = icon("user"),
                         size = "s",
                         right = TRUE,
                         textOutput(ns("textOutputHeaderData2")),
-                        bsButton(ns("abuttonuseradmin"), "User Administration",
-                                 style = "btn btn-primary", size = "default", type = "action",
-                                 block = TRUE),
-                        bsButton(ns("abuttondefineaccount"), "Define Account",
-                                 style = "btn btn-primary", size = "default", type = "action",
-                                 block = TRUE),
-                        bsTooltip(ns("abuttondefineaccount"),
-                                  landing_page$abuttondefineaccount,
-                                  placement = "left",
-                                  options   = list(container = "body")),
-                        bsButton(ns("abuttonsysconf"), "System Configuration",
-                                 style = "btn btn-primary", size = "default", type = "action",
-                                 block = TRUE),
-                        bsTooltip(ns("abuttonsysconf"),
-                                  landing_page$abuttonsysconf,
-                                  placement = "left",
-                                  options   = list(container = "body")),
-                        bsButton(ns("abuttonlogout"), "Logout",
-                                 style = "btn btn-primary", size = "default", type = "action",
-                                 block = TRUE)
-         )
+                        flamingoButton(ns("abuttonuseradmin"),
+                                     label = "User Administration", align = "center", width = "100%"),
+
+                        ### TODO: recheck allignment of the comment after fixing dtyle of action buttons
+                        flamingoButton(ns("abuttondefineaccount"),
+                                     label = "Define Account", align = "center", width = "100%") %>%
+                          bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "left"),
+
+                        flamingoButton(ns("abuttonsysconf"),
+                                     label = "System Configuration", align = "center", width = "100%") %>%
+                          bs_embed_tooltip(title = landing_page$abuttonsysconf, placement = "left"),
+
+                        flamingoButton(ns("abuttonlogout"),
+                                     label = "Logout", align = "center", width = "100%")
+         ) %>%
+           bs_embed_tooltip(title = landing_page$accountDD, placement = "right")
     )
   )
 }
@@ -70,11 +60,9 @@ pageheaderUI <- function(id) {
 #' @rdname pagestructure
 #' @export
 pagestructureUI <- function(id) {
-
   ns <- NS(id)
 
   tagList(
     uiOutput(ns("sidebar"))
   )
-
 }

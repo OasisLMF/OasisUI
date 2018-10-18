@@ -1,9 +1,9 @@
-# Helper texts to show explanations next to buttons. 
-# A list per file. 
+# Helper texts to show explanations next to buttons.
+# A list per file.
 # Naming convention: buttonname
 
 file_Viewer <- list(
-  FVfileListdownloadzip = "Download all checked files"
+  FLdownloadzip = "Download all checked files"
   #FVFLdownloadexcel = "Download files table"
 )
 
@@ -16,20 +16,22 @@ landing_page <- list(
   abuttondefineprogrammebatch = "Define batch Process Run",
   abuttonbrowseSBR = "Visualize outputs from single run",
   abuttonbrowseBBR = "Visualize results across runs or from batch runs",
+  abuttonbrowseCBR = "Compare runs",
   abuttongotorun = "Go to run details",
   PRIdownloadexcel = "Download files table",
   abuttonfilemngt = "Access input/output files",
-  abuttonsysconf = "System configuration"
+  abuttonsysconf = "System configuration",
+  accountDD = "User info"
 )
 
 programme_Definition_Single <- list(
   sinputTransformname = "Transformation Description to be added here",
   sinputProgModTransform = "Transformation Description to be added here",
-  selectprogammeID = "Select a programme ID to which associate a model",
+  selectprogrammeID = "Select a programme ID to which associate a model",
   selectprogOasisID = "Select the Oasis Programme to Run"
 )
 
-### Panel Browse ----  
+### Panel Browse ----
 
 browse_programmes <- list(
   selectRunID = "Selecct RunID",

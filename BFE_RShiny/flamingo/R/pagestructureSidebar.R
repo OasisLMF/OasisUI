@@ -1,8 +1,17 @@
+#' @title pagestructureSidebar
+#' @rdname pagestructureSidebar
+#' @param ns ns
+#' @param collapsed FALSE
+#' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom shinyWidgets dropdownButton
+#' @export
+
 pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
   flamingoPanel(
     "sidebar",
     heading = div(
-      actionButton(inputId = ns("abuttonhome"), class = "btn btn-primary", icon = icon("home"),
+      flamingoButton(inputId = ns("abuttonhome"), icon = icon("home"),
                    label = NULL),
       actionButton(inputId = ns("abuttoncollapsesidebar"), icon = icon("ellipsis-v"),
                    label = NULL, style = "float:right;")
@@ -15,24 +24,17 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       circle = FALSE,
       right = FALSE,
       width = "100%",
-      tooltip = tooltipOptions(title = landing_page$abuttonrun, placement = "right"),
-      actionButton(ns("abuttondefineprogrammesingle"),
+      flamingoButton(ns("abuttondefineprogrammesingle"),
                    label = if (!collapsed) "Single Process" else "Single",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
-                   class = "btn btn-primary", align = "left",  width = "100%"),
-      bsTooltip(ns("abuttondefineprogrammesingle"),
-                landing_page$abuttondefineprogrammesingle,
-                placement = "right",
-                options   = list(container = "body")),
-      actionButton(ns("abuttondefineprogrammebatch"),
+                   align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttondefineprogrammesingle, placement = "right"),
+      flamingoButton(ns("abuttondefineprogrammebatch"),
                    label = if (!collapsed) "Batch Process" else "Batch",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
-                   class = "btn btn-primary", align = "left",  width = "100%"),
-      bsTooltip(ns("abuttondefineprogrammebatch"),
-                landing_page$abuttondefineprogrammebatch,
-                placement = "right",
-                options   = list(container = "body"))
-    ),
+                   align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttondefineprogrammebatch, placement = "right")
+    ) %>% bs_embed_tooltip(title = landing_page$abuttonrun, placement = "right"),
 
     dropdownButton(
       inputId = ns("abuttonbrowse"),
@@ -42,39 +44,29 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       circle = FALSE,
       right = FALSE,
       width = "100%",
-      tooltip = tooltipOptions(title = landing_page$abuttonbrowse, placement = "right"),
-      actionButton(ns("abuttonbrowseSBR"),
+      flamingoButton(ns("abuttonbrowseSBR"),
                    label = if (!collapsed) "Single Browse" else "Single",
                    icon = if (collapsed) icon("eye"),
-                   class = "btn btn-primary", align = "left",  width = "100%"),
-      bsTooltip(ns("abuttonbrowseSBR"),
-                landing_page$abuttonbrowseSBR,
-                placement = "right",
-                options   = list(container = "body")),
-      actionButton(ns("abuttonbrowseBBR"),
+                   align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttonbrowseSBR, placement = "right"),
+      flamingoButton(ns("abuttonbrowseBBR"),
                    label = if (!collapsed) "Batch Browse" else "Batch",
                    icon = if (collapsed) icon("eye"),
-                   class = "btn btn-primary", align = "left",  width = "100%"),
-      bsTooltip(ns("abuttonbrowseBBR"),
-                landing_page$abuttonbrowseBBR,
-                placement = "right",
-                options   = list(container = "body"))
-    ),
+                   align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttonbrowseBBR, placement = "right"),
+      flamingoButton(ns("abuttonbrowseCBR"),
+                   label = if (!collapsed) "Compare runs" else "Runs",
+                   icon = if (collapsed) icon("eye"),
+                   align = "left",  width = "100%") %>%
+        bs_embed_tooltip(title = landing_page$abuttonbrowseCBR, placement = "right")
+    ) %>% bs_embed_tooltip(title = landing_page$abuttonbrowse, placement = "right"),
 
-    actionButton(
+    flamingoButton(
       ns("abuttonfilemngt"),
       label = if (!collapsed) "File Management",
       icon = if (collapsed) icon("file", lib = "glyphicon"),
-      class = "btn btn-primary", align = "left",  width = "100%"
-    ),
-    bsTooltip(ns("abuttonfilemngt"),
-              landing_page$abuttonfilemngt,
-              placement = "right",
-              options   = list(container = "body"))#,
-    # sidebar_button(ID = ns("abuttonsysconf"),  Label =  if (collapsed) "SC" else "System Configuration"),
-    # bsTooltip(ns("abuttonsysconf"),
-    #           landing_page$abuttonsysconf,
-    #           placement = "right",
-    #           options   = list(container = "body"))
+      align = "left",  width = "100%"
+    ) %>%
+      bs_embed_tooltip(title = landing_page$abuttonfilemngt, placement = "right")
   )
 }

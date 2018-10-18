@@ -122,7 +122,7 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "SBR")
   )
 
-  auth_modules$visualizationBBR<- .callModule(
+  auth_modules$visualizationBBR <- .callModule(
     visualizationBBR,
     id = "visualizationBBR",
     apiSettings = apiSettings,
@@ -130,6 +130,16 @@ server <- function(input, output, session) {
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "BBR")
+  )
+
+  auth_modules$visualizationCBR <- .callModule(
+    visualizationCBR,
+    id = "visualizationCBR",
+    apiSettings = apiSettings,
+    userId = reactive(result$userId),
+    logMessage = logMessage,
+    reloadMillis = reloadMillis,
+    active = reactive(authenticated() && main_visible() == "CBR")
   )
 
 
@@ -145,26 +155,26 @@ server <- function(input, output, session) {
     fileViewer,
     id = "fileViewer",
     logMessage = logMessage,
-    active = reactive(authenticated()) #&& input$fm == "fileviewer"))
+    active = reactive(authenticated() ) # && main_visible() == "FM" ) #&& input$fm == "fileviewer"))
   )
 
   auth_modules$modelSupplierPage <- .callModule(
     modelSupplierPage,
     id = "modelSupplierPage",
-    active = reactive(authenticated())# && input$sc == "Model"))
+    active = reactive(authenticated()) # && main_visible() == "SC" )# && input$sc == "Model"))
   )
 
   auth_modules$userAdminDefinition <- .callModule(
     userAdminDefinition,
     id = "userAdminDefinition",
-    active = reactive(authenticated() && input$ua == "defineuser"),
+    active = reactive(authenticated() && main_visible() == "UA" && input$ua == "defineuser"),
     userId = reactive(result$userId)
   )
 
   auth_modules$companyDefinition <- .callModule(
     companyDefinition,
     id = "companyDefinition",
-    active = reactive(authenticated() && input$ua == "definecompany")
+    active = reactive(authenticated() && main_visible() == "UA" && input$ua == "definecompany")
   )
 
   ### authentication ----
@@ -243,6 +253,11 @@ server <- function(input, output, session) {
 
            "BBR" = { # go to Batch browse submenu
              loginfo(paste("Navigate to Batch browse, userId: ", result$userId),
+                     logger = "flamingo.module")
+           },
+
+           "CBR" = { # go to Compare Runs submenu
+             loginfo(paste("Navigate to compare runs, userId: ", result$userId),
                      logger = "flamingo.module")
            },
 

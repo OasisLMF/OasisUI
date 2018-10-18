@@ -1,7 +1,9 @@
-# TODOs:
-# * Review / enhance the module signature.
-# * roxygen tags including examples.
-# * Refine UI look (together with flamingoPanel).
+#' @title flamingoIncrementalPanelUI
+#' @rdname flamingoIncrementalPanelUI
+#' @param removable TRUE
+#' @inheritParams flamingoPanel
+#' @importFrom htmltools tags
+#' @export
 
 flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, status = "default",
                                        collapsible = FALSE, show = TRUE, removable = TRUE) {
@@ -11,8 +13,8 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
     ...,
     heading = tagAppendChildren(
       flamingoPanelHeading(heading),
-      shiny::actionButton(ns("add"), icon("plus"), style = "float: left; margin-right: 12px"),
-      if (removable) shiny::actionButton(ns("delete"), icon("times"), style = "float: right")
+      actionButton(ns("add"), icon("plus"), style = "float: left; margin-right: 12px"),
+      if (removable) actionButton(ns("delete"), icon("times"), style = "float: right")
     ),
     footer = footer,
     status = status,
@@ -21,7 +23,15 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
   )
 }
 
-#' @importFrom utils head
+#' @title flamingoIncrementalPanel
+#' @rdname flamingoIncrementalPanel
+#' @inheritParams flamingoModule
+#' @param new_content_IDs ID with new content
+#' @param new_content_fun function with new content
+#' @param new_headings new heading
+#' @param panels_state state of panel
+#' @importFrom htmltools tags
+#' @export
 flamingoIncrementalPanel <- function(input, output, session, panels_state,
                                      new_content_IDs, new_content_fun, ..., new_headings = NULL,
                                      collapsible = FALSE, show = TRUE) {
@@ -42,7 +52,7 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state,
       )
       panels_state(taken)
     } else {
-      showNotification("Reached maximum number of panels", type = "warning")
+      flamingoNotification("Reached maximum number of panels", type = "warning")
     }
   })
   observeEvent(input$delete, {
@@ -51,7 +61,7 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state,
       "Do you want to remove the selected panel?",
       footer = tagList(
         modalButton("Cancel"),
-        shiny::actionButton(session$ns("del_ok"), "OK")
+        actionButton(session$ns("del_ok"), "OK")
       )
     ))
   })
@@ -65,12 +75,24 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state,
   })
 }
 
+#' @title panelsState
+#' @rdname panelsState
+#' @param IDs IDs
+#' @export
 panelsState <- function(IDs) {
   reactiveVal(
     setNames(rep(FALSE, length(IDs)), IDs)
   )
 }
 
+#' @title callIncrementalPanelModules
+#' @rdname callIncrementalPanelModules
+#' @inheritParams flamingoPanel
+#' @param IDs IDs
+#' @param ID_0 ID_0
+#' @param contentIDs content of the IDs
+#' @param contentUI content of the UI
+#' @export
 callIncrementalPanelModules <- function(IDs, ID_0,
                                         contentIDs, contentUI, ...,
                                         headings = NULL,
@@ -86,7 +108,7 @@ callIncrementalPanelModules <- function(IDs, ID_0,
     new_headings = headings,
     collapsible = collapsible, show = show
   )
-  
+
   list(
     state = panels_state,
     remove_all = function() {
@@ -111,11 +133,11 @@ if (FALSE) {
       verticalLayout(
         textInput(ns("txt_in"), label = paste("type something", id)),
         textOutput(ns("txt_out")),
-        shiny::actionButton(ns("upd"), "Update")
+        actionButton(ns("upd"), "Update")
       )
     }
     examplePanel <- function(input, output, session, reset = reactive(FALSE)) {
-      
+
       if (FALSE) {
         txt <- eventReactive(input$upd, {
           input$txt_in
@@ -146,7 +168,7 @@ if (FALSE) {
       ')),
       titlePanel("Dynamic panels"),
       verticalLayout(
-        shiny::actionButton("delete_all", "Remove all panels"),
+        actionButton("delete_all", "Remove all panels"),
         flamingoIncrementalPanelUI(
           "start-panel", heading = "Add a new panel",
           collapsible = FALSE, show = FALSE, removable = FALSE
@@ -180,8 +202,8 @@ if (FALSE) {
         all_panels$remove_all()
       })
     }
-    
+
     shinyApp(ui = ui, server = server)
-    
+
   }
 }

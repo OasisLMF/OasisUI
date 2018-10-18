@@ -2,12 +2,9 @@
 % Please edit documentation in R/reactiveConditionalPanel.R
 \name{reactiveConditionalPanel}
 \alias{reactiveConditionalPanel}
-\alias{reactiveConditionalPanelUI}
 \title{Reactive Conditional Panel}
 \usage{
 reactiveConditionalPanel(input, output, session, condition)
-
-reactiveConditionalPanelUI(id, ...)
 }
 \arguments{
 \item{input}{Shiny input object.}
@@ -20,8 +17,6 @@ reactiveConditionalPanelUI(id, ...)
 the panel.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{...}{Elements to include in the panel.}
 }
 \description{
 Shiny module handling the visibility of a panel based on a reactive \code{condition}.

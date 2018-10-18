@@ -1,7 +1,9 @@
+#' @rdname loginDialog
 #' @description UI/View to login an user
 #' @param id account id
 #' @rdname loginDialog
 #' @importFrom shinyjs hidden
+#' @importFrom htmltools tags
 #' @export
 loginDialogUI <- function(id) {
 
@@ -18,7 +20,7 @@ loginDialogUI <- function(id) {
                         onkeydown = sprintf(
                           "if (event.keyCode == 13) document.getElementById('%s').click()",
                           ns("loginbutton"))),
-             actionButton(ns("loginbutton"), "Login", class = "btn btn-success")
+             flamingoButton(ns("loginbutton"), "Login", class = "btn btn-success")
     )
   )
 }

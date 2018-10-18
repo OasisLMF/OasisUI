@@ -1,7 +1,16 @@
-
-# adapted from shinyWidgets::panel() including IDs and collapsible (inspired by
-# shinyBS::bsCollapsePanel())
-# TODO: roxygen tags including example (see below)
+#' @title flamingoPanel
+#' @rdname flamingoPanel
+#' @param id id
+#' @param ... additional parameters
+#' @param heading NULL by default
+#' @param footer NULL by default
+#' @param status default
+#' @param show TRUE
+#' @param collapsible FALSE
+#' @importFrom htmltools tags
+#' @export
+#' @details  adapted from shinyWidgets::panel() including IDs and collapsible
+#' (inspired by shinyBS::bsCollapsePanel())
 flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "default", collapsible = FALSE, show = TRUE) {
 
   with_id <- function(x) paste(id, x, sep = "-")
@@ -73,11 +82,11 @@ if (FALSE) {
         "...Yeah yeah yeah",
         heading = tagList(
           "She loves you...",
-          shiny::actionButton("aa", icon("times"), style = "float: right")
+          actionButton("aa", icon("times"), style = "float: right")
         ),
         footer = fluidRow(column(
           12,
-          shiny::actionButton("aa", "+", style = "float: left")
+          actionButton("aa", "+", style = "float: left")
         )),
         collapsible = TRUE,
         show = FALSE
@@ -86,7 +95,7 @@ if (FALSE) {
         "dpanel",
         footer = fluidRow(column(
           12,
-          shiny::actionButton("aa", "+", style = "float: left")
+          actionButton("aa", "+", style = "float: left")
         )),
         show = FALSE
       ),
@@ -98,11 +107,17 @@ if (FALSE) {
   }
 }
 
-
-# TODO: roxygen tags including example (see below)
-# shall we use flamingo::actionButton()?
+#' @title collapseButton
+#' @rdname collapseButton
+#' @param id id
+#' @param id_collapse id to collapse
+#' @param ... additional paramters
+#' @param width NULL
+#' @param collapsed FALSE
+#' @importFrom bsplus bs_attach_collapse
+#' @importFrom htmltools tagAppendAttributes
 collapseButton <- function(id, id_collapse, ..., width = NULL, collapsed = FALSE) {
-  shiny::actionButton(id, NULL, NULL, ..., width = width) %>%
+  actionButton(id, NULL, NULL, ..., width = width) %>%
     bsplus::bs_attach_collapse(id_collapse)  %>%
     tagAppendAttributes(class = paste("collapsebtn", if (collapsed) "collapsed"))
 }
@@ -110,6 +125,7 @@ if (FALSE) {
   # to become man-roxygen/ex-collapseButton.R
   collapseButton(id = "abutton", id_collapse = "acollapse")
   collapseButton(id = "abutton", id_collapse = "acollapse", collapsed = TRUE)
+
   if (interactive()) {
     library(shiny)
     ui <- fluidPage(
@@ -138,6 +154,9 @@ if (FALSE) {
   }
 }
 
+#' @title flamingoPanelHeading
+#' @rdname flamingoPanelHeading
+#' @param heading heading
 flamingoPanelHeading <- function(heading) {
   if (is.character(heading)) {
     # TODO: fine-tune font size
@@ -147,10 +166,19 @@ flamingoPanelHeading <- function(heading) {
   }
 }
 
+#' @title flamingoPanelHeadingOutput
+#' @rdname flamingoPanelHeadingOutput
+#' @param outputId outputId
+#' @param ... additional parameters
 flamingoPanelHeadingOutput <- function(outputId, ...) {
   div(uiOutput(outputId, inline = TRUE, ...))
 }
 
+#' @title renderflamingoPanelHeading
+#' @rdname renderflamingoPanelHeading
+#' @param expr expression
+#' @param env environment
+#' @param ... additional parameters
 renderflamingoPanelHeading <- function(expr, env = parent.frame(), ...) {
   renderUI(call("flamingoPanelHeading", substitute(expr)), quoted = TRUE, env = env, ...)
 }

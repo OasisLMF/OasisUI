@@ -3,7 +3,6 @@
 #' @description UI/View to view files
 #' @import leaflet
 #' @importFrom DT DTOutput
-#' @importFrom shinyBS bsTooltip
 #' @export
 fileViewerUI <- function(id) {
 
@@ -11,23 +10,12 @@ fileViewerUI <- function(id) {
 
   tagList(
 
-    h3("File Viewer", class = "flamingo-page-title"),
+    # h3("File Viewer", class = "flamingo-page-title"),
 
     h4("File List", class = "flamingo-table-title"),
 
-    checkboxInput(inputId = ns("tableFVfileListSelectall"), label = "Select all", value = FALSE),
-    DTOutput(ns("tableFVfileList")),
-
-    downloadButton(ns("FVfileListdownloadzip"), label = "Export to zip"),
-    bsTooltip(ns("FVfileListdownloadzip"),
-              file_Viewer$FVfileListdownloadzip,
-              placement = "right",
-              options   = list(container = "body"))
-    # downloadButton(ns("FVFLdownloadexcel"), label = "Export to csv"),
-    # bsTooltip(ns("FVFLdownloadexcel"),
-    #             file_Viewer$FVFLdownloadexcel,
-    #             placement = "right",
-    #             options   = list(container = "body"))
+    actionButton(inputId = ns("refreshtable"), label = "Refresh", style = "float:right"),
+    ViewFilesModuleUI(id  = ns("ViewFilesModule"), includechkbox = TRUE)
 
   )
 

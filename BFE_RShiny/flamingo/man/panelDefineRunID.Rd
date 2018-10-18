@@ -2,7 +2,7 @@
 % Please edit documentation in R/browse_ui.R
 \name{panelDefineRunID}
 \alias{panelDefineRunID}
-\title{Function wrapping panel to define prgramme and model IDs}
+\title{panelDefineRunID}
 \usage{
 panelDefineRunID(id)
 }
@@ -10,5 +10,5 @@ panelDefineRunID(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to define prgramme and model IDs
+panelDefineRunID
 }
