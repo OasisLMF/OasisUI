@@ -37,13 +37,13 @@ fileViewer <- function(
   observe(if (active()) {
     stmt <- buildDbQuery("getFileViewerTable")
     FLdata <- executeDbQuery(dbSettings, stmt)
-    result$FLdata <- FLdata %>% select(-c(FileID, Source))
+    result$FLdata <- FLdata %>% select(-c(Source))
   })
 
   observeEvent(input$refreshtable, {
     stmt <- buildDbQuery("getFileViewerTable")
     FLdata <- executeDbQuery(dbSettings, stmt)
-    result$FLdata <- FLdata %>% select(-c(FileID, Source))
+    result$FLdata <- FLdata %>% select(-c(Source))
   })
 
   # Pre-select the correct runId

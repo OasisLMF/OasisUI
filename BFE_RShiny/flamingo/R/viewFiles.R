@@ -1,4 +1,5 @@
 # ViewFilesModule Module -----------------------
+# UI -------------------------------------------
 #' Module to View Files
 #' @description UI logic to view  files
 #' @inheritParams flamingoModuleUI
@@ -28,7 +29,7 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
     )
 }
 
-
+# Server ---------------------------------------------------------
 #' Module to View Files
 #' @rdname ViewFilesModule
 #' @description Server logic to view files
@@ -60,6 +61,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     fileData = NULL
   )
 
+  # Help function
+  '%notin%' <- Negate('%in%')
 
   # Add buttons -------------------------------------
   observeEvent(filesListData(), ignoreNULL = FALSE, {
@@ -88,7 +91,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         selectionUsed <- "single"
       }
       datatable(
-        result$filesListDataButtons,
+        result$filesListDataButtons %>% select(-c(FileID)),
         class = "flamingo-table display",
         rownames = TRUE,
         escape = FALSE,
@@ -140,9 +143,24 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
 
   # Selected Row --------------------------------------------------------
 
+  # lapply(seq(maxrowsperpage), function(i){
+  #   onclick(paste0("srows_", i), {
+  #     print("srows_i")
+  #     print(input[[paste0("srows_", i)]])
+  #     if (input[[paste0("srows_", i)]]) {
+  #       # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+  #       selected <- input$outputFLtable_rows_selected[input$outputFLtable_rows_selected %notin% c(i)]
+  #       lapply(selected, function(i){selectRows(dataTableProxy("outputFLtable", deferUntilFlush = FALSE), i)})
+  #     } else {
+  #       #session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
+  #       selectRows(dataTableProxy("outputFLtable", deferUntilFlush = FALSE), i)
+  #     }
+  #   })
+  # })
+
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
-      lapply(input$outputFLtable_rows_selected, function(i){
+      lapply(input$outputFLtable_rows_selected, function(i) {
         session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
         .enableButton(i)})
       lapply(setdiff(input$outputFLtable_rows_current, input$outputFLtable_rows_selected), function(i) {
@@ -304,13 +322,13 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     manageButtons <- c("FO_btn_show_raw_content" = paste0("vrows_", i),
                        "FO_btn_show_map" = paste0("mrows_", i))
     # lapply(t(validButtons), function(btnIDs){enable(manageButtons[btnIDs])})
-    lapply(t(validButtons), function(btnIDs){shinyjs::show(manageButtons[btnIDs])})
+    lapply(t(validButtons), function(btnIDs){show(manageButtons[btnIDs])})
   }
 
   #hide buttons in a row
   .hideButtons <- function(i=NULL){
-    shinyjs::hide(paste0("vrows_", i))
-    shinyjs::hide(paste0("mrows_", i))
+    hide(paste0("vrows_", i))
+    hide(paste0("mrows_", i))
   }
 
 
@@ -319,7 +337,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     inputs <- character(num)
     for (i in seq_len(num)) {
       if (hidden) {
-        inputs[i] <- as.character(shinyjs::hidden(FUN(inputId = ns(paste0(id,i)), label = Label, ...)))
+        inputs[i] <- as.character(hidden(FUN(inputId = ns(paste0(id,i)), label = Label, ...)))
       } else {
         inputs[i] <- as.character(FUN(inputId = ns(paste0(id,i)), label = Label, ...))
       }
