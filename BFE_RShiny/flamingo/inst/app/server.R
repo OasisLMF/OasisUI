@@ -110,8 +110,8 @@ server <- function(input, output, session) {
   )
 
   auth_modules$visualizationSBR <- .callModule(
-    browseprogrammes,
-    id = "browseprogrammes",
+    visualizationSBR,
+    id = "visualizationSBR",
     apiSettings = apiSettings,
     userId = reactive(result$userId),
     runIdList =  auth_modules$landingPage$runIdList,
