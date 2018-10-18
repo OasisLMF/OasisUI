@@ -545,10 +545,7 @@ step3_configureOutput <- function(input, output, session,
 
   #number of Rows per Page in a dataable
   pageLength <- 5
-
-  # Help function
-  '%notin%' <- Negate('%in%')
-
+  
   # Default checkgroup for  GUL, IL and RI
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
@@ -560,6 +557,8 @@ step3_configureOutput <- function(input, output, session,
     navigationstate = NULL,
     # reactive value for process runs table
     prcrundata = NULL,
+    # flag to know if the user is creating a new output configuration or rerunning a process
+    prrun_flag = "C",
     # Id of the Process Run
     prrunid = -1
   )
@@ -614,20 +613,17 @@ step3_configureOutput <- function(input, output, session,
     prcid <- selectprogOasisID()
     # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
     # 'In Progress' (not handled by stored procedure in the DB due to bug!)
-    prcrundata <- getProcessRun(dbSettings, prcid, input$radioprrunsAllOrInProgress)
-    StatusGood <- "Completed"
-    StatusBad <- c("Failed", "Cancelled", NA_character_)
+    prcrundata <- getProcessRun(dbSettings, prcid, input$radioprrunsAllOrInProgress) %>%
+      rename(Status = prcrundata.ProcessRunStatus.old) %>%
+      as.data.frame()
     # RSc TODO: should probably allow NULL to clear connections when selecting
     # a ProgOasisID that has no runs
     if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
       show("tableprocessrundata")
       show("divprocessRunButtons")
       result$prcrundata <- prcrundata %>%
-        mutate(ProcessRunStatus = case_when(ProcessRunStatus %in% StatusGood ~ StatusCompleted,
-                                            ProcessRunStatus %in% StatusBad ~ StatusFailed,
-                                            ProcessRunStatus %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-        as.data.frame()
-      #Handling bug for 'In Progress'
+        replaceWithIcons()
+      #Handling bug for 'In Progress' 
       if (input$radioprrunsAllOrInProgress == "In_Progress") {
         result$prcrundata <- result$prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
       }
@@ -669,7 +665,7 @@ step3_configureOutput <- function(input, output, session,
   output$paneltitlepanelProcessRunTable <- renderUI({
     if (selectprogOasisID() != "") {
       progOasisName <- ifelse(toString(progOasisName()) == " " | toString(progOasisName()) == "" | toString(progOasisName()) == "NA", "", paste0('"',  toString(progOasisName()), '"'))
-      paste0('Runs for Model ', progOasisName,' (id: ', toString(selectprogOasisID()), ') ', toString(progOasisStatus()))
+      paste0('Runs for Model id ', toString(selectprogOasisID()), ' ', progOasisName,' ', toString(progOasisStatus()))
     } else {
       paste0("Runs")
     }
@@ -688,13 +684,18 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # > Configure Output --------------------------------------------
+  # hide panel
+  onclick("abuttonhidepanelconfigureoutput", {
+    hide("panelDefineOutputs")
+  })
+  
   # configuration title
   output$paneltitleReDefineProgramme <- renderUI({
-    if (length(input$tableprocessrundata_rows_selected) > 0) {
+    if (result$prrun_flag  == "R") {
       processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
       processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName]
       processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
-      paste0('Re-Define Output Configuration for Run ', processRunName, ' (id: ', processRunId, ')')
+      paste0('Re-Define Output Configuration for Run id ', processRunId, ' ', processRunName)
     } else {
       "New Output Configuration"
     }
@@ -708,9 +709,9 @@ step3_configureOutput <- function(input, output, session,
         show("panelDefineOutputs")
         logMessage("showing panelDefineOutputs")
         logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
-        selectRows(dataTableProxy("tableprocessrundata"), selected = NULL)
-        selectPage(dataTableProxy("tableprocessrundata"), 1)
-        logMessage(paste("selected row is:", input$tableprocessrundata_rows_selected))
+        result$prrun_flag <- "C"
+        # selectRows(dataTableProxy("tableprocessrundata"), selected = NULL)
+        # selectPage(dataTableProxy("tableprocessrundata"), 1)
       } else {
         flamingoNotification(type = "error", "Please select a Programme Model first")
       }
@@ -725,6 +726,7 @@ step3_configureOutput <- function(input, output, session,
         .defaultview(session)
         show("panelDefineOutputs")
         logMessage("showing panelDefineOutputs")
+        result$prrun_flag <- "R"
         .updateOutputConfig()
       } else {
         flamingoNotification(type = "warning", "Please select Process Run first")
@@ -737,6 +739,7 @@ step3_configureOutput <- function(input, output, session,
   ### Hide Output Configuration panel
   onclick("abuttonehidepanelconfigureoutput", {
     hide("panelDefineOutputs")
+    result$prrun_flag <- "C"
   })
 
   # simplified view selection
@@ -1045,14 +1048,9 @@ step3_configureOutput <- function(input, output, session,
       invisible(input$abuttonrefreshprrunlogs)
 
       wfid <- result$prrunid
-
-      StatusGood <- "Success"
-      StatusBad <- c("Cancelled", "Failed",  NA_character_)
+      
       logdata <- getProcessRunDetails(dbSettings, wfid) %>%
-        mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                  Status %in% StatusBad ~ StatusFailed,
-                                  Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-        as.data.frame()
+        replaceWithIcons()
       logMessage("re-rendering process run log table")
       if (!is.null(logdata)) {
         datatable(
@@ -1076,7 +1074,7 @@ step3_configureOutput <- function(input, output, session,
     processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
     processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName]
     processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
-    paste0('Logs ', processRunName, ' (id: ', processRunId, ')')
+    paste0('Logs for Run id ', processRunId, ' ', processRunName)
   })
 
   # > Updates dependent on changed: tableprocessrundata_rows_selected ---------

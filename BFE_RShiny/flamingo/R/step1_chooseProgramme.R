@@ -10,7 +10,6 @@
 #' @importFrom bsplus bs_embed_tooltip
 #' @export
 step1_chooseProgrammeUI <- function(id) {
-
   ns <- NS(id)
   tagList(
     # Section "Choose Programme" = "1"
@@ -73,7 +72,6 @@ panelProgrammeDetails <- function(id) {
 panelDefineProgramme <- function(id) {
   ns <- NS(id)
   flamingoPanel(
-
     collapsible = FALSE,
     ns("progdef"),
     heading = tagAppendChildren(
@@ -188,10 +186,7 @@ step1_chooseProgramme <- function(input, output, session,
 
   #values to stop ping pong effect
   stop_selProgID <- check_selProgID <- 0
-
-  # Help function
-  '%notin%' <- Negate('%in%')
-
+  
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
@@ -278,7 +273,7 @@ step1_chooseProgramme <- function(input, output, session,
     progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
     progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
     progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
-    paste0('Details of Programme ', progName, ' (id: ', progId, ')')
+    paste0('Details of Programme id ', progId, ' ', progName)
   })
 
   # Show Programme Details
@@ -309,7 +304,7 @@ step1_chooseProgramme <- function(input, output, session,
       progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
       progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
       progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
-      paste0('Amend Programme ', progName, ' (id: ', progId, ')')
+      paste0('Amend Programme id ', progId, ' ', progName)
     }
   })
 
@@ -776,14 +771,9 @@ step1_chooseProgramme <- function(input, output, session,
     logMessage(".reloadDPProgData called")
     stmt <- buildDbQuery("getProgData")
     DPProgData <- executeDbQuery(dbSettings, stmt)
-    StatusGood <- "Loaded"
-    StatusBad <- c("Failed", "Cancelled", NA_character_)
     if (!is.null(DPProgData)) {
       result$DPProgData <- DPProgData %>%
-        mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                  Status %in% StatusBad ~ StatusFailed,
-                                  Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-        as.data.frame()
+        replaceWithIcons()
       logMessage("programme table refreshed")
     }
     invisible()
@@ -797,14 +787,9 @@ step1_chooseProgramme <- function(input, output, session,
 
       stmt <- buildDbQuery("getProgFileDetails", progId)
       progDetails <- executeDbQuery(dbSettings, stmt)
-      StatusGood <- "Loaded"
-      StatusBad <- c("Failed", "Cancelled", NA_character_)
       if (!is.null(progDetails)) {
         result$progDetails  <- progDetails %>%
-          mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                    Status %in% StatusBad ~ StatusFailed,
-                                    Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-          as.data.frame()
+          replaceWithIcons()
       }
       logMessage("programme details table refreshed")
     } else {

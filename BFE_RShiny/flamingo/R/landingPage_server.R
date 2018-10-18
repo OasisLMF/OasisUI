@@ -31,22 +31,6 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   observeEvent(input$abuttongotorun,
                updateNavigation(navigation_state, "SBR"))
 
-  # inbox <- reactive({
-  #   if (active()) {
-  #     # reload automatically every so often
-  #     invalidateLater(reloadMillis)
-  #     # explicit refresh button
-  #     invisible(input$refreshInbox)
-  #     logMessage("refreshing inbox...")
-  #     data <- getInboxData(dbSettings, userId()) %>%
-  #       mutate(Status = replace(Status, Status == "Failed" | Status == "Cancelled", StatusFailed)) %>%
-  #       mutate(Status = replace(Status, Status == "Completed", StatusCompleted)) %>%
-  #       mutate(Status = replace(Status, Status != "Completed" & Status != "Failed" & Status != "Cancelled" & Status != StatusFailed & Status != StatusCompleted, StatusProcessing)) %>%
-  #       as.data.frame()
-  #     data
-  #   }
-  # })
-
   observe(if (active()) {
 
     # invalidate if the refresh button updates
@@ -58,16 +42,8 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     landingPageButtonUpdate(session, dbSettings, userId())
 
     data <- getInboxData(dbSettings, userId())
-
-    StatusGood <- "Completed"
-    StatusBad <- c("Failed", "Cancelled", NA_character_)
-    '%notin%' <- Negate('%in%')
-
-    result$inbox <-  data %>%
-      mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                          Status %in% StatusBad ~ StatusFailed,
-                                          Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-      as.data.frame()
+    result$inbox <- data %>%
+      replaceWithIcons()
 
     logMessage("inbox refreshed")
 

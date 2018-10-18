@@ -15,7 +15,7 @@ userAdminDefinitionUI <- function(id) {
 
   tagList(
 
-    h3("Company User Administration", class = "flamingo-page-title"),
+    # h3("Company User Administration", class = "flamingo-page-title"),
 
     fluidRow(
       column(12,

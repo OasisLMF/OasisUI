@@ -31,13 +31,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   stop_selProgID <- check_selProgID <- 0
   stop_selProgOasisID <- check_selProgOasisID <- 0
   
-  #Statuses to be replaced
-  StatusGood <- "Loaded"
-  StatusBad <- c("Failed", "Cancelled", NA_character_)
-  
-  # Help function
-  '%notin%' <- Negate('%in%')
-  
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # Id of the Process Run
@@ -169,15 +162,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
   
-  observeEvent(submodulesList$step2_chooseModel$selectprogrammeID(), ignoreInit = TRUE, {
-    prgId <- submodulesList$step2_chooseModel$selectprogrammeID()
-    #Avoid updating input if not necessary
-    if (prgId != "" && !is.na(prgId) && result$selectprogrammeID != prgId) {
-      logMessage(paste0("updating result$selectprogrammeID because submodulesList$step2_chooseModel$selectprogrammeID() changed to: ", prgId ))
-      result$selectprogrammeID <- prgId
-    }
-  })
-  
   observeEvent(input$selectprogrammeID, ignoreInit = TRUE,{
     #Avoid updating input if not necessary
     if (input$selectprogrammeID != result$selectprogrammeID) {
@@ -199,13 +183,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   # > prog Table reactives ----
   observeEvent(submodulesList$step1_chooseProgramme$DPProgData(), ignoreInit = TRUE,{
-    if (is.null(submodulesList$step1_chooseProgramme$DPProgData())) {
+    if (is.null(submodulesList$step1_chooseProgramme$DPProgData()) || nrow(submodulesList$step1_chooseProgramme$DPProgData()) == 0) {
       stmt <- buildDbQuery("getProgData")
       result$DPProgData <- executeDbQuery(dbSettings, stmt) %>%
-        mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                  Status %in% StatusBad ~ StatusFailed,
-                                  Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-        as.data.frame()
+        replaceWithIcons()
     } else {
       result$DPProgData <- submodulesList$step1_chooseProgramme$DPProgData()
     }
@@ -242,18 +223,24 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   observeEvent({
     input$selectprogOasisID
-    input$selectprogrammeID
     }, ignoreInit = TRUE, {
     #Avoid updating input if not necessary
-    if (result$selectprogOasisID != input$selectprogOasisID) {
+    if (input$selectprogOasisID != "" && result$selectprogOasisID != input$selectprogOasisID) {
       logMessage(paste0("updating result$selectprogOasisID because input$selectprogOasisID changed to: ", input$selectprogOasisID ))
       result$selectprogOasisID <- input$selectprogOasisID
     }
   })
   
-  observeEvent(result$DPProgData_rowselected, ignoreInit = TRUE, {
-    progOasisId <- result$POData[result$POData_rowselected, POData.ProgOasisId]
-    if (!is.null(progOasisId) && progOasisId != result$selectprogOasisID) {
+  #If programmeID changes, then we select the first progOasis 
+  observeEvent({
+    result$POData_rowselected
+    result$selectprogrammeID
+    }, ignoreInit = TRUE, {
+    progOasisId <- ""
+    if (!is.null(result$POData) && nrow(result$POData) > 0) {
+      progOasisId <- result$POData[result$POData_rowselected, POData.ProgOasisId]
+    } 
+    if (!is.null(progOasisId) && !is.na(progOasisId) && progOasisId != result$selectprogOasisID) {
       logMessage(paste0("updating result$selectprogOasisID because result$POData_rowselected changed to: ", result$POData_rowselected ))
       result$selectprogOasisID <- progOasisId
     }
@@ -278,25 +265,27 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   }, ignoreInit = TRUE, {
     if (result$selectprogrammeID != "" & !is.null(result$selectprogrammeID)) {
       result$POData <- getProgOasisForProgdata(dbSettings, result$selectprogrammeID) %>%
-        mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                  Status %in% StatusBad ~ StatusFailed,
-                                  Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-        as.data.frame() 
-      result$progOasisChoices <-  result$POData[, POData.ProgOasisId]
+        replaceWithIcons()
+      if (nrow(result$POData) != 0) {
+        result$progOasisChoices <-  result$POData[, POData.ProgOasisId]
+      } else {
+        result$progOasisChoices <- c("")
+      }
+      
     }
   })
   
   observeEvent({
-    input$selectprogrammeID
+    result$selectprogrammeID
     result$selectprogOasisID
     result$progOasisChoices
   }, ignoreInit = TRUE, {
     prgOasisId <- result$selectprogOasisID
     rowToSelect <- match(prgOasisId, result$progOasisChoices)
     result$POData_rowselected <- ifelse(is.na(rowToSelect), 1, rowToSelect)
-    result$progOasisName <- result$POData[result$POData_rowselected, POData.ProgName]
+    result$progOasisName <- ifelse(nrow(result$POData) > 0, result$POData[result$POData_rowselected, POData.ProgName], "")
     progOasisStatus <- ""
-    if (!is.na(result$POData) && !is.na(result$POData_rowselected) && length(result$POData_rowselected) > 0) {
+    if (!is.na(result$POData) && nrow(result$POData) > 0 && length(result$POData_rowselected) > 0) {
       if (result$POData[result$POData_rowselected, POData.Status] == StatusCompleted) {
         progOasisStatus <- "- Status: Completed"
       } else if (result$POData[result$POData_rowselected, POData.Status] == StatusProcessing) {
@@ -319,4 +308,28 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   moduleOutput
   
+}
+
+#' Function to replace status with icons in table
+#' @param df dataframe
+#' @importFrom dplyr mutate case_when
+#' @export
+
+replaceWithIcons <- function(df){
+  #Status
+  StatusGood <- c("success", "completed", "loaded")
+  StatusBad <- c("cancelled", "failed",  NA_character_)
+  
+  # Help function
+  '%notin%' <- Negate('%in%')
+  
+  #Replace Status in df
+  logMessage(paste0("replacing icons"))
+  df <- df %>%
+    mutate(Status = tolower(Status)) %>%
+    mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
+                              Status %in% StatusBad ~ StatusFailed,
+                              Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
+    as.data.frame()
+  df
 }

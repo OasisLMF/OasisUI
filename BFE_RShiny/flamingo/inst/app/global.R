@@ -151,4 +151,5 @@ POData.Status <- "Status" #reactive(names(result$POData)[7])
 prcrundata.ProcessRunID <- "ProcessRunID" #reactive(names(result$prcrundata)[1])
 prcrundata.ProcessRunName <- "ProcessRunName" #reactive(names(result$prcrundata)[2])
 prcrundata.ProgOasisID <- "ProgOasisID" #reactive(names(result$prcrundata)[3])
-prcrundata.ProcessRunStatus <- "ProcessRunStatus" #reactive(names(result$prcrundata)[4])
+prcrundata.ProcessRunStatus <- "Status" #reactive(names(result$prcrundata)[4])
+prcrundata.ProcessRunStatus.old <- "ProcessRunStatus"
