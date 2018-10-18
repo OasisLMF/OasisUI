@@ -5,6 +5,8 @@
 #                                "Associate Model" = "2",
 #                                "Configure Output & Run" = "3",
 #                                "Browse & Re-run" = "4")
+
+#' @export
 programmeWorkflowSteps <- list("Choose Programme" = "1",
                                "Choose Model" = "2",
                                "Configure Output & Run" = "3")

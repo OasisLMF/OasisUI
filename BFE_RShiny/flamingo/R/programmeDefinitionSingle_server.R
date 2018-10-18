@@ -69,7 +69,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   # to first panel if accessing from landing page
   # and to panel 3 if coming from Browse
   observe(if (active()) {
-    workflowSteps$update(preselPanel())
+    workflowSteps$update(programmeWorkflowSteps[[preselPanel()]])
   })
   
   observeEvent(workflowSteps$step(), ignoreInit = TRUE, {
@@ -145,6 +145,16 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (submodulesList$step3_configureOutput$navigationstate() == "SBR") {
       updateNavigation(navigation_state, "SBR")
     }
+  })
+  
+  observeEvent(submodulesList$step1_chooseProgramme$newstep(), ignoreInit = TRUE, {
+    print("submodulesList$step1_chooseProgramme$newstep()")
+    print(submodulesList$step1_chooseProgramme$newstep())
+    workflowSteps$update(programmeWorkflowSteps[[2]])
+  })
+  
+  observeEvent(submodulesList$step2_chooseModel$newstep(), ignoreInit = TRUE, {
+    workflowSteps$update(programmeWorkflowSteps[[3]])
   })
   
   # > RunId ----
