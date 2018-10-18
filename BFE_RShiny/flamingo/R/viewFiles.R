@@ -162,8 +162,6 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
 
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
-      print("input$outputFLtable_rows_selected")
-      print(input$outputFLtable_rows_selected)
       lapply(input$outputFLtable_rows_selected, function(i) {
         session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
         .enableButton(i)})
@@ -171,8 +169,6 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
         .hideButtons(i)})
     }else {
-      print("input$outputFLtable_rows_selected should be null")
-      print(input$outputFLtable_rows_selected)
       lapply(input$outputFLtable_rows_current, function(i){
          session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
         .hideButtons(i)})
