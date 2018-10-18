@@ -90,8 +90,13 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       } else {
         selectionUsed <- "single"
       }
+      if ("FileID" %in% names(result$filesListDataButtons)) {
+        tableToShow <- result$filesListDataButtons %>% select(-c(FileID))
+      } else {
+        tableToShow <- result$filesListDataButtons
+      }
       datatable(
-        result$filesListDataButtons %>% select(-c(FileID)),
+        tableToShow,
         class = "flamingo-table display",
         rownames = TRUE,
         escape = FALSE,
@@ -143,23 +148,22 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
 
   # Selected Row --------------------------------------------------------
 
-  # lapply(seq(maxrowsperpage), function(i){
-  #   onclick(paste0("srows_", i), {
-  #     print("srows_i")
-  #     print(input[[paste0("srows_", i)]])
-  #     if (input[[paste0("srows_", i)]]) {
-  #       # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
-  #       selected <- input$outputFLtable_rows_selected[input$outputFLtable_rows_selected %notin% c(i)]
-  #       lapply(selected, function(i){selectRows(dataTableProxy("outputFLtable", deferUntilFlush = FALSE), i)})
-  #     } else {
-  #       #session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
-  #       selectRows(dataTableProxy("outputFLtable", deferUntilFlush = FALSE), i)
-  #     }
-  #   })
-  # })
+  lapply(seq(maxrowsperpage), function(i){
+    onclick(paste0("srows_", i), {
+      print("srows_i")
+      print(input[[paste0("srows_", i)]])
+      if (i %notin% input$outputFLtable_rows_selected) {
+        session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+      } else {
+        session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
+      }
+    })
+  })
 
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
+      print("input$outputFLtable_rows_selected")
+      print(input$outputFLtable_rows_selected)
       lapply(input$outputFLtable_rows_selected, function(i) {
         session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
         .enableButton(i)})
@@ -167,8 +171,10 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
         .hideButtons(i)})
     }else {
+      print("input$outputFLtable_rows_selected should be null")
+      print(input$outputFLtable_rows_selected)
       lapply(input$outputFLtable_rows_current, function(i){
-        session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+         session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
         .hideButtons(i)})
     }
 
