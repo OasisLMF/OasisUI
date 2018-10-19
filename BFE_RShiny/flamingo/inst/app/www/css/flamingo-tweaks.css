@@ -153,9 +153,10 @@ div.flamingo-page-division {
 }
 
 /* Tabs Panels */
-.nav-tabs > li > a{color: #000;}
+.nav-tabs > li > a{
+  color: #000;
+}
 
-.nav-tabs > li > a,
 .nav-tabs > li > a:hover {
   border-color: #eeeeee #eeeeee #dddddd;
 }
