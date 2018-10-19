@@ -32,7 +32,7 @@ visualizationSBRUI <- function(id) {
       ),
       
       tabPanel(
-        title = "Output Files",
+        title = "Files",
         outputfilesUI(ns("outputfiles")),
         value = ns("taboutputfiles")
       )

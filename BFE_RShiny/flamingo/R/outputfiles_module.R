@@ -14,13 +14,25 @@ outputfilesUI <- function(id) {
   
   ns <- NS(id)
   
-  flamingoPanel(
-    id = ns("flamingoPanelViewOutputFiles"),
-    collapsible = FALSE,
-    heading = "Files Table",
-    ViewFilesModuleUI(id  = ns("ViewFilesModule"), includechkbox = FALSE)
+  tagList(
+    
+    flamingoPanel(
+      id = ns("flamingoPanelViewOutputFiles"),
+      collapsible = TRUE,
+      show = TRUE,
+      heading = "Output Files Table",
+      ViewFilesModuleUI(id  = ns("ViewOutputFilesModule"), includechkbox = TRUE)
+    ),
+    
+    flamingoPanel(
+      id = ns("flamingoPanelViewInputFiles"),
+      collapsible = TRUE,
+      show = FALSE,
+      heading = "Input Files Table",
+      ViewFilesModuleUI(id  = ns("ViewInputFilesModule"), includechkbox = TRUE)
+    )
+    
   )
-  
 }
 
 
@@ -38,27 +50,27 @@ outputfilesUI <- function(id) {
 #' @export
 #' @export
 outputfiles <- function(input, output, session, dbSettings,
-                    apiSettings, userId,
-                    filesListDatatoview, active, logMessage = message) {
+                        apiSettings, userId,
+                        filesListDatatoview, active, logMessage = message) {
   
   ns <- session$ns
   
   # list of sub-modules
   sub_modules <- list()
   
-  filesListData <- reactive({
-    if (!is.null(filesListDatatoview())) {
-      filesListDatatoview()
-    } else {
-      NULL
-    }
-  })
-  
   sub_modules$ViewFilesModule <- callModule(
     ViewFilesModule,
-    id = "ViewFilesModule",
+    id = "ViewOutputFilesModule",
     filesListData =  filesListDatatoview,
     logMessage = logMessage,
     includemrows = FALSE,
-    includechkbox = FALSE)
+    includechkbox = TRUE)
+  
+  sub_modules$ViewFilesModule <- callModule(
+    ViewFilesModule,
+    id = "ViewInputFilesModule",
+    filesListData =  reactive(NULL),
+    logMessage = logMessage,
+    includemrows = FALSE,
+    includechkbox = TRUE)
 }
