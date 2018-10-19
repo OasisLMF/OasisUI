@@ -152,6 +152,24 @@ div.flamingo-page-division {
   border: 1px solid #979797;
 }
 
+/* Tabs Panels */
+.nav-tabs > li > a{color: #000;}
+
+.nav-tabs > li > a,
+.nav-tabs > li > a:hover {
+  border-color: #eeeeee #eeeeee #dddddd;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  color: #8b0000;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-bottom-color: transparent;
+  cursor: default;
+}
+
 /* Slider styles */
 .irs-grid-pol.small {
   height: 0px !important;
