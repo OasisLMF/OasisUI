@@ -20,7 +20,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
   
   ns <- session$ns
   
-  # Reactive Values and parameters ------------------------------------------
+  # Reactive Values and parameters ---------------------------------------------
   
   navigation_state <- reactiveNavigation()
   
@@ -52,7 +52,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
   })
   
   
-  # Run identification -----------------------------------------------------
+  # Run identification ---------------------------------------------------------
   
   #Define reactive value to react if any of the preselected run Ids changes
   observe({
@@ -94,7 +94,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
     }
   })
   
-  # Go to Configure Output button ------------------------------------------
+  # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
     updateNavigation(navigation_state, "PS")
     result$preselPanel <- "4"
@@ -163,7 +163,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
     logMessage = logMessage)
 
 
-  # Helper functions --------------------------------------------------------
+  # Helper functions -----------------------------------------------------------
   #function to split the description field of result$filesListData
   .splitDescription <- function(x){
     y <- unlist(strsplit(x,split = " "))
@@ -171,7 +171,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
     return(z)}
   
   
-  # Module Outout ------------------------------------------------------------
+  # Module Outout --------------------------------------------------------------
   
   moduleOutput <- c(
     outputNavigation(navigation_state),
