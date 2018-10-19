@@ -223,13 +223,6 @@ step2_chooseModel <- function(input, output, session,
     }
   })
 
-  
-  # observer for debugging -----------------------------------------------------
-  observe({
-    print("input$tableProgOasisOOK_rows_selected")
-    print(input$tableProgOasisOOK_rows_selected)
-  })
-  
   # Programme Model Table ------------------------------------------------------
   output$tableProgOasisOOK <- renderDT(
     if (!is.null(result$POData) && nrow(result$POData) > 0 ) {
