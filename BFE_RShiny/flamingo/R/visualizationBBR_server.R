@@ -2,14 +2,11 @@
 #' @rdname visualizationBBR
 #' @description Server logic to define a programme
 #' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater};
 #' @return For \code{visualizationBBR()}, list of reactives.
 #' @template return-outputNavigation
 #' @export
 visualizationBBR <- function(input, output, session, dbSettings, apiSettings,
-                              userId, active = reactive(TRUE), logMessage = message,
-                              reloadMillis = 10000) {
+                              userId, active = reactive(TRUE), logMessage = message) {
 
   ns <- session$ns
 

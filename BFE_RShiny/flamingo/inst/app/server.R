@@ -118,7 +118,6 @@ server <- function(input, output, session) {
     preselRunId =  auth_modules$landingPage$runId,
     processRunId = auth_modules$programmeDefinitionSingle$processRunId,
     logMessage = logMessage,
-    reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "SBR")
   )
 
@@ -128,7 +127,6 @@ server <- function(input, output, session) {
     apiSettings = apiSettings,
     userId = reactive(result$userId),
     logMessage = logMessage,
-    reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "BBR")
   )
 
@@ -138,7 +136,6 @@ server <- function(input, output, session) {
     apiSettings = apiSettings,
     userId = reactive(result$userId),
     logMessage = logMessage,
-    reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "CBR")
   )
 
