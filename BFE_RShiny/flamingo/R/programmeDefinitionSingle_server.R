@@ -20,7 +20,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   
   ns <- session$ns
   
-  # Reactive Values and parameters ------------------------------------------
+  # Reactive Values and parameters ---------------------------------------------
   # Navigation State
   navigation_state <- reactiveNavigation()
   
@@ -31,7 +31,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   stop_selProgID <- check_selProgID <- 0
   stop_selProgOasisID <- check_selProgOasisID <- 0
   
-  # > Reactive Values ---------------------------------------------------------
+  # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # Id of the Process Run
     prrunid = -1,
@@ -61,7 +61,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     progOasisStatus = ""
   )
   
-  # Panels switch ------------------------------------------------------------
+  # Panels switch --------------------------------------------------------------
   # Module to control colors of radio buttons in the singleProgrammeWorkflowSteps
   workflowSteps <- callModule(singleProgrammeWorkflowSteps, "workflowsteps")
   
@@ -94,7 +94,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
   
-  # Sub-Modules --------------------------------------------------
+  # Sub-Modules ----------------------------------------------------------------
   submodulesList$step1_chooseProgramme <- callModule(
     step1_chooseProgramme,
     id = "step1_chooseProgramme",
@@ -139,7 +139,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     POData_rowselected = reactive({result$POData_rowselected})
   )
   
-  # Sub-Modules output ----------------------------------------------------------
+  # Sub-Modules output ---------------------------------------------------------
   # > Navigation ----
   observeEvent(submodulesList$step3_configureOutput$navigationstate(), ignoreInit = TRUE, {
     if (submodulesList$step3_configureOutput$navigationstate() == "SBR") {
@@ -162,7 +162,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     result$prrunid <- submodulesList$step3_configureOutput$prrunid()
   })
   
-  # > selectprogrammeID -----
+  # > selectprogrammeID --------------------------------------------------------
   observeEvent(submodulesList$step1_chooseProgramme$selectprogrammeID(), ignoreInit = TRUE, {
     prgId <- submodulesList$step1_chooseProgramme$selectprogrammeID()
     #Avoid updating input if not necessary
@@ -187,11 +187,14 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     if (input$selectprogrammeID != result$selectprogrammeID) {
       logMessage(paste0("updating input$selectprogrammeID because result$selectprogrammeID changed to: ", result$selectprogrammeID ))
       updateSelectizeInput(session, inputId = "selectprogrammeID", selected = result$selectprogrammeID, choices = result$progChoices)
-    }  
+    }  else if (input$selectprogrammeID == "" && input$selectprogrammeID == result$selectprogrammeID) {
+      logMessage(paste0("updating input$selectprogrammeID choices"))
+      updateSelectizeInput(session, inputId = "selectprogrammeID", selected = character(0), choices = result$progChoices)
+    }
   }
   })
   
-  # > prog Table reactives ----
+  # > prog Table reactives -----------------------------------------------------
   observeEvent(submodulesList$step1_chooseProgramme$DPProgData(), ignoreInit = TRUE,{
     if (is.null(submodulesList$step1_chooseProgramme$DPProgData()) || nrow(submodulesList$step1_chooseProgramme$DPProgData()) == 0) {
       stmt <- buildDbQuery("getProgData")
@@ -222,7 +225,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     result$progStatus <- progStatus
   })
   
-  # > selectprogOasisID -----
+  # > selectprogOasisID --------------------------------------------------------
   observeEvent(submodulesList$step2_chooseModel$selectprogOasisID(), ignoreInit = TRUE, {
     progOasisId <- submodulesList$step2_chooseModel$selectprogOasisID()
     if (!is.null(progOasisId) && result$selectprogOasisID != progOasisId) {
@@ -268,7 +271,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
   
-  # > prog Model Table reactives ----
+  # > prog Model Table reactives -----------------------------------------------
   observeEvent({
     submodulesList$step2_chooseModel$POData()
     result$selectprogrammeID
@@ -308,7 +311,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   
-  # Model Outout ------------------------------------------------------------
+  # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
