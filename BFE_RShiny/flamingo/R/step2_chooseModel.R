@@ -1,6 +1,6 @@
-# step2_chooseModel  Module ----------------
+# step2_chooseModel  Module ----------------------------------------------------
 
-# UI ------------------------------------------
+# UI ---------------------------------------------------------------------------
 #' step2_chooseModel UI
 #' @rdname step2_chooseModel
 #' @description UI/View for the step2_chooseModel
@@ -95,12 +95,12 @@ panelAssociateModel <- function(id) {
         bs_embed_tooltip(title = programme_Definition_Single$sinputProgModTransform,
                          placement = "right")),
 
-    div(flamingoButton(inputId = ns("abuttoncrprogoasis"), label = "Create"), style="float:right;")
+    div(flamingoButton(inputId = ns("abuttoncrprogoasis"), label = "Create"), style = "float:right;")
   )
 }
 
 
-# Server --------------------------------------
+# Server -----------------------------------------------------------------------
 #' step2_chooseModel Server
 #' @rdname step2_chooseModel
 #' @description Server logic to step2_chooseModel
@@ -127,7 +127,7 @@ step2_chooseModel <- function(input, output, session,
 
   ns <- session$ns
 
-  # Reactive Values and parameters -------------------------------------------
+  # Reactive Values and parameters ---------------------------------------------
 
   #number of Rows per Page in a dataable
   pageLength <- 5
@@ -135,7 +135,7 @@ step2_chooseModel <- function(input, output, session,
   #values to stop ping pong effect
   stop_selProgOasisID <- check_selProgOasisID <- 0
   
-  # > Reactive Values ---------------------------------------------------------
+  # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
     selectprogrammeID = "",
@@ -161,7 +161,7 @@ step2_chooseModel <- function(input, output, session,
     result$selectprogOasisID <- selectprogOasisID()
   })
 
-  # Panels Visualization -----------------------------------------------------
+  # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
     if (currstep() == 2 ) {
@@ -171,7 +171,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
 
-  ### Define selectprogrammeID ----
+  # Define selectprogrammeID ---------------------------------------------------
   
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
@@ -184,7 +184,7 @@ step2_chooseModel <- function(input, output, session,
     }
   })
 
-  ### Define selectprogOasisID ----
+  # Define selectprogOasisID ---------------------------------------------------
   observeEvent(result$POData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       if (result$selectprogOasisID != "") {
@@ -223,8 +223,14 @@ step2_chooseModel <- function(input, output, session,
     }
   })
 
-
-  # Programme Model Table --------------------------
+  
+  # observer for debugging -----------------------------------------------------
+  observe({
+    print("input$tableProgOasisOOK_rows_selected")
+    print(input$tableProgOasisOOK_rows_selected)
+  })
+  
+  # Programme Model Table ------------------------------------------------------
   output$tableProgOasisOOK <- renderDT(
     if (!is.null(result$POData) && nrow(result$POData) > 0 ) {
 
@@ -273,7 +279,7 @@ step2_chooseModel <- function(input, output, session,
     }
   })
 
-  # Model Details Table -----
+  # Model Details Table --------------------------------------------------------
   output$tabledisplayprogoasisfiles <- renderDT(
     if (!is.null(result$progFiles) && nrow(result$progFiles) > 0 ) {
 
@@ -321,7 +327,7 @@ step2_chooseModel <- function(input, output, session,
     logMessage("hiding panelModelDetails")
   })
 
-  ### Create Model ------
+  ### Create Model -------------------------------------------------------------
   onclick("buttonassociatemodel", {
     show("panelAssociateModel")
   })
@@ -371,7 +377,7 @@ step2_chooseModel <- function(input, output, session,
     hide("panelAssociateModel")
   })
   
-  # Updates dependent on changed: tableProgOasisOOK_rows_selected ------------
+  # Updates dependent on changed: tableProgOasisOOK_rows_selected --------------
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -412,7 +418,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
 
-  # Help Functions -----------------------------------------------------------
+  # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
     logMessage(".hideDivs called")
@@ -511,7 +517,7 @@ step2_chooseModel <- function(input, output, session,
                          selected = character(0))
   }
   
-  # Model Outout ------------------------------------------------------------
+  # Model Outout ---------------------------------------------------------------
 
   progOasisStatus <- reactive({
     if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {

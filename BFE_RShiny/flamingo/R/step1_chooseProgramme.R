@@ -1,6 +1,6 @@
-# step1_chooseProgramme Module ----------------
+# step1_chooseProgramme Module -------------------------------------------------
 
-# UI ------------------------------------------
+# UI ---------------------------------------------------------------------------
 #' step1_chooseProgramme UI
 #' @rdname step1_chooseProgramme
 #' @description UI/View for the step1_chooseProgramme
@@ -157,7 +157,7 @@ panelDefineProgramme <- function(id) {
   )
 }
 
-# Server --------------------------------------
+# Server -----------------------------------------------------------------------
 #' step1_chooseProgramme Server
 #' @rdname step1_chooseProgramme
 #' @description Server logic to step1_chooseProgramme
@@ -180,7 +180,7 @@ step1_chooseProgramme <- function(input, output, session,
 
   ns <- session$ns
 
-  # Reactive Values and parameters -------------------------------------------
+  # Reactive Values and parameters ---------------------------------------------
 
   #number of Rows per Page in a dataable
   pageLength <- 5
@@ -188,7 +188,7 @@ step1_chooseProgramme <- function(input, output, session,
   #values to stop ping pong effect
   stop_selProgID <- check_selProgID <- 0
   
-  # > Reactive Values ---------------------------------------------------------
+  # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
     selectprogrammeID = "",
@@ -209,7 +209,7 @@ step1_chooseProgramme <- function(input, output, session,
     result$selectprogrammeID <- isolate(selectprogrammeID())
   })
 
-  # Panels Visualization -----------------------------------------------------
+  # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
     if (currstep() == 1 ){
@@ -218,7 +218,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
-  ### Programme Table --------------------------------------------------------
+  ### Programme Table ----------------------------------------------------------
   output$tableDPprog <- renderDT({
     # manual refresh button
     invisible(input$abuttonprgtblrfsh)
@@ -247,7 +247,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
-  # Programme Details Table-----
+  # Programme Details Table ----------------------------------------------------
   output$tableprogdetails <- renderDT({
     if (!is.null(result$progDetails) && nrow(result$progDetails) > 0) {
 
@@ -296,7 +296,7 @@ step1_chooseProgramme <- function(input, output, session,
     logMessage("hiding panelProgrammeDetails")
   })
 
-  # Create / Amend Programme sub-panel -----------------------------------------------
+  # Create / Amend Programme sub-panel -----------------------------------------
   # Create/Amend programme title
   output$paneltitleDefineProgramme <- renderUI({
     if (result$prog_flag == "C" || is.null(input$tableDPprog_rows_selected)) {
@@ -424,7 +424,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
-  ### > Source Files ----------------------------------------------------------
+  ### > Source Files -----------------------------------------------------------
   ### Upload Location/Account File
   .uploadSourceFile <- function(inFile, recordIdString, recordIdCode){
     flc <- getFileLocationPath(dbSettings, "Exposure File")
@@ -670,7 +670,7 @@ step1_chooseProgramme <- function(input, output, session,
 
   output$tableviewSRSfile <-  .renderDTSourceFile(SourceFile = result$viewSRSfile)
 
-  ### Define selectprogrammeID ----
+  ### Define selectprogrammeID -------------------------------------------------
   # Add choices to selectprogrammeID, update selectprogrammeID
   observeEvent(result$DPProgData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -689,7 +689,10 @@ step1_chooseProgramme <- function(input, output, session,
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
     if (active()) {
-      prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+      prgId <- ""
+      if (!is.null(input$tableDPprog_rows_selected)) {
+        prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID] 
+      }
       if (result$selectprogrammeID != prgId) {
         bl_dirty <- stop_selProgID > check_selProgID
         logMessage(paste("--- stop_selProgID is:", stop_selProgID))
@@ -722,7 +725,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
-  # Updates dependent on changed: tableDPprog_rows_selected -------------------
+  # Updates dependent on changed: tableDPprog_rows_selected --------------------
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
@@ -749,7 +752,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
-  # Help Functions -----------------------------------------------------------
+  # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
     logMessage(".hideDivs called")
@@ -887,7 +890,7 @@ step1_chooseProgramme <- function(input, output, session,
                          selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.TranformID]))
   }
 
-  # Model Outout ------------------------------------------------------------
+  # Model Outout ---------------------------------------------------------------
 
   moduleOutput <- c(
     list(
