@@ -15,7 +15,8 @@ step1_chooseProgrammeUI <- function(id) {
     # Section "Choose Programme" = "1"
     div(id = ns("panelProgrammeTable"), panelProgrammeTable(id)),
     hidden(div(id = ns("panelProgrammeDetails"), panelProgrammeDetails(id))),
-    hidden(div(id = ns("panelDefineProgramme"), panelDefineProgramme(id)))
+    hidden(div(id = ns("panelDefineProgramme"), panelDefineProgramme(id))),
+    hidden(div(id = ns("panelLinkFiles"), panelLinkFiles(id)))
   )
 }
 
@@ -102,7 +103,28 @@ panelDefineProgramme <- function(id) {
                bs_embed_tooltip(title = programme_Definition_Single$sinputTransformname,
                                 placement = "right"))),
     fluidRow(column(4,
-                    flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right"),
+                    flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right")
+  )
+}
+
+
+#' Function wrapping panel to link files to a programme
+#' @rdname panelLinkFiles
+#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tagAppendChildren
+#' @importFrom shiny selectizeInput textInput fileInput
+#' @export
+panelLinkFiles <- function(id) {
+  ns <- NS(id)
+  flamingoPanel(
+    collapsible = FALSE,
+    ns("proglink"),
+    heading = tagAppendChildren(
+      h4(""),
+      uiOutput(ns("paneltitleLinkFiles"), inline = TRUE),
+      actionButton(inputId = ns("abuttonhidelinkfilespanel"), label = NULL, icon = icon("times"), style = "float: right;")
+    ),
+    
     fluidRow(
       column(12, h4("Link input files to programme"))),
     fluidRow(
@@ -279,6 +301,8 @@ step1_chooseProgramme <- function(input, output, session,
 
   # Show Programme Details
   onclick("buttonprogdetails", {
+    hide("panelDefineProgramme")
+    hide("panelLinkFiles")
     if (length(input$tableDPprog_rows_selected) > 0) {
       show("panelProgrammeDetails")
       hide("buttonprogdetails")
@@ -316,6 +340,9 @@ step1_chooseProgramme <- function(input, output, session,
 
   # Create Programme
   onclick("buttoncreatepr", {
+    hide("panelProgrammeDetails")
+    show("buttonprogdetails")
+    hide("panelLinkFiles")
     result$prog_flag <- "C"
     #clear fields
     .clearDPAccountSelection()
@@ -328,6 +355,9 @@ step1_chooseProgramme <- function(input, output, session,
 
   ### Amend Programme
   onclick("buttonamendpr", {
+    hide("panelProgrammeDetails")
+    show("buttonprogdetails")
+    .defaultCreateProg()
     if (length(input$tableDPprog_rows_selected) > 0) {
       # TODO: review where/when/how this should be set
       result$prog_flag <- "A"
@@ -337,6 +367,7 @@ step1_chooseProgramme <- function(input, output, session,
       .clearSourceFilesSelection()
       .updateTransformNameSelection()
       show("panelDefineProgramme")
+      show("panelLinkFiles")
       logMessage("showing panelDefineProgramme")
     } else {
       flamingoNotification(type = "warning", "Please select a Programme to Amend")
@@ -382,6 +413,7 @@ step1_chooseProgramme <- function(input, output, session,
     selectRows(dataTableProxy("tableDPprog"), idxSel)
     selectPage(dataTableProxy("tableDPprog"), pageSel)
     logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+    show("panelLinkFiles")
   })
 
   ### Clear Programme Definition panel
@@ -392,7 +424,27 @@ step1_chooseProgramme <- function(input, output, session,
     .clearSourceFilesSelection()
     .clearTransformNameSelection()
   })
+  
+  # > Link files to Programme --------------------------------------------------
 
+  # Link files to programme title
+  output$paneltitleLinkFiles <- renderUI({
+      progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+      progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
+      progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
+      if (result$prog_flag == "C") {
+        paste0('Provide Inputs to Programme id ', progId, ' ', progName)
+      } else {
+        paste0('Amend Inputs to Programme id ', progId, ' ', progName)
+      }
+      
+  })
+
+  # Hide Link files Panel
+  onclick("abuttonhidelinkfilespanel", {
+    hide("panelLinkFiles")
+  })
+  
   ### Load Programme Button
   onclick("buttonloadcanmodpr", {
     progId = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
@@ -409,10 +461,16 @@ step1_chooseProgramme <- function(input, output, session,
       flamingoNotification(type = "error", "Failed to load programme data")
     }
     .reloadDPProgData()
+    .hideDivs()
+    .defaultCreateProg()
   })
 
   # Delete Programme
   onclick("buttondeletepr",{
+    show("buttonprogdetails")
+    hide("panelProgrammeDetails")
+    hide("panelDefineProgramme")
+    hide("panelLinkFiles")
     if (length(input$tableDPprog_rows_selected) > 0) {
       stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
       executeDbQuery(dbSettings, stmt)
@@ -561,11 +619,11 @@ step1_chooseProgramme <- function(input, output, session,
     } else if (input$sinputSRFile == "S") {
       show("divSRFileSelect")
       hide("divSRFileUpload")
-      #*********SRfiles <- getFileSourceAccountFile(dbSettings)
-      #********* updateSelectInput(
-      #*********  session, "sinputselectSRFile",
-      #*********  choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
-      #*********)
+      SRfiles <- getFileSourceAccountFile(dbSettings)
+      updateSelectInput(
+        session, "sinputselectSRFile",
+        choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
+      )
     }
   })
 
@@ -583,11 +641,11 @@ step1_chooseProgramme <- function(input, output, session,
     } else if (input$sinputSRSFile == "S") {
       show("divSRSFileSelect")
       hide("divSRSFileUpload")
-      #*********SRfiles <- getFileSourceAccountFile(dbSettings)
-      #********* updateSelectInput(
-      #*********  session, "sinputselectSRFile",
-      #*********  choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
-      #*********)
+      SRfiles <- getFileSourceAccountFile(dbSettings)
+      updateSelectInput(
+        session, "sinputselectSRFile",
+        choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
+      )
     }
   })
 
@@ -733,8 +791,7 @@ step1_chooseProgramme <- function(input, output, session,
       hide("panelProgrammeDetails")
       show("buttonprogdetails")
       hide("panelDefineProgramme")
-
-
+      
       if (length(input$tableDPprog_rows_selected) > 0) {
         # note that tableDPprog allows single row selection only
         prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
@@ -760,6 +817,7 @@ step1_chooseProgramme <- function(input, output, session,
     hide("panelProgrammeTable")
     hide("panelProgrammeDetails")
     hide("panelDefineProgramme")
+    hide("panelLinkFiles")
   }
 
   #show default view for Section "Choose Programme" = "1"
