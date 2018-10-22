@@ -63,7 +63,6 @@ outputfiles <- function(input, output, session, dbSettings,
     id = "ViewOutputFilesModule",
     filesListData =  filesListDatatoview,
     logMessage = logMessage,
-    includemrows = FALSE,
     includechkbox = TRUE)
   
   sub_modules$ViewFilesModule <- callModule(
@@ -71,6 +70,5 @@ outputfiles <- function(input, output, session, dbSettings,
     id = "ViewInputFilesModule",
     filesListData =  reactive(NULL),
     logMessage = logMessage,
-    includemrows = FALSE,
     includechkbox = TRUE)
 }

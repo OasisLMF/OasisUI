@@ -153,3 +153,12 @@ prcrundata.ProcessRunName <- "ProcessRunName" #reactive(names(result$prcrundata)
 prcrundata.ProgOasisID <- "ProgOasisID" #reactive(names(result$prcrundata)[3])
 prcrundata.ProcessRunStatus <- "Status" #reactive(names(result$prcrundata)[4])
 prcrundata.ProcessRunStatus.old <- "ProcessRunStatus"
+
+
+### Creating Variables for  col names of filesListData
+# result$filesListData
+# "FileID", "File Name", "Description", "Location","Location Unix", "File Type", "Owner", "Resource Table", "Resource Key"
+filesListData.fileID <- "FileID"
+filesListData.fileName <- "File Name"
+filesListData.path <- "Location Unix"
+filesListData.key <- "Resource Key"
