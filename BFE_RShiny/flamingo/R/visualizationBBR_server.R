@@ -44,16 +44,19 @@ visualizationBBR <- function(input, output, session, dbSettings,
   observeEvent(active(), {
     result$preselPanel <- "1"
   })
+
+  # Selected runID -------------------------------------------------------------
+  sub_modules$defineID <- callModule(
+    defineID,
+    id = "defineID",
+    runIdList = runIdList,
+    preselectedRunId = reactive(result$preselectedRunId),
+    logMessage = logMessage)
   
-  # Run identification ---------------------------------------------------------
-  
-  #Update list of options
-  observeEvent(result$preselectedRunId, {
-    index <- match(c(result$preselectedRunId), runIdList()$RunID)
-    if (!is.null(index) & !is.na(index)) {
-      updateSelectInput(session, inputId = "selectBatchRunID", choices = runIdList()$RunID, selected = runIdList()$RunID[index])
-    }
+  selectRunID <- reactive({
+    sub_modules$defineID$selectRunID()
   })
+
   
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotobatchconfig, {
@@ -64,8 +67,8 @@ visualizationBBR <- function(input, output, session, dbSettings,
 
   # Tab Summary ----------------------------------------------------------------
   sub_modules$summary <- callModule(
-    summary,
-    id = "summary",
+    summarytab,
+    id = "summarytab",
     selectRunID = reactive(input$selectRunID1),
     dbSettings = dbSettings,
     apiSettings = apiSettings,
@@ -92,7 +95,7 @@ visualizationBBR <- function(input, output, session, dbSettings,
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
-    selectRunID = reactive(input$selectBatchRunID),
+    selectRunID = reactive(selectRunID()),
     filesListData =  reactive({result$filesListData}),
     n_panels = n_panels,
     dbSettings = dbSettings,

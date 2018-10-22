@@ -7,7 +7,7 @@
 visualizationSBR(input, output, session, dbSettings, apiSettings, userId,
   runIdList = reactive(c(-1)), preselRunId = reactive(-1),
   processRunId = reactive(-1), active = reactive(TRUE),
-  logMessage = message, reloadMillis = 10000)
+  logMessage = message)
 }
 \arguments{
 \item{input}{shiny input object}
@@ -29,9 +29,6 @@ visualizationSBR(input, output, session, dbSettings, apiSettings, userId,
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages}
-
-\item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater}}
 }
 \value{
 list of reactives:

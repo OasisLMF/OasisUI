@@ -5,7 +5,7 @@
 \title{Module for Output Panel}
 \usage{
 panelOutputModule(input, output, session, logMessage = message,
-  filesListData, active)
+  filesListData = reactive(NULL), active)
 }
 \arguments{
 \item{input}{shiny input object}

@@ -79,12 +79,27 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     }
   })
   
-  #Update list of options
-  observeEvent(result$preselectedRunId, {
-    index <- match(c(result$preselectedRunId), runIdList()$RunID)
-    if (!is.null(index) & !is.na(index)) {
-      updateSelectInput(session, inputId = "selectRunID1", choices = runIdList()$RunID, selected = runIdList()$RunID[index])
-    }
+  # Selected runID -------------------------------------------------------------
+  sub_modules$defineID1 <- callModule(
+    defineID,
+    id = "defineID-1",
+    runIdList = runIdList,
+    preselectedRunId = reactive(result$preselectedRunId),
+    logMessage = logMessage)
+  
+  selectRunID1 <- reactive({
+    sub_modules$defineID1$selectRunID()
+  })
+  
+  sub_modules$defineID2 <- callModule(
+    defineID,
+    id = "defineID-2",
+    runIdList = runIdList,
+    preselectedRunId = reactive(result$preselectedRunId),
+    logMessage = logMessage)
+  
+  selectRunID2 <- reactive({
+    sub_modules$defineID2$selectRunID()
   })
   
   # Go to Configure Output button ----------------------------------------------
@@ -95,9 +110,9 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   
   # Tab Summary ----------------------------------------------------------------
   sub_modules$summary <- callModule(
-    summary,
-    id = "summary",
-    selectRunID = reactive(input$selectRunID1),
+    summarytab,
+    id = "summarytab",
+    selectRunID = reactive(selectRunID1()),
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     userId = userId,
@@ -123,7 +138,7 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
-    selectRunID = reactive(input$selectRunID1),
+    selectRunID = reactive(selectRunID1()),
     filesListData =  reactive({result$filesListData}),
     n_panels = n_panels,
     dbSettings = dbSettings,

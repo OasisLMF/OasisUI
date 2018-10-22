@@ -14,14 +14,14 @@ visualizationSBRUI <- function(id) {
   tagList(
     
     # h4("Browse Run Outputs", class = "flamingo-page-title") ,
-    panelDefineRunID(id),
+    defineRunID(id),
     
     tabsetPanel(
       id = ns("tabsSBR"),
       
       tabPanel(
         title = "Summary",
-        summaryUI(ns("summary")),
+        summarytabUI(ns("summarytab")),
         value = ns("tabsummary")
       ),
       
@@ -42,24 +42,25 @@ visualizationSBRUI <- function(id) {
   
 }
 
-# UI Functions -----------------------------------------------------------------
-#' @title panelDefineRunID
-#' @rdname panelDefineRunID
+# UI Function ------------------------------------------------------------------
+#' @title defineRunID
+#' @rdname defineRunID
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel
 #' @importFrom bsplus bs_embed_tooltip
 #' @export
-panelDefineRunID <-  function(id){
+
+defineRunID <- function(id){
+
   ns <- NS(id)
+  w <- 6
+  labelconfig <- "Go to Configure Output"
+ 
   panel(
     status = "primary",
     fluidRow(
-      column(6,
-             selectInput(inputId =  ns("selectRunID"), label = "Run ID", choices = "", selected = NULL) %>%
-               bs_embed_tooltip(title = browse_programmes$selectRunID, placement = "right")),
-      column(6,
+      defineIDUI(ns("defineID"), w, batch = FALSE),
+      column(w,
              align = "right",
-             actionButton(inputId = ns("abuttongotoconfig"), label = "Go to Configure Output"))
+             actionButton(inputId = ns("abuttongotoconfig"), label = labelconfig)))
     )
-  )
 }

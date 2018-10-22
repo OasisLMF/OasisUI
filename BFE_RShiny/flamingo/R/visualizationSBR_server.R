@@ -86,12 +86,16 @@ visualizationSBR <- function(input, output, session, dbSettings,
     }
   })
   
-  #Update list of options
-  observeEvent(result$preselectedRunId, {
-    index <- match(c(result$preselectedRunId), runIdList()$RunID)
-    if (!is.null(index) & !is.na(index)) {
-      updateSelectInput(session, inputId = "selectRunID", choices = runIdList()$RunID, selected = runIdList()$RunID[index])
-    }
+  # Selected runID -------------------------------------------------------------
+  sub_modules$defineID <- callModule(
+    defineID,
+    id = "defineID",
+    runIdList = runIdList,
+    preselectedRunId = reactive(result$preselectedRunId),
+    logMessage = logMessage)
+  
+  selectRunID <- reactive({
+    sub_modules$defineID$selectRunID()
   })
   
   # Go to Configure Output button ----------------------------------------------
@@ -102,9 +106,9 @@ visualizationSBR <- function(input, output, session, dbSettings,
   
   # Tab Summary ----------------------------------------------------------------
   sub_modules$summary <- callModule(
-    summary,
-    id = "summary",
-    selectRunID = reactive(input$selectRunID),
+    summarytab,
+    id = "summarytab",
+    selectRunID = reactive(selectRunID()),
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     userId = userId,
@@ -113,12 +117,12 @@ visualizationSBR <- function(input, output, session, dbSettings,
  
   
   # Extract Output files for given runID----------------------------------------
-  observeEvent( input$selectRunID, {if (input$selectRunID != "") {
+  observeEvent( selectRunID(), {if (!is.na(selectRunID()) && selectRunID() != "") {
     if (!is.null(runIdList())) {
-      index <- match(c(input$selectRunID), runIdList()$RunID)
+      index <- match(c(selectRunID()), runIdList()$RunID)
       status <- runIdList()[index, "Status"]
       if (!is.na(status) && status == StatusCompleted) {
-        result$filesListData <- getFileList(dbSettings, input$selectRunID)
+        result$filesListData <- getFileList(dbSettings, selectRunID())
         result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
       } else {
         result$filesListData <- NULL
@@ -153,7 +157,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
-    selectRunID = reactive(input$selectRunID),
+    selectRunID = reactive(selectRunID()),
     filesListData =   reactive({result$filesListData}),
     n_panels = n_panels,
     dbSettings = dbSettings,

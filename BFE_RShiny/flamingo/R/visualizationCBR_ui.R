@@ -8,19 +8,19 @@
 #' @return list of tags
 #' @export
 visualizationCBRUI <- function(id) {
-
+  
   ns <- NS(id)
   
   tagList(
     
-    panelDefineCompareRunIDs(id),
+    defineCompareRunIDs(id),
     
     tabsetPanel(
       id = ns("tabsCBR"),
       
       tabPanel(
         title = "Summary",
-        summaryUI(ns("summary")),
+        summarytabUI(ns("summarytab")),
         value = ns("tabsummary")
       ),
       
@@ -42,27 +42,26 @@ visualizationCBRUI <- function(id) {
 }
 
 
-# UI Functions -----------------------------------------------------------------
-#' @title panelDefineCompareRunIDs
-#' @rdname panelDefineCompareRunIDs
+# UI Function ------------------------------------------------------------------
+#' @title defineCompareRunIDs
+#' @rdname defineCompareRunIDs
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel
 #' @importFrom bsplus bs_embed_tooltip
 #' @export
-panelDefineCompareRunIDs <-  function(id){
+
+defineCompareRunIDs <- function(id){
+  
   ns <- NS(id)
+  w <- 4
+  labelconfig <- "Go to Configure Output"
+  
   panel(
     status = "primary",
     fluidRow(
-      column(4,
-             selectInput(inputId =  ns("selectRunID1"), label = "Run ID 1", choices = "", selected = NULL) %>%
-               bs_embed_tooltip(title = browse_programmes$selectRunID, placement = "right")),
-      column(4,
-             selectInput(inputId =  ns("selectRunID2"), label = "Run ID 2", choices = "", selected = NULL) %>%
-               bs_embed_tooltip(title = browse_programmes$selectRunID, placement = "right")),
-      column(4,
+      defineIDUI(ns("defineID-1"), w, batch = FALSE),
+      defineIDUI(ns("defineID-2"), w, batch = FALSE),
+      column(w,
              align = "right",
-             actionButton(inputId = ns("abuttongotoconfig"), label = "Go to Batch Configure Output"))
-    )
+             actionButton(inputId = ns("abuttongotoconfig"), label = labelconfig)))
   )
 }

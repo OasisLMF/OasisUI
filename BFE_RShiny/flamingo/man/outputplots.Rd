@@ -6,7 +6,8 @@
 Run outputplots Server}
 \usage{
 outputplots(input, output, session, dbSettings, apiSettings, userId,
-  selectRunID, n_panels, filesListData, active, logMessage = message)
+  selectRunID, n_panels, filesListData = reactive(NULL), active,
+  logMessage = message)
 }
 \arguments{
 \item{input}{shiny input object}

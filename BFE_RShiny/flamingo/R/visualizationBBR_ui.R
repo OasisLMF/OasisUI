@@ -8,19 +8,19 @@
 #' @return list of tags
 #' @export
 visualizationBBRUI <- function(id) {
-
+  
   ns <- NS(id)
   
   tagList(
     
-    panelDefineBatchRunID(id),
+    defineBatchRunID(id),
     
     tabsetPanel(
       id = ns("tabsBBR"),
       
       tabPanel(
         title = "Summary",
-        summaryUI(ns("summary")),
+        summarytabUI(ns("summarytab")),
         value = ns("tabsummary")
       ),
       
@@ -38,27 +38,29 @@ visualizationBBRUI <- function(id) {
       
     )
   )
-
+  
 }
 
-# UI Functions -----------------------------------------------------------------
-#' @title panelDefineBatchRunID
-#' @rdname panelDefineBatchRunID
+
+# UI Function ------------------------------------------------------------------
+#' @title defineBatchRunID
+#' @rdname defineBatchRunID
 #' @inheritParams flamingoModuleUI
-#' @importFrom shinyWidgets panel
 #' @importFrom bsplus bs_embed_tooltip
 #' @export
-panelDefineBatchRunID <-  function(id){
+
+defineBatchRunID <- function(id){
+  
   ns <- NS(id)
+  w <- 6
+  labelconfig <- "Go to Configure Batch Output"
+  
   panel(
     status = "primary",
     fluidRow(
-      column(6,
-             selectInput(inputId =  ns("selectBatchRunID"), label = "Batch Run ID", choices = "", selected = NULL) %>%
-               bs_embed_tooltip(title = browse_programmes$selectBatchRunID, placement = "right")),
-      column(6,
+      defineIDUI(ns("defineID"), w, batch = TRUE),
+      column(w,
              align = "right",
-             actionButton(inputId = ns("abuttongotobatchconfig"), label = "Go to Batch Configure Output"))
-    )
+             actionButton(inputId = ns("abuttongotoconfig"), label = labelconfig)))
   )
 }

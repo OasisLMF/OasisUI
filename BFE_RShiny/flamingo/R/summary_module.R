@@ -1,16 +1,16 @@
 # Summary Module ---------------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' @title summary_ui
+#' @title summarytab_ui
 #' Run Summary UI
-#' @rdname summaryUI
+#' @rdname summarytabUI
 #' @description Summary elements of a Run
 #' @inheritParams flamingoModuleUI
 #' @return list of tags
 #' @importFrom shinyWidgets panel
 #' @importFrom bsplus bs_embed_tooltip
 #' @export
-summaryUI <- function(id) {
+summarytabUI <- function(id) {
   
   ns <- NS(id)
   
@@ -39,9 +39,9 @@ panelSummaryTableModuleUI <-  function(id){
 
 # Server -----------------------------------------------------------------------
 
-#' @title summary_server
+#' @title summarytab_server
 #' Run Summary Server
-#' @rdname summary
+#' @rdname summarytab
 #' @description Summary elements of a Run
 #' @inheritParams flamingoModule
 #' @return list of tags
@@ -50,7 +50,7 @@ panelSummaryTableModuleUI <-  function(id){
 #' @importFrom dplyr mutate select contains filter
 #' @export
 #' @export
-summary <- function(input, output, session, dbSettings,
+summarytab <- function(input, output, session, dbSettings,
                     apiSettings, userId,
                     selectRunID, active, logMessage = message) {
   
