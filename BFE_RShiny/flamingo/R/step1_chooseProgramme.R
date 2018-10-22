@@ -38,9 +38,12 @@ panelProgrammeTable <- function(id) {
     ),
     DTOutput(ns("tableDPprog")),
     flamingoButton(ns("buttoncreatepr"), "Create Programme", align = "centre"),
-    flamingoButton(ns("buttonamendpr"), "Amend Programme", align = "centre"),
-    flamingoButton(ns("buttondeletepr"), "Delete Programme", align = "centre"),
-    flamingoButton(ns("buttonprogdetails"), "Show Details", align = "centre"),
+    flamingoButton(ns("buttonamendpr"), "Amend Programme", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$buttonamendpr, placement = "right"),
+    flamingoButton(ns("buttondeletepr"), "Delete Programme", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$buttondeletepr, placement = "right"),
+    flamingoButton(ns("buttonprogdetails"), "Show Details", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$buttonprogdetails, placement = "right"),
     actionButton(ns("buttonpgotonextstep"), "Proceed to Choose Model", style = "float:right")
   )
 }
@@ -103,7 +106,8 @@ panelDefineProgramme <- function(id) {
                bs_embed_tooltip(title = programme_Definition_Single$sinputTransformname,
                                 placement = "right"))),
     fluidRow(column(4,
-                    flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right")
+                    flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttonProgSubmit, placement = "right")
   )
 }
 
@@ -124,7 +128,7 @@ panelLinkFiles <- function(id) {
       uiOutput(ns("paneltitleLinkFiles"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelinkfilespanel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    
+
     fluidRow(
       column(12, h4("Link input files to programme"))),
     fluidRow(
@@ -209,8 +213,8 @@ step1_chooseProgramme <- function(input, output, session,
 
   #values to stop ping pong effect
   stop_selProgID <- check_selProgID <- 0
-  
-  # > Reactive Values ----------------------------------------------------------
+
+  # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
     selectprogrammeID = "",
@@ -299,17 +303,31 @@ step1_chooseProgramme <- function(input, output, session,
     paste0('Details of Programme id ', progId, ' ', progName)
   })
 
+  # Enable and disable buttons
+  observeEvent (input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (length(input$tableDPprog_rows_selected) > 0) {
+      shinyjs::enable("buttonprogdetails")
+      shinyjs::enable("buttondeletepr")
+      shinyjs::enable("buttonamendpr")
+      shinyjs::enable("buttonpgotonextstep")
+
+    } else {
+      shinyjs::disable("buttonprogdetails")
+      shinyjs::disable("buttondeletepr")
+      shinyjs::disable("buttonamendpr")
+      shinyjs::disable("buttonpgotonextstep")
+
+    }
+  })
+
   # Show Programme Details
   onclick("buttonprogdetails", {
     hide("panelDefineProgramme")
     hide("panelLinkFiles")
     if (length(input$tableDPprog_rows_selected) > 0) {
       show("panelProgrammeDetails")
-      hide("buttonprogdetails")
       logMessage("showing panelProgrammeDetails")
       .reloadProgDetails()
-    } else {
-      flamingoNotification(type = "warning", "Please select a Programme first")
     }
   })
 
@@ -369,10 +387,21 @@ step1_chooseProgramme <- function(input, output, session,
       show("panelDefineProgramme")
       show("panelLinkFiles")
       logMessage("showing panelDefineProgramme")
-    } else {
-      flamingoNotification(type = "warning", "Please select a Programme to Amend")
     }
   })
+
+  # to enable and disable submit button for create programme
+  observeEvent({
+    input$tinputDPProgName
+    input$sinputDPAccountName
+    input$sinputTransformname
+    }, ignoreInit = TRUE, {
+      if (input$tinputDPProgName == "" || input$sinputDPAccountName == "" || input$sinputTransformname == "") {
+        shinyjs::disable("abuttonProgSubmit")
+      } else {
+        shinyjs::enable("abuttonProgSubmit")
+      }
+    })
 
   ### Submit Button
   onclick("abuttonProgSubmit", {
@@ -384,8 +413,7 @@ step1_chooseProgramme <- function(input, output, session,
                       input$sinputTransformname, "]")
       res <- executeDbQuery(dbSettings, query)
       if (is.null(res)) {
-        flamingoNotification(type = "error",
-                         paste("Failed to create a Programme - ", input$tinputDPProgName))
+
       } else {
         flamingoNotification(type = "message",
                          paste("Programme ", input$tinputDPProgName, " created."))
@@ -424,7 +452,7 @@ step1_chooseProgramme <- function(input, output, session,
     .clearSourceFilesSelection()
     .clearTransformNameSelection()
   })
-  
+
   # > Link files to Programme --------------------------------------------------
 
   # Link files to programme title
@@ -437,14 +465,14 @@ step1_chooseProgramme <- function(input, output, session,
       } else {
         paste0('Amend Inputs to Programme id ', progId, ' ', progName)
       }
-      
+
   })
 
   # Hide Link files Panel
   onclick("abuttonhidelinkfilespanel", {
     hide("panelLinkFiles")
   })
-  
+
   ### Load Programme Button
   onclick("buttonloadcanmodpr", {
     progId = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
@@ -471,15 +499,11 @@ step1_chooseProgramme <- function(input, output, session,
     hide("panelProgrammeDetails")
     hide("panelDefineProgramme")
     hide("panelLinkFiles")
-    if (length(input$tableDPprog_rows_selected) > 0) {
       stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
       executeDbQuery(dbSettings, stmt)
       flamingoNotification(type = "message",
                        sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
       .reloadDPProgData()
-    } else {
-      flamingoNotification(type = "warning", "Please select a Programme to Delete")
-    }
   })
 
   ### > Source Files -----------------------------------------------------------
@@ -749,7 +773,7 @@ step1_chooseProgramme <- function(input, output, session,
     if (active()) {
       prgId <- ""
       if (!is.null(input$tableDPprog_rows_selected)) {
-        prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID] 
+        prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
       }
       if (result$selectprogrammeID != prgId) {
         bl_dirty <- stop_selProgID > check_selProgID
@@ -791,7 +815,7 @@ step1_chooseProgramme <- function(input, output, session,
       hide("panelProgrammeDetails")
       show("buttonprogdetails")
       hide("panelDefineProgramme")
-      
+
       if (length(input$tableDPprog_rows_selected) > 0) {
         # note that tableDPprog allows single row selection only
         prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]

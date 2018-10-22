@@ -83,19 +83,23 @@ accountDefinition <- function(input, output, session, dbSettings,
     updateTextInput(session, "tinputDAAccountName", value = "")
   })
 
-  onclick("buttonamendac", {
-    if (length(row <- input$tableDAAccount_rows_selected) > 0) {
+  # Enable and disable buttons
+  observeEvent (input$tableDAAccount_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      if (length(row <- input$tableDAAccount_rows_selected) > 0) {
+        shinyjs::enable("buttonamendac")
+        shinyjs::enable("buttondeleteac")
+      } else {
+        shinyjs::disable("buttonamendac")
+        shinyjs::disable("buttondeleteac")
+      }
+    })
 
+  onclick("buttonamendac", {
       result$accFlag <- "A"
 
       showModal(.crtupModal())
       updateTextInput(session, "tinputDAAccountName",
                       value = result$DAAccountData[row, 2])
-
-    } else {
-      flamingoNotification(type = "warning",
-                       "Please select an Account to Amend")
-    }
   })
 
   onclick("abuttonAccSubmit", {
@@ -190,15 +194,9 @@ accountDefinition <- function(input, output, session, dbSettings,
       stmt <- buildDbQuery("deleteAccount", result$DAAccountData[row ,1])
       res <- executeDbQuery(dbSettings, stmt)
 
-      if (is.null(res)) {
-        flamingoNotification(type = "message",
-                         sprintf("Failed to delete account %s",
-                                 result$DAAccountData[row, 2]))
-      } else {
         flamingoNotification(type = "message",
                          sprintf("Account %s deleted",
                                  result$DAAccountData[row, 2]))
-      }
 
     }
 

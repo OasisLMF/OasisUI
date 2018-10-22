@@ -37,7 +37,8 @@ panelProgrammeModelTable <- function(id) {
       actionButton(inputId = ns("abuttonookrefresh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableProgOasisOOK")),
-    flamingoButton(ns("buttonmodeldetails"), "Show Details", align = "centre"),
+    flamingoButton(ns("buttonmodeldetails"), "Show Details", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$buttonmodeldetails, placement = "right"),
     flamingoButton(ns("buttonassociatemodel"), "Create Model Association", align = "centre"),
     actionButton(ns("buttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
   )
@@ -95,7 +96,8 @@ panelAssociateModel <- function(id) {
         bs_embed_tooltip(title = programme_Definition_Single$sinputProgModTransform,
                          placement = "right")),
 
-    div(flamingoButton(inputId = ns("abuttoncrprogoasis"), label = "Create"), style = "float:right;")
+    div(flamingoButton(inputId = ns("abuttoncrprogoasis"), label = "Create"), style = "float:right;") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttoncrprogoasis, placement = "right")
   )
 }
 
@@ -134,7 +136,7 @@ step2_chooseModel <- function(input, output, session,
 
   #values to stop ping pong effect
   stop_selProgOasisID <- check_selProgOasisID <- 0
-  
+
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
@@ -172,7 +174,7 @@ step2_chooseModel <- function(input, output, session,
 
 
   # Define selectprogrammeID ---------------------------------------------------
-  
+
   # If selectprogrammeID changes, reload programme model table and set view back to default
   observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
     logMessage(paste0("updating Programme Model Table because result$selectprogrammeID changed to ", result$selectprogrammeID))
@@ -301,17 +303,26 @@ step2_chooseModel <- function(input, output, session,
     paste0('Details of Model Association id ', progOasisId, ' ', progOasisName)
   })
 
+  # Enable and disable buttons
+  observeEvent ({
+    result$POData
+    input$tableProgOasisOOK_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (length(input$tableProgOasisOOK_rows_selected) > 0) {
+      shinyjs::enable("buttonmodeldetails")
+      shinyjs::enable("buttonpgotonextstep")
+    } else {
+      shinyjs::disable("buttonmodeldetails")
+      shinyjs::disable("buttonpgotonextstep")
+    }
+  })
+
   ### Show/hide Programme Model Details Panel
   onclick("buttonmodeldetails", {
     logMessage("showing panelModelDetails")
     .reloadProgFiles()
-    if (length(input$tableProgOasisOOK_rows_selected) > 0) {
-      hide("buttonmodeldetails")
-      show("panelModelDetails")
-      logMessage("showing panelModelDetails")
-    } else {
-      flamingoNotification(type = "warning", "Please select a Programme Model first")
-    }
+    hide("buttonmodeldetails")
+    show("panelModelDetails")
+    logMessage("showing panelModelDetails")
   })
 
   onclick("buttonhidemodeldetails", {
@@ -324,52 +335,58 @@ step2_chooseModel <- function(input, output, session,
   onclick("buttonassociatemodel", {
     show("panelAssociateModel")
   })
-  
+
+  # Enable and disable create button
+  observeEvent (selectprogrammeID, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (isolate(result$selectprogrammeID) > 0 && isolate(input$sinputookmodelid) > 0) {
+      shinyjs::enable("abuttoncrprogoasis")
+    } else {
+      shinyjs::disable("abuttoncrprogoasis")
+    }
+
+  })
+
   onclick("abuttoncrprogoasis", {
     if (progStatus() == "- Status: Completed") {
-      if (isolate(result$selectprogrammeID) > 0 && isolate(input$sinputookmodelid) > 0) {
-        prgId <- createProgOasis(dbSettings,
-                                 isolate(result$selectprogrammeID),
-                                 isolate(input$sinputookmodelid),
-                                 isolate(input$sinputProgModTransform))
-        prgId <- ifelse(is.null(prgId), -1, prgId)
-        if (prgId == -1) {
-          flamingoNotification(type = "error", paste("No Prog Oasis created"))
+      prgId <- createProgOasis(dbSettings,
+                               isolate(result$selectprogrammeID),
+                               isolate(input$sinputookmodelid),
+                               isolate(input$sinputProgModTransform))
+      prgId <- ifelse(is.null(prgId), -1, prgId)
+      if (prgId == -1) {
+        flamingoNotification(type = "error", paste("No Prog Oasis created"))
+      } else {
+        flamingoNotification(type = "message", paste("Prog Oasis id:",prgId, " created"))
+        .clearOOKSidebar()
+        .defaultAssociateModel()
+        .reloadPOData()
+        logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
+        idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
+        pageSel <- ceiling(idxSel/pageLength)
+        selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
+        selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
+        logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+        loadprogmodel <- loadProgrammeModel(
+          apiSettings,
+          progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId])
+        )
+        if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
+          flamingoNotification(type = "message", "Initiating load programme model...")
+          #.reloadProgFiles()
         } else {
-          flamingoNotification(type = "message", paste("Prog Oasis id:",prgId, " created"))
-          .clearOOKSidebar()
-          .defaultAssociateModel()
-          .reloadPOData()
-          logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
-          idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
-          pageSel <- ceiling(idxSel/pageLength)
-          selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
-          selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
-          logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
-          loadprogmodel <- loadProgrammeModel(
-            apiSettings,
-            progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId])
-          )
-          if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
-            flamingoNotification(type = "message", "Initiating load programme model...")
-            #.reloadProgFiles()
-          } else {
-            flamingoNotification(type = "error", "Failed to load programme model")
-          }
+          flamingoNotification(type = "error", "Failed to load programme model")
         }
-      } else{
-        flamingoNotification(type = "warning", "Please select both the fields")
       }
     } else {
       flamingoNotification(type = "error", "Please select a completed Programme first")
     }
   })
-  
+
   # Hide Programme Definition Panel
   onclick("abuttonhideassociatemodel", {
     hide("panelAssociateModel")
   })
-  
+
   # Updates dependent on changed: tableProgOasisOOK_rows_selected --------------
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -378,7 +395,7 @@ step2_chooseModel <- function(input, output, session,
       show("buttonmodeldetails")
       hide("panelModelDetails")
       hide("panelDefineProgramme")
-      
+
       # Show perils according to programme model
       if (length(input$tableProgOasisOOK_rows_selected) > 0 ) {
         prgId <- result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId]
@@ -492,8 +509,8 @@ step2_chooseModel <- function(input, output, session,
       options = list(searchHighlight = TRUE)
     )
   }
-  
-  
+
+
   .clearOOKModelSelection <- function() {
     logMessage(".clearOOKModelSelection called")
     models <- getModelList(dbSettings)
@@ -509,7 +526,7 @@ step2_chooseModel <- function(input, output, session,
                          choices = createSelectOptions(transforms, "Select Transform", labelCol = 1, valueCol = 2),
                          selected = character(0))
   }
-  
+
   # Model Outout ---------------------------------------------------------------
 
   progOasisStatus <- reactive({
