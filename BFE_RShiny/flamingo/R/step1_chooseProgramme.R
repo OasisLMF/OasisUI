@@ -636,7 +636,7 @@ step1_chooseProgramme <- function(input, output, session,
     } else if (input$sinputSRFile == "S") {
       show("divSRFileSelect")
       hide("divSRFileUpload")
-      SRfiles <- getFileSourceAccountFile(dbSettings)
+      SRfiles <- getFileSourceReinsuranceFile(dbSettings)
       updateSelectInput(
         session, "sinputselectSRFile",
         choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
