@@ -4,13 +4,11 @@
 \alias{defineID}
 \title{defineID Module}
 \usage{
-defineID(input, output, session, apiSettings, userId,
-  runIdList = reactive(c(-1)), preselectedRunId = reactive(-1),
-  logMessage = message)
+defineID(input, output, session, runIdList = reactive(c(-1)),
+  preselectedRunId = reactive(-1), logMessage = message)
 
-defineID(input, output, session, apiSettings, userId,
-  runIdList = reactive(c(-1)), preselectedRunId = reactive(-1),
-  logMessage = message)
+defineID(input, output, session, runIdList = reactive(c(-1)),
+  preselectedRunId = reactive(-1), logMessage = message)
 }
 \arguments{
 \item{input}{shiny input object}
@@ -18,8 +16,6 @@ defineID(input, output, session, apiSettings, userId,
 \item{output}{shiny output object}
 
 \item{session}{shiny session object}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{runIdList}{list of runs and their status}
 

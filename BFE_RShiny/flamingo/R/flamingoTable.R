@@ -28,6 +28,8 @@ flamingoTable <- function(input, output, session,
                           selection = "none",
                           escape = TRUE,
                           scrollX = FALSE,
+                          filter = FALSE,
+                          rownames = FALSE,
                           maxrowsperpage = 10,
                           logMessage = message ) {
   
@@ -36,55 +38,44 @@ flamingoTable <- function(input, output, session,
   
     output$flamingoTable <- renderDT({
       if (!is.null(data())) {
-        datatable(
-          data(),
-          class = "flamingo-table display",
-          rownames = TRUE,
-          selection = selection,
-          escape = escape,
-          colnames = c('Row Number' = 1),
-          options = if(escape){.getPRTableOptions(scrollX, maxrowsperpage)} else {.getFLTableOptions(scrollX, maxrowsperpage)}
-        )
+        data <- data()
       } else {
-        datatable(
-          data.frame(content = "nothing to show"),
+        data <- data.frame(content = "nothing to show")
+      }
+      datatable(
+          data,
           class = "flamingo-table display",
-          rownames = FALSE,
+          rownames = rownames,
           selection = selection,
           escape = escape,
           colnames = c('Row Number' = 1),
-          options = .getPRTableOptions(scrollX, maxrowsperpage)
+          options = .getPRTableOptions(scrollX, maxrowsperpage, filter)
         )
-      }
-      
+        
     })
 
   # Helper functions -----------------------------------------------------------
   
   #table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function(scrollX, maxrowsperpage) {
+  .getPRTableOptions <- function(scrollX, maxrowsperpage, filter) {
     options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      processing = 0,
-      scrollX = scrollX,
-      pageLength = maxrowsperpage,
-      columnDefs = list(list(visible = FALSE, targets = 0)))
-    return(options)
-  }
-  
-  .getFLTableOptions <- function(scrollX, maxrowsperpage) {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
       #columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
       processing = 0,
       scrollX = scrollX,
-      pageLength = maxrowsperpage,
-      preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
-      drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
+      pageLength = maxrowsperpage
       #autoWidth = TRUE
     )
+    if (filter) {
+      options$dom <- 'ft'
+      options$search <- list(caseInsensitive = TRUE)
+      options$searchHighlight <- TRUE
+    } else {
+      options$dom <- 't'
+    }
+    if (!escape) {
+      options$preDrawCallback <- JS('function() { Shiny.unbindAll(this.api().table().node()); }')
+      options$drawCallback <- JS('function() { Shiny.bindAll(this.api().table().node()); } ')
+    }
     return(options)
   }
   

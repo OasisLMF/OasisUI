@@ -17,24 +17,14 @@ summarytabUI <- function(id) {
   flamingoPanel(
     id = ns("flamingoPanelSummaryTable"),
     collapsible = FALSE,
-    heading = "Summary Table",
-    panelSummaryTableModuleUI(ns( "panelSummaryTableModule"))
+    heading =  tagAppendChildren(
+      h4("Summary Table")
+    ),
+    flamingoTableUI(ns("summaryInputTable")),
+    flamingoTableUI(ns("summaryParamsTable")),
+    flamingoTableUI(ns("summaryOutputTable"))
   )
   
-}
-
-# UI Functions -----------------------------------------------------------------
-
-#' @title panelSummaryTableModuleUI
-#' @rdname panelSummaryTableModuleUI
-#' @inheritParams flamingoModuleUI
-#' @importFrom DT DTOutput
-#' @export
-panelSummaryTableModuleUI <-  function(id){
-  ns <- NS(id)
-  tagList(
-    DTOutput(ns("outputsummarytable"))
-  )
 }
 
 # Server -----------------------------------------------------------------------
@@ -51,106 +41,82 @@ panelSummaryTableModuleUI <-  function(id){
 #' @export
 #' @export
 summarytab <- function(input, output, session, dbSettings,
-                    apiSettings, userId,
-                    selectRunID, active, logMessage = message) {
+                       apiSettings, userId,
+                       selectRunID, active, logMessage = message) {
   
   ns <- session$ns
+  
+  # Reactive Values & Params ---------------------------------------------------
+  result <- reactiveValues(
+    inputSummaryData = NULL,
+    paramSummaryData = NULL,
+    outputSummaryData = NULL
+  )
   
   # list of sub-modules
   sub_modules <- list()
   
-  # collapse panel
-  observeEvent(input$abuttonhidesummarytable, {
-    num <- input$abuttonhidesummarytable
-    if ((num %% 2) != 0 ) {
-      updateActionButton(session = session, inputId = "abuttonhidesummarytable", label = NULL, icon = icon("expand"))
-      hide("outputsummarytable")
-    } else {
-      updateActionButton(session = session, inputId = "abuttonhidesummarytable", label = NULL, icon = icon("minus"))
-      show("outputsummarytable")
+  # strings to filer
+  outputStrg <- c("portfolio")
+  paramStrg <- c("treshold|number|peril|set")
+  
+  # Extract Summary Data -------------------------------------------------------
+  observeEvent(selectRunID(), {
+    SummaryData <- executeDbQuery(dbSettings,
+                                  paste("exec getOutputSummary", selectRunID()))
+    if (!is.null(SummaryData)) {
+    result$inputSummaryData <- SummaryData %>% 
+      filter(!grepl(paste0(outputStrg, "|", paramStrg), SummaryType)) %>%
+      as.data.frame()
+    result$paramSummaryData <- SummaryData %>% 
+      filter(grepl(paramStrg, SummaryType)) %>%
+      as.data.frame()
+    result$outputSummaryData <- SummaryData %>% 
+      filter(grepl(outputStrg, SummaryType)) %>%
+      as.data.frame()
     }
   })
   
-  # Summary table
-  observeEvent(selectRunID(), ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (!is.null(selectRunID()) && !is.na(selectRunID())) {
-      sub_modules$panelSummaryTableModule <- callModule(
-        panelSummaryTableModule,
-        id = "panelSummaryTableModule",
-        selectRunID = reactive(selectRunID()),
-        dbSettings = dbSettings,
-        apiSettings = apiSettings,
-        userId = userId,
-        logMessage = logMessage)
-    }
+  # Summary Input tables
+  observeEvent(result$inputSummaryData, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    sub_modules$summaryTable <- callModule(
+      flamingoTable,
+      id = "summaryInputTable",
+      data = reactive(result$inputSummaryData),
+      selection = "none",
+      escape = TRUE,
+      scrollX = FALSE,
+      filter = FALSE,
+      maxrowsperpage = 10,
+      logMessage = logMessage)
   })
   
-}
-
-# panelSummaryTableModule Module -----------------------
-#' Module for Summary Table Panel
-#' @rdname panelSummaryTableModule
-#' @description Server logic to show the summary table output
-#' @inheritParams flamingoModule
-#' @param selectRunID selected runID
-#' @return null
-#' @importFrom DT renderDT datatable
-#' @export
-panelSummaryTableModule <- function(input, output, session, dbSettings,
-                                    apiSettings, userId, logMessage = message, selectRunID ) {
-  
-  ns <- session$ns
-  
-  result <- reactiveValues(
-    selectRunID = NULL,
-    outputSummaryData = NULL
-  )
-  
-  observe({
-    result$selectRunID <- selectRunID()
+  # Summary Params tables
+  observeEvent(result$paramSummaryData, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    sub_modules$summaryTable <- callModule(
+      flamingoTable,
+      id = "summaryParamsTable",
+      data = reactive(result$paramSummaryData),
+      selection = "none",
+      escape = TRUE,
+      scrollX = FALSE,
+      filter = FALSE,
+      maxrowsperpage = 10,
+      logMessage = logMessage)
   })
   
-  observe({
-    output$outputsummarytable <- renderDT({
-      outputSummaryData <- executeDbQuery(dbSettings,
-                                          paste("exec getOutputSummary", result$selectRunID))
-      if (!is.null(outputSummaryData)) {
-        datatable(
-          outputSummaryData,
-          class = "flamingo-table display",
-          rownames = TRUE,
-          selection = "none",
-          colnames = c('Row Number' = 1),
-          options = .getPRTableOptions()
-        )
-      } else {
-        datatable(
-          data.frame(content = "nothing to show"),
-          class = "flamingo-table display",
-          rownames = FALSE,
-          selection = "none",
-          colnames = c('Row Number' = 1),
-          options = .getPRTableOptions()
-        )
-      }
-      
-    })
-    
-    
+  # Summary Output tables
+  observeEvent(result$outputSummaryData, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    sub_modules$summaryTable <- callModule(
+      flamingoTable,
+      id = "summaryOutputTable",
+      data = reactive(result$outputSummaryData),
+      selection = "none",
+      escape = TRUE,
+      scrollX = FALSE,
+      filter = FALSE,
+      maxrowsperpage = 10,
+      logMessage = logMessage)
   })
-  # Helper functions --------------------------------------------------------
   
-  #table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function() {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      processing = 0,
-      scrollX = TRUE,
-      pageLength = 10,
-      columnDefs = list(list(visible = FALSE, targets = 0)))
-    return(options)
-  }
-  
-  # Module Output -----------------------
-  invisible()
 }
