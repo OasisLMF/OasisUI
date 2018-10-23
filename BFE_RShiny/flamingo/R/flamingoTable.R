@@ -51,10 +51,7 @@ flamingoTable <- function(input, output, session,
         if (rownames) {
           colnamesToUse <- c('Row Number', colnamesToUse)
         }
-      } 
-      
-      print("colnamesToUse")
-      print(colnamesToUse)
+      }
       
       datatable(
           data,
