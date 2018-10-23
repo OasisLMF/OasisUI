@@ -341,7 +341,7 @@ step2_chooseModel <- function(input, output, session,
     input$sinputookmodelid
     input$sinputProgModTransform
   }, ignoreInit = TRUE, {
-      if (input$sinputookmodelid > 0 && input$sinputProgModTransform > 0) {
+      if (input$sinputookmodelid > 0 && input$sinputProgModTransform > 0 && result$selectprogrammeID != "") {
       shinyjs::enable("abuttoncrprogoasis")
     } else {
       shinyjs::disable("abuttoncrprogoasis")
@@ -352,7 +352,7 @@ step2_chooseModel <- function(input, output, session,
   onclick("abuttoncrprogoasis", {
     if (progStatus() == "- Status: Completed") {
       prgId <- createProgOasis(dbSettings,
-                               isolate(result$selectprogrammeID),
+                               result$selectprogrammeID,
                                isolate(input$sinputookmodelid),
                                isolate(input$sinputProgModTransform))
       prgId <- ifelse(is.null(prgId), -1, prgId)
@@ -363,11 +363,11 @@ step2_chooseModel <- function(input, output, session,
         .clearOOKSidebar()
         .defaultAssociateModel()
         .reloadPOData()
-        logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
         idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
         pageSel <- ceiling(idxSel/pageLength)
         selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
         selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
+        logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
         logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
         loadprogmodel <- loadProgrammeModel(
           apiSettings,
