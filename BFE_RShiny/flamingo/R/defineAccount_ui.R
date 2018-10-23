@@ -28,10 +28,10 @@ accountDefinitionUI <- function(id) {
                               align = "left"),
                  flamingoButton(ns("buttonamendac"), "Amend Account",
                               align = "centre") %>%
-                   bs_embed_tooltip(title = landing_page$buttonamendac, placement = "right"),
+                   bs_embed_tooltip(title = define_account$buttonamendac, placement = "right"),
                  flamingoButton(ns("buttondeleteac"), "Delete Account",
                               align = "right") %>%
-                   bs_embed_tooltip(title = landing_page$buttondeleteac, placement = "right")
+                   bs_embed_tooltip(title = define_account$buttondeleteac, placement = "right")
              )
       )
     )

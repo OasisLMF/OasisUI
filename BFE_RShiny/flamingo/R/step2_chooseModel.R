@@ -96,8 +96,9 @@ panelAssociateModel <- function(id) {
         bs_embed_tooltip(title = programme_Definition_Single$sinputProgModTransform,
                          placement = "right")),
 
-    div(flamingoButton(inputId = ns("abuttoncrprogoasis"), label = "Create"), style = "float:right;") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$abuttoncrprogoasis, placement = "right")
+    div(flamingoButton(inputId = ns("abuttoncrprogoasis"), label = "Create") %>%
+          bs_embed_tooltip(title = programme_Definition_Single$abuttoncrprogoasis, placement = "right"),
+        style = "float:right;")
   )
 }
 
@@ -203,7 +204,6 @@ step2_chooseModel <- function(input, output, session,
     if (active()) {
       bl_dirty1 <- stop_selProgOasisID > check_selProgOasisID
       #.defaultview(session)
-      show("buttonmodeldetails")
       hide("panelModelDetails")
       if (result$selectprogOasisID != "") {
         if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
@@ -309,7 +309,9 @@ step2_chooseModel <- function(input, output, session,
     input$tableProgOasisOOK_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length(input$tableProgOasisOOK_rows_selected) > 0) {
       shinyjs::enable("buttonmodeldetails")
-      shinyjs::enable("buttonpgotonextstep")
+      if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {
+        shinyjs::enable("buttonpgotonextstep")
+        }
     } else {
       shinyjs::disable("buttonmodeldetails")
       shinyjs::disable("buttonpgotonextstep")
@@ -320,13 +322,11 @@ step2_chooseModel <- function(input, output, session,
   onclick("buttonmodeldetails", {
     logMessage("showing panelModelDetails")
     .reloadProgFiles()
-    hide("buttonmodeldetails")
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
   })
 
   onclick("buttonhidemodeldetails", {
-    show("buttonmodeldetails")
     hide("panelModelDetails")
     logMessage("hiding panelModelDetails")
   })
@@ -337,8 +337,11 @@ step2_chooseModel <- function(input, output, session,
   })
 
   # Enable and disable create button
-  observeEvent (selectprogrammeID, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (isolate(result$selectprogrammeID) > 0 && isolate(input$sinputookmodelid) > 0) {
+  observeEvent ({
+    input$sinputookmodelid
+    input$sinputProgModTransform
+  }, ignoreInit = TRUE, {
+      if (input$sinputookmodelid > 0 && input$sinputProgModTransform > 0) {
       shinyjs::enable("abuttoncrprogoasis")
     } else {
       shinyjs::disable("abuttoncrprogoasis")
@@ -392,7 +395,6 @@ step2_chooseModel <- function(input, output, session,
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       #.reloadProgFiles()
-      show("buttonmodeldetails")
       hide("panelModelDetails")
       hide("panelDefineProgramme")
 
@@ -443,7 +445,6 @@ step2_chooseModel <- function(input, output, session,
     logMessage(".defaultAssociateModel called")
     show("panelDefineIDs")
     show("panelProgrammeModelTable")
-    show("buttonmodeldetails")
     hide("panelAssociateModel")
   }
 

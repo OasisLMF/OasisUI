@@ -2,12 +2,12 @@
 # A list per file.
 # Naming convention: buttonname
 
-file_Viewer <- list(
+file_Viewer <- list (
   FLdownloadzip = "Download all checked files"
   #FVFLdownloadexcel = "Download files table"
 )
 
-landing_page <- list(
+landing_page <- list (
   abuttonrun = "Define process to run",
   abuttonbrowse = "Choose browse option",
   abuttondefineaccount = "Create/amend/delete account",
@@ -22,25 +22,34 @@ landing_page <- list(
   abuttonfilemngt = "Access input/output files",
   abuttonsysconf = "System configuration",
   accountDD = "User info",
-  buttonamendac = "Please select an account to amend",
-  buttondeleteac = "Please select an account to delete",
-  abuttoncompupdate = "Please select a company to update.",
-  abuttoncompdel = "Please select a company to delete",
   abuttonuserupdate = "Please select a user to update.",
   abuttonuserdelete = "Please select a user to delete",
   abuttonusersecurity = "Please select a user to add security group",
   abuttonuseroasis = "Please select a user to add license"
 )
 
-programme_Definition_Single <- list(
+  define_account <- list (
+    buttonamendac = "Please select an account to amend",
+    buttondeleteac = "Please select an account to delete"
+  )
+
+  define_company <- list (
+    abuttoncompupdate = "Please select a company to update.",
+    abuttoncompdel = "Please select a company to delete"
+  )
+
+  sys_conf <- list(
+    btnAmend = "Please select a Model Resource to amend.",
+    btnDelete = "Please select a Model Resource to delete.",
+    btnConfirmDel = "Please select a Model Resource to delete.",
+    btnSubmitCrtAm = "Submit Programme"
+  )
+
+programme_Definition_Single <- list (
   sinputTransformname = "Transformation Description to be added here",
   sinputProgModTransform = "Transformation Description to be added here",
   selectprogrammeID = "Select a programme ID to which associate a model",
   selectprogOasisID = "Select the Oasis Programme to Run",
-  btnAmend = "Please select a Model Resource to amend.",
-  btnDelete = "Please select a Model Resource to delete.",
-  btnSubmitCrtAm = "Submit Programme",
-  btnConfirmDel = "Please select a Model Resource to delete.",
   buttonprogdetails = "Please select a Programme to show details",
   buttonamendpr = "Please select a Programme to Amend",
   abuttonProgSubmit = "Please fill all fields",
@@ -56,7 +65,7 @@ programme_Definition_Single <- list(
 
 ### Panel Browse ----
 
-browse_programmes <- list(
+browse_programmes <- list (
   selectRunID = "Selecct RunID",
   abuttonplusplot = "Add a new plot"
   )

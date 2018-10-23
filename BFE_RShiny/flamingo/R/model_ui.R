@@ -31,10 +31,10 @@ modelSupplierPageUI <- function(id) {
                                 align = "left"),
                    flamingoButton(ns("btnAmend"), "Amend",
                                 align = "centre") %>%
-                     bs_embed_tooltip(title = programme_Definition_Single$btnAmend, placement = "right"),
+                     bs_embed_tooltip(title = sys_conf$btnAmend, placement = "right"),
                    flamingoButton(ns("btnDelete"), "Delete",
                                 align = "right") %>%
-                     bs_embed_tooltip(title = programme_Definition_Single$btnDelete, placement = "right"),
+                     bs_embed_tooltip(title = sys_conf$btnDelete, placement = "right"),
                    # flamingoButton(ns("abuttoncrtudptdelmodres"), "Create/Update/Delete"),
                    downloadButton(ns("MRdownloadexcel"), label="Export to csv")
                )

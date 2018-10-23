@@ -133,7 +133,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                 footer = tagList(
                   flamingoButton(ns("btnSubmitCrtAm"),
                                  label = "Submit", align = "left")  %>%
-                    bs_embed_tooltip(title = programme_Definition_Single$btnSubmitCrtAm, placement = "right"),
+                    bs_embed_tooltip(title = sys_conf$btnSubmitCrtAm, placement = "right"),
                   actionButton(ns("btnCancelCrtAm"),
                                label = "Cancel", align = "right")
                 ),
@@ -152,21 +152,21 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   observeEvent ({
     result$MRData
     input$mrtable_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (length(input$mrtable_rows_selected) > 0) {
-      shinyjs::enable("btnAmend")
-      shinyjs::enable("btnDelete")
-      shinyjs::enable("btnConfirmDel")
-    } else {
-      shinyjs::disable("btnAmend")
-      shinyjs::disable("btnDelete")
-      shinyjs::disable("btnConfirmDel")
-    }
-  })
+      if (length(input$mrtable_rows_selected) > 0) {
+        shinyjs::enable("btnAmend")
+        shinyjs::enable("btnDelete")
+        shinyjs::enable("btnConfirmDel")
+      } else {
+        shinyjs::disable("btnAmend")
+        shinyjs::disable("btnDelete")
+        shinyjs::disable("btnConfirmDel")
+      }
+    })
 
   observeEvent(input$btnAmend, {
-      result$crtAmFlag <- "A"
-      showModal(.crtAmModal())
-      .autoFillCrtAm(row)
+    result$crtAmFlag <- "A"
+    showModal(.crtAmModal())
+    .autoFillCrtAm(row)
   })
 
   .delModal <- function(){
@@ -177,7 +177,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                 footer = tagList(
                   flamingoButton(ns("btnConfirmDel"),
                                  label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = programme_Definition_Single$btnConfirmDel, placement = "right"),
+                    bs_embed_tooltip(title = sys_conf$btnConfirmDel, placement = "right"),
                   actionButton(ns("btnCancelDel"),
                                label = "Cancel", align = "right")
                 ),
@@ -187,7 +187,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   }
 
   observeEvent(input$btnDelete, {
-      showModal(.delModal())
+    showModal(.delModal())
   })
 
   # Enable and disable submit button
@@ -259,7 +259,11 @@ modelSupplierPage <- function(input, output, session, dbSettings,
       if (!is.null(modResId)) {
         flamingoNotification(sprintf("Model Resource %s deleted.", modResId),
                              type = "message")
+
+      } else {
+        flamingoNotification(sprintf("Model Resource could not be deleted."))
       }
+
       .reloadMRData()
     }
     removeModal()

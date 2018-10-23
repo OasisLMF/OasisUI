@@ -304,19 +304,22 @@ step1_chooseProgramme <- function(input, output, session,
   })
 
   # Enable and disable buttons
-  observeEvent (input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent ({
+    result$DPProgData
+    input$tableDPprog_rows_selected
+    }, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length(input$tableDPprog_rows_selected) > 0) {
       shinyjs::enable("buttonprogdetails")
       shinyjs::enable("buttondeletepr")
       shinyjs::enable("buttonamendpr")
-      shinyjs::enable("buttonpgotonextstep")
-
+      if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusCompleted) {
+        shinyjs::enable("buttonpgotonextstep")
+      }
     } else {
       shinyjs::disable("buttonprogdetails")
       shinyjs::disable("buttondeletepr")
       shinyjs::disable("buttonamendpr")
       shinyjs::disable("buttonpgotonextstep")
-
     }
   })
 
@@ -324,17 +327,14 @@ step1_chooseProgramme <- function(input, output, session,
   onclick("buttonprogdetails", {
     hide("panelDefineProgramme")
     hide("panelLinkFiles")
-    if (length(input$tableDPprog_rows_selected) > 0) {
-      show("panelProgrammeDetails")
-      logMessage("showing panelProgrammeDetails")
-      .reloadProgDetails()
-    }
+    show("panelProgrammeDetails")
+    logMessage("showing panelProgrammeDetails")
+    .reloadProgDetails()
   })
 
   # Hide Programme Details
   onclick("buttonhideprogdetails", {
     hide("panelProgrammeDetails")
-    show("buttonprogdetails")
     logMessage("hiding panelProgrammeDetails")
   })
 
@@ -359,7 +359,6 @@ step1_chooseProgramme <- function(input, output, session,
   # Create Programme
   onclick("buttoncreatepr", {
     hide("panelProgrammeDetails")
-    show("buttonprogdetails")
     hide("panelLinkFiles")
     result$prog_flag <- "C"
     #clear fields
@@ -374,7 +373,6 @@ step1_chooseProgramme <- function(input, output, session,
   ### Amend Programme
   onclick("buttonamendpr", {
     hide("panelProgrammeDetails")
-    show("buttonprogdetails")
     .defaultCreateProg()
     if (length(input$tableDPprog_rows_selected) > 0) {
       # TODO: review where/when/how this should be set
@@ -395,13 +393,13 @@ step1_chooseProgramme <- function(input, output, session,
     input$tinputDPProgName
     input$sinputDPAccountName
     input$sinputTransformname
-    }, ignoreInit = TRUE, {
-      if (input$tinputDPProgName == "" || input$sinputDPAccountName == "" || input$sinputTransformname == "") {
-        shinyjs::disable("abuttonProgSubmit")
-      } else {
-        shinyjs::enable("abuttonProgSubmit")
-      }
-    })
+  }, ignoreInit = TRUE, {
+    if (input$tinputDPProgName == "" || input$sinputDPAccountName == "" || input$sinputTransformname == "") {
+      shinyjs::disable("abuttonProgSubmit")
+    } else {
+      shinyjs::enable("abuttonProgSubmit")
+    }
+  })
 
   ### Submit Button
   onclick("abuttonProgSubmit", {
@@ -416,7 +414,7 @@ step1_chooseProgramme <- function(input, output, session,
 
       } else {
         flamingoNotification(type = "message",
-                         paste("Programme ", input$tinputDPProgName, " created."))
+                             paste("Programme ", input$tinputDPProgName, " created."))
       }
     } else if (result$prog_flag == "A") { # && length(input$tableDPprog_rows_selected) > 0
       idxSel <- input$tableDPprog_rows_selected
@@ -428,10 +426,10 @@ step1_chooseProgramme <- function(input, output, session,
       message(paste("A res is:", res))
       if (is.null(res)) {
         flamingoNotification(type = "error",
-                         paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+                             paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
       } else {
         flamingoNotification(type = "message",
-                         paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName], " amended."))
+                             paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName], " amended."))
       }
     }
 
@@ -457,14 +455,14 @@ step1_chooseProgramme <- function(input, output, session,
 
   # Link files to programme title
   output$paneltitleLinkFiles <- renderUI({
-      progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-      progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
-      progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
-      if (result$prog_flag == "C") {
-        paste0('Provide Inputs to Programme id ', progId, ' ', progName)
-      } else {
-        paste0('Amend Inputs to Programme id ', progId, ' ', progName)
-      }
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
+    progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
+    if (result$prog_flag == "C") {
+      paste0('Provide Inputs to Programme id ', progId, ' ', progName)
+    } else {
+      paste0('Amend Inputs to Programme id ', progId, ' ', progName)
+    }
 
   })
 
@@ -495,15 +493,14 @@ step1_chooseProgramme <- function(input, output, session,
 
   # Delete Programme
   onclick("buttondeletepr",{
-    show("buttonprogdetails")
     hide("panelProgrammeDetails")
     hide("panelDefineProgramme")
     hide("panelLinkFiles")
-      stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
-      executeDbQuery(dbSettings, stmt)
-      flamingoNotification(type = "message",
-                       sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
-      .reloadDPProgData()
+    stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
+    executeDbQuery(dbSettings, stmt)
+    flamingoNotification(type = "message",
+                         sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+    .reloadDPProgData()
   })
 
   ### > Source Files -----------------------------------------------------------
@@ -520,7 +517,7 @@ step1_chooseProgramme <- function(input, output, session,
         )
         if (!is.null(recordId)) {
           flamingoNotification(type = "message",
-                           paste("New File record id: ", recordId, " created"))
+                               paste("New File record id: ", recordId, " created"))
           #.reloadProgDetails()
         } else {
           flamingoNotification(type = "error", "Could not create file record")
@@ -559,7 +556,7 @@ step1_chooseProgramme <- function(input, output, session,
           flamingoNotification(type = "error", "Failed to link the File")
         } else {
           flamingoNotification(type = "message",
-                           paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+                               paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
         }
       } else {
         flamingoNotification(type = "warning", "Please select a file to Link")
@@ -811,9 +808,7 @@ step1_chooseProgramme <- function(input, output, session,
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
-      # Update Programme Detail table if row selected changes
       hide("panelProgrammeDetails")
-      show("buttonprogdetails")
       hide("panelDefineProgramme")
 
       if (length(input$tableDPprog_rows_selected) > 0) {
@@ -848,7 +843,6 @@ step1_chooseProgramme <- function(input, output, session,
   .defaultCreateProg <- function(){
     logMessage(".defaultCreateProg called")
     show("panelProgrammeTable")
-    show("buttonprogdetails")
   }
 
 

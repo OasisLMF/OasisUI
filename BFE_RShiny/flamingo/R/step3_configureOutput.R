@@ -49,7 +49,7 @@ panelProcessRunTable <- function(id) {
                             flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                               bs_embed_tooltip(title = programme_Definition_Single$abuttonshowlog, placement = "right"),
                             div(
-                              flamingoButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Browse") %>%
+                              actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Browse") %>%
                                 bs_embed_tooltip(title = programme_Definition_Single$abuttondisplayoutput, placement = "right"),
                               style = "inline: true;float: right;")
                         )))
@@ -582,15 +582,6 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
-  # hide process run section if DC returns empty table
-  observeEvent(result$prcrundata, {
-    if (nrow(result$prcrundata) == 0) {
-      hide("abuttondisplayoutput")
-    } else {
-      show("abuttondisplayoutput")
-    }
-  })
-
   # If selectprogOasisID changes, reload process run table and set view back to default
   observeEvent(selectprogOasisID(), ignoreInit = TRUE, {
     if (active()) {
@@ -625,7 +616,7 @@ step3_configureOutput <- function(input, output, session,
     # a ProgOasisID that has no runs
     if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
       show("tableprocessrundata")
-      show("divprocessRunButtons")
+      # show("divprocessRunButtons")
       result$prcrundata <- prcrundata %>%
         replaceWithIcons()
       #Handling bug for 'In Progress'
@@ -677,16 +668,16 @@ step3_configureOutput <- function(input, output, session,
 
   })
 
-  #Not allow any actions if the process run table is empty
-  observeEvent(result$prcrundata, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (active()) {
-      if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
-        show("divprocessRunButtons")
-      } else {
-        hide("divprocessRunButtons")
-      }
-    }
-  })
+  # #Not allow any actions if the process run table is empty
+  # observeEvent(result$prcrundata, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  #   if (active()) {
+  #     if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
+  #       show("divprocessRunButtons")
+  #     } else {
+  #       hide("divprocessRunButtons")
+  #     }
+  #   }
+  # })
 
   # > Configure Output --------------------------------------------
   # hide panel
@@ -711,15 +702,23 @@ step3_configureOutput <- function(input, output, session,
     result$prcrundata
     selectprogOasisID()
     input$tableprocessrundata_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      if (selectprogOasisID() != "") {shinyjs::enable("abuttonconfigoutput")} else  {shinyjs::disable("abuttonconfigoutput")}
+      if (selectprogOasisID() != "") {
+        shinyjs::enable("abuttonconfigoutput")
+        }
       if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0 && length(input$tableprocessrundata_rows_selected) > 0) {
         shinyjs::enable("abuttonrerunpr")
         shinyjs::enable("abuttonshowlog")
-        if (progOasisStatus() == "- Status: Completed") {shinyjs::enable("abuttondisplayoutput")} else {shinyjs::disable("abuttondisplayoutput")}
+        if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] == StatusCompleted) {
+          shinyjs::enable("abuttondisplayoutput")
+        }
+        if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] == StatusProcessing) {
+          shinyjs::disable("abuttonconfigoutput")
+        }
       } else {
         shinyjs::disable("abuttonrerunpr")
         shinyjs::disable("abuttondisplayoutput")
         shinyjs::disable("abuttonshowlog")
+        shinyjs::disable("abuttonconfigoutput")
       }
     }
   )
@@ -898,11 +897,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   onclick("abuttonsaveoutput", {
-    if (outputOptionsList() != "") {
-      showModal(.modalsaveoutput())
-    } else {
-      removeModal()
-    }
+    showModal(.modalsaveoutput())
   })
 
   # Submit output configuration (to be saved)
@@ -1029,10 +1024,8 @@ step3_configureOutput <- function(input, output, session,
         flamingoNotification(type = "warning",
                              sprintf("Created Process Run ID: %s. But process run executing failed",
                                      runId))
-        hide("abuttondisplayoutput")
         show("panelProcessRunLogs")
         logMessage("showing prrunlogtable")
-        hide("abuttonshowlog")
       }
     }
     .defaultview(session)
@@ -1046,12 +1039,10 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonshowlog", {
     show("panelProcessRunLogs")
     logMessage("showing prrunlogtable")
-    hide("abuttonshowlog")
   })
 
   onclick("abuttonhidelog", {
     hide("panelProcessRunLogs")
-    show("abuttonshowlog")
   })
 
   ### Log Table
@@ -1097,20 +1088,13 @@ step3_configureOutput <- function(input, output, session,
       logMessage(paste("input$tableprocessrundata_rows_selected is changed to:", input$tableprocessrundata_rows_selected))
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
-      show("abuttondisplayoutput")
-      show("abuttonshowlog")
       ##### TODO: Do I need the second check in this if????
       if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
         result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
         if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
-          hide("abuttondisplayoutput")
-          hide("abuttonshowlog")
           # This occurs only by changing process run, which is only possible in panel 3
           show("panelProcessRunLogs")
           logMessage("showing prrunlogtable")
-        } else {
-          show("abuttondisplayoutput")
-          show("abuttonshowlog")
         }
       } else {
         result$prrunid <- -1
