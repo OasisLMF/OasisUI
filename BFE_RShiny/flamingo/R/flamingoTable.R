@@ -30,6 +30,7 @@ flamingoTable <- function(input, output, session,
                           scrollX = FALSE,
                           filter = FALSE,
                           rownames = FALSE,
+                          colnames = TRUE,
                           maxrowsperpage = 10,
                           logMessage = message ) {
   
@@ -37,18 +38,31 @@ flamingoTable <- function(input, output, session,
   
   
     output$flamingoTable <- renderDT({
+      
       if (!is.null(data())) {
         data <- data()
       } else {
         data <- data.frame(content = "nothing to show")
       }
+      
+      colnamesToUse <- ""
+      if (colnames) {
+        colnamesToUse <- names(data)
+        if (rownames) {
+          colnamesToUse <- c('Row Number', colnamesToUse)
+        }
+      } 
+      
+      print("colnamesToUse")
+      print(colnamesToUse)
+      
       datatable(
           data,
           class = "flamingo-table display",
           rownames = rownames,
           selection = selection,
           escape = escape,
-          colnames = c('Row Number' = 1),
+          colnames = colnamesToUse,
           options = .getPRTableOptions(scrollX, maxrowsperpage, filter)
         )
         

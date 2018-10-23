@@ -20,9 +20,27 @@ summarytabUI <- function(id) {
     heading =  tagAppendChildren(
       h4("Summary Table")
     ),
-    flamingoTableUI(ns("summaryInputTable")),
-    flamingoTableUI(ns("summaryParamsTable")),
-    flamingoTableUI(ns("summaryOutputTable"))
+    fluidRow(
+      column(6,
+             h5("Inputs"),
+             flamingoTableUI(ns("summaryInputTable"))
+             ),
+      column(6,
+             h5("Parameters"),
+             flamingoTableUI(ns("summaryParamsTable"))
+      )
+    ),
+    fluidRow(
+      column(6,
+             h5("Output"),
+             flamingoTableUI(ns("summaryOutputTable"))
+      ),
+      column(6,
+             plotlyOutput(ns("summaryOutputPlot"))
+      )
+    )
+   
+        
   )
   
 }
@@ -87,6 +105,8 @@ summarytab <- function(input, output, session, dbSettings,
       escape = TRUE,
       scrollX = FALSE,
       filter = FALSE,
+      rownames = FALSE,
+      colnames = FALSE,
       maxrowsperpage = 10,
       logMessage = logMessage)
   })
@@ -101,6 +121,8 @@ summarytab <- function(input, output, session, dbSettings,
       escape = TRUE,
       scrollX = FALSE,
       filter = FALSE,
+      rownames = FALSE,
+      colnames = FALSE,
       maxrowsperpage = 10,
       logMessage = logMessage)
   })
@@ -114,7 +136,8 @@ summarytab <- function(input, output, session, dbSettings,
       selection = "none",
       escape = TRUE,
       scrollX = FALSE,
-      filter = FALSE,
+      rownames = FALSE,
+      colnames = FALSE,
       maxrowsperpage = 10,
       logMessage = logMessage)
   })
