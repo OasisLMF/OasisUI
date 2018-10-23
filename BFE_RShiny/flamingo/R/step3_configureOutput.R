@@ -44,11 +44,14 @@ panelProcessRunTable <- function(id) {
         fluidRow(column(12,
                         div(id = ns("divprocessRunButtons"),
                             flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration"),
-                            flamingoButton(inputId = ns("abuttonrerunpr"), label = "Rerun"),
-                            flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log"),
+                            flamingoButton(inputId = ns("abuttonrerunpr"), label = "Rerun") %>%
+                              bs_embed_tooltip(title = programme_Definition_Single$abuttonrerunpr, placement = "right"),
+                            flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+                              bs_embed_tooltip(title = programme_Definition_Single$abuttonshowlog, placement = "right"),
                             div(
-                              flamingoButton(inputId = ns("abuttondisplayoutput"), label = "Browse Run Outputs")
-                              , style = "inline: true;float: right;")
+                              actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Browse") %>%
+                                bs_embed_tooltip(title = programme_Definition_Single$abuttondisplayoutput, placement = "right"),
+                              style = "inline: true;float: right;")
                         )))
     )
   )
@@ -94,7 +97,8 @@ panelDefineOutputs <- function(id) {
     ),
     fluidRow(
       column(12,
-             flamingoButton(inputId = ns("abuttonexecuteprrun"), label = "Execute Run"), align = "right"))
+             flamingoButton(inputId = ns("abuttonexecuteprrun"), label = "Execute Run"), align = "right")) %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttonexecuteprrun, placement = "right")
   )
 }
 
@@ -152,7 +156,8 @@ panelDefineOutputConfiguration <- function(id) {
     hidden(div(id = ns("configureAdvancedRI"), configureAdvancedRI(id))),
     flamingoButton(inputId = ns("abtnadvanced"), label = "Advanced"),
     hidden(flamingoButton(inputId = ns("abtnbasic"), label = "Basic")),
-    hidden(flamingoButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration")),
+    hidden(flamingoButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration")) %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttonsaveoutput, placement = "right"),
     hidden(flamingoButton(inputId = ns("abtnclroutopt"), label = "Default"))
   )
 }
@@ -545,7 +550,7 @@ step3_configureOutput <- function(input, output, session,
 
   #number of Rows per Page in a dataable
   pageLength <- 5
-  
+
   # Default checkgroup for  GUL, IL and RI
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
@@ -574,15 +579,6 @@ step3_configureOutput <- function(input, output, session,
     if (currstep() == 3 ) {
       .defaultRun()
       .reloadRunData()
-    }
-  })
-
-  # hide process run section if DC returns empty table
-  observeEvent(result$prcrundata, {
-    if (nrow(result$prcrundata) == 0) {
-      hide("abuttondisplayoutput")
-    } else {
-      show("abuttondisplayoutput")
     }
   })
 
@@ -620,10 +616,9 @@ step3_configureOutput <- function(input, output, session,
     # a ProgOasisID that has no runs
     if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
       show("tableprocessrundata")
-      show("divprocessRunButtons")
       result$prcrundata <- prcrundata %>%
         replaceWithIcons()
-      #Handling bug for 'In Progress' 
+      #Handling bug for 'In Progress'
       if (input$radioprrunsAllOrInProgress == "In_Progress") {
         result$prcrundata <- result$prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
       }
@@ -672,23 +667,12 @@ step3_configureOutput <- function(input, output, session,
 
   })
 
-  #Not allow any actions if the process run table is empty
-  observeEvent(result$prcrundata, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (active()) {
-      if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
-        show("divprocessRunButtons")
-      } else {
-        hide("divprocessRunButtons")
-      }
-    }
-  })
-
   # > Configure Output --------------------------------------------
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
     hide("panelDefineOutputs")
   })
-  
+
   # configuration title
   output$paneltitleReDefineProgramme <- renderUI({
     if (result$prrun_flag  == "R") {
@@ -701,39 +685,47 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
+  # Enable and disable buttons
+  observeEvent ({
+    result$prcrundata
+    selectprogOasisID()
+    input$tableprocessrundata_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      if (selectprogOasisID() != "") {
+        shinyjs::enable("abuttonconfigoutput")
+        }
+      if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0 && length(input$tableprocessrundata_rows_selected) > 0) {
+        shinyjs::enable("abuttonrerunpr")
+        shinyjs::enable("abuttonshowlog")
+        if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] == StatusCompleted) {
+          shinyjs::enable("abuttondisplayoutput")
+        }
+        if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] == StatusProcessing) {
+          shinyjs::disable("abuttonconfigoutput")
+        }
+      } else {
+        shinyjs::disable("abuttonrerunpr")
+        shinyjs::disable("abuttondisplayoutput")
+        shinyjs::disable("abuttonshowlog")
+        shinyjs::disable("abuttonconfigoutput")
+      }
+    }
+  )
+
   #Show Output Configuration Panel
   onclick("abuttonconfigoutput", {
-    if (progOasisStatus() == "- Status: Completed") {
-      if (selectprogOasisID() != "") {
-        .defaultview(session)
-        show("panelDefineOutputs")
-        logMessage("showing panelDefineOutputs")
-        logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
-        result$prrun_flag <- "C"
-        # selectRows(dataTableProxy("tableprocessrundata"), selected = NULL)
-        # selectPage(dataTableProxy("tableprocessrundata"), 1)
-      } else {
-        flamingoNotification(type = "error", "Please select a Programme Model first")
-      }
-    } else {
-      flamingoNotification(type = "warning", "Please select a completed Programme Model first")
-    }
+    .defaultview(session)
+    show("panelDefineOutputs")
+    logMessage("showing panelDefineOutputs")
+    logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
+    result$prrun_flag <- "C"
   })
 
   onclick("abuttonrerunpr", {
-    if (progOasisStatus() == "- Status: Completed") {
-      if (length(input$tableprocessrundata_rows_selected) > 0) {
-        .defaultview(session)
-        show("panelDefineOutputs")
-        logMessage("showing panelDefineOutputs")
-        result$prrun_flag <- "R"
-        .updateOutputConfig()
-      } else {
-        flamingoNotification(type = "warning", "Please select Process Run first")
-      }
-    } else {
-      flamingoNotification(type = "warning", "Please select a completed Programme Model first")
-    }
+    .defaultview(session)
+    show("panelDefineOutputs")
+    logMessage("showing panelDefineOutputs")
+    result$prrun_flag <- "R"
+    .updateOutputConfig()
   })
 
   ### Hide Output Configuration panel
@@ -872,20 +864,26 @@ step3_configureOutput <- function(input, output, session,
                 textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
                 footer = tagList(
                   flamingoButton(inputId = ns("abuttonsubmitoutput"),
-                               label = "Submit")
+                                 label = "Submit")
                 ),
                 size = "s",
                 easyClose = TRUE
     )
   }
 
-  onclick("abuttonsaveoutput", {
+  # Enable and disable buttons
+  observeEvent (outputOptionsList, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (outputOptionsList() != "") {
-      showModal(.modalsaveoutput())
+      shinyjs::enable("abuttonsaveoutput")
+      shinyjs::enable("abuttonexecuteprrun")
     } else {
-      removeModal()
-      flamingoNotification(type = "warning", "Please select Output Configuration")
+      shinyjs::disable("abuttonsaveoutput")
+      shinyjs::disable("abuttonexecuteprrun")
     }
+  })
+
+  onclick("abuttonsaveoutput", {
+    showModal(.modalsaveoutput())
   })
 
   # Submit output configuration (to be saved)
@@ -990,55 +988,43 @@ step3_configureOutput <- function(input, output, session,
 
   # Execute Process run: When "Execute Run" button is clicked - switsches view to Run panel
   onclick("abuttonexecuteprrun", {
-    if (outputOptionsList() == "") {
-      flamingoNotification(type = "warning", "Please select Output Configuration")
+    runId <- .generateRun()
+    if (is.null(runId)) {
+      flamingoNotification(type = "error",
+                           "Process Run ID could not be generated. So process run cannot be executed")
     } else {
-      runId <- .generateRun()
-      if (is.null(runId)) {
-        flamingoNotification(type = "error",
-                         "Process Run ID could not be generated. So process run cannot be executed")
+      status <- runProcess(apiSettings, runId)
+      if (grepl("success", status, ignore.case = TRUE)) {
+        flamingoNotification(type = "message",
+                             sprintf("Created Process Run ID: %s and process run is executing",
+                                     runId))
+        .reloadRunData()
+        #logMessage(paste("colnames are:", paste(colnames(result$prcrundata), collapse = ", ")))
+        logMessage(paste("updating tableprocessrundataa select because executing a new run"))
+        rowToSelect <- match(runId, result$prcrundata[, prcrundata.ProcessRunID])
+        pageSel <- ceiling(rowToSelect/pageLength)
+        selectRows(dataTableProxy("tableprocessrundata"), rowToSelect)
+        selectPage(dataTableProxy("tableprocessrundata"), pageSel)
+        logMessage(paste("selected row is:", input$tableprocessrundata_rows_selected))
       } else {
-        status <- runProcess(apiSettings, runId)
-        if (grepl("success", status, ignore.case = TRUE)) {
-          flamingoNotification(type = "message",
-                           sprintf("Created Process Run ID: %s and process run is executing",
-                                   runId))
-          .reloadRunData()
-          #logMessage(paste("colnames are:", paste(colnames(result$prcrundata), collapse = ", ")))
-          logMessage(paste("updating tableprocessrundataa select because executing a new run"))
-          rowToSelect <- match(runId, result$prcrundata[, prcrundata.ProcessRunID])
-          pageSel <- ceiling(rowToSelect/pageLength)
-          selectRows(dataTableProxy("tableprocessrundata"), rowToSelect)
-          selectPage(dataTableProxy("tableprocessrundata"), pageSel)
-          logMessage(paste("selected row is:", input$tableprocessrundata_rows_selected))
-        } else {
-          flamingoNotification(type = "warning",
-                           sprintf("Created Process Run ID: %s. But process run executing failed",
-                                   runId))
-          hide("abuttondisplayoutput")
-          show("panelProcessRunLogs")
-          logMessage("showing prrunlogtable")
-          hide("abuttonshowlog")
-        }
+        flamingoNotification(type = "warning",
+                             sprintf("Created Process Run ID: %s. But process run executing failed",
+                                     runId))
+        show("panelProcessRunLogs")
+        logMessage("showing prrunlogtable")
       }
-      .defaultview(session)
     }
+    .defaultview(session)
   })
 
   ### > Logs ---------------------------------------------------------------
   onclick("abuttonshowlog", {
-    if (length(input$tableprocessrundata_rows_selected) > 0) {
-      show("panelProcessRunLogs")
-      logMessage("showing prrunlogtable")
-      hide("abuttonshowlog")
-    } else {
-      flamingoNotification(type = "warning", "Please select a Process Run first")
-    }
+    show("panelProcessRunLogs")
+    logMessage("showing prrunlogtable")
   })
 
   onclick("abuttonhidelog", {
     hide("panelProcessRunLogs")
-    show("abuttonshowlog")
   })
 
   ### Log Table
@@ -1048,7 +1034,7 @@ step3_configureOutput <- function(input, output, session,
       invisible(input$abuttonrefreshprrunlogs)
 
       wfid <- result$prrunid
-      
+
       logdata <- getProcessRunDetails(dbSettings, wfid) %>%
         replaceWithIcons()
       logMessage("re-rendering process run log table")
@@ -1084,20 +1070,13 @@ step3_configureOutput <- function(input, output, session,
       logMessage(paste("input$tableprocessrundata_rows_selected is changed to:", input$tableprocessrundata_rows_selected))
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
-      show("abuttondisplayoutput")
-      show("abuttonshowlog")
       ##### TODO: Do I need the second check in this if????
       if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
         result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
         if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
-          hide("abuttondisplayoutput")
-          hide("abuttonshowlog")
           # This occurs only by changing process run, which is only possible in panel 3
           show("panelProcessRunLogs")
           logMessage("showing prrunlogtable")
-        } else {
-          show("abuttondisplayoutput")
-          show("abuttonshowlog")
         }
       } else {
         result$prrunid <- -1
@@ -1105,15 +1084,10 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
-
   # Navigation --------------------------------------------------------------
   # Go to browse section
   onclick("abuttondisplayoutput", {
-    if (length(input$tableprocessrundata_rows_selected) > 0) {
-      result$navigationstate <-"SBR"
-    } else {
-      flamingoNotification(type = "warning", "Please select a Process Run first")
-    }
+    result$navigationstate <-"SBR"
   })
 
   # Help Functions -----------------------------------------------------------
@@ -1132,6 +1106,10 @@ step3_configureOutput <- function(input, output, session,
     show("panelDefineIDs")
     show("panelProcessRunTable")
     disable("chkgulpolicy")
+    shinyjs::disable("abuttonrerunpr")
+    shinyjs::disable("abuttondisplayoutput")
+    shinyjs::disable("abuttonshowlog")
+    shinyjs::disable("abuttonconfigoutput")
   }
 
   # Reload Process Runs table
