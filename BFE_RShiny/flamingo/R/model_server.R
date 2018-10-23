@@ -190,15 +190,6 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     showModal(.delModal())
   })
 
-  # Enable and disable submit button
-  observeEvent (result$crtAmFlag, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (result$crtAmFlag == "C" | result$crtAmFlag == "A") {
-      shinyjs::enable("btnSubmitCrtAm")
-    } else {
-      shinyjs::disable("btnSubmitCrtAm")
-    }
-  })
-
   ## submit/cancel buttons
   observeEvent(input$btnSubmitCrtAm, {
 
@@ -252,20 +243,17 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   })
 
   observeEvent(input$btnConfirmDel, {
+    modResId <- deleteModelResource(dbSettings, result$MRData[input$mrtable_rows_selected,1])
 
-    if (length(row <- input$mrtable_rows_selected) > 0) {
-      modResId <- deleteModelResource(dbSettings, result$MRData[row,1])
+    if (!is.null(modResId)) {
+      flamingoNotification(sprintf("Model Resource %s deleted.", modResId),
+                           type = "message")
 
-      if (!is.null(modResId)) {
-        flamingoNotification(sprintf("Model Resource %s deleted.", modResId),
-                             type = "message")
-
-      } else {
-        flamingoNotification(sprintf("Model Resource could not be deleted."))
-      }
-
-      .reloadMRData()
+    } else {
+      flamingoNotification(sprintf("Model Resource could not be deleted."))
     }
+
+    .reloadMRData()
     removeModal()
   })
 

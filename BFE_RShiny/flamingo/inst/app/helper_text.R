@@ -2,12 +2,12 @@
 # A list per file.
 # Naming convention: buttonname
 
-file_Viewer <- list (
+file_Viewer <- list(
   FLdownloadzip = "Download all checked files"
   #FVFLdownloadexcel = "Download files table"
 )
 
-landing_page <- list (
+landing_page <- list(
   abuttonrun = "Define process to run",
   abuttonbrowse = "Choose browse option",
   abuttondefineaccount = "Create/amend/delete account",
@@ -28,12 +28,12 @@ landing_page <- list (
   abuttonuseroasis = "Please select a user to add license"
 )
 
-  define_account <- list (
+  define_account <- list(
     buttonamendac = "Please select an account to amend",
     buttondeleteac = "Please select an account to delete"
   )
 
-  define_company <- list (
+  define_company <- list(
     abuttoncompupdate = "Please select a company to update.",
     abuttoncompdel = "Please select a company to delete"
   )
@@ -45,7 +45,7 @@ landing_page <- list (
     btnSubmitCrtAm = "Submit Programme"
   )
 
-programme_Definition_Single <- list (
+programme_Definition_Single <- list(
   sinputTransformname = "Transformation Description to be added here",
   sinputProgModTransform = "Transformation Description to be added here",
   selectprogrammeID = "Select a programme ID to which associate a model",
@@ -65,7 +65,7 @@ programme_Definition_Single <- list (
 
 ### Panel Browse ----
 
-browse_programmes <- list (
+browse_programmes <- list(
   selectRunID = "Selecct RunID",
   abuttonplusplot = "Add a new plot"
   )

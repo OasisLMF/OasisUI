@@ -730,8 +730,6 @@ step3_configureOutput <- function(input, output, session,
     logMessage("showing panelDefineOutputs")
     logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
     result$prrun_flag <- "C"
-    # selectRows(dataTableProxy("tableprocessrundata"), selected = NULL)
-    # selectPage(dataTableProxy("tableprocessrundata"), 1)
   })
 
   onclick("abuttonrerunpr", {
@@ -1032,10 +1030,6 @@ step3_configureOutput <- function(input, output, session,
   })
 
   ### > Logs ---------------------------------------------------------------
-
-
-
-
   onclick("abuttonshowlog", {
     show("panelProcessRunLogs")
     logMessage("showing prrunlogtable")
@@ -1101,7 +1095,6 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
 
   # Navigation --------------------------------------------------------------
   # Go to browse section
