@@ -475,14 +475,10 @@ step1_chooseProgramme <- function(input, output, session,
   onclick("buttonloadcanmodpr", {
     progId = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
     logMessage(paste("loading programme - progId is:", progId))
-    loadprogdata <- loadProgrammeData(
-      apiSettings,
-      progId = progId
-    )
+    loadprogdata <- loadProgrammeData(apiSettings,
+                                      progId = toString(progId))
     if (loadprogdata == 'success' || loadprogdata == 'Success') {
       flamingoNotification(type = "message", "Initiating load programme data...")
-      # Going to next step when programme load is successful (but not completed)
-      workflowSteps$update("2")
     } else {
       flamingoNotification(type = "error", "Failed to load programme data")
     }
@@ -556,7 +552,7 @@ step1_chooseProgramme <- function(input, output, session,
           flamingoNotification(type = "error", "Failed to link the File")
         } else {
           flamingoNotification(type = "message",
-                               paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+                               paste("File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
         }
       } else {
         flamingoNotification(type = "warning", "Please select a file to Link")
@@ -662,10 +658,10 @@ step1_chooseProgramme <- function(input, output, session,
     } else if (input$sinputSRSFile == "S") {
       show("divSRSFileSelect")
       hide("divSRSFileUpload")
-      SRfiles <- getFileSourceAccountFile(dbSettings)
+      SRSfiles <- getFileSourceReinsuranceScopeFile(dbSettings)
       updateSelectInput(
-        session, "sinputselectSRFile",
-        choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
+        session, "sinputselectSRSFile",
+        choices = createSelectOptions(SRSfiles, labelCol = 1, valueCol = 2)
       )
     }
   })
@@ -810,6 +806,7 @@ step1_chooseProgramme <- function(input, output, session,
       logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
       hide("panelProgrammeDetails")
       hide("panelDefineProgramme")
+      hide("panelLinkFiles")
 
       if (length(input$tableDPprog_rows_selected) > 0) {
         # note that tableDPprog allows single row selection only
