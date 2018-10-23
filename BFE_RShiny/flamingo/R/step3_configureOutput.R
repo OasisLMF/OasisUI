@@ -616,7 +616,6 @@ step3_configureOutput <- function(input, output, session,
     # a ProgOasisID that has no runs
     if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
       show("tableprocessrundata")
-      # show("divprocessRunButtons")
       result$prcrundata <- prcrundata %>%
         replaceWithIcons()
       #Handling bug for 'In Progress'
@@ -667,17 +666,6 @@ step3_configureOutput <- function(input, output, session,
     }
 
   })
-
-  # #Not allow any actions if the process run table is empty
-  # observeEvent(result$prcrundata, ignoreNULL = FALSE, ignoreInit = TRUE, {
-  #   if (active()) {
-  #     if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
-  #       show("divprocessRunButtons")
-  #     } else {
-  #       hide("divprocessRunButtons")
-  #     }
-  #   }
-  # })
 
   # > Configure Output --------------------------------------------
   # hide panel

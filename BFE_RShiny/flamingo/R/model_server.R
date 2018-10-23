@@ -234,12 +234,10 @@ modelSupplierPage <- function(input, output, session, dbSettings,
       }
     }
     removeModal()
-    result$crtAmFlag <- ""
   })
 
   observeEvent(input$btnCancelCrtAm, {
     removeModal()
-    result$crtAmFlag <- ""
   })
 
   observeEvent(input$btnConfirmDel, {
