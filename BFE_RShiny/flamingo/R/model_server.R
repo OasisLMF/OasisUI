@@ -216,22 +216,18 @@ modelSupplierPage <- function(input, output, session, dbSettings,
 
     } else if (result$crtAmFlag == "A") {
 
-      if(length(row <- input$mrtable_rows_selected) > 0) {
+      updtmodres <- updateModelResource(dbSettings,
+                                        result$MRData[row, 1],
+                                        input$tinmodelresname,
+                                        isolate(input$sinresrctype),
+                                        isolate(input$sinoasissysname),
+                                        isolate(result$MID),
+                                        input$tinmodelresvalue)
 
-        updtmodres <- updateModelResource(dbSettings,
-                                          result$MRData[row, 1],
-                                          input$tinmodelresname,
-                                          isolate(input$sinresrctype),
-                                          isolate(input$sinoasissysname),
-                                          isolate(result$MID),
-                                          input$tinmodelresvalue)
+      flamingoNotification(sprintf("Model Resource %s updated.", updtmodres),
+                           type = "message")
 
-        flamingoNotification(sprintf("Model Resource %s updated.", updtmodres),
-                             type = "message")
-
-        .reloadMRData()
-
-      }
+      .reloadMRData()
     }
     removeModal()
   })
