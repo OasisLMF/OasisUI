@@ -38,7 +38,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
     preselectedRunId = NULL,
     selectedRunId = NULL,
     #Panel to select
-    preselPanel = "1",
+    preselPanel = 1,
     # output files table
     filesListData = NULL
   )
@@ -48,7 +48,9 @@ visualizationSBR <- function(input, output, session, dbSettings,
   
   #clean value
   observeEvent(active(), {
-    result$preselPanel <- "1"
+    if (active()) {
+      result$preselPanel <- 1
+    }
   })
   
   
@@ -101,7 +103,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
     updateNavigation(navigation_state, "PS")
-    result$preselPanel <- "4"
+    result$preselPanel <- 3
   })
   
   # Tab Summary ----------------------------------------------------------------
