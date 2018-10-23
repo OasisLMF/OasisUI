@@ -39,7 +39,7 @@ panelProcessRunTable <- function(id) {
     ),
     div(id = "divProcessRun",
         fluidRow(column(12,
-                        radioButtons(inputId = ns("radioprrunsAllOrInProgress"), "Processes' Status", list("All", "In_Progress"), inline = TRUE))),
+                        radioButtons(inputId = ns("radioprrunsAllOrInProgress"), "Processes' Status", list("All", "In Progress"), inline = TRUE))),
         DTOutput(ns("tableprocessrundata")),
         fluidRow(column(12,
                         div(id = ns("divprocessRunButtons"),
@@ -615,7 +615,6 @@ step3_configureOutput <- function(input, output, session,
     # RSc TODO: should probably allow NULL to clear connections when selecting
     # a ProgOasisID that has no runs
     if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
-      show("tableprocessrundata")
       result$prcrundata <- prcrundata %>%
         replaceWithIcons()
       #Handling bug for 'In Progress'
