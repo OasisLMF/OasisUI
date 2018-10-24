@@ -288,7 +288,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   })
 
   # Enable and disable buttons
-  observeEvent (input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$tablecompanyuserlist_rows_selected) > 0) {
         shinyjs::enable("abuttonuserupdate")
         shinyjs::enable("abuttonuserdelete")

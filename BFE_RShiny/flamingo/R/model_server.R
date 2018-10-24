@@ -149,7 +149,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   })
 
   # Enable and disable buttons
-  observeEvent ({
+  observeEvent({
     result$MRData
     input$mrtable_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$mrtable_rows_selected) > 0) {

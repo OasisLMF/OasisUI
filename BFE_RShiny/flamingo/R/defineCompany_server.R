@@ -89,7 +89,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   })
 
   # Enable and disable buttons
-  observeEvent (input$tablecompanylist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$tablecompanylist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$tablecompanylist_rows_selected) > 0) {
         shinyjs::enable("abuttoncompupdate")
         shinyjs::enable("abuttoncompdel")
