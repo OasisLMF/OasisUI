@@ -592,7 +592,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
 
-  ### > Process Run Table -----
+  ### Process Run Table -----
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioprrunsAllOrInProgress, ignoreInit = TRUE, {
     if (active()) {
@@ -629,10 +629,6 @@ step3_configureOutput <- function(input, output, session,
   output$tableprocessrundata <- renderDT(
 
     if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
-
-      # manual refresh button
-      invisible(input$abuttonrefreshprrun)
-
       # if (preselRunId() == -1) {
       #   index <- 1
       # } else {
@@ -666,7 +662,7 @@ step3_configureOutput <- function(input, output, session,
 
   })
 
-  # > Configure Output --------------------------------------------
+  # Configure Output --------------------------------------------
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
     hide("panelDefineOutputs")
@@ -903,7 +899,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
 
-  ### > Run Process --------------------------------------------------------
+  ### Run Process --------------------------------------------------------
   # A function to generate process run
   .generateRun <- function() {
 
@@ -1016,7 +1012,7 @@ step3_configureOutput <- function(input, output, session,
     .defaultview(session)
   })
 
-  ### > Logs ---------------------------------------------------------------
+  ### Logs ---------------------------------------------------------------
   onclick("abuttonshowlog", {
     show("panelProcessRunLogs")
     logMessage("showing prrunlogtable")
@@ -1061,8 +1057,13 @@ step3_configureOutput <- function(input, output, session,
     processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
     paste0('Logs for Run id ', processRunId, ' ', processRunName)
   })
+  
+  # Refresh Buttons ----------------------------------------------------------
+  onclick("abuttonrefreshprrun", {
+    .reloadRunData()
+  } )
 
-  # > Updates dependent on changed: tableprocessrundata_rows_selected ---------
+  # Updates dependent on changed: tableprocessrundata_rows_selected ---------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(input$tableprocessrundata_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {

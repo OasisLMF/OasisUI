@@ -246,9 +246,6 @@ step1_chooseProgramme <- function(input, output, session,
 
   ### Programme Table ----------------------------------------------------------
   output$tableDPprog <- renderDT({
-    # manual refresh button
-    invisible(input$abuttonprgtblrfsh)
-
     logMessage("re-rendering programme table")
     if (!is.null(result$DPProgData)) {
       if (isolate(result$selectprogrammeID) != "") {
@@ -276,9 +273,6 @@ step1_chooseProgramme <- function(input, output, session,
   # Programme Details Table ----------------------------------------------------
   output$tableprogdetails <- renderDT({
     if (!is.null(result$progDetails) && nrow(result$progDetails) > 0) {
-
-      # manual refresh button
-      invisible(input$abuttondefprogrfsh)
       logMessage("re-rendering programme details table")
       datatable(
         result$progDetails,
@@ -435,11 +429,11 @@ step1_chooseProgramme <- function(input, output, session,
 
     # Reload Programme Table
     .reloadDPProgData()
-    logMessage(paste("updating tableDPprog select because programme table was reloaded:", idxSel))
-    selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), idxSel)
-    selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), pageSel)
-    logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
-    show("panelLinkFiles")
+    logMessage(paste("updating tableDPprog select because programme table was reloaded"))
+    # selectRows(dataTableProxy("tableDPprog"), 1)
+    # selectPage(dataTableProxy("tableDPprog"), 1)
+    # logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+    # show("panelLinkFiles")
   })
 
   ### Clear Programme Definition panel
@@ -800,6 +794,15 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
+  # Refresh Buttons ------------------------------------------------------------
+  onclick("abuttonprgtblrfsh", {
+    .reloadDPProgData()
+  } )
+  
+  onclick("abuttondefprogrfsh", {
+    .reloadProgDetails()
+  } )
+  
   # Updates dependent on changed: tableDPprog_rows_selected --------------------
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -811,6 +814,11 @@ step1_chooseProgramme <- function(input, output, session,
       if (length(input$tableDPprog_rows_selected) > 0) {
         # note that tableDPprog allows single row selection only
         prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+        #If incomplete show panel to link files
+        currStatus <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status]
+        if (!is.na(currStatus) && currStatus == StatusProcessing) {
+          show("panelLinkFiles")
+        }
         if (prgId != result$selectprogrammeID) {
           logMessage(paste("updating selectprogrammeID because selection in programme table changed to", prgId))
           # re-selecting the same programme ID in the drop-down would not re-trigger
@@ -818,11 +826,6 @@ step1_chooseProgramme <- function(input, output, session,
           # sure not to increase stop_selProgID!
           stop_selProgID <<- stop_selProgID + 1
           result$selectprogrammeID <- prgId
-          #If incomplete show panel to link files
-          currStatus <- result$DPProgData[prgId, DPProgData.Status]
-          if (!is.na(currStatus) && currStatus == StatusProcessing) {
-            show("panelLinkFiles")
-          }
         }
       } else {
         result$selectprogrammeID <- ""
@@ -850,6 +853,7 @@ step1_chooseProgramme <- function(input, output, session,
 
   # Reload Programme table
   .reloadDPProgData <- function() {
+    # manual refresh button
     logMessage(".reloadDPProgData called")
     stmt <- buildDbQuery("getProgData")
     DPProgData <- executeDbQuery(dbSettings, stmt)

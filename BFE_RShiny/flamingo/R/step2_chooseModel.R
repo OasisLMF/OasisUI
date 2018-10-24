@@ -228,10 +228,6 @@ step2_chooseModel <- function(input, output, session,
   # Programme Model Table ------------------------------------------------------
   output$tableProgOasisOOK <- renderDT(
     if (!is.null(result$POData) && nrow(result$POData) > 0 ) {
-
-      # manual refresh button
-      invisible(input$abuttonookrefresh)
-
       if (isolate(result$selectprogOasisID) != "") {
         rowToSelect <- match(isolate(result$selectprogOasisID), result$POData[,POData.ProgOasisId])
       } else {
@@ -277,9 +273,6 @@ step2_chooseModel <- function(input, output, session,
   # Model Details Table --------------------------------------------------------
   output$tabledisplayprogoasisfiles <- renderDT(
     if (!is.null(result$progFiles) && nrow(result$progFiles) > 0 ) {
-
-      # manual refresh button
-      invisible(input$abuttonprgoasisrfsh)
       logMessage("re-rendering programme model details table")
       datatable(
         result$progFiles,
@@ -391,6 +384,15 @@ step2_chooseModel <- function(input, output, session,
     hide("panelAssociateModel")
   })
 
+  # Refresh Buttons ------------------------------------------------------------
+  onclick("abuttonookrefresh", {
+    .reloadPOData()
+  } )
+  
+  onclick("abuttonprgoasisrfsh", {
+    .reloadProgFiles()
+  } )
+  
   # Updates dependent on changed: tableProgOasisOOK_rows_selected --------------
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
