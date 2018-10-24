@@ -436,8 +436,8 @@ step1_chooseProgramme <- function(input, output, session,
     # Reload Programme Table
     .reloadDPProgData()
     logMessage(paste("updating tableDPprog select because programme table was reloaded:", idxSel))
-    selectRows(dataTableProxy("tableDPprog"), idxSel)
-    selectPage(dataTableProxy("tableDPprog"), pageSel)
+    selectRows(dataTableProxy("tableDPprog"), idxSel, deferUntilFlush = FALSE)
+    selectPage(dataTableProxy("tableDPprog"), pageSel, deferUntilFlush = FALSE)
     logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
     show("panelLinkFiles")
   })

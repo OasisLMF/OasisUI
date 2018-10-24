@@ -337,7 +337,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
   # Enable and disable create button
-  observeEvent ({
+  observeEvent({
     input$sinputookmodelid
     input$sinputProgModTransform
   }, ignoreInit = TRUE, {
@@ -365,14 +365,15 @@ step2_chooseModel <- function(input, output, session,
         .reloadPOData()
         idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
         pageSel <- ceiling(idxSel/pageLength)
-        selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
-        selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
+        selectRows(dataTableProxy("tableProgOasisOOK"), idxSel, deferUntilFlush = FALSE)
+        selectPage(dataTableProxy("tableProgOasisOOK"), pageSel, deferUntilFlush = FALSE)
         logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
         logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
         loadprogmodel <- loadProgrammeModel(
           apiSettings,
           progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId])
         )
+        flamingoNotification(type = "message", paste("loadprogmodel id:",loadprogmodel))
         if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
           flamingoNotification(type = "message", "Initiating load programme model...")
           #.reloadProgFiles()
