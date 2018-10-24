@@ -436,8 +436,8 @@ step1_chooseProgramme <- function(input, output, session,
     # Reload Programme Table
     .reloadDPProgData()
     logMessage(paste("updating tableDPprog select because programme table was reloaded:", idxSel))
-    selectRows(dataTableProxy("tableDPprog"), idxSel, deferUntilFlush = FALSE)
-    selectPage(dataTableProxy("tableDPprog"), pageSel, deferUntilFlush = FALSE)
+    selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), idxSel)
+    selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), pageSel)
     logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
     show("panelLinkFiles")
   })
@@ -779,20 +779,20 @@ step1_chooseProgramme <- function(input, output, session,
             #backward propagation
             if (is.null(input$tableDPprog_rows_selected)) {
               if (workflowSteps$step() == '2'){
-                selectRows(dataTableProxy("tableDPprog"), rowToSelect)
-                selectPage(dataTableProxy("tableDPprog"), pageSel)
+                selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), rowToSelect)
+                selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), pageSel)
                 logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
               }
             } else if (rowToSelect != input$tableDPprog_rows_selected) {
               # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
-              selectRows(dataTableProxy("tableDPprog"), rowToSelect)
-              selectPage(dataTableProxy("tableDPprog"), pageSel)
+              selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), rowToSelect)
+              selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), pageSel)
               logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
             }
           }
         } else {
-          selectRows(dataTableProxy("tableDPprog"), NULL)
-          selectPage(dataTableProxy("tableDPprog"), 1)
+          selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), NULL)
+          selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), 1)
           logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
         }
         if (bl_dirty) check_selProgID <<- check_selProgID + 1

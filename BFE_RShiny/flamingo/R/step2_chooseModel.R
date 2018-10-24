@@ -211,14 +211,14 @@ step2_chooseModel <- function(input, output, session,
           pageSel <- ceiling(rowToSelect/pageLength)
           if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
             # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
-            selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
-            selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
+            selectRows(dataTableProxy("tableProgOasisOOK", deferUntilFlush = FALSE), rowToSelect)
+            selectPage(dataTableProxy("tableProgOasisOOK", deferUntilFlush = FALSE), pageSel)
             logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
           }
         }
       } else {
-        selectRows(dataTableProxy("tableProgOasisOOK"), NULL)
-        selectPage(dataTableProxy("tableProgOasisOOK"), 1)
+        selectRows(dataTableProxy("tableProgOasisOOK", deferUntilFlush = FALSE), NULL)
+        selectPage(dataTableProxy("tableProgOasisOOK", deferUntilFlush = FALSE), 1)
         logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
       }
       if (bl_dirty1) check_selProgOasisID <<- check_selProgOasisID + 1
@@ -365,15 +365,14 @@ step2_chooseModel <- function(input, output, session,
         .reloadPOData()
         idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
         pageSel <- ceiling(idxSel/pageLength)
-        selectRows(dataTableProxy("tableProgOasisOOK"), idxSel, deferUntilFlush = FALSE)
-        selectPage(dataTableProxy("tableProgOasisOOK"), pageSel, deferUntilFlush = FALSE)
+        selectRows(dataTableProxy("tableProgOasisOOK", deferUntilFlush = FALSE), idxSel)
+        selectPage(dataTableProxy("tableProgOasisOOK", deferUntilFlush = FALSE), pageSel)
         logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded:", idxSel))
         logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
         loadprogmodel <- loadProgrammeModel(
           apiSettings,
           progOasisId = toString(result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId])
         )
-        flamingoNotification(type = "message", paste("loadprogmodel id:",loadprogmodel))
         if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
           flamingoNotification(type = "message", "Initiating load programme model...")
           #.reloadProgFiles()
