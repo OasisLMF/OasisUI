@@ -190,11 +190,9 @@ step2_chooseModel <- function(input, output, session,
   # Define selectprogOasisID ---------------------------------------------------
   observeEvent(result$POData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
-      if (result$selectprogOasisID != "") {
+      if (result$selectprogOasisID != "" && !is.null(result$POData) && nrow(result$POData) > 0) {
         logMessage(paste0("updating selectprogOasisID choices because Programme Model Table was reloaded - contains ", nrow(result$POData), " rows"))
         result$selectprogOasisID <- result$POData[1, POData.ProgOasisId]
-      } else {
-        result$selectprogOasisID <- ""
       }
     }
   })
@@ -304,7 +302,8 @@ step2_chooseModel <- function(input, output, session,
       disable("buttonpgotonextstep")
       if (length(input$tableProgOasisOOK_rows_selected) > 0) {
         enable("buttonmodeldetails")
-        if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {
+        currStatus <- result$POData[input$tableProgOasisOOK_rows_selected, POData.Status]
+        if (!is.na(currStatus) && currStatus == StatusCompleted) {
           enable("buttonpgotonextstep")
         }
       } 
