@@ -148,8 +148,6 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   })
   
   observeEvent(submodulesList$step1_chooseProgramme$newstep(), ignoreInit = TRUE, {
-    print("submodulesList$step1_chooseProgramme$newstep()")
-    print(submodulesList$step1_chooseProgramme$newstep())
     workflowSteps$update(programmeWorkflowSteps[[2]])
   })
   

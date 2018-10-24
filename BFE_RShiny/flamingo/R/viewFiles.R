@@ -150,8 +150,6 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
 
   lapply(seq(maxrowsperpage), function(i){
     onclick(paste0("srows_", i), {
-      print("srows_i")
-      print(input[[paste0("srows_", i)]])
       if (i %notin% input$outputFLtable_rows_selected) {
         session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
       } else {
