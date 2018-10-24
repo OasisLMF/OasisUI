@@ -540,8 +540,7 @@ step3_configureOutput <- function(input, output, session,
                                   selectprogrammeID = reactive(""),
                                   selectprogOasisID = reactive(""),
                                   progOasisName = reactive(""),
-                                  progOasisStatus = reactive(""),
-                                  POData_rowselected  = reactive(NULL)
+                                  progOasisStatus = reactive("")
 ) {
   
   ns <- session$ns
@@ -1175,12 +1174,8 @@ step3_configureOutput <- function(input, output, session,
                       selected = character(0))
     updateTextInput(session, "tinputprocessrunname", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
-    if (length(POData_rowselected()) > 0) {
-      prgId <- selectprogOasisID()
-      prgId <- ifelse(is.null(prgId), toString(prgId), -1)
-    } else {
-      prgId <- -1
-    }
+    
+    prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
     if (prgId != -1) {
       updateSelectInput(session, "sinputeventset",
                         choices = getEventSet(dbSettings, prgId ))

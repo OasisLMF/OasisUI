@@ -135,8 +135,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     selectprogrammeID = reactive(input$selectprogrammeID),
     selectprogOasisID = reactive(input$selectprogOasisID),
     progOasisName = reactive({result$progOasisName}),
-    progOasisStatus = reactive({result$progOasisStatus}),
-    POData_rowselected = reactive({result$POData_rowselected})
+    progOasisStatus = reactive({result$progOasisStatus})
   )
   
   # Sub-Modules output ---------------------------------------------------------
