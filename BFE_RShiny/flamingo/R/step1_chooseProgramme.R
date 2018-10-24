@@ -818,6 +818,11 @@ step1_chooseProgramme <- function(input, output, session,
           # sure not to increase stop_selProgID!
           stop_selProgID <<- stop_selProgID + 1
           result$selectprogrammeID <- prgId
+          #If incomplete show panel to link files
+          currStatus <- result$DPProgData[prgId, DPProgData.Status]
+          if (!is.na(currStatus) && currStatus == StatusProcessing) {
+            show("panelLinkFiles")
+          }
         }
       } else {
         result$selectprogrammeID <- ""
