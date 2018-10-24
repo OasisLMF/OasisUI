@@ -360,7 +360,8 @@ step2_chooseModel <- function(input, output, session,
         flamingoNotification(type = "error", paste("No Prog Oasis created"))
       } else {
         flamingoNotification(type = "message", paste("Prog Oasis id:",prgId, " created"))
-        .clearOOKSidebar()
+        .clearOOKTransformSelection()
+        .clearOOKModelSelection()
         .defaultAssociateModel()
         .reloadPOData()
         idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
