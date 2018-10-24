@@ -1094,7 +1094,6 @@ step3_configureOutput <- function(input, output, session,
   #show default view for Section "Configure Output & Run" = "3"
   .defaultRun <- function(){
     logMessage(".defaultRun called")
-    show("panelDefineIDs")
     show("panelProcessRunTable")
     disable("chkgulpolicy")
     disable("abuttonrerunpr")

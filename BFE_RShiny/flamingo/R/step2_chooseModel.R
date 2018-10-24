@@ -454,7 +454,6 @@ step2_chooseModel <- function(input, output, session,
   #show default view for Section "Choose Model" = "2"
   .defaultAssociateModel <- function(){
     logMessage(".defaultAssociateModel called")
-    show("panelDefineIDs")
     show("panelProgrammeModelTable")
     hide("panelAssociateModel")
   }
