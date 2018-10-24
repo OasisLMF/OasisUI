@@ -906,25 +906,20 @@ step3_configureOutput <- function(input, output, session,
     eventsetid <- isolate(input$sinputeventset)
     eventoccid <- isolate(input$sinputeventocc)
     
-    # windperil <- NULL
-    # surgeperil <- NULL
-    # quakeperil <- NULL
-    # floodperil <- NULL
-    # dmdsurge <- NULL
-    # leakagefactor <- NULL
+    windperil <- NULL
+    surgeperil <- NULL
+    quakeperil <- NULL
+    floodperil <- NULL
+    dmdsurge <- NULL
+    leakagefactor <- NULL
     
     summaryreports <- tolower(isolate(input$chkinputsummaryoption))
     
     # functionality to handle model resource based metrics
-    if (length(POData_rowselected()) > 0) {
-      prgId <- selectprogOasisID()
-      prgId <- ifelse(is.null(prgId), toString(prgId), -1)
-    } else {
-      prgId <- -1
-    }
+    prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
     stmt <- buildDbQuery("getRuntimeParamList", prgId)
     runparamlist <- executeDbQuery(dbSettings, stmt)
-    
+
     rows <- nrow(runparamlist)
     if (rows > 0) {
       for (i in 1:rows) {
