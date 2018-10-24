@@ -995,8 +995,8 @@ step3_configureOutput <- function(input, output, session,
         logMessage(paste("updating tableprocessrundataa select because executing a new run"))
         rowToSelect <- match(runId, result$prcrundata[, prcrundata.ProcessRunID])
         pageSel <- ceiling(rowToSelect/pageLength)
-        selectRows(dataTableProxy("tableprocessrundata", deferUntilFlush = FALSE), rowToSelect)
-        selectPage(dataTableProxy("tableprocessrundata", deferUntilFlush = FALSE), pageSel)
+        selectRows(dataTableProxy("tableprocessrundata"), rowToSelect)
+        selectPage(dataTableProxy("tableprocessrundata"), pageSel)
         logMessage(paste("selected row is:", input$tableprocessrundata_rows_selected))
       } else {
         flamingoNotification(type = "warning",

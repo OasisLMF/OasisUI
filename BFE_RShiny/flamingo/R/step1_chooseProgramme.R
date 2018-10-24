@@ -774,19 +774,19 @@ step1_chooseProgramme <- function(input, output, session,
             pageSel <- ceiling(rowToSelect/pageLength)
             #backward propagation
             if (is.null(input$tableDPprog_rows_selected)) {
-                selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), rowToSelect)
-                selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), pageSel)
+                selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+                selectPage(dataTableProxy("tableDPprog"), pageSel)
                 logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
             } else if (rowToSelect != input$tableDPprog_rows_selected) {
               # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
-              selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), rowToSelect)
-              selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), pageSel)
+              selectRows(dataTableProxy("tableDPprog"), rowToSelect)
+              selectPage(dataTableProxy("tableDPprog"), pageSel)
               logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
             }
           }
         } else {
-          selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), NULL)
-          selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), 1)
+          selectRows(dataTableProxy("tableDPprog"), NULL)
+          selectPage(dataTableProxy("tableDPprog"), 1)
           logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
         }
         if (bl_dirty) check_selProgID <<- check_selProgID + 1
