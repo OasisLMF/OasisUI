@@ -368,7 +368,6 @@ step2_chooseModel <- function(input, output, session,
           apiSettings,
           progOasisId = toString(prgId)
         )
-        flamingoNotification(type = "message", paste("loadprogmodel is:",loadprogmodel))
         if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
           flamingoNotification(type = "message", "Initiating load programme model...")
           #.reloadProgFiles()
