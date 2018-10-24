@@ -193,7 +193,7 @@ panelLinkFiles <- function(id) {
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
 #' @importFrom dplyr mutate select case_when
-#' @importFrom shinyjs onclick js removeClass addClass
+#' @importFrom shinyjs onclick disable enable
 #' @export
 step1_chooseProgramme <- function(input, output, session,
                                   dbSettings,apiSettings, userId,
@@ -298,22 +298,21 @@ step1_chooseProgramme <- function(input, output, session,
   })
 
   # Enable and disable buttons
-  observeEvent ({
+  observeEvent({
     result$DPProgData
     input$tableDPprog_rows_selected
     }, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      disable("buttonprogdetails")
+      disable("buttondeletepr")
+      disable("buttonamendpr")
+      disable("buttonpgotonextstep")
     if (length(input$tableDPprog_rows_selected) > 0) {
-      shinyjs::enable("buttonprogdetails")
-      shinyjs::enable("buttondeletepr")
-      shinyjs::enable("buttonamendpr")
+      enable("buttonprogdetails")
+      enable("buttondeletepr")
+      enable("buttonamendpr")
       if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusCompleted) {
-        shinyjs::enable("buttonpgotonextstep")
+        enable("buttonpgotonextstep")
       }
-    } else {
-      shinyjs::disable("buttonprogdetails")
-      shinyjs::disable("buttondeletepr")
-      shinyjs::disable("buttonamendpr")
-      shinyjs::disable("buttonpgotonextstep")
     }
   })
 
@@ -389,9 +388,9 @@ step1_chooseProgramme <- function(input, output, session,
     input$sinputTransformname
   }, ignoreInit = TRUE, {
     if (input$tinputDPProgName == "" || input$sinputDPAccountName == "" || input$sinputTransformname == "") {
-      shinyjs::disable("abuttonProgSubmit")
+      disable("abuttonProgSubmit")
     } else {
-      shinyjs::enable("abuttonProgSubmit")
+      enable("abuttonProgSubmit")
     }
   })
 
@@ -430,6 +429,9 @@ step1_chooseProgramme <- function(input, output, session,
     # Reload Programme Table
     .reloadDPProgData()
     logMessage(paste("updating tableDPprog select because programme table was reloaded"))
+    result$selectprogrammeID <- result$DPProgData[1, DPProgData.ProgrammeID]
+    hide("panelDefineProgramme")
+    show("panelLinkFiles")
     # selectRows(dataTableProxy("tableDPprog"), 1)
     # selectPage(dataTableProxy("tableDPprog"), 1)
     # logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
@@ -772,11 +774,9 @@ step1_chooseProgramme <- function(input, output, session,
             pageSel <- ceiling(rowToSelect/pageLength)
             #backward propagation
             if (is.null(input$tableDPprog_rows_selected)) {
-              if (workflowSteps$step() == '2'){
                 selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), rowToSelect)
                 selectPage(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), pageSel)
                 logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
-              }
             } else if (rowToSelect != input$tableDPprog_rows_selected) {
               # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
               selectRows(dataTableProxy("tableDPprog", deferUntilFlush = FALSE), rowToSelect)
@@ -814,7 +814,7 @@ step1_chooseProgramme <- function(input, output, session,
       if (length(input$tableDPprog_rows_selected) > 0) {
         # note that tableDPprog allows single row selection only
         prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-        #If incomplete show panel to link files
+        # #If incomplete show panel to link files
         currStatus <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status]
         if (!is.na(currStatus) && currStatus == StatusProcessing) {
           show("panelLinkFiles")
