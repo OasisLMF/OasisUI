@@ -5,8 +5,8 @@
 \title{Module for flamingoTable}
 \usage{
 flamingoTable(input, output, session, data, selection = "none",
-  escape = TRUE, scrollX = FALSE, maxrowsperpage = 10,
-  logMessage = message)
+  escape = TRUE, scrollX = FALSE, filter = FALSE, rownames = FALSE,
+  colnames = TRUE, maxrowsperpage = 10, logMessage = message)
 }
 \arguments{
 \item{input}{shiny input object}
