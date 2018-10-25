@@ -78,6 +78,8 @@ panelOutputModuleUI <-  function(id){
 #' @importFrom shinyjs show hide enable disable hidden
 #' @importFrom DT renderDT datatable
 #' @importFrom dplyr mutate select contains filter
+#' @importFrom plotly ggplotly renderPlotly plotlyOutput
+#' @importFrom ggplot2 geom_line geom_hline ggplot scale_color_manual labs theme aes element_text element_line element_blank geom_point geom_area facet_wrap scale_x_continuous geom_bar geom_errorbar
 #' @export
 #' @export
 outputplots <- function(input, output, session, dbSettings,
