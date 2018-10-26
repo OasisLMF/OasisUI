@@ -336,12 +336,15 @@ replaceWithIcons <- function(df){
   '%notin%' <- Negate('%in%')
   
   #Replace Status in df
-  logMessage(paste0("replacing icons"))
-  df <- df %>%
-    mutate(Status = tolower(Status)) %>%
-    mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                              Status %in% StatusBad ~ StatusFailed,
-                              Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-    as.data.frame()
+  if (!is.null(df)) {
+    logMessage(paste0("replacing icons"))
+    df <- df %>%
+      mutate(Status = tolower(Status)) %>%
+      mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
+                                Status %in% StatusBad ~ StatusFailed,
+                                Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
+      as.data.frame()
+  }
+
   df
 }

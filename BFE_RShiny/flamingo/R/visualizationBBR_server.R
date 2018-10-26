@@ -51,6 +51,8 @@ visualizationBBR <- function(input, output, session, dbSettings,
   sub_modules$defineID <- callModule(
     defineID,
     id = "defineID",
+    dbSettings = dbSettings,
+    userId = reactive(userId()),
     runIdList = runIdList,
     preselectedRunId = reactive(result$preselectedRunId),
     logMessage = logMessage)

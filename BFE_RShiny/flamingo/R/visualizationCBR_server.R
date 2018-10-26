@@ -85,6 +85,8 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   sub_modules$defineID1 <- callModule(
     defineID,
     id = "defineID-1",
+    dbSettings = dbSettings,
+    userId = reactive(userId()),
     runIdList = runIdList,
     preselectedRunId = reactive(result$preselectedRunId),
     logMessage = logMessage)
@@ -96,6 +98,8 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   sub_modules$defineID2 <- callModule(
     defineID,
     id = "defineID-2",
+    dbSettings = dbSettings,
+    userId = reactive(userId()),
     runIdList = runIdList,
     preselectedRunId = reactive(result$preselectedRunId),
     logMessage = logMessage)
