@@ -159,7 +159,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   )
   
   # Selected Row --------------------------------------------------------
-  observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, {
+  observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
       lapply(input$outputFLtable_rows_selected, function(i) {
         # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
@@ -175,14 +175,13 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
         hide(paste0("vrows_", i))})
     }
-    
   })
   
   
   # Select All Functionality --------------------------------------------
   
   #If page in table is changed, update rows selection based on select all value
-  observe({
+  observeEvent( input$outputFLtable_rows_current, ignoreNULL= FALSE, ignoreInit = TRUE, {
     if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
       lapply(input$outputFLtable_rows_current, function(i){
         if (input$chkboxselectall) {
@@ -197,24 +196,24 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     }
   })
   
-  #update checkboxes according to selectAll button
-  observeEvent(input$chkboxselectall, ignoreNULL = FALSE, {
-    if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
-      lapply(input$outputFLtable_rows_current, function(i){
-        if (input$chkboxselectall) {
-          # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
-          session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
-        } else {
-          # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+  # #update checkboxes according to selectAll button
+  observeEvent(input$chkboxselectall, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if(!is.null(result$filesListDataButtons)){
+      if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
+        lapply(input$outputFLtable_rows_current, function(i){
+          if (input$chkboxselectall) {
+            session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
+          } else {
+            session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+          }
+        })
+        selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
+      } else {
+        lapply(input$outputFLtable_rows_current, function(i){
           session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
-        }
-      })
-      selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
-    } else {
-      lapply(input$outputFLtable_rows_current, function(i){
-        session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
-      })
-      selectRows(dataTableProxy("outputFLtable"), NULL)
+        })
+        selectRows(dataTableProxy("outputFLtable"), NULL)
+      }
     }
   })
   
@@ -236,8 +235,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                htmlOutput(ns("tableFVExposureStatisticInfo")))),
       br(),
       fluidRow(
-        hidden(flamingoButton(inputId = ns("view"), label = "View")),
-        hidden(flamingoButton(inputId = ns("map"), label = "Map")),
+        hidden(flamingoButton(inputId = ns("view"), label = "View", icon = icon("file"))),
+        hidden(flamingoButton(inputId = ns("map"), label = "Map", icon = icon("map"))),
         downloadButton(ns("FVEdownloadexcel"), label = "Export to csv"),
         style = "inline:true"), 
       hidden(flamingoPanel(
