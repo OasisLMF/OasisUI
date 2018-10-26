@@ -11,10 +11,10 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
   tagList(
     tags$script("Shiny.addCustomMessageHandler('resetInputValue', function(variableName){
                 Shiny.onInputChange(variableName, null);});"),
-    # tags$script("Shiny.addCustomMessageHandler('resetColorWhite', function(variableName){
-    #              document.getElementById(variableName).style.color = '#ffffff';});"),
-    # tags$script("Shiny.addCustomMessageHandler('setColorOasis', function(variableName){
-    #              document.getElementById(variableName).style.color = '#8b2129';});"),
+    tags$script("Shiny.addCustomMessageHandler('resetColorWhite', function(variableName){
+                 document.getElementById(variableName).style.color = '#ffffff';});"),
+    tags$script("Shiny.addCustomMessageHandler('setColorOasis', function(variableName){
+                 document.getElementById(variableName).style.color = '#8b2129';});"),
     if (includechkbox) {
       checkboxInput(inputId = ns("chkboxselectall"), label = "Select all", value = FALSE)
     },
@@ -166,66 +166,67 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   )
 
   # Selected Row --------------------------------------------------------
-  # observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-  #   if (length( input$outputFLtable_rows_selected) > 0) {
-  #     print("input$outputFLtable_rows_selected")
-  #     print(input$outputFLtable_rows_selected)
-  #     lapply(input$outputFLtable_rows_selected, function(i) {
-  #       # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
-  #       session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
-  #       .enableButton(i)})
-  #     lapply(setdiff(input$outputFLtable_rows_current, input$outputFLtable_rows_selected), function(i) {
-  #       # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
-  #       session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
-  #       .hideButtons(i)})
-  #   }else {
-  #     lapply(input$outputFLtable_rows_current, function(i){
-  #        # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
-  #       session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
-  #       .hideButtons(i)})
-  #   }
-  # 
-  # })
+  observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (length( input$outputFLtable_rows_selected) > 0) {
+      print("input$outputFLtable_rows_selected")
+      print(input$outputFLtable_rows_selected)
+      lapply(input$outputFLtable_rows_selected, function(i) {
+        # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
+        session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
+        .enableButton(i)})
+      lapply(setdiff(input$outputFLtable_rows_current, input$outputFLtable_rows_selected), function(i) {
+        # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+        session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+        .hideButtons(i)})
+    }else {
+      lapply(input$outputFLtable_rows_current, function(i){
+         # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+        session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+        .hideButtons(i)})
+    }
+  })
 
 
   # Select All Functionality --------------------------------------------
 
   #If page in table is changed, update rows selection based on select all value
-  # observe({
-  #   if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
-  #     lapply(input$outputFLtable_rows_current, function(i){
-  #       if (input$chkboxselectall) {
-  #         # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
-  #         session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
-  #       } else {
-  #         # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
-  #         session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
-  #       }
-  #     })
-  #     selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
-  #   }
-  # })
-
-  #update checkboxes according to selectAll button
-  # observeEvent(input$chkboxselectall, ignoreNULL = FALSE, {
-  #   if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
-  #     lapply(input$outputFLtable_rows_current, function(i){
-  #       if (input$chkboxselectall) {
-  #         # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
-  #         session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
-  #       } else {
-  #         # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
-  #         session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
-  #       }
-  #     })
-  #     selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
-  #   } else {
-  #     lapply(input$outputFLtable_rows_current, function(i){
-  #       session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
-  #     })
-  #     selectRows(dataTableProxy("outputFLtable"), NULL)
-  #   }
-  # })
+  observeEvent( input$outputFLtable_rows_current, ignoreNULL= FALSE, ignoreInit = TRUE, {
+    if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
+      lapply(input$outputFLtable_rows_current, function(i){
+        if (input$chkboxselectall) {
+          # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
+          session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
+        } else {
+          # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+          session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+        }
+      })
+      selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
+    }
+  })
+  
+  # #update checkboxes according to selectAll button
+  observeEvent(input$chkboxselectall, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if(!is.null(result$filesListDataButtons)){
+      if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
+        lapply(input$outputFLtable_rows_current, function(i){
+          if (input$chkboxselectall) {
+            # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
+            session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
+          } else {
+            # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
+            session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+          }
+        })
+        selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
+      } else {
+        lapply(input$outputFLtable_rows_current, function(i){
+          session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+        })
+        selectRows(dataTableProxy("outputFLtable"), NULL)
+      }
+    }
+  })
   
 
   # File content view ---------------------------------------------------
