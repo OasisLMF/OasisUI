@@ -84,16 +84,23 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
 
   # onclick of create button in main panel
   onclick("abuttoncompcrt", {
-
     result$compFlag <- "C"
-
     showModal(.compcrtupmodal())
-
   })
+
+  # Enable and disable buttons
+  observeEvent(input$tablecompanylist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      if (length(input$tablecompanylist_rows_selected) > 0) {
+        shinyjs::enable("abuttoncompupdate")
+        shinyjs::enable("abuttoncompdel")
+      } else {
+        shinyjs::disable("abuttoncompupdate")
+        shinyjs::disable("abuttoncompdel")
+      }
+    })
 
   # on click of update button in main panel
   onclick("abuttoncompupdate", {
-    if(length(input$tablecompanylist_rows_selected) > 0){
       showModal(.compcrtupmodal())
       result$compFlag <- "U"
       updateTextInput(session, "tinputCompName",
@@ -104,10 +111,6 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
                       value = result$compData[input$tablecompanylist_rows_selected, 4])
       updateTextInput(session, "tinputCompRegNo",
                       value = result$compData[input$tablecompanylist_rows_selected, 5])
-    } else{
-      flamingoNotification(type = "warning",
-                       "Please select the company to update.")
-    }
   })
 
   # modalDialog of delete button in main panel
@@ -129,12 +132,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
 
   # on click of delete button in main panel
   onclick("abuttoncompdel", {
-    if(length(input$tablecompanylist_rows_selected) > 0){
       showModal(.compdelmodal())
-    } else{
-      flamingoNotification(type = "warning",
-                       "Please select the company to delete")
-    }
   })
 
   # on click of cancel button in delete modal

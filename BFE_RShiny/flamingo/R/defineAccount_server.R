@@ -67,7 +67,7 @@ accountDefinition <- function(input, output, session, dbSettings,
                 textInput(ns("tinputDAAccountName"), "Account Name"),
                 footer = tagList(
                   flamingoButton(ns("abuttonAccSubmit"),
-                               label = "Submit", align = "left"),
+                                 label = "Submit", align = "left"),
                   actionButton(ns("abuttonAccCancel"),
                                label = "Cancel", align = "right")
                 ),
@@ -83,19 +83,23 @@ accountDefinition <- function(input, output, session, dbSettings,
     updateTextInput(session, "tinputDAAccountName", value = "")
   })
 
-  onclick("buttonamendac", {
-    if (length(row <- input$tableDAAccount_rows_selected) > 0) {
-
-      result$accFlag <- "A"
-
-      showModal(.crtupModal())
-      updateTextInput(session, "tinputDAAccountName",
-                      value = result$DAAccountData[row, 2])
-
+  # Enable and disable buttons
+  observeEvent(input$tableDAAccount_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (length(input$tableDAAccount_rows_selected) > 0) {
+      shinyjs::enable("buttonamendac")
+      shinyjs::enable("buttondeleteac")
     } else {
-      flamingoNotification(type = "warning",
-                       "Please select an Account to Amend")
+      shinyjs::disable("buttonamendac")
+      shinyjs::disable("buttondeleteac")
     }
+  })
+
+  onclick("buttonamendac", {
+    result$accFlag <- "A"
+
+    showModal(.crtupModal())
+    updateTextInput(session, "tinputDAAccountName",
+                    value = result$DAAccountData[row, 2])
   })
 
   onclick("abuttonAccSubmit", {
@@ -108,10 +112,10 @@ accountDefinition <- function(input, output, session, dbSettings,
 
       if (is.null(res)) {
         flamingoNotification(type = "error",
-                         sprintf("Failed to create an account - %s", input$tinputDAAccountName))
+                             sprintf("Failed to create an account - %s", input$tinputDAAccountName))
       } else {
         flamingoNotification(type = "message",
-                         sprintf("Account %s created.", input$tinputDAAccountName))
+                             sprintf("Account %s created.", input$tinputDAAccountName))
       }
 
     } else if (result$accFlag == "A") {
@@ -124,11 +128,11 @@ accountDefinition <- function(input, output, session, dbSettings,
 
         if (is.null(res)) {
           flamingoNotification(type = "error",
-                           paste("Failed to amend an account - ", result$DAAccountData[row, 2]))
+                               paste("Failed to amend an account - ", result$DAAccountData[row, 2]))
 
         } else {
           flamingoNotification(type = "message",
-                           paste("Account ", result$DAAccountData[row, 2], " amended."))
+                               paste("Account ", result$DAAccountData[row, 2], " amended."))
         }
 
       }
@@ -158,7 +162,7 @@ accountDefinition <- function(input, output, session, dbSettings,
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("btnConfirmDel"),
-                               label = "Confirm", align = "center"),
+                                 label = "Confirm", align = "center"),
                   actionButton(ns("btnCancelDel"),
                                label = "Cancel", align = "right")
                 ),
@@ -173,7 +177,7 @@ accountDefinition <- function(input, output, session, dbSettings,
       showModal(.delModal())
     } else {
       flamingoNotification(type = "warning",
-                       "Please select an Account to Delete")
+                           "Please select an Account to Delete")
     }
 
   })
@@ -192,16 +196,16 @@ accountDefinition <- function(input, output, session, dbSettings,
 
       if (is.null(res)) {
         flamingoNotification(type = "message",
-                         sprintf("Failed to delete account %s",
-                                 result$DAAccountData[row, 2]))
+                             sprintf("Failed to delete account %s",
+                                     result$DAAccountData[row, 2]))
       } else {
+
         flamingoNotification(type = "message",
-                         sprintf("Account %s deleted",
-                                 result$DAAccountData[row, 2]))
+                             sprintf("Account %s deleted",
+                                     result$DAAccountData[row, 2]))
+
       }
-
     }
-
     .reloadDAAccountData()
 
   })

@@ -461,8 +461,8 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
       labs(title = titleToUse, x = xlabel, y = ylabel) +
       theme(
-        plot.title = element_text(color = "grey45", size = 18, face = "bold.italic", hjust = 0.5),
-        text = element_text(size = 18),
+        plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
+        text = element_text(size = 12),
         panel.background = element_blank(),
         axis.line.x = element_line(color = "grey45", size = 0.5),
         axis.line.y = element_line(color = "grey45", size = 0.5),

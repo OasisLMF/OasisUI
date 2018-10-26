@@ -15,7 +15,8 @@ step1_chooseProgrammeUI <- function(id) {
     # Section "Choose Programme" = "1"
     div(id = ns("panelProgrammeTable"), panelProgrammeTable(id)),
     hidden(div(id = ns("panelProgrammeDetails"), panelProgrammeDetails(id))),
-    hidden(div(id = ns("panelDefineProgramme"), panelDefineProgramme(id)))
+    hidden(div(id = ns("panelDefineProgramme"), panelDefineProgramme(id))),
+    hidden(div(id = ns("panelLinkFiles"), panelLinkFiles(id)))
   )
 }
 
@@ -37,9 +38,12 @@ panelProgrammeTable <- function(id) {
     ),
     DTOutput(ns("tableDPprog")),
     flamingoButton(ns("buttoncreatepr"), "Create Programme", align = "centre"),
-    flamingoButton(ns("buttonamendpr"), "Amend Programme", align = "centre"),
-    flamingoButton(ns("buttondeletepr"), "Delete Programme", align = "centre"),
-    flamingoButton(ns("buttonprogdetails"), "Show Details", align = "centre"),
+    flamingoButton(ns("buttonamendpr"), "Amend Programme", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$buttonamendpr, placement = "right"),
+    flamingoButton(ns("buttondeletepr"), "Delete Programme", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$buttondeletepr, placement = "right"),
+    flamingoButton(ns("buttonprogdetails"), "Show Details", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$buttonprogdetails, placement = "right"),
     actionButton(ns("buttonpgotonextstep"), "Proceed to Choose Model", style = "float:right")
   )
 }
@@ -102,7 +106,29 @@ panelDefineProgramme <- function(id) {
                bs_embed_tooltip(title = programme_Definition_Single$sinputTransformname,
                                 placement = "right"))),
     fluidRow(column(4,
-                    flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right"),
+                    flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttonProgSubmit, placement = "right")
+  )
+}
+
+
+#' Function wrapping panel to link files to a programme
+#' @rdname panelLinkFiles
+#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tagAppendChildren
+#' @importFrom shiny selectizeInput textInput fileInput
+#' @export
+panelLinkFiles <- function(id) {
+  ns <- NS(id)
+  flamingoPanel(
+    collapsible = FALSE,
+    ns("proglink"),
+    heading = tagAppendChildren(
+      h4(""),
+      uiOutput(ns("paneltitleLinkFiles"), inline = TRUE),
+      actionButton(inputId = ns("abuttonhidelinkfilespanel"), label = NULL, icon = icon("times"), style = "float: right;")
+    ),
+
     fluidRow(
       column(12, h4("Link input files to programme"))),
     fluidRow(
@@ -167,7 +193,7 @@ panelDefineProgramme <- function(id) {
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
 #' @importFrom dplyr mutate select case_when
-#' @importFrom shinyjs onclick js removeClass addClass
+#' @importFrom shinyjs onclick disable enable
 #' @export
 step1_chooseProgramme <- function(input, output, session,
                                   dbSettings,apiSettings, userId,
@@ -187,8 +213,8 @@ step1_chooseProgramme <- function(input, output, session,
 
   #values to stop ping pong effect
   stop_selProgID <- check_selProgID <- 0
-  
-  # > Reactive Values ----------------------------------------------------------
+
+  # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # reactive for selectprogrammeID
     selectprogrammeID = "",
@@ -220,9 +246,6 @@ step1_chooseProgramme <- function(input, output, session,
 
   ### Programme Table ----------------------------------------------------------
   output$tableDPprog <- renderDT({
-    # manual refresh button
-    invisible(input$abuttonprgtblrfsh)
-
     logMessage("re-rendering programme table")
     if (!is.null(result$DPProgData)) {
       if (isolate(result$selectprogrammeID) != "") {
@@ -250,9 +273,6 @@ step1_chooseProgramme <- function(input, output, session,
   # Programme Details Table ----------------------------------------------------
   output$tableprogdetails <- renderDT({
     if (!is.null(result$progDetails) && nrow(result$progDetails) > 0) {
-
-      # manual refresh button
-      invisible(input$abuttondefprogrfsh)
       logMessage("re-rendering programme details table")
       datatable(
         result$progDetails,
@@ -277,22 +297,37 @@ step1_chooseProgramme <- function(input, output, session,
     paste0('Details of Programme id ', progId, ' ', progName)
   })
 
+  # Enable and disable buttons
+  observeEvent({
+    result$DPProgData
+    input$tableDPprog_rows_selected
+    }, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      disable("buttonprogdetails")
+      disable("buttondeletepr")
+      disable("buttonamendpr")
+      disable("buttonpgotonextstep")
+    if (length(input$tableDPprog_rows_selected) > 0) {
+      enable("buttonprogdetails")
+      enable("buttondeletepr")
+      enable("buttonamendpr")
+      if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusCompleted) {
+        enable("buttonpgotonextstep")
+      }
+    }
+  })
+
   # Show Programme Details
   onclick("buttonprogdetails", {
-    if (length(input$tableDPprog_rows_selected) > 0) {
-      show("panelProgrammeDetails")
-      hide("buttonprogdetails")
-      logMessage("showing panelProgrammeDetails")
-      .reloadProgDetails()
-    } else {
-      flamingoNotification(type = "warning", "Please select a Programme first")
-    }
+    hide("panelDefineProgramme")
+    hide("panelLinkFiles")
+    show("panelProgrammeDetails")
+    logMessage("showing panelProgrammeDetails")
+    .reloadProgDetails()
   })
 
   # Hide Programme Details
   onclick("buttonhideprogdetails", {
     hide("panelProgrammeDetails")
-    show("buttonprogdetails")
     logMessage("hiding panelProgrammeDetails")
   })
 
@@ -316,6 +351,8 @@ step1_chooseProgramme <- function(input, output, session,
 
   # Create Programme
   onclick("buttoncreatepr", {
+    hide("panelProgrammeDetails")
+    hide("panelLinkFiles")
     result$prog_flag <- "C"
     #clear fields
     .clearDPAccountSelection()
@@ -328,6 +365,8 @@ step1_chooseProgramme <- function(input, output, session,
 
   ### Amend Programme
   onclick("buttonamendpr", {
+    hide("panelProgrammeDetails")
+    .defaultCreateProg()
     if (length(input$tableDPprog_rows_selected) > 0) {
       # TODO: review where/when/how this should be set
       result$prog_flag <- "A"
@@ -337,9 +376,21 @@ step1_chooseProgramme <- function(input, output, session,
       .clearSourceFilesSelection()
       .updateTransformNameSelection()
       show("panelDefineProgramme")
+      show("panelLinkFiles")
       logMessage("showing panelDefineProgramme")
+    }
+  })
+
+  # to enable and disable submit button for create programme
+  observeEvent({
+    input$tinputDPProgName
+    input$sinputDPAccountName
+    input$sinputTransformname
+  }, ignoreInit = TRUE, {
+    if (input$tinputDPProgName == "" || input$sinputDPAccountName == "" || input$sinputTransformname == "") {
+      disable("abuttonProgSubmit")
     } else {
-      flamingoNotification(type = "warning", "Please select a Programme to Amend")
+      enable("abuttonProgSubmit")
     }
   })
 
@@ -353,11 +404,10 @@ step1_chooseProgramme <- function(input, output, session,
                       input$sinputTransformname, "]")
       res <- executeDbQuery(dbSettings, query)
       if (is.null(res)) {
-        flamingoNotification(type = "error",
-                         paste("Failed to create a Programme - ", input$tinputDPProgName))
+
       } else {
         flamingoNotification(type = "message",
-                         paste("Programme ", input$tinputDPProgName, " created."))
+                             paste("Programme ", input$tinputDPProgName, " created."))
       }
     } else if (result$prog_flag == "A") { # && length(input$tableDPprog_rows_selected) > 0
       idxSel <- input$tableDPprog_rows_selected
@@ -369,19 +419,23 @@ step1_chooseProgramme <- function(input, output, session,
       message(paste("A res is:", res))
       if (is.null(res)) {
         flamingoNotification(type = "error",
-                         paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+                             paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
       } else {
         flamingoNotification(type = "message",
-                         paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName], " amended."))
+                             paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName], " amended."))
       }
     }
 
     # Reload Programme Table
     .reloadDPProgData()
-    logMessage(paste("updating tableDPprog select because programme table was reloaded:", idxSel))
-    selectRows(dataTableProxy("tableDPprog"), idxSel)
-    selectPage(dataTableProxy("tableDPprog"), pageSel)
-    logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+    logMessage(paste("updating tableDPprog select because programme table was reloaded"))
+    result$selectprogrammeID <- result$DPProgData[1, DPProgData.ProgrammeID]
+    hide("panelDefineProgramme")
+    show("panelLinkFiles")
+    # selectRows(dataTableProxy("tableDPprog"), 1)
+    # selectPage(dataTableProxy("tableDPprog"), 1)
+    # logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+    # show("panelLinkFiles")
   })
 
   ### Clear Programme Definition panel
@@ -393,35 +447,52 @@ step1_chooseProgramme <- function(input, output, session,
     .clearTransformNameSelection()
   })
 
+  # > Link files to Programme --------------------------------------------------
+
+  # Link files to programme title
+  output$paneltitleLinkFiles <- renderUI({
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
+    progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
+    if (result$prog_flag == "C") {
+      paste0('Provide Inputs to Programme id ', progId, ' ', progName)
+    } else {
+      paste0('Amend Inputs to Programme id ', progId, ' ', progName)
+    }
+
+  })
+
+  # Hide Link files Panel
+  onclick("abuttonhidelinkfilespanel", {
+    hide("panelLinkFiles")
+  })
+
   ### Load Programme Button
   onclick("buttonloadcanmodpr", {
     progId = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
     logMessage(paste("loading programme - progId is:", progId))
-    loadprogdata <- loadProgrammeData(
-      apiSettings,
-      progId = progId
-    )
+    loadprogdata <- loadProgrammeData(apiSettings,
+                                      progId = toString(progId))
     if (loadprogdata == 'success' || loadprogdata == 'Success') {
       flamingoNotification(type = "message", "Initiating load programme data...")
-      # Going to next step when programme load is successful (but not completed)
-      workflowSteps$update("2")
     } else {
       flamingoNotification(type = "error", "Failed to load programme data")
     }
     .reloadDPProgData()
+    .hideDivs()
+    .defaultCreateProg()
   })
 
   # Delete Programme
   onclick("buttondeletepr",{
-    if (length(input$tableDPprog_rows_selected) > 0) {
-      stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
-      executeDbQuery(dbSettings, stmt)
-      flamingoNotification(type = "message",
-                       sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
-      .reloadDPProgData()
-    } else {
-      flamingoNotification(type = "warning", "Please select a Programme to Delete")
-    }
+    hide("panelProgrammeDetails")
+    hide("panelDefineProgramme")
+    hide("panelLinkFiles")
+    stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
+    executeDbQuery(dbSettings, stmt)
+    flamingoNotification(type = "message",
+                         sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+    .reloadDPProgData()
   })
 
   ### > Source Files -----------------------------------------------------------
@@ -438,7 +509,7 @@ step1_chooseProgramme <- function(input, output, session,
         )
         if (!is.null(recordId)) {
           flamingoNotification(type = "message",
-                           paste("New File record id: ", recordId, " created"))
+                               paste("New File record id: ", recordId, " created"))
           #.reloadProgDetails()
         } else {
           flamingoNotification(type = "error", "Could not create file record")
@@ -477,7 +548,7 @@ step1_chooseProgramme <- function(input, output, session,
           flamingoNotification(type = "error", "Failed to link the File")
         } else {
           flamingoNotification(type = "message",
-                           paste("Location File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+                               paste("File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
         }
       } else {
         flamingoNotification(type = "warning", "Please select a file to Link")
@@ -561,11 +632,11 @@ step1_chooseProgramme <- function(input, output, session,
     } else if (input$sinputSRFile == "S") {
       show("divSRFileSelect")
       hide("divSRFileUpload")
-      #*********SRfiles <- getFileSourceAccountFile(dbSettings)
-      #********* updateSelectInput(
-      #*********  session, "sinputselectSRFile",
-      #*********  choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
-      #*********)
+      SRfiles <- getFileSourceReinsuranceFile(dbSettings)
+      updateSelectInput(
+        session, "sinputselectSRFile",
+        choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
+      )
     }
   })
 
@@ -583,11 +654,11 @@ step1_chooseProgramme <- function(input, output, session,
     } else if (input$sinputSRSFile == "S") {
       show("divSRSFileSelect")
       hide("divSRSFileUpload")
-      #*********SRfiles <- getFileSourceAccountFile(dbSettings)
-      #********* updateSelectInput(
-      #*********  session, "sinputselectSRFile",
-      #*********  choices = createSelectOptions(SRfiles, labelCol = 1, valueCol = 2)
-      #*********)
+      SRSfiles <- getFileSourceReinsuranceScopeFile(dbSettings)
+      updateSelectInput(
+        session, "sinputselectSRSFile",
+        choices = createSelectOptions(SRSfiles, labelCol = 1, valueCol = 2)
+      )
     }
   })
 
@@ -691,7 +762,7 @@ step1_chooseProgramme <- function(input, output, session,
     if (active()) {
       prgId <- ""
       if (!is.null(input$tableDPprog_rows_selected)) {
-        prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID] 
+        prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
       }
       if (result$selectprogrammeID != prgId) {
         bl_dirty <- stop_selProgID > check_selProgID
@@ -703,11 +774,9 @@ step1_chooseProgramme <- function(input, output, session,
             pageSel <- ceiling(rowToSelect/pageLength)
             #backward propagation
             if (is.null(input$tableDPprog_rows_selected)) {
-              if (workflowSteps$step() == '2'){
                 selectRows(dataTableProxy("tableDPprog"), rowToSelect)
                 selectPage(dataTableProxy("tableDPprog"), pageSel)
                 logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
-              }
             } else if (rowToSelect != input$tableDPprog_rows_selected) {
               # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
               selectRows(dataTableProxy("tableDPprog"), rowToSelect)
@@ -725,19 +794,31 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
+  # Refresh Buttons ------------------------------------------------------------
+  onclick("abuttonprgtblrfsh", {
+    .reloadDPProgData()
+  } )
+  
+  onclick("abuttondefprogrfsh", {
+    .reloadProgDetails()
+  } )
+  
   # Updates dependent on changed: tableDPprog_rows_selected --------------------
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
-      # Update Programme Detail table if row selected changes
       hide("panelProgrammeDetails")
-      show("buttonprogdetails")
       hide("panelDefineProgramme")
-
+      hide("panelLinkFiles")
 
       if (length(input$tableDPprog_rows_selected) > 0) {
         # note that tableDPprog allows single row selection only
         prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+        # #If incomplete show panel to link files
+        currStatus <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status]
+        if (!is.na(currStatus) && currStatus == StatusProcessing) {
+          show("panelLinkFiles")
+        }
         if (prgId != result$selectprogrammeID) {
           logMessage(paste("updating selectprogrammeID because selection in programme table changed to", prgId))
           # re-selecting the same programme ID in the drop-down would not re-trigger
@@ -760,18 +841,19 @@ step1_chooseProgramme <- function(input, output, session,
     hide("panelProgrammeTable")
     hide("panelProgrammeDetails")
     hide("panelDefineProgramme")
+    hide("panelLinkFiles")
   }
 
   #show default view for Section "Choose Programme" = "1"
   .defaultCreateProg <- function(){
     logMessage(".defaultCreateProg called")
     show("panelProgrammeTable")
-    show("buttonprogdetails")
   }
 
 
   # Reload Programme table
   .reloadDPProgData <- function() {
+    # manual refresh button
     logMessage(".reloadDPProgData called")
     stmt <- buildDbQuery("getProgData")
     DPProgData <- executeDbQuery(dbSettings, stmt)

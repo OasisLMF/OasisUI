@@ -8,6 +8,7 @@ ui <- function(request) {
 
   fluidPage(
     tags$head(
+      #tags$script('window.onbeforeunload = function(event) {return "";};'),
       tags$link(rel = "stylesheet", type = "text/css", href = "css/bootstrap.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "css/flamingo-tweaks.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "css/flamingo-table.css"),

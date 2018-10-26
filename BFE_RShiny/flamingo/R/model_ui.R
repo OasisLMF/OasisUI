@@ -13,7 +13,7 @@ modelSupplierPageUI <- function(id) {
   tagList(
 
     # h3("Model", class = "flamingo-page-title"),
-    
+
     fluidRow(
       column(12,
 
@@ -30,9 +30,11 @@ modelSupplierPageUI <- function(id) {
                    flamingoButton(ns("btnCreate"), "Create",
                                 align = "left"),
                    flamingoButton(ns("btnAmend"), "Amend",
-                                align = "centre"),
+                                align = "centre") %>%
+                     bs_embed_tooltip(title = sys_conf$btnAmend, placement = "right"),
                    flamingoButton(ns("btnDelete"), "Delete",
-                                align = "right"),
+                                align = "right") %>%
+                     bs_embed_tooltip(title = sys_conf$btnDelete, placement = "right"),
                    # flamingoButton(ns("abuttoncrtudptdelmodres"), "Create/Update/Delete"),
                    downloadButton(ns("MRdownloadexcel"), label="Export to csv")
                )

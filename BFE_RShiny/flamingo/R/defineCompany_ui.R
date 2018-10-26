@@ -26,9 +26,11 @@ companyDefinitionUI <- function(id) {
                  flamingoButton(ns("abuttoncompcrt"),
                               label = "Create", align = "left"),
                  flamingoButton(ns("abuttoncompupdate"),
-                              label = "Update", align = "left"),
+                              label = "Update", align = "left") %>%
+                   bs_embed_tooltip(title = define_company$abuttoncompupdate, placement = "right"),
                  flamingoButton(ns("abuttoncompdel"),
-                              label = "Delete", align = "left")
+                              label = "Delete", align = "left") %>%
+                   bs_embed_tooltip(title = define_company$abuttoncompdel, placement = "right")
              )
       )
     )

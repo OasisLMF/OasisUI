@@ -23,15 +23,9 @@ summarytabUI <- function(id) {
     fluidRow(
       column(6,
              h5("Inputs"),
-             flamingoTableUI(ns("summaryInputTable"))
-      ),
-      column(6,
+             flamingoTableUI(ns("summaryInputTable")),
              h5("Parameters"),
-             flamingoTableUI(ns("summaryParamsTable"))
-      )
-    ),
-    fluidRow(
-      column(6,
+             flamingoTableUI(ns("summaryParamsTable")),
              h5("Output"),
              flamingoTableUI(ns("summaryOutputTable"))
       ),
@@ -182,8 +176,8 @@ basicplot <- function(xlabel, ylabel, titleToUse, data){
   p <- ggplot(data, aes(x = xaxis, y = value)) +
     labs(title = titleToUse, x = xlabel, y = ylabel) +
     theme(
-      plot.title = element_text(color = "grey45", size = 18, face = "bold.italic", hjust = 0.5),
-      text = element_text(size = 18),
+      plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
+      text = element_text(size = 12),
       panel.background = element_blank(),
       axis.line.x = element_line(color = "grey45", size = 0.5),
       axis.line.y = element_line(color = "grey45", size = 0.5),

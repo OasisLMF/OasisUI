@@ -27,14 +27,18 @@ userAdminDefinitionUI <- function(id) {
                  flamingoButton(ns("abuttonnewUser"),
                               label = "Create", align = "left"),
                  flamingoButton(ns("abuttonuserupdate"),
-                              label = "Update", align = "center"),
-                 flamingoButton(ns("abuttonuserdelete"),
-                              label = "Delete", align = "right"),
+                              label = "Update", align = "center") %>%
+                   bs_embed_tooltip(title = landing_page$abuttonuserupdate, placement = "right"),
+                 flamingoButton(ns("abuttonuserdelete") ,
+                              label = "Delete", align = "right") %>%
+                   bs_embed_tooltip(title = landing_page$abuttonuserdelete, placement = "right"),
 
                  flamingoButton(ns("abuttonusersecurity"),
-                              label = "Add/Remove Security Group"),
+                              label = "Add/Remove Security Group") %>%
+                   bs_embed_tooltip(title = landing_page$abuttonusersecurity, placement = "right"),
                  flamingoButton(ns("abuttonuseroasis"),
-                              label = "Add/Remove User License", align = "right")
+                              label = "Add/Remove User License", align = "right") %>%
+                   bs_embed_tooltip(title = landing_page$abuttonuseroasis, placement = "right")
 
              )
       )

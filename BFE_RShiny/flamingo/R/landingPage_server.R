@@ -14,7 +14,7 @@
 #' @importFrom DT renderDT datatable
 #' @importFrom dplyr mutate '%>%'
 #' @importFrom utils write.csv
-#' @importFrom shinyWidgets dropdown toggleDropdownButton
+#' @importFrom shinyWidgets toggleDropdownButton
 #' @export
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
@@ -117,7 +117,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
 #' }
 #' @template return-outputNavigation
-#' @importFrom shinyWidgets dropdown toggleDropdownButton
+#' @importFrom shinyWidgets toggleDropdownButton
 #' @export
 pageheader <- function(input, output, session, userId, userName, dbSettings,
                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {

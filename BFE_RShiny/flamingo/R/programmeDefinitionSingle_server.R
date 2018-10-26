@@ -135,8 +135,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     selectprogrammeID = reactive(input$selectprogrammeID),
     selectprogOasisID = reactive(input$selectprogOasisID),
     progOasisName = reactive({result$progOasisName}),
-    progOasisStatus = reactive({result$progOasisStatus}),
-    POData_rowselected = reactive({result$POData_rowselected})
+    progOasisStatus = reactive({result$progOasisStatus})
   )
   
   # Sub-Modules output ---------------------------------------------------------
@@ -207,6 +206,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   observeEvent({
     result$selectprogrammeID
     result$progChoices
+    result$DPProgData
   }, ignoreInit = TRUE, {
     result$DPProgData_rowselected <- match(result$selectprogrammeID, result$progChoices)
     result$progName <- result$DPProgData[result$DPProgData_rowselected, DPProgData.ProgrammeName]
@@ -290,6 +290,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     result$selectprogrammeID
     result$selectprogOasisID
     result$progOasisChoices
+    result$POData
   }, ignoreInit = TRUE, {
     prgOasisId <- result$selectprogOasisID
     rowToSelect <- match(prgOasisId, result$progOasisChoices)

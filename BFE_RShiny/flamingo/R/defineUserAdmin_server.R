@@ -287,17 +287,27 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     .reloadCULData()
   })
 
+  # Enable and disable buttons
+  observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      if (length(input$tablecompanyuserlist_rows_selected) > 0) {
+        shinyjs::enable("abuttonuserupdate")
+        shinyjs::enable("abuttonuserdelete")
+        shinyjs::enable("abuttonusersecurity")
+        shinyjs::enable("abuttonuseroasis")
+      } else {
+        shinyjs::disable("abuttonuserupdate")
+        shinyjs::disable("abuttonuserdelete")
+        shinyjs::disable("abuttonusersecurity")
+        shinyjs::disable("abuttonuseroasis")
+      }
+    })
+
   #on click of update button
   onclick("abuttonuserupdate", {
-    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       result$useradminflg <- "U"
       showModal(.useradmincrtupmodal())
       .clearCompanySelection()
       .getCompUserDetails()
-    } else {
-      flamingoNotification(type = "warning",
-                       "Please select a user to update details.")
-    }
   })
 
 
@@ -358,11 +368,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   # onclick of delete button
   onclick("abuttonuserdelete", {
-    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       showModal(.userdelmodal())
-    } else {
-      flamingoNotification(type = "warning", "Please select a user to delete")
-    }
   })
 
   # onclick of cancel delete button
@@ -414,13 +420,8 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   # onclick of add/remove security button
   onclick("abuttonusersecurity", {
-    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       showModal(.usersecuritymodal())
       .clearSecurityGroupSelection()
-    } else {
-      flamingoNotification(type = "warning",
-                       "Please select a user to add security group")
-    }
   })
 
   # onclick of add security button in pop-up
@@ -465,13 +466,8 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   # onclick of add/remove license button
   onclick("abuttonuseroasis", {
-    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
       showModal(.userlicensemodal())
       .clearOasisUserSelection()
-    } else {
-      flamingoNotification(type = "warning",
-                       "Please select a user to add license")
-    }
   })
 
 
