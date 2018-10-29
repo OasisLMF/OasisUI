@@ -9,6 +9,7 @@
 #' @return list of tags
 #' @importFrom shinyWidgets panel
 #' @importFrom bsplus bs_embed_tooltip
+#' @importFrom shinyjs hidden
 #' @export
 summarytabUI <- function(id) {
   
@@ -20,20 +21,23 @@ summarytabUI <- function(id) {
     heading =  tagAppendChildren(
       h4("Summary Table")
     ),
+    
     fluidRow(
       column(6,
-             h5("Inputs"),
-             flamingoTableUI(ns("summaryInputTable")),
-             h5("Parameters"),
-             flamingoTableUI(ns("summaryParamsTable")),
-             h5("Output"),
-             flamingoTableUI(ns("summaryOutputTable"))
+             div(
+               id = ns("summarypanel"),
+               h5("Inputs"),
+               flamingoTableUI(ns("summaryInputTable")),
+               h5("Parameters"),
+               flamingoTableUI(ns("summaryParamsTable")),
+               h5("Output"),
+               flamingoTableUI(ns("summaryOutputTable"))
+             )
       ),
       column(6,
              plotlyOutput(ns("summaryOutputPlot"))
       )
     )
-    
   )
   
 }
@@ -50,11 +54,12 @@ summarytabUI <- function(id) {
 #' @importFrom DT renderDT datatable
 #' @importFrom dplyr mutate select contains filter
 #' @importFrom plotly ggplotly renderPlotly plotlyOutput
+#' @importFrom shinyjs show hide
 #' @export
 #' @export
 summarytab <- function(input, output, session, dbSettings,
                        apiSettings, userId,
-                       selectRunID, active, logMessage = message) {
+                       selectRunID = reactive(""), active, logMessage = message) {
   
   ns <- session$ns
   
@@ -73,68 +78,72 @@ summarytab <- function(input, output, session, dbSettings,
   paramStrg <- c("treshold|number|peril|set")
   
   # Extract Summary Data -------------------------------------------------------
-  observeEvent(selectRunID(), {
-    SummaryData <- executeDbQuery(dbSettings,
-                                  paste("exec getOutputSummary", selectRunID()))
-    if (!is.null(SummaryData)) {
-      result$inputSummaryData <- SummaryData %>% 
-        filter(!grepl(paste0(outputStrg, "|", paramStrg), SummaryType)) %>%
-        as.data.frame()
-      result$paramSummaryData <- SummaryData %>% 
-        filter(grepl(paramStrg, SummaryType)) %>%
-        as.data.frame()
-      result$outputSummaryData <- SummaryData %>% 
-        filter(grepl(outputStrg, SummaryType)) %>%
-        as.data.frame()
+  observeEvent({
+    selectRunID()
+    active()
+   }, {
+    if (!is.null(selectRunID()) && selectRunID() != "") {
+      SummaryData <- executeDbQuery(dbSettings,
+                                    paste("exec getOutputSummary", selectRunID()))
+      if (!is.null(SummaryData)) {
+        result$inputSummaryData <- SummaryData %>% 
+          filter(!grepl(paste0(outputStrg, "|", paramStrg), SummaryType)) %>%
+          as.data.frame()
+        result$paramSummaryData <- SummaryData %>% 
+          filter(grepl(paramStrg, SummaryType)) %>%
+          as.data.frame()
+        result$outputSummaryData <- SummaryData %>% 
+          filter(grepl(outputStrg, SummaryType)) %>%
+          as.data.frame()
+      }
+      show("summarypanel")
+      show("summaryOutputPlot")
+    } else {
+      hide("summarypanel")
+      hide("summaryOutputPlot")
     }
   })
   
+  
   # Summary Input tables
-  observeEvent(result$inputSummaryData, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    sub_modules$summaryTable <- callModule(
-      flamingoTable,
-      id = "summaryInputTable",
-      data = reactive(result$inputSummaryData),
-      selection = "none",
-      escape = TRUE,
-      scrollX = FALSE,
-      filter = FALSE,
-      rownames = FALSE,
-      colnames = FALSE,
-      maxrowsperpage = 10,
-      logMessage = logMessage)
-  })
+  sub_modules$summaryTable <- callModule(
+    flamingoTable,
+    id = "summaryInputTable",
+    data = reactive(result$inputSummaryData),
+    selection = "none",
+    escape = TRUE,
+    scrollX = FALSE,
+    filter = FALSE,
+    rownames = FALSE,
+    colnames = FALSE,
+    maxrowsperpage = 10,
+    logMessage = logMessage)
   
-  # Summary Params tables
-  observeEvent(result$paramSummaryData, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    sub_modules$summaryTable <- callModule(
-      flamingoTable,
-      id = "summaryParamsTable",
-      data = reactive(result$paramSummaryData),
-      selection = "none",
-      escape = TRUE,
-      scrollX = FALSE,
-      filter = FALSE,
-      rownames = FALSE,
-      colnames = FALSE,
-      maxrowsperpage = 10,
-      logMessage = logMessage)
-  })
+  sub_modules$summaryTable <- callModule(
+    flamingoTable,
+    id = "summaryParamsTable",
+    data = reactive(result$paramSummaryData),
+    selection = "none",
+    escape = TRUE,
+    scrollX = FALSE,
+    filter = FALSE,
+    rownames = FALSE,
+    colnames = FALSE,
+    maxrowsperpage = 10,
+    logMessage = logMessage)
   
-  # Summary Output tables
-  observeEvent(result$outputSummaryData, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    sub_modules$summaryTable <- callModule(
-      flamingoTable,
-      id = "summaryOutputTable",
-      data = reactive(result$outputSummaryData),
-      selection = "none",
-      escape = TRUE,
-      scrollX = FALSE,
-      rownames = FALSE,
-      colnames = FALSE,
-      maxrowsperpage = 10,
-      logMessage = logMessage)
-  })
+  sub_modules$summaryTable <- callModule(
+    flamingoTable,
+    id = "summaryOutputTable",
+    data = reactive(result$outputSummaryData),
+    selection = "none",
+    escape = TRUE,
+    scrollX = FALSE,
+    rownames = FALSE,
+    colnames = FALSE,
+    maxrowsperpage = 10,
+    logMessage = logMessage)
+  
   
   # Plot -----------------------------------------------------------------------
   output$summaryOutputPlot <- renderPlotly({
