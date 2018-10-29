@@ -113,11 +113,18 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
                       value = result$compData[input$tablecompanylist_rows_selected, 5])
   })
 
+  # title for delete button
+  output$compdelmodal <- renderUI({
+    companyId <- result$compData[input$tablecompanylist_rows_selected, 1]
+    companyName <- result$compData[input$tablecompanylist_rows_selected, 2]
+    paste0('Delete ', companyId, ' ', companyName)
+  })
+
   # modalDialog of delete button in main panel
   .compdelmodal <- function() {
     ns <- session$ns
     modalDialog(label = "compdelmodal",
-                title = "Delete selection",
+                title = uiOutput(ns("compdelmodal"), inline = TRUE),
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("abuttoncconfirmdel"),

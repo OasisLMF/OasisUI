@@ -483,11 +483,18 @@ step1_chooseProgramme <- function(input, output, session,
     .defaultCreateProg()
   })
 
+  # title for delete button
+  output$progdelmodal <- renderUI({
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
+    paste0('Delete ', progId, ' ', progName)
+    })
+
   # Modal dialog of delete button
-  .userdelmodal <- function() {
+  .progdelmodal <- function() {
     ns <- session$ns
-    modalDialog(label = "userdelmodal",
-                title = "Delete selection",
+    modalDialog(label = "progdelmodal",
+                title = uiOutput(ns("progdelmodal"), inline = TRUE),
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonuconfirmdel"),
@@ -502,7 +509,7 @@ step1_chooseProgramme <- function(input, output, session,
 
   # Delete Programme
   onclick("buttondeletepr",{
-    showModal(.userdelmodal())
+    showModal(.progdelmodal())
   })
 
   # onclick of confirm delete button
