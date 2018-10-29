@@ -162,3 +162,13 @@ filesListData.fileID <- "FileID"
 filesListData.fileName <- "File Name"
 filesListData.path <- "Location Unix"
 filesListData.key <- "Resource Key"
+
+### Creating Variables for  col names of  $inbox
+# result$inbox
+# "ProgOasisID"  "RunID"        "Run Name"     "Model"        "Status"       "Completed At"
+inbox.ProgOasisID <- "ProgOasisID"
+inbox.RunID <- "RunID"
+inbox.RunName <- "Run Name"
+inbox.Model <- "Model"
+inbox.Status <- "Status"
+inbox.ProgOasisID <- "ProgOasisID"

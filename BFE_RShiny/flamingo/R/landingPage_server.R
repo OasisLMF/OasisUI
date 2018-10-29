@@ -47,8 +47,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 
     logMessage("inbox refreshed")
 
-    result$runIdList <- result$inbox[, c("RunID", "Status")]
-    #logMessage(paste0("result$runIdList ", names(result$runIdList)))
+    result$runIdList <- result$inbox[, c(inbox.RunID , inbox.Status)]
   })
 
   output$tableInbox <- renderDT(if (userId() != FLAMINGO_GUEST_ID) {
@@ -77,17 +76,6 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   )
 
   ### Module Output ----
-  # moduleOutput <- c(
-  #   outputNavigation(navigation_state),
-  #   list(
-  #     runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-  #       inbox()[i, 2]} else -1),
-  #     # this is needed in processRun, probably shouldn't
-  #     procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-  #       inbox()[i, 1]} else -1),
-  #     runIdList = reactive(inbox()[, c("RunID", "Status")])
-  #   )
-  # )
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
