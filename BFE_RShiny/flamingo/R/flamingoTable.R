@@ -36,7 +36,6 @@ flamingoTable <- function(input, output, session,
   
   ns <- session$ns
   
-  
     output$flamingoTable <- renderDT({
       
       if (!is.null(data())) {
@@ -90,6 +89,11 @@ flamingoTable <- function(input, output, session,
     return(options)
   }
   
-  # Module Output --------------------------------------------------------------
-  invisible()
+    # Module Outout --------------------------------------------------------------
+    moduleOutput <- c(
+      list(
+        rows_selected = reactive({input$flamingoTable_rows_selected}),
+        rows_current = reactive({input$flamingoTable_rows_current})
+      )
+    )
 }
