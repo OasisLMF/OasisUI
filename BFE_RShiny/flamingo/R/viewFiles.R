@@ -82,7 +82,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                                                                               height: 16px;
                                                                               width: 16px;",
                                                                  icon = icon("check"),
-                                                                 onclick = paste0('Shiny.onInputChange(\"',ns("select_sbutton"),'\",  this.id)'), 
+                                                                 onclick = paste0('Shiny.onInputChange(\"',ns("select_sbutton"),'\",  this.id)')
                                                                  #onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;'
                                                                  )), 
                                filesListData)
@@ -162,16 +162,13 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
       lapply(input$outputFLtable_rows_selected, function(i) {
-        # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
         session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
         show(paste0("vrows_", i))})
       lapply(setdiff(input$outputFLtable_rows_current, input$outputFLtable_rows_selected), function(i) {
-        # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
         session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
         hide(paste0("vrows_", i))})
     }else {
       lapply(input$outputFLtable_rows_current, function(i){
-         # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
         session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
         hide(paste0("vrows_", i))})
     }
@@ -181,14 +178,12 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   # Select All Functionality --------------------------------------------
   
   #If page in table is changed, update rows selection based on select all value
-  observeEvent( input$outputFLtable_rows_current, ignoreNULL= FALSE, ignoreInit = TRUE, {
+  observeEvent( input$outputFLtable_rows_current, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
       lapply(input$outputFLtable_rows_current, function(i){
         if (input$chkboxselectall) {
-          # session$sendCustomMessage(type = 'resetcheckboxValueTrue', message =  session$ns( paste0("srows_", i)))
           session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
         } else {
-          # session$sendCustomMessage(type = 'resetcheckboxValueFalse', message =  session$ns( paste0("srows_", i)))
           session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
         }
       })
@@ -198,7 +193,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   
   # #update checkboxes according to selectAll button
   observeEvent(input$chkboxselectall, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if(!is.null(result$filesListDataButtons)){
+    if(!is.null(result$filesListDataButtons)) {
       if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
         lapply(input$outputFLtable_rows_current, function(i){
           if (input$chkboxselectall) {
