@@ -2,13 +2,11 @@
 % Please edit documentation in R/defineID.R
 \name{defineID}
 \alias{defineID}
-\title{defineID Module}
+\title{define oneID Module}
 \usage{
-defineID(input, output, session, runIdList = reactive(c(-1)),
-  preselectedRunId = reactive(-1), logMessage = message)
-
-defineID(input, output, session, runIdList = reactive(c(-1)),
-  preselectedRunId = reactive(-1), logMessage = message)
+defineID(input, output, session, dbSettings, userId,
+  runIdList = reactive(c(-1)), preselectedRunId = reactive(-1),
+  logMessage = message)
 }
 \arguments{
 \item{input}{shiny input object}
@@ -17,23 +15,17 @@ defineID(input, output, session, runIdList = reactive(c(-1)),
 
 \item{session}{shiny session object}
 
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
 \item{runIdList}{list of runs and their status}
 
 \item{preselectedRunId}{reactive string expression for reselected run id from landingpage}
 
 \item{logMessage}{function that will be passed info messages}
-
-\item{runIdList}{list of runs and their status}
-
-\item{preselectedRunId}{reactive string expression for reselected run id from landingpage}
 }
 \value{
 reactive for runID selected
-
-reactive for runID selected
 }
 \description{
-Server logic for defining one run ID
-
 Server logic for defining one run ID
 }
