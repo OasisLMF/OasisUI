@@ -126,7 +126,7 @@ server <- function(input, output, session) {
     id = "visualizationBBR",
     apiSettings = apiSettings,
     userId = reactive(result$userId),
-    runIdList = reactive(c(-1)),
+    runIdList = auth_modules$landingPage$runIdList,
     preselRunId = reactive(-1),
     processRunId = reactive(-1),
     logMessage = logMessage,
