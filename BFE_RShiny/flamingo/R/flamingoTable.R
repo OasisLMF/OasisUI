@@ -31,6 +31,7 @@ flamingoTable <- function(input, output, session,
                           filter = FALSE,
                           rownames = FALSE,
                           colnames = TRUE,
+                          preselRow = reactive({NULL}),
                           maxrowsperpage = 10,
                           logMessage = message ) {
   
@@ -51,12 +52,15 @@ flamingoTable <- function(input, output, session,
           colnamesToUse <- c('Row Number', colnamesToUse)
         }
       }
+
       
       datatable(
           data,
           class = "flamingo-table display",
           rownames = rownames,
-          selection = selection,
+          selection = list(mode = selection,
+                           selected = preselRow(),
+                           target = 'row'),
           escape = escape,
           colnames = colnamesToUse,
           options = .getPRTableOptions(scrollX, maxrowsperpage, filter)
