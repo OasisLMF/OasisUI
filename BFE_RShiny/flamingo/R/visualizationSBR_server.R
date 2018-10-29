@@ -98,10 +98,6 @@ visualizationSBR <- function(input, output, session, dbSettings,
     preselectedRunId = reactive(result$preselectedRunId),
     logMessage = logMessage)
   
-  selectRunID <- reactive({
-    sub_modules$defineID$selectRunID()
-  })
-  
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
     updateNavigation(navigation_state, "PS")
@@ -112,29 +108,30 @@ visualizationSBR <- function(input, output, session, dbSettings,
   sub_modules$summary <- callModule(
     summarytab,
     id = "summarytab",
-    selectRunID = reactive(selectRunID()),
+    selectRunID = reactive(sub_modules$defineID$selectRunID()),
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     userId = userId,
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)
- 
+  
   
   # Extract Output files for given runID----------------------------------------
-  observeEvent( selectRunID(), {if (!is.na(selectRunID()) && selectRunID() != "") {
-    if (!is.null(runIdList())) {
-      index <- match(c(selectRunID()), runIdList()$RunID)
-      status <- runIdList()[index, "Status"]
-      if (!is.na(status) && status == StatusCompleted) {
-        result$filesListData <- getFileList(dbSettings, selectRunID())
-        result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
+  observeEvent( sub_modules$defineID$selectRunID(), {
+    if (!is.na(sub_modules$defineID$selectRunID()) && sub_modules$defineID$selectRunID() != "") {
+      if (!is.null(runIdList())) {
+        index <- match(c(sub_modules$defineID$selectRunID()), runIdList()$RunID)
+        status <- runIdList()[index, "Status"]
+        if (!is.na(status) && status == StatusCompleted) {
+          result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectRunID())
+          result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
+        } else {
+          result$filesListData <- NULL
+        }
       } else {
         result$filesListData <- NULL
       }
-    } else {
-      result$filesListData <- NULL
     }
-  }
   })
   
   filesListDatatoview <- reactive({
@@ -155,13 +152,13 @@ visualizationSBR <- function(input, output, session, dbSettings,
     userId = userId,
     active = reactive({active() && input$tabsSBR == "taboutputfiles"}),
     logMessage = logMessage)
-
-   
+  
+  
   # Tab Output Plots -----------------------------------------------------------
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
-    selectRunID = reactive(selectRunID()),
+    selectRunID = reactive(sub_modules$defineID$selectRunID()),
     filesListData =   reactive({result$filesListData}),
     n_panels = n_panels,
     dbSettings = dbSettings,
@@ -169,8 +166,8 @@ visualizationSBR <- function(input, output, session, dbSettings,
     userId = userId,
     active = reactive({active() && input$tabsSBR == "tabplots"}),
     logMessage = logMessage)
-
-
+  
+  
   # Helper functions -----------------------------------------------------------
   #function to split the description field of result$filesListData
   .splitDescription <- function(x){

@@ -54,14 +54,9 @@ visualizationBBR <- function(input, output, session, dbSettings,
     dbSettings = dbSettings,
     userId = reactive(userId()),
     runIdList = runIdList,
-    preselectedRunId = reactive(result$preselectedRunId),
+    preselectedRunId = reactive({1}),
     logMessage = logMessage)
-  
-  selectRunID <- reactive({
-    sub_modules$defineID$selectRunID()
-  })
 
-  
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotobatchconfig, {
     updateNavigation(navigation_state, "PB")
@@ -73,7 +68,7 @@ visualizationBBR <- function(input, output, session, dbSettings,
   sub_modules$summary <- callModule(
     summarytab,
     id = "summarytab",
-    selectRunID = reactive(input$selectRunID1),
+    selectRunID = reactive(sub_modules$defineID$selectRunID()),
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     userId = userId,
@@ -82,12 +77,36 @@ visualizationBBR <- function(input, output, session, dbSettings,
   
   
   # Extract Output files for given runID----------------------------------------
+  observeEvent( sub_modules$defineID$selectRunID(), {
+    if (!is.na(sub_modules$defineID$selectRunID()) && sub_modules$defineID$selectRunID() != "") {
+      if (!is.null(runIdList())) {
+        index <- match(c(sub_modules$defineID$selectRunID()), runIdList()$RunID)
+        status <- runIdList()[index, "Status"]
+        if (!is.na(status) && status == StatusCompleted) {
+          result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectRunID())
+          result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
+        } else {
+          result$filesListData <- NULL
+        }
+      } else {
+        result$filesListData <- NULL
+      }
+    }
+  })
+  
+  filesListDatatoview <- reactive({
+    if (!is.null(result$filesListData)) {
+      result$filesListData %>% select(-c("Variable", "Granularity", "Losstype"))
+    } else {
+      result$filesListData
+    }
+  })
   
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
     outputfiles,
     id = "outputfiles",
-    filesListDatatoview =  reactive({result$filesListData}),
+    filesListDatatoview =  filesListDatatoview ,
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     userId = userId,
@@ -99,7 +118,7 @@ visualizationBBR <- function(input, output, session, dbSettings,
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
-    selectRunID = reactive(selectRunID()),
+    selectRunID = reactive(sub_modules$defineID$selectRunID()),
     filesListData =  reactive({result$filesListData}),
     n_panels = n_panels,
     dbSettings = dbSettings,

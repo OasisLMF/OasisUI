@@ -91,10 +91,6 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     preselectedRunId = reactive(result$preselectedRunId),
     logMessage = logMessage)
   
-  selectRunID1 <- reactive({
-    sub_modules$defineID1$selectRunID()
-  })
-  
   sub_modules$defineID2 <- callModule(
     defineID,
     id = "defineID-2",
@@ -103,10 +99,7 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     runIdList = runIdList,
     preselectedRunId = reactive(result$preselectedRunId),
     logMessage = logMessage)
-  
-  selectRunID2 <- reactive({
-    sub_modules$defineID2$selectRunID()
-  })
+
   
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
@@ -118,7 +111,7 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   sub_modules$summary <- callModule(
     summarytab,
     id = "summarytab",
-    selectRunID = reactive(selectRunID1()),
+    selectRunID = reactive(sub_modules$defineID1$selectRunID()),
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     userId = userId,
@@ -127,12 +120,47 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   
   
   # Extract Output files for given runID----------------------------------------
+  observeEvent( {
+    sub_modules$defineID1$selectRunID()
+    sub_modules$defineID2$selectRunID()
+                }, {
+    if (!is.na(sub_modules$defineID1$selectRunID()) && sub_modules$defineID1$selectRunID() != "" &&
+        !is.na(sub_modules$defineID2$selectRunID()) && sub_modules$defineID2$selectRunID() != "") {
+    if (!is.null(runIdList())) {
+      index1 <- match(c(sub_modules$defineID1$selectRunID()), runIdList()$RunID)
+      status1 <- runIdList()[index1, "Status"]
+      if (!is.na(status1) && status1 == StatusCompleted) {
+        filesListData1 <- getFileList(dbSettings, sub_modules$defineID1$selectRunID())
+        result$filesListData <- cbind(filesListData1,do.call(rbind.data.frame,  lapply(filesListData1$Description, .splitDescription)))
+      } else {
+        result$filesListData <- NULL
+      }
+      index2 <- match(c(sub_modules$defineID2$selectRunID()), runIdList()$RunID)
+      status2 <- runIdList()[index2, "Status"]
+      if (!is.na(status2) && status2 == StatusCompleted) {
+        filesListData2 <- getFileList(dbSettings, sub_modules$defineID2$selectRunID())
+        result$filesListData <- rbind(result$filesListData,
+                                      cbind(filesListData2,do.call(rbind.data.frame,  lapply(filesListData2$Description, .splitDescription))))
+      }
+    } else {
+      result$filesListData <- NULL
+    }
+  }
+  })
+  
+  filesListDatatoview <- reactive({
+    if (!is.null(result$filesListData)) {
+      result$filesListData %>% select(-c("Variable", "Granularity", "Losstype"))
+    } else {
+      result$filesListData
+    }
+  })
   
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
     outputfiles,
     id = "outputfiles",
-    filesListDatatoview =  reactive({result$filesListData}),
+    filesListDatatoview =  filesListDatatoview,
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     userId = userId,
@@ -144,7 +172,7 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
-    selectRunID = reactive(selectRunID1()),
+    selectRunID = reactive(sub_modules$defineID1$selectRunID()),
     filesListData =  reactive({result$filesListData}),
     n_panels = n_panels,
     dbSettings = dbSettings,
