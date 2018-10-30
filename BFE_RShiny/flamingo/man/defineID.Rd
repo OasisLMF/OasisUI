@@ -6,7 +6,7 @@
 \usage{
 defineID(input, output, session, dbSettings, userId,
   runIdList = reactive(c(-1)), preselectedRunId = reactive(-1),
-  logMessage = message)
+  batch = FALSE, logMessage = message)
 }
 \arguments{
 \item{input}{shiny input object}

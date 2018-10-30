@@ -6,7 +6,7 @@
 Run Summary Server}
 \usage{
 summarytab(input, output, session, dbSettings, apiSettings, userId,
-  selectRunID, active, logMessage = message)
+  selectRunID = reactive(""), active, logMessage = message)
 }
 \arguments{
 \item{input}{shiny input object}

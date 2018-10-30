@@ -6,7 +6,8 @@
 \usage{
 flamingoTable(input, output, session, data, selection = "none",
   escape = TRUE, scrollX = FALSE, filter = FALSE, rownames = FALSE,
-  colnames = TRUE, maxrowsperpage = 10, logMessage = message)
+  colnames = TRUE, preselRow = reactive({     NULL }),
+  maxrowsperpage = 10, logMessage = message)
 }
 \arguments{
 \item{input}{shiny input object}
