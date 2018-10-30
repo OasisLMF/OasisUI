@@ -48,6 +48,28 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
   )
 }
 
+#' Flamingo action button look like a checkbox
+#' @description Modified version of the default [shiny::actionButton()]
+#' @param class HTML class attribute
+#' @param ... arguments to [shiny::actionButton()]
+#' @importFrom shiny restoreInput
+#' @export
+#' @md
+flamingoCheckboxButton <- function(inputId, label, icon = NULL, width = NULL, class = c("btn"), ...) {
+  value <- restoreInput(id = inputId, default = NULL)
+  df_class <- c("btn", "action-button")
+  fl_class <- paste(union(class, df_class), collapse = " ")
+  tags$button(
+    id = inputId,
+    style = if (!is.null(width)) paste0("width: ", validateCssUnit(width), ";"),
+    type = "button",
+    class = fl_class,
+    `data-val` = value,
+    list(shiny:::validateIcon(icon), label),
+    ...
+  )
+}
+
 
 #' Show or remove a notification
 #' @description Modified version of the default [shiny::showNotification()]
