@@ -75,11 +75,11 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                                                                  style = "background-color: white;
                                                                           border-color: black;
                                                                           color: white;
-                                                                          font-size: 10 px;
+                                                                          font-size: 10px;
                                                                           text-shadow: none;
                                                                           padding: 0px;
-                                                                          height: 16 px;
-                                                                          width: 16 px;",
+                                                                          height: 16px;
+                                                                          width: 16px;",
                                                                  icon = icon("check"),
                                                                  onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)')
                                                                  )), 
