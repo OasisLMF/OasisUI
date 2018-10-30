@@ -113,11 +113,18 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
                       value = result$compData[input$tablecompanylist_rows_selected, 5])
   })
 
+  # title for delete button
+  output$compdelmodal <- renderUI({
+    companyId <- result$compData[input$tablecompanylist_rows_selected, 1]
+    companyName <- result$compData[input$tablecompanylist_rows_selected, 2]
+    paste0('Delete Company id ', companyId, ' "', companyName, '"')
+  })
+
   # modalDialog of delete button in main panel
   .compdelmodal <- function() {
     ns <- session$ns
     modalDialog(label = "compdelmodal",
-                title = "Delete selection",
+                title = uiOutput(ns("compdelmodal"), inline = TRUE),
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("abuttoncconfirmdel"),
@@ -138,7 +145,6 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # on click of cancel button in delete modal
   onclick("abuttonccanceldel", {
     removeModal()
-    .reloadCompData()
   })
 
 
@@ -192,8 +198,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # confirm delete
   onclick("abuttoncconfirmdel", {
     removeModal()
-    if(length(input$tablecompanylist_rows_selected) > 0){
-
+    
       stmt <- buildDbQuery("deleteCompany",
                            result$compData[input$tablecompanylist_rows_selected, 1])
       res <- executeDbQuery(dbSettings, stmt)
@@ -208,7 +213,6 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
                                  result$compData[input$tablecompanylist_rows_selected, 2]))
       }
       .reloadCompData()
-    }
   })
 
 
