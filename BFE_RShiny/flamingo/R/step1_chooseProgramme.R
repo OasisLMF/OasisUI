@@ -487,7 +487,7 @@ step1_chooseProgramme <- function(input, output, session,
   output$progdelmodal <- renderUI({
     progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
     progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
-    paste0('Delete ', progId, ' ', progName)
+    paste0('Delete Programme id ', progId, ' "', progName,'"')
     })
 
   # Modal dialog of delete button
@@ -528,7 +528,6 @@ step1_chooseProgramme <- function(input, output, session,
   # onclick of cancel delete button
   onclick("abuttonucanceldel", {
     removeModal()
-    .reloadDPProgData()
   })
 
   ### > Source Files -----------------------------------------------------------

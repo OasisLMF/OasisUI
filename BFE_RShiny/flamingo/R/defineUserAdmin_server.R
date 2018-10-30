@@ -13,9 +13,13 @@
 userAdminDefinition <- function(input, output, session, dbSettings, userId,
                                 active = reactive(TRUE)) {
 
+  # Reactive Values and parameters ---------------------------------------------
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues(
+    
+    permission = NULL,
+    
     CULData = NULL,
     CULDataCounter = 0,
 
@@ -129,10 +133,10 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
         filter = 'bottom',
         options = list(
           searchHighlight = TRUE,
-          autoWidth=TRUE,
+          autoWidth = TRUE,
           columnDefs = list(list(visible = FALSE, targets = 0)),
           search = list(caseInsensitive = TRUE),
-          processing=0,
+          processing = 0,
           pageLength = 10)
       )
     }
@@ -178,33 +182,17 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     # the user Id here is the user id of the logged in user, not of the
     # currently selected user
 
-    permission <- flamingoDBCheckPermissions(dbSettings, userId(), 905)
+    result$permission <- flamingoDBCheckPermissions(dbSettings, userId(), 905)
 
-    if(length(permission) == 0){
+    if (length(result$permission) == 0) {
 
       flamingoNotification(type = "warning",
                        "You do not have the required permissions to view this page")
 
       updateNavigation(navigation_state, "LP")
 
-    } else if(permission[1] == "CRUD") {
-
-      enable("abuttonnewUser")
-      enable("abuttonuserupdate")
-      enable("abuttonuserdelete")
-      enable("abuttonusersecurity")
-      enable("abuttonuseroasis")
-
-    } else if(permission[1] == "R") {
-
-      disable("abuttonnewUser")
-      disable("abuttonuserupdate")
-      disable("abuttonuserdelete")
-      disable("abuttonusersecurity")
-      disable("abuttonuseroasis")
-
-    } else {
-
+    } else if (result$permission[1] != "CRUD" && result$permission[1] != "R") {
+      
       flamingoNotification(type = "warning", "Neither CRUD nor R")
 
     }
@@ -289,7 +277,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   # Enable and disable buttons
   observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      if (length(input$tablecompanyuserlist_rows_selected) > 0) {
+      if (length(input$tablecompanyuserlist_rows_selected) > 0 && result$permission[1] == "CRUD") {
         shinyjs::enable("abuttonuserupdate")
         shinyjs::enable("abuttonuserdelete")
         shinyjs::enable("abuttonusersecurity")
@@ -353,7 +341,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   output$userdelmodal <- renderUI({
     companyId <- result$CULData[(input$tablecompanyuserlist_rows_selected), 1]
     companyName <- result$CULData[(input$tablecompanyuserlist_rows_selected), 2]
-    paste0('Delete ', companyId, ' ', companyName)
+    userId <- result$CULData[(input$tablecompanyuserlist_rows_selected), 3]
+    userName <- result$CULData[(input$tablecompanyuserlist_rows_selected), 4]
+    paste0('Delete User id ', userId, ' "', userName,'" for Company id ', companyId, ' "', companyName, '"')
   })
 
   # Modal dialog of delete button
