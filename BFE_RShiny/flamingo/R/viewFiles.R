@@ -12,7 +12,7 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
     tags$script("Shiny.addCustomMessageHandler('resetInputValue', function(variableName){
                 Shiny.onInputChange(variableName, null);});"),
     tags$script("Shiny.addCustomMessageHandler('resetcolorWhite', function(variableName){
-                document.getElementById(variableName).style.color = 'ffffff';});"),
+                document.getElementById(variableName).style.color = '#ffffff';});"),
     tags$script("Shiny.addCustomMessageHandler('resetcolorOasis', function(variableName){
                 document.getElementById(variableName).style.color = '#8b2129';});"),
     if (includechkbox) {
@@ -71,12 +71,12 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       result$filesListData <- filesListData
       if (includechkbox) {
         filesListData <- cbind(data.frame(Selected = .shinyInput(flamingoCheckboxButton,"srows_", nrow(filesListData), Label = NULL, 
-                                                                 hidden = TRUE, 
+                                                                 hidden = FALSE, 
                                                                  style = "background-color: white;
                                                                           border-color: black;
                                                                           color: white;
                                                                           font-size: 10 px;
-                                                                          textshadow: none;
+                                                                          text-shadow: none;
                                                                           padding: 0px;
                                                                           height: 16 px;
                                                                           width: 16 px;",
@@ -205,11 +205,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     if (!is.null(result$filesListDataButtons)) {
       if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
         lapply(input$outputFLtable_rows_current, function(i){
-          if (input$chkboxselectall) {
             session$sendCustomMessage(type = 'resetcolorOasis', message =  session$ns( paste0("srows_", i)))
-          } else {
-            session$sendCustomMessage(type = 'resetcolorWhite', message =  session$ns( paste0("srows_", i)))
-          }
         })
         selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
       } else {
