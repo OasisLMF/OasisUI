@@ -684,6 +684,7 @@ step3_configureOutput <- function(input, output, session,
     result$prcrundata
     selectprogOasisID()
     progOasisStatus()
+    currstep()
     input$tableprocessrundata_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonrerunpr")
       disable("abuttondisplayoutput")
