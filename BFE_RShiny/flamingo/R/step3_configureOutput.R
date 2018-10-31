@@ -127,12 +127,18 @@ panelDefineOutputsDetails <- function(id) {
                  selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "Long Term"),
                  checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
                  h5("Available Perils"),
-                 checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = TRUE),
-                 checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = TRUE),
-                 checkboxInput(ns("chkinputprquake"), label = "Peril: Quake", value = TRUE),
-                 checkboxInput(ns("chkinputprflood"), label = "Peril: Flood", value = TRUE),
-                 checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = TRUE),
-                 sliderInput(ns("sliderleakagefac"), label = "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)))
+                 hidden(div(id = ns("perilwind"),
+                            checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = TRUE))),
+                 hidden(div(id = ns("perilsurge"),
+                            checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = TRUE))),
+                 hidden(div(id = ns("perilquake"),
+                            checkboxInput(ns("chkinputprquake"), label = "Peril: Quake", value = TRUE))),
+                 hidden(div(id = ns("perilflood"),
+                            checkboxInput(ns("chkinputprflood"), label = "Peril: Flood", value = TRUE))),
+                 hidden(div(id = ns("demandsurge"),
+                            checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = TRUE))),
+                 hidden(div(id = ns("leakagefactor"),
+                            sliderInput(ns("sliderleakagefac"), label = "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)))))
     )
   )
 }
@@ -530,7 +536,7 @@ configureAdvancedRI <- function(id) {
 #' @importFrom shinyjs show hide enable disable
 #' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
 #' @importFrom dplyr mutate select case_when
-#' @importFrom shinyjs onclick disable enable
+#' @importFrom shinyjs onclick disable enable show hide
 #' @export
 step3_configureOutput <- function(input, output, session,
                                   dbSettings,apiSettings, userId,
@@ -707,6 +713,7 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonconfigoutput", {
     .defaultview(session)
     show("panelDefineOutputs")
+    .showPerils()
     logMessage("showing panelDefineOutputs")
     logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
     result$prrun_flag <- "C"
@@ -715,6 +722,7 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonrerunpr", {
     .defaultview(session)
     show("panelDefineOutputs")
+    .showPerils()
     logMessage("showing panelDefineOutputs")
     result$prrun_flag <- "R"
     .updateOutputConfig()
@@ -919,7 +927,7 @@ step3_configureOutput <- function(input, output, session,
     prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
     stmt <- buildDbQuery("getRuntimeParamList", prgId)
     runparamlist <- executeDbQuery(dbSettings, stmt)
-
+    
     rows <- nrow(runparamlist)
     if (rows > 0) {
       for (i in 1:rows) {
@@ -1195,6 +1203,27 @@ step3_configureOutput <- function(input, output, session,
     updateSelectInput(session, "sinoutputoptions",
                       choices = c(getOutputOptions(dbSettings)),
                       selected = character(0))
+  }
+  
+  #Show available perils
+  .showPerils <- function() {
+    prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
+    stmt <- buildDbQuery("getRuntimeParamList", prgId)
+    runparamlist <- executeDbQuery(dbSettings, stmt)
+    
+    hide("perilwind") 
+    hide("perilsurge")
+    hide("perilquake") 
+    hide("perilflood")
+    hide("demandsurge")
+    hide("leakagefactor")
+    
+    if (nrow(runparamlist) > 0) {
+      for (i in 1:nrow(runparamlist)) {
+        ctrname <- gsub("_", "", runparamlist[i, 1], fixed = TRUE)
+        show(ctrname)
+      }
+    }
   }
   
   # Update output configuration for rerun
