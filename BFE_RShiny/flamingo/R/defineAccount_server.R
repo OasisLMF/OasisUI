@@ -9,8 +9,12 @@
 #'
 #' @return Empty list.
 #'
-#' @importFrom shinyjs onclick show disable enable hide
-#' @importFrom DT renderDT datatable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs onclick
+#' @importFrom DT renderDT
+#' @importFrom DT datatable
+#' @importFrom htmltools tags
 #'
 #' @export
 accountDefinition <- function(input, output, session, dbSettings,

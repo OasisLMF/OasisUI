@@ -11,9 +11,13 @@
 #' @return Empty list.
 #'
 #' @importFrom DT renderDT
+#' @importFrom DT datatable
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
-#' @importFrom shinyjs onclick
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs enable
+#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
 #'
 #' @export
 modelSupplierPage <- function(input, output, session, dbSettings,

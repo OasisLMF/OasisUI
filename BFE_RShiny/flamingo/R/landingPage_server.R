@@ -128,6 +128,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' }.
 #'
 #' @importFrom shinyWidgets toggleDropdownButton
+#' @importFrom htmltools tags
 #'
 #' @export
 pageheader <- function(input, output, session, userId, userName, dbSettings,

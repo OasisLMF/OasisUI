@@ -10,6 +10,7 @@
 #'
 #' @importFrom DT DTOutput
 #' @importFrom htmltools tags
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 companyDefinitionUI <- function(id) {

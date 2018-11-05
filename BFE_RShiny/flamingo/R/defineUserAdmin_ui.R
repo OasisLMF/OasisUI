@@ -9,13 +9,9 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom shiny helpText
-#' @importFrom shiny textInput
-#' @importFrom shiny sidebarLayout
-#' @importFrom shiny sidebarPanel
-#' @importFrom shiny downloadButton
 #' @importFrom DT DTOutput
 #' @importFrom shinyjs hidden
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 userAdminDefinitionUI <- function(id) {

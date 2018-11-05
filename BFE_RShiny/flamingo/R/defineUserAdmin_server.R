@@ -13,8 +13,11 @@
 #' @return For \code{userAdminDefinition()}, list of reactives.
 #'
 #' @importFrom DT renderDT
+#' @importFrom DT datatable
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
+#' @importFrom shinyjs onclick
+#' @importFrom htmltools tags
 #'
 #' @export
 userAdminDefinition <- function(input, output, session, dbSettings, userId,

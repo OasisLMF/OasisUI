@@ -6,7 +6,6 @@
 #'
 #' @inheritParams accountDefinitionUI
 #'
-#' @importFrom shinyjs hidden
 #' @importFrom htmltools tags
 #'
 #' @export

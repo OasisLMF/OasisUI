@@ -11,8 +11,8 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom DT DTOutput
-#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
+#' @importFrom shinyjs hidden
 #'
 #' @export
 step2_chooseModelUI <- function(id) {
@@ -35,6 +35,8 @@ step2_chooseModelUI <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
+#' @importFrom htmltools tags
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 panelProgrammeModelTable <- function(id) {
@@ -65,6 +67,7 @@ panelProgrammeModelTable <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
+#' @importFrom htmltools tags
 #'
 #' @export
 panelModelDetails <- function(id) {
@@ -91,6 +94,7 @@ panelModelDetails <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
 #'
 #' @export
 panelAssociateModel <- function(id) {
@@ -147,13 +151,11 @@ panelAssociateModel <- function(id) {
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
 #' @importFrom DT renderDT
+#' @importFrom DT datatable
 #' @importFrom DT dataTableProxy
 #' @importFrom DT selectRows
-#' @importFrom DT DTOutput
 #' @importFrom DT selectPage
-#' @importFrom dplyr mutate
 #' @importFrom dplyr select
-#' @importFrom dplyr case_when
 #'
 #' @export
 step2_chooseModel <- function(input, output, session,

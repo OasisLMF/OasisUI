@@ -26,6 +26,7 @@ programmeWorkflowSteps <- list("Choose Programme" = "1",
 #' @return smth.
 #'
 #' @importFrom shinyWidgets radioGroupButtons
+#' @importFrom htmltools tags
 #'
 #' @export
 singleProgrammeWorkflowStepsUI <- function(id) {

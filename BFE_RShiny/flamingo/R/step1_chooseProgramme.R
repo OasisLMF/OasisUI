@@ -11,8 +11,8 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom DT DTOutput
-#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
+#' @importFrom shinyjs hidden
 #'
 #' @export
 step1_chooseProgrammeUI <- function(id) {
@@ -35,6 +35,8 @@ step1_chooseProgrammeUI <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
+#' @importFrom htmltools tags
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 panelProgrammeTable <- function(id) {
@@ -68,6 +70,7 @@ panelProgrammeTable <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
+#' @importFrom htmltools tags
 #'
 #' @export
 panelProgrammeDetails <- function(id) {
@@ -92,10 +95,7 @@ panelProgrammeDetails <- function(id) {
 #' @description Function wrapping panel to create/amend programme.
 #'
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tagAppendChildren
-#' @importFrom shiny selectizeInput
-#' @importFrom shiny textInput
-#' @importFrom shiny fileInput
+#' @importFrom htmltools tags
 #'
 #' @export
 panelDefineProgramme <- function(id) {
@@ -143,10 +143,8 @@ panelDefineProgramme <- function(id) {
 #' @description Function wrapping panel to link files to a programme.
 #'
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tagAppendChildren
-#' @importFrom shiny selectizeInput
-#' @importFrom shiny textInput
-#' @importFrom shiny fileInput
+#' @importFrom htmltools tags
+#' @importFrom shinyjs hidden
 #'
 #' @export
 panelLinkFiles <- function(id) {
@@ -233,13 +231,12 @@ panelLinkFiles <- function(id) {
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
+#' @importFrom DT datatable
 #' @importFrom DT dataTableProxy
 #' @importFrom DT selectRows
 #' @importFrom DT DTOutput
 #' @importFrom DT selectPage
-#' @importFrom dplyr mutate
 #' @importFrom dplyr select
-#' @importFrom dplyr case_when
 #'
 #' @export
 step1_chooseProgramme <- function(input, output, session,

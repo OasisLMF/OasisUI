@@ -8,12 +8,9 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom shiny helpText
-#' @importFrom shiny textInput
-#' @importFrom shiny sidebarLayout
-#' @importFrom shiny sidebarPanel
-#' @importFrom shiny downloadButton
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
 #'
 #' @export
 accountDefinitionUI <- function(id) {

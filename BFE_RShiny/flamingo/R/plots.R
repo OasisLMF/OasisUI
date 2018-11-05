@@ -12,8 +12,6 @@
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 scale_colour_gradient
-#' @importFrom ggplot2 stat_function
-#' @importFrom graphics lines plot
 #' @importFrom data.table melt
 #'
 #' @export
@@ -50,12 +48,9 @@ plotAEPCurve <- function(AEPData, years = 1000) {
 #' @importFrom plotly plot_ly
 #' @importFrom plotly add_trace
 #' @importFrom plotly layout
-#' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 scale_colour_gradient
-#' @importFrom ggplot2 stat_function
-#' @importFrom graphics lines plot
-#' @importFrom data.table melt
+#' @importFrom graphics lines
+#' @importFrom graphics plot
 #'
 #' @export
 #'
@@ -105,9 +100,8 @@ plotIL <- function(outputPlotData, interactive = FALSE, ...) {
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 scale_colour_gradient
-#' @importFrom ggplot2 stat_function
-#' @importFrom graphics lines plot
-#' @importFrom data.table melt
+#' @importFrom graphics lines
+#' @importFrom graphics plot
 #'
 #' @export
 #'
@@ -150,6 +144,9 @@ plotGUL <- function(outputPlotData, interactive = FALSE, ...) {
 #'
 #' @return Some plot.
 #'
+#' @importFrom ggplot2 ggplot
+#' @importFrom data.table melt
+#'
 #' @export
 funPlotOutput <- function(outputPlotData) {
   # years <- 1000
@@ -173,6 +170,10 @@ funPlotOutput <- function(outputPlotData) {
 #' @inheritParams plotIL
 #'
 #' @return Some plot.
+#'
+#' @importFrom ggplot2 stat_function
+#' @importFrom ggplot2 ggplot
+#' @importFrom data.table melt
 #'
 #' @export
 funPlotOutput2 <- function(outputPlotData) {

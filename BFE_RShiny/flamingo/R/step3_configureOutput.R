@@ -11,8 +11,8 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom DT DTOutput
-#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
+#' @importFrom shinyjs hidden
 #'
 #' @export
 step3_configureOutputUI <- function(id) {
@@ -36,6 +36,8 @@ step3_configureOutputUI <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
 #'
 #' @export
 panelProcessRunTable <- function(id) {
@@ -78,6 +80,7 @@ panelProcessRunTable <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
+#' @importFrom htmltools tags
 #'
 #' @export
 panelProcessRunLogs <- function(id) {
@@ -102,7 +105,8 @@ panelProcessRunLogs <- function(id) {
 #'
 #' @inheritParams flamingoModuleUI
 #'
-#' @importFrom shinyjs hidden
+#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
 #'
 #' @export
 panelDefineOutputs <- function(id) {
@@ -137,6 +141,7 @@ panelDefineOutputs <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom shinyjs hidden
+#' @importFrom htmltools tags
 #'
 #' @export
 panelDefineOutputsDetails <- function(id) {
@@ -185,6 +190,7 @@ panelDefineOutputsDetails <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom shinyjs hidden
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 panelDefineOutputConfiguration <- function(id) {
@@ -214,6 +220,8 @@ panelDefineOutputConfiguration <- function(id) {
 #' @description Function wrapping sub-panel to define outputs advanced configuration GUL.
 #'
 #' @inheritParams flamingoModuleUI
+#'
+#' @importFrom htmltools tags
 #'
 #' @export
 configureAdvancedGUL <- function(id) {
@@ -348,6 +356,8 @@ configureAdvancedGUL <- function(id) {
 #'
 #' @inheritParams flamingoModuleUI
 #'
+#' @importFrom htmltools tags
+#'
 #' @export
 configureAdvancedIL <- function(id) {
   ns <- NS(id)
@@ -479,6 +489,8 @@ configureAdvancedIL <- function(id) {
 #'
 #' @inheritParams flamingoModuleUI
 #'
+#' @importFrom htmltools tags
+#'
 #' @export
 configureAdvancedRI <- function(id) {
   ns <- NS(id)
@@ -595,18 +607,16 @@ configureAdvancedRI <- function(id) {
 #' @return For \code{programmeDefinitionSingle()}, list of reactives.
 #'
 #' @importFrom DT renderDT
+#' @importFrom DT datatable
 #' @importFrom DT dataTableProxy
 #' @importFrom DT selectRows
-#' @importFrom DT DTOutput
 #' @importFrom DT selectPage
-#' @importFrom dplyr mutate
-#' @importFrom dplyr select
-#' @importFrom dplyr case_when
 #' @importFrom shinyjs onclick
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs show
-#' @importFrom shinyjs hide
+#' @importFrom htmltools tags
+#' @importFrom dplyr filter
 #'
 #' @export
 step3_configureOutput <- function(input, output, session,

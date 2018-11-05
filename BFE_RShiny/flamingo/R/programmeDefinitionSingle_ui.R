@@ -10,8 +10,8 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom DT DTOutput
-#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
+#' @importFrom shinyjs hidden
 #'
 #' @export
 programmeDefinitionSingleUI <- function(id) {

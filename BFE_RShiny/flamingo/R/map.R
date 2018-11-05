@@ -13,7 +13,7 @@
 #' @importFrom leaflet addMarkers
 #' @importFrom leaflet markerClusterOptions
 #' @importFrom utils read.csv
-#' @importFrom htmltools tagList
+#' @importFrom htmltools tags
 #'
 #' @export
 createPlainMap <- function(fileName) {

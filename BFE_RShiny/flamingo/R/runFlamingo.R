@@ -10,8 +10,6 @@
 #'
 #' @return No return value.
 #'
-#' @importFrom shiny runApp
-#'
 #' @export
 runFlamingo <- function(port = 3838, ...) {
 

@@ -48,7 +48,7 @@ flamingoModule <- function(
 #'
 #' @return Acces to Oasis UI.
 #'
-#' @importFrom shiny restoreInput
+#' @importFrom htmltools tags
 #'
 #' @export
 #'
@@ -79,7 +79,7 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
 #'
 #' @return List of tags.
 #'
-#' @importFrom shiny restoreInput
+#' @importFrom htmltools tags
 #'
 #' @export
 #'
@@ -111,9 +111,6 @@ flamingoCheckboxButton <- function(inputId, label, icon = NULL, width = NULL, cl
 #' @param ... other arguments to [shiny::showNotification()].
 #'
 #' @return Notifications.
-#'
-#' @importFrom shiny showNotification
-#' @importFrom shiny icon
 #'
 #' @export
 #'

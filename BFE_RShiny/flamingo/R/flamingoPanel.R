@@ -125,7 +125,7 @@ if (FALSE) {
 #' @return Collapsed button.
 #'
 #' @importFrom bsplus bs_attach_collapse
-#' @importFrom htmltools tagAppendAttributes
+#' @importFrom htmltools tags
 collapseButton <- function(id, id_collapse, ..., width = NULL, collapsed = FALSE) {
   actionButton(id, NULL, NULL, ..., width = width) %>%
     bsplus::bs_attach_collapse(id_collapse)  %>%

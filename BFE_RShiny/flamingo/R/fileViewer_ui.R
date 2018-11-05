@@ -4,8 +4,7 @@
 #'
 #' @description UI/View to view files.
 #'
-#' @importFrom leaflet leaflet
-#' @importFrom DT DTOutput
+#' @importFrom htmltools tags
 #'
 #' @export
 fileViewerUI <- function(id) {

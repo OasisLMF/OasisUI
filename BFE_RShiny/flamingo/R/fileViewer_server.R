@@ -10,15 +10,6 @@
 #'
 #' @return Empty list.
 #'
-#' @importFrom DT renderDT
-#' @importFrom DT DTOutput
-#' @importFrom DT dataTableProxy
-#' @importFrom DT selectRows
-#' @importFrom shinyjs show
-#' @importFrom shinyjs hide
-#' @importFrom shinyjs hidden
-#' @importFrom utils read.csv
-#' @importFrom utils zip
 #' @importFrom dplyr select
 #'
 #' @export

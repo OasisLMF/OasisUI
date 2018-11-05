@@ -13,20 +13,6 @@
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
-#' @importFrom shinyjs enable
-#' @importFrom shinyjs disable
-#' @importFrom shinyjs onclick
-#' @importFrom shinyjs js
-#' @importFrom shinyjs removeClass
-#' @importFrom shinyjs addClass
-#' @importFrom DT renderDT
-#' @importFrom DT dataTableProxy
-#' @importFrom DT selectRows
-#' @importFrom DT DTOutput
-#' @importFrom DT selectPage
-#' @importFrom dplyr mutate
-#' @importFrom dplyr select
-#' @importFrom dplyr case_when
 #'
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,

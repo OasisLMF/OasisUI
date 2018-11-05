@@ -9,8 +9,9 @@
 #' @return smth.
 #'
 #' @importFrom shinyjs hidden
-#' @importFrom shiny downloadButton
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
 #'
 #' @export
 modelSupplierPageUI <- function(id) {

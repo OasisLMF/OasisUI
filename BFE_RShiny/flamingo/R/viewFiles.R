@@ -8,6 +8,7 @@
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
+#' @importFrom htmltools tags
 #'
 #' @export
 ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
@@ -48,15 +49,17 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs hidden
+#' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
+#' @importFrom DT dataTableProxy
+#' @importFrom DT selectRows
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
-#' @importFrom dplyr filter
-#' @importFrom leaflet leaflet
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet leafletOutput
+#' @importFrom utils read.csv
 #'
 #' @export
 ViewFilesModule <- function(input, output, session, logMessage = message, filesListData, includemrows = FALSE, includechkbox = FALSE) {

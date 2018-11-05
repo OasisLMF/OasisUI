@@ -45,6 +45,8 @@ reactiveConditionalPanel <- function(input, output, session, condition) {
 #'
 #' @return smth.
 #'
+#' @importFrom htmltools tags
+#'
 #' @export
 #'
 #' @md
