@@ -5,7 +5,7 @@
 \title{Module to View Files}
 \usage{
 ViewFilesModule(input, output, session, logMessage = message,
-  filesListData, includemrows = FALSE, includechkbox = FALSE)
+  filesListData, includechkbox = FALSE)
 }
 \arguments{
 \item{input}{shiny input object}
