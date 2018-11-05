@@ -1,9 +1,17 @@
-#' @title visualizationSBR_ui
-#' visualization Single Browse Run UI
-#' @rdname visualizationSBRUI
-#' @description UI/View for the process run page
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
+# visualization Single Run Browse Module UI ------------------------------------
+
+#' visualizationSBRUI
+#' 
+#' @rdname visualizationSBR
+#' 
+#' @description UI/View for viewing results of a single run.
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
+#' @importFrom shinyWidgets panel
+#' 
 #' @export
 visualizationSBRUI <- function(id) {
   
