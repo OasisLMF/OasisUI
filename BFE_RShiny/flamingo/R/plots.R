@@ -4,13 +4,14 @@
 #'
 #' @description Plot AEP Curve.
 #'
-#' @param AEPData AEP data.
-#' @param years Years.
+#' @param AEPData AEP dataframe.
+#' @param years Years, integer.
 #'
 #' @return AEP Curve plot.
 #'
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 aes
 #' @importFrom ggplot2 scale_colour_gradient
 #' @importFrom data.table melt
 #'
@@ -39,7 +40,7 @@ plotAEPCurve <- function(AEPData, years = 1000) {
 #'
 #' @description Plot IL using the current device.
 #'
-#' @param outputPlotData Data for plot.
+#' @param outputPlotData plotly output.
 #' @param ... Extra arguments to [plot()].
 #' @param interactive Create interactive plot using [plotly::plot_ly()].
 #'
@@ -64,7 +65,7 @@ plotIL <- function(outputPlotData, interactive = FALSE, ...) {
     IL_OEP <- outputPlotData$IL_OEP
 
     options("scipen" = 100, "digits" = 4)
-    plot(x=returnPeriod, y = IL_AEP, ylab = "Loss", type = "o", col = "red", ...)+
+    plot(x = returnPeriod, y = IL_AEP, ylab = "Loss", type = "o", col = "red", ...) +
         lines(x = returnPeriod, y = IL_OEP, type = "o", col = "blue")
 
     invisible()
@@ -115,8 +116,8 @@ plotGUL <- function(outputPlotData, interactive = FALSE, ...) {
     GUL_OEP <- outputPlotData$GUL_OEP
 
     options("scipen" = 100, "digits" = 4)
-    plot(x=returnPeriod, y=GUL_AEP, ylab = "Loss", type = "o", col = "red", ...)+
-        lines(x=returnPeriod, y=GUL_OEP, type = "o", col = "blue")
+    plot(x = returnPeriod, y = GUL_AEP, ylab = "Loss", type = "o", col = "red", ...) +
+        lines(x = returnPeriod, y = GUL_OEP, type = "o", col = "blue")
 
     invisible()
 
@@ -145,6 +146,9 @@ plotGUL <- function(outputPlotData, interactive = FALSE, ...) {
 #' @return Some plot.
 #'
 #' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 scale_colour_gradient
 #' @importFrom data.table melt
 #'
 #' @export
@@ -173,6 +177,7 @@ funPlotOutput <- function(outputPlotData) {
 #'
 #' @importFrom ggplot2 stat_function
 #' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 aes
 #' @importFrom data.table melt
 #'
 #' @export
@@ -186,10 +191,10 @@ funPlotOutput2 <- function(outputPlotData) {
   #   Rank <- AEPData[, 5]
   #   RT <- years/Rank
   outputData <- data.frame(ReturnPeriod = outputPlotData[,1], Loss = outputPlotData[,2])
-  outputData <- melt(outputData, id.vars=c("ReturnPeriod", "Loss"))
+  outputData <- melt(outputData, id.vars = c("ReturnPeriod", "Loss"))
 
-  res <- ggplot(aes(x='ReturnPeriod'),data=outputData) +
-      stat_function(outputPlotData[,2],color="blue") +
-      stat_function(outputPlotData[,3],color="red")
+  res <- ggplot(aes(x ='ReturnPeriod'),data = outputData) +
+      stat_function(outputPlotData[,2],color = "blue") +
+      stat_function(outputPlotData[,3],color = "red")
   return(res)
 }

@@ -6,17 +6,16 @@
 #' in association with OASIS LMF.
 #'
 #' @template return-outputNavigation
-#'
-#' @inheritParams flamingoModule
-#' @inheritParams companyDefinition
-#'
-#' @return For \code{userAdminDefinition()}, list of reactives.
+#' @template params-module
+#' @template params-flamingo-module
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs onclick
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
 #'
 #' @export
 userAdminDefinition <- function(input, output, session, dbSettings, userId,
@@ -287,15 +286,15 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # Enable and disable buttons
   observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$tablecompanyuserlist_rows_selected) > 0 && result$permission[1] == "CRUD") {
-        shinyjs::enable("abuttonuserupdate")
-        shinyjs::enable("abuttonuserdelete")
-        shinyjs::enable("abuttonusersecurity")
-        shinyjs::enable("abuttonuseroasis")
+        enable("abuttonuserupdate")
+        enable("abuttonuserdelete")
+        enable("abuttonusersecurity")
+        enable("abuttonuseroasis")
       } else {
-        shinyjs::disable("abuttonuserupdate")
-        shinyjs::disable("abuttonuserdelete")
-        shinyjs::disable("abuttonusersecurity")
-        shinyjs::disable("abuttonuseroasis")
+        disable("abuttonuserupdate")
+        disable("abuttonuserdelete")
+        disable("abuttonusersecurity")
+        disable("abuttonuseroasis")
       }
     })
 

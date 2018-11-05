@@ -12,7 +12,7 @@ step1_chooseProgramme(input, output, session, dbSettings, apiSettings,
   currstep = reactive(-1), selectprogrammeID = reactive(""))
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 
 \item{input}{Shiny input object.}
 
@@ -20,13 +20,19 @@ step1_chooseProgramme(input, output, session, dbSettings, apiSettings,
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{active}{Reactive expression whether the module state should be updated.}
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{logMessage}{Function that will be passed info messages.}
+\item{active}{reactive expression whether the module state should be updated.}
+
+\item{logMessage}{function that will be passed info messages.}
+
+\item{currstep}{current selected step.}
+
+\item{selectprogrammeID}{selected programme ID.}
 }
 \value{
 List of tags.
@@ -34,7 +40,11 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-For \code{programmeDefinitionSingle()}, list of reactives.
+selectprogrammeID Id of selected programmeID
+
+DPProgData POData model association table.
+
+newstep navigation step
 }
 \description{
 UI/View for the step1_chooseProgramme.

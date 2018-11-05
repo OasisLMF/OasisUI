@@ -1,11 +1,11 @@
 #' accountDefinitionUI
 #'
-#' @rdname accountDefinitionUI
+#' @rdname accountDefinition
 #'
 #' @description UI/View to define an account.
 #'
-#' @param id Shiny module id.
-#'
+#' @template params-module-ui
+#' 
 #' @return List of tags.
 #'
 #' @importFrom DT DTOutput

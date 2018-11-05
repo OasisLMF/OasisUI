@@ -7,7 +7,7 @@
 #'
 #' @description UI/View for the step3_configureOutput.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'
@@ -32,7 +32,7 @@ step3_configureOutputUI <- function(id) {
 #'
 #' @description Function wrapping panel to show process run table.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
@@ -75,7 +75,7 @@ panelProcessRunTable <- function(id) {
 #'
 #' @description Function wrapping panel to show log table for specific Process Run.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom DT DTOutput
 #'
@@ -100,7 +100,7 @@ panelProcessRunLogs <- function(id) {
 #'
 #' @description Function wrapping panel to define outputs
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom bsplus bs_embed_tooltip
 #'
@@ -182,7 +182,7 @@ panelDefineOutputsDetails <- function(id) {
 #'
 #' @description Function wrapping sub-panel to define outputs configuration.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom shinyjs hidden
 #' @importFrom bsplus bs_embed_tooltip
@@ -214,7 +214,7 @@ panelDefineOutputConfiguration <- function(id) {
 #'
 #' @description Function wrapping sub-panel to define outputs advanced configuration GUL.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @export
 configureAdvancedGUL <- function(id) {
@@ -347,7 +347,7 @@ configureAdvancedGUL <- function(id) {
 #'
 #' @description Function wrapping sub-panel to define outputs advanced configuration IL.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @export
 configureAdvancedIL <- function(id) {
@@ -478,7 +478,7 @@ configureAdvancedIL <- function(id) {
 #'
 #' @description Function wrapping sub-panel to define outputs advanced configuration RI.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @export
 configureAdvancedRI <- function(id) {
@@ -590,10 +590,16 @@ configureAdvancedRI <- function(id) {
 #' @description Server logic to step3_configureOutput.
 #'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param currstep current selected step.
+#' @param selectprogrammeID selected programme ID.
+#' @param selectprogOasisID selected ProgOasis ID.
+#' @param progOasisName Name of selected progOasis.
+#' @param progOasisStatus Status of selected progOasis.
 #'
-#' @inheritParams flamingoModule
-#'
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+#' @return prrunid id of selected run.
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -604,6 +610,7 @@ configureAdvancedRI <- function(id) {
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs show
+#' @importFrom shinyjs hide
 #' @importFrom dplyr filter
 #'
 #' @export
@@ -1156,7 +1163,7 @@ step3_configureOutput <- function(input, output, session,
   # Navigation --------------------------------------------------------------
   # Go to browse section
   onclick("abuttondisplayoutput", {
-    result$navigationstate <-"SBR"
+    result$navigationstate <- "SBR"
   })
 
   # Help Functions -----------------------------------------------------------

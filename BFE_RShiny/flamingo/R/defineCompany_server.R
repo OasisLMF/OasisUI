@@ -4,16 +4,17 @@
 #'
 #' @description Server logic to define a company.
 #'
-#' @inheritParams flamingoModule
-#' @inheritParams companyDefinition
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
 #'
 #' @return Empty list.
-#'
-#' @importFrom shinyjs onclick
+#
 #' @importFrom DT datatable
 #' @importFrom DT renderDT
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
+#' @importFrom shinyjs onclick
 #'
 #' @export
 companyDefinition <- function(input, output, session, dbSettings, userId,
@@ -101,11 +102,11 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # Enable and disable buttons
   observeEvent(input$tablecompanylist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$tablecompanylist_rows_selected) > 0) {
-        shinyjs::enable("abuttoncompupdate")
-        shinyjs::enable("abuttoncompdel")
+        enable("abuttoncompupdate")
+        enable("abuttoncompdel")
       } else {
-        shinyjs::disable("abuttoncompupdate")
-        shinyjs::disable("abuttoncompdel")
+        disable("abuttoncompupdate")
+        isable("abuttoncompdel")
       }
     })
 

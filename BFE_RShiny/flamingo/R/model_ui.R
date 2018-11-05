@@ -1,10 +1,10 @@
 #' modelSupplierPageUI
 #'
-#' @rdname modelSupplierPageUI
+#' @rdname modelSupplierPage
 #'
 #' @description UI/View for the model supplier page.
 #'
-#' @inheritParams accountDefinitionUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'

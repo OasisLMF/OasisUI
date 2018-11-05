@@ -41,9 +41,9 @@ reactiveConditionalPanels <- function(input, output, session, visible) {
 
 #' reactiveConditionalPanelsUI
 #'
-#' @rdname reactiveConditionalPanelsUI
+#' @rdname reactiveConditionalPanels
 #'
-#' @inheritParams flamingoModule
+#' @template params-module-ui
 #' @param panels Named list of UI content for a set of panels. Only the panel
 #'   whose name matches the `visible` reactive input to the module server
 #'   function is shown.

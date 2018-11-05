@@ -48,7 +48,7 @@ dynamicColumn <- function(input, output, session, width) {
 #'
 #' @rdname dynamicColumn
 #'
-#' @inheritParams accountDefinitionUI
+#' @template params-module-ui
 #' @inheritParams dynamicColumn
 #' @param ... Other inputs.
 #'

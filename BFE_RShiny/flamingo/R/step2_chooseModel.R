@@ -7,7 +7,7 @@
 #'
 #' @description UI/View for the step2_chooseModel.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'
@@ -31,7 +31,7 @@ step2_chooseModelUI <- function(id) {
 #'
 #' @description Function wrapping panel to show created programme model table.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
@@ -62,7 +62,7 @@ panelProgrammeModelTable <- function(id) {
 #'
 #' @description Function wrapping panel to show details of programme table.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom DT DTOutput
 #'
@@ -136,10 +136,19 @@ panelAssociateModel <- function(id) {
 #' @description Server logic to step2_chooseModel.
 #'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param currstep current selected step.
+#' @param selectprogrammeID selected programme ID.
+#' @param selectprogOasisID selected ProgOasis ID.
+#' @param progName Name of selected programme.
+#' @param progStatus Status of selected programme.
+#' @param DPProgData Dataframe of programmes.
 #'
-#' @inheritParams flamingoModule
-#'
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+#' @return selectprogOasisID Id of selected progOasis.
+#' @return POData model association table.
+#' @return newstep navigation step
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide

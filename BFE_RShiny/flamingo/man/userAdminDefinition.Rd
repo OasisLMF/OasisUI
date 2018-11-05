@@ -20,9 +20,11 @@ userAdminDefinitionUI(id)
 
 \item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+
 \item{active}{Reactive expression whether the module state should be updated.}
 
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state

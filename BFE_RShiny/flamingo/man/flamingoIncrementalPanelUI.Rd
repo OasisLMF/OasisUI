@@ -9,7 +9,7 @@ flamingoIncrementalPanelUI(id, ..., heading = NULL, footer = NULL,
   removable = TRUE)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 
 \item{...}{Additional parameters.}
 

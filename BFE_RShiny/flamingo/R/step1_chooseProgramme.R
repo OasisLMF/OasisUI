@@ -7,7 +7,7 @@
 #'
 #' @description UI/View for the step1_chooseProgramme.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'
@@ -31,7 +31,7 @@ step1_chooseProgrammeUI <- function(id) {
 #'
 #' @description Function wrapping panel to show created programmes table.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
@@ -65,7 +65,7 @@ panelProgrammeTable <- function(id) {
 #'
 #' @description Function wrapping panel to show details of programme.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom DT DTOutput
 #'
@@ -90,6 +90,8 @@ panelProgrammeDetails <- function(id) {
 #' @rdname panelDefineProgramme
 #'
 #' @description Function wrapping panel to create/amend programme.
+#' 
+#' @template params-module-ui
 #'
 #' @importFrom bsplus bs_embed_tooltip
 #'
@@ -137,8 +139,9 @@ panelDefineProgramme <- function(id) {
 #' @rdname panelLinkFiles
 #'
 #' @description Function wrapping panel to link files to a programme.
+#' 
+#' @template params-module-ui
 #'
-#' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyjs hidden
 #'
 #' @export
@@ -215,10 +218,15 @@ panelLinkFiles <- function(id) {
 #' @description Server logic to step1_chooseProgramme.
 #'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
 #'
-#' @inheritParams flamingoModule
+#' @param currstep current selected step.
+#' @param selectprogrammeID selected programme ID.
 #'
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+#' @return selectprogrammeID Id of selected programmeID
+#' @return DPProgData POData model association table.
+#' @return newstep navigation step
 
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide

@@ -21,7 +21,7 @@ programmeWorkflowSteps <- list("Choose Programme" = "1",
 #'
 #' @rdname singleProgrammeWorkflowStepsUI
 #'
-#' @inheritParams accountDefinitionUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'
@@ -46,11 +46,12 @@ singleProgrammeWorkflowStepsUI <- function(id) {
 #'
 #' @rdname singleProgrammeWorkflowSteps
 #'
-#' @inheritParams flamingoModule
+#' @template params-module
 #'
 #' @return smth.
 #'
 #' @importFrom shinyWidgets updateRadioGroupButtons
+#' @importFrom shinyjs js
 #'
 #' @export
 singleProgrammeWorkflowSteps <- function(input, output, session) {

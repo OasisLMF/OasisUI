@@ -2,14 +2,11 @@
 #'
 #' @rdname programmeDefinitionBatch
 #'
-#' @description Server logic to define a programme.
+#' @description Server logic to define a batch process.
 #'
 #' @template return-outputNavigation
-#'
-#' @inheritParams flamingoModule
-#' @inheritParams landingPage
-#'
-#' @return For \code{programmeDefinitionBatch()}, list of reactives.
+#' @template params-module
+#' @template params-flamingo-modulee
 #'
 #' @export
 programmeDefinitionBatch <- function(input, output, session, dbSettings,

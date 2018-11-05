@@ -4,8 +4,9 @@
 #'
 #' @description Server logic to define an account.
 #'
-#' @inheritParams executeDbQuery
-#' @inheritParams flamingoModule
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
 #'
 #' @return Empty list.
 #'

@@ -692,6 +692,8 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
 #' @template params-flamingo-module
 #'
 #' @param selectRunID selected runID
+#' 
+#' #' @return Empty list.
 #'
 #' @importFrom DT renderDT 
 #' @importFrom DT datatable

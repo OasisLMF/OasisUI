@@ -1,8 +1,10 @@
 #' landingPage
 #'
 #' @rdname landingPage
+#' 
+#' @template params-module-ui
 #'
-#' @return LandingPage.
+#'  @return List of tags.
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
@@ -29,7 +31,9 @@ landingPageUI <- function(id) {
 
 #' pageheaderUI
 #'
-#' @rdname pageheaderUI
+#' @rdname pageheader
+#' 
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'
@@ -71,9 +75,9 @@ pageheaderUI <- function(id) {
 
 #' pagestructureUI
 #'
-#' @rdname pagestructureUI
+#' @rdname pagestructure
 #'
-#' @inheritParams accountDefinitionUI
+#' @template params-module-ui
 #'
 #' @return Lits of tags
 #'

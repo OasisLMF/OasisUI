@@ -7,7 +7,7 @@
 configureAdvancedRI(id)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \description{
 Function wrapping sub-panel to define outputs advanced configuration RI.

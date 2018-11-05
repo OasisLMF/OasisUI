@@ -6,6 +6,9 @@
 \usage{
 panelLinkFiles(id)
 }
+\arguments{
+\item{id}{module id}
+}
 \description{
 Function wrapping panel to link files to a programme.
 }

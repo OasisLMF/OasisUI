@@ -1,10 +1,10 @@
 #' companyDefinitionUI
 #'
-#' @rdname companyDefinitionUI
+#' @rdname companyDefinition
 #'
 #' @description UI/View to define an account.
 #'
-#' @inheritParams accountDefinitionUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'

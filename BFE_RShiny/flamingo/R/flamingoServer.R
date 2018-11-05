@@ -12,6 +12,7 @@
 #' @return http status category warn_for_status.
 #'
 #' @importFrom httr http_status
+#' @importFrom httr warn_for_status
 #'
 #' @export
 #'
@@ -43,8 +44,9 @@ loadProgrammeModel <- function(
 #'
 #' @description A function to load Programme data.
 #'
-#' @inheritParams loadProgrammeModel
-#' @inheritParams loadProgrammeData
+#' @param apiSettings Settings object as returned by [flamingoServer()].
+#' @param progId programme identifier-
+#' @param logWarning Warning message callback-
 #' @param ... Additional arguments to [httr::GET()].
 #'
 #' @return http status category warn_for_status.
@@ -82,7 +84,8 @@ loadProgrammeData <- function(
 #' @description Creates a settings object which can then be used to connect
 #' to the Flamingo API Server.
 #'
-#' @inheritParams flamingoDB
+#' @param host Host name.
+#' @param port Host port.
 #' @param scheme Communication scheme.
 #'
 #' @return A flamingo server settings object (HTTP by default).
@@ -109,7 +112,7 @@ flamingoServer <- function(host, port, scheme = c("http", "https")) {
 #'
 #' @description Performs a health check on the Flamingo API Server.
 #'
-#' @inheritParams loadProgrammeModel
+#' @param apiSettings as returned from \link{flamingoServer}
 #' @param ... further arguments to \link{GET}.
 #'
 #' @return \code{200} if the health check succeeds; otherwise an exception is
@@ -142,11 +145,16 @@ testFlamingoServer <- function(apiSettings, ...) {
 #' @description Submit a GET request to the Flamingo API Server to execute
 #' the workflow.
 #'
-#' @inheritParams loadProgrammeModel
+#' @param apiSettings as returned from \link{flamingoServer}
 #' @param runId Run identifier.
+#' @param logWarning Warning message callback-
 #' @param ... Further arguments to \link{GET}.
 #'
 #' @return http status category warn_for_status.
+#'
+#' @importFrom httr modify_url
+#' @importFrom httr GET
+#' @importFrom httr warn_for_status
 #'
 #' @export
 runProcess <- function(

@@ -3,24 +3,22 @@
 #' @rdname landingPage
 #'
 #' @template return-outputNavigation
-#'
-#' @inheritParams flamingoModule
+#' @template params-module
+#' @template params-flamingo-module
+#' 
 #' @param reloadMillis Amount of time to wait between table updates;
 #' see \link{invalidateLater}.
-#' @inheritParams companyDefinition
-#' @inheritParams companyDefinition
+#' @param userName user name as returned by [flamingoDBLogin()]
 #'
 #' @return For \code{landingPage()}, list of reactives:
 #' \itemize{
 #' 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
+#' 		\item{\\code{runIdList}: }{ilist of possible process run ids}
 #' }
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
-#' @importFrom dplyr mutate
-#' @importFrom utils write.csv
-#' @importFrom shinyWidgets toggleDropdownButton
 #'
 #' @export
 landingPage <- function(input, output, session, userId, userName, dbSettings,
@@ -117,10 +115,12 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' @rdname pageheader
 #'
 #' @template return-outputNavigation
-#'
-#' @inheritParams flamingoModule
-#' @inheritParams companyDefinition
-#' @inheritParams landingPage
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param reloadMillis Amount of time to wait between table updates;
+#' see \link{invalidateLater}.
+#' @param userName user name as returned by [flamingoDBLogin()]
 #'
 #' @return For \code{pageheader()}, list of reactives:
 #' \itemize{
@@ -204,17 +204,17 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' @rdname pagestructure
 #'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
 #'
-#' @inheritParams flamingoModule
+#' @param reloadMillis Amount of time to wait between table updates;
+#' see \link{invalidateLater}.
+#' @param userName user name as returned by [flamingoDBLogin()]
+#' 
+#' @return collapsed status of panel.
 #'
-#' @inheritParams landingPage
-#' @inheritParams companyDefinition
-#'
-#' @return For \code{pagestructure()}, list of reactives.
-#'
-#' @importFrom bsplus bs_embed_tooltip
-#' @importFrom shinyWidgets panel
 #' @importFrom shinyWidgets toggleDropdownButton
+#' 
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
                           reloadMillis = 10000, logMessage = message,
@@ -293,10 +293,10 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 #'
 #' @description Disable/Enable menu buttons based on permissions in database.
 #'
-#' @inheritParams pagestructure
-#'
-#' @importFrom shinyjs enable
-#' @importFrom shinyjs disable
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @return NULL
 #'
 #' @export
 landingPageButtonUpdate <- function(session, dbSettings, userId,

@@ -7,7 +7,7 @@
 pagestructureUI(id)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \value{
 Lits of tags

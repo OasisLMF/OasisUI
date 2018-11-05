@@ -5,8 +5,6 @@
 #'
 #' @description Id to use for an unidentified user.
 #'
-#' @return Set value.
-#'
 #' @export
 FLAMINGO_GUEST_ID <- -1
 
@@ -15,8 +13,12 @@ FLAMINGO_GUEST_ID <- -1
 #' @rdname loginDialog
 #'
 #' @description Server logic to login an user.
+#' 
+#'@template params-module
 #'
-#' @inheritParams accountDefinition
+#' @param dbSettings as returned from \link{flamingoDB}
+#' @param logMessage function that will be passed info messages.
+#' @param logError function that will be passed error messages.
 #' @param logout Reactive yielding logout signal.
 #'
 #' @return List of reactive expressions:
@@ -27,6 +29,7 @@ FLAMINGO_GUEST_ID <- -1
 #' }.
 #'
 #' @importFrom httr content
+#' @importFrom shinyjs js
 #'
 #' @export
 loginDialog <- function(input, output, session, dbSettings, logout,

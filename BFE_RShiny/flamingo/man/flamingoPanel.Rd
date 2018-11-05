@@ -8,7 +8,7 @@ flamingoPanel(id, ..., heading = NULL, footer = NULL,
   status = "default", collapsible = FALSE, show = TRUE)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 
 \item{...}{Additional parameters.}
 

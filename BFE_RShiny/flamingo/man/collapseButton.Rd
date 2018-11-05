@@ -7,7 +7,7 @@
 collapseButton(id, id_collapse, ..., width = NULL, collapsed = FALSE)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 
 \item{...}{Additional paramters.}
 

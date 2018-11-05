@@ -6,7 +6,7 @@
 #'
 #' @description UI/View for the process run page
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'
@@ -33,7 +33,7 @@ tagList(
 #'
 #' @description Function wrapping panel to define prgramme and model IDs.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'

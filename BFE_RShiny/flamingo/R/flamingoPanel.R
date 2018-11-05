@@ -5,7 +5,7 @@
 #' @description Adapted from shinyWidgets::panel() including IDs and collapsible
 #' (inspired by shinyBS::bsCollapsePanel()).
 #'
-#' @inheritParams accountDefinitionUI
+#' @template params-module-ui
 #' @param ... Additional parameters.
 #' @param heading NULL by default.
 #' @param footer NULL by default.
@@ -114,15 +114,12 @@ if (FALSE) {
 #'
 #' @rdname collapseButton
 #'
-#' @inheritParams accountDefinitionUI
-#' @inheritParams accountDefinitionUI
-#' @inheritParams dynamicColumn
-#' @param ... Additional paramters.
+#' @template params-module-ui
+#' @param id_collapse id of button that triggers collapsing.
+#' @param width widget widt
 #' @param collapsed FALSE.
-#'
-#' @return Collapsed button.
-#'
-#' @importFrom bsplus bs_attach_collapse
+#' 
+#' @return List of tags.
 collapseButton <- function(id, id_collapse, ..., width = NULL, collapsed = FALSE) {
   actionButton(id, NULL, NULL, ..., width = width) %>%
     bsplus::bs_attach_collapse(id_collapse)  %>%
@@ -165,9 +162,9 @@ if (FALSE) {
 #'
 #' @rdname flamingoPanelHeading
 #'
-#' @param heading
+#' @param heading title of the panel
 #'
-#' @return smth.
+#' @return heading
 flamingoPanelHeading <- function(heading) {
   if (is.character(heading)) {
     # TODO: fine-tune font size
@@ -182,6 +179,7 @@ flamingoPanelHeading <- function(heading) {
 #' @rdname flamingoPanelHeadingOutput
 #'
 #' @param outputId Output Id.
+#' @param inline boolean for inline css tag
 #' @param ... Additional parameters.
 #'
 #' @return smth.

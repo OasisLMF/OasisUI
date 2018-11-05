@@ -7,7 +7,7 @@
 panelProcessRunLogs(id)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \description{
 Function wrapping panel to show log table for specific Process Run.

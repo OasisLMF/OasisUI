@@ -22,7 +22,9 @@ panelSummaryTableModule(input, output, session, dbSettings, apiSettings,
 
 \item{logMessage}{function that will be passed info messages.}
 
-\item{selectRunID}{selected runID}
+\item{selectRunID}{selected runID
+
+#' @return Empty list.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 }

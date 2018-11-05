@@ -17,11 +17,13 @@ loginDialogUI(id)
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{logout}{Reactive yielding logout signal.}
 
-\item{id}{Shiny module id.}
+\item{logMessage}{function that will be passed info messages.}
+
+\item{id}{module id}
 }
 \value{
 List of reactive expressions:

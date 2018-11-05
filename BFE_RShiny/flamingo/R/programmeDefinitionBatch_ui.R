@@ -2,9 +2,9 @@
 #'
 #' @rdname programmeDefinitionBatch
 #'
-#' @description UI/View for the process run page.
+#' @description UI/View for the process batch run page.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @return List of tags.
 #'

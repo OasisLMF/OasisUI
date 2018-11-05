@@ -4,7 +4,7 @@
 #'
 #' @description Creates a plain map using leaflet.
 #'
-#' @inheritParams createFileRecord
+#' @param fileName name of file to plot as map
 #'
 #' @return Leaflet map.
 #'
@@ -12,7 +12,6 @@
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet addMarkers
 #' @importFrom leaflet markerClusterOptions
-#' @importFrom utils read.csv
 #'
 #' @export
 createPlainMap <- function(fileName) {
@@ -39,7 +38,7 @@ createPlainMap <- function(fileName) {
 #' @description creates a footprint map using leaflet based on exposure data
 #' stored in the flamingo database.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param fileId File id for exposure data.
 #'
 #' @importFrom leaflet leaflet

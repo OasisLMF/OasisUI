@@ -10,7 +10,7 @@ flamingoModuleUI(id)
 panelAssociateModel(id)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \value{
 No value.

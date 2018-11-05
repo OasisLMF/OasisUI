@@ -14,6 +14,8 @@ companyDefinition(input, output, session, dbSettings, userId,
 
 \item{session}{Shiny session object.}
 
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+
 \item{active}{Reactive expression whether the module state should be updated.}
 
 \item{logMessage}{Function that will be passed info messages.}

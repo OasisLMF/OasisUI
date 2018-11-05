@@ -6,6 +6,9 @@
 \usage{
 panelDefineProgramme(id)
 }
+\arguments{
+\item{id}{module id}
+}
 \description{
 Function wrapping panel to create/amend programme.
 }

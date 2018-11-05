@@ -5,11 +5,15 @@
 #' @description Server logic to define a programme.
 #'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param preselRunId selected run id as returned from \link{landingpage}
+#' @param preselProcId selected progOasis id as returned from \link{landingpage}
+#' @param preselPanel selectedstep to visualize as returned from either
+#'  \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}
 #'
-#' @inheritParams flamingoModule
-#' @inheritParams landingPage
-#'
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+#' @return processRunId selected process run ID
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
@@ -332,7 +336,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 #'
 #' @description Function to replace status with icons in table.
 #'
-#' @param df \code{data.frame} as returned by e.g. \link{getCompanyList}.
+#' @param df \code{data.frame}.
 #'
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when

@@ -30,7 +30,7 @@ programmeDefinitionBatchUI(id)
 \item{reloadMillis}{Amount of time to wait between table updates;
 see \link{invalidateLater}.}
 
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state

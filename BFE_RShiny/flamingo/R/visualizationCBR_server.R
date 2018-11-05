@@ -1,11 +1,15 @@
-#' Compare Runs Definition Module
+#' Compare Runs Definition Module Server ---------------------------------------
+
+#' visualizationCBR
+#'
 #' @rdname visualizationCBR
-#' @description Server logic to compare runs
-#' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater};
-#' @return For \code{visualizationCBR()}, list of reactives.
+#'
+#' @description Server logic for comparing runs run page.
+#'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
 #' @export
 visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
                              userId, active = reactive(TRUE), logMessage = message,

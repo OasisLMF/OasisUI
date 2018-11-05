@@ -1,12 +1,12 @@
-
 #' modelSupplierPage
 #'
 #' @rdname modelSupplierPage
 #'
 #' @description Server logic for the model supplier page.
 #'
-#' @inheritParams flamingoModule
-#' @inheritParams accountDefinitionUI
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
 #'
 #' @return Empty list.
 #'
@@ -165,13 +165,13 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     result$MRData
     input$mrtable_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$mrtable_rows_selected) > 0) {
-        shinyjs::enable("btnAmend")
-        shinyjs::enable("btnDelete")
-        shinyjs::enable("btnConfirmDel")
+        enable("btnAmend")
+        enable("btnDelete")
+        enable("btnConfirmDel")
       } else {
-        shinyjs::disable("btnAmend")
-        shinyjs::disable("btnDelete")
-        shinyjs::disable("btnConfirmDel")
+        disable("btnAmend")
+        disable("btnDelete")
+        disable("btnConfirmDel")
       }
     })
 

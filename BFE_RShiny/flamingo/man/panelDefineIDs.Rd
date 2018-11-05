@@ -7,7 +7,7 @@
 panelDefineIDs(id)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \value{
 List of tags.

@@ -4,7 +4,8 @@
 \name{visualizationCBR}
 \alias{visualizationCBR}
 \alias{visualizationCBRUI}
-\title{Compare Runs Definition Module}
+\title{Compare Runs Definition Module Server ---------------------------------------
+visualizationCBR}
 \usage{
 visualizationCBR(input, output, session, dbSettings, apiSettings, userId,
   active = reactive(TRUE), logMessage = message,
@@ -19,29 +20,26 @@ visualizationCBRUI(id)
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{active}{Reactive expression whether the module state should be updated.}
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{logMessage}{Function that will be passed info messages.}
+\item{active}{reactive expression whether the module state should be updated.}
 
-\item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater};}
+\item{logMessage}{function that will be passed info messages.}
 
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \value{
-For \code{visualizationCBR()}, list of reactives.
-
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-list of tags
+List of tags.
 }
 \description{
-Server logic to compare runs
+Server logic for comparing runs run page.
 
-UI/View for compare runs run page
+UI/View for comparing runs run page.
 }

@@ -4,7 +4,7 @@
 \name{visualizationBBR}
 \alias{visualizationBBR}
 \alias{visualizationBBRUI}
-\title{Batch Browse Definition Module}
+\title{visualizationBBR}
 \usage{
 visualizationBBR(input, output, session, dbSettings, apiSettings, userId,
   active = reactive(TRUE), logMessage = message,
@@ -27,21 +27,19 @@ visualizationBBRUI(id)
 
 \item{logMessage}{Function that will be passed info messages.}
 
-\item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater};}
+\item{reloadMillis}{Amount of time to wait between table updates;
+see \link{invalidateLater}.}
 
-\item{id}{Shiny module id.}
+\item{id}{module id}
 }
 \value{
-For \code{visualizationBBR()}, list of reactives.
-
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-list of tags
+List of tags.
 }
 \description{
-Server logic to define a programme
+Server logic for batchbrowse run page.
 
-UI/View for batchbrowse run page
+UI/View for batchbrowse run page.
 }

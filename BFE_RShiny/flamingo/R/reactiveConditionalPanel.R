@@ -14,7 +14,6 @@
 #'   _reactiveConditionalPanel_ module provides a convenient abstraction from the
 #'   JavaScript condition details, relying on the reactive `condition` instead.
 #'
-#' @inheritParams flamingoModule
 #' @param condition Reactive boolean expression determining the visibility of
 #'   the panel.
 #'
@@ -39,7 +38,7 @@ reactiveConditionalPanel <- function(input, output, session, condition) {
 
 #' reactiveConditionalPanelUI
 #'
-#' @rdname reactiveConditionalPanelUI
+#' @rdname reactiveConditionalPanel
 #'
 #' @inheritParams shiny::conditionalPanel
 #'

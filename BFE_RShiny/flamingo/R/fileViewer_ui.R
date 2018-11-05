@@ -3,6 +3,8 @@
 #' @rdname fileViewer
 #'
 #' @description UI/View to view files.
+#' 
+#' @template params-module-ui
 #'
 #' @return LIst of tags.
 #'

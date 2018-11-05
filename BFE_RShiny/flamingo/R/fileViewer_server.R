@@ -4,11 +4,11 @@
 #'
 #' @description Server logic to view files.
 #'
-#' @inheritParams flamingoModule
-#' @inheritParams companyDefinition
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
 #' @param preselRunId Reactive string expression for reselected run id from landingpage.
-#'
-#' @return Empty list.
 #'
 #' @importFrom dplyr select
 #'

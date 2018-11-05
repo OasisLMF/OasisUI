@@ -179,8 +179,8 @@ flamingoDBLogin <- function(dbSettings, uid, pwd) {
 #' @description Consult the interface permissions for the user with given
 #' user identifier by creating and executing a database query.
 #'
-#' @inheritParams flamingoDBLogin
-#' @inheritParams companyDefinition
+#' @param dbSettings as returned from \link{flamingoDB}
+#' @param userId user id as returned by [flamingoDBLogin()]
 #' @param resourceId Resource identifier, e.g. `c("1000")`.
 #'
 #' @return Character vector of permission Modes, e.g. #' `c("CRUD" "R")`.
@@ -206,7 +206,7 @@ flamingoDBCheckPermissions <- function(dbSettings, userId, resourceId) {
 #'
 #' @description Get the list of companies from the database.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Companies; `data.frame` of 5 variables:
 #' \itemize{
@@ -235,9 +235,10 @@ getCompanyList <- function(dbSettings) {
 #' @description Get the process run overview from the database.
 #'
 #' @param ... Other arguments to [executeDbQuery()].
-#' @inheritParams companyDefinition
+#' @param dbSettings as returned from \link{flamingoDB}
+#' @param userId user id as returned by [flamingoDBLogin()]
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Inbox; `data.frame` of 6 variables:
 #' \itemize{
@@ -266,7 +267,7 @@ getInboxData <- function(dbSettings, userId, ...) {
 #'
 #' @description Get Process Data.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param pruser Process user.
 #' @param prmodel Process model.
 #' @param prprogramme Process programme.
@@ -299,7 +300,7 @@ getProcessData <- function(dbSettings, pruser, prmodel, prprogramme,
 #'
 #' @description Get Oasis Systems.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Oasis systems; `data.frame` of 2 variables:
 #' \itemize{
@@ -323,7 +324,7 @@ getOasisSystemId <- function(dbSettings) {
 #'
 #' @description Get Process Run.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param procid Process id.
 #' @param prstatus Process status.
 #'
@@ -345,7 +346,7 @@ getProcessRun <- function(dbSettings, procid, prstatus) {
 #'
 #' @description Get log details for a run.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param wfid Workflow id.
 #'
 #' @return Log details; `data.frame` of 5 variables:
@@ -382,7 +383,7 @@ getProcessRunDetails <- function(dbSettings, wfid) {
 #'
 #' @description Get the list of output files for a given process run id.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param prrunid Process run id.
 #'
 #' @return Output files; `data.frame` of 10 variables:
@@ -425,7 +426,7 @@ getFileList <- function(dbSettings, prrunid) {
 #'
 #' @description Get the list of output presets.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Output options.
 #'
@@ -444,7 +445,7 @@ getOutputOptions <- function(dbSettings, simplify = TRUE) {
 #'
 #' @description Get the event set list.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param prgoasisid Oasis programme id.
 #'
 #' @return Event set.
@@ -465,7 +466,6 @@ getEventSet <- function(dbSettings, prgoasisid, simplify = TRUE){
 #' @description Get the event occurrence list.
 #'
 #' @inheritParams getEventSet
-#' @inheritParams getEventSet
 #'
 #' @return Event occurrence.
 #'
@@ -484,7 +484,7 @@ getEventOccurrence <- function(dbSettings, prgoasisid, simplify = TRUE) {
 #'
 #' @description Fetch resource type name and ID.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Resource types; `data.frame` of 3 variables:
 #' \itemize{
@@ -509,7 +509,7 @@ getResourceType <- function(dbSettings) {
 #'
 #' @description Get Model Data.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Res `data.frame` of 3 variables:
 #' \itemize{
@@ -534,7 +534,7 @@ getModelList <- function(dbSettings) {
 #'
 #' @description Get Source Account Files.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return res `data.frame` of 2 variables:
 #' \itemize{
@@ -559,7 +559,7 @@ getFileSourceAccountFile <- function(dbSettings) {
 #'
 #' @description Get Transforms from Source to Canonical.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Transforms; `data.frame` of 2 variables:
 #' \itemize{
@@ -584,7 +584,7 @@ getTransformNameSourceCan <- function(dbSettings) {
 #'
 #' @description Get Account Names.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Account name; `data.frame` of 2 variables:
 #' \itemize{
@@ -609,7 +609,7 @@ getAccountName <- function(dbSettings) {
 #'
 #' @description Get Transforms from Canonical to Model.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return Transforms; `data.frame` of 2 variables:
 #' \itemize{
@@ -634,7 +634,7 @@ getTransformNameCanModel <- function(dbSettings) {
 #'
 #' @description Get File Source Location File.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return  file source`data.frame` of 2 variables:
 #' \itemize{
@@ -659,7 +659,7 @@ getFileSourceLocationFile <- function(dbSettings){
 #'
 #' @description Get File Source Reinsurance File.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return \code{data.frame} of 2 variables:
 #' \itemize{
@@ -682,7 +682,7 @@ getFileSourceReinsuranceFile <- function(dbSettings){
 #'
 #' @description Get File Source Reinsurance Scope File.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return \code{data.frame} of 2 variables:
 #' \itemize{
@@ -707,7 +707,7 @@ getFileSourceReinsuranceScopeFile <- function(dbSettings){
 #'
 #' @details Run getProgOasisForProg against the database.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return `data.frame` of 11 variables:
 #' \itemize{
@@ -742,7 +742,7 @@ getProgOasisForProgdata <- function(dbSettings, progId) {
 #'
 #' @description Get a list of programme data.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return `data.frame` of 7 variables:
 #' \itemize{
@@ -758,7 +758,7 @@ getProgOasisForProgdata <- function(dbSettings, progId) {
 #' @export
 #'
 #' @md
-getProgrammeList <- function (dbSettings) {
+getProgrammeList <- function(dbSettings) {
 
   res <- executeDbQuery(dbSettings, paste("exec dbo.getProgData"))
 
@@ -773,8 +773,8 @@ getProgrammeList <- function (dbSettings) {
 #' @description Queries the database to retrieve department login and password
 #' details for the designated user.
 #'
-#' @inheritParams executeDbQuery
-#' @inheritParams companyDefinition
+#' @param dbSettings as returned from \link{flamingoDB}
+#' @param userId user id as returned by [flamingoDBLogin()]
 #'
 #' @export
 #'
@@ -794,7 +794,7 @@ getDeptData <- function(dbSettings, userId) {
 #'
 #' @description Get Security Groups.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return security groups; `data.frame` of 2 variables:
 #' \itemize{
@@ -819,7 +819,7 @@ getSecurityGroups <- function(dbSettings) {
 #'
 #' @description Get Oasis Users.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #'
 #' @return oasis users; `data.frame` of 2 variables:
 #' \itemize{
@@ -845,7 +845,7 @@ getOasisUsers <- function(dbSettings) {
 #'
 #' @description Get Process Runtime Param Details.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param processRunId Reactive string expression for reselected run id from defineProgramme.
 #'
 #' @return Param details.
@@ -866,8 +866,8 @@ getProcRunParamFileOutput <- function(dbSettings, processRunId){
 #'
 #' @description Get Process Run Details.
 #'
-#' @inheritParams executeDbQuery
-#' @inheritParams getProcRunParamFileOutput
+#' @param dbSettings as returned from \link{flamingoDB}
+#' @param processRunId identifier selected process run.
 #'
 #' @return Process run details.
 #'
@@ -887,7 +887,7 @@ getProcRunDetForFileOutput <- function(dbSettings, processRunId) {
 #'
 #' @description Get location path for a given fileType.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param fileType File type.
 #'
 #' @return Path.
@@ -907,8 +907,8 @@ getFileLocationPath <- function(dbSettings, fileType){
 #'
 #' @description Document args better.
 #'
-#' @inheritParams executeDbQuery
-#' @inheritParams getFileLocationPath
+#' @param dbSettings as returned from \link{flamingoDB}
+#' @param fileType File type.
 #' @param fileName File name.
 #' @param fileDesc File describer.
 #' @param locPathUnix locPathUnix.
@@ -934,7 +934,7 @@ createFileRecord <- function(dbSettings, fileName, fileDesc,
 #'
 #' @description Create Prog Oasis.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param progId Programme id.
 #' @param modelId Model id.
 #' @param transformId Transform id.
@@ -958,7 +958,7 @@ createProgOasis <- function(dbSettings, progId, modelId, transformId) {
 #'
 #' @description Create Model Resource.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @param modresname `character()`; name of the model resource.
 #' @param restype Resource type.
 #' @param oasissys TODO document.
@@ -997,7 +997,7 @@ createModelResource <- function(
 #'
 #' @description Update Model Resource.
 #'
-#' @inheritParams executeDbQuery
+#' @param dbSettings as returned from \link{flamingoDB}
 #' @inheritParams createModelResource
 #' @param modresid Model resource id.
 #'
@@ -1032,7 +1032,8 @@ updateModelResource <- function(
 #'
 #' @description Delete Model Resource.
 #'
-#' @inheritParams updateModelResource
+#' @param dbSettings as returned from \link{flamingoDB}
+#' @param modelid Model id.
 #'
 #' @return Model resource id.
 #'

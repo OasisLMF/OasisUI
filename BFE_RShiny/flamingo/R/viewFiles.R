@@ -1,11 +1,13 @@
 # ViewFilesModule Module -----------------------
 # UI -------------------------------------------
 #' ViewFilesModuleUI
+#' 
+#' @rdname ViewFilesModule
 #'
-#' @description UI logic to view  files.
+#' @description UI/View to view  files.
 #'
-#' @inheritParams flamingoModuleUI
-#'
+#' @template params-module-ui
+#' 
 #' @return List of tags.
 #'
 #' @importFrom DT DTOutput
@@ -32,7 +34,7 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
     if (!includechkbox) {
       downloadButton(ns("FLdownloadexcel"), label = "Export to csv")
     }
-    )
+  )
 }
 
 # Server ---------------------------------------------------------
@@ -42,34 +44,36 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 #'
 #' @description Server logic to view files.
 #'
-#' @inheritParams flamingoModule
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
 #' @param filesListData Table of output files for a given runID.
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs hidden
-#' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
 #' @importFrom DT dataTableProxy
 #' @importFrom DT selectRows
+#' @importFrom htmlwidgets JS
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet leafletOutput
-#' @importFrom utils read.csv
 #'
 #' @export
 ViewFilesModule <- function(input, output, session, logMessage = message, filesListData, includemrows = FALSE, includechkbox = FALSE) {
-
+  
   ns <- session$ns
-
-
-  # Reactive values & parameters --------------------------------------------
-
+  
+  
+  # Reactive values & parameters -----------------------------------------------
+  
   maxrowsperpage <- 10
-
+  
   result <- reactiveValues(
     #reactive of the input list of files
     filesListData = NULL,
@@ -80,11 +84,11 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     #content of curr file
     fileData = NULL
   )
-
+  
   # Help function
   '%notin%' <- Negate('%in%')
-
-  # Add buttons -------------------------------------
+  
+  # Add buttons ----------------------------------------------------------------
   observeEvent(filesListData(), ignoreNULL = FALSE, {
     filesListData <- filesListData()
     if (length(filesListData) > 0) {
@@ -102,8 +106,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                                                                           width: 16px;",
                                                                  icon = icon("check"),
                                                                  onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)')
-                                                                 )),
-                               filesListData)
+        )),
+        filesListData)
       }
       filesListData <- cbind(filesListData,data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View",
                                                                          hidden = TRUE,
@@ -120,8 +124,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       result$filesListData <- NULL
     }
   })
-
-
+  
+  
   output$outputFLtable <- renderDT(
     if (!is.null(result$filesListData) && nrow(result$filesListData) > 0) {
       if (includechkbox) {
@@ -155,10 +159,10 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         options = list(searchHighlight = TRUE))
     }
   )
-
-
-  # Download Files ----
-
+  
+  
+  # Download Files -------------------------------------------------------------
+  
   # Files to download in zip bundle
   fs <- reactive({
     files <- c()
@@ -167,8 +171,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     }
     files
   })
-
-
+  
+  
   # Download zip button
   output$FLdownloadzip <- downloadHandler(
     filename = "files.zip",
@@ -177,16 +181,16 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       if (file.exists(paste0(fname, "./"))) {file.rename(paste0(fname, ".zip"), fname)}
     }
   )
-
+  
   output$FLTdownloadexcel <- downloadHandler(
     filename = "outputFLtable.csv",
     content = function(file) {
       write.csv(result$filesListData, file)
     }
   )
-
-  # Selected Row --------------------------------------------------------
-
+  
+  # Selected Row ---------------------------------------------------------------
+  
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
       lapply(input$outputFLtable_rows_selected, function(i) {
@@ -197,15 +201,15 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         .hideButtons(i)})
     }else {
       lapply(input$outputFLtable_rows_current, function(i){
-         session$sendCustomMessage(type = 'resetcolorWhite', message =  session$ns( paste0("srows_", i)))
+        session$sendCustomMessage(type = 'resetcolorWhite', message =  session$ns( paste0("srows_", i)))
         .hideButtons(i)})
     }
-
+    
   })
-
-
+  
+  
   # Select All Functionality --------------------------------------------
-
+  
   #If page in table is changed, update rows selection based on select all value
   observeEvent(input$outputFLtable_rows_current, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
@@ -219,13 +223,13 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
     }
   })
-
+  
   #update checkboxes according to selectAll button
   observeEvent(input$chkboxselectall, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(result$filesListDataButtons)) {
       if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
         lapply(input$outputFLtable_rows_current, function(i){
-            session$sendCustomMessage(type = 'resetcolorOasis', message =  session$ns( paste0("srows_", i)))
+          session$sendCustomMessage(type = 'resetcolorOasis', message =  session$ns( paste0("srows_", i)))
         })
         selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
       } else {
@@ -236,10 +240,10 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       }
     }
   })
-
-
+  
+  
   # File content view ---------------------------------------------------
-
+  
   # Exposure table
   output$tableFVExposureSelected <- renderDT(
     if (!is.null(result$fileData) && nrow(result$fileData) > 0 ) {
@@ -266,14 +270,14 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                        scrollX = TRUE))
     }
   )
-
+  
   # Export to .csv
   output$FVEdownloadexcel <- downloadHandler(
     filename = result$currentFile,
     content = function(file) {
       write.csv(result$fileData, file)}
   )
-
+  
   # Modal Panel
   FileContent <- modalDialog(
     easyClose = TRUE,
@@ -286,8 +290,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       downloadButton(ns("FVEdownloadexcel"), label = "Export to csv")
     )
   )
-
-
+  
+  
   observeEvent({input[["select_vbutton"]]},{
     idx <- as.numeric(strsplit(input$select_vbutton, "_")[[1]][2])
     showModal(FileContent)
@@ -301,14 +305,14 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                                   quote = "\"", dec = ".", fill = TRUE, comment.char = "")
     }, error = function(e) {
       flamingoNotification(type = "error",
-                       paste("Could not read file:", e$message))
+                           paste("Could not read file:", e$message))
       result$fileData <- NULL
     }) # end try catch
   })#end observeEvent
-
-
+  
+  
   # File content map -------------------------
-
+  
   Map <- modalDialog(
     easyClose = TRUE,
     size = "l",
@@ -318,7 +322,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       leafletOutput(ns("plainmap"))
     )
   )
-
+  
   observeEvent({input[["select_mbutton"]]},{
     showModal(Map)
     session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_mbutton"))
@@ -329,9 +333,9 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     fileName <- file.path(result$filesListData[idx, 5], result$filesListData[idx, 2])
     output$plainmap <- renderLeaflet({createPlainMap(fileName)})
   })
-
+  
   # Helper functions -------------------------
-
+  
   # default table options
   .getFLTableOptions <- function() {
     options <- list(
@@ -344,10 +348,10 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
       drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
       #autoWidth = TRUE
-      )
+    )
     return(options)
   }
-
+  
   # Check permission row by row and show buttons
   .enableButton <- function(i) {
     FVid <- result$filesListData[i, 1]
@@ -358,14 +362,14 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     # lapply(t(validButtons), function(btnIDs){enable(manageButtons[btnIDs])})
     lapply(t(validButtons), function(btnIDs){show(manageButtons[btnIDs])})
   }
-
+  
   #hide buttons in a row
   .hideButtons <- function(i=NULL){
     hide(paste0("vrows_", i))
     hide(paste0("mrows_", i))
   }
-
-
+  
+  
   # utility function to add to buttons in table
   .shinyInput <- function(FUN, id, num, Label = NULL, hidden = FALSE,  ...) {
     inputs <- character(num)
@@ -378,14 +382,14 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     }
     inputs
   }
-
+  
   .getDetailsFile <- function(idx){
     str1 <- paste("File Name: ", result$filesListData[idx,2])
     str2 <- paste("Resource Key ", result$filesListData[idx,10])
     HTML(paste(str1, str2, sep = '<br/>'))
   }
-
+  
   # Module Output -----------------------
   invisible()
-
+  
 }
