@@ -169,10 +169,17 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     .autoFillCrtAm(row)
   })
 
+  # title for delete button
+  output$delModal <- renderUI({
+    modelId <- result$MRData[input$mrtable_rows_selected, 1]
+    modelName <- result$MRData[input$mrtable_rows_selected, 2]
+    paste0('Delete ', modelId, ' ', modelName)
+  })
+
   .delModal <- function(){
     ns <- session$ns
     modalDialog(label = "delModal",
-                title = "Delete Selection",
+                title = uiOutput(ns("delModal"), inline = TRUE),
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("btnConfirmDel"),

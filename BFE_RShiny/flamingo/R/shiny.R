@@ -48,7 +48,7 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
   )
 }
 
-#' Flamingo action button lookalaike to a checkbox
+#' Flamingo action button look like a checkbox
 #' @description Modified version of the default [shiny::actionButton()]
 #' @param class HTML class attribute
 #' @param ... arguments to [shiny::actionButton()]

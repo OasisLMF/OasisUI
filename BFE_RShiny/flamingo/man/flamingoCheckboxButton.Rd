@@ -2,7 +2,7 @@
 % Please edit documentation in R/shiny.R
 \name{flamingoCheckboxButton}
 \alias{flamingoCheckboxButton}
-\title{Flamingo action button lookalaike to a checkbox}
+\title{Flamingo action button look like a checkbox}
 \usage{
 flamingoCheckboxButton(inputId, label, icon = NULL, width = NULL,
   class = c("btn"), ...)

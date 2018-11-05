@@ -11,10 +11,10 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
   tagList(
     tags$script("Shiny.addCustomMessageHandler('resetInputValue', function(variableName){
                 Shiny.onInputChange(variableName, null);});"),
-    tags$script("Shiny.addCustomMessageHandler('resetColorWhite', function(variableName){
-                 document.getElementById(variableName).style.color = '#ffffff';});"),
-    tags$script("Shiny.addCustomMessageHandler('setColorOasis', function(variableName){
-                 document.getElementById(variableName).style.color = '#8b2129';});"),
+    tags$script("Shiny.addCustomMessageHandler('resetcolorWhite', function(variableName){
+                document.getElementById(variableName).style.color = '#ffffff';});"),
+    tags$script("Shiny.addCustomMessageHandler('resetcolorOasis', function(variableName){
+                document.getElementById(variableName).style.color = '#8b2129';});"),
     if (includechkbox) {
       checkboxInput(inputId = ns("chkboxselectall"), label = "Select all", value = FALSE)
     },
@@ -70,8 +70,6 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     if (length(filesListData) > 0) {
       result$filesListData <- filesListData
       if (includechkbox) {
-      #   filesListData <- cbind(data.frame(Selected = .shinyInput(checkboxInput,"srows_", nrow(filesListData), value = FALSE, width = 1)), 
-      #                                     filesListData)
         filesListData <- cbind(data.frame(Selected = .shinyInput(flamingoCheckboxButton ,"srows_", nrow(filesListData), Label = NULL, hidden = FALSE, 
                                                                  style = "    background-color: white;
                                                                               border-color: black;
@@ -83,9 +81,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                                                                               width: 16px;",
                                                                  icon = icon("check"),
                                                                  onclick = paste0('Shiny.onInputChange(\"',ns("select_sbutton"),'\",  this.id)')
-                                                                 #onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;'
-                                                                 )), 
-                               filesListData)
+        )), 
+        filesListData)
       }
       filesListData <- cbind(filesListData,data.frame(Explore = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "Explore", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       result$filesListDataButtons <- filesListData %>% select(-contains("Location") )
@@ -162,29 +159,30 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
       lapply(input$outputFLtable_rows_selected, function(i) {
-        session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
+        session$sendCustomMessage(type = 'resetcolorOasis', message =  session$ns( paste0("srows_", i)))
         show(paste0("vrows_", i))})
       lapply(setdiff(input$outputFLtable_rows_current, input$outputFLtable_rows_selected), function(i) {
-        session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+        session$sendCustomMessage(type = 'resetcolorWhite', message = session$ns(paste0("srows_", i)))
         hide(paste0("vrows_", i))})
     }else {
       lapply(input$outputFLtable_rows_current, function(i){
-        session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+        session$sendCustomMessage(type = 'resetcolorWhite', message = session$ns(paste0("srows_", i)))
         hide(paste0("vrows_", i))})
     }
+    
   })
   
   
   # Select All Functionality --------------------------------------------
   
   #If page in table is changed, update rows selection based on select all value
-  observeEvent( input$outputFLtable_rows_current, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$outputFLtable_rows_current, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
       lapply(input$outputFLtable_rows_current, function(i){
         if (input$chkboxselectall) {
-          session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
+          session$sendCustomMessage(type = 'resetcolorOasis', message = session$ns(paste0("srows_", i)))
         } else {
-          session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+          session$sendCustomMessage(type = 'resetcolorWhite', message = session$ns(paste0("srows_", i)))
         }
       })
       selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
@@ -193,24 +191,25 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   
   # #update checkboxes according to selectAll button
   observeEvent(input$chkboxselectall, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if(!is.null(result$filesListDataButtons)) {
+    if (!is.null(result$filesListDataButtons)) {
       if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
         lapply(input$outputFLtable_rows_current, function(i){
           if (input$chkboxselectall) {
-            session$sendCustomMessage(type = 'setColorOasis', message = session$ns(paste0("srows_", i)))
+            session$sendCustomMessage(type = 'resetcolorOasis', message = session$ns(paste0("srows_", i)))
           } else {
-            session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+            session$sendCustomMessage(type = 'resetcolorWhite', message = session$ns(paste0("srows_", i)))
           }
         })
         selectRows(dataTableProxy("outputFLtable"), input$outputFLtable_rows_current)
       } else {
         lapply(input$outputFLtable_rows_current, function(i){
-          session$sendCustomMessage(type = 'resetColorWhite', message = session$ns(paste0("srows_", i)))
+          session$sendCustomMessage(type = 'resetcolorWhite', message =  session$ns( paste0("srows_", i)))
         })
         selectRows(dataTableProxy("outputFLtable"), NULL)
       }
     }
   })
+  
   
   
   # File content view ---------------------------------------------------
@@ -236,20 +235,18 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         style = "inline:true"), 
       hidden(flamingoPanel(
         id = ns("flamingoPaneltableFVExposureSelected"),
-        collapsible = TRUE,
-        show = TRUE,
-        tagAppendChildren(
-          h4(""),
-          uiOutput(ns("paneltitletableFVExposureSelected"), inline = TRUE),
+        collapsible = FALSE,
+        heading =  tagAppendChildren(
+          h4("File Content"),
+          #uiOutput(ns("paneltitletableFVExposureSelected"), inline = TRUE),
           actionButton(inputId = ns("buttonhidetableFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
         DTOutput(ns("tableFVExposureSelected")))),
       hidden(flamingoPanel(
         id = ns("flamingoPanelmapFVExposureSelected"),
-        collapsible = TRUE,
-        show = TRUE,
-        tagAppendChildren(
-          h4(""),
-          uiOutput(ns("paneltitlemapFVExposureSelected"), inline = TRUE),
+        collapsible = FALSE,
+        heading = tagAppendChildren(
+          h4("Map "),
+          #uiOutput(ns("paneltitlemapFVExposureSelected"), inline = TRUE),
           actionButton(inputId = ns("buttonhidemapFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
         leafletOutput(ns("plainmap"))))
     )

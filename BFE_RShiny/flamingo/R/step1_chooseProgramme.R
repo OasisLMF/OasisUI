@@ -483,8 +483,37 @@ step1_chooseProgramme <- function(input, output, session,
     .defaultCreateProg()
   })
 
+  # title for delete button
+  output$progdelmodal <- renderUI({
+    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
+    paste0('Delete Programme id ', progId, ' "', progName,'"')
+    })
+
+  # Modal dialog of delete button
+  .progdelmodal <- function() {
+    ns <- session$ns
+    modalDialog(label = "progdelmodal",
+                title = uiOutput(ns("progdelmodal"), inline = TRUE),
+                paste0("Are you sure you want to delete?"),
+                footer = tagList(
+                  flamingoButton(ns("abuttonuconfirmdel"),
+                                 label = "Confirm", align = "center"),
+                  actionButton(ns("abuttonucanceldel"),
+                               label = "Cancel", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+
   # Delete Programme
   onclick("buttondeletepr",{
+    showModal(.progdelmodal())
+  })
+
+  # onclick of confirm delete button
+  onclick("abuttonuconfirmdel",{
     hide("panelProgrammeDetails")
     hide("panelDefineProgramme")
     hide("panelLinkFiles")
@@ -493,6 +522,12 @@ step1_chooseProgramme <- function(input, output, session,
     flamingoNotification(type = "message",
                          sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
     .reloadDPProgData()
+    removeModal()
+  })
+
+  # onclick of cancel delete button
+  onclick("abuttonucanceldel", {
+    removeModal()
   })
 
   ### > Source Files -----------------------------------------------------------
@@ -798,11 +833,11 @@ step1_chooseProgramme <- function(input, output, session,
   onclick("abuttonprgtblrfsh", {
     .reloadDPProgData()
   } )
-  
+
   onclick("abuttondefprogrfsh", {
     .reloadProgDetails()
   } )
-  
+
   # Updates dependent on changed: tableDPprog_rows_selected --------------------
   observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
