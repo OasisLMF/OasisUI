@@ -7,9 +7,9 @@
 plotAEPCurve(AEPData, years = 1000)
 }
 \arguments{
-\item{AEPData}{AEP data.}
+\item{AEPData}{AEP dataframe.}
 
-\item{years}{Years.}
+\item{years}{Years, integer.}
 }
 \value{
 AEP Curve plot.
