@@ -10,6 +10,8 @@ flamingoPanelHeadingOutput(outputId, ...)
 \item{outputId}{Output Id.}
 
 \item{...}{Additional parameters.}
+
+\item{inline}{boolean for inline css tag}
 }
 \value{
 smth.

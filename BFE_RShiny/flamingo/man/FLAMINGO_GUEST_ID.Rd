@@ -8,9 +8,6 @@
 \usage{
 FLAMINGO_GUEST_ID
 }
-\value{
-Set value.
-}
 \description{
 Id to use for an unidentified user.
 }

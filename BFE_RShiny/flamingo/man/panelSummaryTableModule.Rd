@@ -26,6 +26,8 @@ panelSummaryTableModule(input, output, session, dbSettings, apiSettings,
 
 #' @return Empty list.}
 
+\item{id}{Namespace ID for the module.}
+
 \item{active}{reactive expression whether the module state should be updated.}
 }
 \description{

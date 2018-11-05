@@ -10,7 +10,7 @@ flamingoModuleUI(id)
 panelAssociateModel(id)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 }
 \value{
 No value.

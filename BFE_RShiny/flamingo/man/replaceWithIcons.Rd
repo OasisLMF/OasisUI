@@ -7,7 +7,7 @@
 replaceWithIcons(df)
 }
 \arguments{
-\item{df}{\code{data.frame} as returned by e.g. \link{getCompanyList}.}
+\item{df}{\code{data.frame}.}
 }
 \description{
 Function to replace status with icons in table.

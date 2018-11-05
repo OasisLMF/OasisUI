@@ -7,10 +7,10 @@
 flamingoPanelHeading(heading)
 }
 \arguments{
-\item{heading}{}
+\item{heading}{title of the panel}
 }
 \value{
-smth.
+heading
 }
 \description{
 flamingoPanelHeading

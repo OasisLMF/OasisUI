@@ -8,7 +8,7 @@ createFileRecord(dbSettings, fileName, fileDesc, fileType, locPathUnix,
   BFEUserID, ResourceTable, ResourceKey)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{fileName}{File name.}
 

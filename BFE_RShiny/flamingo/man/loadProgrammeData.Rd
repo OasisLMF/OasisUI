@@ -10,6 +10,8 @@ loadProgrammeData(apiSettings, progId, logWarning = function(w) warning,
 \arguments{
 \item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
 
+\item{progId}{programme identifier-}
+
 \item{logWarning}{Warning message callback-}
 
 \item{...}{Additional arguments to \code{\link[httr:GET]{httr::GET()}}.}

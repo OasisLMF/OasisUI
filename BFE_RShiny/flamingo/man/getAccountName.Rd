@@ -7,7 +7,7 @@
 getAccountName(dbSettings)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
 Account name; \code{data.frame} of 2 variables:

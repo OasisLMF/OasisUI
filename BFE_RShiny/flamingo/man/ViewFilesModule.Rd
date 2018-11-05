@@ -23,6 +23,8 @@ ViewFilesModule(input, output, session, logMessage = message,
 
 \item{filesListData}{Table of output files for a given runID.}
 
+\item{id}{Namespace ID for the module.}
+
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}

@@ -21,13 +21,15 @@ accountDefinitionUI(id)
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+
+\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state

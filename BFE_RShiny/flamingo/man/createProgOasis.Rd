@@ -7,7 +7,7 @@
 createProgOasis(dbSettings, progId, modelId, transformId)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{progId}{Programme id.}
 

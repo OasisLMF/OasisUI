@@ -23,6 +23,8 @@ visualizationBBRUI(id)
 
 \item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
 
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+
 \item{active}{Reactive expression whether the module state should be updated.}
 
 \item{logMessage}{Function that will be passed info messages.}

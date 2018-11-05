@@ -7,9 +7,13 @@
 getInboxData(dbSettings, userId, ...)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
 \item{...}{Other arguments to \code{\link[=executeDbQuery]{executeDbQuery()}}.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
 Inbox; \code{data.frame} of 6 variables:

@@ -7,7 +7,7 @@
 createFootprintMap(dbSettings, fileId)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{fileId}{File id for exposure data.}
 }

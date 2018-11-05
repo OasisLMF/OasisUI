@@ -115,6 +115,7 @@ if (FALSE) {
 #' @rdname collapseButton
 #'
 #' @template params-module-ui
+#' 
 #' @param id_collapse id of button that triggers collapsing.
 #' @param width widget widt
 #' @param collapsed FALSE.

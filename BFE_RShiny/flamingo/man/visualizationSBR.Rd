@@ -36,6 +36,8 @@ visualizationSBRUI(id)
 
 \item{logMessage}{function that will be passed info messages.}
 
+\item{id}{Namespace ID for the module.}
+
 \item{id}{module id}
 }
 \value{

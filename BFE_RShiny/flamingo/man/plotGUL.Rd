@@ -7,7 +7,7 @@
 plotGUL(outputPlotData, interactive = FALSE, ...)
 }
 \arguments{
-\item{outputPlotData}{Data for plot.}
+\item{outputPlotData}{plotly output.}
 
 \item{interactive}{Create interactive plot using \code{\link[plotly:plot_ly]{plotly::plot_ly()}}.}
 

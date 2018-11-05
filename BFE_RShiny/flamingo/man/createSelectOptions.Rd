@@ -8,7 +8,7 @@ createSelectOptions(df, label = NA, value = "0", labelCol = 2,
   valueCol = 1)
 }
 \arguments{
-\item{df}{\code{data.frame} as returned by e.g. \link{getCompanyList}.}
+\item{df}{\code{data.frame}.}
 
 \item{label}{Label for extra option to add at the top. If \code{NA} (default)
 no extra option will be added to the top.}

@@ -7,6 +7,8 @@
 flamingoServer(host, port, scheme = c("http", "https"))
 }
 \arguments{
+\item{host}{Host name.}
+
 \item{port}{Host port.}
 
 \item{scheme}{Communication scheme.}

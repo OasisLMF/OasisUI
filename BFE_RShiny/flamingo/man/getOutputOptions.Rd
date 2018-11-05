@@ -7,10 +7,7 @@
 getOutputOptions(dbSettings, simplify = TRUE)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
-
-\item{simplify}{If \code{TRUE}, a vector will be returned instead of a
-\code{data.frame} only a single column is returned.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
 Output options.

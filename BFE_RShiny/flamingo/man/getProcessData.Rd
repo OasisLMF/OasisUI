@@ -7,7 +7,7 @@
 getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{pruser}{Process user.}
 

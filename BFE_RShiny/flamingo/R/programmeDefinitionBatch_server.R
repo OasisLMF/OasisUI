@@ -6,7 +6,7 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-modulee
+#' @template params-flamingo-module
 #'
 #' @export
 programmeDefinitionBatch <- function(input, output, session, dbSettings,

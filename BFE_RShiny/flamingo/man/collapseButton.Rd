@@ -9,15 +9,14 @@ collapseButton(id, id_collapse, ..., width = NULL, collapsed = FALSE)
 \arguments{
 \item{id}{module id}
 
-\item{...}{Additional paramters.}
+\item{id_collapse}{id of button that triggers collapsing.}
 
-\item{width}{Width of the column, a reactive value for \code{dynamicColumn()},
-non-reactive (or \link[shiny:isolate]{isolated}) for \code{dynamicColumnUI()}.}
+\item{width}{widget widt}
 
 \item{collapsed}{FALSE.}
 }
 \value{
-Collapsed button.
+List of tags.
 }
 \description{
 collapseButton

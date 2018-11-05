@@ -18,14 +18,24 @@ landingPageUI(id)
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+
+\item{userName}{user name as returned by [flamingoDBLogin()]}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{reloadMillis}{Amount of time to wait between table updates;
 see \link{invalidateLater}.}
 
-\item{logMessage}{Function that will be passed info messages.}
+\item{logMessage}{function that will be passed info messages.}
 
-\item{active}{Reactive expression whether the module state should be updated.}
+\item{active}{reactive expression whether the module state should be updated.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state
@@ -35,9 +45,10 @@ For \code{landingPage()}, list of reactives:
 \itemize{
 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
+		\item{\\code{runIdList}: }{ilist of possible process run ids}
 }
 
-LandingPage.
+List of tags.
 }
 \description{
 Landing Page

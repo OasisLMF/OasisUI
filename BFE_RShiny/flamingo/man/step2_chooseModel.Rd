@@ -44,6 +44,8 @@ step2_chooseModel(input, output, session, dbSettings, apiSettings, userId,
 \item{progStatus}{Status of selected programme.}
 
 \item{DPProgData}{Dataframe of programmes.}
+
+\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

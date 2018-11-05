@@ -7,7 +7,7 @@
 createPlainMap(fileName)
 }
 \arguments{
-\item{fileName}{File name.}
+\item{fileName}{name of file to plot as map}
 }
 \value{
 Leaflet map.

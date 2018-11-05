@@ -7,7 +7,7 @@
 testFlamingoServer(apiSettings, ...)
 }
 \arguments{
-\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{...}{further arguments to \link{GET}.}
 }

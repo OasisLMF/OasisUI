@@ -7,7 +7,7 @@
 getProcessRunDetails(dbSettings, wfid)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{wfid}{Workflow id.}
 }

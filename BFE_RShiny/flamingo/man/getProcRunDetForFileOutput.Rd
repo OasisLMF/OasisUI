@@ -7,9 +7,9 @@
 getProcRunDetForFileOutput(dbSettings, processRunId)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{processRunId}{Reactive string expression for reselected run id from defineProgramme.}
+\item{processRunId}{identifier selected process run.}
 }
 \value{
 Process run details.

@@ -12,6 +12,8 @@ singleProgrammeWorkflowSteps(input, output, session)
 \item{output}{Shiny output object.}
 
 \item{session}{Shiny session object.}
+
+\item{id}{Namespace ID for the module.}
 }
 \value{
 smth.

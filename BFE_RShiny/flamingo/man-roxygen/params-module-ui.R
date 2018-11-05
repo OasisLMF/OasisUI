@@ -1,3 +1,3 @@
-#' @param id module id.
+#' @param id module id
 #' 
 #' @md

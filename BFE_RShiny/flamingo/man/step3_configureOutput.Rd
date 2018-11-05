@@ -41,6 +41,8 @@ step3_configureOutput(input, output, session, dbSettings, apiSettings,
 \item{progOasisName}{Name of selected progOasis.}
 
 \item{progOasisStatus}{Status of selected progOasis.}
+
+\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

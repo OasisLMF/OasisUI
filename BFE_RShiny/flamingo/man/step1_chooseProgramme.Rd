@@ -33,6 +33,8 @@ step1_chooseProgramme(input, output, session, dbSettings, apiSettings,
 \item{currstep}{current selected step.}
 
 \item{selectprogrammeID}{selected programme ID.}
+
+\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

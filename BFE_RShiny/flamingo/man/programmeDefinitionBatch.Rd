@@ -19,16 +19,17 @@ programmeDefinitionBatchUI(id)
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{active}{Reactive expression whether the module state should be updated.}
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{logMessage}{Function that will be passed info messages.}
+\item{active}{reactive expression whether the module state should be updated.}
 
-\item{reloadMillis}{Amount of time to wait between table updates;
-see \link{invalidateLater}.}
+\item{logMessage}{function that will be passed info messages.}
+
+\item{id}{Namespace ID for the module.}
 
 \item{id}{module id}
 }
@@ -36,12 +37,10 @@ see \link{invalidateLater}.}
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-For \code{programmeDefinitionBatch()}, list of reactives.
-
 List of tags.
 }
 \description{
-Server logic to define a programme.
+Server logic to define a batch process.
 
-UI/View for the process run page.
+UI/View for the process batch run page.
 }

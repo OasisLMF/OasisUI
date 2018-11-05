@@ -4,7 +4,7 @@
 #' 
 #' @template params-module-ui
 #'
-#'  @return List of tags.
+#' @return List of tags.
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
