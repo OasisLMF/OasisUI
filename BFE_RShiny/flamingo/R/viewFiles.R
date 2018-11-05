@@ -45,8 +45,6 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 #' @inheritParams flamingoModule
 #' @param filesListData Table of output files for a given runID.
 #'
-#' @return List of reactives.
-#'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs hidden

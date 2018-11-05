@@ -2,15 +2,18 @@
 % Please edit documentation in R/visualizationSBR_ui.R
 \name{panelOutput}
 \alias{panelOutput}
-\title{panelSummaryTableModuleUI}
+\title{panelOutput}
 \usage{
 panelOutput(id)
 }
 \arguments{
-\item{id}{Shiny module id.}
+\item{id}{module id}
+}
+\value{
+List of tags.
 }
 \description{
-panelSummaryTableModuleUI
+panelOutput
 }
 \details{
 Function wrapping panel to define prgramme and model IDs

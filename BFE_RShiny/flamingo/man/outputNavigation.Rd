@@ -15,7 +15,7 @@ state, thus forcing rectivity. This is especially desirable within inner
 modules.}
 }
 \value{
-\code{Returns a list containing the reactive navigation state, to be possibliy}c\code{ombined with other module outputs. The reactive navigation state can then be extracted using}getNavigation()`.
+\code{Returns a list containing the reactive navigation state, to be possibliy }c\code{ombined with other module outputs. The reactive navigation state can then be extracted using }getNavigation()`.
 }
 \description{
 outputNavigation

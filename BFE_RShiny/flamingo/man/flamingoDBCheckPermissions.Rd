@@ -7,8 +7,6 @@
 flamingoDBCheckPermissions(dbSettings, userId, resourceId)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
-
 \item{resourceId}{Resource identifier, e.g. \code{c("1000")}.}
 }
 \value{

@@ -1,4 +1,4 @@
-# visualizationSBR Module Server ----------------- -----------------------------
+# visualizationSBR Module Server -----------------------------------------------
 
 #' visualizationSBR
 #'
@@ -247,18 +247,52 @@ visualizationSBR <- function(input, output, session, dbSettings,
 }
 
 
-# panelOutputModule Module -----------------------
-#' Module for Output Panel
+# panelOutputModule Module -----------------------------------------------------
+
+#' panelOutputModule
+#'
 #' @rdname panelOutputModule
+#'
 #' @description Server logic to show graphical output such as plots
-#' @inheritParams flamingoModule
+#'
+#' @template params-module
+#' @template params-flamingo-module
+#'
 #' @param filesListData table of output files for a given runID
+#'
 #' @return reactive value of the title
-#' @importFrom shinyjs enable disable
-#' @importFrom dplyr rename left_join filter group_by summarise intersect
-#' @importFrom tidyr gather separate spread
-#' @importFrom ggplot2 geom_line geom_hline ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area facet_wrap scale_x_continuous geom_bar geom_errorbar
-#' @importFrom plotly ggplotly  renderPlotly
+#'
+#' @importFrom dplyr select
+#' @importFrom dplyr rename
+#' @importFrom dplyr left_join
+#' @importFrom dplyr filter
+#' @importFrom dplyr intersect
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs js
+#' @importFrom tidyr gather
+#' @importFrom tidyr separate
+#' @importFrom tidyr spread
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 geom_hline
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 element_line
+#' @importFrom ggplot2 element_blank
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 geom_area
+#' @importFrom ggplot2 facet_wrap
+#' @importFrom ggplot2 scale_x_continuous
+#' @importFrom ggplot2 geom_bar
+#' @importFrom ggplot2 geom_errorbar
+#' @importFrom plotly ggplotly
+#' @importFrom plotly renderPlotly
+#' 
 #' @export
 panelOutputModule <- function(input, output, session, logMessage = message, filesListData, active) {
   
@@ -642,18 +676,26 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     p
   }
   
-  # Module Output -----------------------
+  # Module Output --------------------------------------------------------------
   reactive(result$Title)
 }
 
-# panelSummaryTableModule Module -----------------------
-#' Module for Summary Table Panel
+# panelSummaryTableModule Module -----------------------------------------------
+
+#' panelSummaryTableModule
+#'
 #' @rdname panelSummaryTableModule
+#'
 #' @description Server logic to show the summary table output
-#' @inheritParams flamingoModule
+#'
+#' @template params-module
+#' @template params-flamingo-module
+#'
 #' @param selectRunID selected runID
-#' @return null
-#' @importFrom DT renderDT datatable
+#'
+#' @importFrom DT renderDT 
+#' @importFrom DT datatable
+#' 
 #' @export
 panelSummaryTableModule <- function(input, output, session, dbSettings,
                                     apiSettings, userId, logMessage = message, selectRunID ) {
