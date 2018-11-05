@@ -2,19 +2,16 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getOutputOptions}
 \alias{getOutputOptions}
-\title{Get the list of output presets}
+\title{getOutputOptions}
 \usage{
 getOutputOptions(dbSettings, simplify = TRUE)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
-
-\item{simplify}{if \code{TRUE}, a vector will be returned instead of a
-\code{data.frame} only a single column is returned.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
-output options
+Output options.
 }
 \description{
-Get the list of output presets
+Get the list of output presets.
 }

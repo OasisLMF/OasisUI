@@ -2,7 +2,7 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{configureAdvancedRI}
 \alias{configureAdvancedRI}
-\title{Function wrapping sub-panel to define outputs advanced configuration RI}
+\title{configureAdvancedRI}
 \usage{
 configureAdvancedRI(id)
 }
@@ -10,5 +10,5 @@ configureAdvancedRI(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping sub-panel to define outputs advanced configuration RI
+Function wrapping sub-panel to define outputs advanced configuration RI.
 }

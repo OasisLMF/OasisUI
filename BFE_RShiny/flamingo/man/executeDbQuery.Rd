@@ -2,30 +2,30 @@
 % Please edit documentation in R/flamingoDB.R
 \name{executeDbQuery}
 \alias{executeDbQuery}
-\title{Convenience function to execute database queries}
+\title{executeDbQuery}
 \usage{
 executeDbQuery(dbSettings, statement, simplify = FALSE,
   verbose = FALSE, logMessage = message, logError = logMessage, ...)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{statement}{query statement to execute, e.g. as returned by
-\code{\link[=buildDbQuery]{buildDbQuery()}}}
+\item{statement}{Query statement to execute, e.g. as returned by
+\code{\link[=buildDbQuery]{buildDbQuery()}}.}
 
-\item{simplify}{if \code{TRUE}, a vector will be returned instead of a
+\item{simplify}{If \code{TRUE}, a vector will be returned instead of a
 \code{data.frame} only a single column is returned.}
 
-\item{verbose}{print query statement}
+\item{verbose}{Print query statement.}
 
-\item{logMessage}{function to call with log message}
+\item{logMessage}{Function to call with log message.}
 
-\item{logError}{function to call with error log message}
+\item{logError}{Function to call with error log message.}
 
-\item{...}{further arguments to \code{\link[=dbGetQuery]{dbGetQuery()}}}
+\item{...}{Further arguments to \code{\link[=dbGetQuery]{dbGetQuery()}}.}
 }
 \value{
-result of the query as a \code{data.frame} or a vector if \code{simplify} is
+Result of the query as a \code{data.frame} or a vector if \code{simplify} is
 set to \code{TRUE}. \code{NULL} if no result can be returned.
 }
 \description{

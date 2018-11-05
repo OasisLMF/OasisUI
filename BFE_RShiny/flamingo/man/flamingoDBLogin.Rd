@@ -2,20 +2,16 @@
 % Please edit documentation in R/flamingoDB.R
 \name{flamingoDBLogin}
 \alias{flamingoDBLogin}
-\title{Login against the database}
+\title{flamingoDBLogin}
 \usage{
 flamingoDBLogin(dbSettings, uid, pwd)
 }
 \arguments{
-\item{dbSettings}{object as returned by \code{\link[=flamingoDB]{flamingoDB()}}}
-
-\item{uid}{user name}
-
-\item{pwd}{user password}
+\item{pwd}{User pass.}
 }
 \value{
-user id if succesful, -1 otherwise
+User id if succesful, -1 otherwise.
 }
 \description{
-Construct and execute a login query for the given credentials
+Construct and execute a login query for the given credentials.
 }

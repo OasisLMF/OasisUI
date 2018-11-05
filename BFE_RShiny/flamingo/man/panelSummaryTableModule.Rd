@@ -2,28 +2,33 @@
 % Please edit documentation in R/visualizationSBR_server.R
 \name{panelSummaryTableModule}
 \alias{panelSummaryTableModule}
-\title{Module for Summary Table Panel}
+\title{panelSummaryTableModule}
 \usage{
 panelSummaryTableModule(input, output, session, dbSettings, apiSettings,
   userId, logMessage = message, selectRunID)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{logMessage}{function that will be passed info messages}
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{selectRunID}{selected runID}
-}
-\value{
-null
+\item{logMessage}{function that will be passed info messages.}
+
+\item{selectRunID}{selected runID
+
+#' @return Empty list.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{active}{reactive expression whether the module state should be updated.}
 }
 \description{
 Server logic to show the summary table output

@@ -1,10 +1,21 @@
-#' Company Definition Module
+#' companyDefinition
+#'
 #' @rdname companyDefinition
-#' @description Server logic to define a company
-#' @inheritParams flamingoModule
-#' @param userId reactive expression yielding user id
-#' @return empty list
+#'
+#' @description Server logic to define a company.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @return Empty list.
+#
+#' @importFrom DT datatable
 #' @importFrom DT renderDT
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs onclick
+#'
 #' @export
 companyDefinition <- function(input, output, session, dbSettings, userId,
                               active = reactive(TRUE), logMessage = message) {
@@ -91,11 +102,11 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # Enable and disable buttons
   observeEvent(input$tablecompanylist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$tablecompanylist_rows_selected) > 0) {
-        shinyjs::enable("abuttoncompupdate")
-        shinyjs::enable("abuttoncompdel")
+        enable("abuttoncompupdate")
+        enable("abuttoncompdel")
       } else {
-        shinyjs::disable("abuttoncompupdate")
-        shinyjs::disable("abuttoncompdel")
+        disable("abuttoncompupdate")
+        isable("abuttoncompdel")
       }
     })
 
@@ -198,7 +209,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # confirm delete
   onclick("abuttoncconfirmdel", {
     removeModal()
-    
+
       stmt <- buildDbQuery("deleteCompany",
                            result$compData[input$tablecompanylist_rows_selected, 1])
       res <- executeDbQuery(dbSettings, stmt)

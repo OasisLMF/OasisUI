@@ -1,14 +1,22 @@
-
-#' User Admin Definition Module
+#' userAdminDefinition
+#'
 #' @rdname userAdminDefinition
+#'
 #' @description Server logic for accessing the Company User List for Flamingo
-#' in association with OASIS LMF
-#' @inheritParams flamingoModule
-#' @param userId reactive yielding user id (of the logged in user)
-#' @return For \code{userAdminDefinition()}, list of reactives.
+#' in association with OASIS LMF.
+#'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
 #' @importFrom DT renderDT
-#' @importFrom shinyjs enable disable
+#' @importFrom DT datatable
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs onclick
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#'
 #' @export
 userAdminDefinition <- function(input, output, session, dbSettings, userId,
                                 active = reactive(TRUE)) {
@@ -17,9 +25,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues(
-    
+
     permission = NULL,
-    
+
     CULData = NULL,
     CULDataCounter = 0,
 
@@ -192,7 +200,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
       updateNavigation(navigation_state, "LP")
 
     } else if (result$permission[1] != "CRUD" && result$permission[1] != "R") {
-      
+
       flamingoNotification(type = "warning", "Neither CRUD nor R")
 
     }
@@ -278,15 +286,15 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # Enable and disable buttons
   observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$tablecompanyuserlist_rows_selected) > 0 && result$permission[1] == "CRUD") {
-        shinyjs::enable("abuttonuserupdate")
-        shinyjs::enable("abuttonuserdelete")
-        shinyjs::enable("abuttonusersecurity")
-        shinyjs::enable("abuttonuseroasis")
+        enable("abuttonuserupdate")
+        enable("abuttonuserdelete")
+        enable("abuttonusersecurity")
+        enable("abuttonuseroasis")
       } else {
-        shinyjs::disable("abuttonuserupdate")
-        shinyjs::disable("abuttonuserdelete")
-        shinyjs::disable("abuttonusersecurity")
-        shinyjs::disable("abuttonuseroasis")
+        disable("abuttonuserupdate")
+        disable("abuttonuserdelete")
+        disable("abuttonusersecurity")
+        disable("abuttonuseroasis")
       }
     })
 

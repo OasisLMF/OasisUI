@@ -1,14 +1,20 @@
 # programmeDefinitionSingle Module UI -----------------------
 
+#' programmeDefinitionSingle
+#'
 #' @rdname programmeDefinitionSingle
+#'
 #' @description UI/View for the process run page
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
-#' @importFrom DT DTOutput
-#' @importFrom bsplus bs_embed_tooltip
+#'
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
+#' @importFrom shinyjs hidden
+#'
 #' @export
 programmeDefinitionSingleUI <- function(id) {
-  
+
 ns <- NS(id)
 
 tagList(
@@ -21,15 +27,24 @@ tagList(
 }
 
 
-#' Function wrapping panel to define prgramme and model IDs
-#' @inheritParams flamingoModuleUI
+#' panelDefineIDs
+#'
+#' @rdname panelDefineIDs
+#'
+#' @description Function wrapping panel to define prgramme and model IDs.
+#'
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 panelDefineIDs <- function(id) {
   ns <- NS(id)
-  
+
   panel(
     status = "primary",
     #heading = fluidRow(column(11, h4("Filter"))),
@@ -38,8 +53,8 @@ panelDefineIDs <- function(id) {
           column(4,
                  div(class = "InlineSelectInputSmall",
                      #selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = c("<Select>"), selected = "<Select>"),
-                     selectizeInput(inputId = ns("selectprogrammeID"), label = "Programme ID", 
-                                    choices = c(), 
+                     selectizeInput(inputId = ns("selectprogrammeID"), label = "Programme ID",
+                                    choices = c(),
                                     selected = character(0),
                                     options = list(
                                       allowEmptyOption = TRUE,
@@ -51,10 +66,10 @@ panelDefineIDs <- function(id) {
                  ))),
       hidden(div(id = ns("divselectprogOasisID"),
                  column(5,
-                        div(class = "InlineSelectInputSmall", 
+                        div(class = "InlineSelectInputSmall",
                             #selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
-                            selectizeInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", 
-                                           choices = c(), 
+                            selectizeInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID",
+                                           choices = c(),
                                            selected = character(0),
                                            options = list(
                                              allowEmptyOption = TRUE,

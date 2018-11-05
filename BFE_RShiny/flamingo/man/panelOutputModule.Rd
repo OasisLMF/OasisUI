@@ -2,23 +2,31 @@
 % Please edit documentation in R/visualizationSBR_server.R
 \name{panelOutputModule}
 \alias{panelOutputModule}
-\title{Module for Output Panel}
+\title{panelOutputModule}
 \usage{
 panelOutputModule(input, output, session, logMessage = message,
   filesListData, active)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{function that will be passed info messages.}
 
 \item{filesListData}{table of output files for a given runID}
 
 \item{active}{reactive expression whether the module state should be updated.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 }
 \value{
 reactive value of the title

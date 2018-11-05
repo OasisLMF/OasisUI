@@ -3,7 +3,7 @@
 \name{modelSupplierPage}
 \alias{modelSupplierPage}
 \alias{modelSupplierPageUI}
-\title{Module For The Model Supplier Page}
+\title{modelSupplierPage}
 \usage{
 modelSupplierPage(input, output, session, dbSettings,
   logMessage = message, active = reactive(TRUE))
@@ -11,25 +11,36 @@ modelSupplierPage(input, output, session, dbSettings,
 modelSupplierPageUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{function that will be passed info messages.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{id}{shiny module id}
+\item{id}{Namespace ID for the module.}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+
+\item{id}{module id}
 }
 \value{
-empty list
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
+Empty list.
+
+List of tags.
 }
 \description{
-Server logic for the model supplier page
+Server logic for the model supplier page.
 
-UI/View for the model supplier page
+UI/View for the model supplier page.
 }

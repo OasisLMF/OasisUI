@@ -7,9 +7,14 @@
 flamingoPanelHeadingOutput(outputId, ...)
 }
 \arguments{
-\item{outputId}{outputId}
+\item{outputId}{Output Id.}
 
-\item{...}{additional parameters}
+\item{...}{Additional parameters.}
+
+\item{inline}{boolean for inline css tag}
+}
+\value{
+smth.
 }
 \description{
 flamingoPanelHeadingOutput

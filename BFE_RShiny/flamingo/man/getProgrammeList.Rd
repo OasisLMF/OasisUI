@@ -2,12 +2,12 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getProgrammeList}
 \alias{getProgrammeList}
-\title{Get Programme List}
+\title{getProgrammeList}
 \usage{
 getProgrammeList(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
 \code{data.frame} of 7 variables:
@@ -19,7 +19,7 @@ getProgrammeList(dbSettings)
 \item \code{Transform ID}
 \item \code{Transform}
 \item \code{Status}
-}
+}.
 }
 \description{
 Get a list of programme data.

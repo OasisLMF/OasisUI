@@ -2,15 +2,18 @@
 % Please edit documentation in R/plots.R
 \name{plotAEPCurve}
 \alias{plotAEPCurve}
-\title{AEP Curve}
+\title{plotAEPCurve}
 \usage{
 plotAEPCurve(AEPData, years = 1000)
 }
 \arguments{
-\item{AEPData}{AEP data}
+\item{AEPData}{AEP dataframe.}
 
-\item{years}{years}
+\item{years}{Years, integer.}
+}
+\value{
+AEP Curve plot.
 }
 \description{
-plot EP Curve
+Plot AEP Curve.
 }

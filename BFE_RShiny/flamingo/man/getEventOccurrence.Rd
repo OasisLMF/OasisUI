@@ -2,21 +2,18 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getEventOccurrence}
 \alias{getEventOccurrence}
-\title{Get the event occurrence list}
+\title{getEventOccurrence}
 \usage{
 getEventOccurrence(dbSettings, prgoasisid, simplify = TRUE)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{prgoasisid}{oasis programme id}
-
-\item{simplify}{if \code{TRUE}, a vector will be returned instead of a
-\code{data.frame} only a single column is returned.}
+\item{prgoasisid}{Oasis programme id.}
 }
 \value{
-event occurrence
+Event occurrence.
 }
 \description{
-Get the event occurrence list
+Get the event occurrence list.
 }

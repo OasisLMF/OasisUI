@@ -2,12 +2,12 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getProgOasisForProgdata}
 \alias{getProgOasisForProgdata}
-\title{Get Programme Oasis for a given Programme Id}
+\title{getProgOasisForProgdata}
 \usage{
 getProgOasisForProgdata(dbSettings, progId)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
 \code{data.frame} of 11 variables:
@@ -23,8 +23,11 @@ getProgOasisForProgdata(dbSettings, progId)
 \item \code{API1bDateTime}
 \item \code{API1cDateTime}
 \item \code{SessionId}
-}
+}.
 }
 \description{
+Get Programme Oasis for a given Programme Id.
+}
+\details{
 Run getProgOasisForProg against the database.
 }

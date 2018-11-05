@@ -9,6 +9,9 @@ panelViewOutputFiles(id)
 \arguments{
 \item{id}{module id}
 }
+\value{
+List of tags.
+}
 \description{
 panelViewOutputFiles
 }

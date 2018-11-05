@@ -2,7 +2,7 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{panelProcessRunLogs}
 \alias{panelProcessRunLogs}
-\title{Function wrapping panel to show log table for specific Process Run}
+\title{panelProcessRunLogs}
 \usage{
 panelProcessRunLogs(id)
 }
@@ -10,5 +10,5 @@ panelProcessRunLogs(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to show log table for specific Process Run
+Function wrapping panel to show log table for specific Process Run.
 }

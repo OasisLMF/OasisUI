@@ -1,9 +1,17 @@
-#' @title visualizationSBR_ui
-#' visualization Single Browse Run UI
-#' @rdname visualizationSBRUI
-#' @description UI/View for the process run page
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
+# visualization Single Run Browse Module UI ------------------------------------
+
+#' visualizationSBRUI
+#' 
+#' @rdname visualizationSBR
+#' 
+#' @description UI/View for viewing results of a single run.
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
+#' @importFrom shinyWidgets panel
+#' 
 #' @export
 visualizationSBRUI <- function(id) {
   
@@ -20,11 +28,17 @@ visualizationSBRUI <- function(id) {
 
 
 # Functions for UI Panels ------------------------------------------------------------------------------
-#' @title panelDefineRunID
+#' panelDefineRunID
+#' 
 #' @rdname panelDefineRunID
-#' @inheritParams flamingoModuleUI
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
 #' @importFrom shinyWidgets panel
 #' @importFrom bsplus bs_embed_tooltip
+#' 
 #' @export
 panelDefineRunID <-  function(id){
   ns <- NS(id)
@@ -41,9 +55,14 @@ panelDefineRunID <-  function(id){
   )
 }
 
-#' @title panelSummaryTable
+#' panelSummaryTable
+#' 
 #' @rdname panelSummaryTable
-#' @inheritParams flamingoModuleUI
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
 #' @export
 panelSummaryTable <-  function(id){
   ns <- NS(id)
@@ -55,10 +74,15 @@ panelSummaryTable <-  function(id){
   )
 }
 
-#' @title panelSummaryTableModuleUI
+#' panelSummaryTableModuleUI
 #' @rdname panelSummaryTableModuleUI
-#' @inheritParams flamingoModuleUI
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
 #' @importFrom DT DTOutput
+#' 
 #' @export
 panelSummaryTableModuleUI <-  function(id){
   ns <- NS(id)
@@ -67,10 +91,16 @@ panelSummaryTableModuleUI <-  function(id){
   )
 }
 
-#' @title panelSummaryTableModuleUI
+#' panelOutput
+#' 
 #' @rdname panelOutput
+#' 
 #' @details Function wrapping panel to define prgramme and model IDs
-#' @inheritParams flamingoModuleUI
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
 #' @export
 panelOutput <-  function(id){
   ns <- NS(id)
@@ -80,12 +110,18 @@ panelOutput <-  function(id){
     collapsible = FALSE, show = FALSE, removable = FALSE)
 }
 
-#' @title panelOutputModuleUI
+#' panelOutputModuleUI
+#' 
 #' @rdname panelOutputModuleUI
-#' @inheritParams flamingoModuleUI
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @importFrom plotly plotlyOutput
+#' 
 #' @export
 panelOutputModuleUI <-  function(id){
   ns <- NS(id)
@@ -124,9 +160,14 @@ panelOutputModuleUI <-  function(id){
   )
 }
 
-#' @title panelViewOutputFiles
+#' panelViewOutputFiles
+#' 
 #' @rdname panelViewOutputFiles
-#' @inheritParams flamingoModuleUI
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
 #' @export
 panelViewOutputFiles <-  function(id){
   ns <- NS(id)

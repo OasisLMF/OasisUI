@@ -1,11 +1,16 @@
-#' @rdname companyDefinitionUI
-#' @title companyDefinitionUI
-#' @description UI/View to define an account.
-#' @param id account id
-#' @return list of tags
+#' companyDefinitionUI
+#'
 #' @rdname companyDefinition
+#'
+#' @description UI/View to define an account.
+#'
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
 #' @importFrom DT DTOutput
-#' @importFrom htmltools tags
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 companyDefinitionUI <- function(id) {
 

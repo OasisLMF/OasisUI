@@ -1,10 +1,17 @@
-
+#' modelSupplierPageUI
+#'
 #' @rdname modelSupplierPage
-#' @description UI/View for the model supplier page
-#' @inheritParams accountDefinitionUI
+#'
+#' @description UI/View for the model supplier page.
+#'
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
 #' @importFrom shinyjs hidden
-#' @importFrom shiny downloadButton
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 modelSupplierPageUI <- function(id) {
 

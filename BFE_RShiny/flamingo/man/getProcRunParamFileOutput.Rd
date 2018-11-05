@@ -2,18 +2,18 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getProcRunParamFileOutput}
 \alias{getProcRunParamFileOutput}
-\title{Get Process Runtime Param Details}
+\title{getProcRunParamFileOutput}
 \usage{
 getProcRunParamFileOutput(dbSettings, processRunId)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{processRunId}{process run id}
+\item{processRunId}{Reactive string expression for reselected run id from defineProgramme.}
 }
 \value{
-param details
+Param details.
 }
 \description{
-Get Process Runtime Param Details
+Get Process Runtime Param Details.
 }

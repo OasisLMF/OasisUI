@@ -1,7 +1,17 @@
+# visualization Compare Runs Browse Module UI ----------------------------------
+
+#' visualizationCBRUI
+#'
 #' @rdname visualizationCBR
-#' @description UI/View for compare runs run page
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
+#'
+#' @description UI/View for comparing runs run page.
+#'
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
+#' @importFrom shinyWidgets panel
+#'
 #' @export
 visualizationCBRUI <- function(id) {
 

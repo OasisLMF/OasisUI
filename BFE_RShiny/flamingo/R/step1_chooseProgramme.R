@@ -1,13 +1,18 @@
 # step1_chooseProgramme Module -------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' step1_chooseProgramme UI
+#' step1_chooseProgrammeUI
+#'
 #' @rdname step1_chooseProgramme
-#' @description UI/View for the step1_chooseProgramme
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
-#' @importFrom DT DTOutput
-#' @importFrom bsplus bs_embed_tooltip
+#'
+#' @description UI/View for the step1_chooseProgramme.
+#'
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
+#' @importFrom shinyjs hidden
+#'
 #' @export
 step1_chooseProgrammeUI <- function(id) {
   ns <- NS(id)
@@ -20,11 +25,17 @@ step1_chooseProgrammeUI <- function(id) {
   )
 }
 
-
-#' Function wrapping panel to show created programmes table
+#' panelProgrammeTable
+#'
 #' @rdname panelProgrammeTable
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping panel to show created programmes table.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 panelProgrammeTable <- function(id) {
   ns <- NS(id)
@@ -48,10 +59,16 @@ panelProgrammeTable <- function(id) {
   )
 }
 
-#' Function wrapping panel to show details of programme
+#' panelProgrammeDetails
+#'
 #' @rdname panelProgrammeDetails
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping panel to show details of programme.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom DT DTOutput
+#'
 #' @export
 panelProgrammeDetails <- function(id) {
   ns <- NS(id)
@@ -68,11 +85,16 @@ panelProgrammeDetails <- function(id) {
   )
 }
 
-#' Function wrapping panel to create/amend programme
+#' panelDefineProgramme
+#'
 #' @rdname panelDefineProgramme
+#'
+#' @description Function wrapping panel to create/amend programme.
+#' 
+#' @template params-module-ui
+#'
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tagAppendChildren
-#' @importFrom shiny selectizeInput textInput fileInput
+#'
 #' @export
 panelDefineProgramme <- function(id) {
   ns <- NS(id)
@@ -112,11 +134,16 @@ panelDefineProgramme <- function(id) {
 }
 
 
-#' Function wrapping panel to link files to a programme
+#' panelLinkFiles
+#'
 #' @rdname panelLinkFiles
-#' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tagAppendChildren
-#' @importFrom shiny selectizeInput textInput fileInput
+#'
+#' @description Function wrapping panel to link files to a programme.
+#' 
+#' @template params-module-ui
+#'
+#' @importFrom shinyjs hidden
+#'
 #' @export
 panelLinkFiles <- function(id) {
   ns <- NS(id)
@@ -184,16 +211,36 @@ panelLinkFiles <- function(id) {
 }
 
 # Server -----------------------------------------------------------------------
-#' step1_chooseProgramme Server
+#' step1_chooseProgramme
+#'
 #' @rdname step1_chooseProgramme
-#' @description Server logic to step1_chooseProgramme
-#' @inheritParams flamingoModule
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+#'
+#' @description Server logic to step1_chooseProgramme.
+#'
 #' @template return-outputNavigation
-#' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
-#' @importFrom dplyr mutate select case_when
-#' @importFrom shinyjs onclick disable enable
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @param currstep current selected step.
+#' @param selectprogrammeID selected programme ID.
+#'
+#' @return selectprogrammeID Id of selected programmeID
+#' @return DPProgData POData model association table.
+#' @return newstep navigation step
+
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs onclick
+#' @importFrom DT renderDT
+#' @importFrom DT datatable
+#' @importFrom DT dataTableProxy
+#' @importFrom DT selectRows
+#' @importFrom DT DTOutput
+#' @importFrom DT selectPage
+#' @importFrom dplyr select
+#'
 #' @export
 step1_chooseProgramme <- function(input, output, session,
                                   dbSettings,apiSettings, userId,

@@ -9,6 +9,9 @@ panelDefineRunID(id)
 \arguments{
 \item{id}{module id}
 }
+\value{
+List of tags.
+}
 \description{
 panelDefineRunID
 }

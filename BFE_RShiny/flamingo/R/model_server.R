@@ -1,11 +1,23 @@
-#' Module For The Model Supplier Page
+#' modelSupplierPage
+#'
 #' @rdname modelSupplierPage
-#' @description Server logic for the model supplier page
-#' @inheritParams flamingoModule
-#' @inheritParams accountDefinitionUI
-#' @return empty list
+#'
+#' @description Server logic for the model supplier page.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @return Empty list.
+#'
 #' @importFrom DT renderDT
-#' @importFrom shinyjs hide show onclick
+#' @importFrom DT datatable
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs show
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs enable
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 modelSupplierPage <- function(input, output, session, dbSettings,
                               logMessage = message, active = reactive(TRUE)) {
@@ -153,13 +165,13 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     result$MRData
     input$mrtable_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$mrtable_rows_selected) > 0) {
-        shinyjs::enable("btnAmend")
-        shinyjs::enable("btnDelete")
-        shinyjs::enable("btnConfirmDel")
+        enable("btnAmend")
+        enable("btnDelete")
+        enable("btnConfirmDel")
       } else {
-        shinyjs::disable("btnAmend")
-        shinyjs::disable("btnDelete")
-        shinyjs::disable("btnConfirmDel")
+        disable("btnAmend")
+        disable("btnDelete")
+        disable("btnConfirmDel")
       }
     })
 

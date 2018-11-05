@@ -1,8 +1,13 @@
-
+#' fileViewerUI
+#'
 #' @rdname fileViewer
-#' @description UI/View to view files
-#' @import leaflet
-#' @importFrom DT DTOutput
+#'
+#' @description UI/View to view files.
+#' 
+#' @template params-module-ui
+#'
+#' @return LIst of tags.
+#'
 #' @export
 fileViewerUI <- function(id) {
 

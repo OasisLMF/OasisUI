@@ -2,25 +2,25 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getProcessRunDetails}
 \alias{getProcessRunDetails}
-\title{Get log details for a run}
+\title{getProcessRunDetails}
 \usage{
 getProcessRunDetails(dbSettings, wfid)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{wfid}{workflow id}
+\item{wfid}{Workflow id.}
 }
 \value{
-log details; \code{data.frame} of 5 variables:
+Log details; \code{data.frame} of 5 variables:
 \itemize{
 \item \code{Element ID}
 \item \code{Element Name}
 \item \code{Status}
 \item \code{Description}
 \item \code{CompletedAt}
-}
+}.
 }
 \description{
-Get log details for a run
+Get log details for a run.
 }

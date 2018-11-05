@@ -1,11 +1,15 @@
-
-#' Get Geo Details
+#' getGeoDetails
+#'
 #' @rdname getGeoDetails
-#' @description this function can be used to query google servers for
+#'
+#' @description This function can be used to query google servers for
 #' geo details.
-#' @param address server address
+#'
+#' @param address Server address.
+#'
 #' @return \code{data.frame} with details. If no match is found, the result
-#' is a \code{data.frame} of \code{NA} values.\@importFrom ggmap geocode
+#' is a \code{data.frame} of \code{NA} values.
+#'
 #' @export
 getGeoDetails <- function(address) {
   geo_reply <- geocode(address, output = "all", messaging = TRUE,

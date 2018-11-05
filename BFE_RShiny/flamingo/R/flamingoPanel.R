@@ -1,16 +1,19 @@
-#' @title flamingoPanel
+#' flamingoPanel
+#'
 #' @rdname flamingoPanel
-#' @param id id
-#' @param ... additional parameters
-#' @param heading NULL by default
-#' @param footer NULL by default
-#' @param status default
-#' @param show TRUE
-#' @param collapsible FALSE
-#' @importFrom htmltools tags
+#'
+#' @description Adapted from shinyWidgets::panel() including IDs and collapsible
+#' (inspired by shinyBS::bsCollapsePanel()).
+#'
+#' @template params-module-ui
+#' @param ... Additional parameters.
+#' @param heading NULL by default.
+#' @param footer NULL by default.
+#' @param status default.
+#' @param show TRUE.
+#' @param collapsible FALSE.
+#'
 #' @export
-#' @details  adapted from shinyWidgets::panel() including IDs and collapsible
-#' (inspired by shinyBS::bsCollapsePanel())
 flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "default", collapsible = FALSE, show = TRUE) {
 
   with_id <- function(x) paste(id, x, sep = "-")
@@ -107,15 +110,17 @@ if (FALSE) {
   }
 }
 
-#' @title collapseButton
+#' collapseButton
+#'
 #' @rdname collapseButton
-#' @param id id
-#' @param id_collapse id to collapse
-#' @param ... additional paramters
-#' @param width NULL
-#' @param collapsed FALSE
-#' @importFrom bsplus bs_attach_collapse
-#' @importFrom htmltools tagAppendAttributes
+#'
+#' @template params-module-ui
+#' 
+#' @param id_collapse id of button that triggers collapsing.
+#' @param width widget widt
+#' @param collapsed FALSE.
+#' 
+#' @return List of tags.
 collapseButton <- function(id, id_collapse, ..., width = NULL, collapsed = FALSE) {
   actionButton(id, NULL, NULL, ..., width = width) %>%
     bsplus::bs_attach_collapse(id_collapse)  %>%
@@ -154,9 +159,13 @@ if (FALSE) {
   }
 }
 
-#' @title flamingoPanelHeading
+#' flamingoPanelHeading
+#'
 #' @rdname flamingoPanelHeading
-#' @param heading heading
+#'
+#' @param heading title of the panel
+#'
+#' @return heading
 flamingoPanelHeading <- function(heading) {
   if (is.character(heading)) {
     # TODO: fine-tune font size
@@ -166,19 +175,28 @@ flamingoPanelHeading <- function(heading) {
   }
 }
 
-#' @title flamingoPanelHeadingOutput
+#' flamingoPanelHeadingOutput
+#'
 #' @rdname flamingoPanelHeadingOutput
-#' @param outputId outputId
-#' @param ... additional parameters
+#'
+#' @param outputId Output Id.
+#' @param inline boolean for inline css tag
+#' @param ... Additional parameters.
+#'
+#' @return smth.
 flamingoPanelHeadingOutput <- function(outputId, ...) {
   div(uiOutput(outputId, inline = TRUE, ...))
 }
 
-#' @title renderflamingoPanelHeading
+#' renderflamingoPanelHeading
+#'
 #' @rdname renderflamingoPanelHeading
-#' @param expr expression
-#' @param env environment
-#' @param ... additional parameters
+#'
+#' @param expr Expression.
+#' @param env Environment.
+#' @param ... Additional parameters.
+#'
+#' @return Flamingo heading.
 renderflamingoPanelHeading <- function(expr, env = parent.frame(), ...) {
   renderUI(call("flamingoPanelHeading", substitute(expr)), quoted = TRUE, env = env, ...)
 }

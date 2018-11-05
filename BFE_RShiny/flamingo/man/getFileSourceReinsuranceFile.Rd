@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getFileSourceReinsuranceFile}
 \alias{getFileSourceReinsuranceFile}
-\title{Get File Source Reinsurance File}
+\title{getFileSourceReinsuranceFile}
 \usage{
 getFileSourceReinsuranceFile(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
 \code{data.frame} of 2 variables:
 \itemize{
              \item \code{FileName}
              \item \code{FileId}
-}
+}.
 }
 \description{
-Get File Source Reinsurance File
+Get File Source Reinsurance File.
 }

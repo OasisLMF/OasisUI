@@ -7,11 +7,16 @@
 singleProgrammeWorkflowSteps(input, output, session)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
+
+\item{id}{Namespace ID for the module.}
+}
+\value{
+smth.
 }
 \description{
 singleProgrammeWorkflowSteps

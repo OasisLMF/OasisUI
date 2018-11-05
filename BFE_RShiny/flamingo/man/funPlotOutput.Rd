@@ -7,7 +7,10 @@
 funPlotOutput(outputPlotData)
 }
 \arguments{
-\item{outputPlotData}{data from output plot}
+\item{outputPlotData}{plotly output.}
+}
+\value{
+Some plot.
 }
 \description{
 funPlotOutput

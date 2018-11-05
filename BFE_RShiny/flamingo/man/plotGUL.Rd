@@ -7,15 +7,15 @@
 plotGUL(outputPlotData, interactive = FALSE, ...)
 }
 \arguments{
-\item{outputPlotData}{data for plot}
+\item{outputPlotData}{plotly output.}
 
-\item{interactive}{create interactive plot using \code{\link[plotly:plot_ly]{plotly::plot_ly()}}}
+\item{interactive}{Create interactive plot using \code{\link[plotly:plot_ly]{plotly::plot_ly()}}.}
 
-\item{...}{extra arguments to \code{\link[=plot]{plot()}}}
+\item{...}{Extra arguments to \code{\link[=plot]{plot()}}.}
 }
 \value{
-nothing; the interactive plot object if \code{interactive = TRUE}
+Nothing; the interactive plot object if \code{interactive = TRUE}.
 }
 \description{
-plot GUL using the current device
+Plot GUL using the current device.
 }

@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getAccountName}
 \alias{getAccountName}
-\title{Get Account Names}
+\title{getAccountName}
 \usage{
 getAccountName(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
-account name; \code{data.frame} of 2 variables:
+Account name; \code{data.frame} of 2 variables:
 \itemize{
 \item \code{Account ID}
 \item \code{progOasisId}
-}
+}.
 }
 \description{
-Get Account Names
+Get Account Names.
 }

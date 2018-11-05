@@ -1,12 +1,17 @@
-#' @title pagestructureSidebar
+#' pagestructureSidebar
+#'
 #' @rdname pagestructureSidebar
-#' @param ns ns
-#' @param collapsed FALSE
+#'
+#' @param ns ns.
+#' @param collapsed FALSE.
+#'
+#' @return Side bar in pagestructure.
+#'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyWidgets dropdownButton
+#'
 #' @export
-
 pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
   flamingoPanel(
     "sidebar",
