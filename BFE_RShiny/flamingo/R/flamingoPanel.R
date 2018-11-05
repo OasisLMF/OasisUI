@@ -13,8 +13,6 @@
 #' @param show TRUE.
 #' @param collapsible FALSE.
 #'
-#' @importFrom htmltools tags
-#'
 #' @export
 flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "default", collapsible = FALSE, show = TRUE) {
 
@@ -125,7 +123,6 @@ if (FALSE) {
 #' @return Collapsed button.
 #'
 #' @importFrom bsplus bs_attach_collapse
-#' @importFrom htmltools tags
 collapseButton <- function(id, id_collapse, ..., width = NULL, collapsed = FALSE) {
   actionButton(id, NULL, NULL, ..., width = width) %>%
     bsplus::bs_attach_collapse(id_collapse)  %>%
@@ -200,7 +197,7 @@ flamingoPanelHeadingOutput <- function(outputId, ...) {
 #' @param env Environment.
 #' @param ... Additional parameters.
 #'
-#' @return smth.
+#' @return Flamingo heading.
 renderflamingoPanelHeading <- function(expr, env = parent.frame(), ...) {
   renderUI(call("flamingoPanelHeading", substitute(expr)), quoted = TRUE, env = env, ...)
 }

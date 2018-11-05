@@ -10,7 +10,7 @@ singleProgrammeWorkflowStepsUI(id)
 \item{id}{Shiny module id.}
 }
 \value{
-smth.
+List of tags.
 }
 \description{
 singleProgrammeWorkflowStepsUI

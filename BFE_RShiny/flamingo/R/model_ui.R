@@ -6,12 +6,11 @@
 #'
 #' @inheritParams accountDefinitionUI
 #'
-#' @return smth.
+#' @return List of tags.
 #'
 #' @importFrom shinyjs hidden
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tags
 #'
 #' @export
 modelSupplierPageUI <- function(id) {

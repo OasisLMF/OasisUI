@@ -50,9 +50,8 @@ reactiveConditionalPanels <- function(input, output, session, visible) {
 #'
 #' @return Panels.
 #'
-#' @importFrom htmltools tags
-#'
 #' @export
+#'
 #' @md
 reactiveConditionalPanelsUI <- function(id, panels) {
   ns <- NS(id)

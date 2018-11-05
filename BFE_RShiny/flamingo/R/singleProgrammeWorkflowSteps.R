@@ -23,10 +23,9 @@ programmeWorkflowSteps <- list("Choose Programme" = "1",
 #'
 #' @inheritParams accountDefinitionUI
 #'
-#' @return smth.
+#' @return List of tags.
 #'
 #' @importFrom shinyWidgets radioGroupButtons
-#' @importFrom htmltools tags
 #'
 #' @export
 singleProgrammeWorkflowStepsUI <- function(id) {

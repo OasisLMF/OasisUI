@@ -6,9 +6,10 @@
 #'
 #' @inheritParams flamingoModuleUI
 #'
+#' @return List of tags.
+#'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tags
 #'
 #' @export
 ViewFilesModuleUI <-  function(id, includechkbox = FALSE){

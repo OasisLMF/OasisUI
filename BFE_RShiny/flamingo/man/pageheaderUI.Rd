@@ -7,7 +7,7 @@
 pageheaderUI(id)
 }
 \value{
-Page header.
+List of tags.
 }
 \description{
 pageheaderUI

@@ -11,7 +11,6 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom htmltools tags
 #' @importFrom shinyjs hidden
 #'
 #' @export
@@ -35,7 +34,6 @@ step1_chooseProgrammeUI <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
-#' @importFrom htmltools tags
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
@@ -70,7 +68,6 @@ panelProgrammeTable <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
-#' @importFrom htmltools tags
 #'
 #' @export
 panelProgrammeDetails <- function(id) {
@@ -95,7 +92,6 @@ panelProgrammeDetails <- function(id) {
 #' @description Function wrapping panel to create/amend programme.
 #'
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tags
 #'
 #' @export
 panelDefineProgramme <- function(id) {
@@ -143,7 +139,6 @@ panelDefineProgramme <- function(id) {
 #' @description Function wrapping panel to link files to a programme.
 #'
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tags
 #' @importFrom shinyjs hidden
 #'
 #' @export

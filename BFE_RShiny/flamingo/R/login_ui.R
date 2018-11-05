@@ -6,7 +6,7 @@
 #'
 #' @inheritParams accountDefinitionUI
 #'
-#' @importFrom htmltools tags
+#' @return List of tags.
 #'
 #' @export
 loginDialogUI <- function(id) {

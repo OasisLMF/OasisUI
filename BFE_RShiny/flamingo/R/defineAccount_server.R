@@ -14,7 +14,6 @@
 #' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
-#' @importFrom htmltools tags
 #'
 #' @export
 accountDefinition <- function(input, output, session, dbSettings,

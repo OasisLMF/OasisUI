@@ -27,6 +27,8 @@ fileViewerUI(id)
 }
 \value{
 Empty list.
+
+LIst of tags.
 }
 \description{
 Server logic to view files.

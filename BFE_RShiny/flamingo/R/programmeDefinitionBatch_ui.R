@@ -8,8 +8,6 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom htmltools tags
-#'
 #' @export
 programmeDefinitionBatchUI <- function(id) {
 

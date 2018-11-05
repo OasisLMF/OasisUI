@@ -25,6 +25,9 @@ flamingoIncrementalPanelUI(id, ..., heading = NULL, footer = NULL,
 
 \item{removable}{TRUE.}
 }
+\value{
+List of tags.
+}
 \description{
 flamingoIncrementalPanelUI
 }

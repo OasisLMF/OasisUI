@@ -48,8 +48,6 @@ flamingoModule <- function(
 #'
 #' @return Acces to Oasis UI.
 #'
-#' @importFrom htmltools tags
-#'
 #' @export
 #'
 #' @md
@@ -78,8 +76,6 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
 #' @param ... Arguments to [shiny::actionButton()].
 #'
 #' @return List of tags.
-#'
-#' @importFrom htmltools tags
 #'
 #' @export
 #'

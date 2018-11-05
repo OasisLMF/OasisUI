@@ -10,7 +10,7 @@ modelSupplierPageUI(id)
 \item{id}{Shiny module id.}
 }
 \value{
-smth.
+List of tags.
 }
 \description{
 UI/View for the model supplier page.

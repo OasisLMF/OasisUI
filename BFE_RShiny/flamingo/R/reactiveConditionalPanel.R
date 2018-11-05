@@ -43,9 +43,7 @@ reactiveConditionalPanel <- function(input, output, session, condition) {
 #'
 #' @inheritParams shiny::conditionalPanel
 #'
-#' @return smth.
-#'
-#' @importFrom htmltools tags
+#' @return List of tags.
 #'
 #' @export
 #'

@@ -10,7 +10,7 @@ reactiveConditionalPanelUI(id, ...)
 \item{...}{Elements to include in the panel.}
 }
 \value{
-smth.
+List of tags.
 }
 \description{
 reactiveConditionalPanelUI

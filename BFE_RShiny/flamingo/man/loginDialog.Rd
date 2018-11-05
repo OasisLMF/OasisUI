@@ -30,6 +30,8 @@ List of reactive expressions:
 					successfully and \link{FLAMINGO_GUEST_ID} otherwise}
 		\item{\code{logout}: }{reactive yielding logout button signal}
 }.
+
+List of tags.
 }
 \description{
 Server logic to login an user.

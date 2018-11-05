@@ -14,7 +14,7 @@ renderflamingoPanelHeading(expr, env = parent.frame(), ...)
 \item{...}{Additional parameters.}
 }
 \value{
-smth.
+Flamingo heading.
 }
 \description{
 renderflamingoPanelHeading

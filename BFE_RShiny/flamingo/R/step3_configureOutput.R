@@ -11,7 +11,6 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom htmltools tags
 #' @importFrom shinyjs hidden
 #'
 #' @export
@@ -37,7 +36,6 @@ step3_configureOutputUI <- function(id) {
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tags
 #'
 #' @export
 panelProcessRunTable <- function(id) {
@@ -80,7 +78,6 @@ panelProcessRunTable <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
-#' @importFrom htmltools tags
 #'
 #' @export
 panelProcessRunLogs <- function(id) {
@@ -106,7 +103,6 @@ panelProcessRunLogs <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tags
 #'
 #' @export
 panelDefineOutputs <- function(id) {
@@ -141,7 +137,6 @@ panelDefineOutputs <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom shinyjs hidden
-#' @importFrom htmltools tags
 #'
 #' @export
 panelDefineOutputsDetails <- function(id) {
@@ -220,8 +215,6 @@ panelDefineOutputConfiguration <- function(id) {
 #' @description Function wrapping sub-panel to define outputs advanced configuration GUL.
 #'
 #' @inheritParams flamingoModuleUI
-#'
-#' @importFrom htmltools tags
 #'
 #' @export
 configureAdvancedGUL <- function(id) {
@@ -356,8 +349,6 @@ configureAdvancedGUL <- function(id) {
 #'
 #' @inheritParams flamingoModuleUI
 #'
-#' @importFrom htmltools tags
-#'
 #' @export
 configureAdvancedIL <- function(id) {
   ns <- NS(id)
@@ -489,8 +480,6 @@ configureAdvancedIL <- function(id) {
 #'
 #' @inheritParams flamingoModuleUI
 #'
-#' @importFrom htmltools tags
-#'
 #' @export
 configureAdvancedRI <- function(id) {
   ns <- NS(id)
@@ -615,7 +604,6 @@ configureAdvancedRI <- function(id) {
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs show
-#' @importFrom htmltools tags
 #' @importFrom dplyr filter
 #'
 #' @export

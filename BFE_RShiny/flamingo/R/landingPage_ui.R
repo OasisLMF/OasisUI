@@ -6,7 +6,6 @@
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tags
 #'
 #' @export
 landingPageUI <- function(id) {
@@ -32,11 +31,10 @@ landingPageUI <- function(id) {
 #'
 #' @rdname pageheaderUI
 #'
-#' @return Page header.
+#' @return List of tags.
 #'
 #' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyWidgets dropdownButton
-#' @importFrom htmltools tags
 #'
 #' @export
 pageheaderUI <- function(id) {
@@ -77,9 +75,7 @@ pageheaderUI <- function(id) {
 #'
 #' @inheritParams accountDefinitionUI
 #'
-#' @return Page Structure.
-#'
-#' @importFrom htmltools tags
+#' @return Lits of tags
 #'
 #' @export
 pagestructureUI <- function(id) {

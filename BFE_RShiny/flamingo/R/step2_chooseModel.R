@@ -11,7 +11,6 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom htmltools tags
 #' @importFrom shinyjs hidden
 #'
 #' @export
@@ -35,7 +34,6 @@ step2_chooseModelUI <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
-#' @importFrom htmltools tags
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
@@ -67,7 +65,6 @@ panelProgrammeModelTable <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom DT DTOutput
-#' @importFrom htmltools tags
 #'
 #' @export
 panelModelDetails <- function(id) {
@@ -94,7 +91,6 @@ panelModelDetails <- function(id) {
 #' @inheritParams flamingoModuleUI
 #'
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom htmltools tags
 #'
 #' @export
 panelAssociateModel <- function(id) {

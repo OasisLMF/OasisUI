@@ -9,6 +9,9 @@ ViewFilesModuleUI(id, includechkbox = FALSE)
 \arguments{
 \item{id}{Shiny module id.}
 }
+\value{
+List of tags.
+}
 \description{
 UI logic to view  files.
 }

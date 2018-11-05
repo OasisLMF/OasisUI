@@ -10,7 +10,6 @@
 #'
 #' @return List of tags.
 #'
-#' @importFrom htmltools tags
 #' @importFrom shinyjs hidden
 #'
 #' @export

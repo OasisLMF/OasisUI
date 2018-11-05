@@ -10,7 +10,7 @@ pagestructureUI(id)
 \item{id}{Shiny module id.}
 }
 \value{
-Page Structure.
+Lits of tags
 }
 \description{
 pagestructureUI

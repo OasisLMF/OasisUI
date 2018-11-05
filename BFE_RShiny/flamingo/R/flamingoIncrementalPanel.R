@@ -5,7 +5,7 @@
 #' @param removable TRUE.
 #' @inheritParams flamingoPanel
 #'
-#' @importFrom htmltools tags
+#' @return List of tags.
 #'
 #' @export
 flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, status = "default",
@@ -38,7 +38,6 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
 #'
 #' @return smth.
 #'
-#' @importFrom htmltools tags
 #' @importFrom utils head
 #'
 #' @export

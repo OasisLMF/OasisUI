@@ -4,7 +4,7 @@
 #'
 #' @description UI/View to view files.
 #'
-#' @importFrom htmltools tags
+#' @return LIst of tags.
 #'
 #' @export
 fileViewerUI <- function(id) {

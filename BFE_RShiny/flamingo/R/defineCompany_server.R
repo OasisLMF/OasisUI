@@ -14,7 +14,6 @@
 #' @importFrom DT renderDT
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
-#' @importFrom htmltools tags
 #'
 #' @export
 companyDefinition <- function(input, output, session, dbSettings, userId,
