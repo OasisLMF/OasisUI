@@ -51,7 +51,6 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
-#' @importFrom dplyr '%>%'
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
 #' @importFrom dplyr filter

@@ -19,7 +19,6 @@
 #' @importFrom shinyjs hidden
 #' @importFrom utils read.csv
 #' @importFrom utils zip
-#' @importFrom dplyr '%>%'
 #' @importFrom dplyr select
 #'
 #' @export

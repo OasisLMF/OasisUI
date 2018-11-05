@@ -238,7 +238,6 @@ panelLinkFiles <- function(id) {
 #' @importFrom DT DTOutput
 #' @importFrom DT selectPage
 #' @importFrom dplyr mutate
-#' @importFrom dplyr '%>%'
 #' @importFrom dplyr select
 #' @importFrom dplyr case_when
 #'

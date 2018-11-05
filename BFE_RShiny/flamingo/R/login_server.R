@@ -1,20 +1,33 @@
 
-#' Id to use for an unidentified user
-#' @name FLAMINGO_GUEST_ID
+#' FLAMINGO_GUEST_ID
+#'
+#' @rdname FLAMINGO_GUEST_ID
+#'
+#' @description Id to use for an unidentified user.
+#'
+#' @return Set value.
+#'
 #' @export
 FLAMINGO_GUEST_ID <- -1
 
-#' Login Dialog Module
+#' loginDialog
+#'
 #' @rdname loginDialog
-#' @description Server logic to login an user
+#'
+#' @description Server logic to login an user.
+#'
 #' @inheritParams accountDefinition
-#' @param logout reactive yielding logout signal
-#' @return list of reactive expressions
+#' @param logout Reactive yielding logout signal.
+#'
+#' @return List of reactive expressions:
 #' \itemize{
 #' 		\item{\code{userId}: }{yielding an user id if login has been completed
 #' 					successfully and \link{FLAMINGO_GUEST_ID} otherwise}
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
-#' }
+#' }.
+#'
+#' @importFrom httr content
+#'
 #' @export
 loginDialog <- function(input, output, session, dbSettings, logout,
     logMessage = message, logError = logMessage) {

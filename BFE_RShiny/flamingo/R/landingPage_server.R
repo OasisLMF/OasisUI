@@ -19,7 +19,6 @@
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom dplyr mutate
-#' @importFrom dplyr '%>%'
 #' @importFrom utils write.csv
 #' @importFrom shinyWidgets toggleDropdownButton
 #'
