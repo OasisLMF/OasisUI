@@ -2,11 +2,13 @@
 % Please edit documentation in R/summary_module.R
 \name{barPlot}
 \alias{barPlot}
-\title{barPlot
-barPlot structure}
+\title{barPlot}
 \usage{
 barPlot(xlabel, ylabel, titleToUse, data)
 }
 \description{
 bar plot
+}
+\details{
+barPlot structure
 }

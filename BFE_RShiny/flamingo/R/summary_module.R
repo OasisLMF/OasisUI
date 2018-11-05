@@ -2,14 +2,17 @@
 
 # UI ---------------------------------------------------------------------------
 #' @title summarytab_ui
-#' Run Summary UI
-#' @rdname summarytabUI
-#' @description Summary elements of a Run
-#' @inheritParams flamingoModuleUI
+#' 
+#' @rdname summarytab
+#' 
+#' @description UI/View of summary elements of a run.
+#' 
+#' @template params-module-ui
+#' 
 #' @return list of tags
-#' @importFrom shinyWidgets panel
-#' @importFrom bsplus bs_embed_tooltip
-#' @importFrom shinyjs hidden
+#' 
+#' @importFrom plotly plotlyOutput
+#' 
 #' @export
 summarytabUI <- function(id) {
   
@@ -44,18 +47,24 @@ summarytabUI <- function(id) {
 
 # Server -----------------------------------------------------------------------
 
-#' @title summarytab_server
 #' Run Summary Server
+#' @title summarytab_server
+#' 
 #' @rdname summarytab
-#' @description Summary elements of a Run
-#' @inheritParams flamingoModule
+#' 
+#' @description Server logic of summary elements of a run.
+#' 
+#' @template params-module
+#' @template params-flamingo-module
+#' 
 #' @return list of tags
-#' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDT datatable
-#' @importFrom dplyr mutate select contains filter
-#' @importFrom plotly ggplotly renderPlotly plotlyOutput
-#' @importFrom shinyjs show hide
-#' @export
+#' 
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom dplyr filter
+#' @importFrom plotly ggplotly 
+#' @importFrom plotly renderPlotly 
+#' 
 #' @export
 summarytab <- function(input, output, session, dbSettings,
                        apiSettings, userId,
@@ -168,13 +177,23 @@ summarytab <- function(input, output, session, dbSettings,
 
 # Plot functions ---------------------------------------------------------------
 
-#' @title basicplot
 #' basicplot structure
+#' @title basicplot
+#' 
 #' @rdname basicplot
+#' 
 #' @description basic plot
-#' @importFrom ggplot2 ggplot labs theme aes element_text element_line element_blank
-#' @importFrom ggplot2 ggplot theme labs
+#' 
+#' @importFrom ggplot2 ggplot 
+#' @importFrom ggplot2 labs 
+#' @importFrom ggplot2 theme 
+#' @importFrom ggplot2 aes 
+#' @importFrom ggplot2 element_text 
+#' @importFrom ggplot2 element_line 
+#' @importFrom ggplot2 element_blank
+
 #' @export
+#' 
 # Expected DF with columns:
 # xaxis : column for aes x
 # value : column for aes y
@@ -196,12 +215,18 @@ basicplot <- function(xlabel, ylabel, titleToUse, data){
   p
 }
 
-#' @title barPlot
 #' barPlot structure
+#' @title barPlot
+#' 
 #' @rdname barPlot
+#' 
 #' @description bar plot
-#' @importFrom ggplot2 aes scale_x_continuous geom_bar
+#' 
+#' @importFrom ggplot2 aes 
+#' @importFrom ggplot2 scale_x_continuous 
+#' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 geom_bar 
+#' 
 #' @export
 # Expected DF with columns:
 # xaxis : column for aes x

@@ -1,9 +1,23 @@
-#' Compare Runs Definition Module
+#' Compare Runs Definition Module Server ---------------------------------------
+
+#' visualizationCBR
+#'
 #' @rdname visualizationCBR
-#' @description Server logic to compare runs
-#' @inheritParams flamingoModule
-#' @return For \code{visualizationCBR()}, list of reactives.
+#'
+#' @description Server logic for comparing runs run page.
+#'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @param runIdList List of runs and their status.
+#' @param preselRunId Reactive string expression for reselected run id from landingpage.
+#' @param processRunId Reactive string expression for reselected run id from defineProgramme.
+#'
+#' @importFrom dplyr select
+#'
+#' @return preselPanel panel to show in the process session.
+#'
 #' @export
 visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
                              userId, active = reactive(TRUE), 
@@ -87,7 +101,6 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     id = "defineID-1",
     dbSettings = dbSettings,
     userId = reactive(userId()),
-    runIdList = runIdList,
     preselectedRunId = reactive(result$preselectedRunId),
     logMessage = logMessage)
   
@@ -96,7 +109,6 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     id = "defineID-2",
     dbSettings = dbSettings,
     userId = reactive(userId()),
-    runIdList = runIdList,
     preselectedRunId = reactive(result$preselectedRunId),
     logMessage = logMessage)
 

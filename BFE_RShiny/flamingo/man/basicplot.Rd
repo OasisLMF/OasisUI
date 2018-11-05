@@ -2,11 +2,13 @@
 % Please edit documentation in R/summary_module.R
 \name{basicplot}
 \alias{basicplot}
-\title{basicplot
-basicplot structure}
+\title{basicplot}
 \usage{
 basicplot(xlabel, ylabel, titleToUse, data)
 }
 \description{
 basic plot
+}
+\details{
+basicplot structure
 }

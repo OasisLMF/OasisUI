@@ -1,9 +1,20 @@
-#' Batch Browse Definition Module
+# visualization Batch Run Browse Module Server ---------------------------------
+
+#' visualizationBBR
+#'
 #' @rdname visualizationBBR
-#' @description Server logic to define a programme
-#' @inheritParams flamingoModule
-#' @return For \code{visualizationBBR()}, list of reactives.
+#'
+#' @description Server logic for batchbrowse run page.
+#'
 #' @template return-outputNavigation
+#'
+#' @inheritParams flamingoModule
+#' @inheritParams landingPage
+#'
+#' @return preselPanel panel to show in the process session.
+#'
+#' @importFrom dplyr select
+#'
 #' @export
 visualizationBBR <- function(input, output, session, dbSettings,
                              apiSettings, userId,
@@ -53,7 +64,6 @@ visualizationBBR <- function(input, output, session, dbSettings,
     id = "defineID",
     dbSettings = dbSettings,
     userId = reactive(userId()),
-    runIdList = runIdList,
     preselectedRunId = reactive({1}),
     logMessage = logMessage)
 

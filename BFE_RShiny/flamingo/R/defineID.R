@@ -1,12 +1,22 @@
 # define One ID module ---------------------------------------------------------
 # UI --------------------------------------------------------------------------- 
-#' @title defineIDUI
-#' @rdname defineIDUI
-#' @inheritParams flamingoModuleUI
-#' @param w width of the coulmn
-#' @param i counter
+
+#' defineIDUI
+#' 
+#' @rdname defineID
+#' 
+#' @description UI/View for defining one run ID
+#' 
+#' @template params-module-ui
+#' 
+#' @param w width of the coulmn.
+#' 
+#' @param batch flag indicating if it is a batch or a simple run.
+#' 
+#' @return List of tags.
+#' 
 #' @importFrom bsplus bs_embed_tooltip
-#' @importFrom shinyjs hidden
+#' 
 #' @export
 defineIDUI <- function(id, w, batch = FALSE){
   ns <- NS(id)
@@ -34,18 +44,26 @@ defineIDUI <- function(id, w, batch = FALSE){
 }
 
 # Server -----------------------------------------------------------------------
-#' define oneID Module
+
+#' defineID
+#' 
 #' @rdname defineID
-#' @description Server logic for defining one run ID
-#' @inheritParams flamingoModule
-#' @param runIdList list of runs and their status
-#' @param preselectedRunId reactive string expression for reselected run id from landingpage
-#' @return reactive for runID selected 
-#' @importFrom shinyjs hide show
+#' 
+#' @description Server logic for defining one run ID.
+#' 
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param preselectedRunId reactive string expression for reselected run id from \link{landingpage}
+#' 
+#' @param batch Flag indicating if it is a batch or a simple run.
+#' 
+#' @return selectRunID reactive for runID selected.
+#' 
 #' @export
 defineID <- function(input, output, session, 
                      dbSettings, userId, 
-                     runIdList = reactive(c(-1)),
                      preselectedRunId = reactive(-1),
                      batch = FALSE,
                      logMessage = message) {

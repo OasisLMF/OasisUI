@@ -1,20 +1,37 @@
 # visualization Single Run Browse Module UI ------------------------------------
 
-#' @title visualizationSBR_ui
-#' visualization Single Browse Run UI
-#' @rdname visualizationSBRUI
-#' @description UI/View for the process run page
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
+#' visualizationSBRUI
+#' 
+#' @rdname visualizationSBR
+#' 
+#' @description UI/View for viewing results of a single run.
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
+#' @importFrom shinyWidgets panel
+#' 
 #' @export
 visualizationSBRUI <- function(id) {
  
   ns <- NS(id)
   
+  #Params
+  w <- 6
+  labelconfig <- "Go to Configure Output"
+  
   tagList(
     
     # h4("Browse Run Outputs", class = "flamingo-page-title") ,
-    defineRunID(id),
+    panel(
+      status = "primary",
+      fluidRow(
+        defineIDUI(ns("defineID"), w, batch = FALSE),
+        column(w,
+               align = "right",
+               actionButton(inputId = ns("abuttongotoconfig"), label = labelconfig)))
+    ),
     
     tabsetPanel(
       id = ns("tabsSBR"),
@@ -40,27 +57,4 @@ visualizationSBRUI <- function(id) {
     )
   )
   
-}
-
-# UI Function ------------------------------------------------------------------
-#' @title defineRunID
-#' @rdname defineRunID
-#' @inheritParams flamingoModuleUI
-#' @importFrom bsplus bs_embed_tooltip
-#' @export
-
-defineRunID <- function(id){
-
-  ns <- NS(id)
-  w <- 6
-  labelconfig <- "Go to Configure Output"
- 
-  panel(
-    status = "primary",
-    fluidRow(
-      defineIDUI(ns("defineID"), w, batch = FALSE),
-      column(w,
-             align = "right",
-             actionButton(inputId = ns("abuttongotoconfig"), label = labelconfig)))
-    )
 }

@@ -1,14 +1,17 @@
-# outputplots Module ---------------------------------------------------------------
+# outputplots Module -----------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' @title outputplots_ui
-#' Run outputplots UI
-#' @rdname summaryUI
-#' @description Output plots of a Run
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
-#' @importFrom shinyWidgets panel
-#' @importFrom bsplus bs_embed_tooltip
+
+#' outputplotsUI
+#' 
+#' @rdname outputplots
+#' 
+#' @description UI/View for output plots of a run.
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
 #' @export
 outputplotsUI <- function(id) {
   
@@ -21,16 +24,71 @@ outputplotsUI <- function(id) {
   
 }
 
-# UI Functions -----------------------------------------------------------------
+# Server -----------------------------------------------------------------------
 
-#' @title panelOutputModuleUI
-#' @rdname panelOutputModuleUI
-#' @inheritParams flamingoModuleUI
+#' outputplots
+#' 
+#' @rdname outputplots
+#' 
+#' @description Server logic for outputplots of a run.
+#' 
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @export
+outputplots <- function(input, output, session, dbSettings,
+                    apiSettings, userId,
+                    selectRunID, 
+                    n_panels,
+                    filesListData = reactive(NULL),
+                    active, logMessage = message) {
+  
+  ns <- session$ns
+  
+  # list of sub-modules
+  sub_modules <- list()
+  
+  #incremental panels
+  panel_names <- paste0("flamingoIncrementalPanelOutput-", c(seq_len(n_panels)))
+  content_IDs <- paste0("flamingoIncrementalPanelOutputcontent-", seq_len(n_panels))
+  plotPanels <- callIncrementalPanelModules(
+    panel_names, "flamingoIncrementalPanelOutput-0", content_IDs,
+    panelOutputModuleUI,
+    headings = lapply(seq_len(n_panels), function(i) {flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))}),
+    collapsible = TRUE, show = TRUE,
+    ns = ns
+  )
+  plotsubmodules <- lapply(seq_along(content_IDs), function(i) {
+    callModule(panelOutputModule, content_IDs[i],
+               filesListData =  reactive(filesListData()),
+               active = reactive(plotPanels$state()[[i]]))
+  })
+  lapply(seq_along(plotsubmodules), function(i) {
+    output[[paste0("paneltitle", i)]] <- renderflamingoPanelHeading(plotsubmodules[[i]]())
+  })
+  
+  observeEvent(selectRunID(), {
+    plotPanels$remove_all()
+  })
+  
+  return(invisible())
+}
+
+# panelOutputModule Module -----------------------------------------------------
+
+# UI ---------------------------------------------------------------------------
+#' panelOutputModuleUI
+#' 
+#' @rdname panelOutputModule
+#' 
+#' @template params-module-ui
+#' 
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @importFrom plotly plotlyOutput
+#' 
 #' @export
-panelOutputModuleUI <-  function(id){
+panelOutputModuleUI <- function(id){
   ns <- NS(id)
   tagList(
     flamingoPanel(
@@ -69,70 +127,50 @@ panelOutputModuleUI <-  function(id){
 
 # Server -----------------------------------------------------------------------
 
-#' @title outputplots_server
-#' Run outputplots Server
-#' @rdname outputplots
-#' @description outputplots of a Run
-#' @inheritParams flamingoModule
-#' @return list of tags
-#' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDT datatable
-#' @importFrom dplyr mutate select contains filter
-#' @importFrom plotly ggplotly renderPlotly plotlyOutput
-#' @importFrom ggplot2 geom_line geom_hline ggplot scale_color_manual labs theme aes element_text element_line element_blank geom_point geom_area facet_wrap scale_x_continuous geom_bar geom_errorbar
-#' @export
-#' @export
-outputplots <- function(input, output, session, dbSettings,
-                    apiSettings, userId,
-                    selectRunID, 
-                    n_panels,
-                    filesListData = reactive(NULL),
-                    active, logMessage = message) {
-  
-  ns <- session$ns
-  
-  # list of sub-modules
-  sub_modules <- list()
-  
-  #incremental panels
-  panel_names <- paste0("flamingoIncrementalPanelOutput-", c(seq_len(n_panels)))
-  content_IDs <- paste0("flamingoIncrementalPanelOutputcontent-", seq_len(n_panels))
-  plotPanels <- callIncrementalPanelModules(
-    panel_names, "flamingoIncrementalPanelOutput-0", content_IDs,
-    panelOutputModuleUI,
-    headings = lapply(seq_len(n_panels), function(i) {flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))}),
-    collapsible = TRUE, show = TRUE,
-    ns = ns
-  )
-  plotsubmodules <- lapply(seq_along(content_IDs), function(i) {
-    callModule(panelOutputModule, content_IDs[i],
-               filesListData =  reactive(filesListData()),
-               active = reactive(plotPanels$state()[[i]]))
-  })
-  lapply(seq_along(plotsubmodules), function(i) {
-    output[[paste0("paneltitle", i)]] <- renderflamingoPanelHeading(plotsubmodules[[i]]())
-  })
-  
-  observeEvent(selectRunID(), {
-    plotPanels$remove_all()
-  })
-  
-}
-
-# panelOutputModule Module -----------------------
-#' Module for Output Panel
+#' panelOutputModule
+#' 
 #' @rdname panelOutputModule
-#' @description Server logic to show graphical output such as plots
-#' @inheritParams flamingoModule
+#' 
+#' @description Server logic to show graphical output such as plots.
+#' 
+#' @template params-module
+#' @template params-flamingo-module
+#' 
 #' @param filesListData table of output files for a given runID
+#' 
 #' @return reactive value of the title
-#' @importFrom shinyjs enable disable
-#' @importFrom dplyr rename left_join filter group_by summarise intersect
-#' @importFrom tidyr gather separate spread
-#' @importFrom ggplot2 geom_line geom_hline ggplot scale_color_manual labs theme aes element_text element_line element_blank  geom_point geom_area facet_wrap scale_x_continuous geom_bar geom_errorbar
-#' @importFrom plotly ggplotly  renderPlotly
+#' 
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom dplyr rename
+#' @importFrom dplyr left_join
+#' @importFrom dplyr filter
+#' @importFrom dplyr intersect
+#' @importFrom tidyr gather
+#' @importFrom tidyr separate
+#' @importFrom tidyr  spread
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 geom_hline 
+#' @importFrom ggplot2 ggplot 
+#' @importFrom ggplot2 labs 
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2  aes
+#' @importFrom ggplot2 element_text 
+#' @importFrom ggplot2 element_line
+#' @importFrom ggplot2 element_blank
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 facet_wrap
+#' @importFrom ggplot2 scale_x_continuous
+#' @importFrom ggplot2 geom_bar
+#' @importFrom ggplot2 geom_errorbar
+#' @importFrom plotly ggplotly
+#' @importFrom plotly renderPlotly
+#' 
 #' @export
-panelOutputModule <- function(input, output, session, logMessage = message, filesListData = reactive(NULL), active) {
+panelOutputModule <- function(input, output, session, logMessage = message, 
+                              filesListData = reactive(NULL), active) {
   
   ns <- session$ns
   
@@ -320,7 +358,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       filesToPlot <- filesListData()  %>% filter(Losstype %in% chkbox$chkboxgrplosstypes(),
                                                  Variable %in% chkbox$chkboxgrpvariables(),
                                                  Granularity %in%  chkbox$chkboxgrpgranularities())
-      if (nrow(filesToPlot) !=  prod(plotstrc)) {
+      if (nrow(filesToPlot) != prod(plotstrc)) {
         flamingoNotification("The run did not produce the selected output. Please check the logs", type = "error")
         filesToPlot <- NULL
       }

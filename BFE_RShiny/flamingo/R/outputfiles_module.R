@@ -1,14 +1,15 @@
 # output files Module ---------------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' @title outputfiles_ui
-#' Run outputfiles UI
-#' @rdname outputfilesUI
-#' @description output files of a Run
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
-#' @importFrom shinyWidgets panel
-#' @importFrom bsplus bs_embed_tooltip
+#' outputfilesUI
+#' @rdname outputfiles
+#' 
+#' @description UI/View for output files of a run.
+#' 
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#' 
 #' @export
 outputfilesUI <- function(id) {
   
@@ -38,16 +39,17 @@ outputfilesUI <- function(id) {
 
 # Server -----------------------------------------------------------------------
 
-#' @title outputfiles_server
-#' Run outputfiles Server
+#' outputfiles
+#' 
 #' @rdname outputfiles
-#' @description output files of a Run
-#' @inheritParams flamingoModule
-#' @return list of tags
-#' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDT datatable
-#' @importFrom dplyr mutate select contains filter
-#' @export
+#' 
+#' @description  Server logic for output files of a run.
+#' 
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param filesListDatatoview dataframe of files to view
+#' 
 #' @export
 outputfiles <- function(input, output, session, dbSettings,
                         apiSettings, userId,
