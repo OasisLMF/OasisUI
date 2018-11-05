@@ -1,17 +1,25 @@
-# visualizationSBR Module -----------------------------
-#' visualizationSBR Module
+# visualizationSBR Module Server ----------------- -----------------------------
+
+#' visualizationSBR
+#'
 #' @rdname visualizationSBR
-#' @description Server logic for viewing results of a single run
-#' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater}
-#' @param runIdList list of runs and their status
-#' @param preselRunId reactive string expression for reselected run id from landingpage
-#' @param processRunId reactive string expression for reselected run id from defineProgramme
-#' @return list of reactives:
-#' @importFrom shinyjs show hide enable disable hidden
-#' @importFrom DT renderDT datatable
-#' @importFrom dplyr mutate select contains filter
+#'
+#' @description Server logic for viewing results of a single run.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @param runIdList List of runs and their status.
+#' @param preselRunId reactive string expression for reselected run id from landingpage.
+#' @param processRunId reactive string expression for reselected run id from defineProgramme.
+#'
+#' @return preselPanel panel to show in the process session
+#'
+#' @importFrom dplyr select
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide 
+#'
 #' @export
 visualizationSBR <- function(input, output, session, dbSettings,
                              apiSettings, userId,
