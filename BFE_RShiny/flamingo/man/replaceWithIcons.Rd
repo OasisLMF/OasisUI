@@ -2,13 +2,13 @@
 % Please edit documentation in R/programmeDefinitionSingle_server.R
 \name{replaceWithIcons}
 \alias{replaceWithIcons}
-\title{Function to replace status with icons in table}
+\title{replaceWithIcons}
 \usage{
 replaceWithIcons(df)
 }
 \arguments{
-\item{df}{dataframe}
+\item{df}{\code{data.frame} as returned by e.g. \link{getCompanyList}.}
 }
 \description{
-Function to replace status with icons in table
+Function to replace status with icons in table.
 }

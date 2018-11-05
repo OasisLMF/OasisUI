@@ -3,7 +3,7 @@
 \name{step1_chooseProgrammeUI}
 \alias{step1_chooseProgrammeUI}
 \alias{step1_chooseProgramme}
-\title{step1_chooseProgramme UI}
+\title{step1_chooseProgrammeUI}
 \usage{
 step1_chooseProgrammeUI(id)
 
@@ -12,32 +12,32 @@ step1_chooseProgramme(input, output, session, dbSettings, apiSettings,
   currstep = reactive(-1), selectprogrammeID = reactive(""))
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{apiSettings}{as returned from \link{flamingoServer}}
+\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
 
-\item{active}{reactive expression whether the module state should be updated.}
+\item{active}{Reactive expression whether the module state should be updated.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{Function that will be passed info messages.}
 }
 \value{
-list of tags
-
-For \code{programmeDefinitionSingle()}, list of reactives.
+List of tags.
 
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
+For \code{programmeDefinitionSingle()}, list of reactives.
 }
 \description{
-UI/View for the step1_chooseProgramme
+UI/View for the step1_chooseProgramme.
 
-Server logic to step1_chooseProgramme
+Server logic to step1_chooseProgramme.
 }

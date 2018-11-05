@@ -7,8 +7,11 @@
 createPlainMap(fileName)
 }
 \arguments{
-\item{fileName}{full file path to marker data}
+\item{fileName}{File name.}
+}
+\value{
+Leaflet map.
 }
 \description{
-creates a plain map using leaflet
+Creates a plain map using leaflet.
 }

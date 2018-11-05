@@ -2,22 +2,22 @@
 % Please edit documentation in R/flamingoDB.R
 \name{createProgOasis}
 \alias{createProgOasis}
-\title{Create Prog Oasis}
+\title{createProgOasis}
 \usage{
 createProgOasis(dbSettings, progId, modelId, transformId)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{progId}{programme id}
+\item{progId}{Programme id.}
 
-\item{modelId}{model id}
+\item{modelId}{Model id.}
 
-\item{transformId}{transform id}
+\item{transformId}{Transform id.}
 }
 \value{
-Prog Oasis id
+Prog Oasis id.
 }
 \description{
-Create Prog Oasis
+Create Prog Oasis.
 }

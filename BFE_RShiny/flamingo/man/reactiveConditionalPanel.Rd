@@ -15,8 +15,9 @@ reactiveConditionalPanel(input, output, session, condition)
 
 \item{condition}{Reactive boolean expression determining the visibility of
 the panel.}
-
-\item{id}{Namespace ID for the module.}
+}
+\value{
+smth.
 }
 \description{
 Shiny module handling the visibility of a panel based on a reactive \code{condition}.

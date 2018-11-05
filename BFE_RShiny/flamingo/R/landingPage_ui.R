@@ -1,6 +1,12 @@
+#' landingPage
+#'
 #' @rdname landingPage
+#'
+#' @return LandingPage.
+#'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 landingPageUI <- function(id) {
   ns <- NS(id)
@@ -21,9 +27,15 @@ landingPageUI <- function(id) {
   )
 }
 
-#' @rdname pagestructure
+#' pageheaderUI
+#'
+#' @rdname pageheaderUI
+#'
+#' @return Page header.
+#'
 #' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyWidgets dropdownButton
+#'
 #' @export
 pageheaderUI <- function(id) {
   ns <- NS(id)
@@ -57,7 +69,14 @@ pageheaderUI <- function(id) {
 
 
 
-#' @rdname pagestructure
+#' pagestructureUI
+#'
+#' @rdname pagestructureUI
+#'
+#' @inheritParams accountDefinitionUI
+#'
+#' @return Page Structure.
+#'
 #' @export
 pagestructureUI <- function(id) {
   ns <- NS(id)

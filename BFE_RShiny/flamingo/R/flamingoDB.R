@@ -1,21 +1,29 @@
-
-#' Convenience function to execute database queries
+#' executeDbQuery
+#'
 #' @rdname executeDbQuery
+#'
 #' @description Opens a new connection to the database, executes the given query
 #'   statement and then closes the connection again.
-#' @param dbSettings setting object as returned by e.g. [flamingoDB()]
-#' @param statement query statement to execute, e.g. as returned by
-#'   [buildDbQuery()]
-#' @param simplify if `TRUE`, a vector will be returned instead of a
+#'
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
+#' @param statement Query statement to execute, e.g. as returned by
+#'   [buildDbQuery()].
+#' @param simplify If `TRUE`, a vector will be returned instead of a
 #'   `data.frame` only a single column is returned.
-#' @param verbose print query statement
-#' @param logMessage function to call with log message
-#' @param logError function to call with error log message
-#' @param ... further arguments to [dbGetQuery()]
-#' @return result of the query as a `data.frame` or a vector if `simplify` is
+#' @param verbose Print query statement.
+#' @param logMessage Function to call with log message.
+#' @param logError Function to call with error log message.
+#' @param ... Further arguments to [dbGetQuery()].
+#'
+#' @return Result of the query as a `data.frame` or a vector if `simplify` is
 #'   set to `TRUE`. `NULL` if no result can be returned.
-#' @importFrom DBI dbGetQuery dbConnect dbDisconnect
+#'
+#' @importFrom DBI dbGetQuery
+#' @importFrom DBI dbConnect
+#' @importFrom DBI dbDisconnect
+#'
 #' @export
+#'
 #' @md
 executeDbQuery <- function(dbSettings, statement, simplify = FALSE,
     verbose = FALSE, logMessage = message, logError = logMessage, ...) {
@@ -53,16 +61,21 @@ executeDbQuery <- function(dbSettings, statement, simplify = FALSE,
 }
 
 
-#' Convenience function to construct query statements
+#' buildDbQuery
+#'
 #' @rdname buildDbQuery
+#'
 #' @description Constructs query statements that can be executed with
 #'   [DBI::dbExecute()].
-#' @param dbFunc database function to call
-#' @param ... arguments to `dbFunc`. `character()` args are quoted with single
+#'
+#' @param dbFunc Database function to call.
+#' @param ... Arguments to `dbFunc`. `character()` args are quoted with single
 #'   quotes (').
-#' @param dboPrefix prefix `dbFunc` with `"dbo."`
-#' @param squareBrackets surround the argument list with square brackets
+#' @param dboPrefix Prefix `dbFunc` with `"dbo."`.
+#' @param squareBrackets Surround the argument list with square brackets.
+#'
 #' @export
+#'
 #' @md
 buildDbQuery <- function(
     dbFunc, ...,
@@ -92,18 +105,24 @@ buildDbQuery <- function(
 
 }
 
-#' Create a database settings object for the Flamingo Database
+#' flamingoDB
+#'
 #' @rdname flamingoDB
-#' @description creates a database settings object which can then be used
-#' to create new connections to the Flamingo Database
-#' @param server host name
-#' @param port host port
-#' @param database database name
-#' @param uid username
-#' @param pwd user pass
-#' @param driver connection driver
-#' @return a database setttings object (list)
+#'
+#' @description Creates a database settings object which can then be used
+#' to create new connections to the Flamingo Database.
+#'
+#' @inheritParams companyDefinition
+#' @param server Host name.
+#' @param port Host port.
+#' @param database Database name.
+#' @param pwd User pass.
+#' @param driver Connection driver.
+#'
+#' @return A database setttings object (list).
+#'
 #' @importFrom odbc odbc
+#'
 #' @export
 flamingoDB <- function(
     server,
@@ -131,14 +150,19 @@ flamingoDB <- function(
 
 ### Authentication / Authorization
 
-#' Login against the database
+#' flamingoDBLogin
+#'
 #' @rdname flamingoDBLogin
-#' @description Construct and execute a login query for the given credentials
-#' @param dbSettings object as returned by [flamingoDB()]
-#' @param uid user name
-#' @param pwd user password
-#' @return user id if succesful, -1 otherwise
+#'
+#' @description Construct and execute a login query for the given credentials.
+#'
+#' @inheritParams flamingoDBLogin
+#' @inheritParams flamingoDB
+#'
+#' @return User id if succesful, -1 otherwise.
+#'
 #' @export
+#'
 #' @md
 flamingoDBLogin <- function(dbSettings, uid, pwd) {
 
@@ -148,15 +172,21 @@ flamingoDBLogin <- function(dbSettings, uid, pwd) {
   return(as.numeric(res))
 }
 
-#' Check interface permissions for a user against the database
+#' flamingoDBCheckPermissions
+#'
 #' @rdname flamingoDBCheckPermissions
+#'
 #' @description Consult the interface permissions for the user with given
 #' user identifier by creating and executing a database query.
-#' @param dbSettings object as returned by [flamingoDB()]
-#' @param userId user id as returned by [flamingoDBLogin()]
-#' @param resourceId resource identifier, e.g. `c("1000")`
-#' @return character vector of permission Modes, e.g. #' `c("CRUD" "R")`
+#'
+#' @inheritParams flamingoDBLogin
+#' @inheritParams companyDefinition
+#' @param resourceId Resource identifier, e.g. `c("1000")`.
+#'
+#' @return Character vector of permission Modes, e.g. #' `c("CRUD" "R")`.
+#'
 #' @export
+#'
 #' @md
 flamingoDBCheckPermissions <- function(dbSettings, userId, resourceId) {
 
@@ -170,18 +200,25 @@ flamingoDBCheckPermissions <- function(dbSettings, userId, resourceId) {
 
 ### Get
 
-#' Get the list of companies from the database
+#' getCompanyList
+#'
 #' @rdname getCompanyList
+#'
+#' @description Get the list of companies from the database.
+#'
 #' @inheritParams executeDbQuery
-#' @return companies; `data.frame` of 5 variables:
+#'
+#' @return Companies; `data.frame` of 5 variables:
 #' \itemize{
 #' 		\item `Company ID`
 #' 		\item `Company Name`
 #'    \item `Company Domicile`
 #' 		\item `Company Legal Name`
 #' 		\item `Company Registration Number`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getCompanyList <- function(dbSettings) {
 
@@ -191,12 +228,18 @@ getCompanyList <- function(dbSettings) {
   return(res)
 }
 
-#' Get the process run overview from the database
+#' getInboxData
+#'
 #' @rdname getInboxData
-#' @param ... other arguments to [executeDbQuery()]
-#' @param userId user id as returned by [flamingoDBLogin()]
+#'
+#' @description Get the process run overview from the database.
+#'
+#' @param ... Other arguments to [executeDbQuery()].
+#' @inheritParams companyDefinition
+#'
 #' @inheritParams executeDbQuery
-#' @return inbox; `data.frame` of 6 variables:
+#'
+#' @return Inbox; `data.frame` of 6 variables:
 #' \itemize{
 #' 		\item `ProgOasisID`
 #' 		\item `RunID`
@@ -204,8 +247,10 @@ getCompanyList <- function(dbSettings) {
 #' 		\item `Model`
 #' 		\item `Status`
 #'    \item `Completed`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getInboxData <- function(dbSettings, userId, ...) {
 
@@ -215,20 +260,27 @@ getInboxData <- function(dbSettings, userId, ...) {
   return(res)
 }
 
-#' Get Process Data
+#' getProcessData
+#'
 #' @rdname getProcessData
+#'
+#' @description Get Process Data.
+#'
 #' @inheritParams executeDbQuery
-#' @param pruser process user
-#' @param prmodel process model
-#' @param prprogramme process programme
-#' @param prworkflow process workflow
-#' @return process data; `data.frame` of 3 variables:
+#' @param pruser Process user.
+#' @param prmodel Process model.
+#' @param prprogramme Process programme.
+#' @param prworkflow Process workflow.
+#'
+#' @return Process data; `data.frame` of 3 variables:
 #' \itemize{
 #'   \item `ProgOasisId`
 #'   \item `ProgName`
 #'   \item `ModelName`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getProcessData <- function(dbSettings, pruser, prmodel, prprogramme,
     prworkflow) {
@@ -241,15 +293,22 @@ getProcessData <- function(dbSettings, pruser, prmodel, prprogramme,
   return(res)
 }
 
-#' Get Oasis Systems
+#' getOasisSystemId
+#'
 #' @rdname getOasisSystemId
+#'
+#' @description Get Oasis Systems.
+#'
 #' @inheritParams executeDbQuery
-#' @return oasis systems; `data.frame` of 2 variables:
+#'
+#' @return Oasis systems; `data.frame` of 2 variables:
 #' \itemize{
 #' 		\item `OasisSystemID`
 #' 		\item `OasisSystemName`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getOasisSystemId <- function(dbSettings) {
 
@@ -258,12 +317,18 @@ getOasisSystemId <- function(dbSettings) {
   return(res)
 }
 
-#' Get Process Run
+#' getProcessRun
+#'
 #' @rdname getProcessRun
+#'
+#' @description Get Process Run.
+#'
 #' @inheritParams executeDbQuery
-#' @param procid process id
-#' @param prstatus process status
+#' @param procid Process id.
+#' @param prstatus Process status.
+#'
 #' @export
+#'
 #' @md
 getProcessRun <- function(dbSettings, procid, prstatus) {
 
@@ -274,19 +339,26 @@ getProcessRun <- function(dbSettings, procid, prstatus) {
   return(res)
 }
 
-#' Get log details for a run
+#' getProcessRunDetails
+#'
 #' @rdname getProcessRunDetails
+#'
+#' @description Get log details for a run.
+#'
 #' @inheritParams executeDbQuery
-#' @param wfid workflow id
-#' @return log details; `data.frame` of 5 variables:
+#' @param wfid Workflow id.
+#'
+#' @return Log details; `data.frame` of 5 variables:
 #' \itemize{
 #'     \item `Element ID`
 #'     \item `Element Name`
 #'     \item `Status`
 #'     \item `Description`
 #'     \item `CompletedAt`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getProcessRunDetails <- function(dbSettings, wfid) {
 
@@ -305,11 +377,15 @@ getProcessRunDetails <- function(dbSettings, wfid) {
 }
 
 #' Get Output Files
+#'
 #' @rdname getFileList
-#' @description Get the list of output files for a given process run id
+#'
+#' @description Get the list of output files for a given process run id.
+#'
 #' @inheritParams executeDbQuery
-#' @param prrunid process run id
-#' @return output files; `data.frame` of 10 variables:
+#' @param prrunid Process run id.
+#'
+#' @return Output files; `data.frame` of 10 variables:
 #' \itemize{
 #'     \item `FileID`
 #'     \item `File Name`
@@ -321,8 +397,10 @@ getProcessRunDetails <- function(dbSettings, wfid) {
 #'     \item `Source`
 #'     \item `Resource Table`
 #'     \item `Resource Key`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getFileList <- function(dbSettings, prrunid) {
 
@@ -341,10 +419,16 @@ getFileList <- function(dbSettings, prrunid) {
   return(res)
 }
 
-#' Get the list of output presets
+#' getOutputOptions
+#'
 #' @rdname getOutputOptions
+#'
+#' @description Get the list of output presets.
+#'
 #' @inheritParams executeDbQuery
-#' @return output options
+#'
+#' @return Output options.
+#'
 #' @export
 getOutputOptions <- function(dbSettings, simplify = TRUE) {
 
@@ -354,11 +438,17 @@ getOutputOptions <- function(dbSettings, simplify = TRUE) {
   return(res)
 }
 
-#' Get the event set list
+#' getEventSet
+#'
 #' @rdname getEventSet
+#'
+#' @description Get the event set list.
+#'
 #' @inheritParams executeDbQuery
-#' @param prgoasisid oasis programme id
-#' @return event set
+#' @param prgoasisid Oasis programme id.
+#'
+#' @return Event set.
+#'
 #' @export
 getEventSet <- function(dbSettings, prgoasisid, simplify = TRUE){
 
@@ -368,11 +458,17 @@ getEventSet <- function(dbSettings, prgoasisid, simplify = TRUE){
   return(res)
 }
 
-#' Get the event occurrence list
+#' getEventOccurrence
+#'
 #' @rdname getEventOccurrence
+#'
+#' @description Get the event occurrence list.
+#'
 #' @inheritParams getEventSet
-#' @param prgoasisid oasis programme id
-#' @return event occurrence
+#' @inheritParams getEventSet
+#'
+#' @return Event occurrence.
+#'
 #' @export
 getEventOccurrence <- function(dbSettings, prgoasisid, simplify = TRUE) {
 
@@ -382,16 +478,23 @@ getEventOccurrence <- function(dbSettings, prgoasisid, simplify = TRUE) {
   return(res)
 }
 
-#' Fetch resource type name and ID
+#' getResourceType
+#'
 #' @rdname getResourceType
+#'
+#' @description Fetch resource type name and ID.
+#'
 #' @inheritParams executeDbQuery
-#' @return resource types; `data.frame` of 3 variables:
+#'
+#' @return Resource types; `data.frame` of 3 variables:
 #' \itemize{
 #' 		\item `ResourceTypeID`
 #' 		\item `ResourceTypeName`
 #'    \item `Source`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getResourceType <- function(dbSettings) {
 
@@ -400,16 +503,23 @@ getResourceType <- function(dbSettings) {
   return(res)
 }
 
-#' Get Model Data
+#' getModelList
+#'
 #' @rdname getModelList
+#'
+#' @description Get Model Data.
+#'
 #' @inheritParams executeDbQuery
-#' @return res `data.frame` of 3 variables:
+#'
+#' @return Res `data.frame` of 3 variables:
 #' \itemize{
 #' 		\item `Model ID`
 #' 		\item `Model Name`
 #'    \item `Model Description`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getModelList <- function(dbSettings) {
 
@@ -418,15 +528,22 @@ getModelList <- function(dbSettings) {
   return(res)
 }
 
-#' Get Source Account Files
+#' getFileSourceAccountFile
+#'
 #' @rdname getFileSourceAccountFile
+#'
+#' @description Get Source Account Files.
+#'
 #' @inheritParams executeDbQuery
+#'
 #' @return res `data.frame` of 2 variables:
 #' \itemize{
 #' 		\item `FileName`
 #' 		\item `FileId`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getFileSourceAccountFile <- function(dbSettings) {
 
@@ -435,15 +552,23 @@ getFileSourceAccountFile <- function(dbSettings) {
   return(res)
 }
 
-#' Get Transforms from Source to Canonical
+
+#' getTransformNameSourceCan
+#'
 #' @rdname getTransformNameSourceCan
+#'
+#' @description Get Transforms from Source to Canonical.
+#'
 #' @inheritParams executeDbQuery
-#' @return transforms; `data.frame` of 2 variables:
+#'
+#' @return Transforms; `data.frame` of 2 variables:
 #' \itemize{
 #' 		\item `TransformName`
 #' 		\item `TransformID`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getTransformNameSourceCan <- function(dbSettings) {
 
@@ -452,15 +577,23 @@ getTransformNameSourceCan <- function(dbSettings) {
   return(res)
 }
 
-#' Get Account Names
+
+#' getAccountName
+#'
 #' @rdname getAccountName
+#'
+#' @description Get Account Names.
+#'
 #' @inheritParams executeDbQuery
-#' @return account name; `data.frame` of 2 variables:
+#'
+#' @return Account name; `data.frame` of 2 variables:
 #' \itemize{
 #' 		\item `Account ID`
 #' 		\item `progOasisId`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getAccountName <- function(dbSettings) {
 
@@ -469,15 +602,23 @@ getAccountName <- function(dbSettings) {
   return(res)
 }
 
-#' Get Transforms from Canonical to Model
+
+#' getTransformNameCanModel
+#'
 #' @rdname getTransformNameCanModel
+#'
+#' @description Get Transforms from Canonical to Model.
+#'
 #' @inheritParams executeDbQuery
-#' @return transforms; `data.frame` of 2 variables:
+#'
+#' @return Transforms; `data.frame` of 2 variables:
 #' \itemize{
 #' 		\item `TransformName`
 #' 		\item `TransformID`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getTransformNameCanModel <- function(dbSettings) {
 
@@ -486,15 +627,23 @@ getTransformNameCanModel <- function(dbSettings) {
   return(res)
 }
 
-#' Get File Source Location File
+
+#' getFileSourceLocationFile
+#'
 #' @rdname getFileSourceLocationFile
+#'
+#' @description Get File Source Location File.
+#'
 #' @inheritParams executeDbQuery
+#'
 #' @return  file source`data.frame` of 2 variables:
 #' \itemize{
 #' 		\item `FileName`
 #' 		\item `FileId`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getFileSourceLocationFile <- function(dbSettings){
 
@@ -503,14 +652,21 @@ getFileSourceLocationFile <- function(dbSettings){
   return(res)
 }
 
-#' Get File Source Reinsurance File
+
+#' getFileSourceReinsuranceFile
+#'
 #' @rdname getFileSourceReinsuranceFile
+#'
+#' @description Get File Source Reinsurance File.
+#'
 #' @inheritParams executeDbQuery
+#'
 #' @return \code{data.frame} of 2 variables:
 #' \itemize{
 #'              \item \code{FileName}
 #'              \item \code{FileId}
-#' }
+#' }.
+#'
 #' @export
 getFileSourceReinsuranceFile <- function(dbSettings){
 
@@ -519,14 +675,21 @@ getFileSourceReinsuranceFile <- function(dbSettings){
   return(res)
 }
 
-#' Get File Source Reinsurance Scope File
+
+#' getFileSourceReinsuranceScopeFile
+#'
 #' @rdname getFileSourceReinsuranceScopeFile
+#'
+#' @description Get File Source Reinsurance Scope File.
+#'
 #' @inheritParams executeDbQuery
+#'
 #' @return \code{data.frame} of 2 variables:
 #' \itemize{
 #'              \item \code{FileName}
 #'              \item \code{FileId}
-#' }
+#' }.
+#'
 #' @export
 getFileSourceReinsuranceScopeFile <- function(dbSettings){
 
@@ -535,10 +698,17 @@ getFileSourceReinsuranceScopeFile <- function(dbSettings){
   return(res)
 }
 
-#' Get Programme Oasis for a given Programme Id
+
+#' getProgOasisForProgdata
+#'
 #' @rdname getProgOasisForProgdata
-#' @description Run getProgOasisForProg against the database.
+#'
+#' @description Get Programme Oasis for a given Programme Id.
+#'
+#' @details Run getProgOasisForProg against the database.
+#'
 #' @inheritParams executeDbQuery
+#'
 #' @return `data.frame` of 11 variables:
 #' \itemize{
 #' 		\item `ProgOasisId`
@@ -552,8 +722,10 @@ getFileSourceReinsuranceScopeFile <- function(dbSettings){
 #' 		\item `API1bDateTime`
 #' 		\item `API1cDateTime`
 #' 		\item `SessionId`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getProgOasisForProgdata <- function(dbSettings, progId) {
 
@@ -563,10 +735,15 @@ getProgOasisForProgdata <- function(dbSettings, progId) {
   return(res)
 }
 
-#' Get Programme List
+
+#' getProgrammeList
+#'
 #' @rdname getProgrammeList
+#'
 #' @description Get a list of programme data.
+#'
 #' @inheritParams executeDbQuery
+#'
 #' @return `data.frame` of 7 variables:
 #' \itemize{
 #'    \item `Programme ID`
@@ -576,8 +753,10 @@ getProgOasisForProgdata <- function(dbSettings, progId) {
 #'    \item `Transform ID`
 #'    \item `Transform`
 #'    \item `Status`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getProgrammeList <- function (dbSettings) {
 
@@ -586,13 +765,19 @@ getProgrammeList <- function (dbSettings) {
   return(res)
 }
 
-#' Get User Department
+
+#' getDeptData
+#'
 #' @rdname getDeptData
-#' @description queries the database to retrieve department login and password
+#'
+#' @description Queries the database to retrieve department login and password
 #' details for the designated user.
+#'
 #' @inheritParams executeDbQuery
-#' @param userId user id
+#' @inheritParams companyDefinition
+#'
 #' @export
+#'
 #' @md
 getDeptData <- function(dbSettings, userId) {
 
@@ -602,15 +787,23 @@ getDeptData <- function(dbSettings, userId) {
   return(res)
 }
 
-#' Get Security Groups
+
+#' getSecurityGroups
+#'
 #' @rdname getSecurityGroups
+#'
+#' @description Get Security Groups.
+#'
 #' @inheritParams executeDbQuery
+#'
 #' @return security groups; `data.frame` of 2 variables:
 #' \itemize{
 #' 		\item `Security Group ID`
 #' 		\item `Security Group Name`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getSecurityGroups <- function(dbSettings) {
 
@@ -619,15 +812,23 @@ getSecurityGroups <- function(dbSettings) {
   return(res)
 }
 
-#' Get Oasis Users
+
+#' getOasisUsers
+#'
 #' @rdname getOasisUsers
+#'
+#' @description Get Oasis Users.
+#'
 #' @inheritParams executeDbQuery
+#'
 #' @return oasis users; `data.frame` of 2 variables:
 #' \itemize{
 #' 		\item `OasisUserID`
 #' 		\item `OasisUserName`
-#' }
+#' }.
+#'
 #' @export
+#'
 #' @md
 getOasisUsers <- function(dbSettings) {
 
@@ -637,11 +838,18 @@ getOasisUsers <- function(dbSettings) {
   return(res)
 }
 
-#' Get Process Runtime Param Details
+
+#' getProcRunParamFileOutput
+#'
 #' @rdname getProcRunParamFileOutput
+#'
+#' @description Get Process Runtime Param Details.
+#'
 #' @inheritParams executeDbQuery
-#' @param processRunId process run id
-#' @return param details
+#' @param processRunId Reactive string expression for reselected run id from defineProgramme.
+#'
+#' @return Param details.
+#'
 #' @export
 getProcRunParamFileOutput <- function(dbSettings, processRunId){
 
@@ -651,11 +859,18 @@ getProcRunParamFileOutput <- function(dbSettings, processRunId){
   return(res)
 }
 
-#' Get Process Run Details
+
+#' getProcRunDetForFileOutput
+#'
 #' @rdname getProcRunDetForFileOutput
+#'
+#' @description Get Process Run Details.
+#'
 #' @inheritParams executeDbQuery
-#' @param processRunId process run id
-#' @return process run details
+#' @inheritParams getProcRunParamFileOutput
+#'
+#' @return Process run details.
+#'
 #' @export
 getProcRunDetForFileOutput <- function(dbSettings, processRunId) {
 
@@ -665,11 +880,18 @@ getProcRunDetForFileOutput <- function(dbSettings, processRunId) {
   return(res)
 }
 
-#' Get location path for a given fileType
+
+#' getFileLocationPath
+#'
 #' @rdname getFileLocationPath
+#'
+#' @description Get location path for a given fileType.
+#'
 #' @inheritParams executeDbQuery
-#' @param fileType file type
-#' @return path
+#' @param fileType File type.
+#'
+#' @return Path.
+#'
 #' @export
 getFileLocationPath <- function(dbSettings, fileType){
   res <- executeDbQuery(dbSettings,
@@ -679,18 +901,23 @@ getFileLocationPath <- function(dbSettings, fileType){
 
 ### Create
 
-#' Create file record
+#' createFileRecord
+#'
 #' @rdname createFileRecord
-#' @description document args better
+#'
+#' @description Document args better.
+#'
 #' @inheritParams executeDbQuery
-#' @param fileName file name
-#' @param fileDesc file descriptor
-#' @param fileType file type
-#' @param locPathUnix locPathUnix
-#' @param BFEUserID BFEUserID
-#' @param ResourceTable ResourceTable
-#' @param ResourceKey ResourceKey
-#' @return file record id (integer)
+#' @inheritParams getFileLocationPath
+#' @param fileName File name.
+#' @param fileDesc File describer.
+#' @param locPathUnix locPathUnix.
+#' @param BFEUserID BFEUserID.
+#' @param ResourceTable ResourceTable.
+#' @param ResourceKey ResourceKey.
+#'
+#' @return File record id (integer).
+#'
 #' @export
 createFileRecord <- function(dbSettings, fileName, fileDesc,
     fileType, locPathUnix, BFEUserID, ResourceTable, ResourceKey) {
@@ -700,13 +927,20 @@ createFileRecord <- function(dbSettings, fileName, fileDesc,
   return(unlist(res))
 }
 
-#' Create Prog Oasis
+
+#' createProgOasis
+#'
 #' @rdname createProgOasis
+#'
+#' @description Create Prog Oasis.
+#'
 #' @inheritParams executeDbQuery
-#' @param progId programme id
-#' @param modelId model id
-#' @param transformId transform id
-#' @return Prog Oasis id
+#' @param progId Programme id.
+#' @param modelId Model id.
+#' @param transformId Transform id.
+#'
+#' @return Prog Oasis id.
+#'
 #' @export
 createProgOasis <- function(dbSettings, progId, modelId, transformId) {
 
@@ -717,17 +951,24 @@ createProgOasis <- function(dbSettings, progId, modelId, transformId) {
   return(res)
 }
 
-#' Create Model Resource
+
+#' createModelResource
+#'
 #' @rdname createModelResource
-#' @description TODO document
+#'
+#' @description Create Model Resource.
+#'
 #' @inheritParams executeDbQuery
-#' @param modresname `character()`; name of the model resource
-#' @param restype resource type
-#' @param oasissys TODO document
-#' @param modelid model id
-#' @param modresval TODO document
-#' @return id
+#' @param modresname `character()`; name of the model resource.
+#' @param restype Resource type.
+#' @param oasissys TODO document.
+#' @param modelid Model id.
+#' @param modresval TODO document.
+#'
+#' @return id.
+#'
 #' @export
+#'
 #' @md
 createModelResource <- function(
     dbSettings,
@@ -749,12 +990,19 @@ createModelResource <- function(
 
 ### Update
 
-#' Update Model Resource
+
+#' updateModelResource
+#'
 #' @rdname updateModelResource
+#'
+#' @description Update Model Resource.
+#'
 #' @inheritParams executeDbQuery
 #' @inheritParams createModelResource
-#' @param modresid model resource id
-#' @return model resource id
+#' @param modresid Model resource id.
+#'
+#' @return Model resource id.
+#'
 #' @export
 updateModelResource <- function(
     dbSettings,
@@ -777,10 +1025,17 @@ updateModelResource <- function(
 
 ### Delete
 
-#' Delete Model Resource
+
+#' deleteModelResource
+#'
 #' @rdname deleteModelResource
+#'
+#' @description Delete Model Resource.
+#'
 #' @inheritParams updateModelResource
-#' @return model resource id
+#'
+#' @return Model resource id.
+#'
 #' @export
 deleteModelResource <- function(dbSettings, modresid) {
 

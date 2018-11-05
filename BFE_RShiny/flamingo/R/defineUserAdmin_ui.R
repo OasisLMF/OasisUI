@@ -1,13 +1,22 @@
-
+#' userAdminDefinition
+#'
 #' @rdname userAdminDefinition
+#'
 #' @description UI/View for accessing the Company User List for Flamingo
-#' in association with OASIS LMF
-#' @param id shiny module id
-#' @return list of tags
-#' @importFrom shiny helpText textInput sidebarLayout sidebarPanel
-#' downloadButton
+#' in association with OASIS LMF.
+#'
+#' @inheritParams accountDefinitionUI
+#'
+#' @return List of tags.
+#'
+#' @importFrom shiny helpText
+#' @importFrom shiny textInput
+#' @importFrom shiny sidebarLayout
+#' @importFrom shiny sidebarPanel
+#' @importFrom shiny downloadButton
 #' @importFrom DT DTOutput
 #' @importFrom shinyjs hidden
+#'
 #' @export
 userAdminDefinitionUI <- function(id) {
 

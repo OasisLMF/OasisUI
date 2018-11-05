@@ -1,11 +1,16 @@
-#' Batch Programme Definition Module
+#' programmeDefinitionBatch_server
+#'
 #' @rdname programmeDefinitionBatch
-#' @description Server logic to define a programme
-#' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater};
-#' @return For \code{programmeDefinitionBatch()}, list of reactives.
+#'
+#' @description Server logic to define a programme.
+#'
 #' @template return-outputNavigation
+#'
+#' @inheritParams flamingoModule
+#' @inheritParams landingPage
+#'
+#' @return For \code{programmeDefinitionBatch()}, list of reactives.
+#'
 #' @export
 programmeDefinitionBatch <- function(input, output, session, dbSettings,
                                      apiSettings, userId, active = reactive(TRUE),

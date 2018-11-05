@@ -2,18 +2,19 @@
 % Please edit documentation in R/shiny.R
 \name{flamingoNotification}
 \alias{flamingoNotification}
-\title{Show or remove a notification}
+\title{flamingoNotification}
 \usage{
 flamingoNotification(ui, type = c("default", "message", "warning",
   "error"), ...)
 }
 \arguments{
-\item{ui}{see \code{\link[shiny:showNotification]{shiny::showNotification()}}}
+\item{type}{see \code{\link[shiny:showNotification]{shiny::showNotification()}}.}
 
-\item{type}{see \code{\link[shiny:showNotification]{shiny::showNotification()}}}
-
-\item{...}{other arguments to \code{\link[shiny:showNotification]{shiny::showNotification()}}}
+\item{...}{other arguments to \code{\link[shiny:showNotification]{shiny::showNotification()}}.}
+}
+\value{
+Notifications.
 }
 \description{
-Modified version of the default \code{\link[shiny:showNotification]{shiny::showNotification()}}
+Modified version of the default \code{\link[shiny:showNotification]{shiny::showNotification()}}.
 }

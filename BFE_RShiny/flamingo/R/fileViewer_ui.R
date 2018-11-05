@@ -1,8 +1,12 @@
-
+#' fileViewerUI
+#'
 #' @rdname fileViewer
-#' @description UI/View to view files
-#' @import leaflet
+#'
+#' @description UI/View to view files.
+#'
+#' @importFrom leaflet leaflet
 #' @importFrom DT DTOutput
+#'
 #' @export
 fileViewerUI <- function(id) {
 

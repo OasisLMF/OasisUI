@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getFileSourceLocationFile}
 \alias{getFileSourceLocationFile}
-\title{Get File Source Location File}
+\title{getFileSourceLocationFile}
 \usage{
 getFileSourceLocationFile(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 }
 \value{
 file source\code{data.frame} of 2 variables:
 \itemize{
 \item \code{FileName}
 \item \code{FileId}
-}
+}.
 }
 \description{
-Get File Source Location File
+Get File Source Location File.
 }

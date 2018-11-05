@@ -2,13 +2,13 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{panelProcessRunTable}
 \alias{panelProcessRunTable}
-\title{Function wrapping panel to show process run table}
+\title{panelProcessRunTable}
 \usage{
 panelProcessRunTable(id)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 }
 \description{
-Function wrapping panel to show process run table
+Function wrapping panel to show process run table.
 }

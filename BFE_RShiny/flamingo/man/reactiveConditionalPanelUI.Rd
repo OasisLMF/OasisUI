@@ -9,6 +9,9 @@ reactiveConditionalPanelUI(id, ...)
 \arguments{
 \item{...}{Elements to include in the panel.}
 }
+\value{
+smth.
+}
 \description{
 reactiveConditionalPanelUI
 }

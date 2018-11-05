@@ -2,16 +2,14 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getDeptData}
 \alias{getDeptData}
-\title{Get User Department}
+\title{getDeptData}
 \usage{
 getDeptData(dbSettings, userId)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
-
-\item{userId}{user id}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 }
 \description{
-queries the database to retrieve department login and password
+Queries the database to retrieve department login and password
 details for the designated user.
 }

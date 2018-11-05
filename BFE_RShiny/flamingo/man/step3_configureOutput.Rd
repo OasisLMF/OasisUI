@@ -3,7 +3,7 @@
 \name{step3_configureOutputUI}
 \alias{step3_configureOutputUI}
 \alias{step3_configureOutput}
-\title{step3_configureOutput ui}
+\title{step3_configureOutputUI}
 \usage{
 step3_configureOutputUI(id)
 
@@ -14,32 +14,32 @@ step3_configureOutput(input, output, session, dbSettings, apiSettings,
   progOasisStatus = reactive(""))
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{apiSettings}{as returned from \link{flamingoServer}}
+\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
 
-\item{active}{reactive expression whether the module state should be updated.}
+\item{active}{Reactive expression whether the module state should be updated.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{Function that will be passed info messages.}
 }
 \value{
-list of tags
-
-For \code{programmeDefinitionSingle()}, list of reactives.
+List of tags.
 
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
+For \code{programmeDefinitionSingle()}, list of reactives.
 }
 \description{
-UI/View for the step3_configureOutput
+UI/View for the step3_configureOutput.
 
-Server logic to step3_configureOutput
+Server logic to step3_configureOutput.
 }

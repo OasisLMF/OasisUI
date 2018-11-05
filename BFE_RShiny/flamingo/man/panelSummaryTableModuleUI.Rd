@@ -7,7 +7,7 @@
 panelSummaryTableModuleUI(id)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 }
 \description{
 panelSummaryTableModuleUI

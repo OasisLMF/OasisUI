@@ -8,17 +8,17 @@ panelOutputModule(input, output, session, logMessage = message,
   filesListData, active)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{Function that will be passed info messages.}
 
 \item{filesListData}{table of output files for a given runID}
 
-\item{active}{reactive expression whether the module state should be updated.}
+\item{active}{Reactive expression whether the module state should be updated.}
 }
 \value{
 reactive value of the title

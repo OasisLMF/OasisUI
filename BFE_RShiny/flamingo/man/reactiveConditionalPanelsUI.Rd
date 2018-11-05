@@ -11,6 +11,9 @@ reactiveConditionalPanelsUI(id, panels)
 whose name matches the \code{visible} reactive input to the module server
 function is shown.}
 }
+\value{
+Panels.
+}
 \description{
 reactiveConditionalPanelsUI
 }

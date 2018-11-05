@@ -8,7 +8,7 @@ visualization Single Browse Run UI}
 visualizationSBRUI(id)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 }
 \value{
 list of tags

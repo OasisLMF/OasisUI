@@ -2,7 +2,7 @@
 % Please edit documentation in R/reactiveConditionalPanels.R
 \name{reactiveConditionalPanels}
 \alias{reactiveConditionalPanels}
-\title{Reactive Conditional Panels}
+\title{reactiveConditionalPanels}
 \usage{
 reactiveConditionalPanels(input, output, session, visible)
 }
@@ -15,8 +15,9 @@ reactiveConditionalPanels(input, output, session, visible)
 
 \item{visible}{Reactive string expression determining the visibility of
 panels.}
-
-\item{id}{Namespace ID for the module.}
+}
+\value{
+smth.
 }
 \description{
 Shiny module handling the visibility of a set of panels depending on a

@@ -1,10 +1,14 @@
 # ViewFilesModule Module -----------------------
 # UI -------------------------------------------
-#' Module to View Files
-#' @description UI logic to view  files
+#' ViewFilesModuleUI
+#'
+#' @description UI logic to view  files.
+#'
 #' @inheritParams flamingoModuleUI
+#'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
   ns <- NS(id)
@@ -30,16 +34,31 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 }
 
 # Server ---------------------------------------------------------
-#' Module to View Files
+#' ViewFilesModule
+#'
 #' @rdname ViewFilesModule
-#' @description Server logic to view files
+#'
+#' @description Server logic to view files.
+#'
 #' @inheritParams flamingoModule
-#' @param filesListData table of output files for a given runID
-#' @importFrom shinyjs show hide hidden
-#' @importFrom DT renderDT datatable DTOutput
-#' @importFrom dplyr select contains filter
-#' @importFrom leaflet renderLeaflet leafletOutput
-#' @return list of reactives
+#' @param filesListData Table of output files for a given runID.
+#'
+#' @return List of reactives.
+#'
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs hidden
+#' @importFrom DT renderDT
+#' @importFrom DT datatable
+#' @importFrom DT DTOutput
+#' @importFrom dplyr '%>%'
+#' @importFrom dplyr select
+#' @importFrom dplyr contains
+#' @importFrom dplyr filter
+#' @importFrom leaflet leaflet
+#' @importFrom leaflet renderLeaflet
+#' @importFrom leaflet leafletOutput
+#'
 #' @export
 ViewFilesModule <- function(input, output, session, logMessage = message, filesListData, includemrows = FALSE, includechkbox = FALSE) {
 
@@ -70,8 +89,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     if (length(filesListData) > 0) {
       result$filesListData <- filesListData
       if (includechkbox) {
-        filesListData <- cbind(data.frame(Selected = .shinyInput(flamingoCheckboxButton,"srows_", nrow(filesListData), Label = NULL, 
-                                                                 hidden = FALSE, 
+        filesListData <- cbind(data.frame(Selected = .shinyInput(flamingoCheckboxButton,"srows_", nrow(filesListData), Label = NULL,
+                                                                 hidden = FALSE,
                                                                  style = "background-color: white;
                                                                           border-color: black;
                                                                           color: white;
@@ -82,20 +101,20 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                                                                           width: 16px;",
                                                                  icon = icon("check"),
                                                                  onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)')
-                                                                 )), 
+                                                                 )),
                                filesListData)
       }
-      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", 
-                                                                         hidden = TRUE, 
-                                                                         onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'), 
+      filesListData <- cbind(filesListData,data.frame(View = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View",
+                                                                         hidden = TRUE,
+                                                                         onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'),
                                                                          onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       if (includemrows) {
-        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(filesListData), Label = "Map", 
-                                                                          hidden = TRUE, 
-                                                                          onclick = paste0('Shiny.onInputChange(\"',ns("select_mbutton"),'\",  this.id)'), 
+        filesListData <- cbind(filesListData,data.frame(Map = .shinyInput(actionButton, "mrows_", nrow(filesListData), Label = "Map",
+                                                                          hidden = TRUE,
+                                                                          onclick = paste0('Shiny.onInputChange(\"',ns("select_mbutton"),'\",  this.id)'),
                                                                           onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       }
-      result$filesListDataButtons <- filesListData %>% select(-contains("Location") )
+      result$filesListDataButtons <- filesListData %>% select(-contains("Location"))
     } else {
       result$filesListData <- NULL
     }

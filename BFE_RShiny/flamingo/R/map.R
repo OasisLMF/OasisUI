@@ -1,10 +1,20 @@
 #' Create Plain Map
+#'
 #' @rdname createPlainMap
-#' @description creates a plain map using leaflet
-#' @param fileName full file path to marker data
-#' @import leaflet
+#'
+#' @description Creates a plain map using leaflet.
+#'
+#' @inheritParams createFileRecord
+#'
+#' @return Leaflet map.
+#'
+#' @importFrom leaflet leaflet
+#' @importFrom leaflet addTiles
+#' @importFrom leaflet addMarkers
+#' @importFrom leaflet markerClusterOptions
 #' @importFrom utils read.csv
 #' @importFrom htmltools tagList
+#'
 #' @export
 createPlainMap <- function(fileName) {
 
@@ -24,12 +34,20 @@ createPlainMap <- function(fileName) {
 }
 
 #' Create Footprint Map
+#'
 #' @rdname createFootprintMap
+#'
 #' @description creates a footprint map using leaflet based on exposure data
 #' stored in the flamingo database.
+#'
 #' @inheritParams executeDbQuery
-#' @param fileId file id for exposure data
-#' @import leaflet
+#' @param fileId File id for exposure data.
+#'
+#' @importFrom leaflet leaflet
+#' @importFrom leaflet addTiles
+#' @importFrom leaflet addMarkers
+#' @importFrom leaflet markerClusterOptions
+#'
 #' @export
 createFootprintMap <- function(dbSettings, fileId) {
 

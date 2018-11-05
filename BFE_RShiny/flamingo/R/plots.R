@@ -1,13 +1,21 @@
-
-
-#' AEP Curve
+#' plotAEPCurve
+#'
 #' @rdname plotAEPCurve
-#' @description plot EP Curve
-#' @param AEPData AEP data
-#' @param years years
-#' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
+#'
+#' @description Plot AEP Curve.
+#'
+#' @param AEPData AEP data.
+#' @param years Years.
+#'
+#' @return AEP Curve plot.
+#'
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 scale_colour_gradient
+#' @importFrom ggplot2 stat_function
 #' @importFrom graphics lines plot
 #' @importFrom data.table melt
+#'
 #' @export
 plotAEPCurve <- function(AEPData, years = 1000) {
 
@@ -28,17 +36,29 @@ plotAEPCurve <- function(AEPData, years = 1000) {
 }
 
 #' IL plot
+#'
 #' @rdname plotIL
-#' @param outputPlotData data for plot
-#' @description plot IL using the current device
-#' @param ... extra arguments to [plot()]
-#' @param interactive create interactive plot using [plotly::plot_ly()]
-#' @return nothing; the interactive plot object if `interactive = TRUE`
-#' @importFrom plotly plot_ly add_trace layout
-#' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
+#'
+#' @description Plot IL using the current device.
+#'
+#' @param outputPlotData Data for plot.
+#' @param ... Extra arguments to [plot()].
+#' @param interactive Create interactive plot using [plotly::plot_ly()].
+#'
+#' @return Nothing; the interactive plot object if `interactive = TRUE`.
+#'
+#' @importFrom plotly plot_ly
+#' @importFrom plotly add_trace
+#' @importFrom plotly layout
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 scale_colour_gradient
+#' @importFrom ggplot2 stat_function
 #' @importFrom graphics lines plot
 #' @importFrom data.table melt
+#'
 #' @export
+#'
 #' @md
 plotIL <- function(outputPlotData, interactive = FALSE, ...) {
 
@@ -70,17 +90,27 @@ plotIL <- function(outputPlotData, interactive = FALSE, ...) {
 }
 
 #' GUL plot
+#'
 #' @rdname plotGUL
-#' @description plot GUL using the current device
-#' @param outputPlotData data for plot
-#' @param ... extra arguments to [plot()]
-#' @param interactive create interactive plot using [plotly::plot_ly()]
-#' @return nothing; the interactive plot object if `interactive = TRUE`
-#' @importFrom plotly plot_ly add_trace layout
-#' @importFrom ggplot2 geom_line ggplot scale_colour_gradient stat_function
+#'
+#' @description Plot GUL using the current device.
+#'
+#' @inheritParams plotIL
+#'
+#' @return Nothing; the interactive plot object if `interactive = TRUE`.
+#'
+#' @importFrom plotly plot_ly
+#' @importFrom plotly add_trace
+#' @importFrom plotly layout
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 scale_colour_gradient
+#' @importFrom ggplot2 stat_function
 #' @importFrom graphics lines plot
 #' @importFrom data.table melt
+#'
 #' @export
+#'
 #' @md
 plotGUL <- function(outputPlotData, interactive = FALSE, ...) {
 
@@ -113,8 +143,13 @@ plotGUL <- function(outputPlotData, interactive = FALSE, ...) {
 
 
 #' funPlotOutput
+#'
 #' @rdname funPlotOutput
-#' @param outputPlotData data from output plot
+#'
+#' @inheritParams plotIL
+#'
+#' @return Some plot.
+#'
 #' @export
 funPlotOutput <- function(outputPlotData) {
   # years <- 1000
@@ -132,8 +167,13 @@ funPlotOutput <- function(outputPlotData) {
 }
 
 #' funPlotOutput2
+#'
 #' @rdname funPlotOutput2
-#' @param outputPlotData data from output plot
+#'
+#' @inheritParams plotIL
+#'
+#' @return Some plot.
+#'
 #' @export
 funPlotOutput2 <- function(outputPlotData) {
   AEPData <- NULL

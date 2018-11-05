@@ -8,17 +8,17 @@ panelSummaryTableModule(input, output, session, dbSettings, apiSettings,
   userId, logMessage = message, selectRunID)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{apiSettings}{as returned from \link{flamingoServer}}
+\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{Function that will be passed info messages.}
 
 \item{selectRunID}{selected runID}
 }

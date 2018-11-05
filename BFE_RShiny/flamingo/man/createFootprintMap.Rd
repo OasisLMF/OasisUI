@@ -7,9 +7,9 @@
 createFootprintMap(dbSettings, fileId)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{fileId}{file id for exposure data}
+\item{fileId}{File id for exposure data.}
 }
 \description{
 creates a footprint map using leaflet based on exposure data

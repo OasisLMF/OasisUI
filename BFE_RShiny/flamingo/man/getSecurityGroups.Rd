@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getSecurityGroups}
 \alias{getSecurityGroups}
-\title{Get Security Groups}
+\title{getSecurityGroups}
 \usage{
 getSecurityGroups(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 }
 \value{
 security groups; \code{data.frame} of 2 variables:
 \itemize{
 \item \code{Security Group ID}
 \item \code{Security Group Name}
-}
+}.
 }
 \description{
-Get Security Groups
+Get Security Groups.
 }

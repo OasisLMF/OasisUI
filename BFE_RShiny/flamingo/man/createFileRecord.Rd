@@ -2,31 +2,31 @@
 % Please edit documentation in R/flamingoDB.R
 \name{createFileRecord}
 \alias{createFileRecord}
-\title{Create file record}
+\title{createFileRecord}
 \usage{
 createFileRecord(dbSettings, fileName, fileDesc, fileType, locPathUnix,
   BFEUserID, ResourceTable, ResourceKey)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{fileName}{file name}
+\item{fileName}{File name.}
 
-\item{fileDesc}{file descriptor}
+\item{fileDesc}{File describer.}
 
-\item{fileType}{file type}
+\item{fileType}{File type.}
 
-\item{locPathUnix}{locPathUnix}
+\item{locPathUnix}{locPathUnix.}
 
-\item{BFEUserID}{BFEUserID}
+\item{BFEUserID}{BFEUserID.}
 
-\item{ResourceTable}{ResourceTable}
+\item{ResourceTable}{ResourceTable.}
 
-\item{ResourceKey}{ResourceKey}
+\item{ResourceKey}{ResourceKey.}
 }
 \value{
-file record id (integer)
+File record id (integer).
 }
 \description{
-document args better
+Document args better.
 }

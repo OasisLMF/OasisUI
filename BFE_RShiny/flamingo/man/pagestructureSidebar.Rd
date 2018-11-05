@@ -7,9 +7,12 @@
 pagestructureSidebar(ns = identity, collapsed = FALSE)
 }
 \arguments{
-\item{ns}{ns}
+\item{ns}{ns.}
 
-\item{collapsed}{FALSE}
+\item{collapsed}{FALSE.}
+}
+\value{
+Side bar in pagestructure.
 }
 \description{
 pagestructureSidebar

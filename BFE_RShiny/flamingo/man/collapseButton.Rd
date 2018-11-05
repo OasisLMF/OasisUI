@@ -7,15 +7,17 @@
 collapseButton(id, id_collapse, ..., width = NULL, collapsed = FALSE)
 }
 \arguments{
-\item{id}{id}
+\item{id}{Shiny module id.}
 
-\item{id_collapse}{id to collapse}
+\item{...}{Additional paramters.}
 
-\item{...}{additional paramters}
+\item{width}{Width of the column, a reactive value for \code{dynamicColumn()},
+non-reactive (or \link[shiny:isolate]{isolated}) for \code{dynamicColumnUI()}.}
 
-\item{width}{NULL}
-
-\item{collapsed}{FALSE}
+\item{collapsed}{FALSE.}
+}
+\value{
+Collapsed button.
 }
 \description{
 collapseButton

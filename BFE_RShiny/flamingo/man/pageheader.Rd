@@ -9,33 +9,29 @@ pageheader(input, output, session, userId, userName, dbSettings,
   active = reactive(TRUE))
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{userId}{reactive expression yielding user id}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{userName}{reactive expression yielding user name}
+\item{reloadMillis}{Amount of time to wait between table updates;
+see \link{invalidateLater}.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{logMessage}{Function that will be passed info messages.}
 
-\item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater};}
-
-\item{logMessage}{function that will be passed info messages}
-
-\item{active}{reactive expression whether the module state should be updated.}
+\item{active}{Reactive expression whether the module state should be updated.}
 }
 \value{
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
 For \code{pageheader()}, list of reactives:
 \itemize{
 		\item{\code{logout}: }{reactive yielding logout button signal}
-}
-
-The returned list also includes reactive navigation state
-constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+}.
 }
 \description{
 pageheader

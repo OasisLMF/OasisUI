@@ -2,18 +2,18 @@
 % Please edit documentation in R/geocode.R
 \name{getGeoDetails}
 \alias{getGeoDetails}
-\title{Get Geo Details}
+\title{getGeoDetails}
 \usage{
 getGeoDetails(address)
 }
 \arguments{
-\item{address}{server address}
+\item{address}{Server address.}
 }
 \value{
 \code{data.frame} with details. If no match is found, the result
-is a \code{data.frame} of \code{NA} values.\@importFrom ggmap geocode
+is a \code{data.frame} of \code{NA} values.
 }
 \description{
-this function can be used to query google servers for
+This function can be used to query google servers for
 geo details.
 }

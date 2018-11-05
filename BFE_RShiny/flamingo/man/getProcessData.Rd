@@ -2,29 +2,29 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getProcessData}
 \alias{getProcessData}
-\title{Get Process Data}
+\title{getProcessData}
 \usage{
 getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{pruser}{process user}
+\item{pruser}{Process user.}
 
-\item{prmodel}{process model}
+\item{prmodel}{Process model.}
 
-\item{prprogramme}{process programme}
+\item{prprogramme}{Process programme.}
 
-\item{prworkflow}{process workflow}
+\item{prworkflow}{Process workflow.}
 }
 \value{
-process data; \code{data.frame} of 3 variables:
+Process data; \code{data.frame} of 3 variables:
 \itemize{
 \item \code{ProgOasisId}
 \item \code{ProgName}
 \item \code{ModelName}
-}
+}.
 }
 \description{
-Get Process Data
+Get Process Data.
 }

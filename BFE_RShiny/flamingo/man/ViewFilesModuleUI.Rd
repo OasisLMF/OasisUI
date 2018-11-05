@@ -2,13 +2,13 @@
 % Please edit documentation in R/viewFiles.R
 \name{ViewFilesModuleUI}
 \alias{ViewFilesModuleUI}
-\title{Module to View Files}
+\title{ViewFilesModuleUI}
 \usage{
 ViewFilesModuleUI(id, includechkbox = FALSE)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 }
 \description{
-UI logic to view  files
+UI logic to view  files.
 }

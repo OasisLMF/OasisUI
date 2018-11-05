@@ -2,18 +2,18 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getProcRunDetForFileOutput}
 \alias{getProcRunDetForFileOutput}
-\title{Get Process Run Details}
+\title{getProcRunDetForFileOutput}
 \usage{
 getProcRunDetForFileOutput(dbSettings, processRunId)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{processRunId}{process run id}
+\item{processRunId}{Reactive string expression for reselected run id from defineProgramme.}
 }
 \value{
-process run details
+Process run details.
 }
 \description{
-Get Process Run Details
+Get Process Run Details.
 }

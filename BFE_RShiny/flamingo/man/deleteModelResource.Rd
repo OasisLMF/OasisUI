@@ -2,18 +2,18 @@
 % Please edit documentation in R/flamingoDB.R
 \name{deleteModelResource}
 \alias{deleteModelResource}
-\title{Delete Model Resource}
+\title{deleteModelResource}
 \usage{
 deleteModelResource(dbSettings, modresid)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{modresid}{model resource id}
+\item{modresid}{Model resource id.}
 }
 \value{
-model resource id
+Model resource id.
 }
 \description{
-Delete Model Resource
+Delete Model Resource.
 }

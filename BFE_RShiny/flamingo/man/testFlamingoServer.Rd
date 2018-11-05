@@ -2,19 +2,19 @@
 % Please edit documentation in R/flamingoServer.R
 \name{testFlamingoServer}
 \alias{testFlamingoServer}
-\title{Flamingo API Server health check}
+\title{testFlamingoServer}
 \usage{
 testFlamingoServer(apiSettings, ...)
 }
 \arguments{
-\item{apiSettings}{settings object as returned by \link{flamingoServer}}
+\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
 
-\item{...}{further arguments to \link{GET}}
+\item{...}{further arguments to \link{GET}.}
 }
 \value{
 \code{200} if the health check succeeds; otherwise an exception is
 raised.
 }
 \description{
-perform a health check on the Flamingo API Server
+Performs a health check on the Flamingo API Server.
 }

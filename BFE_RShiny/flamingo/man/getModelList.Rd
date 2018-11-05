@@ -2,21 +2,21 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getModelList}
 \alias{getModelList}
-\title{Get Model Data}
+\title{getModelList}
 \usage{
 getModelList(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 }
 \value{
-res \code{data.frame} of 3 variables:
+Res \code{data.frame} of 3 variables:
 \itemize{
 \item \code{Model ID}
 \item \code{Model Name}
 \item \code{Model Description}
-}
+}.
 }
 \description{
-Get Model Data
+Get Model Data.
 }

@@ -1,11 +1,20 @@
-#' Module For The Model Supplier Page
+
+#' modelSupplierPage
+#'
 #' @rdname modelSupplierPage
-#' @description Server logic for the model supplier page
+#'
+#' @description Server logic for the model supplier page.
+#'
 #' @inheritParams flamingoModule
 #' @inheritParams accountDefinitionUI
-#' @return empty list
+#'
+#' @return Empty list.
+#'
 #' @importFrom DT renderDT
-#' @importFrom shinyjs hide show onclick
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs show
+#' @importFrom shinyjs onclick
+#'
 #' @export
 modelSupplierPage <- function(input, output, session, dbSettings,
                               logMessage = message, active = reactive(TRUE)) {

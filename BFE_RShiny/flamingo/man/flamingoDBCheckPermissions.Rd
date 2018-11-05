@@ -2,19 +2,17 @@
 % Please edit documentation in R/flamingoDB.R
 \name{flamingoDBCheckPermissions}
 \alias{flamingoDBCheckPermissions}
-\title{Check interface permissions for a user against the database}
+\title{flamingoDBCheckPermissions}
 \usage{
 flamingoDBCheckPermissions(dbSettings, userId, resourceId)
 }
 \arguments{
-\item{dbSettings}{object as returned by \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
-
-\item{resourceId}{resource identifier, e.g. \code{c("1000")}}
+\item{resourceId}{Resource identifier, e.g. \code{c("1000")}.}
 }
 \value{
-character vector of permission Modes, e.g. #' \code{c("CRUD" "R")}
+Character vector of permission Modes, e.g. #' \code{c("CRUD" "R")}.
 }
 \description{
 Consult the interface permissions for the user with given

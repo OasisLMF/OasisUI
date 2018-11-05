@@ -1,10 +1,17 @@
-
-#' @rdname modelSupplierPage
-#' @description UI/View for the model supplier page
+#' modelSupplierPageUI
+#'
+#' @rdname modelSupplierPageUI
+#'
+#' @description UI/View for the model supplier page.
+#'
 #' @inheritParams accountDefinitionUI
+#'
+#' @return smth.
+#'
 #' @importFrom shinyjs hidden
 #' @importFrom shiny downloadButton
 #' @importFrom DT DTOutput
+#'
 #' @export
 modelSupplierPageUI <- function(id) {
 

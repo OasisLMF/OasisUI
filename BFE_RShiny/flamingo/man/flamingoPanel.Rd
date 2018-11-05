@@ -8,24 +8,21 @@ flamingoPanel(id, ..., heading = NULL, footer = NULL,
   status = "default", collapsible = FALSE, show = TRUE)
 }
 \arguments{
-\item{id}{id}
+\item{id}{Shiny module id.}
 
-\item{...}{additional parameters}
+\item{...}{Additional parameters.}
 
-\item{heading}{NULL by default}
+\item{heading}{NULL by default.}
 
-\item{footer}{NULL by default}
+\item{footer}{NULL by default.}
 
-\item{status}{default}
+\item{status}{default.}
 
-\item{collapsible}{FALSE}
+\item{collapsible}{FALSE.}
 
-\item{show}{TRUE}
+\item{show}{TRUE.}
 }
 \description{
-flamingoPanel
-}
-\details{
-adapted from shinyWidgets::panel() including IDs and collapsible
-(inspired by shinyBS::bsCollapsePanel())
+Adapted from shinyWidgets::panel() including IDs and collapsible
+(inspired by shinyBS::bsCollapsePanel()).
 }

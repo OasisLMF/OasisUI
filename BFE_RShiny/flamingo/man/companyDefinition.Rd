@@ -2,29 +2,27 @@
 % Please edit documentation in R/defineCompany_server.R
 \name{companyDefinition}
 \alias{companyDefinition}
-\title{Company Definition Module}
+\title{companyDefinition}
 \usage{
 companyDefinition(input, output, session, dbSettings, userId,
   active = reactive(TRUE), logMessage = message)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{userId}{reactive expression yielding user id}
+\item{active}{Reactive expression whether the module state should be updated.}
 
-\item{active}{reactive expression whether the module state should be updated.}
-
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{Function that will be passed info messages.}
 }
 \value{
-empty list
+Empty list.
 }
 \description{
-Server logic to define a company
+Server logic to define a company.
 }

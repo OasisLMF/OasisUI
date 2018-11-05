@@ -2,13 +2,13 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{panelDefineOutputConfiguration}
 \alias{panelDefineOutputConfiguration}
-\title{Function wrapping sub-panel to define outputs configuration}
+\title{panelDefineOutputConfiguration}
 \usage{
 panelDefineOutputConfiguration(id)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 }
 \description{
-Function wrapping sub-panel to define outputs configuration
+Function wrapping sub-panel to define outputs configuration.
 }

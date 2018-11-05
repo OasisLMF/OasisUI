@@ -2,21 +2,19 @@
 % Please edit documentation in R/flamingoServer.R
 \name{flamingoServer}
 \alias{flamingoServer}
-\title{Create a settings object for the Flamingo API Server}
+\title{flamingoServer}
 \usage{
 flamingoServer(host, port, scheme = c("http", "https"))
 }
 \arguments{
-\item{port}{host port}
+\item{port}{Host port.}
 
-\item{scheme}{communication scheme}
-
-\item{server}{host name}
+\item{scheme}{Communication scheme.}
 }
 \value{
-a flamingo server settings object (HTTP by default)
+A flamingo server settings object (HTTP by default).
 }
 \description{
-creates a settings object which can then be used to connect
+Creates a settings object which can then be used to connect
 to the Flamingo API Server.
 }

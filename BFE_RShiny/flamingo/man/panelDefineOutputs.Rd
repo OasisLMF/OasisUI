@@ -2,12 +2,12 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{panelDefineOutputs}
 \alias{panelDefineOutputs}
-\title{Function wrapping panel to define outputs}
+\title{panelDefineOutputs}
 \usage{
 panelDefineOutputs(id)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 }
 \description{
 Function wrapping panel to define outputs

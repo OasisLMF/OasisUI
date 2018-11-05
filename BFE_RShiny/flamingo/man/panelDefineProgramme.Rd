@@ -2,10 +2,10 @@
 % Please edit documentation in R/step1_chooseProgramme.R
 \name{panelDefineProgramme}
 \alias{panelDefineProgramme}
-\title{Function wrapping panel to create/amend programme}
+\title{panelDefineProgramme}
 \usage{
 panelDefineProgramme(id)
 }
 \description{
-Function wrapping panel to create/amend programme
+Function wrapping panel to create/amend programme.
 }

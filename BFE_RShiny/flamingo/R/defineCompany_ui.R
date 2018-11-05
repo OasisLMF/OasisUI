@@ -1,11 +1,16 @@
+#' companyDefinitionUI
+#'
 #' @rdname companyDefinitionUI
-#' @title companyDefinitionUI
+#'
 #' @description UI/View to define an account.
-#' @param id account id
-#' @return list of tags
-#' @rdname companyDefinition
+#'
+#' @inheritParams accountDefinitionUI
+#'
+#' @return List of tags.
+#'
 #' @importFrom DT DTOutput
 #' @importFrom htmltools tags
+#'
 #' @export
 companyDefinitionUI <- function(id) {
 

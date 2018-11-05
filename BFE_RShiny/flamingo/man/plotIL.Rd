@@ -7,15 +7,15 @@
 plotIL(outputPlotData, interactive = FALSE, ...)
 }
 \arguments{
-\item{outputPlotData}{data for plot}
+\item{outputPlotData}{Data for plot.}
 
-\item{interactive}{create interactive plot using \code{\link[plotly:plot_ly]{plotly::plot_ly()}}}
+\item{interactive}{Create interactive plot using \code{\link[plotly:plot_ly]{plotly::plot_ly()}}.}
 
-\item{...}{extra arguments to \code{\link[=plot]{plot()}}}
+\item{...}{Extra arguments to \code{\link[=plot]{plot()}}.}
 }
 \value{
-nothing; the interactive plot object if \code{interactive = TRUE}
+Nothing; the interactive plot object if \code{interactive = TRUE}.
 }
 \description{
-plot IL using the current device
+Plot IL using the current device.
 }

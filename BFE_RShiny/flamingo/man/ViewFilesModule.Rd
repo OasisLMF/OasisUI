@@ -2,25 +2,25 @@
 % Please edit documentation in R/viewFiles.R
 \name{ViewFilesModule}
 \alias{ViewFilesModule}
-\title{Module to View Files}
+\title{ViewFilesModule}
 \usage{
 ViewFilesModule(input, output, session, logMessage = message,
   filesListData, includemrows = FALSE, includechkbox = FALSE)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{Function that will be passed info messages.}
 
-\item{filesListData}{table of output files for a given runID}
+\item{filesListData}{Table of output files for a given runID.}
 }
 \value{
-list of reactives
+List of reactives.
 }
 \description{
-Server logic to view files
+Server logic to view files.
 }

@@ -1,13 +1,19 @@
 # step1_chooseProgramme Module -------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' step1_chooseProgramme UI
+#' step1_chooseProgrammeUI
+#'
 #' @rdname step1_chooseProgramme
-#' @description UI/View for the step1_chooseProgramme
+#'
+#' @description UI/View for the step1_chooseProgramme.
+#'
 #' @inheritParams flamingoModuleUI
-#' @return list of tags
+#'
+#' @return List of tags.
+#'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 step1_chooseProgrammeUI <- function(id) {
   ns <- NS(id)
@@ -20,11 +26,16 @@ step1_chooseProgrammeUI <- function(id) {
   )
 }
 
-
-#' Function wrapping panel to show created programmes table
+#' panelProgrammeTable
+#'
 #' @rdname panelProgrammeTable
+#'
+#' @description Function wrapping panel to show created programmes table.
+#'
 #' @inheritParams flamingoModuleUI
+#'
 #' @importFrom DT DTOutput
+#'
 #' @export
 panelProgrammeTable <- function(id) {
   ns <- NS(id)
@@ -48,10 +59,16 @@ panelProgrammeTable <- function(id) {
   )
 }
 
-#' Function wrapping panel to show details of programme
+#' panelProgrammeDetails
+#'
 #' @rdname panelProgrammeDetails
+#'
+#' @description Function wrapping panel to show details of programme.
+#'
 #' @inheritParams flamingoModuleUI
+#'
 #' @importFrom DT DTOutput
+#'
 #' @export
 panelProgrammeDetails <- function(id) {
   ns <- NS(id)
@@ -68,11 +85,18 @@ panelProgrammeDetails <- function(id) {
   )
 }
 
-#' Function wrapping panel to create/amend programme
+#' panelDefineProgramme
+#'
 #' @rdname panelDefineProgramme
+#'
+#' @description Function wrapping panel to create/amend programme.
+#'
 #' @importFrom bsplus bs_embed_tooltip
 #' @importFrom htmltools tagAppendChildren
-#' @importFrom shiny selectizeInput textInput fileInput
+#' @importFrom shiny selectizeInput
+#' @importFrom shiny textInput
+#' @importFrom shiny fileInput
+#'
 #' @export
 panelDefineProgramme <- function(id) {
   ns <- NS(id)
@@ -112,11 +136,18 @@ panelDefineProgramme <- function(id) {
 }
 
 
-#' Function wrapping panel to link files to a programme
+#' panelLinkFiles
+#'
 #' @rdname panelLinkFiles
+#'
+#' @description Function wrapping panel to link files to a programme.
+#'
 #' @importFrom bsplus bs_embed_tooltip
 #' @importFrom htmltools tagAppendChildren
-#' @importFrom shiny selectizeInput textInput fileInput
+#' @importFrom shiny selectizeInput
+#' @importFrom shiny textInput
+#' @importFrom shiny fileInput
+#'
 #' @export
 panelLinkFiles <- function(id) {
   ns <- NS(id)
@@ -184,16 +215,33 @@ panelLinkFiles <- function(id) {
 }
 
 # Server -----------------------------------------------------------------------
-#' step1_chooseProgramme Server
+#' step1_chooseProgramme
+#'
 #' @rdname step1_chooseProgramme
-#' @description Server logic to step1_chooseProgramme
-#' @inheritParams flamingoModule
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+#'
+#' @description Server logic to step1_chooseProgramme.
+#'
 #' @template return-outputNavigation
-#' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
-#' @importFrom dplyr mutate select case_when
-#' @importFrom shinyjs onclick disable enable
+#'
+#' @inheritParams flamingoModule
+#'
+#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs onclick
+#' @importFrom DT renderDT
+#' @importFrom DT dataTableProxy
+#' @importFrom DT selectRows
+#' @importFrom DT DTOutput
+#' @importFrom DT selectPage
+#' @importFrom dplyr mutate
+#' @importFrom dplyr '%>%'
+#' @importFrom dplyr select
+#' @importFrom dplyr case_when
+#'
 #' @export
 step1_chooseProgramme <- function(input, output, session,
                                   dbSettings,apiSettings, userId,

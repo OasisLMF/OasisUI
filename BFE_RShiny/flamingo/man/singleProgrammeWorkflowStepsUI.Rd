@@ -7,7 +7,10 @@
 singleProgrammeWorkflowStepsUI(id)
 }
 \arguments{
-\item{id}{id}
+\item{id}{Shiny module id.}
+}
+\value{
+smth.
 }
 \description{
 singleProgrammeWorkflowStepsUI

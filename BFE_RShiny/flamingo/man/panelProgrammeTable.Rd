@@ -2,13 +2,13 @@
 % Please edit documentation in R/step1_chooseProgramme.R
 \name{panelProgrammeTable}
 \alias{panelProgrammeTable}
-\title{Function wrapping panel to show created programmes table}
+\title{panelProgrammeTable}
 \usage{
 panelProgrammeTable(id)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Shiny module id.}
 }
 \description{
-Function wrapping panel to show created programmes table
+Function wrapping panel to show created programmes table.
 }

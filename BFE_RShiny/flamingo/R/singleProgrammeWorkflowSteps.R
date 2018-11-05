@@ -6,15 +6,27 @@
 #                                "Configure Output & Run" = "3",
 #                                "Browse & Re-run" = "4")
 
+#' programmeWorkflowSteps
+#'
+#' @rdname programmeWorkflowSteps
+#'
+#' @return List.
+#'
 #' @export
 programmeWorkflowSteps <- list("Choose Programme" = "1",
                                "Choose Model" = "2",
                                "Configure Output & Run" = "3")
 
-#' @title singleProgrammeWorkflowStepsUI
+#' singleProgrammeWorkflowStepsUI
+#'
 #' @rdname singleProgrammeWorkflowStepsUI
-#' @param id id
+#'
+#' @inheritParams accountDefinitionUI
+#'
+#' @return smth.
+#'
 #' @importFrom shinyWidgets radioGroupButtons
+#'
 #' @export
 singleProgrammeWorkflowStepsUI <- function(id) {
   ns <- NS(id)
@@ -30,10 +42,16 @@ singleProgrammeWorkflowStepsUI <- function(id) {
   )
 }
 
-#' @title singleProgrammeWorkflowSteps
+#' singleProgrammeWorkflowSteps
+#'
 #' @rdname singleProgrammeWorkflowSteps
+#'
 #' @inheritParams flamingoModule
+#'
+#' @return smth.
+#'
 #' @importFrom shinyWidgets updateRadioGroupButtons
+#'
 #' @export
 singleProgrammeWorkflowSteps <- function(input, output, session) {
   observeEvent(input$radiobuttons, {

@@ -8,18 +8,18 @@ accountDefinition(input, output, session, dbSettings,
   active = reactive(TRUE))
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{active}{reactive expression whether the module state should be updated.}
+\item{active}{Reactive expression whether the module state should be updated.}
 }
 \value{
-empty list
+Empty list.
 }
 \description{
 Server logic to define an account.

@@ -1,10 +1,16 @@
-#' Company Definition Module
+#' companyDefinition
+#'
 #' @rdname companyDefinition
-#' @description Server logic to define a company
+#'
+#' @description Server logic to define a company.
+#'
 #' @inheritParams flamingoModule
-#' @param userId reactive expression yielding user id
-#' @return empty list
+#' @inheritParams companyDefinition
+#'
+#' @return Empty list.
+#'
 #' @importFrom DT renderDT
+#'
 #' @export
 companyDefinition <- function(input, output, session, dbSettings, userId,
                               active = reactive(TRUE), logMessage = message) {
@@ -198,7 +204,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # confirm delete
   onclick("abuttoncconfirmdel", {
     removeModal()
-    
+
       stmt <- buildDbQuery("deleteCompany",
                            result$compData[input$tablecompanylist_rows_selected, 1])
       res <- executeDbQuery(dbSettings, stmt)

@@ -2,27 +2,25 @@
 % Please edit documentation in R/flamingoDB.R
 \name{flamingoDB}
 \alias{flamingoDB}
-\title{Create a database settings object for the Flamingo Database}
+\title{flamingoDB}
 \usage{
 flamingoDB(server, port, database, uid, pwd, driver = "{FreeTDS}")
 }
 \arguments{
-\item{server}{host name}
+\item{server}{Host name.}
 
-\item{port}{host port}
+\item{port}{Host port.}
 
-\item{database}{database name}
+\item{database}{Database name.}
 
-\item{uid}{username}
+\item{pwd}{User pass.}
 
-\item{pwd}{user pass}
-
-\item{driver}{connection driver}
+\item{driver}{Connection driver.}
 }
 \value{
-a database setttings object (list)
+A database setttings object (list).
 }
 \description{
-creates a database settings object which can then be used
-to create new connections to the Flamingo Database
+Creates a database settings object which can then be used
+to create new connections to the Flamingo Database.
 }

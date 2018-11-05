@@ -1,7 +1,13 @@
+#' programmeDefinitionBatchUI
+#'
 #' @rdname programmeDefinitionBatch
-#' @description UI/View for the process run page
+#'
+#' @description UI/View for the process run page.
+#'
 #' @inheritParams flamingoModuleUI
-#' @return list of tags
+#'
+#' @return List of tags.
+#'
 #' @export
 programmeDefinitionBatchUI <- function(id) {
 

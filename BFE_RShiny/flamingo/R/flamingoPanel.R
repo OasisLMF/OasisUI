@@ -1,16 +1,21 @@
-#' @title flamingoPanel
+#' flamingoPanel
+#'
 #' @rdname flamingoPanel
-#' @param id id
-#' @param ... additional parameters
-#' @param heading NULL by default
-#' @param footer NULL by default
-#' @param status default
-#' @param show TRUE
-#' @param collapsible FALSE
+#'
+#' @description Adapted from shinyWidgets::panel() including IDs and collapsible
+#' (inspired by shinyBS::bsCollapsePanel()).
+#'
+#' @inheritParams accountDefinitionUI
+#' @param ... Additional parameters.
+#' @param heading NULL by default.
+#' @param footer NULL by default.
+#' @param status default.
+#' @param show TRUE.
+#' @param collapsible FALSE.
+#'
 #' @importFrom htmltools tags
+#'
 #' @export
-#' @details  adapted from shinyWidgets::panel() including IDs and collapsible
-#' (inspired by shinyBS::bsCollapsePanel())
 flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "default", collapsible = FALSE, show = TRUE) {
 
   with_id <- function(x) paste(id, x, sep = "-")
@@ -107,13 +112,18 @@ if (FALSE) {
   }
 }
 
-#' @title collapseButton
+#' collapseButton
+#'
 #' @rdname collapseButton
-#' @param id id
-#' @param id_collapse id to collapse
-#' @param ... additional paramters
-#' @param width NULL
-#' @param collapsed FALSE
+#'
+#' @inheritParams accountDefinitionUI
+#' @inheritParams accountDefinitionUI
+#' @inheritParams dynamicColumn
+#' @param ... Additional paramters.
+#' @param collapsed FALSE.
+#'
+#' @return Collapsed button.
+#'
 #' @importFrom bsplus bs_attach_collapse
 #' @importFrom htmltools tagAppendAttributes
 collapseButton <- function(id, id_collapse, ..., width = NULL, collapsed = FALSE) {
@@ -154,9 +164,13 @@ if (FALSE) {
   }
 }
 
-#' @title flamingoPanelHeading
+#' flamingoPanelHeading
+#'
 #' @rdname flamingoPanelHeading
-#' @param heading heading
+#'
+#' @param heading
+#'
+#' @return smth.
 flamingoPanelHeading <- function(heading) {
   if (is.character(heading)) {
     # TODO: fine-tune font size
@@ -166,19 +180,27 @@ flamingoPanelHeading <- function(heading) {
   }
 }
 
-#' @title flamingoPanelHeadingOutput
+#' flamingoPanelHeadingOutput
+#'
 #' @rdname flamingoPanelHeadingOutput
-#' @param outputId outputId
-#' @param ... additional parameters
+#'
+#' @param outputId Output Id.
+#' @param ... Additional parameters.
+#'
+#' @return smth.
 flamingoPanelHeadingOutput <- function(outputId, ...) {
   div(uiOutput(outputId, inline = TRUE, ...))
 }
 
-#' @title renderflamingoPanelHeading
+#' renderflamingoPanelHeading
+#'
 #' @rdname renderflamingoPanelHeading
-#' @param expr expression
-#' @param env environment
-#' @param ... additional parameters
+#'
+#' @param expr Expression.
+#' @param env Environment.
+#' @param ... Additional parameters.
+#'
+#' @return smth.
 renderflamingoPanelHeading <- function(expr, env = parent.frame(), ...) {
   renderUI(call("flamingoPanelHeading", substitute(expr)), quoted = TRUE, env = env, ...)
 }

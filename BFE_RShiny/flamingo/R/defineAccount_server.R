@@ -1,11 +1,17 @@
 #' Account Definition Module
+#'
 #' @rdname accountDefinition
+#'
 #' @description Server logic to define an account.
+#'
 #' @inheritParams executeDbQuery
 #' @inheritParams flamingoModule
-#' @return empty list
+#'
+#' @return Empty list.
+#'
 #' @importFrom shinyjs onclick show disable enable hide
 #' @importFrom DT renderDT datatable
+#'
 #' @export
 accountDefinition <- function(input, output, session, dbSettings,
                               active = reactive(TRUE)) {

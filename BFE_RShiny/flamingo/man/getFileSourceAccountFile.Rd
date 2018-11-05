@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getFileSourceAccountFile}
 \alias{getFileSourceAccountFile}
-\title{Get Source Account Files}
+\title{getFileSourceAccountFile}
 \usage{
 getFileSourceAccountFile(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 }
 \value{
 res \code{data.frame} of 2 variables:
 \itemize{
 \item \code{FileName}
 \item \code{FileId}
-}
+}.
 }
 \description{
-Get Source Account Files
+Get Source Account Files.
 }

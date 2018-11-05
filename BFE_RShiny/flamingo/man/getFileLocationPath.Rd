@@ -2,18 +2,18 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getFileLocationPath}
 \alias{getFileLocationPath}
-\title{Get location path for a given fileType}
+\title{getFileLocationPath}
 \usage{
 getFileLocationPath(dbSettings, fileType)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{fileType}{file type}
+\item{fileType}{File type.}
 }
 \value{
-path
+Path.
 }
 \description{
-Get location path for a given fileType
+Get location path for a given fileType.
 }

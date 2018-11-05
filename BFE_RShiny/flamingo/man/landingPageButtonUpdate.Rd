@@ -8,14 +8,12 @@ landingPageButtonUpdate(session, dbSettings, userId,
   logMessage = message)
 }
 \arguments{
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
 
-\item{userId}{reactive expression yielding user id}
-
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{Function that will be passed info messages.}
 }
 \description{
-Disable/Enable menu buttons based on permissions in database
+Disable/Enable menu buttons based on permissions in database.
 }

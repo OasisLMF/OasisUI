@@ -7,10 +7,10 @@
 accountDefinitionUI(id)
 }
 \arguments{
-\item{id}{shiny module id}
+\item{id}{Shiny module id.}
 }
 \value{
-list of tags
+List of tags.
 }
 \description{
 UI/View to define an account.
