@@ -17,8 +17,7 @@ visualizationSBRUI <- function(id) {
   
   ns <- NS(id)
   tagList(
-    
-    # h4("Browse Run Outputs", class = "flamingo-page-title") ,
+
     panelDefineRunID(id),
     panelSummaryTable(id),
     panelOutput(id),
@@ -27,7 +26,7 @@ visualizationSBRUI <- function(id) {
 }
 
 
-# Functions for UI Panels ------------------------------------------------------------------------------
+# Functions for UI Panels ------------------------------------------------------
 #' panelDefineRunID
 #' 
 #' @rdname panelDefineRunID

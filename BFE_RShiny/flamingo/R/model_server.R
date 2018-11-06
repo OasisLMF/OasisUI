@@ -41,7 +41,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     invisible()
   }
 
-  ### Model List Table
+  # Model List Table -----------------------------------------------------------
 
   # when navigated to Model tab, model table should be updated
   observe(if (active()) {
@@ -73,16 +73,16 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   })
 
   output$Modeldownloadexcel <- downloadHandler(
-    filename ="model.csv",
+    filename = "model.csv",
     content = function(file) {
       write.csv(result$MData, file)
     }
   )
 
-  ### Model Resource Table
+  # Model Resource Table -------------------------------------------------------
 
   # Model resource table to be displayed at the click a row of Model table
-  observe(if(active() && length(input$tablemodel_rows_selected) > 0) {
+  observe(if (active() && length(input$tablemodel_rows_selected) > 0) {
 
     # reload if .reloadMRData is called
     force(result$MRDataCounter)
@@ -126,7 +126,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     }
   )
 
-  ### Model Resource CRUD
+  # Model Resource CRUD --------------------------------------------------------
 
   ## create/amend/delete buttons - open/initialize modal dialog
 
@@ -209,15 +209,15 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     showModal(.delModal())
   })
 
-  ## submit/cancel buttons
+  # submit/cancel buttons
   observeEvent(input$btnSubmitCrtAm, {
 
     if (result$crtAmFlag == "C") {
 
-      if(input$tinmodelresname >0 &&
-         (isolate(input$sinresrctype)>0) &&
-         (isolate(input$sinoasissysname)>0) &&
-         input$tinmodelresvalue >0){
+      if (input$tinmodelresname > 0 &&
+         (isolate(input$sinresrctype) > 0) &&
+         (isolate(input$sinoasissysname) > 0) &&
+         input$tinmodelresvalue > 0){
 
         crtmodres <- createModelResource(dbSettings,
                                          input$tinmodelresname,
@@ -274,7 +274,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     removeModal()
   })
 
-  ## helper functions
+  # helper functions -----------------------------------------------------------
   .clearCrtAm <- function() {
 
     updateTextInput(session, "tinmodelresname", value = "")

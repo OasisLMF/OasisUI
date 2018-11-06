@@ -82,13 +82,13 @@ panelModelDetails <- function(id) {
   )
 }
 
-#' flamingoModuleUI
+#' panelAssociateModel
 #'
-#' @rdname flamingoModuleUI
+#' @rdname panelAssociateModel
 #'
 #' @description Function wrapping panel to associate model.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom bsplus bs_embed_tooltip
 #'
@@ -357,7 +357,7 @@ step2_chooseModel <- function(input, output, session,
       }
     })
 
-  ### Show/hide Programme Model Details Panel
+  # Show/hide Programme Model Details Panel
   onclick("buttonmodeldetails", {
     logMessage("showing panelModelDetails")
     .reloadProgFiles()
@@ -370,7 +370,7 @@ step2_chooseModel <- function(input, output, session,
     logMessage("hiding panelModelDetails")
   })
 
-  ### Create Model -------------------------------------------------------------
+  # Create Model ----------------------------------------------------------------
   onclick("buttonassociatemodel", {
     show("panelAssociateModel")
   })
@@ -548,8 +548,6 @@ step2_chooseModel <- function(input, output, session,
       searchHighlight = TRUE,
       processing = 0,
       pageLength = pageLength,
-      #width = "100%",
-      #autoWidth = TRUE,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }

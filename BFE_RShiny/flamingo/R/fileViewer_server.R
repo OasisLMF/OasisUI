@@ -23,7 +23,7 @@ fileViewer <- function(
   active, #= reactive(TRUE),
   logMessage = message) {
 
-  # Reactive Values -----
+  # Reactive Values ------------------------------------------------------------
 
   result <- reactiveValues(
     FLdata = NULL
@@ -33,7 +33,7 @@ fileViewer <- function(
 
   navigation_state <- reactiveNavigation()
 
-  ### File List Table ----
+  ### File List Table ----------------------------------------------------------
 
   # Load Company user list data when the page is loaded
   # queries the database every time to update its dataset
@@ -70,7 +70,7 @@ fileViewer <- function(
     includechkbox = TRUE)
 
 
-  # Module Outout ------------------------------------------------------------
+  # Module Outout --------------------------------------------------------------
 
   moduleOutput <- c(
     outputNavigation(navigation_state),

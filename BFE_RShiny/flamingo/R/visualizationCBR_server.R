@@ -23,7 +23,7 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
 
   result <- reactiveValues() # placeholder
 
-  # Model Outout ------------------------------------------------------------
+  # Model Outout ---------------------------------------------------------------
 
   moduleOutput <- c(
     outputNavigation(navigation_state),

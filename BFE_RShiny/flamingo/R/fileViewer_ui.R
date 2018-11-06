@@ -14,9 +14,7 @@ fileViewerUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-
-    # h3("File Viewer", class = "flamingo-page-title"),
-
+    
     h4("File List", class = "flamingo-table-title"),
 
     actionButton(inputId = ns("refreshtable"), label = "Refresh", style = "float:right"),

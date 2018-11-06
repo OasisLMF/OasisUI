@@ -25,6 +25,24 @@ panels.}
 whose name matches the \code{visible} reactive input to the module server
 function is shown.}
 
+\item{input}{Shiny input object.}
+
+\item{output}{Shiny output object.}
+
+\item{session}{Shiny session object.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{active}{reactive expression whether the module state should be updated.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{logMessage}{function that will be passed info messages.}
+
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+
 \item{id}{module id}
 }
 \value{

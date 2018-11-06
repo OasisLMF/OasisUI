@@ -24,7 +24,7 @@
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
-  # Reactive Values and parameters -----
+  # Reactive Values and parameters ---------------------------------------------
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues(
@@ -32,7 +32,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     runIdList = NULL
   )
 
-  # navigation -----
+  # navigation -----------------------------------------------------------------
   observeEvent(input$abuttongotorun,
                updateNavigation(navigation_state, "SBR"))
 
@@ -53,7 +53,6 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     logMessage("inbox refreshed")
 
     result$runIdList <- result$inbox[, c("RunID", "Status")]
-    #logMessage(paste0("result$runIdList ", names(result$runIdList)))
   })
 
   output$tableInbox <- renderDT(if (userId() != FLAMINGO_GUEST_ID) {
@@ -81,18 +80,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     }
   )
 
-  ### Module Output ----
-  # moduleOutput <- c(
-  #   outputNavigation(navigation_state),
-  #   list(
-  #     runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-  #       inbox()[i, 2]} else -1),
-  #     # this is needed in processRun, probably shouldn't
-  #     procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-  #       inbox()[i, 1]} else -1),
-  #     runIdList = reactive(inbox()[, c("RunID", "Status")])
-  #   )
-  # )
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -137,7 +125,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 
   navigation_state <- reactiveNavigation()
 
-  ### Greeter ----
+  ### Greeter ------------------------------------------------------------------
   output$textOutputHeaderData2 <- renderText(paste("User Name:", userName()))
 
   observeEvent(input$abuttonuseradmin, {
@@ -181,12 +169,13 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
                removeModal()
   )
 
-  ### Button permissions ---- TODO:
+  ### Button permissions ---- --------------------------------------------------
+  # TODO:
   # observe(if (active()) {
   #   landingPageButtonUpdate(session, dbSettings, userId())
   # })
 
-  ### Module Output ----
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -238,7 +227,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   })
 
 
-  ### Navigation Menu ----
+  ### Navigation Menu ----------------------------------------------------------
 
   observeEvent(input$abuttondefineprogrammesingle, {
     updateNavigation(navigation_state, "PS")
@@ -274,7 +263,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "FM")
   })
 
-  ### Module Output ----
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(

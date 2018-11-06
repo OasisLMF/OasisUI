@@ -14,41 +14,39 @@
 #'
 #' @export
 modelSupplierPageUI <- function(id) {
-
+  
   ns <- NS(id)
-
+  
   tagList(
-
-    # h3("Model", class = "flamingo-page-title"),
-
+    
     fluidRow(
       column(12,
-
+             
              div(class = "flamingo-page-division",
                  helpText(h4("Model", class = "flamingo-table-title")),
                  DTOutput(ns("tablemodel")),
                  downloadButton(ns("Modeldownloadexcel"), label="Export to csv")
              ),
-
+             
              hidden(
                div(id = ns("divmr"), class = "flamingo-page-division",
                    h4("Model Resource", class = "flamingo-table-title"),
                    DTOutput(ns("mrtable")),
                    flamingoButton(ns("btnCreate"), "Create",
-                                align = "left"),
+                                  align = "left"),
                    flamingoButton(ns("btnAmend"), "Amend",
-                                align = "centre") %>%
+                                  align = "centre") %>%
                      bs_embed_tooltip(title = sys_conf$btnAmend, placement = "right"),
                    flamingoButton(ns("btnDelete"), "Delete",
-                                align = "right") %>%
+                                  align = "right") %>%
                      bs_embed_tooltip(title = sys_conf$btnDelete, placement = "right"),
                    # flamingoButton(ns("abuttoncrtudptdelmodres"), "Create/Update/Delete"),
                    downloadButton(ns("MRdownloadexcel"), label="Export to csv")
                )
              )
-
+             
       )
     )
   )
-
+  
 }

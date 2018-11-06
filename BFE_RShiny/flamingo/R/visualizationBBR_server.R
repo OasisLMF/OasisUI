@@ -7,9 +7,8 @@
 #' @description Server logic for batchbrowse run page.
 #'
 #' @template return-outputNavigation
-#'
-#' @inheritParams flamingoModule
-#' @inheritParams landingPage
+#' @template params-module
+#' @template params-flamingo-module
 #'
 #' @export
 visualizationBBR <- function(input, output, session, dbSettings, apiSettings,
@@ -18,13 +17,13 @@ visualizationBBR <- function(input, output, session, dbSettings, apiSettings,
 
   ns <- session$ns
 
-  # Reactive Values and parameters ------------------------------------------
+  # Reactive Values and parameters ---------------------------------------------
 
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues() # placeholder
 
-  # Model Outout ------------------------------------------------------------
+  # Model Outout ---------------------------------------------------------------
 
   moduleOutput <- c(
     outputNavigation(navigation_state),

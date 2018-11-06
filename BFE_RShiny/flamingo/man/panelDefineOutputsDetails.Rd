@@ -7,7 +7,7 @@
 panelDefineOutputsDetails(id)
 }
 \arguments{
-\item{id}{Namespace ID for the module.}
+\item{id}{module id}
 }
 \description{
 Function wrapping sub-panel to define outputs details.

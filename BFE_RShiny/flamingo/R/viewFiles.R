@@ -242,7 +242,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   })
   
   
-  # File content view ---------------------------------------------------
+  # File content view ----------------------------------------------------------
   
   # Exposure table
   output$tableFVExposureSelected <- renderDT(
@@ -311,7 +311,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   })#end observeEvent
   
   
-  # File content map -------------------------
+  # File content map -----------------------------------------------------------
   
   Map <- modalDialog(
     easyClose = TRUE,
@@ -334,7 +334,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     output$plainmap <- renderLeaflet({createPlainMap(fileName)})
   })
   
-  # Helper functions -------------------------
+  # Helper functions -----------------------------------------------------------
   
   # default table options
   .getFLTableOptions <- function() {
@@ -347,7 +347,6 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       pageLength = maxrowsperpage,
       preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
       drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
-      #autoWidth = TRUE
     )
     return(options)
   }
@@ -359,7 +358,6 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                                    buildDbQuery("TellOperationsValidOnFileID", FVid))
     manageButtons <- c("FO_btn_show_raw_content" = paste0("vrows_", i),
                        "FO_btn_show_map" = paste0("mrows_", i))
-    # lapply(t(validButtons), function(btnIDs){enable(manageButtons[btnIDs])})
     lapply(t(validButtons), function(btnIDs){show(manageButtons[btnIDs])})
   }
   
@@ -389,7 +387,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     HTML(paste(str1, str2, sep = '<br/>'))
   }
   
-  # Module Output -----------------------
+  # Module Output --------------------------------------------------------------
   invisible()
   
 }

@@ -19,18 +19,17 @@ visualizationBBRUI(id)
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{active}{Reactive expression whether the module state should be updated.}
+\item{active}{reactive expression whether the module state should be updated.}
 
-\item{logMessage}{Function that will be passed info messages.}
+\item{logMessage}{function that will be passed info messages.}
 
-\item{reloadMillis}{Amount of time to wait between table updates;
-see \link{invalidateLater}.}
+\item{id}{Namespace ID for the module.}
 
 \item{id}{module id}
 }

@@ -65,7 +65,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
   })
   
   
-  # Run identification -----------------------------------------------------
+  # Run identification ---------------------------------------------------------
   
   #Define reactive value to react if any of the preselected run Ids changes
   observe({
@@ -107,13 +107,13 @@ visualizationSBR <- function(input, output, session, dbSettings,
     }
   })
   
-  # Go to Configure Output button ------------------------------------------
+  # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
     updateNavigation(navigation_state, "PS")
     result$preselPanel <- 3
   })
   
-  # Summary Table ----------------------------------------------------------
+  # Summary Table --------------------------------------------------------------
   
   # collapse panel
   observeEvent(input$abuttonhidesummarytable, {
@@ -143,7 +143,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
   })
   
   
-  # Extract Output files for given runID------------------------------------
+  # Extract Output files for given runID----------------------------------------
   observeEvent( input$selectRunID, {if (input$selectRunID != "") {
     if (!is.null(runIdList())) {
       index <- match(c(input$selectRunID), runIdList()$RunID)
@@ -184,7 +184,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
   #   logMessage = logMessage)
   #
   
-  # panelOutputModule module -----------------------------------------------------
+  # panelOutputModule module ---------------------------------------------------
   
   #incremental panels
   panel_names <- paste0("flamingoIncrementalPanelOutput-", c(seq_len(n_panels)))
@@ -213,7 +213,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
   # content modules
   # observeModuleNavigation(navigation_state, plotsubmodules, logger = NULL)
   
-  # Helper functions --------------------------------------------------------
+  # Helper functions -----------------------------------------------------------
   
   #table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function() {
@@ -234,7 +234,7 @@ visualizationSBR <- function(input, output, session, dbSettings,
     return(z)}
   
   
-  # Module Outout ------------------------------------------------------------
+  # Module Outout --------------------------------------------------------------
   
   moduleOutput <- c(
     outputNavigation(navigation_state),
@@ -298,7 +298,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   
   ns <- session$ns
   
-  # Reactive values & parameters --------------------------------------------
+  # Reactive values & parameters -----------------------------------------------
   
   result <- reactiveValues(
     #plot and panel title
@@ -350,9 +350,9 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   })
   
   
-  # Enable / Disable options -------------------------------
+  # Enable / Disable options ---------------------------------------------------
   
-  # > based on run ID ----
+  # > based on run ID ----------------------------------------------------------
   #Gather the Granularities, Variables and Losstypes based on the runID output presets
   observe(if (active()) {
     if (!is.null(filesListData() )) {
@@ -383,7 +383,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
   })
   
-  # > based on inputs ----
+  # > based on inputs ----------------------------------------------------------
   
   #GUL does not have policy
   observeEvent(
@@ -399,7 +399,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
     })
   
-  # Extract dataframe to plot ----------------------------------------------
+  # Extract dataframe to plot --------------------------------------------------
   
   #Logic to filter the files to plot
   #Missing logic in case either variables or granularities are not selected. For the moment not allowed
@@ -436,7 +436,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     ylabel <- plottypeslist[[inputplottype()]]$ylabel
     plottype <- plottypeslist[[inputplottype()]]$plottype
     
-    # > sanity checks ----
+    # > sanity checks ----------------------------------------------------------
     #If no data to plot show error
     if (length(chkbox$chkboxgrplosstypes()) == 0    |
         length(chkbox$chkboxgrpvariables()) == 0    |
@@ -477,7 +477,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     } # End of sanity checksThere is data to plot
     
     
-    # > filter out files ----
+    # > filter out files -------------------------------------------------------
     if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
       filesToPlot <- filesListData()  %>% filter(Losstype %in% chkbox$chkboxgrplosstypes(),
                                                  Variable %in% chkbox$chkboxgrpvariables(),
@@ -489,7 +489,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
     
     if (!is.null(filesToPlot)) {
-      # > read files to plot ---------
+      # > read files to plot ---------------------------------------------------
       for (i in seq(nrow(filesToPlot))) { # i<- 1
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
         # if (TRUE) {
@@ -519,7 +519,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
     }
     
     if (!is.null(fileData)) {
-      # > make ggplot friendly ------
+      # > make ggplot friendly -------------------------------------------------
       data <- fileData %>% gather(key = variables, value = value, -nonkey) %>% separate(variables, into = c("variables", "keyval"), sep = "\\.") %>% spread(variables, value)
       if (length(gridcol) > 0) {
         data <- data %>% rename("gridcol" = gridcol)
@@ -543,9 +543,8 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
           data <- data %>% rename("colour" = keyval)
         }
       }
-      # print("data")
-      # print(data)
-      # > draw plot ----
+
+      # > draw plot ------------------------------------------------------------
       if (input$textinputtitle != "") {
         result$Title <- input$textinputtitle
       }
@@ -565,7 +564,7 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
   })
   
   
-  # Helper functions -------------------------
+  # Helper functions -----------------------------------------------------------
   
   .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
     # disable and untick variables that are not relevant
@@ -671,7 +670,6 @@ panelOutputModule <- function(input, output, session, logMessage = message, file
                       width = .2,                    # Width of the error bars
                       position = position_dodge(.9))
     }
-    # p <- .addRefLine(p, unique(data$reference))
     p <- .multiplot(p,multipleplots)
     p
   }
@@ -741,7 +739,7 @@ panelSummaryTableModule <- function(input, output, session, dbSettings,
     
     
   })
-  # Helper functions --------------------------------------------------------
+  # Helper functions -----------------------------------------------------------
   
   #table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function() {
@@ -754,7 +752,7 @@ panelSummaryTableModule <- function(input, output, session, dbSettings,
     return(options)
   }
   
-  # Module Output -----------------------
+  # Module Output --------------------------------------------------------------
   invisible()
 }
 

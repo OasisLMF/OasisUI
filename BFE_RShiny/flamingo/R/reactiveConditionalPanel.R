@@ -1,4 +1,4 @@
-# Module server function ----
+# Module server function -------------------------------------------------------
 
 #' Reactive Conditional Panel
 #'
@@ -34,7 +34,7 @@ reactiveConditionalPanel <- function(input, output, session, condition) {
 }
 
 
-# Module UI function ----
+# Module UI function -----------------------------------------------------------
 
 #' reactiveConditionalPanelUI
 #'

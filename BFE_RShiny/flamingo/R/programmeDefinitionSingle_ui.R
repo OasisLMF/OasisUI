@@ -1,4 +1,4 @@
-# programmeDefinitionSingle Module UI -----------------------
+# programmeDefinitionSingle Module UI ------------------------------------------
 
 #' programmeDefinitionSingle
 #'
@@ -47,12 +47,10 @@ panelDefineIDs <- function(id) {
 
   panel(
     status = "primary",
-    #heading = fluidRow(column(11, h4("Filter"))),
     fluidRow(
       div(id = ns("divselectprogrammeID"),
           column(4,
                  div(class = "InlineSelectInputSmall",
-                     #selectInput(inputId = ns("selectprogrammeID"), label = "Programme ID", choices = c("<Select>"), selected = "<Select>"),
                      selectizeInput(inputId = ns("selectprogrammeID"), label = "Programme ID",
                                     choices = c(),
                                     selected = character(0),
@@ -67,7 +65,6 @@ panelDefineIDs <- function(id) {
       hidden(div(id = ns("divselectprogOasisID"),
                  column(5,
                         div(class = "InlineSelectInputSmall",
-                            #selectInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID", choices = c("<Select>"), selected = "<Select>"),
                             selectizeInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID",
                                            choices = c(),
                                            selected = character(0),

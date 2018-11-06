@@ -1,6 +1,6 @@
-# step3_configureOutput Module ------------------
+# step3_configureOutput Module -------------------------------------------------
 
-# UI ------------------------------------------
+# UI ---------------------------------------------------------------------------
 #' step3_configureOutputUI
 #'
 #' @rdname step3_configureOutput
@@ -134,7 +134,7 @@ panelDefineOutputs <- function(id) {
 #'
 #' @description Function wrapping sub-panel to define outputs details.
 #'
-#' @inheritParams flamingoModuleUI
+#' @template params-module-ui
 #'
 #' @importFrom shinyjs hidden
 #'
@@ -581,7 +581,7 @@ configureAdvancedRI <- function(id) {
   )#end of fluidrow RI
 }
 
-# Server --------------------------------------
+# Server -----------------------------------------------------------------------
 
 #' step3_configureOutput server
 #'
@@ -627,7 +627,7 @@ step3_configureOutput <- function(input, output, session,
 
   ns <- session$ns
 
-  # Reactive Values and parameters ------------------------------------------
+  # Reactive Values and parameters ---------------------------------------------
 
   #number of Rows per Page in a dataable
   pageLength <- 5
@@ -637,7 +637,7 @@ step3_configureOutput <- function(input, output, session,
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
   checkrigrplist <- c("chkriprog", "chkristate", "chkricounty", "chkriloc", "chkrilob", "chkripolicy")
 
-  # > Reactive Values -------------------------------------------------------
+  # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # reactve value for navigation
     navigationstate = NULL,
@@ -654,7 +654,7 @@ step3_configureOutput <- function(input, output, session,
     result$navigationstate <- NULL
   })
 
-  # Panels Visualization ----------------------------------------------------
+  # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
     if (currstep() == 3 ) {
@@ -673,7 +673,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
 
-  ### Process Run Table -----
+  # Process Run Table ----------------------------------------------------------
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioprrunsAllOrInProgress, ignoreInit = TRUE, {
     if (active()) {
@@ -710,11 +710,6 @@ step3_configureOutput <- function(input, output, session,
   output$tableprocessrundata <- renderDT(
 
     if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
-      # if (preselRunId() == -1) {
-      #   index <- 1
-      # } else {
-      #   index <- match(c(preselRunId()), result$prcrundata[,prcrundata.ProcessRunID])
-      # }
       index <- 1
       logMessage("re-rendering process run table")
       datatable(
@@ -743,7 +738,7 @@ step3_configureOutput <- function(input, output, session,
 
   })
 
-  # Configure Output --------------------------------------------
+  # Configure Output -----------------------------------------------------------
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
     hide("panelDefineOutputs")
@@ -804,7 +799,7 @@ step3_configureOutput <- function(input, output, session,
     .updateOutputConfig()
   })
 
-  ### Hide Output Configuration panel
+  # Hide Output Configuration panel
   onclick("abuttonehidepanelconfigureoutput", {
     hide("panelDefineOutputs")
     result$prrun_flag <- "C"
@@ -850,7 +845,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Select/deselect IL
-  #Note: the ignoreInit = TRUE does not prevent the trigger once logged in
+  # Note: the ignoreInit = TRUE does not prevent the trigger once logged in
   observeEvent(input$chkinputIL, ignoreInit = TRUE, {
     if (active()) {
       if (input$chkinputIL == FALSE) {
@@ -980,7 +975,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
 
-  ### Run Process --------------------------------------------------------
+  # Run Process ----------------------------------------------------------------
   # A function to generate process run
   .generateRun <- function() {
 
@@ -1088,7 +1083,7 @@ step3_configureOutput <- function(input, output, session,
     .defaultview(session)
   })
 
-  ### Logs ---------------------------------------------------------------
+  # Logs -----------------------------------------------------------------------
   onclick("abuttonshowlog", {
     show("panelProcessRunLogs")
     logMessage("showing prrunlogtable")
@@ -1134,23 +1129,21 @@ step3_configureOutput <- function(input, output, session,
     paste0('Logs for Run id ', processRunId, ' ', processRunName)
   })
 
-  # Refresh Buttons ----------------------------------------------------------
+  # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonrefreshprrun", {
     .reloadRunData()
   } )
 
-  # Updates dependent on changed: tableprocessrundata_rows_selected ---------
+  # Updates dependent on changed: tableprocessrundata_rows_selected ------------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(input$tableprocessrundata_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$tableprocessrundata_rows_selected is changed to:", input$tableprocessrundata_rows_selected))
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
-      ##### TODO: Do I need the second check in this if????
       if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
         result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
         if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
-          # This occurs only by changing process run, which is only possible in panel 3
           show("panelProcessRunLogs")
           logMessage("showing prrunlogtable")
         }
@@ -1160,13 +1153,13 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
-  # Navigation --------------------------------------------------------------
+  # Navigation -----------------------------------------------------------------
   # Go to browse section
   onclick("abuttondisplayoutput", {
     result$navigationstate <- "SBR"
   })
 
-  # Help Functions -----------------------------------------------------------
+  # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
     logMessage(".hideDivs called")
@@ -1386,7 +1379,7 @@ step3_configureOutput <- function(input, output, session,
     .basicview()
   }
 
-  # Model Outout ------------------------------------------------------------
+  # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     list(
       navigationstate = reactive(result$navigationstate),
