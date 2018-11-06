@@ -2,22 +2,22 @@
 % Please edit documentation in R/flamingoServer.R
 \name{loadProgrammeModel}
 \alias{loadProgrammeModel}
-\title{Call BFE webservice to load programme data}
+\title{loadProgrammeModel}
 \usage{
 loadProgrammeModel(apiSettings, progOasisId, logWarning = function(w)
   warning, ...)
 }
 \arguments{
-\item{apiSettings}{settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}}
+\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
 
-\item{progOasisId}{oasis programme identifier}
+\item{progOasisId}{Oasis programme identifier-}
 
-\item{logWarning}{warning message callback}
+\item{logWarning}{Warning message callback-}
 
-\item{...}{additional arguments to \code{\link[httr:GET]{httr::GET()}}}
+\item{...}{Additional arguments to \code{\link[httr:GET]{httr::GET()}}.}
 }
 \value{
-http status category warn_for_status
+http status category warn_for_status.
 }
 \description{
 A function to load Programme data.

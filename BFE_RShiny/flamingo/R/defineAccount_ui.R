@@ -1,10 +1,16 @@
-#' @title accountDefinitionUI
-#' @rdname accountDefinitionUI
+#' accountDefinitionUI
+#'
+#' @rdname accountDefinition
+#'
 #' @description UI/View to define an account.
-#' @param id shiny module id
-#' @return list of tags
-#' @importFrom shiny helpText textInput sidebarLayout sidebarPanel downloadButton
+#'
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#'
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 accountDefinitionUI <- function(id) {
 

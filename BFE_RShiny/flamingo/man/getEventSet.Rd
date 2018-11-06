@@ -2,21 +2,18 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getEventSet}
 \alias{getEventSet}
-\title{Get the event set list}
+\title{getEventSet}
 \usage{
 getEventSet(dbSettings, prgoasisid, simplify = TRUE)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{prgoasisid}{oasis programme id}
-
-\item{simplify}{if \code{TRUE}, a vector will be returned instead of a
-\code{data.frame} only a single column is returned.}
+\item{prgoasisid}{Oasis programme id.}
 }
 \value{
-event set
+Event set.
 }
 \description{
-Get the event set list
+Get the event set list.
 }

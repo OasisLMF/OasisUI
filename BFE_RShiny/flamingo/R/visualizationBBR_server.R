@@ -7,9 +7,8 @@
 #' @description Server logic for batchbrowse run page.
 #'
 #' @template return-outputNavigation
-#'
-#' @inheritParams flamingoModule
-#' @inheritParams landingPage
+#' @template params-module
+#' @template params-flamingo-module
 #'
 #' @return preselPanel panel to show in the process session.
 #'

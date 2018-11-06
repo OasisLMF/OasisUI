@@ -2,27 +2,27 @@
 % Please edit documentation in R/flamingoDB.R
 \name{createModelResource}
 \alias{createModelResource}
-\title{Create Model Resource}
+\title{createModelResource}
 \usage{
 createModelResource(dbSettings, modresname, restype, oasissys, modelid,
   modresval)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{modresname}{\code{character()}; name of the model resource}
+\item{modresname}{\code{character()}; name of the model resource.}
 
-\item{restype}{resource type}
+\item{restype}{Resource type.}
 
-\item{oasissys}{TODO document}
+\item{oasissys}{TODO document.}
 
-\item{modelid}{model id}
+\item{modelid}{Model id.}
 
-\item{modresval}{TODO document}
+\item{modresval}{TODO document.}
 }
 \value{
-id
+id.
 }
 \description{
-TODO document
+Create Model Resource.
 }

@@ -1,14 +1,17 @@
 #' File Viewer Module
+#'
 #' @rdname fileViewer
-#' @description Server logic to view files
-#' @inheritParams flamingoModule
-#' @param userId user id
-#' @param preselRunId preselected run id
-#' @return empty list
-#' @importFrom DT renderDT DTOutput dataTableProxy selectRows
-#' @importFrom shinyjs show hide hidden
-#' @importFrom utils read.csv zip
-#' @rdname fileViewer
+#'
+#' @description Server logic to view files.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param preselRunId Reactive string expression for reselected run id from landingpage.
+#'
+#' @importFrom dplyr select
+#'
 #' @export
 fileViewer <- function(
   input,

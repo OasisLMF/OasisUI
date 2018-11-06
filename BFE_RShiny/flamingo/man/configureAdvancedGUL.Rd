@@ -2,7 +2,7 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{configureAdvancedGUL}
 \alias{configureAdvancedGUL}
-\title{Function wrapping sub-panel to define outputs advanced configuration GUL}
+\title{configureAdvancedGUL}
 \usage{
 configureAdvancedGUL(id)
 }
@@ -10,5 +10,5 @@ configureAdvancedGUL(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping sub-panel to define outputs advanced configuration GUL
+Function wrapping sub-panel to define outputs advanced configuration GUL.
 }

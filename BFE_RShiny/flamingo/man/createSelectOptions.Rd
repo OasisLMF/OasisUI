@@ -2,22 +2,25 @@
 % Please edit documentation in R/shiny.R
 \name{createSelectOptions}
 \alias{createSelectOptions}
-\title{Create Choices For Select Input Widgets}
+\title{createSelectOptions}
 \usage{
 createSelectOptions(df, label = NA, value = "0", labelCol = 2,
   valueCol = 1)
 }
 \arguments{
-\item{df}{\code{data.frame} as returned by e.g. \link{getCompanyList}}
+\item{df}{\code{data.frame}.}
 
-\item{label}{label for extra option to add at the top. If \code{NA} (default)
+\item{label}{Label for extra option to add at the top. If \code{NA} (default)
 no extra option will be added to the top.}
 
-\item{value}{value for extra option to add at the top}
+\item{value}{value for extra option to add at the top.}
 
-\item{labelCol}{column index of the column that is used for the labels}
+\item{labelCol}{Column index of the column that is used for the labels.}
 
-\item{valueCol}{column index of the column that is used for the values}
+\item{valueCol}{Column index of the column that is used for the values.}
+}
+\value{
+smth.
 }
 \description{
 Converts a table into a named list of choices for use in

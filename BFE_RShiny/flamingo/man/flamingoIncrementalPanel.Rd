@@ -9,19 +9,22 @@ flamingoIncrementalPanel(input, output, session, panels_state,
   collapsible = FALSE, show = TRUE)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{panels_state}{state of panel}
+\item{panels_state}{State of panel.}
 
-\item{new_content_IDs}{ID with new content}
+\item{new_content_IDs}{ID with new content.}
 
-\item{new_content_fun}{function with new content}
+\item{new_content_fun}{Function with new content.}
 
-\item{new_headings}{new heading}
+\item{new_headings}{New heading.}
+}
+\value{
+smth.
 }
 \description{
 flamingoIncrementalPanel

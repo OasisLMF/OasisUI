@@ -3,7 +3,7 @@
 \name{loginDialog}
 \alias{loginDialog}
 \alias{loginDialogUI}
-\title{Login Dialog Module}
+\title{loginDialog}
 \usage{
 loginDialog(input, output, session, dbSettings, logout,
   logMessage = message, logError = logMessage)
@@ -11,28 +11,36 @@ loginDialog(input, output, session, dbSettings, logout,
 loginDialogUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{logout}{reactive yielding logout signal}
+\item{logout}{Reactive yielding logout signal.}
 
-\item{id}{account id}
+\item{logMessage}{function that will be passed info messages.}
+
+\item{logError}{function that will be passed error messages.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{id}{module id}
 }
 \value{
-list of reactive expressions
+List of reactive expressions:
 \itemize{
 		\item{\code{userId}: }{yielding an user id if login has been completed
 					successfully and \link{FLAMINGO_GUEST_ID} otherwise}
 		\item{\code{logout}: }{reactive yielding logout button signal}
-}
+}.
+
+List of tags.
 }
 \description{
-Server logic to login an user
+Server logic to login an user.
 
-UI/View to login an user
+UI/View to login an user.
 }

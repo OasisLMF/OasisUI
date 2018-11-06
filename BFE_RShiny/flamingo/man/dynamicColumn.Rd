@@ -3,9 +3,7 @@
 \name{dynamicColumn}
 \alias{dynamicColumn}
 \alias{dynamicColumnUI}
-\title{Resizable UI column
-Shiny module providing support for dynamic UI \link[shiny:column]{column} width
-without re-rendering the column content.}
+\title{dynamicColumn}
 \usage{
 dynamicColumn(input, output, session, width)
 
@@ -23,14 +21,11 @@ non-reactive (or \link[shiny:isolate]{isolated}) for \code{dynamicColumnUI()}.}
 
 \item{id}{Namespace ID for the module.}
 
-\item{...}{other inputs}
+\item{...}{Other inputs.}
 
-\item{id}{id}
-
-\item{width}{width}
+\item{id}{module id}
 }
 \description{
-Resizable UI column
 Shiny module providing support for dynamic UI \link[shiny:column]{column} width
 without re-rendering the column content.
 }

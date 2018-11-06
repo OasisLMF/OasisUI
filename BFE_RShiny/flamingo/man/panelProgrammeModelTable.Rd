@@ -2,7 +2,7 @@
 % Please edit documentation in R/step2_chooseModel.R
 \name{panelProgrammeModelTable}
 \alias{panelProgrammeModelTable}
-\title{Function wrapping panel to show created programme model table}
+\title{panelProgrammeModelTable}
 \usage{
 panelProgrammeModelTable(id)
 }
@@ -10,5 +10,5 @@ panelProgrammeModelTable(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to show created programme model table
+Function wrapping panel to show created programme model table.
 }

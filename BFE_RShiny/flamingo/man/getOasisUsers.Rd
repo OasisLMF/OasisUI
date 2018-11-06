@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getOasisUsers}
 \alias{getOasisUsers}
-\title{Get Oasis Users}
+\title{getOasisUsers}
 \usage{
 getOasisUsers(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
 oasis users; \code{data.frame} of 2 variables:
 \itemize{
 \item \code{OasisUserID}
 \item \code{OasisUserName}
-}
+}.
 }
 \description{
-Get Oasis Users
+Get Oasis Users.
 }

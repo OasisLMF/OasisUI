@@ -3,12 +3,12 @@
 \docType{data}
 \name{FLAMINGO_GUEST_ID}
 \alias{FLAMINGO_GUEST_ID}
-\title{Id to use for an unidentified user}
+\title{FLAMINGO_GUEST_ID}
 \format{An object of class \code{numeric} of length 1.}
 \usage{
 FLAMINGO_GUEST_ID
 }
 \description{
-Id to use for an unidentified user
+Id to use for an unidentified user.
 }
 \keyword{datasets}

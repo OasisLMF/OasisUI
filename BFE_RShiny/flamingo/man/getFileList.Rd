@@ -7,12 +7,12 @@
 getFileList(dbSettings, prrunid)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{prrunid}{process run id}
+\item{prrunid}{Process run id.}
 }
 \value{
-output files; \code{data.frame} of 10 variables:
+Output files; \code{data.frame} of 10 variables:
 \itemize{
 \item \code{FileID}
 \item \code{File Name}
@@ -24,8 +24,8 @@ output files; \code{data.frame} of 10 variables:
 \item \code{Source}
 \item \code{Resource Table}
 \item \code{Resource Key}
-}
+}.
 }
 \description{
-Get the list of output files for a given process run id
+Get the list of output files for a given process run id.
 }

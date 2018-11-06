@@ -1,10 +1,18 @@
 # ViewFilesModule Module -----------------------
 # UI -------------------------------------------
-#' Module to View Files
-#' @description UI logic to view  files
-#' @inheritParams flamingoModuleUI
+#' ViewFilesModuleUI
+#' 
+#' @rdname ViewFilesModule
+#'
+#' @description UI/View to view  files.
+#'
+#' @template params-module-ui
+#' 
+#' @return List of tags.
+#'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
   ns <- NS(id)
@@ -30,23 +38,39 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 }
 
 # Server ---------------------------------------------------------
-#' Module to View Files
+#' ViewFilesModule
+#'
 #' @rdname ViewFilesModule
-#' @description Server logic to view files
-#' @inheritParams flamingoModule
-#' @param filesListData table of output files for a given runID
-#' @importFrom shinyjs show hide hidden
-#' @importFrom DT renderDT datatable DTOutput
-#' @importFrom dplyr select contains filter
-#' @importFrom leaflet renderLeaflet leafletOutput
-#' @return list of reactives
+#'
+#' @description Server logic to view files.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @param filesListData Table of output files for a given runID.
+#'
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs hidden
+#' @importFrom DT renderDT
+#' @importFrom DT datatable
+#' @importFrom DT DTOutput
+#' @importFrom DT dataTableProxy
+#' @importFrom DT selectRows
+#' @importFrom htmlwidgets JS
+#' @importFrom dplyr select
+#' @importFrom dplyr contains
+#' @importFrom leaflet renderLeaflet
+#' @importFrom leaflet leafletOutput
+#'
 #' @export
 ViewFilesModule <- function(input, output, session, logMessage = message, filesListData, includechkbox = FALSE) {
   
   ns <- session$ns
   
   
-  # Reactive values & parameters --------------------------------------------
+  # Reactive values & parameters -----------------------------------------------
   
   maxrowsperpage <- 10
   
@@ -64,21 +88,22 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   # Help function
   '%notin%' <- Negate('%in%')
   
-  # Add buttons -------------------------------------
+  # Add buttons ----------------------------------------------------------------
   observeEvent(filesListData(), ignoreNULL = FALSE, {
     filesListData <- filesListData()
     if (length(filesListData) > 0) {
       result$filesListData <- filesListData
       if (includechkbox) {
-        filesListData <- cbind(data.frame(Selected = .shinyInput(flamingoCheckboxButton ,"srows_", nrow(filesListData), Label = NULL, hidden = FALSE, 
-                                                                 style = "    background-color: white;
-                                                                              border-color: black;
-                                                                              color: white;
-                                                                              font-size: 10px;
-                                                                              text-shadow: none;
-                                                                              padding: 0px;
-                                                                              height: 16px;
-                                                                              width: 16px;",
+        filesListData <- cbind(data.frame(Selected = .shinyInput(flamingoCheckboxButton,"srows_", nrow(filesListData), Label = NULL,
+                                                                 hidden = FALSE,
+                                                                 style = "background-color: white;
+                                                                          border-color: black;
+                                                                          color: white;
+                                                                          font-size: 10px;
+                                                                          text-shadow: none;
+                                                                          padding: 0px;
+                                                                          height: 16px;
+                                                                          width: 16px;",
                                                                  icon = icon("check"),
                                                                  onclick = paste0('Shiny.onInputChange(\"',ns("select_sbutton"),'\",  this.id)')
         )), 
@@ -127,7 +152,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   )
   
   
-  # Download Files ----
+  # Download Files -------------------------------------------------------------
   
   # Files to download in zip bundle
   fs <- reactive({
@@ -189,7 +214,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     }
   })
   
-  # #update checkboxes according to selectAll button
+  #update checkboxes according to selectAll button
   observeEvent(input$chkboxselectall, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(result$filesListDataButtons)) {
       if (!is.null(input$chkboxselectall) && input$chkboxselectall) {

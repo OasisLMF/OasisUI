@@ -12,35 +12,46 @@ landingPage(input, output, session, userId, userName, dbSettings,
 landingPageUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
-\item{userId}{reactive expression yielding user id}
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{userName}{reactive expression yielding user name}
+\item{userName}{user name as returned by [flamingoDBLogin()]}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater};}
+\item{reloadMillis}{Amount of time to wait between table updates;
+see \link{invalidateLater}.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{function that will be passed info messages.}
 
 \item{active}{reactive expression whether the module state should be updated.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{id}{module id}
 }
 \value{
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
 For \code{landingPage()}, list of reactives:
 \itemize{
 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
+		\item{\\code{runIdList}: }{ilist of possible process run ids}
 }
 
-The returned list also includes reactive navigation state
-constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+List of tags.
 }
 \description{
 Landing Page
+
+landingPage
 }

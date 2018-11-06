@@ -2,13 +2,16 @@
 % Please edit documentation in R/programmeDefinitionSingle_ui.R
 \name{panelDefineIDs}
 \alias{panelDefineIDs}
-\title{Function wrapping panel to define prgramme and model IDs}
+\title{panelDefineIDs}
 \usage{
 panelDefineIDs(id)
 }
 \arguments{
 \item{id}{module id}
 }
+\value{
+List of tags.
+}
 \description{
-Function wrapping panel to define prgramme and model IDs
+Function wrapping panel to define prgramme and model IDs.
 }

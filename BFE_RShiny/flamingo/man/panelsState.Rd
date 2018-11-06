@@ -7,7 +7,10 @@
 panelsState(IDs)
 }
 \arguments{
-\item{IDs}{IDs}
+\item{IDs}{IDs.}
+}
+\value{
+smth.
 }
 \description{
 panelsState

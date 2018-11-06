@@ -2,9 +2,12 @@
 % Please edit documentation in R/reactiveConditionalPanels.R
 \name{reactiveConditionalPanels}
 \alias{reactiveConditionalPanels}
-\title{Reactive Conditional Panels}
+\alias{reactiveConditionalPanelsUI}
+\title{reactiveConditionalPanels}
 \usage{
 reactiveConditionalPanels(input, output, session, visible)
+
+reactiveConditionalPanelsUI(id, panels)
 }
 \arguments{
 \item{input}{Shiny input object.}
@@ -17,6 +20,17 @@ reactiveConditionalPanels(input, output, session, visible)
 panels.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{panels}{Named list of UI content for a set of panels. Only the panel
+whose name matches the \code{visible} reactive input to the module server
+function is shown.}
+
+\item{id}{module id}
+}
+\value{
+smth.
+
+Panels.
 }
 \description{
 Shiny module handling the visibility of a set of panels depending on a

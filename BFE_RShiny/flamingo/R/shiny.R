@@ -1,19 +1,30 @@
 
-#' Flamingo Module Template UI
-#' @param id module id
+#' flamingoModuleUI
+#'
+#' @rdname flamingoModuleUI
+#'
+#' @description Flamingo Module Template UI.
+#'
+#' @inheritParams accountDefinitionUI
+#'
+#' @return No value.
 flamingoModuleUI <- function(id) {}
 
 
 #' Flamingo Module Template
+#'
 #' @rdname flamingoModule
-#' @param input shiny input object
-#' @param output shiny output object
-#' @param session shiny session object
-#' @param active reactive expression whether the module state should be updated.
-#' @param dbSettings as returned from \link{flamingoDB}
-#' @param apiSettings as returned from \link{flamingoServer}
-#' @param logMessage function that will be passed info messages
-#' @param logError function that will be passed error messages
+#'
+#' @inheritParams loadProgrammeModel
+#' @inheritParams flamingoDBLogin
+#' @inheritParams executeDbQuery
+#' @param input Shiny input object.
+#' @param output Shiny output object.
+#' @param session Shiny session object.
+#' @param active Reactive expression whether the module state should be updated.
+#' @param logMessage Function that will be passed info messages.
+#' @param logError Function that will be passed error messages.
+#'
 #' @export
 flamingoModule <- function(
   input,
@@ -26,12 +37,19 @@ flamingoModule <- function(
   logError) {}
 
 
-#' Flamingo action button/link version
-#' @description Modified version of the default [shiny::actionButton()]
-#' @param class HTML class attribute
-#' @param ... arguments to [shiny::actionButton()]
-#' @importFrom shiny restoreInput
+#' flamingoButton
+#'
+#' @rdname flamingoButton
+#'
+#' @description Modified version of the default [shiny::actionButton()].
+#'
+#' @param class HTML class attribute.
+#' @param ... Arguments to [shiny::actionButton()].
+#'
+#' @return Acces to Oasis UI.
+#'
 #' @export
+#'
 #' @md
 flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c("btn", "btn-primary"), ...) {
   value <- restoreInput(id = inputId, default = NULL)
@@ -48,12 +66,19 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
   )
 }
 
-#' Flamingo action button look like a checkbox
-#' @description Modified version of the default [shiny::actionButton()]
-#' @param class HTML class attribute
-#' @param ... arguments to [shiny::actionButton()]
-#' @importFrom shiny restoreInput
+#' flamingoCheckboxButton
+#'
+#' @rdname flamingoCheckboxButton
+#'
+#' @description Modified version of the default [shiny::actionButton()].
+#'
+#' @inheritParams flamingoButton
+#' @param ... Arguments to [shiny::actionButton()].
+#'
+#' @return List of tags.
+#'
 #' @export
+#'
 #' @md
 flamingoCheckboxButton <- function(inputId, label, icon = NULL, width = NULL, class = c("btn"), ...) {
   value <- restoreInput(id = inputId, default = NULL)
@@ -71,13 +96,20 @@ flamingoCheckboxButton <- function(inputId, label, icon = NULL, width = NULL, cl
 }
 
 
-#' Show or remove a notification
-#' @description Modified version of the default [shiny::showNotification()]
-#' @param ui see [shiny::showNotification()]
-#' @param type see [shiny::showNotification()]
-#' @param ... other arguments to [shiny::showNotification()]
-# @importFrom shiny showNotification icon
+#' flamingoNotification
+#'
+#' @rdname flamingoNotification
+#'
+#' @description Modified version of the default [shiny::showNotification()].
+#'
+#' @inheritParams companyDefinition
+#' @param type see [shiny::showNotification()].
+#' @param ... other arguments to [shiny::showNotification()].
+#'
+#' @return Notifications.
+#'
 #' @export
+#'
 #' @md
 flamingoNotification <- function(ui, type = c("default", "message", "warning", "error"), ...) {
 
@@ -99,17 +131,24 @@ flamingoNotification <- function(ui, type = c("default", "message", "warning", "
 
 
 
-#' Create Choices For Select Input Widgets
+#' createSelectOptions
+#'
 #' @rdname createSelectOptions
+#'
 #' @description Converts a table into a named list of choices for use in
 #' \link{selectInput}.
-#' @param df \code{data.frame} as returned by e.g. \link{getCompanyList}
-#' @param label label for extra option to add at the top. If \code{NA} (default)
+#'
+#' @inheritParams replaceWithIcons
+#' @param label Label for extra option to add at the top. If \code{NA} (default)
 #' no extra option will be added to the top.
-#' @param value value for extra option to add at the top
-#' @param labelCol column index of the column that is used for the labels
-#' @param valueCol column index of the column that is used for the values
+#' @param value value for extra option to add at the top.
+#' @param labelCol Column index of the column that is used for the labels.
+#' @param valueCol Column index of the column that is used for the values.
+#'
+#' @return smth.
+#'
 #' @importFrom stats setNames
+#'
 #' @export
 createSelectOptions <- function(df, label = NA, value = "0", labelCol = 2,
                                 valueCol = 1) {
