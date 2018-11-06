@@ -8,7 +8,8 @@
 summarytabUI(id)
 
 summarytab(input, output, session, dbSettings, apiSettings, userId,
-  selectRunID = reactive(""), active, logMessage = message)
+  selectRunID1 = reactive(""), selectRunID2 = reactive(""),
+  compare = FALSE, active, logMessage = message)
 }
 \arguments{
 \item{id}{module id}

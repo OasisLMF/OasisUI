@@ -62,13 +62,20 @@ summarytabUI <- function(id) {
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
 #' @importFrom dplyr filter
+#' @importFrom dplyr rename
+#' @importFrom dplyr select
+#' @importFrom dplyr contains
+#' @importFrom dplyr left_join
 #' @importFrom plotly ggplotly 
 #' @importFrom plotly renderPlotly 
+#' @importFrom tidyr gather
 #' 
 #' @export
 summarytab <- function(input, output, session, dbSettings,
                        apiSettings, userId,
-                       selectRunID = reactive(""), active, logMessage = message) {
+                       selectRunID1 = reactive(""), selectRunID2 = reactive(""),
+                       compare = FALSE,
+                       active, logMessage = message) {
   
   ns <- session$ns
   
@@ -87,33 +94,57 @@ summarytab <- function(input, output, session, dbSettings,
   paramStrg <- c("treshold|number|peril|set")
   
   # Extract Summary Data -------------------------------------------------------
+  
   observeEvent({
-    selectRunID()
-    active()
-   }, {
-    if (!is.null(selectRunID()) && selectRunID() != "") {
-      SummaryData <- executeDbQuery(dbSettings,
-                                    paste("exec getOutputSummary", selectRunID()))
-      if (!is.null(SummaryData)) {
-        result$inputSummaryData <- SummaryData %>% 
-          filter(!grepl(paste0(outputStrg, "|", paramStrg), SummaryType)) %>%
-          as.data.frame()
-        result$paramSummaryData <- SummaryData %>% 
-          filter(grepl(paramStrg, SummaryType)) %>%
-          as.data.frame()
-        result$outputSummaryData <- SummaryData %>% 
-          filter(grepl(outputStrg, SummaryType)) %>%
-          as.data.frame()
+    selectRunID1()
+    selectRunID2()
+    active()}, {
+      # Initialize variables
+      SummaryData1 <- NULL
+      SummaryData2 <- NULL
+      SummaryData <- NULL
+      
+      #Check for run 1
+      if (selectRunID1() != "") {
+        SummaryData1 <- executeDbQuery(dbSettings,
+                                       paste("exec getOutputSummary", selectRunID1()))
       }
-      show("summarypanel")
-      show("summaryOutputPlot")
-    } else {
-      hide("summarypanel")
-      hide("summaryOutputPlot")
-    }
-  })
-  
-  
+      
+      #check for run2
+      if (selectRunID2() != "") {
+        SummaryData2 <- executeDbQuery(dbSettings,
+                                       paste("exec getOutputSummary", selectRunID2()))
+      }
+      
+      #define df to use
+      if (compare) {
+        if (!is.null(SummaryData1) && !is.null(SummaryData2)) {
+          idx1 <- which(names(SummaryData1) == "Value")
+          names(SummaryData1)[idx1] <- paste0("Run Id ", selectRunID1())
+          idx2 <- which(names(SummaryData2) == "Value") 
+          names(SummaryData2)[idx2] <- paste0("Run Id ", selectRunID2())
+          SummaryData <- left_join(SummaryData1, SummaryData2, "SummaryType")
+        }
+      } else {
+        SummaryData <- SummaryData1
+      }
+      
+      
+      if (!is.null(SummaryData)) {
+        result$inputSummaryData <- .extractinputSummaryData(SummaryData)
+        result$paramSummaryData <- .extractparamSummaryData(SummaryData)
+        result$outputSummaryData <- .extractoutputSummaryData(SummaryData)
+        show("summarypanel")
+        show("summaryOutputPlot")
+      } else {
+        result$inputSummaryData <- NULL
+        result$paramSummaryData <- NULL
+        result$outputSummaryData <- NULL
+        hide("summarypanel")
+        hide("summaryOutputPlot")
+      }
+    })
+
   # Summary Input tables
   sub_modules$summaryTable <- callModule(
     flamingoTable,
@@ -124,7 +155,7 @@ summarytab <- function(input, output, session, dbSettings,
     scrollX = FALSE,
     filter = FALSE,
     rownames = FALSE,
-    colnames = FALSE,
+    colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
   
@@ -137,7 +168,7 @@ summarytab <- function(input, output, session, dbSettings,
     scrollX = FALSE,
     filter = FALSE,
     rownames = FALSE,
-    colnames = FALSE,
+    colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
   
@@ -149,7 +180,7 @@ summarytab <- function(input, output, session, dbSettings,
     escape = TRUE,
     scrollX = FALSE,
     rownames = FALSE,
-    colnames = FALSE,
+    colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
   
@@ -158,13 +189,31 @@ summarytab <- function(input, output, session, dbSettings,
   output$summaryOutputPlot <- renderPlotly({
     if (!is.null(result$outputSummaryData)) {
       data <- result$outputSummaryData
-      data <- cbind(result$outputSummaryData,do.call(rbind.data.frame,  lapply(result$outputSummaryData[,1], function(i){
-        x <- as.character(i)
-        y <- unlist(strsplit(x,split = " "))
-        z <- data.frame("Loss Type" = y[2], "Sample Type" = y[4], stringsAsFactors = FALSE)
-        return(z)
-      })))
-      names(data) <- c("description", "value", "colour", "xaxis")
+      if (compare) {
+        colnames <- names(select(data, contains("run", ignore.case = TRUE)))
+        data <- data %>% gather(key = "runid", value = "value",colnames)
+      }
+        data <- cbind(data,do.call(rbind.data.frame,  lapply(data[,"SummaryType"], function(i){
+          x <- as.character(i)
+          y <- unlist(strsplit(x,split = " "))
+          z <- data.frame("Loss Type" = y[2], "Sample Type" = y[4], stringsAsFactors = FALSE)
+          return(z)
+        })))
+        if (compare) {
+          data <- data %>% tidyr::unite("identifier", c("Loss.Type","Sample.Type"))
+          data <- data %>% 
+            rename("description" = "SummaryType") %>%
+            rename("colour" = "runid") %>%
+            rename("xaxis" = "identifier")
+        } else {
+          data <- data %>% 
+            rename("description" = "SummaryType") %>%
+            rename("colour" = "Sample.Type") %>%
+            rename("xaxis" = "Loss.Type") %>%
+            rename("value" = "Value")
+        }
+
+      
       xlabel <- "Sample Type"
       ylabel <- "Loss"
       titleToUse <- "AAL"
@@ -173,6 +222,40 @@ summarytab <- function(input, output, session, dbSettings,
     }
   })
   
+  # Helper functions -----------------------------------------------------------
+  .extractinputSummaryData <- function(SummaryData) {
+    inputSummaryData <- NULL
+    if (!is.null(SummaryData)) {
+      inputSummaryData <- SummaryData %>% 
+        filter(!grepl(paste0(outputStrg, "|", paramStrg), SummaryType)) %>%
+        as.data.frame()
+    }
+    return(inputSummaryData)
+  }
+  
+  .extractparamSummaryData <- function(SummaryData) {
+    paramSummaryData <- NULL
+    if (!is.null(SummaryData)) {
+      paramSummaryData <- SummaryData %>% 
+        filter(grepl(paramStrg, SummaryType)) %>%
+        as.data.frame()
+    }
+    return(paramSummaryData)
+  }
+  
+  .extractoutputSummaryData <- function(SummaryData) {
+    outputSummaryData <- NULL
+    if (!is.null(SummaryData)) {
+      outputSummaryData <- SummaryData %>% 
+        filter(grepl(outputStrg, SummaryType)) %>%
+        as.data.frame()
+    }
+    return(outputSummaryData)
+  }
+  
+  
+  # Module output --------------------------------------------------------------
+  invisible()
 }
 
 # Plot functions ---------------------------------------------------------------

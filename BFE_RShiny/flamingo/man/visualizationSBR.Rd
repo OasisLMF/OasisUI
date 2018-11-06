@@ -7,9 +7,8 @@
 \title{visualizationSBR}
 \usage{
 visualizationSBR(input, output, session, dbSettings, apiSettings, userId,
-  runIdList = reactive(c(-1)), preselRunId = reactive(-1),
-  processRunId = reactive(-1), active = reactive(TRUE),
-  logMessage = message)
+  preselRunId = reactive(-1), processRunId = reactive(-1),
+  active = reactive(TRUE), logMessage = message)
 
 visualizationSBRUI(id)
 }
@@ -26,17 +25,17 @@ visualizationSBRUI(id)
 
 \item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{runIdList}{List of runs and their status.}
+\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
 
-\item{preselRunId}{reactive string expression for reselected run id from landingpage.}
-
-\item{processRunId}{reactive string expression for reselected run id from defineProgramme.}
+\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{runIdList}{List of runs and their status.}
 
 \item{id}{module id}
 }

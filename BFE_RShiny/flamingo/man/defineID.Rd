@@ -8,8 +8,8 @@
 defineIDUI(id, w, batch = FALSE)
 
 defineID(input, output, session, dbSettings, userId,
-  preselectedRunId = reactive(-1), batch = FALSE,
-  logMessage = message)
+  preselRunId = reactive(-1), processRunId = reactive(-1),
+  batch = FALSE, logMessage = message)
 }
 \arguments{
 \item{id}{module id}
@@ -28,7 +28,9 @@ defineID(input, output, session, dbSettings, userId,
 
 \item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
-\item{preselectedRunId}{reactive string expression for reselected run id from \link{landingpage}}
+\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
+
+\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
 
 \item{logMessage}{function that will be passed info messages.}
 

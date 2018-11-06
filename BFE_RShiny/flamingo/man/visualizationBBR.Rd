@@ -7,9 +7,8 @@
 \title{visualizationBBR}
 \usage{
 visualizationBBR(input, output, session, dbSettings, apiSettings, userId,
-  runIdList = reactive(c(-1)), preselRunId = reactive(-1),
-  processRunId = reactive(-1), active = reactive(TRUE),
-  logMessage = message)
+  preselRunId = reactive(-1), processRunId = reactive(-1),
+  active = reactive(TRUE), logMessage = message)
 
 visualizationBBRUI(id)
 }
@@ -25,6 +24,10 @@ visualizationBBRUI(id)
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+
+\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
+
+\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

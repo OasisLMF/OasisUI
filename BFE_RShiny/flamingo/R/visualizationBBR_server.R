@@ -71,7 +71,7 @@ visualizationBBR <- function(input, output, session, dbSettings,
   sub_modules$summary <- callModule(
     summarytab,
     id = "summarytab",
-    selectRunID = reactive(sub_modules$defineID$selectRunID()),
+    selectRunID1 = reactive(sub_modules$defineID$selectRunID()),
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     userId = userId,
