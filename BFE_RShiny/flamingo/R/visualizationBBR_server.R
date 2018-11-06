@@ -9,6 +9,9 @@
 #' @template return-outputNavigation
 #' @template params-module
 #' @template params-flamingo-module
+#' 
+#' @param preselRunId reactive string expression for reselected run id from \link{landingpage}.
+#' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
 #'
 #' @return preselPanel panel to show in the process session.
 #'
@@ -17,30 +20,20 @@
 #' @export
 visualizationBBR <- function(input, output, session, dbSettings,
                              apiSettings, userId,
-                             runIdList = reactive(c(-1)),
                              preselRunId = reactive(-1),
                              processRunId = reactive(-1),
                              active = reactive(TRUE), logMessage = message) {
-
+  
   ns <- session$ns
-
+  
   # Reactive Values and parameters ---------------------------------------------
-
+  
   navigation_state <- reactiveNavigation()
   
   # list of sub-modules
   sub_modules <- list()
-
+  
   result <- reactiveValues(
-    #Reactive to know if one of the preselected runIds has changed
-    RunIDchanged = -2,
-    # preselRunId()
-    preselRunId = -1,
-    # processRunId()
-    processRunId = -1,
-    #selected run
-    preselectedRunId = NULL,
-    selectedRunId = NULL,
     #Panel to select
     preselPanel = 1,
     # output files table
@@ -56,23 +49,24 @@ visualizationBBR <- function(input, output, session, dbSettings,
       result$preselPanel <- 1
     }
   })
-
-  # Selected runID -------------------------------------------------------------
+  
+  # # Selected runID -------------------------------------------------------------
   sub_modules$defineID <- callModule(
     defineID,
     id = "defineID",
     dbSettings = dbSettings,
     userId = reactive(userId()),
-    preselectedRunId = reactive({1}),
+    preselRunId = preselRunId,
+    processRunId =  processRunId,
     logMessage = logMessage)
-
+  
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotobatchconfig, {
     updateNavigation(navigation_state, "PB")
     result$preselPanel <- 3
   })
   
-
+  
   # Tab Summary ----------------------------------------------------------------
   sub_modules$summary <- callModule(
     summarytab,
@@ -88,18 +82,10 @@ visualizationBBR <- function(input, output, session, dbSettings,
   # Extract Output files for given runID----------------------------------------
   observeEvent( sub_modules$defineID$selectRunID(), {
     if (!is.na(sub_modules$defineID$selectRunID()) && sub_modules$defineID$selectRunID() != "") {
-      if (!is.null(runIdList())) {
-        index <- match(c(sub_modules$defineID$selectRunID()), runIdList()$RunID)
-        status <- runIdList()[index, "Status"]
-        if (!is.na(status) && status == StatusCompleted) {
-          result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectRunID())
-          result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
-        } else {
-          result$filesListData <- NULL
-        }
-      } else {
-        result$filesListData <- NULL
-      }
+      result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectRunID())
+      result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
+    } else {
+      result$filesListData <- NULL
     }
   })
   
@@ -136,6 +122,12 @@ visualizationBBR <- function(input, output, session, dbSettings,
     active = reactive({active() && input$tabsSBR == "tabplots"}),
     logMessage = logMessage)
   
+  # Helper functions -----------------------------------------------------------
+  #function to split the description field of result$filesListData
+  .splitDescription <- function(x){
+    y <- unlist(strsplit(x,split = " "))
+    z <- data.frame("Granularity" = y[2], "Losstype" = y[4], "Variable" = paste(y[5:length(y)], collapse = " "), stringsAsFactors = FALSE)
+    return(z)}
   
   
   # Module Outout --------------------------------------------------------------

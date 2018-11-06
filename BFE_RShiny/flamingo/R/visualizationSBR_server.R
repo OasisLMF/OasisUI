@@ -11,8 +11,8 @@
 #' @template params-flamingo-module
 #'
 #' @param runIdList List of runs and their status.
-#' @param preselRunId reactive string expression for reselected run id from landingpage.
-#' @param processRunId reactive string expression for reselected run id from defineProgramme.
+#' @param preselRunId reactive string expression for reselected run id from \link{landingpage}.
+#' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
 #'
 #' @return preselPanel panel to show in the process session
 #'
@@ -21,7 +21,6 @@
 #' @export
 visualizationSBR <- function(input, output, session, dbSettings,
                              apiSettings, userId,
-                             runIdList = reactive(c(-1)),
                              preselRunId = reactive(-1),
                              processRunId = reactive(-1),
                              active = reactive(TRUE), logMessage = message) {
@@ -36,15 +35,6 @@ visualizationSBR <- function(input, output, session, dbSettings,
   sub_modules <- list()
   
   result <- reactiveValues(
-    #Reactive to know if one of the preselected runIds has changed
-    RunIDchanged = -2,
-    # preselRunId()
-    preselRunId = -1,
-    # processRunId()
-    processRunId = -1,
-    #selected run
-    preselectedRunId = NULL,
-    selectedRunId = NULL,
     #Panel to select
     preselPanel = 1,
     # output files table
@@ -60,49 +50,15 @@ visualizationSBR <- function(input, output, session, dbSettings,
       result$preselPanel <- 1
     }
   })
-  
-  
-  # Run identification ---------------------------------------------------------
-  
-  #Define reactive value to react if any of the preselected run Ids changes
-  observe({
-    preselRunId()
-    processRunId()
-    if (is.null(processRunId())) {
-      result$processRunId <- -1
-    } else {
-      result$processRunId <- processRunId()
-    }
-    if (is.null(preselRunId())) {
-      result$preselRunId <- -1
-    } else {
-      result$preselRunId <- preselRunId()
-    }
-    result$RunIDchanged <- result$preselRunId + result$processRunId
-  })
-  
-  #Update selected runID
-  observe({
-    result$RunIDchanged
-    if (result$RunIDchanged == -2 ) {
-      result$preselectedRunId = runIdList()$RunID[1]
-    } else {
-      if (result$preselRunId != -1) {
-        result$preselectedRunId = isolate(result$preselRunId)
-      }
-      if (result$processRunId != -1) {
-        result$preselectedRunId = isolate(result$processRunId)
-      }
-    }
-  })
-  
+ 
   # Selected runID -------------------------------------------------------------
   sub_modules$defineID <- callModule(
     defineID,
     id = "defineID",
     dbSettings = dbSettings,
     userId = reactive(userId()),
-    preselectedRunId = reactive(result$preselectedRunId),
+    preselRunId = preselRunId,
+    processRunId =  processRunId,
     logMessage = logMessage)
   
   # Go to Configure Output button ----------------------------------------------
@@ -126,20 +82,14 @@ visualizationSBR <- function(input, output, session, dbSettings,
   # Extract Output files for given runID----------------------------------------
   observeEvent( sub_modules$defineID$selectRunID(), {
     if (!is.na(sub_modules$defineID$selectRunID()) && sub_modules$defineID$selectRunID() != "") {
-      if (!is.null(runIdList())) {
-        index <- match(c(sub_modules$defineID$selectRunID()), runIdList()$RunID)
-        status <- runIdList()[index, "Status"]
-        if (!is.na(status) && status == StatusCompleted) {
           result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectRunID())
-          result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
+          result$filesListData <- cbind(result$filesListData, 
+                                        do.call(rbind.data.frame, lapply(result$filesListData$Description, 
+                                                                         .splitDescription)))
         } else {
           result$filesListData <- NULL
         }
-      } else {
-        result$filesListData <- NULL
-      }
-    }
-  })
+    })
   
   filesListDatatoview <- reactive({
     if (!is.null(result$filesListData)) {

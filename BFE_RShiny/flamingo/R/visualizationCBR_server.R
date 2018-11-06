@@ -11,8 +11,8 @@
 #' @template params-flamingo-module
 #'
 #' @param runIdList List of runs and their status.
-#' @param preselRunId Reactive string expression for reselected run id from landingpage.
-#' @param processRunId Reactive string expression for reselected run id from defineProgramme.
+#' @param preselRunId reactive string expression for reselected run id from \link{landingpage}.
+#' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
 #'
 #' @importFrom dplyr select
 #'
@@ -20,8 +20,7 @@
 #'
 #' @export
 visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
-                             userId, active = reactive(TRUE), 
-                             runIdList = reactive(c(-1)),
+                             userId, active = reactive(TRUE),
                              preselRunId = reactive(-1),
                              processRunId = reactive(-1),
                              logMessage = message) {
@@ -36,15 +35,6 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   sub_modules <- list()
 
   result <- reactiveValues(
-    #Reactive to know if one of the preselected runIds has changed
-    RunIDchanged = -2,
-    # preselRunId()
-    preselRunId = -1,
-    # processRunId()
-    processRunId = -1,
-    #selected run
-    preselectedRunId = NULL,
-    selectedRunId = NULL,
     #Panel to select
     preselPanel = 1,
     # output files table
@@ -61,39 +51,6 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     }
   })
   
-  # Run identification ---------------------------------------------------------
-  
-  #Define reactive value to react if any of the preselected run Ids changes
-  observe({
-    preselRunId()
-    processRunId()
-    if (is.null(processRunId())) {
-      result$processRunId <- -1
-    } else {
-      result$processRunId <- processRunId()
-    }
-    if (is.null(preselRunId())) {
-      result$preselRunId <- -1
-    } else {
-      result$preselRunId <- preselRunId()
-    }
-    result$RunIDchanged <- result$preselRunId + result$processRunId
-  })
-  
-  #Update selected runID
-  observe({
-    result$RunIDchanged
-    if (result$RunIDchanged == -2 ) {
-      result$preselectedRunId = runIdList()$RunID[1]
-    } else {
-      if (result$preselRunId != -1) {
-        result$preselectedRunId = isolate(result$preselRunId)
-      }
-      if (result$processRunId != -1) {
-        result$preselectedRunId = isolate(result$processRunId)
-      }
-    }
-  })
   
   # Selected runID -------------------------------------------------------------
   sub_modules$defineID1 <- callModule(
@@ -101,15 +58,17 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     id = "defineID-1",
     dbSettings = dbSettings,
     userId = reactive(userId()),
-    preselectedRunId = reactive(result$preselectedRunId),
+    preselRunId = preselRunId,
+    processRunId =  processRunId,
     logMessage = logMessage)
-  
+
   sub_modules$defineID2 <- callModule(
     defineID,
     id = "defineID-2",
     dbSettings = dbSettings,
     userId = reactive(userId()),
-    preselectedRunId = reactive(result$preselectedRunId),
+    preselRunId = preselRunId,
+    processRunId =  processRunId,
     logMessage = logMessage)
 
   
@@ -134,30 +93,21 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   # Extract Output files for given runID----------------------------------------
   observeEvent( {
     sub_modules$defineID1$selectRunID()
-    sub_modules$defineID2$selectRunID()
-                }, {
+    sub_modules$defineID2$selectRunID()}, {
     if (!is.na(sub_modules$defineID1$selectRunID()) && sub_modules$defineID1$selectRunID() != "" &&
         !is.na(sub_modules$defineID2$selectRunID()) && sub_modules$defineID2$selectRunID() != "") {
-    if (!is.null(runIdList())) {
-      index1 <- match(c(sub_modules$defineID1$selectRunID()), runIdList()$RunID)
-      status1 <- runIdList()[index1, "Status"]
-      if (!is.na(status1) && status1 == StatusCompleted) {
         filesListData1 <- getFileList(dbSettings, sub_modules$defineID1$selectRunID())
-        result$filesListData <- cbind(filesListData1,do.call(rbind.data.frame,  lapply(filesListData1$Description, .splitDescription)))
-      } else {
-        result$filesListData <- NULL
-      }
-      index2 <- match(c(sub_modules$defineID2$selectRunID()), runIdList()$RunID)
-      status2 <- runIdList()[index2, "Status"]
-      if (!is.na(status2) && status2 == StatusCompleted) {
+        result$filesListData <- cbind(filesListData1,
+                                      do.call(rbind.data.frame, 
+                                              lapply(filesListData1$Description, .splitDescription)))
         filesListData2 <- getFileList(dbSettings, sub_modules$defineID2$selectRunID())
         result$filesListData <- rbind(result$filesListData,
-                                      cbind(filesListData2,do.call(rbind.data.frame,  lapply(filesListData2$Description, .splitDescription))))
-      }
+                                      cbind(filesListData2,
+                                            do.call(rbind.data.frame, 
+                                                    lapply(filesListData2$Description, .splitDescription))))
     } else {
       result$filesListData <- NULL
     }
-  }
   })
   
   filesListDatatoview <- reactive({
@@ -193,7 +143,13 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     active = reactive({active() && input$tabsSBR == "tabplots"}),
     logMessage = logMessage)
   
-
+  # Helper functions -----------------------------------------------------------
+  #function to split the description field of result$filesListData
+  .splitDescription <- function(x){
+    y <- unlist(strsplit(x,split = " "))
+    z <- data.frame("Granularity" = y[2], "Losstype" = y[4], "Variable" = paste(y[5:length(y)], collapse = " "), stringsAsFactors = FALSE)
+    return(z)}
+  
   # Module Outout --------------------------------------------------------------
   
   moduleOutput <- c(

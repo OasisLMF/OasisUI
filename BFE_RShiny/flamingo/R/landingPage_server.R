@@ -14,7 +14,6 @@
 #' \itemize{
 #' 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
-#' 		\item{\\code{runIdList}: }{ilist of possible process run ids}
 #' }
 #'
 #' @importFrom DT renderDT
@@ -51,8 +50,6 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
       replaceWithIcons()
 
     logMessage("inbox refreshed")
-
-    result$runIdList <- result$inbox[, c(inbox.RunID , inbox.Status)]
   })
 
   output$tableInbox <- renderDT(if (userId() != FLAMINGO_GUEST_ID) {
@@ -88,8 +85,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
         result$inbox[i, 2]} else -1),
       # this is needed in processRun, probably shouldn't
       procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        result$inbox[i, 1]} else -1),
-      runIdList = reactive(result$runIdList)
+        result$inbox[i, 1]} else -1)
     )
   )
 

@@ -36,9 +36,15 @@ defineIDUI <- function(id, w, batch = FALSE){
                                border: none;
                                 ") %>%
            bs_embed_tooltip(title = browse_programmes$selectRunID, placement = "right"),
-         div(textOutput(ns("selectRunInfo1"), inline = TRUE), style = "font-weight:bold; font-color: #2d2d2d; display:inline;"),
-         div(textOutput(ns("selectRunInfo2"), inline = TRUE), style = "font-weight:bold; font-color: #2d2d2d; display:inline; 
-                                                                       padding:10px; margin: 5px; border-style: ridge;"),
+         div(textOutput(ns("selectRunInfo1"), inline = TRUE), 
+               style = "font-weight:bold; font-color: #2d2d2d; 
+                        display:inline;
+                        padding:10px; margin: 5px; "),
+         div(textOutput(ns("selectRunInfo2"), inline = TRUE),
+             style = "display:inline;"
+                      # font-weight:bold; font-color: #2d2d2d;
+                      # padding:10px; margin: 5px; border-style: solid;"
+             ),
          style = "display:inline;")
   
 }
@@ -55,7 +61,8 @@ defineIDUI <- function(id, w, batch = FALSE){
 #' @template params-module
 #' @template params-flamingo-module
 #' 
-#' @param preselectedRunId reactive string expression for reselected run id from \link{landingpage}
+#' @param preselRunId reactive string expression for reselected run id from \link{landingpage}.
+#' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
 #' 
 #' @param batch Flag indicating if it is a batch or a simple run.
 #' 
@@ -64,7 +71,8 @@ defineIDUI <- function(id, w, batch = FALSE){
 #' @export
 defineID <- function(input, output, session, 
                      dbSettings, userId, 
-                     preselectedRunId = reactive(-1),
+                     preselRunId = reactive(-1),
+                     processRunId = reactive(-1),
                      batch = FALSE,
                      logMessage = message) {
   
@@ -75,6 +83,8 @@ defineID <- function(input, output, session,
     inbox = NULL,
     selectRunID = "",
     selectRunName = "",
+    LProw = NULL,
+    PRrow = NULL,
     preselRow = NULL
   )
   
@@ -111,6 +121,7 @@ defineID <- function(input, output, session,
     showModal(RunsList)
   })
   
+  
   # > modal content
   sub_modules$tableInboxpanel <- callModule(
     flamingoTable,
@@ -127,10 +138,42 @@ defineID <- function(input, output, session,
     logMessage = logMessage)
   
   # > row to select
-  observeEvent(preselectedRunId(), {
-    result$preselRow <- match(preselectedRunId(), result$inbox[, inbox.RunID])
-  })
   
+  #Find row of runId preselected in landing page
+  observeEvent({
+    preselRunId()},{
+      idx <- which(result$inbox[, inbox.RunID] == preselRunId())
+      status <- result$inbox[idx,  inbox.Status]
+      
+      if (length(idx) > 0 && status == StatusCompleted){
+        result$LProw <- idx 
+      }
+    })
+  
+  #Find row of runId preselected in process run server step 3
+  observeEvent({
+    processRunId()},{
+      idx <- which(result$inbox[, inbox.RunID] ==  processRunId())
+      status <- result$inbox[idx,  inbox.Status]
+      
+      if (length(idx) > 0 && status == StatusCompleted){
+        result$PRrow <- idx 
+      }
+    })
+  
+  observeEvent({
+    result$LProw
+    result$PRrow
+  },ignoreNULL = FALSE, {
+    if (!is.null(result$LProw)) {
+      result$preselRow <- result$LProw
+    } else if (!is.null(result$PRrow)) {
+      result$preselRow <- result$PRrow
+    } else {
+      result$preselRow <- 1
+    }
+  })
+
   
   # > select run ID
   observeEvent(sub_modules$tableInboxpanel$rows_selected(), ignoreNULL = FALSE, {
@@ -167,7 +210,7 @@ defineID <- function(input, output, session,
   
   output$selectRunInfo2 <- renderText({
     if (result$selectRunID == "") {
-      info <- " ... "
+      info <- " "
     } else {
       info <- paste0(result$selectRunID, ' "' ,result$selectRunName, '"  ')
     }
