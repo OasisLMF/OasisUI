@@ -37,11 +37,11 @@ outputplotsUI <- function(id) {
 #' 
 #' @export
 outputplots <- function(input, output, session, dbSettings,
-                    apiSettings, userId,
-                    selectRunID, 
-                    n_panels,
-                    filesListData = reactive(NULL),
-                    active, logMessage = message) {
+                        apiSettings, userId,
+                        selectRunID, 
+                        n_panels,
+                        filesListData = reactive(NULL),
+                        active, logMessage = message) {
   
   ns <- session$ns
   
@@ -184,6 +184,24 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     Variables = character(0)
   )
   
+  # > Variables for cols positions
+  ### Creating Variables for col names of filesToPlot dataframe
+  #filesToPlot
+  #"FileID" "File Name" "Description" "Location" "Location Unix" "File Type" "Owner" "Source" "Resource Table" "Resource Key" "Granularity" "Losstype" "Variable"
+  filesToPlot.FileID <- "FileID"
+  filesToPlot.FileName <- "File Name"
+  filesToPlot.Description <- "Description"
+  filesToPlot.Location <- "Location"
+  filesToPlot.LocationUnix <- "Location Unix"
+  filesToPlot.FileType <- "File Type"
+  filesToPlot.Owner <- "Owner"
+  filesToPlot.Source <- "Source"
+  filesToPlot.ResourceTable <- "Resource Table"
+  filesToPlot.ResourceKey <- "Resource Key"
+  filesToPlot.Granularity <- "Granularity"
+  filesToPlot.Losstype <- "Losstype"
+  filesToPlot.Variable <- "Variable"
+  
   # reactive values holding checkbox state
   chkbox <- list(
     chkboxgrplosstypes = reactiveVal(NULL),
@@ -226,9 +244,9 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   })
   
   
-  # Enable / Disable options -------------------------------
+  # Enable / Disable options -----------------------------------------------------
   
-  # > based on run ID ----
+  # > based on run ID ------------------------------------------------------------
   #Gather the Granularities, Variables and Losstypes based on the runID output presets
   observe(if (active()) {
     if (!is.null(filesListData() )) {
@@ -259,8 +277,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     }
   })
   
-  # > based on inputs ----
-  
+  # > based on inputs ------------------------------------------------------------
   #GUL does not have policy
   observeEvent(
     chkbox$chkboxgrplosstypes(),
@@ -275,8 +292,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
     })
   
-  # Extract dataframe to plot ----------------------------------------------
-  
+  # Extract dataframe to plot ----------------------------------------------------
   #Logic to filter the files to plot
   #Missing logic in case either variables or granularities are not selected. For the moment not allowed
   observeEvent(input$abuttondraw, {
@@ -289,17 +305,20 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                       # ", aggregated to Portfolio Level: ", input$chkboxaggregate
     ))
     
-    # > clear data
+    # > Setup ----------------------------------------------------------------------
+    # >> clear data
     # Content to plot
     fileData <- NULL
     # List of files to plot
     filesToPlot <- NULL
+    # ggplot friendly dataframe to plot 
+    data <- NULL
     # DF indicating structure of the plot
     plotstrc <- data.frame("Loss" = NULL, "Variable" = NULL, "Granularity" = NULL)
     # single plot or grid
     multipleplots = FALSE
     
-    # > Plot parameters
+    # >> Plot parameters
     key <- plottypeslist[[inputplottype()]]$keycols
     uncertainty <- plottypeslist[[inputplottype()]]$uncertaintycols
     reference <- plottypeslist[[inputplottype()]]$referencecols
@@ -312,60 +331,59 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     ylabel <- plottypeslist[[inputplottype()]]$ylabel
     plottype <- plottypeslist[[inputplottype()]]$plottype
     
-    # > sanity checks ----
-    #If no data to plot show error
-    if (length(chkbox$chkboxgrplosstypes()) == 0    |
-        length(chkbox$chkboxgrpvariables()) == 0    |
-        length(chkbox$chkboxgrpgranularities()) == 0) {
-      flamingoNotification("Select the loss type(s), the variable(s) and the granularity of the data to plot", type = "error")
+    # >> sanity checks
+    # something must be selected
+    # only one granularity is allowed
+    # we can compare either multi-variables or multi-losstypes
+    l_losstypes <- length(chkbox$chkboxgrplosstypes())
+    l_variables <- length(chkbox$chkboxgrpvariables())
+    l_granularities <- length(chkbox$chkboxgrpgranularities()) 
+    sanytyChecks <- FALSE
+    if (l_losstypes == 0 | l_variables == 0 | l_granularities == 0) {
+      flamingoNotification("Select the perspective(s), the summary level(s) and the report to plot", type = "error")
     } else {
-      #If data to plot
-      #Only one granularity is allowed
-      if (length(chkbox$chkboxgrpgranularities()) > 1) {
-        flamingoNotification("Select only one granularity to plot", type = "error")
+      if (l_losstypes > 1 && l_variables > 1) {
+        flamingoNotification("Only comparison across either perspectives or reports are allowed", type = "error")
       } else {
-        # Max 2 variables are allowed
-        if (length(chkbox$chkboxgrpvariables()) > 2) {
-          flamingoNotification("Select max two variables to plot", type = "error")
-        } else {
-          # If 2 loss types
-          if (length(chkbox$chkboxgrplosstypes()) > 1) {
-            #With 2 loss types only one variable is allowed
-            if (length(chkbox$chkboxgrpvariables()) > 1) {
-              flamingoNotification("Select only one variable to plot", type = "error")
-            } else {
-              plotstrc <- data.frame("Loss" = c(2), "Variable" = c(1), "Granularity" = c(1))
-              result$Title <- paste0(key, " per ", chkbox$chkboxgrpgranularities())
-            } # One variable
-          } else {
-            # If one loss type
-            # if 2 variables
-            if (length(chkbox$chkboxgrpvariables()) > 1) {
-              plotstrc <- data.frame("Loss" = c(1), "Variable" = c(2), "Granularity" = c(1))
-              result$Title <- paste0(chkbox$chkboxgrplosstypes(), " per ", chkbox$chkboxgrpgranularities())
-            } else {
-              result$Title <- paste0(chkbox$chkboxgrpvariables(), " of ", chkbox$chkboxgrplosstypes(), "per ", chkbox$chkboxgrpgranularities())
-              plotstrc <- data.frame("Loss" = c(1), "Variable" = c(1), "Granularity" = c(1))
-            } # One variable
-          }# One loss type
-        } # Variables < 3
-      } # Granularity is one
-    } # End of sanity checksThere is data to plot
-    
-    
-    # > filter out files ----
-    if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
-      filesToPlot <- filesListData()  %>% filter(Losstype %in% chkbox$chkboxgrplosstypes(),
-                                                 Variable %in% chkbox$chkboxgrpvariables(),
-                                                 Granularity %in%  chkbox$chkboxgrpgranularities())
-      if (nrow(filesToPlot) != prod(plotstrc)) {
-        flamingoNotification("The run did not produce the selected output. Please check the logs", type = "error")
-        filesToPlot <- NULL
+        logMessage("Sanity checks passed")
+        sanytyChecks <- TRUE
+        # >> define plot structure
+        plotstrc <- data.frame("Loss" = c(l_losstypes), "Variable" = c(l_variables), "Granularity" = c(l_granularities))
       }
     }
     
+    # >> define dynamic default title
+    if (sanytyChecks) {
+      if (input$textinputtitle != "") {
+        result$Title <- input$textinputtitle
+      } else {
+        if (l_losstypes > l_variables) {
+          result$Title <- paste0(chkbox$chkboxgrplosstypes(), " per ", chkbox$chkboxgrpgranularities())
+        } else if (l_losstypes < l_variables)  {
+          result$Title <- paste0(chkbox$chkboxgrpvariables(), " of ", chkbox$chkboxgrplosstypes(), "per ", chkbox$chkboxgrpgranularities())
+        } else {
+          result$Title <- paste0(key, " per ", chkbox$chkboxgrpgranularities())
+        }
+      }
+    }
+    
+    # > filter out files to read -------------------------------------------------
+    if (sanytyChecks) {
+      if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
+        filesToPlot <- filesListData()  %>% filter(Losstype %in% chkbox$chkboxgrplosstypes(),
+                                                   Variable %in% chkbox$chkboxgrpvariables(),
+                                                   Granularity %in%  chkbox$chkboxgrpgranularities())
+        print("filesToPlot")
+        print(names(filesToPlot))
+        if (nrow(filesToPlot) != prod(plotstrc)) {
+          flamingoNotification("The run did not produce the selected output. Please check the logs", type = "error")
+          filesToPlot <- NULL
+        }
+      }
+    }
+    
+    # > read files to plot -----------------------------------------------------
     if (!is.null(filesToPlot)) {
-      # > read files to plot ---------
       for (i in seq(nrow(filesToPlot))) { # i<- 1
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
         # if (TRUE) {
@@ -374,12 +392,13 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
         # }
         currfileData <- .readFile(fileName)
+        #Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
         nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
         gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) & !(names(currfileData) %in% extracols) & !(names(currfileData) %in% x)]
-        if (any(which(plotstrc == 2))) {
-          extension <- filesToPlot[i, suffix[which(plotstrc == 2)]]
+        if (any(which(plotstrc > 1))) {
+          extension <- filesToPlot[i, suffix[which(plotstrc > 1)]] # losstype or Variable
         } else {
-          extension <- filesToPlot[i, suffix[3]]
+          extension <- filesToPlot[i, suffix[3]] # granularity
         }
         for (k in keycols) {
           newnamekey <- paste0(k, ".", extension)
@@ -394,48 +413,53 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       }
     }
     
+    # Make ggplot friendly -----------------------------------------------------
     if (!is.null(fileData)) {
-      # > make ggplot friendly ------
       data <- fileData %>% gather(key = variables, value = value, -nonkey) %>% separate(variables, into = c("variables", "keyval"), sep = "\\.") %>% spread(variables, value)
+      # rename column for Y axis
+      data <- data %>% rename("value" = key)
+      # rename column for x axis
+      data <- data %>% rename("xaxis" = x)
+      # rename column for granularity. Can be null if granularity level is portfolio
       if (length(gridcol) > 0) {
         data <- data %>% rename("gridcol" = gridcol)
       }
-      data <- data %>% rename("value" = key)
-      data <- data %>% rename("xaxis" = x)
+      # rename column for uncertainty. Not all files will have it
       if (length(uncertainty) > 0) {
         data <- data %>% rename("uncertainty" = uncertainty)
       }
+      # rename column for refernece. Not all files will have it
       if (length(reference) > 0) {
         data <- data %>% rename("reference" = reference)
       }
-      if (any(plotstrc == 2) & length(gridcol) > 0) {
+      # make multiplots if more than one losstype or variable is selected
+      if (any(plotstrc > 1) & length(gridcol) > 0) {
         multipleplots <- TRUE
         data <- data %>% rename("colour" = keyval)
       } else {
         multipleplots <- FALSE
         if (length(gridcol) > 0) {
-          data <- data %>% rename("colour" = gridcol)
+          data <- data %>% rename("colour" = "gridcol")
         }  else {
           data <- data %>% rename("colour" = keyval)
         }
       }
-      # print("data")
-      # print(data)
-      # > draw plot ----
-      if (input$textinputtitle != "") {
-        result$Title <- input$textinputtitle
+    }
+    
+    # print("data")
+    # print(data)
+    
+    # > draw plot --------------------------------------------------------------
+    if (!is.null(data)) {
+      if (plottype == "line") {
+        p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
+                         multipleplots = multipleplots)
+      } else if (plottype == "bar") {
+        p <- .barPlotDF (xlabel, ylabel, toupper(result$Title), data, wuncertainty = input$chkboxuncertainty, multipleplots = multipleplots, xtickslabels = xtickslabels)
       }
-      if (!is.null(data)) {
-        if (plottype == "line") {
-          p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
-                           multipleplots = multipleplots)
-        } else if (plottype == "bar"){
-          p <- .barPlotDF (xlabel, ylabel, toupper(result$Title), data, wuncertainty = input$chkboxuncertainty, multipleplots = multipleplots, xtickslabels = xtickslabels)
-        }
-        output$outputplot <- renderPlotly({ggplotly(p)})
-      } else {
-        flamingoNotification("No data to plot", type = "error")
-      }
+      output$outputplot <- renderPlotly({ggplotly(p)})
+    } else {
+      flamingoNotification("No data to plot", type = "error")
     }
     
   })
