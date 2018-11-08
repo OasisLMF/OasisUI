@@ -25,6 +25,7 @@ visualizationBBRUI(id)
 
 \item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
+<<<<<<< HEAD
 \item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
 
 \item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
@@ -33,6 +34,12 @@ visualizationBBRUI(id)
 
 \item{logMessage}{function that will be passed info messages.}
 
+=======
+\item{active}{reactive expression whether the module state should be updated.}
+
+\item{logMessage}{function that will be passed info messages.}
+
+>>>>>>> 4cbf70a6b8a4873dc77a64dae9d3e8fc22c37c86
 \item{id}{Namespace ID for the module.}
 
 \item{id}{module id}

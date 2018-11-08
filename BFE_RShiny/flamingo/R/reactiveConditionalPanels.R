@@ -1,4 +1,4 @@
-# Module server function ----
+# Module server function -------------------------------------------------------
 
 #' reactiveConditionalPanels
 #'
@@ -18,7 +18,8 @@
 #'
 #' @param visible Reactive string expression determining the visibility of
 #'   panels.
-#' @inheritParams flamingoModule
+#' @template params-module
+#' @template params-flamingo-module
 #
 #' @seealso Module _[reactiveConditionalPanel]_, providing similar functionality
 #'   for a single panel.
@@ -37,7 +38,7 @@ reactiveConditionalPanels <- function(input, output, session, visible) {
 }
 
 
-# Module UI function ----
+# Module UI function -----------------------------------------------------------
 
 #' reactiveConditionalPanelsUI
 #'

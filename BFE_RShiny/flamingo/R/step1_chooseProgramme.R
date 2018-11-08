@@ -479,10 +479,6 @@ step1_chooseProgramme <- function(input, output, session,
     result$selectprogrammeID <- result$DPProgData[1, DPProgData.ProgrammeID]
     hide("panelDefineProgramme")
     show("panelLinkFiles")
-    # selectRows(dataTableProxy("tableDPprog"), 1)
-    # selectPage(dataTableProxy("tableDPprog"), 1)
-    # logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
-    # show("panelLinkFiles")
   })
 
   ### Clear Programme Definition panel
@@ -577,8 +573,8 @@ step1_chooseProgramme <- function(input, output, session,
     removeModal()
   })
 
-  ### > Source Files -----------------------------------------------------------
-  ### Upload Location/Account File
+  # > Source Files -------------------------------------------------------------
+  # Upload Location/Account File
   .uploadSourceFile <- function(inFile, recordIdString, recordIdCode){
     flc <- getFileLocationPath(dbSettings, "Exposure File")
     flcopy <- file.copy(inFile$datapath, file.path(flc, inFile[1, 1]), overwrite = TRUE)
@@ -744,7 +740,7 @@ step1_chooseProgramme <- function(input, output, session,
     }
   })
 
-  ### View source files
+  # View source files
   .modalviewSourcefile <- function(Label, Title, InputID) {
     ns <- session$ns
     modalDialog(label = Label,
@@ -823,7 +819,7 @@ step1_chooseProgramme <- function(input, output, session,
 
   output$tableviewSRSfile <-  .renderDTSourceFile(SourceFile = result$viewSRSfile)
 
-  ### Define selectprogrammeID -------------------------------------------------
+  # Define selectprogrammeID ---------------------------------------------------
   # Add choices to selectprogrammeID, update selectprogrammeID
   observeEvent(result$DPProgData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -973,8 +969,6 @@ step1_chooseProgramme <- function(input, output, session,
       searchHighlight = TRUE,
       processing = 0,
       pageLength = pageLength,
-      #width = "100%",
-      #autoWidth = TRUE,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }

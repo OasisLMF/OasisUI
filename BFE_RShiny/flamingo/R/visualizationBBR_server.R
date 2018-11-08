@@ -25,9 +25,9 @@ visualizationBBR <- function(input, output, session, dbSettings,
                              active = reactive(TRUE), logMessage = message) {
   
   ns <- session$ns
-  
+
   # Reactive Values and parameters ---------------------------------------------
-  
+
   navigation_state <- reactiveNavigation()
   
   # list of sub-modules

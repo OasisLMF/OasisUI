@@ -22,6 +22,18 @@ flamingoIncrementalPanel(input, output, session, panels_state,
 \item{new_content_fun}{Function with new content.}
 
 \item{new_headings}{New heading.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{active}{reactive expression whether the module state should be updated.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{logMessage}{function that will be passed info messages.}
+
+\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 }
 \value{
 smth.

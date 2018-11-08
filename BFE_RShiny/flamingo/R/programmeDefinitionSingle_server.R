@@ -147,7 +147,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   )
 
   # Sub-Modules output ---------------------------------------------------------
-  # > Navigation ----
+  # > Navigation ---------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$navigationstate(), ignoreInit = TRUE, {
     if (submodulesList$step3_configureOutput$navigationstate() == "SBR") {
       updateNavigation(navigation_state, "SBR")
@@ -162,7 +162,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     workflowSteps$update(programmeWorkflowSteps[[3]])
   })
 
-  # > RunId ----
+  # > RunId --------------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$prrunid(), ignoreInit = TRUE, {
     result$prrunid <- submodulesList$step3_configureOutput$prrunid()
   })
@@ -250,7 +250,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  #If programmeID changes, then we select the first progOasis
+  # If programmeID changes, then we select the first progOasis
   observeEvent({
     result$POData_rowselected
     result$selectprogrammeID

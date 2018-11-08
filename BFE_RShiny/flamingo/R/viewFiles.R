@@ -373,7 +373,6 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
       pageLength = maxrowsperpage,
       preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
       drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
-      #autoWidth = TRUE
     )
     return(options)
   }
@@ -409,7 +408,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     HTML(paste(str1, str2, sep = '<br/>'))
   }
   
-  # Module Output -----------------------
+  # Module Output --------------------------------------------------------------
   invisible()
   
 }

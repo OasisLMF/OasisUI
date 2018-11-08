@@ -1,4 +1,4 @@
-# Module server function ----
+# Module server function -------------------------------------------------------
 
 #' dynamicColumn
 #'
@@ -42,7 +42,7 @@ dynamicColumn <- function(input, output, session, width) {
 }
 
 
-# Module UI function ----
+# Module UI function -----------------------------------------------------------
 
 #' dynamicColumn
 #'
@@ -66,7 +66,7 @@ dynamicColumnUI <- function(id, width, ...) {
 
 
 
-# utilities ----
+# utilities --------------------------------------------------------------------
 
 col_class <- function(width) {
   sprintf("col-sm-%d", width)

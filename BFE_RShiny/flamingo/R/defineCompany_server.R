@@ -39,7 +39,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   }
 
 
-  ### Company Table ###
+  # Company Table --------------------------------------------------------------
 
   # update company table when:
   # - module activated (e.g. when switching to tab)
@@ -62,11 +62,12 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
       options = list(
         searchHighlight = TRUE,
         columnDefs = list(list(visible = FALSE, targets = 0)),
-        autoWidth=TRUE
+        autoWidth = TRUE
       )
     )
   })
 
+  # Modal dialog and buttons in main panel -------------------------------------
   # Modal dialog of create button in main panel
   .compcrtupmodal <- function() {
     ns <- session$ns
@@ -227,7 +228,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   })
 
 
-  ### Module Output ###########################################################
+  # Module Output --------------------------------------------------------------
 
   moduleOutput <- list()
 

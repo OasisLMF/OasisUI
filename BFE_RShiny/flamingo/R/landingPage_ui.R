@@ -25,7 +25,6 @@ landingPageUI <- function(id) {
                      label = "Export to csv") %>%
         bs_embed_tooltip(title = landing_page$PRIdownloadexcel, placement = "right")
     )
-    # img(src = "landingpage.png", width = "70%") # to be replaced with proper image
   )
 }
 

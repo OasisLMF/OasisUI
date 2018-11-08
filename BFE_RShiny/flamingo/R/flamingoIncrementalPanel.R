@@ -30,7 +30,8 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
 #'
 #' @rdname flamingoIncrementalPanel
 #'
-#' @inheritParams flamingoModule
+#' @template params-module
+#' @template params-flamingo-module
 #' @param new_content_IDs ID with new content.
 #' @param new_content_fun Function with new content.
 #' @param new_headings New heading.

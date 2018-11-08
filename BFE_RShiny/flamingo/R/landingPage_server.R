@@ -23,7 +23,7 @@
 landingPage <- function(input, output, session, userId, userName, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
-  # Reactive Values and parameters -----
+  # Reactive Values and parameters ---------------------------------------------
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues(
@@ -31,7 +31,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     runIdList = NULL
   )
 
-  # navigation -----
+  # navigation -----------------------------------------------------------------
   observeEvent(input$abuttongotorun,
                updateNavigation(navigation_state, "SBR"))
 
@@ -121,7 +121,7 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 
   navigation_state <- reactiveNavigation()
 
-  ### Greeter ----
+  ### Greeter ------------------------------------------------------------------
   output$textOutputHeaderData2 <- renderText(paste("User Name:", userName()))
 
   observeEvent(input$abuttonuseradmin, {
@@ -165,12 +165,13 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
                removeModal()
   )
 
-  ### Button permissions ---- TODO:
+  ### Button permissions ---- --------------------------------------------------
+  # TODO:
   # observe(if (active()) {
   #   landingPageButtonUpdate(session, dbSettings, userId())
   # })
 
-  ### Module Output ----
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -222,7 +223,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
   })
 
 
-  ### Navigation Menu ----
+  ### Navigation Menu ----------------------------------------------------------
 
   observeEvent(input$abuttondefineprogrammesingle, {
     updateNavigation(navigation_state, "PS")
@@ -258,7 +259,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
     updateNavigation(navigation_state, "FM")
   })
 
-  ### Module Output ----
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(

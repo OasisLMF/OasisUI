@@ -1,4 +1,4 @@
-# visualization Batch Run Browse Module UI ------------------------------------
+# visualization Batch Run Browse Module UI -------------------------------------
 
 #' visualizationBBRUI
 #'

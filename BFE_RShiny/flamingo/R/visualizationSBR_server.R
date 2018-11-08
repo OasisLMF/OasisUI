@@ -1,4 +1,4 @@
-# visualizationSBR Module Server ----------------- -----------------------------
+# visualizationSBR Module Server -----------------------------------------------
 
 #' visualizationSBR
 #'
