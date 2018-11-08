@@ -8,7 +8,7 @@
 ViewFilesModuleUI(id, includechkbox = FALSE)
 
 ViewFilesModule(input, output, session, logMessage = message,
-  filesListData, includemrows = FALSE, includechkbox = FALSE)
+  filesListData, includechkbox = FALSE)
 }
 \arguments{
 \item{id}{module id}

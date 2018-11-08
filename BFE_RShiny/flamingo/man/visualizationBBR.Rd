@@ -7,8 +7,8 @@
 \title{visualizationBBR}
 \usage{
 visualizationBBR(input, output, session, dbSettings, apiSettings, userId,
-  active = reactive(TRUE), logMessage = message,
-  reloadMillis = 10000)
+  preselRunId = reactive(-1), processRunId = reactive(-1),
+  active = reactive(TRUE), logMessage = message)
 
 visualizationBBRUI(id)
 }
@@ -25,6 +25,10 @@ visualizationBBRUI(id)
 
 \item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
+\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
+
+\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
@@ -36,6 +40,8 @@ visualizationBBRUI(id)
 \value{
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
+preselPanel panel to show in the process session.
 
 List of tags.
 }

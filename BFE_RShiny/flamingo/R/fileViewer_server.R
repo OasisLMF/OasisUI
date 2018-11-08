@@ -66,7 +66,6 @@ fileViewer <- function(
     id = "ViewFilesModule",
     filesListData =  reactive({result$FLdata}),
     logMessage = logMessage,
-    includemrows = TRUE,
     includechkbox = TRUE)
 
 

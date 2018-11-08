@@ -45,7 +45,6 @@ For \code{landingPage()}, list of reactives:
 \itemize{
 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
-		\item{\\code{runIdList}: }{ilist of possible process run ids}
 }
 
 List of tags.

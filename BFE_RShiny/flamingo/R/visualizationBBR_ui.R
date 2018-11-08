@@ -13,12 +13,48 @@
 #' @importFrom shinyWidgets panel
 #'
 #' @export
+
 visualizationBBRUI <- function(id) {
-
+  
   ns <- NS(id)
-
+  
+  #Parameters
+  w <- 6
+  labelconfig <- "Go to Configure Batch Output"
+  
   tagList(
-    h3("Define Batch Browse", class = "flamingo-page-title")
+    
+    panel(
+      status = "primary",
+      fluidRow(
+        defineIDUI(ns("defineID"), w, batch = TRUE),
+        column(w,
+               align = "right",
+               actionButton(inputId = ns("abuttongotoconfig"), label = labelconfig)))
+    ),
+    
+    tabsetPanel(
+      id = ns("tabsBBR"),
+      
+      tabPanel(
+        title = "Summary",
+        summarytabUI(ns("summarytab")),
+        value = ns("tabsummary")
+      ),
+      
+      tabPanel(
+        title = "Plots",
+        outputplotsUI(ns("outputplots")),
+        value = ns("tabplots")
+      ),
+      
+      tabPanel(
+        title = "Files",
+        outputfilesUI(ns("outputfiles")),
+        value = ns("taboutputfiles")
+      )
+      
+    )
   )
-
+  
 }
