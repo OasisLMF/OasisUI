@@ -14,7 +14,7 @@ flamingoDBLogin(dbSettings, uid, pwd)
 \item{pwd}{user password}
 }
 \value{
-user id if succesful, -1 otherwise
+user if succesful, -1 otherwise
 }
 \description{
 Construct and execute a login query for the given credentials

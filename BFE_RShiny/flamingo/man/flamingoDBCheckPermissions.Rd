@@ -4,12 +4,12 @@
 \alias{flamingoDBCheckPermissions}
 \title{Check interface permissions for a user against the database}
 \usage{
-flamingoDBCheckPermissions(dbSettings, userId, resourceId)
+flamingoDBCheckPermissions(dbSettings, user, resourceId)
 }
 \arguments{
 \item{dbSettings}{object as returned by \code{\link[=flamingoDB]{flamingoDB()}}}
 
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+\item{user}{user as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
 \item{resourceId}{resource identifier, e.g. \code{c("1000")}}
 }

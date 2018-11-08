@@ -13,7 +13,7 @@ loginDialogUI <- function(id) {
 
     tags$div(align = "center", class = "login-dialog",
              img(src = "img/Flamingo.jpg" ),
-             tags$input(id = ns("userid"), type = "text",
+             tags$input(id = ns("user"), type = "text",
                         placeholder = "username", size = 15),
              tags$input(id = ns("password"), type = "password",
                         placeholder = "password", size = 15,

@@ -7,7 +7,7 @@
 \title{Batch Programme Definition Module}
 \usage{
 programmeDefinitionBatch(input, output, session, dbSettings, apiSettings,
-  userId, active = reactive(TRUE), logMessage = message,
+  active = reactive(TRUE), logMessage = message,
   reloadMillis = 10000)
 
 programmeDefinitionBatchUI(id)

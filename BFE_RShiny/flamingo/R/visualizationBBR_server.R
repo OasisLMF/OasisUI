@@ -8,7 +8,7 @@
 #' @template return-outputNavigation
 #' @export
 visualizationBBR <- function(input, output, session, dbSettings, apiSettings,
-                              userId, active = reactive(TRUE), logMessage = message,
+                              active = reactive(TRUE), logMessage = message,
                               reloadMillis = 10000) {
 
   ns <- session$ns

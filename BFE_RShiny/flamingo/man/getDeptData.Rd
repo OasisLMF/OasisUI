@@ -4,12 +4,12 @@
 \alias{getDeptData}
 \title{Get User Department}
 \usage{
-getDeptData(dbSettings, userId)
+getDeptData(dbSettings, user)
 }
 \arguments{
 \item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
-\item{userId}{user id}
+\item{user}{user}
 }
 \description{
 queries the database to retrieve department login and password

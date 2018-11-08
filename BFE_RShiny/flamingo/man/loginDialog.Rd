@@ -3,7 +3,7 @@
 \name{loginDialog}
 \alias{loginDialog}
 \alias{loginDialogUI}
-\title{Login Dialog Module}
+\title{loginDialog}
 \usage{
 loginDialog(input, output, session, dbSettings, logout,
   logMessage = message, logError = logMessage)
@@ -19,20 +19,20 @@ loginDialogUI(id)
 
 \item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
-\item{logout}{reactive yielding logout signal}
+\item{logout}{Reactive yielding logout signal.}
 
 \item{id}{account id}
 }
 \value{
-list of reactive expressions
+List of reactive expressions:
 \itemize{
-		\item{\code{userId}: }{yielding an user id if login has been completed
+		\item{\code{user}: }{yielding an user id if login has been completed
 					successfully and \link{FLAMINGO_GUEST_ID} otherwise}
 		\item{\code{logout}: }{reactive yielding logout button signal}
-}
+}.
 }
 \description{
-Server logic to login an user
+Server logic to login an user.
 
 UI/View to login an user
 }

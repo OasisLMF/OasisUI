@@ -2,7 +2,6 @@
 #' @rdname fileViewer
 #' @description Server logic to view files
 #' @inheritParams flamingoModule
-#' @param userId user id
 #' @param preselRunId preselected run id
 #' @return empty list
 #' @importFrom DT renderDT DTOutput dataTableProxy selectRows
@@ -15,7 +14,6 @@ fileViewer <- function(
   output,
   session,
   dbSettings,
-  userId,
   preselRunId = reactive(-1),
   active, #= reactive(TRUE),
   logMessage = message) {

@@ -6,7 +6,7 @@
 \alias{visualizationCBRUI}
 \title{Compare Runs Definition Module}
 \usage{
-visualizationCBR(input, output, session, dbSettings, apiSettings, userId,
+visualizationCBR(input, output, session, dbSettings, apiSettings,
   active = reactive(TRUE), logMessage = message,
   reloadMillis = 10000)
 

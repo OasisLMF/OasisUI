@@ -1,78 +1,70 @@
 
-#' Id to use for an unidentified user
-#' @name FLAMINGO_GUEST_ID
+#' FLAMINGO_GUEST_ID
+#'
+#' @rdname FLAMINGO_GUEST_ID
+#'
+#' @description Id to use for an unidentified user.
+#'
+#' @return Set value.
+#'
 #' @export
-FLAMINGO_GUEST_ID <- -1
+FLAMINGO_GUEST_ID <- "unauthorized"
 
-#' Login Dialog Module
+#' loginDialog
+#'
 #' @rdname loginDialog
-#' @description Server logic to login an user
+#'
+#' @description Server logic to login an user.
+#'
 #' @inheritParams accountDefinition
-#' @param logout reactive yielding logout signal
-#' @return list of reactive expressions
+#' @param logout Reactive yielding logout signal.
+#'
+#' @return List of reactive expressions:
 #' \itemize{
-#' 		\item{\code{userId}: }{yielding an user id if login has been completed
+#' 		\item{\code{user}: }{yielding an user id if login has been completed
 #' 					successfully and \link{FLAMINGO_GUEST_ID} otherwise}
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
-#' }
+#' }.
+#'
+#' @importFrom httr content
+#'
 #' @export
 loginDialog <- function(input, output, session, dbSettings, logout,
     logMessage = message, logError = logMessage) {
 
   result <- reactiveValues(
-      userId = FLAMINGO_GUEST_ID,
-      userName = ""
+      user = FLAMINGO_GUEST_ID
   )
 
   observeEvent(logout(), {
     js$reset()
-    result$userId <- FLAMINGO_GUEST_ID
-    updateTextInput(session, "userid", label = "", value = "")
+    result$user <- FLAMINGO_GUEST_ID
+    updateTextInput(session, "user", label = "", value = "")
     updateTextInput(session, "password", label = "", value = "")
   })
 
   observeEvent(input$loginbutton, {
-
     if (input$loginbutton > 0) {
-
-      userId <- FLAMINGO_GUEST_ID
-
-      tryCatch({
-        userId <- flamingoDBLogin(
-          dbSettings,
-          pwd = isolate(input$password),
-          uid = isolate(input$userid))
-      }, error = function(e) {
-        logError(e$message)
-      })
-
-      if ( userId == FLAMINGO_GUEST_ID ) {
-
-        flamingoNotification("Login Failed, please check your credentials.",
-                         type = "error")
-
+      user <- isolate(input$user)
+      pwd <- isolate(input$password)
+      res <- api_refresh_token(user, pwd)
+      if (res$status == "Success") {
+        result$user <- 1 #TODO for now, this is a workaround
+        #result$user <- user # for later
+        options(flamingo.settings.api.token = content(res$result)$access_token)
       } else {
-
-        stmt <- paste("SELECT BFEUserName FROM [dbo].[BFEUser] WHERE BFEUserID =", userId)
-        result$userName <- executeDbQuery(dbSettings, stmt)[1,1]
-
+        options(flamingo.settings.api.token = NULL)
+        flamingoNotification("Login Failed, please check your credentials.",
+                              type = "error")
       }
-
-      result$userId <- userId
-
     }
-
-    logMessage(paste("In Login Userid: ", result$userId))
+    logMessage(paste("In Login User: ", result$user))
   })
 
-
-  ### Module Output
-
+  # Module Output
   moduleOutput <- list(
-    userId = reactive(result$userId),
-    userName = reactive(result$userName)
+    user = reactive(result$user)
   )
 
   return(moduleOutput)
 }
-

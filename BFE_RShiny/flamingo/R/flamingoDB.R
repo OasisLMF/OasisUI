@@ -137,7 +137,7 @@ flamingoDB <- function(
 #' @param dbSettings object as returned by [flamingoDB()]
 #' @param uid user name
 #' @param pwd user password
-#' @return user id if succesful, -1 otherwise
+#' @return user if succesful, -1 otherwise
 #' @export
 #' @md
 flamingoDBLogin <- function(dbSettings, uid, pwd) {
@@ -153,14 +153,14 @@ flamingoDBLogin <- function(dbSettings, uid, pwd) {
 #' @description Consult the interface permissions for the user with given
 #' user identifier by creating and executing a database query.
 #' @param dbSettings object as returned by [flamingoDB()]
-#' @param userId user id as returned by [flamingoDBLogin()]
+#' @param user user as returned by [flamingoDBLogin()]
 #' @param resourceId resource identifier, e.g. `c("1000")`
 #' @return character vector of permission Modes, e.g. #' `c("CRUD" "R")`
 #' @export
 #' @md
-flamingoDBCheckPermissions <- function(dbSettings, userId, resourceId) {
+flamingoDBCheckPermissions <- function(dbSettings, user, resourceId) {
 
-  stmt <- buildDbQuery("getResourceModeUser", userId, as.numeric(resourceId))
+  stmt <- buildDbQuery("getResourceModeUser", user, as.numeric(resourceId))
   res <- executeDbQuery(dbSettings, stmt)
 
   return(res[,1])
@@ -194,7 +194,7 @@ getCompanyList <- function(dbSettings) {
 #' Get the process run overview from the database
 #' @rdname getInboxData
 #' @param ... other arguments to [executeDbQuery()]
-#' @param userId user id as returned by [flamingoDBLogin()]
+#' @param user user as returned by [flamingoDBLogin()]
 #' @inheritParams executeDbQuery
 #' @return inbox; `data.frame` of 6 variables:
 #' \itemize{
@@ -207,9 +207,9 @@ getCompanyList <- function(dbSettings) {
 #' }
 #' @export
 #' @md
-getInboxData <- function(dbSettings, userId, ...) {
-
-  stmt <- paste0("exec dbo.getUserProcessDetails ", userId)
+getInboxData <- function(dbSettings, user, ...) {
+#TODO API:
+  stmt <- paste0("exec dbo.getUserProcessDetails ", user)
   res <- executeDbQuery(dbSettings, stmt, ...)
 
   return(res)
@@ -591,12 +591,12 @@ getProgrammeList <- function (dbSettings) {
 #' @description queries the database to retrieve department login and password
 #' details for the designated user.
 #' @inheritParams executeDbQuery
-#' @param userId user id
+#' @param user user
 #' @export
 #' @md
-getDeptData <- function(dbSettings, userId) {
-
-  stmt <- buildDbQuery("getUserDepartment", userId)
+getDeptData <- function(dbSettings, user) {
+  #TODO API:
+  stmt <- buildDbQuery("getUserDepartment", user)
   res <- executeDbQuery(dbSettings, stmt)
 
   return(res)

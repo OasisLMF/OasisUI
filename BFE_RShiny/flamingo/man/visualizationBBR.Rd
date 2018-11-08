@@ -6,7 +6,7 @@
 \alias{visualizationBBRUI}
 \title{Batch Browse Definition Module}
 \usage{
-visualizationBBR(input, output, session, dbSettings, apiSettings, userId,
+visualizationBBR(input, output, session, dbSettings, apiSettings,
   active = reactive(TRUE), logMessage = message,
   reloadMillis = 10000)
 

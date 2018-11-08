@@ -196,7 +196,7 @@ panelLinkFiles <- function(id) {
 #' @importFrom shinyjs onclick disable enable
 #' @export
 step1_chooseProgramme <- function(input, output, session,
-                                  dbSettings,apiSettings, userId,
+                                  dbSettings,apiSettings, user,
                                   active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
@@ -533,13 +533,14 @@ step1_chooseProgramme <- function(input, output, session,
   ### > Source Files -----------------------------------------------------------
   ### Upload Location/Account File
   .uploadSourceFile <- function(inFile, recordIdString, recordIdCode){
+    #TODO API:
     flc <- getFileLocationPath(dbSettings, "Exposure File")
     flcopy <- file.copy(inFile$datapath, file.path(flc, inFile[1, 1]), overwrite = TRUE)
     logMessage(file.path(flc, inFile[1, 1]))
     if (length(input$tableDPprog_rows_selected) > 0) {
       if (flcopy == TRUE) {
         recordId <- createFileRecord(
-          dbSettings, inFile[1, 1], recordIdString, recordIdCode, flc, userId(),
+          dbSettings, inFile[1, 1], recordIdString, recordIdCode, flc, user(),
           "Prog", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
         )
         if (!is.null(recordId)) {

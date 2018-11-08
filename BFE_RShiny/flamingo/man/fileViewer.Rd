@@ -5,7 +5,7 @@
 \alias{fileViewerUI}
 \title{File Viewer Module}
 \usage{
-fileViewer(input, output, session, dbSettings, userId,
+fileViewer(input, output, session, dbSettings,
   preselRunId = reactive(-1), active, logMessage = message)
 
 fileViewerUI(id)
@@ -18,8 +18,6 @@ fileViewerUI(id)
 \item{session}{shiny session object}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{userId}{user id}
 
 \item{preselRunId}{preselected run id}
 

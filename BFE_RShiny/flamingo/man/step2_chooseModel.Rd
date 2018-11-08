@@ -7,7 +7,7 @@
 \usage{
 step2_chooseModelUI(id)
 
-step2_chooseModel(input, output, session, dbSettings, apiSettings, userId,
+step2_chooseModel(input, output, session, dbSettings, apiSettings,
   active = reactive(TRUE), logMessage = message,
   currstep = reactive(-1), selectprogrammeID = reactive({     "" }),
   selectprogOasisID = reactive({     "" }), progName = reactive({    

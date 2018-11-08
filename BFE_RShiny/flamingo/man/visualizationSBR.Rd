@@ -4,7 +4,7 @@
 \alias{visualizationSBR}
 \title{visualizationSBR Module}
 \usage{
-visualizationSBR(input, output, session, dbSettings, apiSettings, userId,
+visualizationSBR(input, output, session, dbSettings, apiSettings,
   runIdList = reactive(c(-1)), preselRunId = reactive(-1),
   processRunId = reactive(-1), active = reactive(TRUE),
   logMessage = message, reloadMillis = 10000)

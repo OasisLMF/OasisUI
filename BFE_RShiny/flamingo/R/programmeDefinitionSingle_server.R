@@ -12,25 +12,25 @@
 #' @importFrom shinyjs onclick js removeClass addClass
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,
-                                      apiSettings, userId, active = reactive(TRUE), logMessage = message,
+                                      apiSettings, user, active = reactive(TRUE), logMessage = message,
                                       preselRunId = reactive(-1),
                                       preselProcId = reactive(-1),
                                       preselPanel = reactive(1),
                                       reloadMillis = 10000) {
-  
+
   ns <- session$ns
-  
+
   # Reactive Values and parameters ---------------------------------------------
   # Navigation State
   navigation_state <- reactiveNavigation()
-  
+
   # Submodules list
   submodulesList <- list()
-  
+
   #values to stop ping pong effect
   stop_selProgID <- check_selProgID <- 0
   stop_selProgOasisID <- check_selProgOasisID <- 0
-  
+
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # Id of the Process Run
@@ -60,18 +60,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     # Model status
     progOasisStatus = ""
   )
-  
+
   # Panels switch --------------------------------------------------------------
   # Module to control colors of radio buttons in the singleProgrammeWorkflowSteps
   workflowSteps <- callModule(singleProgrammeWorkflowSteps, "workflowsteps")
-  
-  # Make sure the view is reset: 
+
+  # Make sure the view is reset:
   # to first panel if accessing from landing page
   # and to panel 3 if coming from Browse
   observe(if (active()) {
     workflowSteps$update(programmeWorkflowSteps[[preselPanel()]])
   })
-  
+
   observeEvent(workflowSteps$step(), ignoreInit = TRUE, {
     if (active()) {
       switch(
@@ -93,27 +93,26 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       )
     }
   })
-  
+
   # Sub-Modules ----------------------------------------------------------------
   submodulesList$step1_chooseProgramme <- callModule(
     step1_chooseProgramme,
     id = "step1_chooseProgramme",
     dbSettings = dbSettings,
-    apiSettings = apiSettings, 
-    userId = userId, 
-    active = reactive({active() && workflowSteps$step() == 1}), 
+    apiSettings = apiSettings,
+    user = user,
+    active = reactive({active() && workflowSteps$step() == 1}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     selectprogrammeID = reactive(result$selectprogrammeID)
   )
-  
+
   submodulesList$step2_chooseModel <- callModule(
     step2_chooseModel,
     id = "step2_chooseModel",
     dbSettings = dbSettings,
-    apiSettings = apiSettings, 
-    userId = userId, 
-    active = reactive({active() && workflowSteps$step() == 2}), 
+    apiSettings = apiSettings,
+    active = reactive({active() && workflowSteps$step() == 2}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     selectprogrammeID = reactive(input$selectprogrammeID),
@@ -122,14 +121,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     progStatus = reactive({result$progStatus}),
     DPProgData = reactive({result$DPProgData})
   )
-  
+
   submodulesList$step3_configureOutput <- callModule(
     step3_configureOutput,
     id = "step3_configureOutput",
     dbSettings = dbSettings,
-    apiSettings = apiSettings, 
-    userId = userId, 
-    active = reactive({active() && workflowSteps$step() == 3}), 
+    apiSettings = apiSettings,
+    active = reactive({active() && workflowSteps$step() == 3}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     selectprogrammeID = reactive(input$selectprogrammeID),
@@ -137,7 +135,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     progOasisName = reactive({result$progOasisName}),
     progOasisStatus = reactive({result$progOasisStatus})
   )
-  
+
   # Sub-Modules output ---------------------------------------------------------
   # > Navigation ----
   observeEvent(submodulesList$step3_configureOutput$navigationstate(), ignoreInit = TRUE, {
@@ -145,20 +143,20 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       updateNavigation(navigation_state, "SBR")
     }
   })
-  
+
   observeEvent(submodulesList$step1_chooseProgramme$newstep(), ignoreInit = TRUE, {
     workflowSteps$update(programmeWorkflowSteps[[2]])
   })
-  
+
   observeEvent(submodulesList$step2_chooseModel$newstep(), ignoreInit = TRUE, {
     workflowSteps$update(programmeWorkflowSteps[[3]])
   })
-  
+
   # > RunId ----
   observeEvent(submodulesList$step3_configureOutput$prrunid(), ignoreInit = TRUE, {
     result$prrunid <- submodulesList$step3_configureOutput$prrunid()
   })
-  
+
   # > selectprogrammeID --------------------------------------------------------
   observeEvent(submodulesList$step1_chooseProgramme$selectprogrammeID(), ignoreInit = TRUE, {
     prgId <- submodulesList$step1_chooseProgramme$selectprogrammeID()
@@ -168,15 +166,15 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       result$selectprogrammeID <- prgId
     }
   })
-  
+
   observeEvent(input$selectprogrammeID, ignoreInit = TRUE,{
     #Avoid updating input if not necessary
     if (input$selectprogrammeID != result$selectprogrammeID) {
       logMessage(paste0("updating result$selectprogrammeID because input$selectprogrammeID changed to: ", input$selectprogrammeID ))
-      result$selectprogrammeID <- input$selectprogrammeID 
+      result$selectprogrammeID <- input$selectprogrammeID
     }
   })
-  
+
   observeEvent({
     workflowSteps$step()
   }, {if (workflowSteps$step() != 1) {
@@ -190,7 +188,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   }
   })
-  
+
   # > prog Table reactives -----------------------------------------------------
   observeEvent(submodulesList$step1_chooseProgramme$DPProgData(), ignoreInit = TRUE,{
     if (is.null(submodulesList$step1_chooseProgramme$DPProgData()) || nrow(submodulesList$step1_chooseProgramme$DPProgData()) == 0) {
@@ -202,7 +200,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
     result$progChoices <- result$DPProgData[, DPProgData.ProgrammeID]
   })
-  
+
   observeEvent({
     result$selectprogrammeID
     result$progChoices
@@ -222,7 +220,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
     result$progStatus <- progStatus
   })
-  
+
   # > selectprogOasisID --------------------------------------------------------
   observeEvent(submodulesList$step2_chooseModel$selectprogOasisID(), ignoreInit = TRUE, {
     progOasisId <- submodulesList$step2_chooseModel$selectprogOasisID()
@@ -231,7 +229,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       result$selectprogOasisID <- submodulesList$step2_chooseModel$selectprogOasisID()
     }
   })
-  
+
   observeEvent({
     input$selectprogOasisID
     }, ignoreInit = TRUE, {
@@ -241,8 +239,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       result$selectprogOasisID <- input$selectprogOasisID
     }
   })
-  
-  #If programmeID changes, then we select the first progOasis 
+
+  #If programmeID changes, then we select the first progOasis
   observeEvent({
     result$POData_rowselected
     result$selectprogrammeID
@@ -250,13 +248,13 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     progOasisId <- ""
     if (!is.null(result$POData) && nrow(result$POData) > 0) {
       progOasisId <- result$POData[result$POData_rowselected, POData.ProgOasisId]
-    } 
+    }
     if (!is.null(progOasisId) && !is.na(progOasisId) && progOasisId != result$selectprogOasisID) {
       logMessage(paste0("updating result$selectprogOasisID because result$POData_rowselected changed to: ", result$POData_rowselected ))
       result$selectprogOasisID <- progOasisId
     }
   })
-  
+
   observeEvent({
     workflowSteps$step()
     result$selectprogOasisID
@@ -265,10 +263,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       #Avoid updating input if not necessary
       if (input$selectprogOasisID  != result$selectprogOasisID) {
         updateSelectizeInput(session, inputId = "selectprogOasisID", selected = result$selectprogOasisID, choices = result$progOasisChoices)
-      } 
+      }
     }
   })
-  
+
   # > prog Model Table reactives -----------------------------------------------
   observeEvent({
     submodulesList$step2_chooseModel$POData()
@@ -282,10 +280,10 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       } else {
         result$progOasisChoices <- c("")
       }
-      
+
     }
   })
-  
+
   observeEvent({
     result$selectprogrammeID
     result$selectprogOasisID
@@ -308,8 +306,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
     result$progOasisStatus <- progOasisStatus
   })
-  
-  
+
+
   # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
@@ -317,9 +315,9 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
       processRunId = reactive(result$prrunid)
     )
   )
-  
+
   moduleOutput
-  
+
 }
 
 #' Function to replace status with icons in table
@@ -331,10 +329,10 @@ replaceWithIcons <- function(df){
   #Status
   StatusGood <- c("success", "completed", "loaded")
   StatusBad <- c("cancelled", "failed",  NA_character_)
-  
+
   # Help function
   '%notin%' <- Negate('%in%')
-  
+
   #Replace Status in df
   logMessage(paste0("replacing icons"))
   df <- df %>%

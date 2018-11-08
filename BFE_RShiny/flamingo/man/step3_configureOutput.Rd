@@ -8,7 +8,7 @@
 step3_configureOutputUI(id)
 
 step3_configureOutput(input, output, session, dbSettings, apiSettings,
-  userId, active = reactive(TRUE), logMessage = message,
+  active = reactive(TRUE), logMessage = message,
   currstep = reactive(-1), selectprogrammeID = reactive(""),
   selectprogOasisID = reactive(""), progOasisName = reactive(""),
   progOasisStatus = reactive(""))

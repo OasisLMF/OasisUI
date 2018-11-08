@@ -6,9 +6,8 @@
 \alias{pagestructureUI}
 \title{Page Structure}
 \usage{
-pagestructure(input, output, session, userId, userName, dbSettings,
-  reloadMillis = 10000, logMessage = message,
-  active = reactive(TRUE))
+pagestructure(input, output, session, dbSettings, reloadMillis = 10000,
+  logMessage = message, active = reactive(TRUE))
 
 pageheaderUI(id)
 
@@ -21,14 +20,10 @@ pagestructureUI(id)
 
 \item{session}{shiny session object}
 
-\item{userId}{reactive expression yielding user id}
-
-\item{userName}{reactive expression yielding user name}
-
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater};}
+\item{reloadMillis}{amount of time to wait between table updates,
+see \link{invalidateLater}}
 
 \item{logMessage}{function that will be passed info messages}
 

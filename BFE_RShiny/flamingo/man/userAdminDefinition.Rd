@@ -6,7 +6,7 @@
 \alias{userAdminDefinitionUI}
 \title{User Admin Definition Module}
 \usage{
-userAdminDefinition(input, output, session, dbSettings, userId,
+userAdminDefinition(input, output, session, dbSettings, user,
   active = reactive(TRUE))
 
 userAdminDefinitionUI(id)
@@ -20,7 +20,7 @@ userAdminDefinitionUI(id)
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{userId}{reactive yielding user id (of the logged in user)}
+\item{user}{reactive yielding user (the logged in user)}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

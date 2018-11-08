@@ -5,7 +5,7 @@
 \alias{landingPageUI}
 \title{Landing Page}
 \usage{
-landingPage(input, output, session, userId, userName, dbSettings,
+landingPage(input, output, session, user, dbSettings,
   reloadMillis = 10000, logMessage = message,
   active = reactive(TRUE))
 
@@ -18,9 +18,7 @@ landingPageUI(id)
 
 \item{session}{shiny session object}
 
-\item{userId}{reactive expression yielding user id}
-
-\item{userName}{reactive expression yielding user name}
+\item{user}{reactive expression yielding user}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 

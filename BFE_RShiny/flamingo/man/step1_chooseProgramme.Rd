@@ -8,7 +8,7 @@
 step1_chooseProgrammeUI(id)
 
 step1_chooseProgramme(input, output, session, dbSettings, apiSettings,
-  userId, active = reactive(TRUE), logMessage = message,
+  user, active = reactive(TRUE), logMessage = message,
   currstep = reactive(-1), selectprogrammeID = reactive(""))
 }
 \arguments{

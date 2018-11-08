@@ -4,7 +4,7 @@
 \alias{companyDefinition}
 \title{Company Definition Module}
 \usage{
-companyDefinition(input, output, session, dbSettings, userId,
+companyDefinition(input, output, session, dbSettings,
   active = reactive(TRUE), logMessage = message)
 }
 \arguments{
@@ -15,8 +15,6 @@ companyDefinition(input, output, session, dbSettings, userId,
 \item{session}{shiny session object}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{userId}{reactive expression yielding user id}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

@@ -4,15 +4,12 @@
 \alias{landingPageButtonUpdate}
 \title{Landing Page Access Control}
 \usage{
-landingPageButtonUpdate(session, dbSettings, userId,
-  logMessage = message)
+landingPageButtonUpdate(session, dbSettings, logMessage = message)
 }
 \arguments{
 \item{session}{shiny session object}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{userId}{reactive expression yielding user id}
 
 \item{logMessage}{function that will be passed info messages}
 }

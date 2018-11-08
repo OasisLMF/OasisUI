@@ -4,22 +4,22 @@
 #' @description Server logic for accessing the Company User List for Flamingo
 #' in association with OASIS LMF
 #' @inheritParams flamingoModule
-#' @param userId reactive yielding user id (of the logged in user)
+#' @param user reactive yielding user (the logged in user)
 #' @return For \code{userAdminDefinition()}, list of reactives.
 #' @template return-outputNavigation
 #' @importFrom DT renderDT
 #' @importFrom shinyjs enable disable
 #' @export
-userAdminDefinition <- function(input, output, session, dbSettings, userId,
+userAdminDefinition <- function(input, output, session, dbSettings, user,
                                 active = reactive(TRUE)) {
 
   # Reactive Values and parameters ---------------------------------------------
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues(
-    
+
     permission = NULL,
-    
+
     CULData = NULL,
     CULDataCounter = 0,
 
@@ -68,8 +68,8 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   .clearOasisUserSelection <- function() {
     oasisUsers <- getOasisUsers(dbSettings)
     updateSelectInput(session, "sinputOasisID",
-                      choices = createSelectOptions(oasisUsers, "Select Oasis User ID"),
-                      selected = c("Select Oasis User ID" = 0))
+                      choices = createSelectOptions(oasisUsers, "Select Oasis User"),
+                      selected = c("Select Oasis User" = 0))
   }
 
   ### When Activated (e.g. tab is openened)
@@ -177,12 +177,12 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   ###  Permission Checking ####################################################
 
-  observeEvent({active(); userId()}, if (active()) {
+  observeEvent({active(); user()}, if (active()) {
 
-    # the user Id here is the user id of the logged in user, not of the
+    # the user here is the logged in user, not the
     # currently selected user
 
-    result$permission <- flamingoDBCheckPermissions(dbSettings, userId(), 905)
+    result$permission <- flamingoDBCheckPermissions(dbSettings, user(), 905)
 
     if (length(result$permission) == 0) {
 
@@ -192,7 +192,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
       updateNavigation(navigation_state, "LP")
 
     } else if (result$permission[1] != "CRUD" && result$permission[1] != "R") {
-      
+
       flamingoNotification(type = "warning", "Neither CRUD nor R")
 
     }
@@ -314,7 +314,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
                          paste("Failed to create new user - ", input$tinputUserName))
       } else {
         flamingoNotification(type = "message",
-                         paste("User ", input$tinputUserName, " created. User id: ", res))
+                         paste("User ", input$tinputUserName, " created. User: ", res))
       }
 
     } else if (result$useradminflg == "U") {
@@ -341,9 +341,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   output$userdelmodal <- renderUI({
     companyId <- result$CULData[(input$tablecompanyuserlist_rows_selected), 1]
     companyName <- result$CULData[(input$tablecompanyuserlist_rows_selected), 2]
-    userId <- result$CULData[(input$tablecompanyuserlist_rows_selected), 3]
-    userName <- result$CULData[(input$tablecompanyuserlist_rows_selected), 4]
-    paste0('Delete User id ', userId, ' "', userName,'" for Company id ', companyId, ' "', companyName, '"')
+    CULId <- result$CULData[(input$tablecompanyuserlist_rows_selected), 3]
+    CULName <- result$CULData[(input$tablecompanyuserlist_rows_selected), 4]
+    paste0('Delete User ', CULId, ' "', CULName,'" for Company id ', companyId, ' "', companyName, '"')
   })
 
   # Modal dialog of delete button
@@ -442,14 +442,14 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
 
 
-  ### Oasis User Id (License) Add/Delete ######################################
+  ### Oasis User (License) Add/Delete ######################################
 
   # modal dialog of add/remove license button
   .userlicensemodal <- function() {
     ns <- session$ns
     modalDialog(label = "userlicensemodal",
                 title = "Add/Remove User Licenses",
-                selectInput(ns("sinputOasisID"), "Select Oasis User ID",
+                selectInput(ns("sinputOasisID"), "Select Oasis User",
                             choices = c("")),
                 footer = tagList(
                   flamingoButton(ns("abuttonaddoasisid"),

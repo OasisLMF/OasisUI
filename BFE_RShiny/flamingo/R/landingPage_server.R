@@ -3,8 +3,7 @@
 #' @inheritParams flamingoModule
 #' @param reloadMillis amount of time to wait between table updates;
 #' see \link{invalidateLater};
-#' @param userId reactive expression yielding user id
-#' @param userName reactive expression yielding user name
+#' @param user reactive expression yielding user
 #' @return For \code{landingPage()}, list of reactives:
 #' \itemize{
 #' 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
@@ -16,7 +15,7 @@
 #' @importFrom utils write.csv
 #' @importFrom shinyWidgets toggleDropdownButton
 #' @export
-landingPage <- function(input, output, session, userId, userName, dbSettings,
+landingPage <- function(input, output, session, user, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
   # Reactive Values and parameters -----
@@ -32,28 +31,25 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
                updateNavigation(navigation_state, "SBR"))
 
   observe(if (active()) {
-
     # invalidate if the refresh button updates
     force(input$refreshInbox)
 
     # reload automatically every so often
     invalidateLater(reloadMillis)
 
-    landingPageButtonUpdate(session, dbSettings, userId())
+    landingPageButtonUpdate(session, dbSettings)
 
-    data <- getInboxData(dbSettings, userId())
+    data <- getInboxData(dbSettings, user())
     result$inbox <- data %>%
       replaceWithIcons()
 
     logMessage("inbox refreshed")
 
     result$runIdList <- result$inbox[, c("RunID", "Status")]
-    #logMessage(paste0("result$runIdList ", names(result$runIdList)))
   })
 
-  output$tableInbox <- renderDT(if (userId() != FLAMINGO_GUEST_ID) {
+  output$tableInbox <- renderDT(if (!is.null(result$inbox)) {
     datatable(
-      # inbox(),
       result$inbox,
       class = "flamingo-table display",
       rownames = TRUE,
@@ -72,22 +68,11 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   output$PRIdownloadexcel <- downloadHandler(
     filename = "processruninbox.csv",
     content = function(file) {
-      write.csv(inbox(), file)
+      write.csv(result$inbox, file)
     }
   )
 
-  ### Module Output ----
-  # moduleOutput <- c(
-  #   outputNavigation(navigation_state),
-  #   list(
-  #     runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-  #       inbox()[i, 2]} else -1),
-  #     # this is needed in processRun, probably shouldn't
-  #     procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-  #       inbox()[i, 1]} else -1),
-  #     runIdList = reactive(inbox()[, c("RunID", "Status")])
-  #   )
-  # )
+  # Module Output ----
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -101,17 +86,15 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
   )
 
   moduleOutput
-
 }
 
 
 #' pageheader
 #' @rdname pageheader
 #' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater};
-#' @param userId reactive expression yielding user id
-#' @param userName reactive expression yielding user name
+#' @param reloadMillis amount of time to wait between table updates,
+#' see \link{invalidateLater}
+#' @param user reactive expression yielding user name
 #' @return For \code{pageheader()}, list of reactives:
 #' \itemize{
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
@@ -119,15 +102,15 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' @template return-outputNavigation
 #' @importFrom shinyWidgets toggleDropdownButton
 #' @export
-pageheader <- function(input, output, session, userId, userName, dbSettings,
+pageheader <- function(input, output, session, user, dbSettings,
                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
   ns <- session$ns
 
   navigation_state <- reactiveNavigation()
 
-  ### Greeter ----
-  output$textOutputHeaderData2 <- renderText(paste("User Name:", userName()))
+  # Greeter ----
+  output$textOutputHeaderData2 <- renderText(paste("User Name:", user()))
 
   observeEvent(input$abuttonuseradmin, {
     updateNavigation(navigation_state, "UA")
@@ -170,16 +153,15 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
                removeModal()
   )
 
-  ### Button permissions ----
-  observe(if (active()) {
-    landingPageButtonUpdate(session, dbSettings, userId())
-  })
+  # Button permissions ----
+  # observe(if (active()) {
+  #   landingPageButtonUpdate(session, dbSettings, user())
+  # })
 
-  ### Module Output ----
+  # Module Output ----
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      # logout = reactive(input$abuttonlogout),
       logout = reactive(input$abuttonlogoutcontinue)
     )
   )
@@ -191,16 +173,14 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' Page Structure
 #' @rdname pagestructure
 #' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater};
-#' @param userId reactive expression yielding user id
-#' @param userName reactive expression yielding user name
+#' @param reloadMillis amount of time to wait between table updates,
+#' see \link{invalidateLater}
 #' @return For \code{pagestructure()}, list of reactives.
 #' @template return-outputNavigation
 #' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyWidgets panel toggleDropdownButton
 #' @export
-pagestructure <- function(input, output, session, userId, userName, dbSettings,
+pagestructure <- function(input, output, session, dbSettings,
                           reloadMillis = 10000, logMessage = message,
                           active = reactive(TRUE)) {
 
@@ -277,17 +257,15 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 #' @inheritParams pagestructure
 #' @importFrom shinyjs enable disable
 #' @export
-landingPageButtonUpdate <- function(session, dbSettings, userId,
+landingPageButtonUpdate <- function(session, dbSettings,
                                     logMessage = message) {
 
   logMessage("Checking Permissions")
 
-  if (userId == FLAMINGO_GUEST_ID) return(NULL)
-
   # TODO: use shinyjs enable / disable on actionButtons according to permissions
 
   # .updateButton <- function(db_resourceId, btn_inputId) {
-  #   permission <- flamingoDBCheckPermissions(dbSettings, userId, db_resourceId)
+  #   permission <- flamingoDBCheckPermissions(dbSettings, user, db_resourceId)
   #   if (identical(permission, character(0))) {
   #     updateButton(session, session$ns(btn_inputId), disabled = TRUE)
   #   } else {

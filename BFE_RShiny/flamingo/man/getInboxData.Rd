@@ -4,12 +4,12 @@
 \alias{getInboxData}
 \title{Get the process run overview from the database}
 \usage{
-getInboxData(dbSettings, userId, ...)
+getInboxData(dbSettings, user, ...)
 }
 \arguments{
 \item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
 
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+\item{user}{user as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 
 \item{...}{other arguments to \code{\link[=executeDbQuery]{executeDbQuery()}}}
 }

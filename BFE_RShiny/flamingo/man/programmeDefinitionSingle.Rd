@@ -7,7 +7,7 @@
 \title{Single Programme Definition Module}
 \usage{
 programmeDefinitionSingle(input, output, session, dbSettings, apiSettings,
-  userId, active = reactive(TRUE), logMessage = message,
+  user, active = reactive(TRUE), logMessage = message,
   preselRunId = reactive(-1), preselProcId = reactive(-1),
   preselPanel = reactive(1), reloadMillis = 10000)
 

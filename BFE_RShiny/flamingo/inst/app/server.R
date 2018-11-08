@@ -20,8 +20,7 @@ server <- function(input, output, session) {
   ))
 
   result <- reactiveValues(
-    userId = FLAMINGO_GUEST_ID,
-    userName = "",
+    user = FLAMINGO_GUEST_ID,
     WidthMain = 9,
     WidthSide = 3,
     preselPanel = 1
@@ -31,7 +30,7 @@ server <- function(input, output, session) {
     # reactive expression yielding TRUE when:
     # - user has been matched to an id
     # - ui has been rendered (input values are available)
-    auth <- (result$userId != FLAMINGO_GUEST_ID) &&
+    auth <- (result$user != FLAMINGO_GUEST_ID) &&
       !is.null(input$authUIRenderCallback)
 
     if (auth) logMessage("Authenticated")
@@ -39,7 +38,7 @@ server <- function(input, output, session) {
     return(auth)
   }) %>% debounce(100)
 
-  ### submodules ----
+  # submodules ----
   .callModule <- function(...) {
     callModule(..., dbSettings = dbSettings)
   }
@@ -50,13 +49,16 @@ server <- function(input, output, session) {
     logout = reactive(auth_modules$pageheader$logout())
   )
 
+  observe({
+    result$user <- loginDialogModule$user()
+  })
+
   # list of modules for the authenticated UI
   auth_modules <- list()
 
   auth_modules$pageheader <- .callModule(
     pageheader, "pageheader",
-    userId = reactive(result$userId),
-    userName = reactive(result$userName),
+    user = reactive(result$user),
     reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated())
@@ -64,8 +66,6 @@ server <- function(input, output, session) {
 
   auth_modules$pagestructure <- .callModule(
     pagestructure, "pagestructure",
-    userId = reactive(result$userId),
-    userName = reactive(result$userName),
     reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated())
@@ -73,8 +73,7 @@ server <- function(input, output, session) {
 
   auth_modules$landingPage <- .callModule(
     landingPage, "landingPage",
-    userId = reactive(result$userId),
-    userName = reactive(result$userName),
+    user = reactive(result$user),
     reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "LP")
@@ -90,10 +89,10 @@ server <- function(input, output, session) {
     programmeDefinitionSingle,
     id = "programmeDefinitionSingle",
     apiSettings = apiSettings,
-    userId = reactive(result$userId),
+    user = reactive(result$user),
     preselRunId =  auth_modules$landingPage$runId,
     preselProcId =  auth_modules$landingPage$procId,
-    preselPanel = reactive(result$preselPanel), #auth_modules$visualizationSBR$preselPanel,#
+    preselPanel = reactive(result$preselPanel),
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "PS")
@@ -103,7 +102,6 @@ server <- function(input, output, session) {
     programmeDefinitionBatch,
     id = "programmeDefinitionBatch",
     apiSettings = apiSettings,
-    userId = reactive(result$userId),
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "PB")
@@ -113,7 +111,6 @@ server <- function(input, output, session) {
     visualizationSBR,
     id = "visualizationSBR",
     apiSettings = apiSettings,
-    userId = reactive(result$userId),
     runIdList =  auth_modules$landingPage$runIdList,
     preselRunId =  auth_modules$landingPage$runId,
     processRunId = auth_modules$programmeDefinitionSingle$processRunId,
@@ -126,7 +123,6 @@ server <- function(input, output, session) {
     visualizationBBR,
     id = "visualizationBBR",
     apiSettings = apiSettings,
-    userId = reactive(result$userId),
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "BBR")
@@ -136,26 +132,25 @@ server <- function(input, output, session) {
     visualizationCBR,
     id = "visualizationCBR",
     apiSettings = apiSettings,
-    userId = reactive(result$userId),
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "CBR")
   )
 
-
   # preselected panel
-  observe({if (!is.null(auth_modules$visualizationSBR$preselPanel)) {
-    result$preselPanel <- auth_modules$visualizationSBR$preselPanel()
-  } else {
-    result$preselPanel <- 1
-  }
+  observe({
+    if (!is.null(auth_modules$visualizationSBR$preselPanel)) {
+      result$preselPanel <- auth_modules$visualizationSBR$preselPanel()
+    } else {
+      result$preselPanel <- 1
+    }
   })
 
   auth_modules$fileViewer <- .callModule(
     fileViewer,
     id = "fileViewer",
     logMessage = logMessage,
-    active = reactive(authenticated() ) # && main_visible() == "FM" ) #&& input$fm == "fileviewer"))
+    active = reactive(authenticated()) # && main_visible() == "FM" ) #&& input$fm == "fileviewer"))
   )
 
   auth_modules$modelSupplierPage <- .callModule(
@@ -168,7 +163,7 @@ server <- function(input, output, session) {
     userAdminDefinition,
     id = "userAdminDefinition",
     active = reactive(authenticated() && main_visible() == "UA" && input$ua == "defineuser"),
-    userId = reactive(result$userId)
+    user = reactive(result$user)
   )
 
   auth_modules$companyDefinition <- .callModule(
@@ -177,23 +172,19 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "UA" && input$ua == "definecompany")
   )
 
-  ### authentication ----
+  # authenticated ----
   # show the logged-in part of the UI if login is completed
   appState <- reactive(
-    if (result$userId == FLAMINGO_GUEST_ID) "loggedout" else "loggedin"
+    # cannot use authenticated() here and below in renderUI(... authUI(...))!
+    #if (authenticated()) "loggedin" else "loggedout"
+    if (result$user != FLAMINGO_GUEST_ID) "loggedin" else "loggedout"
   )
   callModule(reactiveConditionalPanels, "appUI", appState)
-
-  observe({
-    result$userId <- loginDialogModule$userId()
-    result$userName <- loginDialogModule$userName()
-  })
-
-  ### Module input parameters depending on othe rmodules outputs ---
-
+  # Module input parameters depending on othe rmodules outputs
   # UI non-reactive to (result$WidthSide) and (result$Widthmain)
   output$authUI <- renderUI(
-    if (result$userId != FLAMINGO_GUEST_ID) {
+    #if (authenticated()) {
+    if (result$user != FLAMINGO_GUEST_ID) {
       authUI(
         WidthSide = isolate(result$WidthSide),
         WidthMain = isolate(result$WidthMain)
@@ -206,7 +197,7 @@ server <- function(input, output, session) {
 
   observe(result$logout <- auth_modules$pageheader$logout())
 
-  ### collapse / expand sidebar ----
+  # collapse / expand sidebar ----
   observe({
     if (auth_modules$pagestructure$collapsed()) {
       result$WidthMain <- 11
@@ -228,64 +219,60 @@ server <- function(input, output, session) {
   # TODO: Consider simplifying the logging of the navigation using the `logger`
   # argument of `observeModuleNavigation()` above.
   observe(if (authenticated()) {
-
     switch(main_visible(),
 
            "DA" = { # go to Define account submenu
-             loginfo(paste("Navigate to Define Account, userId: ", result$userId),
+             loginfo(paste("Navigate to Define Account"),
                      logger = "flamingo.module")
            },
 
            "PS" = { # go to Define programme single submenu
-             loginfo(paste("Navigate to Define Process Single, userId: ", result$userId),
+             loginfo(paste("Navigate to Define Process Single"),
                      logger = "flamingo.module")
            },
 
            "PB" = { # go to Define programme batch submenu
-             loginfo(paste("Navigate to Define Process Batch, userId: ", result$userId),
+             loginfo(paste("Navigate to Define Process Batch"),
                      logger = "flamingo.module")
            },
 
            "SBR" = { # go to Single browse submenu
-             loginfo(paste("Navigate to Single browse, userId: ", result$userId),
+             loginfo(paste("Navigate to Single browse"),
                      logger = "flamingo.module")
            },
 
            "BBR" = { # go to Batch browse submenu
-             loginfo(paste("Navigate to Batch browse, userId: ", result$userId),
+             loginfo(paste("Navigate to Batch browse"),
                      logger = "flamingo.module")
            },
 
            "CBR" = { # go to Compare Runs submenu
-             loginfo(paste("Navigate to compare runs, userId: ", result$userId),
+             loginfo(paste("Navigate to compare runs"),
                      logger = "flamingo.module")
            },
 
            "UA" = { # go to User Admin submenu
-             loginfo(paste("Navigate to User Admin, userId: ", result$userId),
+             loginfo(paste("Navigate to User Admin"),
                      logger = "flamingo.module")
              updateTabsetPanel(session, "ua", selected = "defineuser")
            },
 
            "FM" = { # go to File Management submenu
-             loginfo(paste("Navigate to File Management, userId: ", result$userId),
+             loginfo(paste("Navigate to File Management"),
                      logger = "flamingo.module")
            },
 
            "SC" = { # go to System Configuration submenu
-             loginfo(paste("Navigate to System Config, userId: ", result$userId),
+             loginfo(paste("Navigate to System Config"),
                      logger = "flamingo.module")
            },
 
            "LP" = { # go to Landing Page
-             loginfo(paste("Navigate to Landing Page, userId:", result$userId),
+             loginfo(paste("Navigate to Landing Page"),
                      logger = "flamingo.module")
            },
 
            stop("page does not exist")
-
     )
-
   })
-
 }

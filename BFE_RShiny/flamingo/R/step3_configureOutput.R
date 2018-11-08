@@ -10,9 +10,9 @@
 #' @importFrom bsplus bs_embed_tooltip
 #' @export
 step3_configureOutputUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   tagList(
     hidden(div(id = ns("panelProcessRunTable"), panelProcessRunTable(id))),
     hidden(div(id = ns("panelDefineOutputs"), panelDefineOutputs(id))),
@@ -190,7 +190,7 @@ configureAdvancedGUL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-    
+
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkgulprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
@@ -208,7 +208,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulprogAAL",
                                   " " = "gulprogPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulstate"),
                                 label = h6("State", class = "flamingo-granularity"),
                                 choices = list(
@@ -225,7 +225,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulstateAAL",
                                   " " = "gulstatePLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
                                 choices = list(
@@ -242,7 +242,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gulcountyAAL",
                                   " " = "gulcountyPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
                                 choices = list(
@@ -259,7 +259,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gullocAAL",
                                   " " = "gullocPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgullob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
                                 choices = list(
@@ -276,7 +276,7 @@ configureAdvancedGUL <- function(id) {
                                   " " = "gullobAAL",
                                   " " = "gullobPLT"),
                                 selected = defaultSelectChoicesGUL),
-             
+
              checkboxGroupInput(ns("chkgulpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
                                 choices = list(
@@ -317,7 +317,7 @@ configureAdvancedIL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-    
+
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkilprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
@@ -335,7 +335,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "ilprogAAL",
                                   " " = "ilprogPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilstate"),
                                 label = h6("State", class = "flamingo-granularity"),
                                 choices = list(
@@ -351,7 +351,7 @@ configureAdvancedIL <- function(id) {
                                   # " " = "ilstateSampleMeanOEP",
                                   " " = "ilstateAAL", " " = "ilstatePLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
                                 choices = list(
@@ -367,7 +367,7 @@ configureAdvancedIL <- function(id) {
                                   # " " = "ilcountySampleMeanOEP",
                                   " " = "ilcountyAAL", " " = "ilcountyPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
                                 choices = list(
@@ -384,7 +384,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "illocAAL",
                                   " " = "illocPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkillob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
                                 choices = list(
@@ -401,7 +401,7 @@ configureAdvancedIL <- function(id) {
                                   " " = "illobAAL",
                                   " " = "illobPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkilpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
                                 choices = list(
@@ -443,7 +443,7 @@ configureAdvancedRI <- function(id) {
            # h5("Sample Mean OEP", style="font-size: 16.5px;"),
            h5("AAL", style="font-size: 16.5px;"),
            tags$div(class = "h5-align",h5("PLT", style="font-size: 16.5px;"))),
-    
+
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkriprog"),
                                 label = h5("Prog", style = "font-size: 15.0px;"),
@@ -457,7 +457,7 @@ configureAdvancedRI <- function(id) {
                                   " " = "riprogAAL",
                                   " " = "riprogPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkristate"),
                                 label = h5("State", style = "font-size: 15.0px;"),
                                 choices = list(
@@ -470,7 +470,7 @@ configureAdvancedRI <- function(id) {
                                   " " = "ristateAAL",
                                   " " = "ristatePLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkricounty"),
                                 label = h5("County", style = "font-size: 15.0px;"),
                                 choices = list(
@@ -483,7 +483,7 @@ configureAdvancedRI <- function(id) {
                                   " " = "ricountyAAL",
                                   " " = "ricountyPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkriloc"),
                                 label = h5("Location", style = "font-size: 15.0px;"),
                                 choices = list(
@@ -496,7 +496,7 @@ configureAdvancedRI <- function(id) {
                                   " " = "rilocAAL",
                                   " " = "rilocPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkrilob"),
                                 label = h5("LOB", style = "font-size: 15.0px;"),
                                 choices = list(
@@ -509,7 +509,7 @@ configureAdvancedRI <- function(id) {
                                   " " = "rilobAAL",
                                   " " = "rilobPLT"),
                                 selected = NULL),
-             
+
              checkboxGroupInput(ns("chkripolicy"),
                                 label = h5("Policy", style = "font-size: 15.0px;"),
                                 choices = list(
@@ -539,7 +539,7 @@ configureAdvancedRI <- function(id) {
 #' @importFrom shinyjs onclick disable enable show hide
 #' @export
 step3_configureOutput <- function(input, output, session,
-                                  dbSettings,apiSettings, userId,
+                                  dbSettings,apiSettings,
                                   active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
@@ -548,19 +548,19 @@ step3_configureOutput <- function(input, output, session,
                                   progOasisName = reactive(""),
                                   progOasisStatus = reactive("")
 ) {
-  
+
   ns <- session$ns
-  
+
   # Reactive Values and parameters ------------------------------------------
-  
+
   #number of Rows per Page in a dataable
   pageLength <- 5
-  
+
   # Default checkgroup for  GUL, IL and RI
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
   checkrigrplist <- c("chkriprog", "chkristate", "chkricounty", "chkriloc", "chkrilob", "chkripolicy")
-  
+
   # > Reactive Values -------------------------------------------------------
   result <- reactiveValues(
     # reactve value for navigation
@@ -572,12 +572,12 @@ step3_configureOutput <- function(input, output, session,
     # Id of the Process Run
     prrunid = -1
   )
-  
+
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
   })
-  
+
   # Panels Visualization ----------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
@@ -586,7 +586,7 @@ step3_configureOutput <- function(input, output, session,
       .reloadRunData()
     }
   })
-  
+
   # If selectprogOasisID changes, reload process run table and set view back to default
   observeEvent(selectprogOasisID(), ignoreInit = TRUE, {
     if (active()) {
@@ -595,8 +595,8 @@ step3_configureOutput <- function(input, output, session,
       .reloadRunData()
     }
   })
-  
-  
+
+
   ### Process Run Table -----
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioprrunsAllOrInProgress, ignoreInit = TRUE, {
@@ -605,12 +605,10 @@ step3_configureOutput <- function(input, output, session,
       .reloadRunData()
     }
   })
-  
+
   #Content of the process run table
-  .getProcessRunWithUserChoices <- function(pruser, prmodel, prprogramme,
-                                            prworkflow) {
+  .getProcessRunWithUserChoices <- function() {
     logMessage(".getProcessRunWithUserChoices called")
-    #prtable <- getProcessData(dbSettings, pruser, prmodel, prprogramme, prworkflow)
     prcid <- selectprogOasisID()
     # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
     # 'In Progress' (not handled by stored procedure in the DB due to bug!)
@@ -630,9 +628,9 @@ step3_configureOutput <- function(input, output, session,
       result$prcrundata <- NULL
     }
   }
-  
+
   output$tableprocessrundata <- renderDT(
-    
+
     if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
       # if (preselRunId() == -1) {
       #   index <- 1
@@ -655,7 +653,7 @@ step3_configureOutput <- function(input, output, session,
     } else {
       .nothingToShowTable(contentMessage = paste0("no runs available for Model ID ", selectprogOasisID()))
     })
-  
+
   # Process Run Table Title
   output$paneltitlepanelProcessRunTable <- renderUI({
     if (selectprogOasisID() != "") {
@@ -664,15 +662,15 @@ step3_configureOutput <- function(input, output, session,
     } else {
       paste0("Runs")
     }
-    
+
   })
-  
+
   # Configure Output --------------------------------------------
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
     hide("panelDefineOutputs")
   })
-  
+
   # configuration title
   output$paneltitleReDefineProgramme <- renderUI({
     if (result$prrun_flag  == "R") {
@@ -684,7 +682,7 @@ step3_configureOutput <- function(input, output, session,
       "New Output Configuration"
     }
   })
-  
+
   # Enable and disable buttons
   observeEvent({
     result$prcrundata
@@ -705,10 +703,10 @@ step3_configureOutput <- function(input, output, session,
             enable("abuttondisplayoutput")
           }
         }
-      } 
+      }
     }
   )
-  
+
   #Show Output Configuration Panel
   onclick("abuttonconfigoutput", {
     .defaultview(session)
@@ -718,7 +716,7 @@ step3_configureOutput <- function(input, output, session,
     logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
     result$prrun_flag <- "C"
   })
-  
+
   onclick("abuttonrerunpr", {
     .defaultview(session)
     show("panelDefineOutputs")
@@ -727,13 +725,13 @@ step3_configureOutput <- function(input, output, session,
     result$prrun_flag <- "R"
     .updateOutputConfig()
   })
-  
+
   ### Hide Output Configuration panel
   onclick("abuttonehidepanelconfigureoutput", {
     hide("panelDefineOutputs")
     result$prrun_flag <- "C"
   })
-  
+
   # simplified view selection
   observe({
     if (length(input$chkgulprog) > 0 |  length(input$chkgulstate) > 0 |
@@ -753,7 +751,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxInput(session, "chkinputRI", value = TRUE)
     }
   })
-  
+
   # Select/deselect GUL
   observeEvent(input$chkinputGUL, ignoreInit = TRUE,  {
     if (active()) {
@@ -772,7 +770,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-  
+
   # Select/deselect IL
   #Note: the ignoreInit = TRUE does not prevent the trigger once logged in
   observeEvent(input$chkinputIL, ignoreInit = TRUE, {
@@ -790,7 +788,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-  
+
   # Select/deselect RI
   observeEvent(input$chkinputRI, ignoreInit = TRUE, {
     if (active()) {
@@ -807,13 +805,13 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-  
+
   # Update button in sidebar panel to update checkboxes for pre-populated values
   observeEvent(input$sinoutputoptions, {
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
       outputlist <- executeDbQuery(dbSettings,
                                    buildDbQuery("getOutputOptionOutputs", input$sinoutputoptions))
-      
+
       if (nrow(outputlist) > 0) {
         # print(paste0("outputlist"))
         # print(outputlist)
@@ -827,22 +825,22 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-  
+
   # Clear the checkbox groups and preset dropdown - Set back to default
   onclick("abtnclroutopt", {
     .defaultview(session)
   })
-  
+
   # show advanced view
   onclick("abtnadvanced", {
     .advancedview()
   })
-  
+
   # show basic view
   onclick("abtnbasic", {
     .basicview()
   })
-  
+
   # reactive expression yielding the output options as a list
   outputOptionsList <- reactive({paste(collapse = ",", c(
     input$chkinputGUL, input$chkgulprog, input$chkgulpolicy,
@@ -855,7 +853,7 @@ step3_configureOutput <- function(input, output, session,
     input$chkristate, input$chkricounty, input$chkriloc,
     input$chkrilob
   ))})
-  
+
   # Save output for later use as presets
   .modalsaveoutput <- function() {
     ns <- session$ns
@@ -870,7 +868,7 @@ step3_configureOutput <- function(input, output, session,
                 easyClose = TRUE
     )
   }
-  
+
   # Enable and disable buttons
   observeEvent(outputOptionsList, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (outputOptionsList() != "") {
@@ -881,11 +879,11 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttonexecuteprrun")
     }
   })
-  
+
   onclick("abuttonsaveoutput", {
     showModal(.modalsaveoutput())
   })
-  
+
   # Submit output configuration (to be saved)
   onclick("abuttonsubmitoutput", {
     if (input$tinputoutputname == "") {
@@ -902,32 +900,32 @@ step3_configureOutput <- function(input, output, session,
       #.defaultview(session)
     }
   })
-  
-  
+
+
   ### Run Process --------------------------------------------------------
   # A function to generate process run
   .generateRun <- function() {
-    
+
     processrunname <- isolate(input$tinputprocessrunname)
     nosample <- isolate(input$tinputnoofsample)
     sthreshold <- isolate(input$tinputthreshold)
     eventsetid <- isolate(input$sinputeventset)
     eventoccid <- isolate(input$sinputeventocc)
-    
+
     windperil <- NULL
     surgeperil <- NULL
     quakeperil <- NULL
     floodperil <- NULL
     dmdsurge <- NULL
     leakagefactor <- NULL
-    
+
     summaryreports <- tolower(isolate(input$chkinputsummaryoption))
-    
+
     # functionality to handle model resource based metrics
     prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
     stmt <- buildDbQuery("getRuntimeParamList", prgId)
     runparamlist <- executeDbQuery(dbSettings, stmt)
-    
+
     rows <- nrow(runparamlist)
     if (rows > 0) {
       for (i in 1:rows) {
@@ -941,19 +939,19 @@ step3_configureOutput <- function(input, output, session,
         )
       }
     }
-    
+
     outputsStringGUL <- paste(collapse = ", ",
                               c(input$chkgulprog, input$chkgulpolicy, input$chkgulstate,
                                 input$chkgulcounty, input$chkgulloc, input$chkgullob))
-    
+
     outputsStringIL <- paste(collapse = ", ",
                              c(input$chkilprog, input$chkilpolicy, input$chkilstate,
                                input$chkilcounty, input$chkilloc, input$chkillob))
-    
+
     outputsStringRI <- paste(collapse = ", ",
                              c(input$chkriprog, input$chkripolicy, input$chkristate,
                                input$chkricounty, input$chkriloc, input$chkrilob))
-    
+
     stmt <- paste0("exec dbo.WorkflowFlattener ",
                    "@ProgOasisID= ", prgId, ", ",
                    "@WorkflowID= 1", ", ",
@@ -973,14 +971,14 @@ step3_configureOutput <- function(input, output, session,
                    "@LeakageFactor= '" , leakagefactor, "', ",
                    "@ProcessRunName= '" , processrunname, "', ",
                    "@SummaryReports='", summaryreports , "'")
-    
+
     logMessage(paste("Workflow flattener query: ", stmt))
     runId <- executeDbQuery(dbSettings, stmt)
     logMessage(paste("Process Run ID: ", runId))
-    
+
     return(runId)
   }
-  
+
   # Execute Process run: When "Execute Run" button is clicked - switsches view to Run panel
   onclick("abuttonexecuteprrun", {
     runId <- .generateRun()
@@ -1011,25 +1009,25 @@ step3_configureOutput <- function(input, output, session,
     }
     .defaultview(session)
   })
-  
+
   ### Logs ---------------------------------------------------------------
   onclick("abuttonshowlog", {
     show("panelProcessRunLogs")
     logMessage("showing prrunlogtable")
   })
-  
+
   onclick("abuttonhidelog", {
     hide("panelProcessRunLogs")
   })
-  
+
   ### Log Table
   output$tablelog <- renderDT({
     if (length(input$tableprocessrundata_rows_selected) > 0) {
       # manual refresh button
       invisible(input$abuttonrefreshprrunlogs)
-      
+
       wfid <- result$prrunid
-      
+
       logdata <- getProcessRunDetails(dbSettings, wfid) %>%
         replaceWithIcons()
       logMessage("re-rendering process run log table")
@@ -1049,7 +1047,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-  
+
   # run logs title
   output$paneltitleProcessRunLogs <- renderUI({
     processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
@@ -1057,12 +1055,12 @@ step3_configureOutput <- function(input, output, session,
     processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
     paste0('Logs for Run id ', processRunId, ' ', processRunName)
   })
-  
+
   # Refresh Buttons ----------------------------------------------------------
   onclick("abuttonrefreshprrun", {
     .reloadRunData()
   } )
-  
+
   # Updates dependent on changed: tableprocessrundata_rows_selected ---------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(input$tableprocessrundata_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -1083,13 +1081,13 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-  
+
   # Navigation --------------------------------------------------------------
   # Go to browse section
   onclick("abuttondisplayoutput", {
     result$navigationstate <-"SBR"
   })
-  
+
   # Help Functions -----------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
@@ -1099,7 +1097,7 @@ step3_configureOutput <- function(input, output, session,
     hide("panelDefineOutputs")
     hide("panelProcessRunLogs")
   }
-  
+
   #show default view for Section "Configure Output & Run" = "3"
   .defaultRun <- function(){
     logMessage(".defaultRun called")
@@ -1110,19 +1108,19 @@ step3_configureOutput <- function(input, output, session,
     disable("abuttonshowlog")
     disable("abuttonconfigoutput")
   }
-  
+
   # Reload Process Runs table
   .reloadRunData <- function() {
     logMessage(".reloadRunData called")
     if (selectprogOasisID() != "") {
-      .getProcessRunWithUserChoices(userId(), 0, 0, 0)
+      .getProcessRunWithUserChoices()
       logMessage("process run table refreshed")
     }  else {
       result$prcrundata <- NULL
     }
     invisible()
   }
-  
+
   # table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function() {
     options <- list(
@@ -1135,7 +1133,7 @@ step3_configureOutput <- function(input, output, session,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }
-  
+
   #empty table
   .nothingToShowTable <- function(contentMessage){
     datatable(
@@ -1149,7 +1147,7 @@ step3_configureOutput <- function(input, output, session,
       options = list(searchHighlight = TRUE)
     )
   }
-  
+
   # Clear checkboxgroups GUL
   .clearchkboxGULgrp <- function() {
     logMessage(".clearchkboxGULgrp called")
@@ -1157,7 +1155,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxGroupInput(session, inputId = i, selected = "None")
     }
   }
-  
+
   # Clear checkboxgroup IL
   .clearchkboxILgrp <- function() {
     logMessage(".clearchkboxILgrp called")
@@ -1165,7 +1163,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxGroupInput(session, inputId = i, selected = "None")
     }
   }
-  
+
   # Clear checkboxgroup RI
   .clearchkboxRIgrp <- function() {
     logMessage(".clearchkboxRIgrp called")
@@ -1173,7 +1171,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxGroupInput(session, inputId = i, selected = "None")
     }
   }
-  
+
   # Clear other runtime params
   .clearotherparams <- function() {
     logMessage(".clearotherparams called")
@@ -1182,7 +1180,7 @@ step3_configureOutput <- function(input, output, session,
                       selected = character(0))
     updateTextInput(session, "tinputprocessrunname", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
-    
+
     prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
     if (prgId != -1) {
       updateSelectInput(session, "sinputeventset",
@@ -1196,7 +1194,7 @@ step3_configureOutput <- function(input, output, session,
     updateCheckboxInput(session, "chkinputprflood", "Peril: Flood", value = TRUE)
     updateCheckboxInput(session, "chkinputdsurge", "Demand Surge", value = TRUE)
   }
-  
+
   # Clear Custom Configuration option
   .clearOutputOptions <- function() {
     logMessage(".clearOutputOptions called")
@@ -1204,20 +1202,20 @@ step3_configureOutput <- function(input, output, session,
                       choices = c(getOutputOptions(dbSettings)),
                       selected = character(0))
   }
-  
+
   #Show available perils
   .showPerils <- function() {
     prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
     stmt <- buildDbQuery("getRuntimeParamList", prgId)
     runparamlist <- executeDbQuery(dbSettings, stmt)
-    
-    hide("perilwind") 
+
+    hide("perilwind")
     hide("perilsurge")
-    hide("perilquake") 
+    hide("perilquake")
     hide("perilflood")
     hide("demandsurge")
     hide("leakagefactor")
-    
+
     if (nrow(runparamlist) > 0) {
       for (i in 1:nrow(runparamlist)) {
         ctrname <- gsub("_", "", runparamlist[i, 1], fixed = TRUE)
@@ -1225,15 +1223,15 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   }
-  
+
   # Update output configuration for rerun
   .updateOutputConfig <- function() {
     logMessage(".updateOutputConfig called")
     outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid ))
     runparamsforpr <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$prrunid ))
-    
+
     updateTextInput(session, "tinputprocessrunname", value = result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName])
-    
+
     if (nrow(runparamsforpr) > 0) {
       for (i in 1:nrow(runparamsforpr)) {
         switch(runparamsforpr[i,1],
@@ -1263,7 +1261,7 @@ step3_configureOutput <- function(input, output, session,
     .clearOutputOptions()
     invisible()
   }
-  
+
   # Output view
   .advancedview <- function() {
     logMessage(".advancedview called")
@@ -1276,7 +1274,7 @@ step3_configureOutput <- function(input, output, session,
     show("abuttonsaveoutput")
     show("abtnclroutopt")
   }
-  
+
   .basicview <- function() {
     logMessage(".basicview called")
     hide("configureAdvancedGUL")
@@ -1288,7 +1286,7 @@ step3_configureOutput <- function(input, output, session,
     hide("abuttonsaveoutput")
     hide("abtnclroutopt")
   }
-  
+
   # Default output configuration options
   .defaultchkboxGULgrp <- function(session) {
     logMessage(".defaultchkboxGULgrp called")
@@ -1296,7 +1294,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesGUL)
     }
   }
-  
+
   .defaultview <- function(session) {
     logMessage(".defaultview called")
     updateCheckboxInput(session, "chkinputGUL", value = TRUE)
@@ -1309,7 +1307,7 @@ step3_configureOutput <- function(input, output, session,
     .clearOutputOptions()
     .basicview()
   }
-  
+
   # Model Outout ------------------------------------------------------------
   moduleOutput <- c(
     list(
@@ -1317,7 +1315,7 @@ step3_configureOutput <- function(input, output, session,
       prrunid = reactive({result$prrunid})
     )
   )
-  
+
   moduleOutput
-  
+
 }

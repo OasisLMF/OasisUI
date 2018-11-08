@@ -5,7 +5,7 @@
 \title{Module for Summary Table Panel}
 \usage{
 panelSummaryTableModule(input, output, session, dbSettings, apiSettings,
-  userId, logMessage = message, selectRunID)
+  logMessage = message, selectRunID)
 }
 \arguments{
 \item{input}{shiny input object}

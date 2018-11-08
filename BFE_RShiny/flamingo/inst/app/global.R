@@ -56,16 +56,12 @@ tryCatch({
 # (300000 == 5 mins)
 reloadMillis <- 300000
 
-### flamingo API server ----
-apiSettings <- flamingoServer(
-  host = Sys.getenv("DOCKER_HOST_IP"),
-  # host = Sys.getenv("FLAMINGO_API_IP"), #TODO this would be a better variable
-  port = Sys.getenv("FLAMINGO_API_PORT")
-)
+# flamingo django API ---
+options(flamingo.settings.api = api_init("localhost", "8000"))
 
-loginfo(paste("flamingo server:", apiSettings$url), logger = "flamingo.module")
+loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
 tryCatch({
-  testFlamingoServer(apiSettings)
+  invisible(api_get_helthcheck())
 }, error = function(e) {
   logerror(e$message, logger = "flamingo.module")
 })
@@ -75,7 +71,7 @@ StatusFailed <- '<i class="fa fa-times-circle"></i>'
 StatusCompleted <- '<i class="fa fa-check-circle"></i>'
 StatusProcessing <- '<i class="fa fa-spinner"></i>'
 
-### Defult Selection Items ----
+### Default Selection Items ----
 defaultSelectChoicesGUL <- c(
   "gulprogSummary", "gulprogELT", "gulprogAAL",
   "gulprogPLT", "gulprogFullUncAEP", "gulprogFullUncOEP"
