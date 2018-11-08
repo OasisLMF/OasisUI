@@ -165,6 +165,7 @@ panelOutputModuleUI <- function(id){
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 geom_errorbar
+#' @importFrom ggplot2 geom_violin
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' 
@@ -279,9 +280,10 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   
   # > based on inputs ------------------------------------------------------------
   #GUL does not have policy
-  observeEvent(
-    chkbox$chkboxgrplosstypes(),
-    ignoreNULL = FALSE, {
+  observeEvent({
+    chkbox$chkboxgrplosstypes()
+    inputplottype()
+    }, ignoreNULL = FALSE, {
       #if losstype = GUL then policy inactive
       if ( "GUL" %in% chkbox$chkboxgrplosstypes()) {
         Granularities <- result$Granularities[which(result$Granularities != "Policy")]
@@ -357,12 +359,12 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       if (input$textinputtitle != "") {
         result$Title <- input$textinputtitle
       } else {
-        if (l_losstypes > l_variables) {
+        if (l_losstypes > 1) {
+          result$Title <- paste0(chkbox$chkboxgrpvariables(), " per ", chkbox$chkboxgrpgranularities())
+        } else if (l_variables > 1) {
           result$Title <- paste0(chkbox$chkboxgrplosstypes(), " per ", chkbox$chkboxgrpgranularities())
-        } else if (l_losstypes < l_variables)  {
-          result$Title <- paste0(chkbox$chkboxgrpvariables(), " of ", chkbox$chkboxgrplosstypes(), "per ", chkbox$chkboxgrpgranularities())
         } else {
-          result$Title <- paste0(key, " per ", chkbox$chkboxgrpgranularities())
+          result$Title <- paste0(chkbox$chkboxgrpvariables(), " of ", chkbox$chkboxgrplosstypes(), " per ", chkbox$chkboxgrpgranularities())
         }
       }
     }
@@ -373,8 +375,6 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         filesToPlot <- filesListData()  %>% filter(Losstype %in% chkbox$chkboxgrplosstypes(),
                                                    Variable %in% chkbox$chkboxgrpvariables(),
                                                    Granularity %in%  chkbox$chkboxgrpgranularities())
-        print("filesToPlot")
-        print(names(filesToPlot))
         if (nrow(filesToPlot) != prod(plotstrc)) {
           flamingoNotification("The run did not produce the selected output. Please check the logs", type = "error")
           filesToPlot <- NULL
@@ -387,7 +387,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       for (i in seq(nrow(filesToPlot))) { # i<- 1
         fileName <- file.path(filesToPlot[i, 5], filesToPlot[i, 2])
         # if (TRUE) {
-        #   oasisBasePath <- "/home/mirai/Desktop/FV/R-projects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
+        #   oasisBasePath <- "/home/mirai/Desktop/Rprojects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
         #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
         #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
         # }
@@ -433,7 +433,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         data <- data %>% rename("reference" = reference)
       }
       # make multiplots if more than one losstype or variable is selected
-      if (any(plotstrc > 1) & length(gridcol) > 0) {
+      if ( (any(plotstrc > 1) | plottype == "violin" ) & length(gridcol) > 0 ) {
         multipleplots <- TRUE
         data <- data %>% rename("colour" = keyval)
       } else {
@@ -445,10 +445,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         }
       }
     }
-    
-    # print("data")
-    # print(data)
-    
+
     # > draw plot --------------------------------------------------------------
     if (!is.null(data)) {
       if (plottype == "line") {
@@ -456,7 +453,10 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                          multipleplots = multipleplots)
       } else if (plottype == "bar") {
         p <- .barPlotDF (xlabel, ylabel, toupper(result$Title), data, wuncertainty = input$chkboxuncertainty, multipleplots = multipleplots, xtickslabels = xtickslabels)
-      }
+      }else if (plottype == "violin") {
+        p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
+                           multipleplots = multipleplots)
+      } 
       output$outputplot <- renderPlotly({ggplotly(p)})
     } else {
       flamingoNotification("No data to plot", type = "error")
@@ -553,8 +553,8 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
       geom_line(size = 1) +
-      geom_point(size = 2) +
-      p <- .multiplot(p, multipleplots)
+      geom_point(size = 2)
+    p <- .multiplot(p, multipleplots)
     p
   }
   
@@ -563,18 +563,30 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
       geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) +
-      scale_x_continuous(breaks = data$xaxis, labels = xtickslabels[1:length(data$xaxis)])
+      scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
     if (wuncertainty){
       p <- p +
         geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
                       size = .3,
                       width = .2,                    # Width of the error bars
                       position = position_dodge(.9))
+      # if ("reference" %in% names(data)) {
+      #   p <- .addRefLine(p, unique(data$reference)) 
+      # }
     }
-    # p <- .addRefLine(p, unique(data$reference))
     p <- .multiplot(p,multipleplots)
     p
   }
+  
+  # Violin Plot
+  .violinPlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE){
+    p <- .basicplot(xlabel, ylabel, titleToUse, data)
+    p <- p +
+      geom_violin(aes(fill = colour, alpha = 0.2), show.legend = FALSE) 
+    p <- .multiplot(p,multipleplots)
+    p
+  }
+  
   
   # Module Output -----------------------
   reactive(result$Title)
