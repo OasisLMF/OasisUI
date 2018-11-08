@@ -1,5 +1,5 @@
-# ViewFilesModule Module -----------------------
-# UI -------------------------------------------
+# ViewFilesModule Module -------------------------------------------------------
+# UI ---------------------------------------------------------------------------
 #' ViewFilesModuleUI
 #' 
 #' @rdname ViewFilesModule
@@ -37,7 +37,7 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
   )
 }
 
-# Server ---------------------------------------------------------
+# Server -----------------------------------------------------------------------
 #' ViewFilesModule
 #'
 #' @rdname ViewFilesModule
@@ -180,7 +180,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     }
   )
   
-  # Selected Row --------------------------------------------------------
+  # Selected Row ---------------------------------------------------------------
   observeEvent( input$outputFLtable_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length( input$outputFLtable_rows_selected) > 0) {
       lapply(input$outputFLtable_rows_selected, function(i) {
@@ -198,7 +198,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   })
   
   
-  # Select All Functionality --------------------------------------------
+  # Select All Functionality ---------------------------------------------------
   
   #If page in table is changed, update rows selection based on select all value
   observeEvent(input$outputFLtable_rows_current, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -237,7 +237,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   
   
   
-  # File content view ---------------------------------------------------
+  # File content view ----------------------------------------------------------
   # Modal Panel
   FileContent <- modalDialog(
     easyClose = TRUE,
@@ -360,7 +360,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   })#end observeEvent
   
   
-  # Helper functions -------------------------
+  # Helper functions -----------------------------------------------------------
   
   # default table options
   .getFLTableOptions <- function() {

@@ -77,7 +77,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
     }
   )
 
-  ### Module Output ----
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(

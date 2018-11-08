@@ -175,7 +175,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   
   ns <- session$ns
   
-  # Reactive values & parameters --------------------------------------------
+  # Reactive values & parameters -----------------------------------------------
   
   result <- reactiveValues(
     #plot and panel title
@@ -245,9 +245,9 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   })
   
   
-  # Enable / Disable options -----------------------------------------------------
+  # Enable / Disable options ---------------------------------------------------
   
-  # > based on run ID ------------------------------------------------------------
+  # > based on run ID ----------------------------------------------------------
   #Gather the Granularities, Variables and Losstypes based on the runID output presets
   observe(if (active()) {
     if (!is.null(filesListData() )) {
@@ -278,23 +278,23 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     }
   })
   
-  # > based on inputs ------------------------------------------------------------
+  # > based on inputs ----------------------------------------------------------
   #GUL does not have policy
   observeEvent({
     chkbox$chkboxgrplosstypes()
     inputplottype()
-    }, ignoreNULL = FALSE, {
-      #if losstype = GUL then policy inactive
-      if ( "GUL" %in% chkbox$chkboxgrplosstypes()) {
-        Granularities <- result$Granularities[which(result$Granularities != "Policy")]
-      } else {
-        Granularities <- result$Granularities
-      }
-      .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", inputplottype())
-      .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
-    })
+  }, ignoreNULL = FALSE, {
+    #if losstype = GUL then policy inactive
+    if ( "GUL" %in% chkbox$chkboxgrplosstypes()) {
+      Granularities <- result$Granularities[which(result$Granularities != "Policy")]
+    } else {
+      Granularities <- result$Granularities
+    }
+    .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", inputplottype())
+    .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
+  })
   
-  # Extract dataframe to plot ----------------------------------------------------
+  # Extract dataframe to plot --------------------------------------------------
   #Logic to filter the files to plot
   #Missing logic in case either variables or granularities are not selected. For the moment not allowed
   observeEvent(input$abuttondraw, {
@@ -307,7 +307,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                       # ", aggregated to Portfolio Level: ", input$chkboxaggregate
     ))
     
-    # > Setup ----------------------------------------------------------------------
+    # > Setup ------------------------------------------------------------------
     # >> clear data
     # Content to plot
     fileData <- NULL
@@ -369,7 +369,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       }
     }
     
-    # > filter out files to read -------------------------------------------------
+    # > filter out files to read -----------------------------------------------
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
         filesToPlot <- filesListData()  %>% filter(Losstype %in% chkbox$chkboxgrplosstypes(),
@@ -445,7 +445,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         }
       }
     }
-
+    
     # > draw plot --------------------------------------------------------------
     if (!is.null(data)) {
       if (plottype == "line") {
@@ -465,8 +465,9 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   })
   
   
-  # Helper functions -------------------------
+  # Helper functions -----------------------------------------------------------
   
+  # Helper function to enable and dosable checkboxes based on condition
   .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
     # disable and untick variables that are not relevant
     if (inputid == "chkboxgrpvariables" && !is.null(plotType)) {
@@ -492,7 +493,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   }
   
   
-  #Helper function to read one file from DB
+  # Helper function to read one file from DB
   .readFile <- function(fileName){
     if (!is.na(fileName)) {
       logMessage(paste0("Reading file ", fileName))
@@ -518,7 +519,6 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   # value : column for aes y
   # colour : column for the aes col
   # flag multipleplots generates grid over col gridcol
-  
   .basicplot <- function(xlabel, ylabel, titleToUse, data){
     p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
       labs(title = titleToUse, x = xlabel, y = ylabel) +
@@ -534,6 +534,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     p
   }
   
+  # add a horizontal line
   .addRefLine <- function(p, reference){
     if (!is.null(reference)) {
       p <- p + geom_hline(yintercept = reference)
@@ -541,6 +542,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     p
   }
   
+  # add facets
   .multiplot <- function(p, multipleplots = FALSE){
     if (multipleplots) {
       p <- p + facet_wrap(.~ gridcol)
@@ -548,7 +550,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     p
   }
   
-  #Line plot
+  # Line plot
   .linePlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE){
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
@@ -558,7 +560,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     p
   }
   
-  #Bar Plot
+  # Bar Plot
   .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE, multipleplots = FALSE, xtickslabels = NULL ){
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
@@ -588,6 +590,6 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   }
   
   
-  # Module Output -----------------------
+  # Module Output --------------------------------------------------------------
   reactive(result$Title)
 }

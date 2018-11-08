@@ -217,7 +217,7 @@ summarytab <- function(input, output, session, dbSettings,
       xlabel <- "Sample Type"
       ylabel <- "Loss"
       titleToUse <- "AAL"
-      p <- barPlot(xlabel, ylabel, titleToUse, data)
+      p <- barPlot(xlabel, ylabel, titleToUse, data, xtickslabels = c("Numerically Integrated", "Sample Statistics") )
       ggplotly(p)
     }
   })
@@ -317,9 +317,8 @@ basicplot <- function(xlabel, ylabel, titleToUse, data){
 # colour : column for the aes col
 # flag multipleplots generates grid over col gridcol
 
-barPlot <- function(xlabel, ylabel, titleToUse, data){
+barPlot <- function(xlabel, ylabel, titleToUse, data, xtickslabels = NULL ){
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
-    geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(data$colour)))
-  #scale_x_continuous(breaks = data$xaxis, labels = xtickslabels[1:length(data$xaxis)])
+    geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(data$colour))) 
   p
 }
