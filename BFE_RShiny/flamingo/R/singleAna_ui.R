@@ -59,7 +59,7 @@ panelDefineIDs <- function(id) {
                                       placeholder = 'Select',
                                       onInitialize = I('function() { this.setValue(""); }'))
                      )  %>%
-                       bs_embed_tooltip(title = programme_Definition_Single$selectprogrammeID,
+                       bs_embed_tooltip(title = defineSingleAna$selectprogrammeID,
                                         placement = "right")
                  ))),
       hidden(div(id = ns("divselectprogOasisID"),
@@ -73,7 +73,7 @@ panelDefineIDs <- function(id) {
                                              placeholder = 'Select',
                                              onInitialize = I('function() { this.setValue(""); }'))
                             ) %>%
-                              bs_embed_tooltip(title = programme_Definition_Single$selectprogOasisID,
+                              bs_embed_tooltip(title = defineSingleAna$selectprogOasisID,
                                                placement = "right")
                         ))))
     )

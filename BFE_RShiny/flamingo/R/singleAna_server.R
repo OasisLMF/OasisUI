@@ -77,7 +77,7 @@ singleAna <- function(input, output, session, dbSettings,
   # to first panel if accessing from landing page
   # and to panel 3 if coming from Browse
   observe(if (active()) {
-    workflowSteps$update(programmeWorkflowSteps[[preselPanel()]])
+    workflowSteps$update(analysisWorkflowSteps[[preselPanel()]])
   })
 
   observeEvent(workflowSteps$step(), ignoreInit = TRUE, {
@@ -153,11 +153,11 @@ singleAna <- function(input, output, session, dbSettings,
   })
 
   observeEvent(submodulesList$step1_chooseProgramme$newstep(), ignoreInit = TRUE, {
-    workflowSteps$update(programmeWorkflowSteps[[2]])
+    workflowSteps$update(analysisWorkflowSteps[[2]])
   })
 
   observeEvent(submodulesList$step2_chooseModel$newstep(), ignoreInit = TRUE, {
-    workflowSteps$update(programmeWorkflowSteps[[3]])
+    workflowSteps$update(analysisWorkflowSteps[[3]])
   })
 
   # > RunId --------------------------------------------------------------------

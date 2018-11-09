@@ -18,15 +18,15 @@ landingPageUI <- function(id) {
   
   tagList(
     wellPanel(
-      h4("Process Runs Inbox"),
-      DTOutput(ns("tableInbox")),
+      h4("Analyses Table"),
+      DTOutput(ns("dt_anaInbox")),
       flamingoButton(ns("abuttongotorun"), "Browse Processes Outputs",
                      align = "right") %>%
         bs_embed_tooltip(title = landing_page$abuttongotorun, placement = "right"),
       actionButton(inputId = ns("refreshInbox"), label = "Refresh", align = "right"),
-      downloadButton(ns("PRIdownloadexcel"),
+      downloadButton(ns("downloadexcel_ana"),
                      label = "Export to csv") %>%
-        bs_embed_tooltip(title = landing_page$PRIdownloadexcel, placement = "right")
+        bs_embed_tooltip(title = landing_page$downloadexcel_ana, placement = "right")
     )
   )
 }
@@ -63,8 +63,7 @@ landingPage <- function(input, output, session, user, dbSettings,
   navigation_state <- reactiveNavigation()
   
   result <- reactiveValues(
-    inbox = NULL,
-    runIdList = NULL
+    tbl_anaInbox = NULL
   )
   
   # navigation -----------------------------------------------------------------
@@ -78,18 +77,18 @@ landingPage <- function(input, output, session, user, dbSettings,
     # reload automatically every so often
     invalidateLater(reloadMillis)
     
-    landingPageButtonUpdate(session, dbSettings)
+    # landingPageButtonUpdate(session, dbSettings)
     
     data <- getInboxData(dbSettings, user())
-    result$inbox <- data %>%
+    result$tbl_anaInbox <- data %>%
       replaceWithIcons()
     
     logMessage("inbox refreshed")
   })
   
-  output$tableInbox <- renderDT(if (!is.null(result$inbox)) {
+  output$dt_anaInbox <- renderDT(if (!is.null(result$tbl_anaInbox)) {
     datatable(
-      result$inbox,
+      result$tbl_anaInbox,
       class = "flamingo-table display",
       rownames = TRUE,
       selection = "single",
@@ -104,10 +103,10 @@ landingPage <- function(input, output, session, user, dbSettings,
     )
   })
   
-  output$PRIdownloadexcel <- downloadHandler(
-    filename = "processruninbox.csv",
+  output$downloadexcel_ana <- downloadHandler(
+    filename = "analyses_inbox.csv",
     content = function(file) {
-      write.csv(result$inbox, file)
+      write.csv(result$tbl_anaInbox, file)
     }
   )
   
@@ -115,11 +114,11 @@ landingPage <- function(input, output, session, user, dbSettings,
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      runId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        result$inbox[i, 2]} else -1),
+      runId = reactive(if (length(i <- input$dt_anaInbox_rows_selected) == 1) {
+        result$tbl_anaInbox[i, 2]} else -1),
       # this is needed in processRun, probably shouldn't
-      procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        result$inbox[i, 1]} else -1)
+      procId = reactive(if (length(i <- input$dt_anaInbox_rows_selected) == 1) {
+        result$tbl_anaInbox[i, 1]} else -1)
     )
   )
   

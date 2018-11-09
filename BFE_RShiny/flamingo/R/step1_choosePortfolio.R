@@ -50,11 +50,11 @@ panelProgrammeTable <- function(id) {
     DTOutput(ns("tableDPprog")),
     flamingoButton(ns("abuttoncreatepr"), "Create Programme", align = "centre"),
     flamingoButton(ns("abuttonamendpr"), "Amend Programme", align = "centre") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$abuttonamendpr, placement = "right"),
+      bs_embed_tooltip(title = defineSingleAna$abuttonamendpr, placement = "right"),
     flamingoButton(ns("abuttondeletepr"), "Delete Programme", align = "centre") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$abuttondeletepr, placement = "right"),
+      bs_embed_tooltip(title = defineSingleAna$abuttondeletepr, placement = "right"),
     flamingoButton(ns("abuttonprogdetails"), "Show Details", align = "centre") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$abuttonprogdetails, placement = "right"),
+      bs_embed_tooltip(title = defineSingleAna$abuttonprogdetails, placement = "right"),
     actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Model", style = "float:right")
   )
 }
@@ -125,11 +125,11 @@ panelDefineProgramme <- function(id) {
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
              ) %>%
-               bs_embed_tooltip(title = programme_Definition_Single$sinputTransformname,
+               bs_embed_tooltip(title = defineSingleAna$sinputTransformname,
                                 placement = "right"))),
     fluidRow(column(4,
                     flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$abuttonProgSubmit, placement = "right")
+      bs_embed_tooltip(title = defineSingleAna$abuttonProgSubmit, placement = "right")
   )
 }
 

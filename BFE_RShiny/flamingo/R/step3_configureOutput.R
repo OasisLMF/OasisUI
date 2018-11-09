@@ -57,12 +57,12 @@ panelProcessRunTable <- function(id) {
                         div(id = ns("divprocessRunButtons"),
                             flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration"),
                             flamingoButton(inputId = ns("abuttonrerunpr"), label = "Rerun") %>%
-                              bs_embed_tooltip(title = programme_Definition_Single$abuttonrerunpr, placement = "right"),
+                              bs_embed_tooltip(title = defineSingleAna$abuttonrerunpr, placement = "right"),
                             flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
-                              bs_embed_tooltip(title = programme_Definition_Single$abuttonshowlog, placement = "right"),
+                              bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
                             div(
-                              actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Browse") %>%
-                                bs_embed_tooltip(title = programme_Definition_Single$abuttondisplayoutput, placement = "right"),
+                              actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Dashboard") %>%
+                                bs_embed_tooltip(title = defineSingleAna$abuttondisplayoutput, placement = "right"),
                               style = "inline: true;float: right;")
                         )))
     )
@@ -124,7 +124,7 @@ panelDefineOutputs <- function(id) {
     fluidRow(
       column(12,
              flamingoButton(inputId = ns("abuttonexecuteprrun"), label = "Execute Run"), align = "right")) %>%
-      bs_embed_tooltip(title = programme_Definition_Single$abuttonexecuteprrun, placement = "right")
+      bs_embed_tooltip(title = defineSingleAna$abuttonexecuteprrun, placement = "right")
   )
 }
 
@@ -203,7 +203,7 @@ panelDefineOutputConfiguration <- function(id) {
     flamingoButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
     hidden(flamingoButton(inputId = ns("abuttonbasic"), label = "Basic")),
     hidden(flamingoButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration")) %>%
-      bs_embed_tooltip(title = programme_Definition_Single$abuttonsaveoutput, placement = "right"),
+      bs_embed_tooltip(title = defineSingleAna$abuttonsaveoutput, placement = "right"),
     hidden(flamingoButton(inputId = ns("abuttonclroutopt"), label = "Default"))
   )
 }

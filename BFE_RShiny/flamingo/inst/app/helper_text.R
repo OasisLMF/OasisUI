@@ -18,7 +18,7 @@ landing_page <- list(
   abuttonbrowseBBR = "Visualize results across runs or from batch runs",
   abuttonbrowseCBR = "Compare runs",
   abuttongotorun = "Go to run details",
-  PRIdownloadexcel = "Download files table",
+  downloadexcel_ana = "Download Analyses table",
   abuttonfilemngt = "Access input/output files",
   abuttonsysconf = "System configuration",
   accountDD = "User info",
@@ -45,7 +45,7 @@ landing_page <- list(
     abuttonSubmitCrtAm = "Submit Programme"
   )
 
-programme_Definition_Single <- list(
+defineSingleAna <- list(
   sinputTransformname = "Transformation Description to be added here",
   sinputProgModTransform = "Transformation Description to be added here",
   selectprogrammeID = "Select a programme ID to which associate a model",

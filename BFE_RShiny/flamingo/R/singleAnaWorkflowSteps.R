@@ -1,19 +1,18 @@
 ### Panels Programme Workflow -----
 # N.B.: checkbox values need to have type = "character", otherwise jQuery errors
 # are thrown when programmatically setting choices
-# programmeWorkflowSteps <- list("Choose Programme" = "1",
-#                                "Associate Model" = "2",
-#                                "Configure Output & Run" = "3",
-#                                "Browse & Re-run" = "4")
+# analysisWorkflowSteps <- list("Choose Portfolio" = "1",
+#                               "Choose Model"" = "2",
+#                               "Configure Output & Run" = "4")
 
-#' programmeWorkflowSteps
+#' analysisWorkflowSteps
 #'
-#' @rdname programmeWorkflowSteps
+#' @rdname analysisWorkflowSteps
 #'
 #' @return List.
 #'
 #' @export
-programmeWorkflowSteps <- list("Choose Programme" = "1",
+analysisWorkflowSteps <- list("Choose Portfolio" = "1",
                                "Choose Model" = "2",
                                "Configure Output & Run" = "3")
 
@@ -35,7 +34,7 @@ singleAnaWorkflowStepsUI <- function(id) {
     # br(),
     radioGroupButtons(
       inputId = ns("radiobuttons"), label = NULL,
-      choices = programmeWorkflowSteps,
+      choices = analysisWorkflowSteps,
       justified = TRUE, individual = TRUE, status = "primary",
       checkIcon = list(yes = icon("triangle-right", lib = "glyphicon"), no = NULL)
     )

@@ -50,7 +50,7 @@ panelProgrammeModelTable <- function(id) {
     ),
     DTOutput(ns("tableProgOasisOOK")),
     flamingoButton(ns("abuttonmodeldetails"), "Show Details", align = "centre") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$abuttonmodeldetails, placement = "right"),
+      bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right"),
     flamingoButton(ns("abuttonassociatemodel"), "Create Model Association", align = "centre"),
     actionButton(ns("abuttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
   )
@@ -118,11 +118,11 @@ panelAssociateModel <- function(id) {
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
              )) %>%
-        bs_embed_tooltip(title = programme_Definition_Single$sinputProgModTransform,
+        bs_embed_tooltip(title = defineSingleAna$sinputProgModTransform,
                          placement = "right")),
 
     div(flamingoButton(inputId = ns("abuttoncrprogoasis"), label = "Create") %>%
-          bs_embed_tooltip(title = programme_Definition_Single$abuttoncrprogoasis, placement = "right"),
+          bs_embed_tooltip(title = defineSingleAna$abuttoncrprogoasis, placement = "right"),
         style = "float:right;")
   )
 }

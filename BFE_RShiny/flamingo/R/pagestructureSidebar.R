@@ -50,17 +50,17 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       right = FALSE,
       width = "100%",
       flamingoButton(ns("abuttonbrowseSBR"),
-                   label = if (!collapsed) "Single Browse" else "Single",
+                   label = if (!collapsed) "Single Analysis Dashboard" else "Single",
                    icon = if (collapsed) icon("eye"),
                    align = "left",  width = "100%") %>%
         bs_embed_tooltip(title = landing_page$abuttonbrowseSBR, placement = "right"),
       flamingoButton(ns("abuttonbrowseBBR"),
-                   label = if (!collapsed) "Batch Browse" else "Batch",
+                   label = if (!collapsed) "Batch Analysis Dashboard" else "Batch",
                    icon = if (collapsed) icon("eye"),
                    align = "left",  width = "100%", disabled = TRUE) %>%
         bs_embed_tooltip(title = landing_page$abuttonbrowseBBR, placement = "right"),
       flamingoButton(ns("abuttonbrowseCBR"),
-                   label = if (!collapsed) "Compare runs" else "Runs",
+                   label = if (!collapsed) "Compare Analyses Dashboard" else "Compare",
                    icon = if (collapsed) icon("eye"),
                    align = "left",  width = "100%", disabled = TRUE) %>%
         bs_embed_tooltip(title = landing_page$abuttonbrowseCBR, placement = "right")
