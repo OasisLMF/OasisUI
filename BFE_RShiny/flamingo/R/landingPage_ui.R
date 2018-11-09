@@ -1,7 +1,7 @@
 #' landingPage
 #'
 #' @rdname landingPage
-#' 
+#'
 #' @template params-module-ui
 #'
 #' @return List of tags.
@@ -31,7 +31,7 @@ landingPageUI <- function(id) {
 #' pageheaderUI
 #'
 #' @rdname pageheader
-#' 
+#'
 #' @template params-module-ui
 #'
 #' @return List of tags.
@@ -50,17 +50,17 @@ pageheaderUI <- function(id) {
                         size = "s",
                         right = TRUE,
                         textOutput(ns("textOutputHeaderData2")),
-                        flamingoButton(ns("abuttonuseradmin"),
-                                     label = "User Administration", align = "center", width = "100%"),
+                        # flamingoButton(ns("abuttonuseradmin"),
+                        #              label = "User Administration", align = "center", width = "100%"),
 
                         ### TODO: recheck allignment of the comment after fixing dtyle of action buttons
-                        flamingoButton(ns("abuttondefineaccount"),
-                                     label = "Define Account", align = "center", width = "100%") %>%
-                          bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "left"),
-
-                        flamingoButton(ns("abuttonsysconf"),
-                                     label = "System Configuration", align = "center", width = "100%") %>%
-                          bs_embed_tooltip(title = landing_page$abuttonsysconf, placement = "left"),
+                        # flamingoButton(ns("abuttondefineaccount"),
+                        #              label = "Define Account", align = "center", width = "100%") %>%
+                        #   bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "left"),
+                        #
+                        # flamingoButton(ns("abuttonsysconf"),
+                        #              label = "System Configuration", align = "center", width = "100%") %>%
+                        #   bs_embed_tooltip(title = landing_page$abuttonsysconf, placement = "left"),
 
                         flamingoButton(ns("abuttonlogout"),
                                      label = "Logout", align = "center", width = "100%")

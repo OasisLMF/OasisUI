@@ -5,7 +5,7 @@
 #' @template return-outputNavigation
 #' @template params-module
 #' @template params-flamingo-module
-#' 
+#'
 #' @param reloadMillis Amount of time to wait between table updates;
 #' see \link{invalidateLater}.
 #' @param userName user name as returned by [flamingoDBLogin()]
@@ -101,7 +101,7 @@ landingPage <- function(input, output, session, userId, userName, dbSettings,
 #' @template return-outputNavigation
 #' @template params-module
 #' @template params-flamingo-module
-#' 
+#'
 #' @param reloadMillis Amount of time to wait between table updates;
 #' see \link{invalidateLater}.
 #' @param userName user name as returned by [flamingoDBLogin()]
@@ -195,11 +195,11 @@ pageheader <- function(input, output, session, userId, userName, dbSettings,
 #' @param reloadMillis Amount of time to wait between table updates;
 #' see \link{invalidateLater}.
 #' @param userName user name as returned by [flamingoDBLogin()]
-#' 
+#'
 #' @return collapsed status of panel.
 #'
 #' @importFrom shinyWidgets toggleDropdownButton
-#' 
+#'
 #' @export
 pagestructure <- function(input, output, session, userId, userName, dbSettings,
                           reloadMillis = 10000, logMessage = message,
@@ -224,6 +224,15 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 
 
   ### Navigation Menu ----------------------------------------------------------
+
+  observeEvent(input$abuttonrun, {
+    disable("abuttondefineprogrammebatch")
+  })
+
+  observeEvent(input$abuttonbrowse, {
+    disable("abuttonbrowseBBR")
+    disable("abuttonbrowseCBR")
+  })
 
   observeEvent(input$abuttondefineprogrammesingle, {
     updateNavigation(navigation_state, "PS")
@@ -280,7 +289,7 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 #'
 #' @template params-module
 #' @template params-flamingo-module
-#' 
+#'
 #' @return NULL
 #'
 #' @export
