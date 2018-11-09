@@ -63,13 +63,13 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
             DA =
               accountDefinitionUI("accountDefinition"),
 
-            # DefineProgramme Single
-            PS =
-              programmeDefinitionSingleUI("programmeDefinitionSingle"),
+            # Define Single Analysis
+            SA =
+              singleAnaUI("singleAna"),
 
-            # DefineProgramme Batch
-            PB =
-              programmeDefinitionBatchUI("programmeDefinitionBatch"),
+            # Define Batch Analysis
+            BA =
+              batchAnaUI("batchAna"),
 
             # DefineBrowse Single
             SBR = visualizationSBRUI("visualizationSBR"),

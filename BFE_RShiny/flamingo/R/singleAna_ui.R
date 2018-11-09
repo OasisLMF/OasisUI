@@ -1,10 +1,10 @@
-# programmeDefinitionSingle Module UI ------------------------------------------
+# Single Analysis Definition Module UI ------------------------------------------
 
-#' programmeDefinitionSingle
+#' singleAnaUI
 #'
-#' @rdname programmeDefinitionSingle
+#' @rdname singleAna
 #'
-#' @description UI/View for the process run page
+#' @description UI/Viewt o define an analysis
 #'
 #' @template params-module-ui
 #'
@@ -13,12 +13,12 @@
 #' @importFrom shinyjs hidden
 #'
 #' @export
-programmeDefinitionSingleUI <- function(id) {
+singleAnaUI <- function(id) {
 
 ns <- NS(id)
 
 tagList(
-  singleProgrammeWorkflowStepsUI(ns("workflowsteps")),
+  singleAnaWorkflowStepsUI(ns("workflowsteps")),
   hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
   step1_chooseProgrammeUI(ns("step1_chooseProgramme")),
   step2_chooseModelUI(ns("step2_chooseModel")),

@@ -17,9 +17,9 @@ programmeWorkflowSteps <- list("Choose Programme" = "1",
                                "Choose Model" = "2",
                                "Configure Output & Run" = "3")
 
-#' singleProgrammeWorkflowStepsUI
+#' singleAnaWorkflowStepsUI
 #'
-#' @rdname singleProgrammeWorkflowStepsUI
+#' @rdname singleAnaWorkflowStepsUI
 #'
 #' @template params-module-ui
 #'
@@ -28,7 +28,7 @@ programmeWorkflowSteps <- list("Choose Programme" = "1",
 #' @importFrom shinyWidgets radioGroupButtons
 #'
 #' @export
-singleProgrammeWorkflowStepsUI <- function(id) {
+singleAnaWorkflowStepsUI <- function(id) {
   ns <- NS(id)
   tagList(
     # h4("Process Definition Steps"),
@@ -42,9 +42,9 @@ singleProgrammeWorkflowStepsUI <- function(id) {
   )
 }
 
-#' singleProgrammeWorkflowSteps
+#' singleAnaWorkflowSteps
 #'
-#' @rdname singleProgrammeWorkflowSteps
+#' @rdname singleAnaWorkflowSteps
 #'
 #' @template params-module
 #'
@@ -54,7 +54,7 @@ singleProgrammeWorkflowStepsUI <- function(id) {
 #' @importFrom shinyjs js
 #'
 #' @export
-singleProgrammeWorkflowSteps <- function(input, output, session) {
+singleAnaWorkflowSteps <- function(input, output, session) {
   observeEvent(input$radiobuttons, {
     # update steps colors
     js$updateStepColors(radioButtonsId = session$ns("radiobuttons"))

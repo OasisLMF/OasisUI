@@ -83,9 +83,9 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "DA")
   )
 
-  auth_modules$programmeDefinitionSingle <- .callModule(
-    programmeDefinitionSingle,
-    id = "programmeDefinitionSingle",
+  auth_modules$singleAna <- .callModule(
+    singleAna,
+    id = "singleAna",
     apiSettings = apiSettings,
     user = reactive(result$user),
     preselRunId =  auth_modules$landingPage$runId,
@@ -93,16 +93,16 @@ server <- function(input, output, session) {
     preselPanel = reactive(result$preselPanel),
     logMessage = logMessage,
     reloadMillis = reloadMillis,
-    active = reactive(authenticated() && main_visible() == "PS")
+    active = reactive(authenticated() && main_visible() == "SA")
   )
 
-  auth_modules$programmeDefinitionBatch <- .callModule(
-    programmeDefinitionBatch,
-    id = "programmeDefinitionBatch",
+  auth_modules$batchAna <- .callModule(
+    batchAna,
+    id = "batchAna",
     apiSettings = apiSettings,
     logMessage = logMessage,
     reloadMillis = reloadMillis,
-    active = reactive(authenticated() && main_visible() == "PB")
+    active = reactive(authenticated() && main_visible() == "BA")
   )
 
   auth_modules$visualizationSBR <- .callModule(
@@ -111,7 +111,7 @@ server <- function(input, output, session) {
     apiSettings = apiSettings,
     user = reactive(result$user),
     preselRunId =  auth_modules$landingPage$runId,
-    processRunId = auth_modules$programmeDefinitionSingle$processRunId,
+    processRunId = auth_modules$singleAna$processRunId,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "SBR")
   )
@@ -133,7 +133,7 @@ server <- function(input, output, session) {
     apiSettings = apiSettings,
     user = reactive(result$user),
     preselRunId = auth_modules$landingPage$runId,
-    processRunId =  auth_modules$programmeDefinitionSingle$processRunId,
+    processRunId =  auth_modules$singleAna$processRunId,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "CBR")
   )
@@ -229,13 +229,13 @@ server <- function(input, output, session) {
                      logger = "flamingo.module")
            },
 
-           "PS" = { # go to Define programme single submenu
-             loginfo(paste("Navigate to Define Process Single"),
+           "SA" = { # go to Define programme single submenu
+             loginfo(paste("Navigate to Define Single Analysis"),
                      logger = "flamingo.module")
            },
 
-           "PB" = { # go to Define programme batch submenu
-             loginfo(paste("Navigate to Define Process Batch"),
+           "BA" = { # go to Define programme batch submenu
+             loginfo(paste("Navigate to Define Batch Analysis"),
                      logger = "flamingo.module")
            },
 

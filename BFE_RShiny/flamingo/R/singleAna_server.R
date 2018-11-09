@@ -1,8 +1,8 @@
-#' programmeDefinitionSingle
+#' singleAna
 #'
-#' @rdname programmeDefinitionSingle
+#' @rdname singleAna
 #'
-#' @description Server logic to define a programme.
+#' @description Server logic to define an analysis
 #'
 #' @template return-outputNavigation
 #' @template params-module
@@ -19,7 +19,7 @@
 #' @importFrom shinyjs hide
 #'
 #' @export
-programmeDefinitionSingle <- function(input, output, session, dbSettings,
+singleAna <- function(input, output, session, dbSettings,
                                       apiSettings, user, active = reactive(TRUE), logMessage = message,
                                       preselRunId = reactive(-1),
                                       preselProcId = reactive(-1),
@@ -70,8 +70,8 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   )
 
   # Panels switch --------------------------------------------------------------
-  # Module to control colors of radio buttons in the singleProgrammeWorkflowSteps
-  workflowSteps <- callModule(singleProgrammeWorkflowSteps, "workflowsteps")
+  # Module to control colors of radio buttons in the singleAnaWorkflowSteps
+  workflowSteps <- callModule(singleAnaWorkflowSteps, "workflowsteps")
 
   # Make sure the view is reset:
   # to first panel if accessing from landing page

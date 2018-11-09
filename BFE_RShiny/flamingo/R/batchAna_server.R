@@ -1,15 +1,15 @@
-#' programmeDefinitionBatch_server
+#' batchAna
 #'
-#' @rdname programmeDefinitionBatch
+#' @rdname batchAna
 #'
-#' @description Server logic to define a batch process.
+#' @description Server logic to define a batch analysis.
 #'
 #' @template return-outputNavigation
 #' @template params-module
 #' @template params-flamingo-module
 #'
 #' @export
-programmeDefinitionBatch <- function(input, output, session, dbSettings,
+batchAna <- function(input, output, session, dbSettings,
                                      apiSettings, active = reactive(TRUE),
                                      logMessage = message, reloadMillis = 10000) {
 

@@ -22,29 +22,29 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
                    label = NULL, style = "float:right;")
     ),
     dropdownButton(
-      inputId = ns("abuttonrun"),
+      inputId = ns("abuttonanalysis"),
       status = "dropdown",
-      label = if (!collapsed) "Process",
+      label = if (!collapsed) "Analysis",
       icon = if (collapsed) icon("cog", lib = "glyphicon"),
       circle = FALSE,
       right = FALSE,
       width = "100%",
-      flamingoButton(ns("abuttondefineprogrammesingle"),
-                   label = if (!collapsed) "Single Process" else "Single",
+      flamingoButton(ns("abuttondefineanasingle"),
+                   label = if (!collapsed) "Single Analysis" else "Single",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
                    align = "left",  width = "100%") %>%
-        bs_embed_tooltip(title = landing_page$abuttondefineprogrammesingle, placement = "right"),
-      flamingoButton(ns("abuttondefineprogrammebatch"),
-                   label = if (!collapsed) "Batch Process" else "Batch",
+        bs_embed_tooltip(title = landing_page$abuttondefineanasingle, placement = "right"),
+      flamingoButton(ns("abuttondefineanabatch"),
+                   label = if (!collapsed) "Batch Analysis" else "Batch",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
                    align = "left",  width = "100%") %>%
-        bs_embed_tooltip(title = landing_page$abuttondefineprogrammebatch, placement = "right")
-    ) %>% bs_embed_tooltip(title = landing_page$abuttonrun, placement = "right"),
+        bs_embed_tooltip(title = landing_page$abuttondefineanabatch, placement = "right")
+    ) %>% bs_embed_tooltip(title = landing_page$abuttonanalysis, placement = "right"),
 
     dropdownButton(
       inputId = ns("abuttonbrowse"),
       status = "dropdown",
-      label = if (!collapsed) "Browse",
+      label = if (!collapsed) "Dashboard",
       icon = if (collapsed) icon("eye"),
       circle = FALSE,
       right = FALSE,

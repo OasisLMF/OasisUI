@@ -160,7 +160,7 @@ landingPageButtonUpdate <- function(session, dbSettings,
   # Not used anywhere else, probably just forgotten
   # ("600", "abuttonenquiry")
   
-  #.updateButton("700", "abuttonrun")
+  #.updateButton("700", "abuttonanalysis")
   #.updateButton("700", "abuttonbrowse")
   
   # .updateButton("904", "abuttonuseradmin")

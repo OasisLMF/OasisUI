@@ -58,14 +58,14 @@ pagestructure <- function(input, output, session, dbSettings,
   
   ### Navigation Menu ----------------------------------------------------------
   
-  observeEvent(input$abuttondefineprogrammesingle, {
-    updateNavigation(navigation_state, "PS")
-    toggleDropdownButton(ns("abuttonrun"))
+  observeEvent(input$abuttondefineanasingle, {
+    updateNavigation(navigation_state, "SA")
+    toggleDropdownButton(ns("abuttonanalysis"))
   })
   
-  observeEvent(input$abuttondefineprogrammebatch, {
-    updateNavigation(navigation_state, "PB")
-    toggleDropdownButton(ns("abuttonrun"))
+  observeEvent(input$abuttondefineanabatch, {
+    updateNavigation(navigation_state, "BA")
+    toggleDropdownButton(ns("abuttonanalysis"))
   })
   
   observeEvent(input$abuttonbrowseSBR, {

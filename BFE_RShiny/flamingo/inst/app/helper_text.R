@@ -8,12 +8,12 @@ file_Viewer <- list(
 )
 
 landing_page <- list(
-  abuttonrun = "Define process to run",
+  abuttonanalysis = "Define analysis to run",
   abuttonbrowse = "Choose browse option",
   abuttondefineaccount = "Create/amend/delete account",
   abuttondefineprogramme = "Create/amend/delete Programme; Associate Model; Run Process",
-  abuttondefineprogrammesingle = "Define single Process Run",
-  abuttondefineprogrammebatch = "Define batch Process Run",
+  abuttondefineanasingle = "Define single analysis",
+  abuttondefineanabatch = "Define batch analysis",
   abuttonbrowseSBR = "Visualize outputs from single run",
   abuttonbrowseBBR = "Visualize results across runs or from batch runs",
   abuttonbrowseCBR = "Compare runs",
