@@ -10,8 +10,6 @@ source(file.path(".", "ui_auth.R"), local = TRUE)$value
 
 server <- function(input, output, session) {
 
-  `%>%` <- magrittr::`%>%`
-
   # active main panel based on the reactive navigation state
   navigation_state <- reactiveNavigation("LP")
   main_visible <- getNavigation(outputNavigation(
