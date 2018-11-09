@@ -1,24 +1,29 @@
 #' Landing Page
+#'
 #' @rdname landingPage
-#' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater};
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param reloadMillis Amount of time to wait between table updates;
+#' see \link{invalidateLater}.
 #' @param user reactive expression yielding user
+#'
 #' @return For \code{landingPage()}, list of reactives:
 #' \itemize{
 #' 		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
 #' 		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
 #' }
-#' @template return-outputNavigation
-#' @importFrom DT renderDT datatable
-#' @importFrom dplyr mutate '%>%'
-#' @importFrom utils write.csv
-#' @importFrom shinyWidgets toggleDropdownButton
+#'
+#' @importFrom DT renderDT
+#' @importFrom DT datatable
+#'
 #' @export
 landingPage <- function(input, output, session, user, dbSettings,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
-  # Reactive Values and parameters -----
+  # Reactive Values and parameters ---------------------------------------------
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues(
@@ -26,7 +31,7 @@ landingPage <- function(input, output, session, user, dbSettings,
     runIdList = NULL
   )
 
-  # navigation -----
+  # navigation -----------------------------------------------------------------
   observeEvent(input$abuttongotorun,
                updateNavigation(navigation_state, "SBR"))
 
@@ -44,8 +49,6 @@ landingPage <- function(input, output, session, user, dbSettings,
       replaceWithIcons()
 
     logMessage("inbox refreshed")
-
-    result$runIdList <- result$inbox[, c("RunID", "Status")]
   })
 
   output$tableInbox <- renderDT(if (!is.null(result$inbox)) {
@@ -72,7 +75,7 @@ landingPage <- function(input, output, session, user, dbSettings,
     }
   )
 
-  # Module Output ----
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -80,8 +83,7 @@ landingPage <- function(input, output, session, user, dbSettings,
         result$inbox[i, 2]} else -1),
       # this is needed in processRun, probably shouldn't
       procId = reactive(if (length(i <- input$tableInbox_rows_selected) == 1) {
-        result$inbox[i, 1]} else -1),
-      runIdList = reactive(result$runIdList)
+        result$inbox[i, 1]} else -1)
     )
   )
 
@@ -90,17 +92,24 @@ landingPage <- function(input, output, session, user, dbSettings,
 
 
 #' pageheader
+#'
 #' @rdname pageheader
-#' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates,
-#' see \link{invalidateLater}
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param reloadMillis Amount of time to wait between table updates;
+#' see \link{invalidateLater}.
 #' @param user reactive expression yielding user name
+#'
 #' @return For \code{pageheader()}, list of reactives:
 #' \itemize{
 #' 		\item{\code{logout}: }{reactive yielding logout button signal}
-#' }
-#' @template return-outputNavigation
+#' }.
+#'
 #' @importFrom shinyWidgets toggleDropdownButton
+#'
 #' @export
 pageheader <- function(input, output, session, user, dbSettings,
                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
@@ -109,7 +118,7 @@ pageheader <- function(input, output, session, user, dbSettings,
 
   navigation_state <- reactiveNavigation()
 
-  # Greeter ----
+  # Greeter ---------------------------------------------------
   output$textOutputHeaderData2 <- renderText(paste("User Name:", user()))
 
   observeEvent(input$abuttonuseradmin, {
@@ -153,12 +162,12 @@ pageheader <- function(input, output, session, user, dbSettings,
                removeModal()
   )
 
-  # Button permissions ----
+  ### Button permissions ---- --------------------------------------------------
   # observe(if (active()) {
   #   landingPageButtonUpdate(session, dbSettings, user())
   # })
 
-  # Module Output ----
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -171,14 +180,19 @@ pageheader <- function(input, output, session, user, dbSettings,
 
 
 #' Page Structure
+#'
 #' @rdname pagestructure
-#' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates,
-#' see \link{invalidateLater}
-#' @return For \code{pagestructure()}, list of reactives.
 #' @template return-outputNavigation
-#' @importFrom bsplus bs_embed_tooltip
-#' @importFrom shinyWidgets panel toggleDropdownButton
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @param reloadMillis Amount of time to wait between table updates;
+#' see \link{invalidateLater}.
+#' 
+#' @return collapsed status of panel.
+#'
+#' @importFrom shinyWidgets toggleDropdownButton
+#' 
 #' @export
 pagestructure <- function(input, output, session, dbSettings,
                           reloadMillis = 10000, logMessage = message,
@@ -202,7 +216,7 @@ pagestructure <- function(input, output, session, dbSettings,
   })
 
 
-  ### Navigation Menu ----
+  ### Navigation Menu ----------------------------------------------------------
 
   observeEvent(input$abuttondefineprogrammesingle, {
     updateNavigation(navigation_state, "PS")
@@ -238,7 +252,7 @@ pagestructure <- function(input, output, session, dbSettings,
     updateNavigation(navigation_state, "FM")
   })
 
-  ### Module Output ----
+  ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -252,10 +266,16 @@ pagestructure <- function(input, output, session, dbSettings,
 
 
 #' Landing Page Access Control
+#'
 #' @rdname landingPageButtonUpdate
-#' @description Disable/Enable menu buttons based on permissions in database
-#' @inheritParams pagestructure
-#' @importFrom shinyjs enable disable
+#'
+#' @description Disable/Enable menu buttons based on permissions in database.
+#'
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @return NULL
+#'
 #' @export
 landingPageButtonUpdate <- function(session, dbSettings,
                                     logMessage = message) {

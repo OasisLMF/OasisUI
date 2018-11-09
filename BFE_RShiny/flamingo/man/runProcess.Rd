@@ -2,21 +2,21 @@
 % Please edit documentation in R/flamingoServer.R
 \name{runProcess}
 \alias{runProcess}
-\title{Call BFE webservice to initiate a job}
+\title{runProcess}
 \usage{
 runProcess(apiSettings, runId, logWarning = warning, ...)
 }
 \arguments{
-\item{apiSettings}{settings object as returned by \link{flamingoServer}}
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{runId}{run identifier}
+\item{runId}{Run identifier.}
 
-\item{logWarning}{warning message callback}
+\item{logWarning}{Warning message callback-}
 
-\item{...}{further arguments to \link{GET}}
+\item{...}{Further arguments to \link{GET}.}
 }
 \value{
-http status category warn_for_status
+http status category warn_for_status.
 }
 \description{
 Submit a GET request to the Flamingo API Server to execute

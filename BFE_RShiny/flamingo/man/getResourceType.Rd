@@ -2,21 +2,21 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getResourceType}
 \alias{getResourceType}
-\title{Fetch resource type name and ID}
+\title{getResourceType}
 \usage{
 getResourceType(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
-resource types; \code{data.frame} of 3 variables:
+Resource types; \code{data.frame} of 3 variables:
 \itemize{
 \item \code{ResourceTypeID}
 \item \code{ResourceTypeName}
 \item \code{Source}
-}
+}.
 }
 \description{
-Fetch resource type name and ID
+Fetch resource type name and ID.
 }

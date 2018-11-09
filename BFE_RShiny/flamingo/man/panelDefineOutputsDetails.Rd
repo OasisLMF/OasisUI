@@ -2,7 +2,7 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{panelDefineOutputsDetails}
 \alias{panelDefineOutputsDetails}
-\title{Function wrapping sub-panel to define outputs details}
+\title{panelDefineOutputsDetails}
 \usage{
 panelDefineOutputsDetails(id)
 }
@@ -10,5 +10,5 @@ panelDefineOutputsDetails(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping sub-panel to define outputs details
+Function wrapping sub-panel to define outputs details.
 }

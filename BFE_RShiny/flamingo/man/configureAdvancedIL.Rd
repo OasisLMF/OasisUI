@@ -2,7 +2,7 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{configureAdvancedIL}
 \alias{configureAdvancedIL}
-\title{Function wrapping sub-panel to define outputs advanced configuration IL}
+\title{configureAdvancedIL}
 \usage{
 configureAdvancedIL(id)
 }
@@ -10,5 +10,5 @@ configureAdvancedIL(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping sub-panel to define outputs advanced configuration IL
+Function wrapping sub-panel to define outputs advanced configuration IL.
 }

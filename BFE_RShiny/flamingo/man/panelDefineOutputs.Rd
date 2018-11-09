@@ -2,7 +2,7 @@
 % Please edit documentation in R/step3_configureOutput.R
 \name{panelDefineOutputs}
 \alias{panelDefineOutputs}
-\title{Function wrapping panel to define outputs}
+\title{panelDefineOutputs}
 \usage{
 panelDefineOutputs(id)
 }

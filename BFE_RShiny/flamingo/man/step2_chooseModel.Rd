@@ -17,11 +17,11 @@ step2_chooseModel(input, output, session, dbSettings, apiSettings,
 \arguments{
 \item{id}{module id}
 
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
@@ -29,18 +29,38 @@ step2_chooseModel(input, output, session, dbSettings, apiSettings,
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{function that will be passed info messages.}
+
+\item{currstep}{current selected step.}
+
+\item{selectprogrammeID}{selected programme ID.}
+
+\item{selectprogOasisID}{selected ProgOasis ID.}
+
+\item{progName}{Name of selected programme.}
+
+\item{progStatus}{Status of selected programme.}
+
+\item{DPProgData}{Dataframe of programmes.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{user}{reactive expression yielding user}
 }
 \value{
-list of tags
-
-For \code{programmeDefinitionSingle()}, list of reactives.
+List of tags.
 
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
+selectprogOasisID Id of selected progOasis.
+
+POData model association table.
+
+newstep navigation step
 }
 \description{
-UI/View for the step2_chooseModel
+UI/View for the step2_chooseModel.
 
-Server logic to step2_chooseModel
+Server logic to step2_chooseModel.
 }

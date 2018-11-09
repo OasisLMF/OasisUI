@@ -1,6 +1,14 @@
+#' landingPage
+#'
 #' @rdname landingPage
+#' 
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 landingPageUI <- function(id) {
   ns <- NS(id)
@@ -17,13 +25,20 @@ landingPageUI <- function(id) {
                      label = "Export to csv") %>%
         bs_embed_tooltip(title = landing_page$PRIdownloadexcel, placement = "right")
     )
-    # img(src = "landingpage.png", width = "70%") # to be replaced with proper image
   )
 }
 
-#' @rdname pagestructure
+#' pageheaderUI
+#'
+#' @rdname pageheader
+#' 
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
 #' @importFrom bsplus bs_embed_tooltip
 #' @importFrom shinyWidgets dropdownButton
+#'
 #' @export
 pageheaderUI <- function(id) {
   ns <- NS(id)
@@ -57,7 +72,14 @@ pageheaderUI <- function(id) {
 
 
 
+#' pagestructureUI
+#'
 #' @rdname pagestructure
+#'
+#' @template params-module-ui
+#'
+#' @return Lits of tags
+#'
 #' @export
 pagestructureUI <- function(id) {
   ns <- NS(id)

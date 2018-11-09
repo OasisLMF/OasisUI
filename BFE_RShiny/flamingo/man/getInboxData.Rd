@@ -2,19 +2,21 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getInboxData}
 \alias{getInboxData}
-\title{Get the process run overview from the database}
+\title{getInboxData}
 \usage{
 getInboxData(dbSettings, user, ...)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{user}{user as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+\item{user}{reactive expression yielding user}
 
-\item{...}{other arguments to \code{\link[=executeDbQuery]{executeDbQuery()}}}
+\item{...}{Other arguments to \code{\link[=executeDbQuery]{executeDbQuery()}}.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
-inbox; \code{data.frame} of 6 variables:
+Inbox; \code{data.frame} of 6 variables:
 \itemize{
 \item \code{ProgOasisID}
 \item \code{RunID}
@@ -22,8 +24,8 @@ inbox; \code{data.frame} of 6 variables:
 \item \code{Model}
 \item \code{Status}
 \item \code{Completed}
-}
+}.
 }
 \description{
-Get the process run overview from the database
+Get the process run overview from the database.
 }

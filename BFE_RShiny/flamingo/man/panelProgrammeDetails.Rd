@@ -2,7 +2,7 @@
 % Please edit documentation in R/step1_chooseProgramme.R
 \name{panelProgrammeDetails}
 \alias{panelProgrammeDetails}
-\title{Function wrapping panel to show details of programme}
+\title{panelProgrammeDetails}
 \usage{
 panelProgrammeDetails(id)
 }
@@ -10,5 +10,5 @@ panelProgrammeDetails(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to show details of programme
+Function wrapping panel to show details of programme.
 }

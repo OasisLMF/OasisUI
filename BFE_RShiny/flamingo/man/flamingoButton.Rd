@@ -2,16 +2,19 @@
 % Please edit documentation in R/shiny.R
 \name{flamingoButton}
 \alias{flamingoButton}
-\title{Flamingo action button/link version}
+\title{flamingoButton}
 \usage{
 flamingoButton(inputId, label, icon = NULL, width = NULL,
   class = c("btn", "btn-primary"), ...)
 }
 \arguments{
-\item{class}{HTML class attribute}
+\item{class}{HTML class attribute.}
 
-\item{...}{arguments to \code{\link[shiny:actionButton]{shiny::actionButton()}}}
+\item{...}{Arguments to \code{\link[shiny:actionButton]{shiny::actionButton()}}.}
+}
+\value{
+Acces to Oasis UI.
 }
 \description{
-Modified version of the default \code{\link[shiny:actionButton]{shiny::actionButton()}}
+Modified version of the default \code{\link[shiny:actionButton]{shiny::actionButton()}}.
 }

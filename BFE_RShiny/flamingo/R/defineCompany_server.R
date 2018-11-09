@@ -1,9 +1,21 @@
-#' Company Definition Module
+#' companyDefinition
+#'
 #' @rdname companyDefinition
-#' @description Server logic to define a company
-#' @inheritParams flamingoModule
-#' @return empty list
+#'
+#' @description Server logic to define a company.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @return Empty list.
+#
+#' @importFrom DT datatable
 #' @importFrom DT renderDT
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs onclick
+#'
 #' @export
 companyDefinition <- function(input, output, session, dbSettings,
                               active = reactive(TRUE), logMessage = message) {
@@ -27,7 +39,7 @@ companyDefinition <- function(input, output, session, dbSettings,
   }
 
 
-  ### Company Table ###
+  # Company Table --------------------------------------------------------------
 
   # update company table when:
   # - module activated (e.g. when switching to tab)
@@ -50,11 +62,12 @@ companyDefinition <- function(input, output, session, dbSettings,
       options = list(
         searchHighlight = TRUE,
         columnDefs = list(list(visible = FALSE, targets = 0)),
-        autoWidth=TRUE
+        autoWidth = TRUE
       )
     )
   })
 
+  # Modal dialog and buttons in main panel -------------------------------------
   # Modal dialog of create button in main panel
   .compcrtupmodal <- function() {
     ns <- session$ns
@@ -90,11 +103,11 @@ companyDefinition <- function(input, output, session, dbSettings,
   # Enable and disable buttons
   observeEvent(input$tablecompanylist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$tablecompanylist_rows_selected) > 0) {
-        shinyjs::enable("abuttoncompupdate")
-        shinyjs::enable("abuttoncompdel")
+        enable("abuttoncompupdate")
+        enable("abuttoncompdel")
       } else {
-        shinyjs::disable("abuttoncompupdate")
-        shinyjs::disable("abuttoncompdel")
+        disable("abuttoncompupdate")
+        isable("abuttoncompdel")
       }
     })
 
@@ -215,7 +228,7 @@ companyDefinition <- function(input, output, session, dbSettings,
   })
 
 
-  ### Module Output ###########################################################
+  # Module Output --------------------------------------------------------------
 
   moduleOutput <- list()
 

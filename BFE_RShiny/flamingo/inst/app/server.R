@@ -111,11 +111,10 @@ server <- function(input, output, session) {
     visualizationSBR,
     id = "visualizationSBR",
     apiSettings = apiSettings,
-    runIdList =  auth_modules$landingPage$runIdList,
+    user = reactive(result$user),
     preselRunId =  auth_modules$landingPage$runId,
     processRunId = auth_modules$programmeDefinitionSingle$processRunId,
     logMessage = logMessage,
-    reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "SBR")
   )
 
@@ -123,8 +122,10 @@ server <- function(input, output, session) {
     visualizationBBR,
     id = "visualizationBBR",
     apiSettings = apiSettings,
+    user = reactive(result$user),
+    preselRunId = reactive(-1),
+    processRunId = reactive(-1),
     logMessage = logMessage,
-    reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "BBR")
   )
 
@@ -132,8 +133,10 @@ server <- function(input, output, session) {
     visualizationCBR,
     id = "visualizationCBR",
     apiSettings = apiSettings,
+    user = reactive(result$user),
+    preselRunId = auth_modules$landingPage$runId,
+    processRunId =  auth_modules$programmeDefinitionSingle$processRunId,
     logMessage = logMessage,
-    reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "CBR")
   )
 
@@ -180,7 +183,9 @@ server <- function(input, output, session) {
     if (result$user != FLAMINGO_GUEST_ID) "loggedin" else "loggedout"
   )
   callModule(reactiveConditionalPanels, "appUI", appState)
-  # Module input parameters depending on othe rmodules outputs
+
+  ### Module input parameters depending on othe rmodules outputs ---
+
   # UI non-reactive to (result$WidthSide) and (result$Widthmain)
   output$authUI <- renderUI(
     #if (authenticated()) {

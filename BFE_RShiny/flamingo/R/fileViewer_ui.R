@@ -1,17 +1,20 @@
-
+#' fileViewerUI
+#'
 #' @rdname fileViewer
-#' @description UI/View to view files
-#' @import leaflet
-#' @importFrom DT DTOutput
+#'
+#' @description UI/View to view files.
+#' 
+#' @template params-module-ui
+#'
+#' @return LIst of tags.
+#'
 #' @export
 fileViewerUI <- function(id) {
 
   ns <- NS(id)
 
   tagList(
-
-    # h3("File Viewer", class = "flamingo-page-title"),
-
+    
     h4("File List", class = "flamingo-table-title"),
 
     actionButton(inputId = ns("refreshtable"), label = "Refresh", style = "float:right"),

@@ -11,25 +11,36 @@ fileViewer(input, output, session, dbSettings,
 fileViewerUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{preselRunId}{preselected run id}
+\item{preselRunId}{Reactive string expression for reselected run id from landingpage.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{function that will be passed info messages.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{user}{reactive expression yielding user}
+
+\item{id}{module id}
 }
 \value{
-empty list
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
+LIst of tags.
 }
 \description{
-Server logic to view files
+Server logic to view files.
 
-UI/View to view files
+UI/View to view files.
 }

@@ -2,12 +2,17 @@
 
 # UI ---------------------------------------------------------------------------
 #' step2_chooseModel UI
+#'
 #' @rdname step2_chooseModel
-#' @description UI/View for the step2_chooseModel
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
-#' @importFrom DT DTOutput
-#' @importFrom bsplus bs_embed_tooltip
+#'
+#' @description UI/View for the step2_chooseModel.
+#'
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
+#' @importFrom shinyjs hidden
+#'
 #' @export
 step2_chooseModelUI <- function(id) {
 
@@ -20,10 +25,17 @@ step2_chooseModelUI <- function(id) {
   )
 }
 
-#' Function wrapping panel to show created programme model table
+#' panelProgrammeModelTable
+#'
 #' @rdname panelProgrammeModelTable
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping panel to show created programme model table.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 panelProgrammeModelTable <- function(id) {
   ns <- NS(id)
@@ -44,10 +56,16 @@ panelProgrammeModelTable <- function(id) {
   )
 }
 
-#' Function wrapping panel to show details of programme table
+#' panelModelDetails
+#'
 #' @rdname panelModelDetails
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping panel to show details of programme table.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom DT DTOutput
+#'
 #' @export
 panelModelDetails <- function(id) {
   ns <- NS(id)
@@ -64,9 +82,16 @@ panelModelDetails <- function(id) {
   )
 }
 
-#' Function wrapping panel to associate model
-#' @inheritParams flamingoModuleUI
+#' panelAssociateModel
+#'
+#' @rdname panelAssociateModel
+#'
+#' @description Function wrapping panel to associate model.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 panelAssociateModel <- function(id) {
   ns <- NS(id)
@@ -105,15 +130,38 @@ panelAssociateModel <- function(id) {
 
 # Server -----------------------------------------------------------------------
 #' step2_chooseModel Server
+#'
 #' @rdname step2_chooseModel
-#' @description Server logic to step2_chooseModel
-#' @inheritParams flamingoModule
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+#'
+#' @description Server logic to step2_chooseModel.
+#'
 #' @template return-outputNavigation
-#' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
-#' @importFrom dplyr mutate select case_when
-#' @importFrom shinyjs onclick disable enable
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param currstep current selected step.
+#' @param selectprogrammeID selected programme ID.
+#' @param selectprogOasisID selected ProgOasis ID.
+#' @param progName Name of selected programme.
+#' @param progStatus Status of selected programme.
+#' @param DPProgData Dataframe of programmes.
+#'
+#' @return selectprogOasisID Id of selected progOasis.
+#' @return POData model association table.
+#' @return newstep navigation step
+#'
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs onclick
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs enable
+#' @importFrom DT renderDT
+#' @importFrom DT datatable
+#' @importFrom DT dataTableProxy
+#' @importFrom DT selectRows
+#' @importFrom DT selectPage
+#' @importFrom dplyr select
+#'
 #' @export
 step2_chooseModel <- function(input, output, session,
                               dbSettings,apiSettings,
@@ -309,7 +357,7 @@ step2_chooseModel <- function(input, output, session,
       }
     })
 
-  ### Show/hide Programme Model Details Panel
+  # Show/hide Programme Model Details Panel
   onclick("buttonmodeldetails", {
     logMessage("showing panelModelDetails")
     .reloadProgFiles()
@@ -322,7 +370,7 @@ step2_chooseModel <- function(input, output, session,
     logMessage("hiding panelModelDetails")
   })
 
-  ### Create Model -------------------------------------------------------------
+  # Create Model ----------------------------------------------------------------
   onclick("buttonassociatemodel", {
     show("panelAssociateModel")
   })
@@ -500,8 +548,6 @@ step2_chooseModel <- function(input, output, session,
       searchHighlight = TRUE,
       processing = 0,
       pageLength = pageLength,
-      #width = "100%",
-      #autoWidth = TRUE,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }

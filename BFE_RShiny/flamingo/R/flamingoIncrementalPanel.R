@@ -1,10 +1,13 @@
-#' @title flamingoIncrementalPanelUI
+#' flamingoIncrementalPanelUI
+#'
 #' @rdname flamingoIncrementalPanelUI
-#' @param removable TRUE
+#'
+#' @param removable TRUE.
 #' @inheritParams flamingoPanel
-#' @importFrom htmltools tags
+#'
+#' @return List of tags.
+#'
 #' @export
-
 flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, status = "default",
                                        collapsible = FALSE, show = TRUE, removable = TRUE) {
   ns <- NS(id)
@@ -23,14 +26,21 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
   )
 }
 
-#' @title flamingoIncrementalPanel
+#' flamingoIncrementalPanel
+#'
 #' @rdname flamingoIncrementalPanel
-#' @inheritParams flamingoModule
-#' @param new_content_IDs ID with new content
-#' @param new_content_fun function with new content
-#' @param new_headings new heading
-#' @param panels_state state of panel
-#' @importFrom htmltools tags
+#'
+#' @template params-module
+#' @template params-flamingo-module
+#' @param new_content_IDs ID with new content.
+#' @param new_content_fun Function with new content.
+#' @param new_headings New heading.
+#' @param panels_state State of panel.
+#'
+#' @return smth.
+#'
+#' @importFrom utils head
+#'
 #' @export
 flamingoIncrementalPanel <- function(input, output, session, panels_state,
                                      new_content_IDs, new_content_fun, ..., new_headings = NULL,
@@ -75,9 +85,14 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state,
   })
 }
 
-#' @title panelsState
+#' panelsState
+#'
 #' @rdname panelsState
-#' @param IDs IDs
+#'
+#' @param IDs IDs.
+#'
+#' @return smth.
+#'
 #' @export
 panelsState <- function(IDs) {
   reactiveVal(
@@ -85,13 +100,18 @@ panelsState <- function(IDs) {
   )
 }
 
-#' @title callIncrementalPanelModules
+#' callIncrementalPanelModules
+#'
 #' @rdname callIncrementalPanelModules
+#'
 #' @inheritParams flamingoPanel
-#' @param IDs IDs
-#' @param ID_0 ID_0
-#' @param contentIDs content of the IDs
-#' @param contentUI content of the UI
+#' @param IDs IDs.
+#' @param ID_0 ID_0.
+#' @param contentIDs content of the IDs.
+#' @param contentUI content of the UI.
+#'
+#' @return smth.
+#'
 #' @export
 callIncrementalPanelModules <- function(IDs, ID_0,
                                         contentIDs, contentUI, ...,

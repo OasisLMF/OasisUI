@@ -2,29 +2,29 @@
 % Please edit documentation in R/flamingoDB.R
 \name{updateModelResource}
 \alias{updateModelResource}
-\title{Update Model Resource}
+\title{updateModelResource}
 \usage{
 updateModelResource(dbSettings, modresid, modresname, restype, oasissys,
   modelid, modresval)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{modresid}{model resource id}
+\item{modresid}{Model resource id.}
 
-\item{modresname}{\code{character()}; name of the model resource}
+\item{modresname}{\code{character()}; name of the model resource.}
 
-\item{restype}{resource type}
+\item{restype}{Resource type.}
 
-\item{oasissys}{TODO document}
+\item{oasissys}{TODO document.}
 
-\item{modelid}{model id}
+\item{modelid}{Model id.}
 
-\item{modresval}{TODO document}
+\item{modresval}{TODO document.}
 }
 \value{
-model resource id
+Model resource id.
 }
 \description{
-Update Model Resource
+Update Model Resource.
 }

@@ -2,17 +2,17 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getProcessRun}
 \alias{getProcessRun}
-\title{Get Process Run}
+\title{getProcessRun}
 \usage{
 getProcessRun(dbSettings, procid, prstatus)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{procid}{process id}
+\item{procid}{Process id.}
 
-\item{prstatus}{process status}
+\item{prstatus}{Process status.}
 }
 \description{
-Get Process Run
+Get Process Run.
 }

@@ -8,19 +8,22 @@ callIncrementalPanelModules(IDs, ID_0, contentIDs, contentUI, ...,
   headings = NULL, collapsible = FALSE, show = TRUE, ns = identity)
 }
 \arguments{
-\item{IDs}{IDs}
+\item{IDs}{IDs.}
 
-\item{ID_0}{ID_0}
+\item{ID_0}{ID_0.}
 
-\item{contentIDs}{content of the IDs}
+\item{contentIDs}{content of the IDs.}
 
-\item{contentUI}{content of the UI}
+\item{contentUI}{content of the UI.}
 
-\item{...}{additional parameters}
+\item{...}{Additional parameters.}
 
-\item{collapsible}{FALSE}
+\item{collapsible}{FALSE.}
 
-\item{show}{TRUE}
+\item{show}{TRUE.}
+}
+\value{
+smth.
 }
 \description{
 callIncrementalPanelModules

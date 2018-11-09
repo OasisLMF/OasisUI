@@ -4,44 +4,52 @@
 \name{visualizationCBR}
 \alias{visualizationCBR}
 \alias{visualizationCBRUI}
-\title{Compare Runs Definition Module}
+\title{Compare Runs Definition Module Server ---------------------------------------
+visualizationCBR}
 \usage{
-visualizationCBR(input, output, session, dbSettings, apiSettings,
-  active = reactive(TRUE), logMessage = message,
-  reloadMillis = 10000)
+visualizationCBR(input, output, session, dbSettings, apiSettings, user,
+  active = reactive(TRUE), preselRunId = reactive(-1),
+  processRunId = reactive(-1), logMessage = message)
 
 visualizationCBRUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
+\item{user}{reactive expression yielding user}
+
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
 
-\item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater};}
+\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+
+\item{logMessage}{function that will be passed info messages.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{runIdList}{List of runs and their status.}
 
 \item{id}{module id}
 }
 \value{
-For \code{visualizationCBR()}, list of reactives.
-
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-list of tags
+preselPanel panel to show in the process session.
+
+List of tags.
 }
 \description{
-Server logic to compare runs
+Server logic for comparing runs run page.
 
-UI/View for compare runs run page
+UI/View for comparing runs run page.
 }

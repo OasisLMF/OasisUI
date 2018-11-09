@@ -1,11 +1,21 @@
 #' Account Definition Module
+#'
 #' @rdname accountDefinition
+#'
 #' @description Server logic to define an account.
-#' @inheritParams executeDbQuery
-#' @inheritParams flamingoModule
-#' @return empty list
-#' @importFrom shinyjs onclick show disable enable hide
-#' @importFrom DT renderDT datatable
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @return Empty list.
+#'
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs onclick
+#' @importFrom DT renderDT
+#' @importFrom DT datatable
+#'
 #' @export
 accountDefinition <- function(input, output, session, dbSettings,
                               active = reactive(TRUE)) {
@@ -17,6 +27,7 @@ accountDefinition <- function(input, output, session, dbSettings,
     accFlag = "",
     # data for account table
     DAAccountData = NULL,
+    # counter for account table
     DAAccountDataCounter = 0
   )
 
@@ -25,7 +36,7 @@ accountDefinition <- function(input, output, session, dbSettings,
     invisible()
   }
 
-  ### Account Table ###
+  # Account Table --------------------------------------------------------------
   observe(if (active()) {
 
     force(result$DAAccountDataCounter)
@@ -58,7 +69,7 @@ accountDefinition <- function(input, output, session, dbSettings,
     }
   )
 
-  ### Create/Amend Account
+  # Create/Amend Account -------------------------------------------------------
 
   .crtupModal <- function() {
     ns <- session$ns
@@ -153,7 +164,7 @@ accountDefinition <- function(input, output, session, dbSettings,
 
   })
 
-  ### Delete Account
+  # Delete Account -------------------------------------------------------------
 
   .delModal <- function() {
     ns <- session$ns
@@ -210,12 +221,12 @@ accountDefinition <- function(input, output, session, dbSettings,
 
   })
 
-  ### When Module Activated
+  # When Module Activated ------------------------------------------------------
   observe(if (active()) {
     result$accFlag <- ""
   })
 
-  ### Module Output ###
+  # Module Output --------------------------------------------------------------
   moduleOutput <- list()
 
   return(moduleOutput)

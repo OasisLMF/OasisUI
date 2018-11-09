@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getOasisSystemId}
 \alias{getOasisSystemId}
-\title{Get Oasis Systems}
+\title{getOasisSystemId}
 \usage{
 getOasisSystemId(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
-oasis systems; \code{data.frame} of 2 variables:
+Oasis systems; \code{data.frame} of 2 variables:
 \itemize{
 \item \code{OasisSystemID}
 \item \code{OasisSystemName}
-}
+}.
 }
 \description{
-Get Oasis Systems
+Get Oasis Systems.
 }

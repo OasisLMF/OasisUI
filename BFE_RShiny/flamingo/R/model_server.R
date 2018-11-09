@@ -1,11 +1,23 @@
-#' Module For The Model Supplier Page
+#' modelSupplierPage
+#'
 #' @rdname modelSupplierPage
-#' @description Server logic for the model supplier page
-#' @inheritParams flamingoModule
-#' @inheritParams accountDefinitionUI
-#' @return empty list
+#'
+#' @description Server logic for the model supplier page.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
+#' @return Empty list.
+#'
 #' @importFrom DT renderDT
-#' @importFrom shinyjs hide show onclick
+#' @importFrom DT datatable
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs show
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs enable
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 modelSupplierPage <- function(input, output, session, dbSettings,
                               logMessage = message, active = reactive(TRUE)) {
@@ -29,7 +41,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     invisible()
   }
 
-  ### Model List Table
+  # Model List Table -----------------------------------------------------------
 
   # when navigated to Model tab, model table should be updated
   observe(if (active()) {
@@ -61,16 +73,16 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   })
 
   output$Modeldownloadexcel <- downloadHandler(
-    filename ="model.csv",
+    filename = "model.csv",
     content = function(file) {
       write.csv(result$MData, file)
     }
   )
 
-  ### Model Resource Table
+  # Model Resource Table -------------------------------------------------------
 
   # Model resource table to be displayed at the click a row of Model table
-  observe(if(active() && length(input$tablemodel_rows_selected) > 0) {
+  observe(if (active() && length(input$tablemodel_rows_selected) > 0) {
 
     # reload if .reloadMRData is called
     force(result$MRDataCounter)
@@ -114,7 +126,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     }
   )
 
-  ### Model Resource CRUD
+  # Model Resource CRUD --------------------------------------------------------
 
   ## create/amend/delete buttons - open/initialize modal dialog
 
@@ -153,13 +165,13 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     result$MRData
     input$mrtable_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$mrtable_rows_selected) > 0) {
-        shinyjs::enable("btnAmend")
-        shinyjs::enable("btnDelete")
-        shinyjs::enable("btnConfirmDel")
+        enable("btnAmend")
+        enable("btnDelete")
+        enable("btnConfirmDel")
       } else {
-        shinyjs::disable("btnAmend")
-        shinyjs::disable("btnDelete")
-        shinyjs::disable("btnConfirmDel")
+        disable("btnAmend")
+        disable("btnDelete")
+        disable("btnConfirmDel")
       }
     })
 
@@ -197,15 +209,15 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     showModal(.delModal())
   })
 
-  ## submit/cancel buttons
+  # submit/cancel buttons
   observeEvent(input$btnSubmitCrtAm, {
 
     if (result$crtAmFlag == "C") {
 
-      if(input$tinmodelresname >0 &&
-         (isolate(input$sinresrctype)>0) &&
-         (isolate(input$sinoasissysname)>0) &&
-         input$tinmodelresvalue >0){
+      if (input$tinmodelresname > 0 &&
+         (isolate(input$sinresrctype) > 0) &&
+         (isolate(input$sinoasissysname) > 0) &&
+         input$tinmodelresvalue > 0){
 
         crtmodres <- createModelResource(dbSettings,
                                          input$tinmodelresname,
@@ -262,7 +274,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     removeModal()
   })
 
-  ## helper functions
+  # helper functions -----------------------------------------------------------
   .clearCrtAm <- function() {
 
     updateTextInput(session, "tinmodelresname", value = "")

@@ -66,6 +66,7 @@ programme_Definition_Single <- list(
 ### Panel Browse ----
 
 browse_programmes <- list(
-  selectRunID = "Selecct RunID",
+  selectRunID = "Select RunID",
+  selectBatchRunID = "Select Batch RunID",
   abuttonplusplot = "Add a new plot"
   )

@@ -15,8 +15,12 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #' @rdname loginDialog
 #'
 #' @description Server logic to login an user.
+#' 
+#'@template params-module
 #'
-#' @inheritParams accountDefinition
+#' @param dbSettings as returned from \link{flamingoDB}
+#' @param logMessage function that will be passed info messages.
+#' @param logError function that will be passed error messages.
 #' @param logout Reactive yielding logout signal.
 #'
 #' @return List of reactive expressions:
@@ -27,6 +31,7 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #' }.
 #'
 #' @importFrom httr content
+#' @importFrom shinyjs js
 #'
 #' @export
 loginDialog <- function(input, output, session, dbSettings, logout,

@@ -98,23 +98,35 @@ plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full 
                                                       "extracols" = c("X", "summary_id"),
                                                       "plottype" = "line",
                                                       "xlabel" = c("Return Period"),
-                                                      "ylabel" = c("Loss")),
-                      "AAL bar plot" = list("Variables" = c("AAL"),
-                                            "keycols" = c("mean"),
-                                            "uncertaintycols" = c("standard_deviation"),
-                                            "referencecols" = c("exposure_value"),
-                                            "x" = c("type"),
-                                            "xtickslabels" = c("Numerically Integrated", "Sample Statistics"),
-                                            "extracols" = c("X", "summary_id"),
-                                            "plottype" = "bar",
-                                            "xlabel" = c("Type"),
-                                            "ylabel" = c("Loss")
-                      )
+                                                      "ylabel" = c("Loss")
+                            ),
+                            "AAL bar plot" = list("Variables" = c("AAL"),
+                                                  "keycols" = c("mean"),
+                                                  "uncertaintycols" = c("standard_deviation"),
+                                                  "referencecols" = c("exposure_value"),
+                                                  "x" = c("type"),
+                                                  "xtickslabels" = c("Numerically Integrated", "Sample Statistics"),
+                                                  "extracols" = c("X", "summary_id"),
+                                                  "plottype" = "bar",
+                                                  "xlabel" = c("Type"),
+                                                  "ylabel" = c("Loss")
+                            )#,
+                            # "Wheatsif violin plot" = list("Variables" = c("LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP"),
+                            #                               "keycols" = c("loss"),
+                            #                               "uncertaintycols" = c(),
+                            #                               "referencecols" = c(),
+                            #                               "x" = c("return_period"),
+                            #                               "xtickslabels" = list(),
+                            #                               "extracols" = c("X", "summary_id", "sidx"),
+                            #                               "plottype" = "violin",
+                            #                               "xlabel" = c("Return Period"),
+                            #                               "ylabel" = c("Loss")
+                            # )
 )
 
 #Output options
 granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
-losstypes <- c("GUL", "IL")
+losstypes <- c("GUL", "IL", "RI")
 variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")
 
 
@@ -149,3 +161,22 @@ prcrundata.ProcessRunName <- "ProcessRunName" #reactive(names(result$prcrundata)
 prcrundata.ProgOasisID <- "ProgOasisID" #reactive(names(result$prcrundata)[3])
 prcrundata.ProcessRunStatus <- "Status" #reactive(names(result$prcrundata)[4])
 prcrundata.ProcessRunStatus.old <- "ProcessRunStatus"
+
+
+### Creating Variables for  col names of filesListData
+# result$filesListData
+# "FileID", "File Name", "Description", "Location","Location Unix", "File Type", "Owner", "Resource Table", "Resource Key"
+filesListData.fileID <- "FileID"
+filesListData.fileName <- "File Name"
+filesListData.path <- "Location Unix"
+filesListData.key <- "Resource Key"
+
+### Creating Variables for  col names of  $inbox
+# result$inbox
+# "ProgOasisID"  "RunID"        "Run Name"     "Model"        "Status"       "Completed At"
+inbox.ProgOasisID <- "ProgOasisID"
+inbox.RunID <- "RunID"
+inbox.RunName <- "Run Name"
+inbox.Model <- "Model"
+inbox.Status <- "Status"
+inbox.ProgOasisID <- "ProgOasisID"

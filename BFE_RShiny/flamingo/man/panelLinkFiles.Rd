@@ -2,10 +2,13 @@
 % Please edit documentation in R/step1_chooseProgramme.R
 \name{panelLinkFiles}
 \alias{panelLinkFiles}
-\title{Function wrapping panel to link files to a programme}
+\title{panelLinkFiles}
 \usage{
 panelLinkFiles(id)
 }
+\arguments{
+\item{id}{module id}
+}
 \description{
-Function wrapping panel to link files to a programme
+Function wrapping panel to link files to a programme.
 }

@@ -7,9 +7,11 @@
 api_init(host, port, scheme = c("http", "https"))
 }
 \arguments{
-\item{port}{host port}
+\item{host}{Host name.}
 
-\item{scheme}{communication scheme}
+\item{port}{Host port.}
+
+\item{scheme}{Communication scheme.}
 }
 \description{
 Builds API URL.

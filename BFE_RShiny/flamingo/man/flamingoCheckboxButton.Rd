@@ -2,16 +2,19 @@
 % Please edit documentation in R/shiny.R
 \name{flamingoCheckboxButton}
 \alias{flamingoCheckboxButton}
-\title{Flamingo action button look like a checkbox}
+\title{flamingoCheckboxButton}
 \usage{
 flamingoCheckboxButton(inputId, label, icon = NULL, width = NULL,
   class = c("btn"), ...)
 }
 \arguments{
-\item{class}{HTML class attribute}
+\item{class}{HTML class attribute.}
 
-\item{...}{arguments to \code{\link[shiny:actionButton]{shiny::actionButton()}}}
+\item{...}{Arguments to \code{\link[shiny:actionButton]{shiny::actionButton()}}.}
+}
+\value{
+List of tags.
 }
 \description{
-Modified version of the default \code{\link[shiny:actionButton]{shiny::actionButton()}}
+Modified version of the default \code{\link[shiny:actionButton]{shiny::actionButton()}}.
 }

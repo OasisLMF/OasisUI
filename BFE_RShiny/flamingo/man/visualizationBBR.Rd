@@ -4,44 +4,49 @@
 \name{visualizationBBR}
 \alias{visualizationBBR}
 \alias{visualizationBBRUI}
-\title{Batch Browse Definition Module}
+\title{visualizationBBR}
 \usage{
-visualizationBBR(input, output, session, dbSettings, apiSettings,
-  active = reactive(TRUE), logMessage = message,
-  reloadMillis = 10000)
+visualizationBBR(input, output, session, dbSettings, apiSettings, user,
+  preselRunId = reactive(-1), processRunId = reactive(-1),
+  active = reactive(TRUE), logMessage = message)
 
 visualizationBBRUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
+\item{user}{reactive expression yielding user}
+
+\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
+
+\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{function that will be passed info messages.}
 
-\item{reloadMillis}{amount of time to wait between table updates;
-see \link{invalidateLater};}
+\item{id}{Namespace ID for the module.}
 
 \item{id}{module id}
 }
 \value{
-For \code{visualizationBBR()}, list of reactives.
-
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-list of tags
+preselPanel panel to show in the process session.
+
+List of tags.
 }
 \description{
-Server logic to define a programme
+Server logic for batchbrowse run page.
 
-UI/View for batchbrowse run page
+UI/View for batchbrowse run page.
 }

@@ -1,14 +1,22 @@
-
-#' User Admin Definition Module
+#' userAdminDefinition
+#'
 #' @rdname userAdminDefinition
+#'
 #' @description Server logic for accessing the Company User List for Flamingo
-#' in association with OASIS LMF
-#' @inheritParams flamingoModule
-#' @param user reactive yielding user (the logged in user)
-#' @return For \code{userAdminDefinition()}, list of reactives.
+#' in association with OASIS LMF.
+#'
 #' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#'
 #' @importFrom DT renderDT
-#' @importFrom shinyjs enable disable
+#' @importFrom DT datatable
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs onclick
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#'
 #' @export
 userAdminDefinition <- function(input, output, session, dbSettings, user,
                                 active = reactive(TRUE)) {
@@ -50,7 +58,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   }
 
 
-  ### Helper Functions
+  # Helper Functions -----------------------------------------------------------
   .clearCompanySelection <- function() {
     companies <- getCompanyList(dbSettings)
     updateSelectInput(session, "sinputCompany",
@@ -72,7 +80,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
                       selected = c("Select Oasis User" = 0))
   }
 
-  ### When Activated (e.g. tab is openened)
+  # When Activated (e.g. tab is openened) --------------------------------------
   observe(if (active()) {
     hide("usgroups")
     hide("ulicenses")
@@ -80,7 +88,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   })
 
 
-  ### Company User List Table
+  # Company User List Table ----------------------------------------------------
 
   # queries the database every time to update its dataset
   observe(if (active()) {
@@ -109,7 +117,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   })
 
 
-  ### User Securtiy Group Table
+  # User Securtiy Group Table --------------------------------------------------
 
   # queries the database every time to update its dataset
   observe(if (active()) {
@@ -143,7 +151,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   })
 
 
-  ### User License Table
+  # User License Table ---------------------------------------------------------
 
   # queries the database every time to update dataset
   observe(if (active()) {
@@ -168,14 +176,14 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
           scrollX = TRUE,
           columnDefs = list(list(visible = FALSE, targets = 0)),
           search = list(caseInsensitive = TRUE),
-          processing=0,
+          processing = 0,
           pageLength = 10)
       )
     }
   })
 
 
-  ###  Permission Checking ####################################################
+  # Permission Checking --------------------------------------------------------
 
   observeEvent({active(); user()}, if (active()) {
 
@@ -199,7 +207,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   })
 
 
-  ### Text Input Updating #####################################################
+  # Text Input Updating --------------------------------------------------------
 
   # Function that:
   # - updates information fields in Modal Dialog
@@ -234,10 +242,9 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
     }
   })
 
-  ### User Create / Update / Delete ###########################################
+  # User Create / Update / Delete ----------------------------------------------
 
   # Modal dialog of create and update buttons
-
   .useradmincrtupmodal <- function() {
     ns <- session$ns
     modalDialog(label = "useradmincrtupmodal",
@@ -278,15 +285,15 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   # Enable and disable buttons
   observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$tablecompanyuserlist_rows_selected) > 0 && result$permission[1] == "CRUD") {
-        shinyjs::enable("abuttonuserupdate")
-        shinyjs::enable("abuttonuserdelete")
-        shinyjs::enable("abuttonusersecurity")
-        shinyjs::enable("abuttonuseroasis")
+        enable("abuttonuserupdate")
+        enable("abuttonuserdelete")
+        enable("abuttonusersecurity")
+        enable("abuttonuseroasis")
       } else {
-        shinyjs::disable("abuttonuserupdate")
-        shinyjs::disable("abuttonuserdelete")
-        shinyjs::disable("abuttonusersecurity")
-        shinyjs::disable("abuttonuseroasis")
+        disable("abuttonuserupdate")
+        disable("abuttonuserdelete")
+        disable("abuttonusersecurity")
+        disable("abuttonuseroasis")
       }
     })
 
@@ -301,7 +308,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
 
   # on click of submit button in pop-up to create/update
   onclick("abuttonusersubmit",{
-    if (result$useradminflg == "C"){
+    if (result$useradminflg == "C") {
 
       stmt <- paste0("exec dbo.CreateNewUser ",
                      "[",input$tinputUserName,"]", ", ", "[",input$sinputCompany, "]", ", ",
@@ -327,7 +334,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
       if (is.null(res)) {
         flamingoNotification(type = "error",
                          paste("Failed to update user - ",input$tinputUserName))
-      }else{
+      } else {
         flamingoNotification(type = "message",
                          paste("User -", input$tinputUserName, " updated."))
       }
@@ -396,7 +403,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
 
 
 
-  ### Security Group Add/Delete ###############################################
+  # Security Group Add/Delete --------------------------------------------------
 
   # modal dialog of add/remove security button
   .usersecuritymodal <- function() {
@@ -442,7 +449,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
 
 
 
-  ### Oasis User (License) Add/Delete ######################################
+  # Oasis User (License) Add/Delete --------------------------------------------
 
   # modal dialog of add/remove license button
   .userlicensemodal <- function() {
@@ -487,31 +494,31 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   })
 
 
-  ### Export to CSV ###########################################################
+  # Export to CSV --------------------------------------------------------------
   # User List
   output$CUACULdownloadexcel <- downloadHandler(
-    filename ="companyuserlist.csv",
+    filename = "companyuserlist.csv",
     content = function(file) {
       write.csv(result$CULData, file)
     }
   )
   # User Security Groups
   output$CUAUUSGdownloadexcel <- downloadHandler(
-    filename ="usersecuritygroups.csv",
+    filename = "usersecuritygroups.csv",
     content = function(file) {
       write.csv(result$USGdata, file)
     }
   )
   # User Licenses
   output$CUAULdownloadexcel <- downloadHandler(
-    filename ="userlicenses.csv",
+    filename = "userlicenses.csv",
     content = function(file) {
       write.csv(result$CUAULData, file)
     }
   )
 
 
-  ### Module Output ###########################################################
+  # Module Output --------------------------------------------------------------
 
   moduleOutput <- c(
     outputNavigation(navigation_state),
@@ -521,4 +528,3 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   moduleOutput
 
 }
-

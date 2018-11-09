@@ -2,23 +2,23 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getCompanyList}
 \alias{getCompanyList}
-\title{Get the list of companies from the database}
+\title{getCompanyList}
 \usage{
 getCompanyList(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
-companies; \code{data.frame} of 5 variables:
+Companies; \code{data.frame} of 5 variables:
 \itemize{
 \item \code{Company ID}
 \item \code{Company Name}
 \item \code{Company Domicile}
 \item \code{Company Legal Name}
 \item \code{Company Registration Number}
-}
+}.
 }
 \description{
-Get the list of companies from the database
+Get the list of companies from the database.
 }

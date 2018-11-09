@@ -7,7 +7,10 @@
 singleProgrammeWorkflowStepsUI(id)
 }
 \arguments{
-\item{id}{id}
+\item{id}{module id}
+}
+\value{
+List of tags.
 }
 \description{
 singleProgrammeWorkflowStepsUI

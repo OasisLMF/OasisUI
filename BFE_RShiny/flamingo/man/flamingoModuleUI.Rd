@@ -2,13 +2,16 @@
 % Please edit documentation in R/shiny.R
 \name{flamingoModuleUI}
 \alias{flamingoModuleUI}
-\title{Flamingo Module Template UI}
+\title{flamingoModuleUI}
 \usage{
 flamingoModuleUI(id)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
+}
+\value{
+No value.
 }
 \description{
-Flamingo Module Template UI
+Flamingo Module Template UI.
 }

@@ -1,9 +1,13 @@
+#' loginDialogUI
+#'
 #' @rdname loginDialog
-#' @description UI/View to login an user
-#' @param id account id
-#' @rdname loginDialog
-#' @importFrom shinyjs hidden
-#' @importFrom htmltools tags
+#'
+#' @description UI/View to login an user.
+#'
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
 #' @export
 loginDialogUI <- function(id) {
 

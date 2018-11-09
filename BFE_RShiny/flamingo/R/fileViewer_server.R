@@ -1,13 +1,17 @@
 #' File Viewer Module
+#'
 #' @rdname fileViewer
-#' @description Server logic to view files
-#' @inheritParams flamingoModule
-#' @param preselRunId preselected run id
-#' @return empty list
-#' @importFrom DT renderDT DTOutput dataTableProxy selectRows
-#' @importFrom shinyjs show hide hidden
-#' @importFrom utils read.csv zip
-#' @rdname fileViewer
+#'
+#' @description Server logic to view files.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param preselRunId Reactive string expression for reselected run id from landingpage.
+#'
+#' @importFrom dplyr select
+#'
 #' @export
 fileViewer <- function(
   input,
@@ -18,7 +22,7 @@ fileViewer <- function(
   active, #= reactive(TRUE),
   logMessage = message) {
 
-  # Reactive Values -----
+  # Reactive Values ------------------------------------------------------------
 
   result <- reactiveValues(
     FLdata = NULL
@@ -28,7 +32,7 @@ fileViewer <- function(
 
   navigation_state <- reactiveNavigation()
 
-  ### File List Table ----
+  ### File List Table ----------------------------------------------------------
 
   # Load Company user list data when the page is loaded
   # queries the database every time to update its dataset
@@ -61,11 +65,10 @@ fileViewer <- function(
     id = "ViewFilesModule",
     filesListData =  reactive({result$FLdata}),
     logMessage = logMessage,
-    includemrows = TRUE,
     includechkbox = TRUE)
 
 
-  # Module Outout ------------------------------------------------------------
+  # Module Outout --------------------------------------------------------------
 
   moduleOutput <- c(
     outputNavigation(navigation_state),

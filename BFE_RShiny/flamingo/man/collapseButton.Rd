@@ -7,15 +7,16 @@
 collapseButton(id, id_collapse, ..., width = NULL, collapsed = FALSE)
 }
 \arguments{
-\item{id}{id}
+\item{id}{module id}
 
-\item{id_collapse}{id to collapse}
+\item{id_collapse}{id of button that triggers collapsing.}
 
-\item{...}{additional paramters}
+\item{width}{widget widt}
 
-\item{width}{NULL}
-
-\item{collapsed}{FALSE}
+\item{collapsed}{FALSE.}
+}
+\value{
+List of tags.
 }
 \description{
 collapseButton

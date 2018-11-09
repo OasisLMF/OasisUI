@@ -7,11 +7,14 @@
 renderflamingoPanelHeading(expr, env = parent.frame(), ...)
 }
 \arguments{
-\item{expr}{expression}
+\item{expr}{Expression.}
 
-\item{env}{environment}
+\item{env}{Environment.}
 
-\item{...}{additional parameters}
+\item{...}{Additional parameters.}
+}
+\value{
+Flamingo heading.
 }
 \description{
 renderflamingoPanelHeading

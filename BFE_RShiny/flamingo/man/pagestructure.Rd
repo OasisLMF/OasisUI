@@ -2,39 +2,48 @@
 % Please edit documentation in R/landingPage_server.R, R/landingPage_ui.R
 \name{pagestructure}
 \alias{pagestructure}
-\alias{pageheaderUI}
 \alias{pagestructureUI}
 \title{Page Structure}
 \usage{
 pagestructure(input, output, session, dbSettings, reloadMillis = 10000,
   logMessage = message, active = reactive(TRUE))
 
-pageheaderUI(id)
-
 pagestructureUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{reloadMillis}{amount of time to wait between table updates,
-see \link{invalidateLater}}
+\item{reloadMillis}{Amount of time to wait between table updates;
+see \link{invalidateLater}.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{function that will be passed info messages.}
 
 \item{active}{reactive expression whether the module state should be updated.}
+
+\item{id}{Namespace ID for the module.}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{user}{reactive expression yielding user}
+
+\item{id}{module id}
 }
 \value{
-For \code{pagestructure()}, list of reactives.
-
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
+collapsed status of panel.
+
+Lits of tags
 }
 \description{
 Page Structure
+
+pagestructureUI
 }

@@ -1,13 +1,18 @@
-# step3_configureOutput Module ------------------
+# step3_configureOutput Module -------------------------------------------------
 
-# UI ------------------------------------------
-#' step3_configureOutput ui
+# UI ---------------------------------------------------------------------------
+#' step3_configureOutputUI
+#'
 #' @rdname step3_configureOutput
-#' @description UI/View for the step3_configureOutput
-#' @inheritParams flamingoModuleUI
-#' @return list of tags
-#' @importFrom DT DTOutput
-#' @importFrom bsplus bs_embed_tooltip
+#'
+#' @description UI/View for the step3_configureOutput.
+#'
+#' @template params-module-ui
+#'
+#' @return List of tags.
+#'
+#' @importFrom shinyjs hidden
+#'
 #' @export
 step3_configureOutputUI <- function(id) {
 
@@ -21,10 +26,17 @@ step3_configureOutputUI <- function(id) {
 }
 
 
-#' Function wrapping panel to show process run table
+#' panelProcessRunTable
+#'
 #' @rdname panelProcessRunTable
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping panel to show process run table.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 panelProcessRunTable <- function(id) {
   ns <- NS(id)
@@ -57,9 +69,16 @@ panelProcessRunTable <- function(id) {
   )
 }
 
-#' Function wrapping panel to show log table for specific Process Run
-#' @inheritParams flamingoModuleUI
+#' panelProcessRunLogs
+#'
+#' @rdname panelProcessRunLogs
+#'
+#' @description Function wrapping panel to show log table for specific Process Run.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom DT DTOutput
+#'
 #' @export
 panelProcessRunLogs <- function(id) {
   ns <- NS(id)
@@ -75,9 +94,16 @@ panelProcessRunLogs <- function(id) {
   )
 }
 
-#' Function wrapping panel to define outputs
-#' @inheritParams flamingoModuleUI
-#' @importFrom shinyjs hidden
+#' panelDefineOutputs
+#'
+#' @rdname panelDefineOutputs
+#'
+#' @description Function wrapping panel to define outputs
+#'
+#' @template params-module-ui
+#'
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 panelDefineOutputs <- function(id) {
   ns <- NS(id)
@@ -102,9 +128,16 @@ panelDefineOutputs <- function(id) {
   )
 }
 
-#' Function wrapping sub-panel to define outputs details
-#' @inheritParams flamingoModuleUI
+#' panelDefineOutputsDetails
+#'
+#' @rdname panelDefineOutputsDetails
+#'
+#' @description Function wrapping sub-panel to define outputs details.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom shinyjs hidden
+#'
 #' @export
 panelDefineOutputsDetails <- function(id) {
   ns <- NS(id)
@@ -143,10 +176,17 @@ panelDefineOutputsDetails <- function(id) {
   )
 }
 
-#' Function wrapping sub-panel to define outputs configuration
+#' panelDefineOutputConfiguration
+#'
 #' @rdname panelDefineOutputConfiguration
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping sub-panel to define outputs configuration.
+#'
+#' @template params-module-ui
+#'
 #' @importFrom shinyjs hidden
+#' @importFrom bsplus bs_embed_tooltip
+#'
 #' @export
 panelDefineOutputConfiguration <- function(id) {
   ns <- NS(id)
@@ -168,9 +208,14 @@ panelDefineOutputConfiguration <- function(id) {
   )
 }
 
-#' Function wrapping sub-panel to define outputs advanced configuration GUL
+#' configureAdvancedGUL
+#'
 #' @rdname configureAdvancedGUL
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping sub-panel to define outputs advanced configuration GUL.
+#'
+#' @template params-module-ui
+#'
 #' @export
 configureAdvancedGUL <- function(id) {
   ns <- NS(id)
@@ -296,9 +341,14 @@ configureAdvancedGUL <- function(id) {
   )
 }
 
-#' Function wrapping sub-panel to define outputs advanced configuration IL
+#' configureAdvancedIL
+#'
 #' @rdname configureAdvancedIL
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping sub-panel to define outputs advanced configuration IL.
+#'
+#' @template params-module-ui
+#'
 #' @export
 configureAdvancedIL <- function(id) {
   ns <- NS(id)
@@ -422,9 +472,14 @@ configureAdvancedIL <- function(id) {
   )
 }
 
-#' Function wrapping sub-panel to define outputs advanced configuration RI
+#' configureAdvancedRI
+#'
 #' @rdname configureAdvancedRI
-#' @inheritParams flamingoModuleUI
+#'
+#' @description Function wrapping sub-panel to define outputs advanced configuration RI.
+#'
+#' @template params-module-ui
+#'
 #' @export
 configureAdvancedRI <- function(id) {
   ns <- NS(id)
@@ -526,17 +581,38 @@ configureAdvancedRI <- function(id) {
   )#end of fluidrow RI
 }
 
-# Server --------------------------------------
+# Server -----------------------------------------------------------------------
+
 #' step3_configureOutput server
+#'
 #' @rdname step3_configureOutput
-#' @description Server logic to step3_configureOutput
-#' @inheritParams flamingoModule
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
+#'
+#' @description Server logic to step3_configureOutput.
+#'
 #' @template return-outputNavigation
-#' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
-#' @importFrom dplyr mutate select case_when
-#' @importFrom shinyjs onclick disable enable show hide
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param currstep current selected step.
+#' @param selectprogrammeID selected programme ID.
+#' @param selectprogOasisID selected ProgOasis ID.
+#' @param progOasisName Name of selected progOasis.
+#' @param progOasisStatus Status of selected progOasis.
+#'
+#' @return prrunid id of selected run.
+#'
+#' @importFrom DT renderDT
+#' @importFrom DT datatable
+#' @importFrom DT dataTableProxy
+#' @importFrom DT selectRows
+#' @importFrom DT selectPage
+#' @importFrom shinyjs onclick
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#' @importFrom dplyr filter
+#'
 #' @export
 step3_configureOutput <- function(input, output, session,
                                   dbSettings,apiSettings,
@@ -551,7 +627,7 @@ step3_configureOutput <- function(input, output, session,
 
   ns <- session$ns
 
-  # Reactive Values and parameters ------------------------------------------
+  # Reactive Values and parameters ---------------------------------------------
 
   #number of Rows per Page in a dataable
   pageLength <- 5
@@ -561,7 +637,7 @@ step3_configureOutput <- function(input, output, session,
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
   checkrigrplist <- c("chkriprog", "chkristate", "chkricounty", "chkriloc", "chkrilob", "chkripolicy")
 
-  # > Reactive Values -------------------------------------------------------
+  # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # reactve value for navigation
     navigationstate = NULL,
@@ -578,7 +654,7 @@ step3_configureOutput <- function(input, output, session,
     result$navigationstate <- NULL
   })
 
-  # Panels Visualization ----------------------------------------------------
+  # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
     if (currstep() == 3 ) {
@@ -597,7 +673,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
 
-  ### Process Run Table -----
+  # Process Run Table ----------------------------------------------------------
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioprrunsAllOrInProgress, ignoreInit = TRUE, {
     if (active()) {
@@ -632,11 +708,6 @@ step3_configureOutput <- function(input, output, session,
   output$tableprocessrundata <- renderDT(
 
     if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
-      # if (preselRunId() == -1) {
-      #   index <- 1
-      # } else {
-      #   index <- match(c(preselRunId()), result$prcrundata[,prcrundata.ProcessRunID])
-      # }
       index <- 1
       logMessage("re-rendering process run table")
       datatable(
@@ -665,7 +736,7 @@ step3_configureOutput <- function(input, output, session,
 
   })
 
-  # Configure Output --------------------------------------------
+  # Configure Output -----------------------------------------------------------
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
     hide("panelDefineOutputs")
@@ -726,7 +797,7 @@ step3_configureOutput <- function(input, output, session,
     .updateOutputConfig()
   })
 
-  ### Hide Output Configuration panel
+  # Hide Output Configuration panel
   onclick("abuttonehidepanelconfigureoutput", {
     hide("panelDefineOutputs")
     result$prrun_flag <- "C"
@@ -772,7 +843,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Select/deselect IL
-  #Note: the ignoreInit = TRUE does not prevent the trigger once logged in
+  # Note: the ignoreInit = TRUE does not prevent the trigger once logged in
   observeEvent(input$chkinputIL, ignoreInit = TRUE, {
     if (active()) {
       if (input$chkinputIL == FALSE) {
@@ -902,7 +973,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
 
-  ### Run Process --------------------------------------------------------
+  # Run Process ----------------------------------------------------------------
   # A function to generate process run
   .generateRun <- function() {
 
@@ -1010,7 +1081,7 @@ step3_configureOutput <- function(input, output, session,
     .defaultview(session)
   })
 
-  ### Logs ---------------------------------------------------------------
+  # Logs -----------------------------------------------------------------------
   onclick("abuttonshowlog", {
     show("panelProcessRunLogs")
     logMessage("showing prrunlogtable")
@@ -1056,23 +1127,21 @@ step3_configureOutput <- function(input, output, session,
     paste0('Logs for Run id ', processRunId, ' ', processRunName)
   })
 
-  # Refresh Buttons ----------------------------------------------------------
+  # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonrefreshprrun", {
     .reloadRunData()
   } )
 
-  # Updates dependent on changed: tableprocessrundata_rows_selected ---------
+  # Updates dependent on changed: tableprocessrundata_rows_selected ------------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(input$tableprocessrundata_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$tableprocessrundata_rows_selected is changed to:", input$tableprocessrundata_rows_selected))
       hide("panelDefineOutputs")
       hide("panelProcessRunLogs")
-      ##### TODO: Do I need the second check in this if????
       if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
         result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
         if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
-          # This occurs only by changing process run, which is only possible in panel 3
           show("panelProcessRunLogs")
           logMessage("showing prrunlogtable")
         }
@@ -1082,13 +1151,13 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
-  # Navigation --------------------------------------------------------------
+  # Navigation -----------------------------------------------------------------
   # Go to browse section
   onclick("abuttondisplayoutput", {
-    result$navigationstate <-"SBR"
+    result$navigationstate <- "SBR"
   })
 
-  # Help Functions -----------------------------------------------------------
+  # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
     logMessage(".hideDivs called")
@@ -1308,7 +1377,7 @@ step3_configureOutput <- function(input, output, session,
     .basicview()
   }
 
-  # Model Outout ------------------------------------------------------------
+  # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     list(
       navigationstate = reactive(result$navigationstate),

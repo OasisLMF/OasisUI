@@ -1,15 +1,23 @@
-#' Single Programme Definition Module
-#' @description Server logic to define a programme
-#' @inheritParams flamingoModule
-#' @param reloadMillis amount of time to wait between table updates;
-#' see \link{invalidateLater};
-#' @return For \code{programmeDefinitionSingle()}, list of reactives.
-#' @template return-outputNavigation
+#' programmeDefinitionSingle
+#'
 #' @rdname programmeDefinitionSingle
-#' @importFrom shinyjs show hide enable disable
-#' @importFrom DT renderDT dataTableProxy selectRows DTOutput selectPage
-#' @importFrom dplyr mutate select case_when
-#' @importFrom shinyjs onclick js removeClass addClass
+#'
+#' @description Server logic to define a programme.
+#'
+#' @template return-outputNavigation
+#' @template params-module
+#' @template params-flamingo-module
+#' 
+#' @param preselRunId selected run id as returned from \link{landingpage}
+#' @param preselProcId selected progOasis id as returned from \link{landingpage}
+#' @param preselPanel selectedstep to visualize as returned from either
+#'  \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}
+#'
+#' @return processRunId selected process run ID
+#'
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
+#'
 #' @export
 programmeDefinitionSingle <- function(input, output, session, dbSettings,
                                       apiSettings, user, active = reactive(TRUE), logMessage = message,
@@ -137,7 +145,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
   )
 
   # Sub-Modules output ---------------------------------------------------------
-  # > Navigation ----
+  # > Navigation ---------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$navigationstate(), ignoreInit = TRUE, {
     if (submodulesList$step3_configureOutput$navigationstate() == "SBR") {
       updateNavigation(navigation_state, "SBR")
@@ -152,7 +160,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     workflowSteps$update(programmeWorkflowSteps[[3]])
   })
 
-  # > RunId ----
+  # > RunId --------------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$prrunid(), ignoreInit = TRUE, {
     result$prrunid <- submodulesList$step3_configureOutput$prrunid()
   })
@@ -240,7 +248,7 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
     }
   })
 
-  #If programmeID changes, then we select the first progOasis
+  # If programmeID changes, then we select the first progOasis
   observeEvent({
     result$POData_rowselected
     result$selectprogrammeID
@@ -320,11 +328,18 @@ programmeDefinitionSingle <- function(input, output, session, dbSettings,
 
 }
 
-#' Function to replace status with icons in table
-#' @param df dataframe
-#' @importFrom dplyr mutate case_when
+#' replaceWithIcons
+#'
+#' @rdname replaceWithIcons
+#'
+#' @description Function to replace status with icons in table.
+#'
+#' @param df \code{data.frame}.
+#'
+#' @importFrom dplyr mutate
+#' @importFrom dplyr case_when
+#'
 #' @export
-
 replaceWithIcons <- function(df){
   #Status
   StatusGood <- c("success", "completed", "loaded")
@@ -334,12 +349,15 @@ replaceWithIcons <- function(df){
   '%notin%' <- Negate('%in%')
 
   #Replace Status in df
-  logMessage(paste0("replacing icons"))
-  df <- df %>%
-    mutate(Status = tolower(Status)) %>%
-    mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                              Status %in% StatusBad ~ StatusFailed,
-                              Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-    as.data.frame()
+  if (!is.null(df)) {
+    logMessage(paste0("replacing icons"))
+    df <- df %>%
+      mutate(Status = tolower(Status)) %>%
+      mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
+                                Status %in% StatusBad ~ StatusFailed,
+                                Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
+      as.data.frame()
+  }
+
   df
 }

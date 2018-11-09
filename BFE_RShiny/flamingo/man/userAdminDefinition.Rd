@@ -4,7 +4,7 @@
 \name{userAdminDefinition}
 \alias{userAdminDefinition}
 \alias{userAdminDefinitionUI}
-\title{User Admin Definition Module}
+\title{userAdminDefinition}
 \usage{
 userAdminDefinition(input, output, session, dbSettings, user,
   active = reactive(TRUE))
@@ -12,32 +12,36 @@ userAdminDefinition(input, output, session, dbSettings, user,
 userAdminDefinitionUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input}{Shiny input object.}
 
-\item{output}{shiny output object}
+\item{output}{Shiny output object.}
 
-\item{session}{shiny session object}
+\item{session}{Shiny session object.}
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{user}{reactive yielding user (the logged in user)}
+\item{user}{reactive expression yielding user}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{id}{shiny module id}
+\item{id}{Namespace ID for the module.}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{logMessage}{function that will be passed info messages.}
+
+\item{id}{module id}
 }
 \value{
-For \code{userAdminDefinition()}, list of reactives.
-
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-list of tags
+List of tags.
 }
 \description{
 Server logic for accessing the Company User List for Flamingo
-in association with OASIS LMF
+in association with OASIS LMF.
 
 UI/View for accessing the Company User List for Flamingo
-in association with OASIS LMF
+in association with OASIS LMF.
 }

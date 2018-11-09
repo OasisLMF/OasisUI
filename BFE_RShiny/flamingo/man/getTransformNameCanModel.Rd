@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoDB.R
 \name{getTransformNameCanModel}
 \alias{getTransformNameCanModel}
-\title{Get Transforms from Canonical to Model}
+\title{getTransformNameCanModel}
 \usage{
 getTransformNameCanModel(dbSettings)
 }
 \arguments{
-\item{dbSettings}{setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}}
+\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
-transforms; \code{data.frame} of 2 variables:
+Transforms; \code{data.frame} of 2 variables:
 \itemize{
 \item \code{TransformName}
 \item \code{TransformID}
-}
+}.
 }
 \description{
-Get Transforms from Canonical to Model
+Get Transforms from Canonical to Model.
 }

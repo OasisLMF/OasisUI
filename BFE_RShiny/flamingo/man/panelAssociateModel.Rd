@@ -2,7 +2,7 @@
 % Please edit documentation in R/step2_chooseModel.R
 \name{panelAssociateModel}
 \alias{panelAssociateModel}
-\title{Function wrapping panel to associate model}
+\title{panelAssociateModel}
 \usage{
 panelAssociateModel(id)
 }
@@ -10,5 +10,5 @@ panelAssociateModel(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to associate model
+Function wrapping panel to associate model.
 }
