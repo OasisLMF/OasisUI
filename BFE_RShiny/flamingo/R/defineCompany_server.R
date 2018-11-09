@@ -107,7 +107,7 @@ companyDefinition <- function(input, output, session, dbSettings,
         enable("abuttoncompdel")
       } else {
         disable("abuttoncompupdate")
-        isable("abuttoncompdel")
+        disable("abuttoncompdel")
       }
     })
 

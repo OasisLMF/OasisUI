@@ -97,11 +97,11 @@ accountDefinition <- function(input, output, session, dbSettings,
   # Enable and disable buttons
   observeEvent(input$tableDAAccount_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length(input$tableDAAccount_rows_selected) > 0) {
-      shinyjs::enable("abuttonamendac")
-      shinyjs::enable("abuttondeleteac")
+      enable("abuttonamendac")
+      enable("abuttondeleteac")
     } else {
-      shinyjs::disable("abuttonamendac")
-      shinyjs::disable("abuttondeleteac")
+      disable("abuttonamendac")
+      disable("abuttondeleteac")
     }
   })
 

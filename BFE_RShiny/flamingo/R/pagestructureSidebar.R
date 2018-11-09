@@ -37,7 +37,7 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       flamingoButton(ns("abuttondefineanabatch"),
                    label = if (!collapsed) "Batch Analysis" else "Batch",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
-                   align = "left",  width = "100%") %>%
+                   align = "left",  width = "100%", disabled = TRUE) %>%
         bs_embed_tooltip(title = landing_page$abuttondefineanabatch, placement = "right")
     ) %>% bs_embed_tooltip(title = landing_page$abuttonanalysis, placement = "right"),
 
@@ -57,12 +57,12 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
       flamingoButton(ns("abuttonbrowseBBR"),
                    label = if (!collapsed) "Batch Browse" else "Batch",
                    icon = if (collapsed) icon("eye"),
-                   align = "left",  width = "100%") %>%
+                   align = "left",  width = "100%", disabled = TRUE) %>%
         bs_embed_tooltip(title = landing_page$abuttonbrowseBBR, placement = "right"),
       flamingoButton(ns("abuttonbrowseCBR"),
                    label = if (!collapsed) "Compare runs" else "Runs",
                    icon = if (collapsed) icon("eye"),
-                   align = "left",  width = "100%") %>%
+                   align = "left",  width = "100%", disabled = TRUE) %>%
         bs_embed_tooltip(title = landing_page$abuttonbrowseCBR, placement = "right")
     ) %>% bs_embed_tooltip(title = landing_page$abuttonbrowse, placement = "right"),
 
