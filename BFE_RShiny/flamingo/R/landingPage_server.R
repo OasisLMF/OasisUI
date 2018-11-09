@@ -225,15 +225,6 @@ pagestructure <- function(input, output, session, userId, userName, dbSettings,
 
   ### Navigation Menu ----------------------------------------------------------
 
-  observeEvent(input$abuttonrun, {
-    disable("abuttondefineprogrammebatch")
-  })
-
-  observeEvent(input$abuttonbrowse, {
-    disable("abuttonbrowseBBR")
-    disable("abuttonbrowseCBR")
-  })
-
   observeEvent(input$abuttondefineprogrammesingle, {
     updateNavigation(navigation_state, "PS")
     toggleDropdownButton(ns("abuttonrun"))
