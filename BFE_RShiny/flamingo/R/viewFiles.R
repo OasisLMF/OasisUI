@@ -254,8 +254,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
                htmlOutput(ns("tableFVExposureStatisticInfo")))),
       br(),
       fluidRow(
-        hidden(flamingoButton(inputId = ns("view"), label = "View", icon = icon("file"))),
-        hidden(flamingoButton(inputId = ns("map"), label = "Map", icon = icon("map"))),
+        hidden(flamingoButton(inputId = ns("abuttonview"), label = "View", icon = icon("file"))),
+        hidden(flamingoButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
         downloadButton(ns("FVEdownloadexcel"), label = "Export to csv"),
         style = "inline:true"), 
       hidden(flamingoPanel(
@@ -282,7 +282,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     hide("flamingoPaneltableFVExposureSelected")
   })
   
-  onclick("view", {
+  onclick("abuttonview", {
     show("flamingoPaneltableFVExposureSelected")
   })
   
@@ -318,7 +318,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     hide("flamingoPanelmapFVExposureSelected")
   })
   
-  onclick("map", {
+  onclick("abuttonmap", {
     show("flamingoPanelmapFVExposureSelected")
   })
   
@@ -382,8 +382,8 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     FVid <- result$filesListData[i, filesListData.fileID]
     validButtons <- executeDbQuery(dbSettings,
                                    buildDbQuery("TellOperationsValidOnFileID", FVid))
-    manageButtons <- c("FO_btn_show_raw_content" = "view",
-                       "FO_btn_show_map" = "map")
+    manageButtons <- c("FO_btn_show_raw_content" = "abuttonview",
+                       "FO_btn_show_map" = "abuttonmap")
     # lapply(t(validButtons), function(btnIDs){enable(manageButtons[btnIDs])})
     lapply(t(validButtons), function(btnIDs){show(manageButtons[btnIDs])})
   }

@@ -143,9 +143,9 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                 textInput(ns("tinmodelresvalue"), label = "Model Resource Value:",
                           value = ""),
                 footer = tagList(
-                  flamingoButton(ns("btnSubmitCrtAm"),
+                  flamingoButton(ns("abuttonSubmitCrtAm"),
                                  label = "Submit", align = "left")  %>%
-                    bs_embed_tooltip(title = sys_conf$btnSubmitCrtAm, placement = "right"),
+                    bs_embed_tooltip(title = sys_conf$abuttonSubmitCrtAm, placement = "right"),
                   actionButton(ns("btnCancelCrtAm"),
                                label = "Cancel", align = "right")
                 ),
@@ -154,7 +154,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     )
   }
 
-  observeEvent(input$btnCreate, {
+  observeEvent(input$abuttoncreate, {
     result$crtAmFlag <- "C"
     showModal(.crtAmModal())
     .clearCrtAm()
@@ -165,17 +165,17 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     result$MRData
     input$mrtable_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       if (length(input$mrtable_rows_selected) > 0) {
-        enable("btnAmend")
-        enable("btnDelete")
-        enable("btnConfirmDel")
+        enable("abuttonamend")
+        enable("abuttondelete")
+        enable("abuttonConfirmDel")
       } else {
-        disable("btnAmend")
-        disable("btnDelete")
-        disable("btnConfirmDel")
+        disable("abuttonamend")
+        disable("abuttondelete")
+        disable("abuttonConfirmDel")
       }
     })
 
-  observeEvent(input$btnAmend, {
+  observeEvent(input$abuttonamend, {
     result$crtAmFlag <- "A"
     showModal(.crtAmModal())
     .autoFillCrtAm(row)
@@ -194,9 +194,9 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                 title = uiOutput(ns("delModal"), inline = TRUE),
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
-                  flamingoButton(ns("btnConfirmDel"),
+                  flamingoButton(ns("abuttonConfirmDel"),
                                  label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = sys_conf$btnConfirmDel, placement = "right"),
+                    bs_embed_tooltip(title = sys_conf$abuttonConfirmDel, placement = "right"),
                   actionButton(ns("btnCancelDel"),
                                label = "Cancel", align = "right")
                 ),
@@ -205,12 +205,12 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     )
   }
 
-  observeEvent(input$btnDelete, {
+  observeEvent(input$abuttondelete, {
     showModal(.delModal())
   })
 
   # submit/cancel buttons
-  observeEvent(input$btnSubmitCrtAm, {
+  observeEvent(input$abuttonSubmitCrtAm, {
 
     if (result$crtAmFlag == "C") {
 
@@ -255,7 +255,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     removeModal()
   })
 
-  observeEvent(input$btnConfirmDel, {
+  observeEvent(input$abuttonConfirmDel, {
     modResId <- deleteModelResource(dbSettings, result$MRData[input$mrtable_rows_selected,1])
 
     if (!is.null(modResId)) {

@@ -29,8 +29,8 @@ landing_page <- list(
 )
 
   define_account <- list(
-    buttonamendac = "Please select an account to amend",
-    buttondeleteac = "Please select an account to delete"
+    abuttonamendac = "Please select an account to amend",
+    abuttondeleteac = "Please select an account to delete"
   )
 
   define_company <- list(
@@ -39,10 +39,10 @@ landing_page <- list(
   )
 
   sys_conf <- list(
-    btnAmend = "Please select a Model Resource to amend.",
-    btnDelete = "Please select a Model Resource to delete.",
-    btnConfirmDel = "Please select a Model Resource to delete.",
-    btnSubmitCrtAm = "Submit Programme"
+    abuttonamend = "Please select a Model Resource to amend.",
+    abuttondelete = "Please select a Model Resource to delete.",
+    abuttonConfirmDel = "Please select a Model Resource to delete.",
+    abuttonSubmitCrtAm = "Submit Programme"
   )
 
 programme_Definition_Single <- list(
@@ -50,11 +50,11 @@ programme_Definition_Single <- list(
   sinputProgModTransform = "Transformation Description to be added here",
   selectprogrammeID = "Select a programme ID to which associate a model",
   selectprogOasisID = "Select the Oasis Programme to Run",
-  buttonprogdetails = "Please select a Programme to show details",
-  buttonamendpr = "Please select a Programme to Amend",
+  abuttonprogdetails = "Please select a Programme to show details",
+  abuttonamendpr = "Please select a Programme to Amend",
   abuttonProgSubmit = "Please fill all fields",
-  buttondeletepr = "Please select a Programme to Delete",
-  buttonmodeldetails = "Please select a Programme Model to show details",
+  abuttondeletepr = "Please select a Programme to Delete",
+  abuttonmodeldetails = "Please select a Programme Model to show details",
   abuttoncrprogoasis = "Please select both fields",
   abuttonrerunpr = "Please select a completed Programme Model to perform rerun",
   abuttonsaveoutput = "Please select Output Configuration",

@@ -49,10 +49,10 @@ panelProgrammeModelTable <- function(id) {
       actionButton(inputId = ns("abuttonookrefresh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableProgOasisOOK")),
-    flamingoButton(ns("buttonmodeldetails"), "Show Details", align = "centre") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$buttonmodeldetails, placement = "right"),
-    flamingoButton(ns("buttonassociatemodel"), "Create Model Association", align = "centre"),
-    actionButton(ns("buttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
+    flamingoButton(ns("abuttonmodeldetails"), "Show Details", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttonmodeldetails, placement = "right"),
+    flamingoButton(ns("abuttonassociatemodel"), "Create Model Association", align = "centre"),
+    actionButton(ns("abuttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
   )
 }
 
@@ -346,19 +346,19 @@ step2_chooseModel <- function(input, output, session,
   observeEvent({
     result$POData
     input$tableProgOasisOOK_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      disable("buttonmodeldetails")
-      disable("buttonpgotonextstep")
+      disable("abuttonmodeldetails")
+      disable("abuttonpgotonextstep")
       if (length(input$tableProgOasisOOK_rows_selected) > 0) {
-        enable("buttonmodeldetails")
+        enable("abuttonmodeldetails")
         currStatus <- result$POData[input$tableProgOasisOOK_rows_selected, POData.Status]
         if (!is.na(currStatus) && currStatus == StatusCompleted) {
-          enable("buttonpgotonextstep")
+          enable("abuttonpgotonextstep")
         }
       }
     })
 
   # Show/hide Programme Model Details Panel
-  onclick("buttonmodeldetails", {
+  onclick("abuttonmodeldetails", {
     logMessage("showing panelModelDetails")
     .reloadProgFiles()
     show("panelModelDetails")
@@ -371,16 +371,16 @@ step2_chooseModel <- function(input, output, session,
   })
 
   # Create Model ----------------------------------------------------------------
-  onclick("buttonassociatemodel", {
+  onclick("abuttonassociatemodel", {
     show("panelAssociateModel")
   })
 
   # Enable and Disable associate Model button
   observeEvent(progStatus(), {
     if (progStatus() == "- Status: Completed") {
-      enable("buttonassociatemodel")
+      enable("abuttonassociatemodel")
     } else {
-      disable("buttonassociatemodel")
+      disable("abuttonassociatemodel")
     }
   })
 
@@ -600,7 +600,7 @@ step2_chooseModel <- function(input, output, session,
     list(
       selectprogOasisID = reactive({result$selectprogOasisID}),
       POData = reactive({result$POData}),
-      newstep = reactive({input$buttonpgotonextstep})
+      newstep = reactive({input$abuttonpgotonextstep})
     )
   )
 

@@ -200,11 +200,11 @@ panelDefineOutputConfiguration <- function(id) {
     hidden(div(id = ns("configureAdvancedIL"), configureAdvancedIL(id))),
     checkboxInput(ns("chkinputRI"), label = "Net RI Loss", value = FALSE),
     hidden(div(id = ns("configureAdvancedRI"), configureAdvancedRI(id))),
-    flamingoButton(inputId = ns("abtnadvanced"), label = "Advanced"),
-    hidden(flamingoButton(inputId = ns("abtnbasic"), label = "Basic")),
+    flamingoButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
+    hidden(flamingoButton(inputId = ns("abuttonbasic"), label = "Basic")),
     hidden(flamingoButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration")) %>%
       bs_embed_tooltip(title = programme_Definition_Single$abuttonsaveoutput, placement = "right"),
-    hidden(flamingoButton(inputId = ns("abtnclroutopt"), label = "Default"))
+    hidden(flamingoButton(inputId = ns("abuttonclroutopt"), label = "Default"))
   )
 }
 
@@ -898,17 +898,17 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Clear the checkbox groups and preset dropdown - Set back to default
-  onclick("abtnclroutopt", {
+  onclick("abuttonclroutopt", {
     .defaultview(session)
   })
 
   # show advanced view
-  onclick("abtnadvanced", {
+  onclick("abuttonadvanced", {
     .advancedview()
   })
 
   # show basic view
-  onclick("abtnbasic", {
+  onclick("abuttonbasic", {
     .basicview()
   })
 
@@ -1338,10 +1338,10 @@ step3_configureOutput <- function(input, output, session,
     show("configureAdvancedIL")
     show("configureAdvancedRI")
     show("configureModelParamsAdvanced")
-    show("abtnbasic")
-    hide("abtnadvanced")
+    show("abuttonbasic")
+    hide("abuttonadvanced")
     show("abuttonsaveoutput")
-    show("abtnclroutopt")
+    show("abuttonclroutopt")
   }
 
   .basicview <- function() {
@@ -1350,10 +1350,10 @@ step3_configureOutput <- function(input, output, session,
     hide("configureAdvancedIL")
     hide("configureAdvancedRI")
     hide("configureModelParamsAdvanced")
-    hide("abtnbasic")
-    show("abtnadvanced")
+    hide("abuttonbasic")
+    show("abuttonadvanced")
     hide("abuttonsaveoutput")
-    hide("abtnclroutopt")
+    hide("abuttonclroutopt")
   }
 
   # Default output configuration options

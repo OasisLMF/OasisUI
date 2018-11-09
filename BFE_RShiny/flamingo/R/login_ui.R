@@ -24,7 +24,7 @@ loginDialogUI <- function(id) {
                         onkeydown = sprintf(
                           "if (event.keyCode == 13) document.getElementById('%s').click()",
                           ns("loginbutton"))),
-             flamingoButton(ns("loginbutton"), "Login", class = "btn btn-success")
+             flamingoButton(ns("abuttonloginbutton"), "Login", class = "btn btn-success")
     )
   )
 }

@@ -25,8 +25,6 @@ pageheaderUI <- function(id) {
                        textOutput(ns("textOutputHeaderData2")),
                        flamingoButton(ns("abuttonuseradmin"),
                                       label = "User Administration", align = "center", width = "100%"),
-                       
-                       ### TODO: recheck allignment of the comment after fixing dtyle of action buttons
                        flamingoButton(ns("abuttondefineaccount"),
                                       label = "Define Account", align = "center", width = "100%") %>%
                          bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "left"),

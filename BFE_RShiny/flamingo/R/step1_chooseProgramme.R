@@ -48,14 +48,14 @@ panelProgrammeTable <- function(id) {
       actionButton(inputId = ns("abuttonprgtblrfsh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("tableDPprog")),
-    flamingoButton(ns("buttoncreatepr"), "Create Programme", align = "centre"),
-    flamingoButton(ns("buttonamendpr"), "Amend Programme", align = "centre") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$buttonamendpr, placement = "right"),
-    flamingoButton(ns("buttondeletepr"), "Delete Programme", align = "centre") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$buttondeletepr, placement = "right"),
-    flamingoButton(ns("buttonprogdetails"), "Show Details", align = "centre") %>%
-      bs_embed_tooltip(title = programme_Definition_Single$buttonprogdetails, placement = "right"),
-    actionButton(ns("buttonpgotonextstep"), "Proceed to Choose Model", style = "float:right")
+    flamingoButton(ns("abuttoncreatepr"), "Create Programme", align = "centre"),
+    flamingoButton(ns("abuttonamendpr"), "Amend Programme", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttonamendpr, placement = "right"),
+    flamingoButton(ns("abuttondeletepr"), "Delete Programme", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttondeletepr, placement = "right"),
+    flamingoButton(ns("abuttonprogdetails"), "Show Details", align = "centre") %>%
+      bs_embed_tooltip(title = programme_Definition_Single$abuttonprogdetails, placement = "right"),
+    actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Model", style = "float:right")
   )
 }
 
@@ -206,7 +206,7 @@ panelLinkFiles <- function(id) {
     fluidRow(
       column(12,
              actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", style = "inline: true;float:right;"),
-             flamingoButton(inputId = ns("buttonloadcanmodpr"), label = "Load Programme", style = "inline: true;float:right;margin-right: 10px;")))
+             flamingoButton(inputId = ns("abuttonloadcanmodpr"), label = "Load Programme", style = "inline: true;float:right;margin-right: 10px;")))
   )
 }
 
@@ -349,22 +349,22 @@ step1_chooseProgramme <- function(input, output, session,
     result$DPProgData
     input$tableDPprog_rows_selected
     }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      disable("buttonprogdetails")
-      disable("buttondeletepr")
-      disable("buttonamendpr")
-      disable("buttonpgotonextstep")
+      disable("abuttonprogdetails")
+      disable("abuttondeletepr")
+      disable("abuttonamendpr")
+      disable("abuttonpgotonextstep")
     if (length(input$tableDPprog_rows_selected) > 0) {
-      enable("buttonprogdetails")
-      enable("buttondeletepr")
-      enable("buttonamendpr")
+      enable("abuttonprogdetails")
+      enable("abuttondeletepr")
+      enable("abuttonamendpr")
       if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusCompleted) {
-        enable("buttonpgotonextstep")
+        enable("abuttonpgotonextstep")
       }
     }
   })
 
   # Show Programme Details
-  onclick("buttonprogdetails", {
+  onclick("abuttonprogdetails", {
     hide("panelDefineProgramme")
     hide("panelLinkFiles")
     show("panelProgrammeDetails")
@@ -397,7 +397,7 @@ step1_chooseProgramme <- function(input, output, session,
   })
 
   # Create Programme
-  onclick("buttoncreatepr", {
+  onclick("abuttoncreatepr", {
     hide("panelProgrammeDetails")
     hide("panelLinkFiles")
     result$prog_flag <- "C"
@@ -411,7 +411,7 @@ step1_chooseProgramme <- function(input, output, session,
   })
 
   ### Amend Programme
-  onclick("buttonamendpr", {
+  onclick("abuttonamendpr", {
     hide("panelProgrammeDetails")
     .defaultCreateProg()
     if (length(input$tableDPprog_rows_selected) > 0) {
@@ -511,7 +511,7 @@ step1_chooseProgramme <- function(input, output, session,
   })
 
   ### Load Programme Button
-  onclick("buttonloadcanmodpr", {
+  onclick("abuttonloadcanmodpr", {
     progId = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
     logMessage(paste("loading programme - progId is:", progId))
     loadprogdata <- loadProgrammeData(apiSettings,
@@ -551,7 +551,7 @@ step1_chooseProgramme <- function(input, output, session,
   }
 
   # Delete Programme
-  onclick("buttondeletepr",{
+  onclick("abuttondeletepr",{
     showModal(.progdelmodal())
   })
 
@@ -1055,7 +1055,7 @@ step1_chooseProgramme <- function(input, output, session,
     list(
       selectprogrammeID = reactive(result$selectprogrammeID),
       DPProgData = reactive({result$DPProgData}),
-      newstep = reactive({input$buttonpgotonextstep})
+      newstep = reactive({input$abuttonpgotonextstep})
     )
   )
 

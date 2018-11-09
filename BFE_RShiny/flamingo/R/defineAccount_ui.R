@@ -28,14 +28,14 @@ accountDefinitionUI <- function(id) {
                  
                  downloadButton(ns("DAAdownloadexcel"), label= " Export to csv"),
                  
-                 flamingoButton(ns("buttoncreateac"), "Create Account",
+                 flamingoButton(ns("abuttoncreateac"), "Create Account",
                                 align = "left"),
-                 flamingoButton(ns("buttonamendac"), "Amend Account",
+                 flamingoButton(ns("abuttonamendac"), "Amend Account",
                                 align = "centre") %>%
-                   bs_embed_tooltip(title = define_account$buttonamendac, placement = "right"),
-                 flamingoButton(ns("buttondeleteac"), "Delete Account",
+                   bs_embed_tooltip(title = define_account$abuttonamendac, placement = "right"),
+                 flamingoButton(ns("abuttondeleteac"), "Delete Account",
                                 align = "right") %>%
-                   bs_embed_tooltip(title = define_account$buttondeleteac, placement = "right")
+                   bs_embed_tooltip(title = define_account$abuttondeleteac, placement = "right")
              )
       )
     )

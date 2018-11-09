@@ -87,7 +87,7 @@ accountDefinition <- function(input, output, session, dbSettings,
     )
   }
 
-  onclick("buttoncreateac", {
+  onclick("abuttoncreateac", {
     # "C" for create
     result$accFlag <- "C"
     showModal(.crtupModal())
@@ -97,15 +97,15 @@ accountDefinition <- function(input, output, session, dbSettings,
   # Enable and disable buttons
   observeEvent(input$tableDAAccount_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length(input$tableDAAccount_rows_selected) > 0) {
-      shinyjs::enable("buttonamendac")
-      shinyjs::enable("buttondeleteac")
+      shinyjs::enable("abuttonamendac")
+      shinyjs::enable("abuttondeleteac")
     } else {
-      shinyjs::disable("buttonamendac")
-      shinyjs::disable("buttondeleteac")
+      shinyjs::disable("abuttonamendac")
+      shinyjs::disable("abuttondeleteac")
     }
   })
 
-  onclick("buttonamendac", {
+  onclick("abuttonamendac", {
     result$accFlag <- "A"
 
     showModal(.crtupModal())
@@ -172,7 +172,7 @@ accountDefinition <- function(input, output, session, dbSettings,
                 title = "Delete Account",
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
-                  flamingoButton(ns("btnConfirmDel"),
+                  flamingoButton(ns("abuttonconfirmdel"),
                                  label = "Confirm", align = "center"),
                   actionButton(ns("btnCancelDel"),
                                label = "Cancel", align = "right")
@@ -182,7 +182,7 @@ accountDefinition <- function(input, output, session, dbSettings,
     )
   }
 
-  onclick("buttondeleteac", {
+  onclick("abuttondeleteac", {
 
     if (length(input$tableDAAccount_rows_selected) > 0) {
       showModal(.delModal())
@@ -197,7 +197,7 @@ accountDefinition <- function(input, output, session, dbSettings,
     removeModal()
   })
 
-  observeEvent(input$btnConfirmDel, {
+  observeEvent(input$abuttonconfirmdel, {
     removeModal()
 
     if (length(row <- input$tableDAAccount_rows_selected) > 0) {

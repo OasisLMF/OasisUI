@@ -48,8 +48,8 @@ loginDialog <- function(input, output, session, dbSettings, logout,
     updateTextInput(session, "password", label = "", value = "")
   })
 
-  observeEvent(input$loginbutton, {
-    if (input$loginbutton > 0) {
+  observeEvent(input$abuttonloginbutton, {
+    if (input$abuttonloginbutton > 0) {
       user <- isolate(input$user)
       pwd <- isolate(input$password)
       res <- api_refresh_token(user, pwd)
