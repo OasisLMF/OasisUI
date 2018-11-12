@@ -4,6 +4,16 @@
 # Software provided for early adopter evaluation only.
 ###############################################################################
 
+#' ui
+#'
+#' @rdname ui
+#'
+#' @param request ui before authentification.
+#'
+#' @return ui before authentification.
+#'
+#' @export
+
 ui <- function(request) {
 
   fluidPage(

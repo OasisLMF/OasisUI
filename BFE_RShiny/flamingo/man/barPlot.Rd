@@ -4,7 +4,7 @@
 \alias{barPlot}
 \title{barPlot}
 \usage{
-barPlot(xlabel, ylabel, titleToUse, data)
+barPlot(xlabel, ylabel, titleToUse, data, xtickslabels = NULL)
 }
 \description{
 bar plot

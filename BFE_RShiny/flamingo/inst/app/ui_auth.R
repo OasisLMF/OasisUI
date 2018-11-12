@@ -4,6 +4,17 @@
 # Software provided for early adopter evaluation only.
 ###############################################################################
 
+#' authUI
+#'
+#' @rdname authUI
+#'
+#' @param WidthSide This is a specific value.
+#' @param WidthMain This is a specific value.
+#'
+#' @return ui after authentification.
+#'
+#' @export
+
 authUI <- function(WidthSide = 3, WidthMain = 9) {
 
   tagList(
