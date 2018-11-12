@@ -52,7 +52,7 @@ constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
 modelID Id of selected progOasis.
 
-POData model association table.
+tbl_modelsData model association table.
 
 newstep navigation step
 }

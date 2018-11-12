@@ -58,9 +58,9 @@ singleAna <- function(input, output, session, dbSettings,
     # Prog status
     progStatus = "",
     # Model table
-    POData = NULL,
+    tbl_modelsData = NULL,
     # Model table row selected
-    POData_rowselected = NULL,
+    tbl_modelsData_rowselected = NULL,
     # Model Name
     progOasisName = "",
     # List of Model IDs
@@ -249,15 +249,15 @@ singleAna <- function(input, output, session, dbSettings,
 
   # If programmeID changes, then we select the first progOasis
   observeEvent({
-    result$POData_rowselected
+    result$tbl_modelsData_rowselected
     result$portfolioID
     }, ignoreInit = TRUE, {
     progOasisId <- ""
-    if (!is.null(result$POData) && nrow(result$POData) > 0) {
-      progOasisId <- result$POData[result$POData_rowselected, POData.ProgOasisId]
+    if (!is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0) {
+      progOasisId <- result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.ProgOasisId]
     }
     if (!is.null(progOasisId) && !is.na(progOasisId) && progOasisId != result$modelID) {
-      logMessage(paste0("updating result$modelID because result$POData_rowselected changed to: ", result$POData_rowselected ))
+      logMessage(paste0("updating result$modelID because result$tbl_modelsData_rowselected changed to: ", result$tbl_modelsData_rowselected ))
       result$modelID <- progOasisId
     }
   })
@@ -276,14 +276,14 @@ singleAna <- function(input, output, session, dbSettings,
 
   # > prog Model Table reactives -----------------------------------------------
   observeEvent({
-    submodulesList$step2_chooseModel$POData()
+    submodulesList$step2_chooseModel$tbl_modelsData()
     result$portfolioID
   }, ignoreInit = TRUE, {
     if (result$portfolioID != "" & !is.null(result$portfolioID)) {
-      result$POData <- getProgOasisForProgdata(dbSettings, result$portfolioID) %>%
+      result$tbl_modelsData <- getProgOasisForProgdata(dbSettings, result$portfolioID) %>%
         replaceWithIcons()
-      if (nrow(result$POData) != 0) {
-        result$progOasisChoices <-  result$POData[, POData.ProgOasisId]
+      if (nrow(result$tbl_modelsData) != 0) {
+        result$progOasisChoices <-  result$tbl_modelsData[, tbl_modelsData.ProgOasisId]
       } else {
         result$progOasisChoices <- c("")
       }
@@ -295,19 +295,19 @@ singleAna <- function(input, output, session, dbSettings,
     result$portfolioID
     result$modelID
     result$progOasisChoices
-    result$POData
+    result$tbl_modelsData
   }, ignoreInit = TRUE, {
     prgOasisId <- result$modelID
     rowToSelect <- match(prgOasisId, result$progOasisChoices)
-    result$POData_rowselected <- ifelse(is.na(rowToSelect), 1, rowToSelect)
-    result$progOasisName <- ifelse(nrow(result$POData) > 0, result$POData[result$POData_rowselected, POData.ProgName], "")
+    result$tbl_modelsData_rowselected <- ifelse(is.na(rowToSelect), 1, rowToSelect)
+    result$progOasisName <- ifelse(nrow(result$tbl_modelsData) > 0, result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.ProgName], "")
     progOasisStatus <- ""
-    if (!is.na(result$POData) && nrow(result$POData) > 0 && length(result$POData_rowselected) > 0) {
-      if (result$POData[result$POData_rowselected, POData.Status] == StatusCompleted) {
+    if (!is.na(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0 && length(result$tbl_modelsData_rowselected) > 0) {
+      if (result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.Status] == StatusCompleted) {
         progOasisStatus <- "- Status: Completed"
-      } else if (result$POData[result$POData_rowselected, POData.Status] == StatusProcessing) {
+      } else if (result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.Status] == StatusProcessing) {
         progOasisStatus <- "- Status: in Progress"
-      } else if (result$POData[result$POData_rowselected, POData.Status] == StatusFailed) {
+      } else if (result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.Status] == StatusFailed) {
         progOasisStatus <- "- Status: Failed"
       }
     }

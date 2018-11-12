@@ -132,26 +132,26 @@ variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Fu
 
 # > Variables for cols positions -----------------------------------------------
 ### Creating Variables for col names of Programme Table
-#result$DPProgData
+#result$tbl_portfoliosData
 #"Programme ID", "Programme Name", "Account ID", "Account Name", "Transform ID", "Transform", "Status"
-DPProgData.ProgrammeID <- "Programme ID" #reactive(names(result$DPProgData)[1])
-DPProgData.ProgrammeName <- "Programme Name" #reactive(names(result$DPProgData)[2])
-DPProgData.AccountID <- "Account ID" #reactive(names(result$DPProgData)[3])
-DPProgData.AccountName <- "Account Name" #reactive(names(result$DPProgData)[4])
-DPProgData.TranformID <- "Transform ID" #reactive(names(result$DPProgData)[5])
-DPProgData.Tranform <- "Transform" #reactive(names(result$DPProgData)[6])
-DPProgData.Status <-  "Status" #reactive(names(result$DPProgData)[7])
+tbl_portfoliosData.ProgrammeID <- "Programme ID" #reactive(names(result$tbl_portfoliosData)[1])
+tbl_portfoliosData.ProgrammeName <- "Programme Name" #reactive(names(result$tbl_portfoliosData)[2])
+tbl_portfoliosData.AccountID <- "Account ID" #reactive(names(result$tbl_portfoliosData)[3])
+tbl_portfoliosData.AccountName <- "Account Name" #reactive(names(result$tbl_portfoliosData)[4])
+tbl_portfoliosData.TranformID <- "Transform ID" #reactive(names(result$tbl_portfoliosData)[5])
+tbl_portfoliosData.Tranform <- "Transform" #reactive(names(result$tbl_portfoliosData)[6])
+tbl_portfoliosData.Status <-  "Status" #reactive(names(result$tbl_portfoliosData)[7])
 
 ### Creating Variables for col names of Programme Model Table
-# result$POData
+# result$tbl_modelsData
 #"ProgOasisId", "ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status"
-POData.ProgOasisId <- "ProgOasisId" #reactive(names(result$POData)[1])
-POData.ProgName <- "ProgName" #reactive(names(result$POData)[2])
-POData.ModelName <- "ModelName" #reactive(names(result$POData)[3])
-POData.TransformName <- "TransformName" #reactive(names(result$POData)[4])
-POData.SourceFileId <- "SourceFileId" #reactive(names(result$POData)[5])
-POData.FileID <- "FileID" #reactive(names(result$POData)[6])
-POData.Status <- "Status" #reactive(names(result$POData)[7])
+tbl_modelsData.ProgOasisId <- "ProgOasisId" #reactive(names(result$tbl_modelsData)[1])
+tbl_modelsData.ProgName <- "ProgName" #reactive(names(result$tbl_modelsData)[2])
+tbl_modelsData.ModelName <- "ModelName" #reactive(names(result$tbl_modelsData)[3])
+tbl_modelsData.TransformName <- "TransformName" #reactive(names(result$tbl_modelsData)[4])
+tbl_modelsData.SourceFileId <- "SourceFileId" #reactive(names(result$tbl_modelsData)[5])
+tbl_modelsData.FileID <- "FileID" #reactive(names(result$tbl_modelsData)[6])
+tbl_modelsData.Status <- "Status" #reactive(names(result$tbl_modelsData)[7])
 
 ### Creating Variables for col names of Process Runs Table
 # result$prcrundata
