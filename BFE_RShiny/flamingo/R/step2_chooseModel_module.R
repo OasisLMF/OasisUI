@@ -193,7 +193,7 @@ step2_chooseModel <- function(input, output, session,
     # reactive value for model table
     tbl_modelsData = NULL,
     # reactive value for detail of model table
-    progFiles = NULL
+    tbl_modelsDetails = NULL
   )
 
   #Set Params
@@ -316,10 +316,10 @@ step2_chooseModel <- function(input, output, session,
 
   # Model Details Table --------------------------------------------------------
   output$dt_modelDetails <- renderDT(
-    if (!is.null(result$progFiles) && nrow(result$progFiles) > 0 ) {
+    if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
       logMessage("re-rendering programme model details table")
       datatable(
-        result$progFiles,
+        result$tbl_modelsDetails,
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -358,7 +358,7 @@ step2_chooseModel <- function(input, output, session,
   # Show/hide Programme Model Details Panel
   onclick("abuttonmodeldetails", {
     logMessage("showing panelModelDetails")
-    .reloadProgFiles()
+    .reloadtbl_modelsDetails()
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
   })
@@ -415,7 +415,7 @@ step2_chooseModel <- function(input, output, session,
         )
         if (loadprogmodel == 'success' || loadprogmodel == 'Success') {
           flamingoNotification(type = "message", "Initiating load programme model...")
-          #.reloadProgFiles()
+          #.reloadtbl_modelsDetails()
         } else {
           flamingoNotification(type = "error", "Failed to load programme model")
         }
@@ -443,14 +443,14 @@ step2_chooseModel <- function(input, output, session,
   } )
 
   onclick("abuttonmodeldetailrfsh", {
-    .reloadProgFiles()
+    .reloadtbl_modelsDetails()
   } )
 
   # Updates dependent on changed: dt_models_rows_selected --------------
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
-      #.reloadProgFiles()
+      #.reloadtbl_modelsDetails()
       hide("panelModelDetails")
       hide("panelDefineProgramme")
 
@@ -522,19 +522,19 @@ step2_chooseModel <- function(input, output, session,
   }
 
   # Reload Programme Model Details table
-  .reloadProgFiles <- function() {
-    logMessage(".reloadProgFiles called")
+  .reloadtbl_modelsDetails <- function() {
+    logMessage(".reloadtbl_modelsDetails called")
     if (length(input$dt_models_rows_selected) > 0) {
       prgId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ProgOasisId]
       stmt <- buildDbQuery("getProgOasisFileDetails", prgId)
-      progFiles <- executeDbQuery(dbSettings, stmt)
-      if (!is.null(progFiles)) {
-        result$progFiles <-  progFiles %>%
+      tbl_modelsDetails <- executeDbQuery(dbSettings, stmt)
+      if (!is.null(tbl_modelsDetails)) {
+        result$tbl_modelsDetails <-  tbl_modelsDetails %>%
           replaceWithIcons()
       }
       logMessage("files table refreshed")
     } else {
-      result$progFiles <- NULL
+      result$tbl_modelsDetails <- NULL
     }
     invisible()
   }
