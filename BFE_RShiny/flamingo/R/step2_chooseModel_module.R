@@ -335,9 +335,9 @@ step2_chooseModel <- function(input, output, session,
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
     progOasisId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ProgOasisId]
-    progOasisName <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ProgName]
-    progOasisName <- ifelse(progOasisName == " " | progOasisName == "", "", paste0('"', progOasisName, '"'))
-    paste0('Details of Model Association id ', progOasisId, ' ', progOasisName)
+    modelName <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ProgName]
+    modelName <- ifelse(modelName == " " | modelName == "", "", paste0('"', modelName, '"'))
+    paste0('Details of Model Association id ', progOasisId, ' ', modelName)
   })
 
   # Enable and disable buttons

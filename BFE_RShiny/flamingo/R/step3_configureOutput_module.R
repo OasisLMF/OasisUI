@@ -594,9 +594,8 @@ panel_configureAdvancedRI <- function(id) {
 #' @template params-flamingo-module
 #' 
 #' @param currstep current selected step.
-#' @param selectprogrammeID selected programme ID.
-#' @param selectprogOasisID selected ProgOasis ID.
-#' @param progOasisName Name of selected progOasis.
+#' @param modelID selected ProgOasis ID.
+#' @param modelName Name of selected progOasis.
 #' @param progOasisStatus Status of selected progOasis.
 #'
 #' @return prrunid id of selected run.
@@ -619,9 +618,8 @@ step3_configureOutput <- function(input, output, session,
                                   active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
-                                  selectprogrammeID = reactive(""),
-                                  selectprogOasisID = reactive(""),
-                                  progOasisName = reactive(""),
+                                  modelID = reactive(""),
+                                  modelName = reactive(""),
                                   progOasisStatus = reactive("")
 ) {
 
@@ -642,7 +640,7 @@ step3_configureOutput <- function(input, output, session,
     # reactve value for navigation
     navigationstate = NULL,
     # reactive value for process runs table
-    prcrundata = NULL,
+    tbl_analysisData = NULL,
     # flag to know if the user is creating a new output configuration or rerunning a process
     prrun_flag = "C",
     # Id of the Process Run
@@ -663,8 +661,8 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
-  # If selectprogOasisID changes, reload process run table and set view back to default
-  observeEvent(selectprogOasisID(), ignoreInit = TRUE, {
+  # If modelID changes, reload process run table and set view back to default
+  observeEvent(modelID(), ignoreInit = TRUE, {
     if (active()) {
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
@@ -685,51 +683,51 @@ step3_configureOutput <- function(input, output, session,
   #Content of the process run table
   .getProcessRunWithUserChoices <- function() {
     logMessage(".getProcessRunWithUserChoices called")
-    prcid <- selectprogOasisID()
+    prcid <- modelID()
     # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
     # 'In Progress' (not handled by stored procedure in the DB due to bug!)
-    prcrundata <- getProcessRun(dbSettings, prcid, input$radioanaAllOrInProgress) %>%
-      rename(Status = prcrundata.ProcessRunStatus.old) %>%
+    tbl_analysisData <- getProcessRun(dbSettings, prcid, input$radioanaAllOrInProgress) %>%
+      rename(Status = tbl_analysisData.ProcessRunStatus.old) %>%
       as.data.frame()
     # RSc TODO: should probably allow NULL to clear connections when selecting
     # a ProgOasisID that has no runs
-    if (!is.null(prcrundata) && nrow(prcrundata) > 0 ) {
-      result$prcrundata <- prcrundata %>%
+    if (!is.null(tbl_analysisData) && nrow(tbl_analysisData) > 0 ) {
+      result$tbl_analysisData <- tbl_analysisData %>%
         replaceWithIcons()
       #Handling bug for 'In Progress'
       if (input$radioanaAllOrInProgress == "In_Progress") {
-        result$prcrundata <- result$prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
+        result$tbl_analysisData <- result$tbl_analysisData %>% filter(ProcessRunStatus == StatusProcessing)
       }
     } else {
-      result$prcrundata <- NULL
+      result$tbl_analysisData <- NULL
     }
   }
 
   output$dt_analysis <- renderDT(
 
-    if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
+    if (!is.null(result$tbl_analysisData) && nrow(result$tbl_analysisData) > 0) {
       index <- 1
       logMessage("re-rendering process run table")
       datatable(
-        result$prcrundata,
+        result$tbl_analysisData,
         class = "flamingo-table display",
         rownames = TRUE,
         selection = list(mode = 'single',
-                         selected = rownames(result$prcrundata)[c(as.integer(index))]),
+                         selected = rownames(result$tbl_analysisData)[c(as.integer(index))]),
         escape = FALSE,
         colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = .getPRTableOptions()
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no runs available for Model ID ", selectprogOasisID()))
+      .nothingToShowTable(contentMessage = paste0("no runs available for Model ID ", modelID()))
     })
 
   # Process Run Table Title
   output$paneltitle_AnalysisTable <- renderUI({
-    if (selectprogOasisID() != "") {
-      progOasisName <- ifelse(toString(progOasisName()) == " " | toString(progOasisName()) == "" | toString(progOasisName()) == "NA", "", paste0('"',  toString(progOasisName()), '"'))
-      paste0('Runs for Model id ', toString(selectprogOasisID()), ' ', progOasisName,' ', toString(progOasisStatus()))
+    if (modelID() != "") {
+      modelName <- ifelse(toString(modelName()) == " " | toString(modelName()) == "" | toString(modelName()) == "NA", "", paste0('"',  toString(modelName()), '"'))
+      paste0('Runs for Model id ', toString(modelID()), ' ', modelName,' ', toString(progOasisStatus()))
     } else {
       paste0("Runs")
     }
@@ -745,8 +743,8 @@ step3_configureOutput <- function(input, output, session,
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
     if (result$prrun_flag  == "R") {
-      processRunId <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunID]
-      processRunName <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunName]
+      processRunId <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
+      processRunName <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName]
       processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
       paste0('Re-Define Output Configuration for Run id ', processRunId, ' ', processRunName)
     } else {
@@ -756,8 +754,8 @@ step3_configureOutput <- function(input, output, session,
 
   # Enable and disable buttons
   observeEvent({
-    result$prcrundata
-    selectprogOasisID()
+    result$tbl_analysisData
+    modelID()
     progOasisStatus()
     currstep()
     input$dt_analysis_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -765,12 +763,12 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttondisplayoutput")
       disable("abuttonshowlog")
       disable("abuttonconfigoutput")
-      if (selectprogOasisID() != "" && progOasisStatus() == "- Status: Completed") {
+      if (modelID() != "" && progOasisStatus() == "- Status: Completed") {
         enable("abuttonconfigoutput")
-        if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0 && length(input$dt_analysis_rows_selected) > 0) {
+        if (!is.null(result$tbl_analysisData) && nrow(result$tbl_analysisData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
           enable("abuttonrerunana")
           enable("abuttonshowlog")
-          if (result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunStatus] == StatusCompleted) {
+          if (result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunStatus] == StatusCompleted) {
             enable("abuttondisplayoutput")
           }
         }
@@ -993,7 +991,7 @@ step3_configureOutput <- function(input, output, session,
     summaryreports <- tolower(isolate(input$chkinputsummaryoption))
 
     # functionality to handle model resource based metrics
-    prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
+    prgId <- ifelse(modelID() == "", -1,modelID())
     stmt <- buildDbQuery("getRuntimeParamList", prgId)
     runparamlist <- executeDbQuery(dbSettings, stmt)
 
@@ -1063,9 +1061,9 @@ step3_configureOutput <- function(input, output, session,
                              sprintf("Created Process Run ID: %s and process run is executing",
                                      runId))
         .reloadRunData()
-        #logMessage(paste("colnames are:", paste(colnames(result$prcrundata), collapse = ", ")))
+        #logMessage(paste("colnames are:", paste(colnames(result$tbl_analysisData), collapse = ", ")))
         logMessage(paste("updating dt_analysisa select because executing a new run"))
-        rowToSelect <- match(runId, result$prcrundata[, prcrundata.ProcessRunID])
+        rowToSelect <- match(runId, result$tbl_analysisData[, tbl_analysisData.ProcessRunID])
         pageSel <- ceiling(rowToSelect/pageLength)
         selectRows(dataTableProxy("dt_analysis"), rowToSelect)
         selectPage(dataTableProxy("dt_analysis"), pageSel)
@@ -1121,8 +1119,8 @@ step3_configureOutput <- function(input, output, session,
 
   # run logs title
   output$paneltitle_AnaLogs <- renderUI({
-    processRunId <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunID]
-    processRunName <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunName]
+    processRunId <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
+    processRunName <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName]
     processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
     paste0('Logs for Run id ', processRunId, ' ', processRunName)
   })
@@ -1139,9 +1137,9 @@ step3_configureOutput <- function(input, output, session,
       logMessage(paste("input$dt_analysis_rows_selected is changed to:", input$dt_analysis_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (length(input$dt_analysis_rows_selected) > 0 && !is.null(result$prcrundata)) {
-        result$prrunid <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunID]
-        if (result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
+      if (length(input$dt_analysis_rows_selected) > 0 && !is.null(result$tbl_analysisData)) {
+        result$prrunid <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
+        if (result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunStatus] != StatusCompleted) {
           show("panelAnalysisLogs")
           logMessage("showing prrunlogtable")
         }
@@ -1181,11 +1179,11 @@ step3_configureOutput <- function(input, output, session,
   # Reload Process Runs table
   .reloadRunData <- function() {
     logMessage(".reloadRunData called")
-    if (selectprogOasisID() != "") {
+    if (modelID() != "") {
       .getProcessRunWithUserChoices()
       logMessage("process run table refreshed")
     }  else {
-      result$prcrundata <- NULL
+      result$tbl_analysisData <- NULL
     }
     invisible()
   }
@@ -1250,7 +1248,7 @@ step3_configureOutput <- function(input, output, session,
     updateTextInput(session, "tinputananame", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
 
-    prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
+    prgId <- ifelse(modelID() == "", -1,modelID())
     if (prgId != -1) {
       updateSelectInput(session, "sinputeventset",
                         choices = getEventSet(dbSettings, prgId ))
@@ -1274,7 +1272,7 @@ step3_configureOutput <- function(input, output, session,
 
   #Show available perils
   .showPerils <- function() {
-    prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
+    prgId <- ifelse(modelID() == "", -1,modelID())
     stmt <- buildDbQuery("getRuntimeParamList", prgId)
     runparamlist <- executeDbQuery(dbSettings, stmt)
 
@@ -1299,7 +1297,7 @@ step3_configureOutput <- function(input, output, session,
     outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid ))
     runparamsforpr <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$prrunid ))
 
-    updateTextInput(session, "tinputananame", value = result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunName])
+    updateTextInput(session, "tinputananame", value = result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName])
 
     if (nrow(runparamsforpr) > 0) {
       for (i in 1:nrow(runparamsforpr)) {

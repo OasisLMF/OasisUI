@@ -154,13 +154,13 @@ tbl_modelsData.FileID <- "FileID" #reactive(names(result$tbl_modelsData)[6])
 tbl_modelsData.Status <- "Status" #reactive(names(result$tbl_modelsData)[7])
 
 ### Creating Variables for col names of Process Runs Table
-# result$prcrundata
+# result$tbl_analysisData
 #"ProcessRunID", "ProcessRunName", "ProgOasisID", "ProcessRunStatus"
-prcrundata.ProcessRunID <- "ProcessRunID" #reactive(names(result$prcrundata)[1])
-prcrundata.ProcessRunName <- "ProcessRunName" #reactive(names(result$prcrundata)[2])
-prcrundata.ProgOasisID <- "ProgOasisID" #reactive(names(result$prcrundata)[3])
-prcrundata.ProcessRunStatus <- "Status" #reactive(names(result$prcrundata)[4])
-prcrundata.ProcessRunStatus.old <- "ProcessRunStatus"
+tbl_analysisData.ProcessRunID <- "ProcessRunID" #reactive(names(result$tbl_analysisData)[1])
+tbl_analysisData.ProcessRunName <- "ProcessRunName" #reactive(names(result$tbl_analysisData)[2])
+tbl_analysisData.ProgOasisID <- "ProgOasisID" #reactive(names(result$tbl_analysisData)[3])
+tbl_analysisData.ProcessRunStatus <- "Status" #reactive(names(result$tbl_analysisData)[4])
+tbl_analysisData.ProcessRunStatus.old <- "ProcessRunStatus"
 
 
 ### Creating Variables for  col names of filesListData

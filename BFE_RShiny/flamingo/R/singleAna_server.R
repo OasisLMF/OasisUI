@@ -62,7 +62,7 @@ singleAna <- function(input, output, session, dbSettings,
     # Model table row selected
     tbl_modelsData_rowselected = NULL,
     # Model Name
-    progOasisName = "",
+    modelName = "",
     # List of Model IDs
     progOasisChoices = NULL,
     # Model status
@@ -137,9 +137,8 @@ singleAna <- function(input, output, session, dbSettings,
     active = reactive({active() && workflowSteps$step() == 3}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
-    selectprogrammeID = reactive(input$portfolioID),
-    selectprogOasisID = reactive(input$modelID),
-    progOasisName = reactive({result$progOasisName}),
+    modelID = reactive(input$modelID),
+    modelName = reactive({result$modelName}),
     progOasisStatus = reactive({result$progOasisStatus})
   )
 
@@ -300,7 +299,7 @@ singleAna <- function(input, output, session, dbSettings,
     prgOasisId <- result$modelID
     rowToSelect <- match(prgOasisId, result$progOasisChoices)
     result$tbl_modelsData_rowselected <- ifelse(is.na(rowToSelect), 1, rowToSelect)
-    result$progOasisName <- ifelse(nrow(result$tbl_modelsData) > 0, result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.ProgName], "")
+    result$modelName <- ifelse(nrow(result$tbl_modelsData) > 0, result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.ProgName], "")
     progOasisStatus <- ""
     if (!is.na(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0 && length(result$tbl_modelsData_rowselected) > 0) {
       if (result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.Status] == StatusCompleted) {
