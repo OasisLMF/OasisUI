@@ -19,15 +19,15 @@ step2_chooseModelUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    hidden(div(id = ns("panelProgrammeModelTable"), panelProgrammeModelTable(id))),
+    hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
     hidden(div(id = ns("panelModelDetails"), panelModelDetails(id))),
     hidden(div(id = ns("panelAssociateModel"), panelAssociateModel(id)))
   )
 }
 
-#' panelProgrammeModelTable
+#' panelModelTable
 #'
-#' @rdname panelProgrammeModelTable
+#' @rdname panelModelTable
 #'
 #' @description Function wrapping panel to show created programme model table.
 #'
@@ -37,18 +37,18 @@ step2_chooseModelUI <- function(id) {
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
-panelProgrammeModelTable <- function(id) {
+panelModelTable <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = TRUE,
     show = TRUE,
-    ns("progmodeltbl"),
+    ns("panel_model"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitleProgrammeModelTable"), inline = TRUE),
-      actionButton(inputId = ns("abuttonookrefresh"), label = "Refresh", style = "float: right;")
+      uiOutput(ns("paneltitle_ModelTable"), inline = TRUE),
+      actionButton(inputId = ns("abuttonmodelrefresh"), label = "Refresh", style = "float: right;")
     ),
-    DTOutput(ns("tableProgOasisOOK")),
+    DTOutput(ns("dt_models")),
     flamingoButton(ns("abuttonmodeldetails"), "Show Details", align = "centre") %>%
       bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right"),
     flamingoButton(ns("abuttonassociatemodel"), "Create Model Association", align = "centre"),
@@ -253,24 +253,24 @@ step2_chooseModel <- function(input, output, session,
         if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
           rowToSelect <- match(result$modelID, result$POData[, POData.ProgOasisId])
           pageSel <- ceiling(rowToSelect/pageLength)
-          if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
+          if (!is.null(input$dt_models_rows_selected) && rowToSelect != input$dt_models_rows_selected) {
             # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
-            selectRows(dataTableProxy("tableProgOasisOOK"), rowToSelect)
-            selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
-            logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+            selectRows(dataTableProxy("dt_models"), rowToSelect)
+            selectPage(dataTableProxy("dt_models"), pageSel)
+            logMessage(paste("selected row is:", input$dt_models_rows_selected))
           }
         }
       } else {
-        selectRows(dataTableProxy("tableProgOasisOOK"), NULL)
-        selectPage(dataTableProxy("tableProgOasisOOK"), 1)
-        logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+        selectRows(dataTableProxy("dt_models"), NULL)
+        selectPage(dataTableProxy("dt_models"), 1)
+        logMessage(paste("selected row is:", input$dt_models_rows_selected))
       }
       if (bl_dirty1) check_selProgOasisID <<- check_selProgOasisID + 1
     }
   })
 
   # Programme Model Table ------------------------------------------------------
-  output$tableProgOasisOOK <- renderDT(
+  output$dt_models <- renderDT(
     if (!is.null(result$POData) && nrow(result$POData) > 0 ) {
       if (isolate(result$modelID) != "") {
         rowToSelect <- match(isolate(result$modelID), result$POData[,POData.ProgOasisId])
@@ -295,7 +295,7 @@ step2_chooseModel <- function(input, output, session,
   )
 
   #  Programme Model Table title
-  output$paneltitleProgrammeModelTable <- renderUI({
+  output$paneltitle_ModelTable <- renderUI({
     if (result$portfolioID != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
       paste0('Model Associations for Programme id ', toString(result$portfolioID), ' ', pfName,' ', toString(progStatus()))
@@ -334,8 +334,8 @@ step2_chooseModel <- function(input, output, session,
 
   # Details Model title
   output$paneltitleProgrammeModelDetails <- renderUI({
-    progOasisId <- result$POData[ input$tableProgOasisOOK_rows_selected,POData.ProgOasisId]
-    progOasisName <- result$POData[ input$tableProgOasisOOK_rows_selected,POData.ProgName]
+    progOasisId <- result$POData[ input$dt_models_rows_selected,POData.ProgOasisId]
+    progOasisName <- result$POData[ input$dt_models_rows_selected,POData.ProgName]
     progOasisName <- ifelse(progOasisName == " " | progOasisName == "", "", paste0('"', progOasisName, '"'))
     paste0('Details of Model Association id ', progOasisId, ' ', progOasisName)
   })
@@ -343,12 +343,12 @@ step2_chooseModel <- function(input, output, session,
   # Enable and disable buttons
   observeEvent({
     result$POData
-    input$tableProgOasisOOK_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    input$dt_models_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonmodeldetails")
       disable("abuttonpgotonextstep")
-      if (length(input$tableProgOasisOOK_rows_selected) > 0) {
+      if (length(input$dt_models_rows_selected) > 0) {
         enable("abuttonmodeldetails")
-        currStatus <- result$POData[input$tableProgOasisOOK_rows_selected, POData.Status]
+        currStatus <- result$POData[input$dt_models_rows_selected, POData.Status]
         if (!is.na(currStatus) && currStatus == StatusCompleted) {
           enable("abuttonpgotonextstep")
         }
@@ -422,10 +422,10 @@ step2_chooseModel <- function(input, output, session,
         .reloadPOData()
         idxSel <- match(prgId, result$POData[, POData.ProgOasisId])
         pageSel <- ceiling(idxSel/pageLength)
-        selectRows(dataTableProxy("tableProgOasisOOK"), idxSel)
-        selectPage(dataTableProxy("tableProgOasisOOK"), pageSel)
-        logMessage(paste("updating tableProgOasisOOK select because programme model table was reloaded"))
-        logMessage(paste("selected row is:", input$tableProgOasisOOK_rows_selected))
+        selectRows(dataTableProxy("dt_models"), idxSel)
+        selectPage(dataTableProxy("dt_models"), pageSel)
+        logMessage(paste("updating dt_models select because programme model table was reloaded"))
+        logMessage(paste("selected row is:", input$dt_models_rows_selected))
       }
     } else {
       flamingoNotification(type = "error", "Please select a completed Programme first")
@@ -438,7 +438,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
   # Refresh Buttons ------------------------------------------------------------
-  onclick("abuttonookrefresh", {
+  onclick("abuttonmodelrefresh", {
     .reloadPOData()
   } )
 
@@ -446,23 +446,23 @@ step2_chooseModel <- function(input, output, session,
     .reloadProgFiles()
   } )
 
-  # Updates dependent on changed: tableProgOasisOOK_rows_selected --------------
+  # Updates dependent on changed: dt_models_rows_selected --------------
   # Output configuration: manage what to show based on  status of row selected in programme Model table
-  observeEvent(input$tableProgOasisOOK_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       #.reloadProgFiles()
       hide("panelModelDetails")
       hide("panelDefineProgramme")
 
       # Show perils according to programme model
-      if (length(input$tableProgOasisOOK_rows_selected) > 0 ) {
-        prgId <- result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId]
+      if (length(input$dt_models_rows_selected) > 0 ) {
+        prgId <- result$POData[input$dt_models_rows_selected, POData.ProgOasisId]
         procId <- toString(prgId)
 
         logMessage(paste("updating modelID because selection in programme model table changed to",  prgId))
         result$modelID <- prgId
 
-        if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {
+        if (result$POData[input$dt_models_rows_selected, POData.Status] == StatusCompleted) {
           paramlist <- executeDbQuery(dbSettings,
                                       buildDbQuery("getRuntimeParamList", procId))
           hide("perilwind")
@@ -491,7 +491,7 @@ step2_chooseModel <- function(input, output, session,
   .hideDivs <- function() {
     logMessage(".hideDivs called")
     #Section "Choose Model" = "2"
-    hide("panelProgrammeModelTable")
+    hide("panelModelTable")
     hide("panelModelDetails")
     hide("panelAssociateModel")
   }
@@ -499,7 +499,7 @@ step2_chooseModel <- function(input, output, session,
   #show default view for Section "Choose Model" = "2"
   .defaultAssociateModel <- function(){
     logMessage(".defaultAssociateModel called")
-    show("panelProgrammeModelTable")
+    show("panelModelTable")
     hide("panelAssociateModel")
   }
 
@@ -524,8 +524,8 @@ step2_chooseModel <- function(input, output, session,
   # Reload Programme Model Details table
   .reloadProgFiles <- function() {
     logMessage(".reloadProgFiles called")
-    if (length(input$tableProgOasisOOK_rows_selected) > 0) {
-      prgId <- result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId]
+    if (length(input$dt_models_rows_selected) > 0) {
+      prgId <- result$POData[input$dt_models_rows_selected, POData.ProgOasisId]
       stmt <- buildDbQuery("getProgOasisFileDetails", prgId)
       progFiles <- executeDbQuery(dbSettings, stmt)
       if (!is.null(progFiles)) {
@@ -584,11 +584,11 @@ step2_chooseModel <- function(input, output, session,
   # Model Outout ---------------------------------------------------------------
 
   progOasisStatus <- reactive({
-    if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {
+    if (result$POData[input$dt_models_rows_selected, POData.Status] == StatusCompleted) {
       progOasisStatus <- "- Status: Completed"
-    } else if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusProcessing) {
+    } else if (result$POData[input$dt_models_rows_selected, POData.Status] == StatusProcessing) {
       progOasisStatus <- "- Status: in Progress"
-    } else if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusFailed) {
+    } else if (result$POData[input$dt_models_rows_selected, POData.Status] == StatusFailed) {
       progOasisStatus <- "- Status: Failed"
     }
     progOasisStatus
