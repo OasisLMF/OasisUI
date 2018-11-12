@@ -1,11 +1,11 @@
-# step1_chooseProgramme Module -------------------------------------------------
+# step1_choosePortfolio Module -------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' step1_chooseProgrammeUI
+#' step1_choosePortfolioUI
 #'
-#' @rdname step1_chooseProgramme
+#' @rdname step1_choosePortfolio
 #'
-#' @description UI/View for the step1_chooseProgramme.
+#' @description UI/View for the step1_choosePortfolio.
 #'
 #' @template params-module-ui
 #'
@@ -14,7 +14,7 @@
 #' @importFrom shinyjs hidden
 #'
 #' @export
-step1_chooseProgrammeUI <- function(id) {
+step1_choosePortfolioUI <- function(id) {
   ns <- NS(id)
   tagList(
     # Section "Choose Programme" = "1"
@@ -211,11 +211,11 @@ panelLinkFiles <- function(id) {
 }
 
 # Server -----------------------------------------------------------------------
-#' step1_chooseProgramme
+#' step1_choosePortfolio
 #'
-#' @rdname step1_chooseProgramme
+#' @rdname step1_choosePortfolio
 #'
-#' @description Server logic to step1_chooseProgramme.
+#' @description Server logic to step1_choosePortfolio
 #'
 #' @template return-outputNavigation
 #' @template params-module
@@ -242,7 +242,7 @@ panelLinkFiles <- function(id) {
 #' @importFrom dplyr select
 #'
 #' @export
-step1_chooseProgramme <- function(input, output, session,
+step1_choosePortfolio <- function(input, output, session,
                                   dbSettings,apiSettings, user,
                                   active = reactive(TRUE),
                                   logMessage = message,

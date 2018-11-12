@@ -103,9 +103,9 @@ singleAna <- function(input, output, session, dbSettings,
   })
 
   # Sub-Modules ----------------------------------------------------------------
-  submodulesList$step1_chooseProgramme <- callModule(
-    step1_chooseProgramme,
-    id = "step1_chooseProgramme",
+  submodulesList$step1_choosePortfolio <- callModule(
+    step1_choosePortfolio,
+    id = "step1_choosePortfolio",
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     user = user,
@@ -152,7 +152,7 @@ singleAna <- function(input, output, session, dbSettings,
     }
   })
 
-  observeEvent(submodulesList$step1_chooseProgramme$newstep(), ignoreInit = TRUE, {
+  observeEvent(submodulesList$step1_choosePortfolio$newstep(), ignoreInit = TRUE, {
     workflowSteps$update(analysisWorkflowSteps[[2]])
   })
 
@@ -166,11 +166,11 @@ singleAna <- function(input, output, session, dbSettings,
   })
 
   # > selectprogrammeID --------------------------------------------------------
-  observeEvent(submodulesList$step1_chooseProgramme$selectprogrammeID(), ignoreInit = TRUE, {
-    prgId <- submodulesList$step1_chooseProgramme$selectprogrammeID()
+  observeEvent(submodulesList$step1_choosePortfolio$selectprogrammeID(), ignoreInit = TRUE, {
+    prgId <- submodulesList$step1_choosePortfolio$selectprogrammeID()
     #Avoid updating input if not necessary
     if (!is.na(prgId) &&  result$selectprogrammeID != prgId) {
-      logMessage(paste0("updating result$selectprogrammeID because submodulesList$step1_chooseProgramme$selectprogrammeID() changed to: ", prgId ))
+      logMessage(paste0("updating result$selectprogrammeID because submodulesList$step1_choosePortfolio$selectprogrammeID() changed to: ", prgId ))
       result$selectprogrammeID <- prgId
     }
   })
@@ -198,13 +198,13 @@ singleAna <- function(input, output, session, dbSettings,
   })
 
   # > prog Table reactives -----------------------------------------------------
-  observeEvent(submodulesList$step1_chooseProgramme$DPProgData(), ignoreInit = TRUE,{
-    if (is.null(submodulesList$step1_chooseProgramme$DPProgData()) || nrow(submodulesList$step1_chooseProgramme$DPProgData()) == 0) {
+  observeEvent(submodulesList$step1_choosePortfolio$DPProgData(), ignoreInit = TRUE,{
+    if (is.null(submodulesList$step1_choosePortfolio$DPProgData()) || nrow(submodulesList$step1_choosePortfolio$DPProgData()) == 0) {
       stmt <- buildDbQuery("getProgData")
       result$DPProgData <- executeDbQuery(dbSettings, stmt) %>%
         replaceWithIcons()
     } else {
-      result$DPProgData <- submodulesList$step1_chooseProgramme$DPProgData()
+      result$DPProgData <- submodulesList$step1_choosePortfolio$DPProgData()
     }
     result$progChoices <- result$DPProgData[, DPProgData.ProgrammeID]
   })

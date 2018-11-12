@@ -20,7 +20,7 @@ ns <- NS(id)
 tagList(
   singleAnaWorkflowStepsUI(ns("workflowsteps")),
   hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
-  step1_chooseProgrammeUI(ns("step1_chooseProgramme")),
+  step1_choosePortfolioUI(ns("step1_choosePortfolio")),
   step2_chooseModelUI(ns("step2_chooseModel")),
   step3_configureOutputUI(ns("step3_configureOutput"))
 )
