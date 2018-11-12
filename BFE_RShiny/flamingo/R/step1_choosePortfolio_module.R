@@ -17,19 +17,19 @@
 step1_choosePortfolioUI <- function(id) {
   ns <- NS(id)
   tagList(
-    # Section "Choose Programme" = "1"
-    div(id = ns("panelProgrammeTable"), panelProgrammeTable(id)),
-    hidden(div(id = ns("panelProgrammeDetails"), panelProgrammeDetails(id))),
-    hidden(div(id = ns("panelDefineProgramme"), panelDefineProgramme(id))),
+    # Section "Choose Portfolio" = "1"
+    div(id = ns("panelPortfolioTable"), panelPortfolioTable(id)),
+    hidden(div(id = ns("panelPortfolioDetails"), panelPortfolioDetails(id))),
+    hidden(div(id = ns("panelDefinePortfolio"), panelDefinePortfolio(id))),
     hidden(div(id = ns("panelLinkFiles"), panelLinkFiles(id)))
   )
 }
 
-#' panelProgrammeTable
+#' panelPortfolioTable
 #'
-#' @rdname panelProgrammeTable
+#' @rdname panelPortfolioTable
 #'
-#' @description Function wrapping panel to show created programmes table.
+#' @description Function wrapping panel to show created portfolios table.
 #'
 #' @template params-module-ui
 #'
@@ -37,77 +37,77 @@ step1_choosePortfolioUI <- function(id) {
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
-panelProgrammeTable <- function(id) {
+panelPortfolioTable <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = TRUE,
     show = TRUE,
-    ns("progtbl"),
+    ns("panel_portfolios"),
     heading = tagAppendChildren(
-      h4("Programme Table"),
+      h4("Portfolios Table"),
       actionButton(inputId = ns("abuttonprgtblrfsh"), label = "Refresh", style = "float: right;")
     ),
-    DTOutput(ns("tableDPprog")),
-    flamingoButton(ns("abuttoncreatepr"), "Create Programme", align = "centre"),
-    flamingoButton(ns("abuttonamendpr"), "Amend Programme", align = "centre") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonamendpr, placement = "right"),
-    flamingoButton(ns("abuttondeletepr"), "Delete Programme", align = "centre") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttondeletepr, placement = "right"),
-    flamingoButton(ns("abuttonprogdetails"), "Show Details", align = "centre") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonprogdetails, placement = "right"),
+    DTOutput(ns("dt_Portfolios")),
+    flamingoButton(ns("abuttoncreatepf"), "Create Portfolio", align = "centre"),
+    flamingoButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
+      bs_embed_tooltip(title = defineSingleAna$abuttonamendpf, placement = "right"),
+    flamingoButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
+      bs_embed_tooltip(title = defineSingleAna$abuttondeletepf, placement = "right"),
+    flamingoButton(ns("abuttonpfdetails"), "Show Details", align = "centre") %>%
+      bs_embed_tooltip(title = defineSingleAna$abuttonpfdetails, placement = "right"),
     actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Model", style = "float:right")
   )
 }
 
-#' panelProgrammeDetails
+#' panelPortfolioDetails
 #'
-#' @rdname panelProgrammeDetails
+#' @rdname panelPortfolioDetails
 #'
-#' @description Function wrapping panel to show details of programme.
+#' @description Function wrapping panel to show details of portfolio.
 #'
 #' @template params-module-ui
 #'
 #' @importFrom DT DTOutput
 #'
 #' @export
-panelProgrammeDetails <- function(id) {
+panelPortfolioDetails <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("progdtl"),
+    ns("panel_portfolio_details"),
     heading = tagAppendChildren(
-      h4("Details of Programme"),
-      uiOutput(ns("paneltitleProgrammeDetails"), inline = TRUE),
-      actionButton(inputId = ns("abuttondefprogrfsh"), label = "Refresh", style = "float: right;"),
-      actionButton(inputId = ns("buttonhideprogdetails"), label = NULL, icon = icon("times"), style = "float: right;")
+      h4("Details of Portfolio"),
+      uiOutput(ns("paneltitle_pfDetails"), inline = TRUE),
+      actionButton(inputId = ns("abuttondefpfrfsh"), label = "Refresh", style = "float: right;"),
+      actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("tableprogdetails"))
+    DTOutput(ns("dt_portfolioDetails"))
   )
 }
 
-#' panelDefineProgramme
+#' panelDefinePortfolio
 #'
-#' @rdname panelDefineProgramme
+#' @rdname panelDefinePortfolio
 #'
-#' @description Function wrapping panel to create/amend programme.
+#' @description Function wrapping panel to create/amend portfolio.
 #' 
 #' @template params-module-ui
 #'
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
-panelDefineProgramme <- function(id) {
+panelDefinePortfolio <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("progdef"),
+    ns("panel_pfdef"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitleDefineProgramme"), inline = TRUE),
-      actionButton(inputId = ns("abuttonhidedefineprogpanel"), label = NULL, icon = icon("times"), style = "float: right;")
+      uiOutput(ns("paneltitle_defPortfolio"), inline = TRUE),
+      actionButton(inputId = ns("abuttonhidedefpfpanel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     fluidRow(
-      column(12, h4("Programme metadata"))),
+      column(12, h4("Portfolio metadata"))),
     fluidRow(
       column(4,
              selectizeInput(ns("sinputDPAccountName"), "Account Name", choices = c(""), selected = character(0),
@@ -117,19 +117,20 @@ panelDefineProgramme <- function(id) {
                               onInitialize = I('function() { this.setValue(""); }'))
              )),
       column(4,
-             textInput(inputId = ns("tinputDPProgName"), label = "Programme Name")),
-      column(4,
-             selectizeInput(ns("sinputTransformname"), "Transform Name", choices = c(""), selected = character(0),
-                            options = list(
-                              allowEmptyOption = TRUE,
-                              placeholder = 'Select',
-                              onInitialize = I('function() { this.setValue(""); }'))
-             ) %>%
-               bs_embed_tooltip(title = defineSingleAna$sinputTransformname,
-                                placement = "right"))),
+             textInput(inputId = ns("tinputpfName"), label = "Portfolio Name")) #,
+      # column(4,
+      #        selectizeInput(ns("sinputTransformname"), "Transform Name", choices = c(""), selected = character(0),
+      #                       options = list(
+      #                         allowEmptyOption = TRUE,
+      #                         placeholder = 'Select',
+      #                         onInitialize = I('function() { this.setValue(""); }'))
+      #        ) %>%
+      #          bs_embed_tooltip(title = defineSingleAna$sinputTransformname,
+      #                           placement = "right"))
+      ),
     fluidRow(column(4,
-                    flamingoButton(ns("abuttonProgSubmit"), "Submit")), style = "float:right") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonProgSubmit, placement = "right")
+                    flamingoButton(ns("abuttonpfsubmit"), "Submit")), style = "float:right") %>%
+      bs_embed_tooltip(title = defineSingleAna$abuttonpfsubmit, placement = "right")
   )
 }
 
@@ -138,7 +139,7 @@ panelDefineProgramme <- function(id) {
 #'
 #' @rdname panelLinkFiles
 #'
-#' @description Function wrapping panel to link files to a programme.
+#' @description Function wrapping panel to link files to a portfolio
 #' 
 #' @template params-module-ui
 #'
@@ -152,12 +153,12 @@ panelLinkFiles <- function(id) {
     ns("proglink"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitleLinkFiles"), inline = TRUE),
+      uiOutput(ns("paneltitle_linkFiles"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelinkfilespanel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
 
     fluidRow(
-      column(12, h4("Link input files to programme"))),
+      column(12, h4("Link input files to portfolio"))),
     fluidRow(
       # Source Location File
       column(4,
@@ -180,7 +181,7 @@ panelLinkFiles <- function(id) {
                         flamingoButton(inputId = ns("abuttonSAFileLink"), label = "Link", align = "left"),
                         flamingoButton(inputId = ns("abuttonSAFileView"), label = "View", align = "left"))))),
     fluidRow(
-      column(12, h4("Link reinsurance input files to programme"))),
+      column(12, h4("Link reinsurance input files to portfolio"))),
     fluidRow(
       ## Source Reinsurance File
       column(4,
@@ -205,8 +206,9 @@ panelLinkFiles <- function(id) {
     ),
     fluidRow(
       column(12,
-             actionButton(inputId = ns("abuttonProgCancel"), label = "Clear", style = "inline: true;float:right;"),
-             flamingoButton(inputId = ns("abuttonloadcanmodpr"), label = "Load Programme", style = "inline: true;float:right;margin-right: 10px;")))
+             actionButton(inputId = ns("abuttonpfclear"), label = "Clear", style = "inline: true;float:right;") #,
+             # flamingoButton(inputId = ns("abuttonloadcanmodpr"), label = "Load Portfolio", style = "inline: true;float:right;margin-right: 10px;")
+             ))
   )
 }
 
@@ -222,10 +224,10 @@ panelLinkFiles <- function(id) {
 #' @template params-flamingo-module
 #'
 #' @param currstep current selected step.
-#' @param selectprogrammeID selected programme ID.
+#' @param portfolioID selected portfolio ID.
 #'
-#' @return selectprogrammeID Id of selected programmeID
-#' @return DPProgData POData model association table.
+#' @return portfolioID Id of selected portfolioID
+#' @return tbl_portfoliosData POData model association table.
 #' @return newstep navigation step
 
 #' @importFrom shinyjs show
@@ -247,7 +249,7 @@ step1_choosePortfolio <- function(input, output, session,
                                   active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
-                                  selectprogrammeID = reactive("")
+                                  portfolioID = reactive("")
 
 ) {
 
@@ -259,27 +261,27 @@ step1_choosePortfolio <- function(input, output, session,
   pageLength <- 5
 
   #values to stop ping pong effect
-  stop_selProgID <- check_selProgID <- 0
+  stop_selPfID <- check_selPfID <- 0
 
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
-    # reactive for selectprogrammeID
-    selectprogrammeID = "",
-    # reactive value for the programme table
-    DPProgData = NULL,
+    # reactive for portfolioID
+    portfolioID = "",
+    # reactive value for the portfolio table
+    tbl_portfoliosData = NULL,
     # SL file to view
     viewSLfile = NULL,
     # SA file to view
     viewSAfile = NULL,
-    # reactive value for details of programme table
-    progDetails = NULL,
-    # flag to know if the user is creating or amending a programme
-    prog_flag = "C"
+    # reactive value for details of portfolio table
+    portfolioDetails = NULL,
+    # flag to know if the user is creating or amending a portfolio
+    portfolio_flag = "C"
   )
 
   #Set Params
   observe( if (active()) {
-    result$selectprogrammeID <- isolate(selectprogrammeID())
+    result$portfolioID <- isolate(portfolioID())
   })
 
   # Panels Visualization -------------------------------------------------------
@@ -287,21 +289,21 @@ step1_choosePortfolio <- function(input, output, session,
     .hideDivs()
     if (currstep() == 1 ){
       .defaultCreateProg()
-      .reloadDPProgData()
+      .reloadtbl_portfoliosData()
     }
   })
 
-  ### Programme Table ----------------------------------------------------------
-  output$tableDPprog <- renderDT({
-    logMessage("re-rendering programme table")
-    if (!is.null(result$DPProgData)) {
-      if (isolate(result$selectprogrammeID) != "") {
-        rowToSelect <- match(isolate(result$selectprogrammeID), result$DPProgData[, DPProgData.ProgrammeID])
+  ### Portfolio Table ----------------------------------------------------------
+  output$dt_Portfolios <- renderDT({
+    logMessage("re-rendering portfolio table")
+    if (!is.null(result$tbl_portfoliosData)) {
+      if (isolate(result$portfolioID) != "") {
+        rowToSelect <- match(isolate(result$portfolioID), result$tbl_portfoliosData[, tbl_portfoliosData.ProgrammeID])
       } else {
         rowToSelect <- 1
       }
       datatable(
-        result$DPProgData %>% select(-c(DPProgData.TranformID, DPProgData.AccountID)),
+        result$tbl_portfoliosData %>% select(-c(tbl_portfoliosData.TranformID, tbl_portfoliosData.AccountID)),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -313,16 +315,16 @@ step1_choosePortfolio <- function(input, output, session,
         options = .getPRTableOptions()
       )
     } else {
-      .nothingToShowTable(contentMessage = "No Programme Available")
+      .nothingToShowTable(contentMessage = "No portfolio available")
     }
   })
 
-  # Programme Details Table ----------------------------------------------------
-  output$tableprogdetails <- renderDT({
-    if (!is.null(result$progDetails) && nrow(result$progDetails) > 0) {
-      logMessage("re-rendering programme details table")
+  # Portfolio Details Table ----------------------------------------------------
+  output$dt_portfolioDetails <- renderDT({
+    if (!is.null(result$portfolioDetails) && nrow(result$portfolioDetails) > 0) {
+      logMessage("re-rendering portfolio details table")
       datatable(
-        result$progDetails,
+        result$portfolioDetails,
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -332,175 +334,175 @@ step1_choosePortfolio <- function(input, output, session,
         options = .getPRTableOptions()
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("No files available for Programme ID ", result$selectprogrammeID))
+      .nothingToShowTable(contentMessage = paste0("No files available for portfolio ID ", result$portfolioID))
     }
   })
 
-  # Title Programme Details Panel
-  output$paneltitleProgrammeDetails <- renderUI({
-    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
-    progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
-    paste0('Details of Programme id ', progId, ' ', progName)
+  # Title Portfolio Details Panel
+  output$paneltitle_pfDetails <- renderUI({
+    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
+    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName]
+    pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
+    paste0('Details of Portfolio id ', pfId, ' ', pfName)
   })
 
   # Enable and disable buttons
   observeEvent({
-    result$DPProgData
-    input$tableDPprog_rows_selected
+    result$tbl_portfoliosData
+    input$dt_Portfolios_rows_selected
     }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      disable("abuttonprogdetails")
-      disable("abuttondeletepr")
-      disable("abuttonamendpr")
+      disable("abuttonpfdetails")
+      disable("abuttondeletepf")
+      disable("abuttonamendpf")
       disable("abuttonpgotonextstep")
-    if (length(input$tableDPprog_rows_selected) > 0) {
-      enable("abuttonprogdetails")
-      enable("abuttondeletepr")
-      enable("abuttonamendpr")
-      if (result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status] == StatusCompleted) {
+    if (length(input$dt_Portfolios_rows_selected) > 0) {
+      enable("abuttonpfdetails")
+      enable("abuttondeletepf")
+      enable("abuttonamendpf")
+      if (result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status] == StatusCompleted) {
         enable("abuttonpgotonextstep")
       }
     }
   })
 
-  # Show Programme Details
-  onclick("abuttonprogdetails", {
-    hide("panelDefineProgramme")
+  # Show Portfolio Details
+  onclick("abuttonpfdetails", {
+    hide("panelDefinePortfolio")
     hide("panelLinkFiles")
-    show("panelProgrammeDetails")
-    logMessage("showing panelProgrammeDetails")
-    .reloadProgDetails()
+    show("panelPortfolioDetails")
+    logMessage("showing panelPortfolioDetails")
+    .reloadportfolioDetails()
   })
 
-  # Hide Programme Details
-  onclick("buttonhideprogdetails", {
-    hide("panelProgrammeDetails")
-    logMessage("hiding panelProgrammeDetails")
+  # Hide portfolio Details
+  onclick("buttonhidepfdetails", {
+    hide("panelPortfolioDetails")
+    logMessage("hiding panelPortfolioDetails")
   })
 
-  # Create / Amend Programme sub-panel -----------------------------------------
-  # Create/Amend programme title
-  output$paneltitleDefineProgramme <- renderUI({
-    if (result$prog_flag == "C" || is.null(input$tableDPprog_rows_selected)) {
-      "Create Programme"
-    } else if (result$prog_flag == "A") {
-      progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-      progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
-      progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
-      paste0('Amend Programme id ', progId, ' ', progName)
+  # Create / Amend portfolio sub-panel -----------------------------------------
+  # Create/Amend portfolio title
+  output$paneltitle_defPortfolio <- renderUI({
+    if (result$portfolio_flag == "C" || is.null(input$dt_Portfolios_rows_selected)) {
+      "Create Portfolio"
+    } else if (result$portfolio_flag == "A") {
+      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
+      pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName]
+      pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
+      paste0('Amend Portfolio id ', pfId, ' ', pfName)
     }
   })
 
-  # Hide Programme Definition Panel
-  onclick("abuttonhidedefineprogpanel", {
-    hide("panelDefineProgramme")
+  # Hide portfolio Definition Panel
+  onclick("abuttonhidedefpfpanel", {
+    hide("panelDefinePortfolio")
   })
 
-  # Create Programme
-  onclick("abuttoncreatepr", {
-    hide("panelProgrammeDetails")
+  # Create portfolio
+  onclick("abuttoncreatepf", {
+    hide("panelPortfolioDetails")
     hide("panelLinkFiles")
-    result$prog_flag <- "C"
+    result$portfolio_flag <- "C"
     #clear fields
     .clearDPAccountSelection()
     .clearProgrammeName()
     .clearSourceFilesSelection()
-    .clearTransformNameSelection()
-    show("panelDefineProgramme")
-    logMessage("showing panelDefineProgramme")
+    # .clearTransformNameSelection()
+    show("panelDefinePortfolio")
+    logMessage("showing panelDefinePortfolio")
   })
 
-  ### Amend Programme
-  onclick("abuttonamendpr", {
-    hide("panelProgrammeDetails")
+  ### Amend portfolio
+  onclick("abuttonamendpf", {
+    hide("panelPortfolioDetails")
     .defaultCreateProg()
-    if (length(input$tableDPprog_rows_selected) > 0) {
+    if (length(input$dt_Portfolios_rows_selected) > 0) {
       # TODO: review where/when/how this should be set
-      result$prog_flag <- "A"
+      result$portfolio_flag <- "A"
       #clear fields
       .updateDPAccountSelection()
       .updateProgrammeName()
       .clearSourceFilesSelection()
-      .updateTransformNameSelection()
-      show("panelDefineProgramme")
+      # .updateTransformNameSelection()
+      show("panelDefinePortfolio")
       show("panelLinkFiles")
-      logMessage("showing panelDefineProgramme")
+      logMessage("showing panelDefinePortfolio")
     }
   })
 
-  # to enable and disable submit button for create programme
+  # to enable and disable submit button for create portfolio
   observeEvent({
-    input$tinputDPProgName
+    input$tinputpfName
     input$sinputDPAccountName
-    input$sinputTransformname
+    # input$sinputTransformname
   }, ignoreInit = TRUE, {
-    if (input$tinputDPProgName == "" || input$sinputDPAccountName == "" || input$sinputTransformname == "") {
-      disable("abuttonProgSubmit")
+    if (input$tinputpfName == "" || input$sinputDPAccountName == "" ) { # || input$sinputTransformname == ""
+      disable("abuttonpfsubmit")
     } else {
-      enable("abuttonProgSubmit")
+      enable("abuttonpfsubmit")
     }
   })
 
   ### Submit Button
-  onclick("abuttonProgSubmit", {
+  onclick("abuttonpfsubmit", {
     idxSel <- 1
     pageSel <- 1
-    if (result$prog_flag == "C") {
-      query <- paste0("exec dbo.createProg [", input$tinputDPProgName,
-                      "],", input$sinputDPAccountName, ", [",
-                      input$sinputTransformname, "]")
+    if (result$portfolio_flag == "C") {
+      # query <- paste0("exec dbo.createProg [", input$tinputpfName,
+      #                 "],", input$sinputDPAccountName, ", [",
+      #                 input$sinputTransformname, "]")
       res <- executeDbQuery(dbSettings, query)
       if (is.null(res)) {
 
       } else {
         flamingoNotification(type = "message",
-                             paste("Programme ", input$tinputDPProgName, " created."))
+                             paste("portfolio ", input$tinputpfName, " created."))
       }
-    } else if (result$prog_flag == "A") { # && length(input$tableDPprog_rows_selected) > 0
-      idxSel <- input$tableDPprog_rows_selected
-      pageSel <- ceiling(input$tableDPprog_rows_selected/pageLength)
-      query <- paste0("exec dbo.updateProg ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID],
-                      ",[", input$tinputDPProgName,"],", input$sinputDPAccountName,
-                      ", [", input$sinputTransformname, "]")
+    } else if (result$portfolio_flag == "A") { # && length(input$dt_Portfolios_rows_selected) > 0
+      idxSel <- input$dt_Portfolios_rows_selected
+      pageSel <- ceiling(input$dt_Portfolios_rows_selected/pageLength)
+      # query <- paste0("exec dbo.updateProg ", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID],
+      #                 ",[", input$tinputpfName,"],", input$sinputDPAccountName,
+      #                 ", [", input$sinputTransformname, "]")
       res <- executeDbQuery(dbSettings, query)
       message(paste("A res is:", res))
       if (is.null(res)) {
         flamingoNotification(type = "error",
-                             paste("Failed to amend a Programme - ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+                             paste("Failed to amend a portfolio - ", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName]))
       } else {
         flamingoNotification(type = "message",
-                             paste("Programme ", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName], " amended."))
+                             paste("Portfolio ", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName], " amended."))
       }
     }
 
-    # Reload Programme Table
-    .reloadDPProgData()
-    logMessage(paste("updating tableDPprog select because programme table was reloaded"))
-    result$selectprogrammeID <- result$DPProgData[1, DPProgData.ProgrammeID]
-    hide("panelDefineProgramme")
+    # Reload portfolio Table
+    .reloadtbl_portfoliosData()
+    logMessage(paste("updating dt_Portfolios select because portfolio table was reloaded"))
+    result$portfolioID <- result$tbl_portfoliosData[1, tbl_portfoliosData.ProgrammeID]
+    hide("panelDefinePortfolio")
     show("panelLinkFiles")
   })
 
-  ### Clear Programme Definition panel
-  onclick("abuttonProgCancel", {
-    result$prog_flag <- "C"
+  ### Clear portfolio Definition panel
+  onclick("abuttonpfclear", {
+    result$portfolio_flag <- "C"
     .clearDPAccountSelection()
     .clearProgrammeName()
     .clearSourceFilesSelection()
-    .clearTransformNameSelection()
+    # .clearTransformNameSelection()
   })
 
-  # > Link files to Programme --------------------------------------------------
+  # > Link files to portfolio --------------------------------------------------
 
-  # Link files to programme title
-  output$paneltitleLinkFiles <- renderUI({
-    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
-    progName <- ifelse(progName == " ", "", paste0('"', progName, '"'))
-    if (result$prog_flag == "C") {
-      paste0('Provide Inputs to Programme id ', progId, ' ', progName)
+  # Link files to portfolio title
+  output$paneltitle_linkFiles <- renderUI({
+    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
+    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName]
+    pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
+    if (result$portfolio_flag == "C") {
+      paste0('Provide Inputs to portfolio id ', pfId, ' ', pfName)
     } else {
-      paste0('Amend Inputs to Programme id ', progId, ' ', progName)
+      paste0('Amend Inputs to portfolio id ', pfId, ' ', pfName)
     }
 
   })
@@ -510,27 +512,27 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelLinkFiles")
   })
 
-  ### Load Programme Button
-  onclick("abuttonloadcanmodpr", {
-    progId = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-    logMessage(paste("loading programme - progId is:", progId))
-    loadprogdata <- loadProgrammeData(apiSettings,
-                                      progId = toString(progId))
-    if (loadprogdata == 'success' || loadprogdata == 'Success') {
-      flamingoNotification(type = "message", "Initiating load programme data...")
-    } else {
-      flamingoNotification(type = "error", "Failed to load programme data")
-    }
-    .reloadDPProgData()
-    .hideDivs()
-    .defaultCreateProg()
-  })
+  # ### Load portfolio Button
+  # onclick("abuttonloadcanmodpr", {
+  #   pfId = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
+  #   logMessage(paste("loading programme - pfId is:", pfId))
+  #   loadprogdata <- loadProgrammeData(apiSettings,
+  #                                     pfId = toString(pfId))
+  #   if (loadprogdata == 'success' || loadprogdata == 'Success') {
+  #     flamingoNotification(type = "message", "Initiating load portfolio data...")
+  #   } else {
+  #     flamingoNotification(type = "error", "Failed to load portfolio data")
+  #   }
+  #   .reloadtbl_portfoliosData()
+  #   .hideDivs()
+  #   .defaultCreateProg()
+  # })
 
   # title for delete button
   output$progdelmodal <- renderUI({
-    progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
-    progName <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]
-    paste0('Delete Programme id ', progId, ' "', progName,'"')
+    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
+    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName]
+    paste0('Delete portfolio id ', pfId, ' "', pfName,'"')
     })
 
   # Modal dialog of delete button
@@ -542,7 +544,7 @@ step1_choosePortfolio <- function(input, output, session,
                 footer = tagList(
                   flamingoButton(ns("abuttonuconfirmdel"),
                                  label = "Confirm", align = "center"),
-                  actionButton(ns("abuttonucanceldel"),
+                  actionButton(ns("abuttoncanceldel"),
                                label = "Cancel", align = "right")
                 ),
                 size = "m",
@@ -550,26 +552,26 @@ step1_choosePortfolio <- function(input, output, session,
     )
   }
 
-  # Delete Programme
-  onclick("abuttondeletepr",{
+  # Delete portfolio
+  onclick("abuttondeletepf",{
     showModal(.progdelmodal())
   })
 
   # onclick of confirm delete button
   onclick("abuttonuconfirmdel",{
-    hide("panelProgrammeDetails")
-    hide("panelDefineProgramme")
+    hide("panelPortfolioDetails")
+    hide("panelDefinePortfolio")
     hide("panelLinkFiles")
-    stmt <- buildDbQuery("deleteProg", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID])
+    stmt <- buildDbQuery("deleteProg", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID])
     executeDbQuery(dbSettings, stmt)
     flamingoNotification(type = "message",
-                         sprintf("Programme %s deleted", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
-    .reloadDPProgData()
+                         sprintf("portfolio %s deleted", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName]))
+    .reloadtbl_portfoliosData()
     removeModal()
   })
 
   # onclick of cancel delete button
-  onclick("abuttonucanceldel", {
+  onclick("abuttoncanceldel", {
     removeModal()
   })
 
@@ -580,16 +582,16 @@ step1_choosePortfolio <- function(input, output, session,
     flc <- getFileLocationPath(dbSettings, "Exposure File")
     flcopy <- file.copy(inFile$datapath, file.path(flc, inFile[1, 1]), overwrite = TRUE)
     logMessage(file.path(flc, inFile[1, 1]))
-    if (length(input$tableDPprog_rows_selected) > 0) {
+    if (length(input$dt_Portfolios_rows_selected) > 0) {
       if (flcopy == TRUE) {
         recordId <- createFileRecord(
           dbSettings, inFile[1, 1], recordIdString, recordIdCode, flc, user(),
-          "Prog", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+          "Prog", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
         )
         if (!is.null(recordId)) {
           flamingoNotification(type = "message",
                                paste("New File record id: ", recordId, " created"))
-          #.reloadProgDetails()
+          #.reloadportfolioDetails()
         } else {
           flamingoNotification(type = "error", "Could not create file record")
         }
@@ -617,17 +619,17 @@ step1_choosePortfolio <- function(input, output, session,
 
   ### Link Location/Account File
   .linkSourceFile <- function(query, inputID) {
-    if (length(input$tableDPprog_rows_selected) > 0) {
+    if (length(input$dt_Portfolios_rows_selected) > 0) {
       res <- executeDbQuery(dbSettings,
                             paste(query,
                                   inputID, ", ",
-                                  result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]))
+                                  result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]))
       if (inputID != "") {
         if (is.null(res)) {
           flamingoNotification(type = "error", "Failed to link the File")
         } else {
           flamingoNotification(type = "message",
-                               paste("File linked to Programme", result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName]))
+                               paste("File linked to portfolio", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName]))
         }
       } else {
         flamingoNotification(type = "warning", "Please select a file to Link")
@@ -820,94 +822,94 @@ step1_choosePortfolio <- function(input, output, session,
 
   output$tableviewSRSfile <-  .renderDTSourceFile(SourceFile = result$viewSRSfile)
 
-  # Define selectprogrammeID ---------------------------------------------------
-  # Add choices to selectprogrammeID, update selectprogrammeID
-  observeEvent(result$DPProgData, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  # Define portfolioID ---------------------------------------------------
+  # Add choices to portfolioID, update portfolioID
+  observeEvent(result$tbl_portfoliosData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
-      logMessage(paste0("updating selectprogrammeID choices because programme table was reloaded - contains ", nrow(result$DPProgData), " rows"))
-      if (result$selectprogrammeID == "") {
-        # initial selection last programme created
-        prgId <- result$DPProgData[1, DPProgData.ProgrammeID]
+      logMessage(paste0("updating portfolioID choices because programme table was reloaded - contains ", nrow(result$tbl_portfoliosData), " rows"))
+      if (result$portfolioID == "") {
+        # initial selection last portfolio created
+        prgId <- result$tbl_portfoliosData[1, tbl_portfoliosData.ProgrammeID]
       } else {
         # keep current selection
-        prgId <- result$selectprogrammeID
+        prgId <- result$portfolioID
       }
-      result$selectprogrammeID <- prgId
+      result$portfolioID <- prgId
     }
   })
 
-  # If selectprogrammeID changes, reload programme model table and set view back to default
-  observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
+  # If portfolioID changes, reload programme model table and set view back to default
+  observeEvent(result$portfolioID, ignoreInit = TRUE, {
     if (active()) {
       prgId <- ""
-      if (!is.null(input$tableDPprog_rows_selected)) {
-        prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+      if (!is.null(input$dt_Portfolios_rows_selected)) {
+        prgId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
       }
-      if (result$selectprogrammeID != prgId) {
-        bl_dirty <- stop_selProgID > check_selProgID
-        logMessage(paste("--- stop_selProgID is:", stop_selProgID))
-        logMessage(paste("updating tableDPprog select because selectprogrammeID changed to", result$selectprogrammeID))
-        if (result$selectprogrammeID != "") {
-          if (!is.null(result$DPProgData) && nrow(result$DPProgData) > 0 && !bl_dirty ) {
-            rowToSelect <- match(result$selectprogrammeID, result$DPProgData[, DPProgData.ProgrammeID])
+      if (result$portfolioID != prgId) {
+        bl_dirty <- stop_selPfID > check_selPfID
+        logMessage(paste("--- stop_selPfID is:", stop_selPfID))
+        logMessage(paste("updating dt_Portfolios select because portfolioID changed to", result$portfolioID))
+        if (result$portfolioID != "") {
+          if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0 && !bl_dirty ) {
+            rowToSelect <- match(result$portfolioID, result$tbl_portfoliosData[, tbl_portfoliosData.ProgrammeID])
             pageSel <- ceiling(rowToSelect/pageLength)
             #backward propagation
-            if (is.null(input$tableDPprog_rows_selected)) {
-                selectRows(dataTableProxy("tableDPprog"), rowToSelect)
-                selectPage(dataTableProxy("tableDPprog"), pageSel)
-                logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
-            } else if (rowToSelect != input$tableDPprog_rows_selected) {
-              # re-selecting the same row would trigger event-observers on input$tableDPprog_rows_selected
-              selectRows(dataTableProxy("tableDPprog"), rowToSelect)
-              selectPage(dataTableProxy("tableDPprog"), pageSel)
-              logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+            if (is.null(input$dt_Portfolios_rows_selected)) {
+                selectRows(dataTableProxy("dt_Portfolios"), rowToSelect)
+                selectPage(dataTableProxy("dt_Portfolios"), pageSel)
+                logMessage(paste("selected row is:", input$dt_Portfolios_rows_selected))
+            } else if (rowToSelect != input$dt_Portfolios_rows_selected) {
+              # re-selecting the same row would trigger event-observers on input$dt_Portfolios_rows_selected
+              selectRows(dataTableProxy("dt_Portfolios"), rowToSelect)
+              selectPage(dataTableProxy("dt_Portfolios"), pageSel)
+              logMessage(paste("selected row is:", input$dt_Portfolios_rows_selected))
             }
           }
         } else {
-          selectRows(dataTableProxy("tableDPprog"), NULL)
-          selectPage(dataTableProxy("tableDPprog"), 1)
-          logMessage(paste("selected row is:", input$tableDPprog_rows_selected))
+          selectRows(dataTableProxy("dt_Portfolios"), NULL)
+          selectPage(dataTableProxy("dt_Portfolios"), 1)
+          logMessage(paste("selected row is:", input$dt_Portfolios_rows_selected))
         }
-        if (bl_dirty) check_selProgID <<- check_selProgID + 1
+        if (bl_dirty) check_selPfID <<- check_selPfID + 1
       }
     }
   })
 
   # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonprgtblrfsh", {
-    .reloadDPProgData()
+    .reloadtbl_portfoliosData()
   } )
 
-  onclick("abuttondefprogrfsh", {
-    .reloadProgDetails()
+  onclick("abuttondefpfrfsh", {
+    .reloadportfolioDetails()
   } )
 
-  # Updates dependent on changed: tableDPprog_rows_selected --------------------
-  observeEvent(input$tableDPprog_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  # Updates dependent on changed: dt_Portfolios_rows_selected --------------------
+  observeEvent(input$dt_Portfolios_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
-      logMessage(paste("input$tableDPprog_rows_selected is changed to:", input$tableDPprog_rows_selected))
-      hide("panelProgrammeDetails")
-      hide("panelDefineProgramme")
+      logMessage(paste("input$dt_Portfolios_rows_selected is changed to:", input$dt_Portfolios_rows_selected))
+      hide("panelPortfolioDetails")
+      hide("panelDefinePortfolio")
       hide("panelLinkFiles")
 
-      if (length(input$tableDPprog_rows_selected) > 0) {
-        # note that tableDPprog allows single row selection only
-        prgId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+      if (length(input$dt_Portfolios_rows_selected) > 0) {
+        # note that dt_Portfolios allows single row selection only
+        prgId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
         # #If incomplete show panel to link files
-        currStatus <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.Status]
+        currStatus <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status]
         if (!is.na(currStatus) && currStatus == StatusProcessing) {
           show("panelLinkFiles")
         }
-        if (prgId != result$selectprogrammeID) {
-          logMessage(paste("updating selectprogrammeID because selection in programme table changed to", prgId))
+        if (prgId != result$portfolioID) {
+          logMessage(paste("updating portfolioID because selection in portfolio table changed to", prgId))
           # re-selecting the same programme ID in the drop-down would not re-trigger
           # any of the observers of the drop-down, however we then also want to be
-          # sure not to increase stop_selProgID!
-          stop_selProgID <<- stop_selProgID + 1
-          result$selectprogrammeID <- prgId
+          # sure not to increase stop_selPfID!
+          stop_selPfID <<- stop_selPfID + 1
+          result$portfolioID <- prgId
         }
       } else {
-        result$selectprogrammeID <- ""
+        result$portfolioID <- ""
       }
     }
   })
@@ -916,49 +918,49 @@ step1_choosePortfolio <- function(input, output, session,
   # hide all panels
   .hideDivs <- function() {
     logMessage(".hideDivs called")
-    # Section "Choose Programme" = "1"
-    hide("panelProgrammeTable")
-    hide("panelProgrammeDetails")
-    hide("panelDefineProgramme")
+    # Section "Choose portfolio" = "1"
+    hide("panelPortfolioTable")
+    hide("panelPortfolioDetails")
+    hide("panelDefinePortfolio")
     hide("panelLinkFiles")
   }
 
-  #show default view for Section "Choose Programme" = "1"
+  #show default view for Section "Choose portfolio" = "1"
   .defaultCreateProg <- function(){
     logMessage(".defaultCreateProg called")
-    show("panelProgrammeTable")
+    show("panelPortfolioTable")
   }
 
 
-  # Reload Programme table
-  .reloadDPProgData <- function() {
+  # Reload portfolio table
+  .reloadtbl_portfoliosData <- function() {
     # manual refresh button
-    logMessage(".reloadDPProgData called")
+    logMessage(".reloadtbl_portfoliosData called")
     stmt <- buildDbQuery("getProgData")
-    DPProgData <- executeDbQuery(dbSettings, stmt)
-    if (!is.null(DPProgData)) {
-      result$DPProgData <- DPProgData %>%
+    tbl_portfoliosData <- executeDbQuery(dbSettings, stmt)
+    if (!is.null(tbl_portfoliosData)) {
+      result$tbl_portfoliosData <- tbl_portfoliosData %>%
         replaceWithIcons()
-      logMessage("programme table refreshed")
+      logMessage("portfolio table refreshed")
     }
     invisible()
   }
 
-  # Reload Programme Details table
-  .reloadProgDetails <- function() {
-    logMessage(".reloadProgDetails called")
-    if (length(input$tableDPprog_rows_selected) > 0) {
-      progId <- result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeID]
+  # Reload portfolio Details table
+  .reloadportfolioDetails <- function() {
+    logMessage(".reloadportfolioDetails called")
+    if (length(input$dt_Portfolios_rows_selected) > 0) {
+      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
 
-      stmt <- buildDbQuery("getProgFileDetails", progId)
-      progDetails <- executeDbQuery(dbSettings, stmt)
-      if (!is.null(progDetails)) {
-        result$progDetails  <- progDetails %>%
+      stmt <- buildDbQuery("getProgFileDetails", pfId)
+      portfolioDetails <- executeDbQuery(dbSettings, stmt)
+      if (!is.null(portfolioDetails)) {
+        result$portfolioDetails  <- portfolioDetails %>%
           replaceWithIcons()
       }
-      logMessage("programme details table refreshed")
+      logMessage("portfolio details table refreshed")
     } else {
-      result$progDetails  <- NULL
+      result$portfolioDetails  <- NULL
     }
     invisible()
   }
@@ -998,7 +1000,7 @@ step1_choosePortfolio <- function(input, output, session,
 
   .clearProgrammeName <- function() {
     logMessage(".clearProgrammeName called")
-    updateTextInput(session, "tinputDPProgName", value = "")
+    updateTextInput(session, "tinputpfName", value = "")
   }
 
   .clearSourceFilesSelection <- function() {
@@ -1017,44 +1019,44 @@ step1_choosePortfolio <- function(input, output, session,
     hide("divSRSFileUpload")
   }
 
-  .clearTransformNameSelection <- function() {
-    logMessage(".clearTransformNameSelection called")
-    transforms <- getTransformNameSourceCan(dbSettings)
-    updateSelectizeInput(session, "sinputTransformname",
-                         choices = createSelectOptions(transforms,
-                                                       labelCol = 1, valueCol = 2),
-                         selected = character(0))
-  }
+  # .clearTransformNameSelection <- function() {
+  #   logMessage(".clearTransformNameSelection called")
+  #   transforms <- getTransformNameSourceCan(dbSettings)
+  #   updateSelectizeInput(session, "sinputTransformname",
+  #                        choices = createSelectOptions(transforms,
+  #                                                      labelCol = 1, valueCol = 2),
+  #                        selected = character(0))
+  # }
 
   .updateDPAccountSelection <- function() {
     logMessage(".updateDPAccountSelection called")
     accounts <- getAccountName(dbSettings)
     updateSelectizeInput(session, "sinputDPAccountName",
                          choices = createSelectOptions(accounts),
-                         selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.AccountID]))
+                         selected = toString(result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.AccountID]))
   }
 
   .updateProgrammeName <- function() {
     logMessage(".updateProgrammeName called")
-    updateTextInput(session, "tinputDPProgName",
-                    value = result$DPProgData[input$tableDPprog_rows_selected, DPProgData.ProgrammeName])
+    updateTextInput(session, "tinputpfName",
+                    value = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeName])
   }
 
-  .updateTransformNameSelection <- function() {
-    logMessage(".updateTransformNameSelection called")
-    transforms <- getTransformNameSourceCan(dbSettings)
-    updateSelectizeInput(session, "sinputTransformname",
-                         choices = createSelectOptions(transforms,
-                                                       labelCol = 1, valueCol = 2),
-                         selected = toString(result$DPProgData[input$tableDPprog_rows_selected, DPProgData.TranformID]))
-  }
+  # .updateTransformNameSelection <- function() {
+  #   logMessage(".updateTransformNameSelection called")
+  #   transforms <- getTransformNameSourceCan(dbSettings)
+  #   updateSelectizeInput(session, "sinputTransformname",
+  #                        choices = createSelectOptions(transforms,
+  #                                                      labelCol = 1, valueCol = 2),
+  #                        selected = toString(result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.TranformID]))
+  # }
 
   # Model Outout ---------------------------------------------------------------
 
   moduleOutput <- c(
     list(
-      selectprogrammeID = reactive(result$selectprogrammeID),
-      DPProgData = reactive({result$DPProgData}),
+      portfolioID = reactive(result$portfolioID),
+      tbl_portfoliosData = reactive({result$tbl_portfoliosData}),
       newstep = reactive({input$abuttonpgotonextstep})
     )
   )

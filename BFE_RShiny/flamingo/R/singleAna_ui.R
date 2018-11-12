@@ -48,10 +48,10 @@ panelDefineIDs <- function(id) {
   panel(
     status = "primary",
     fluidRow(
-      div(id = ns("divselectprogrammeID"),
+      div(id = ns("divportfolioID"),
           column(4,
                  div(class = "InlineSelectInputSmall",
-                     selectizeInput(inputId = ns("selectprogrammeID"), label = "Programme ID",
+                     selectizeInput(inputId = ns("portfolioID"), label = "Portfolio ID",
                                     choices = c(),
                                     selected = character(0),
                                     options = list(
@@ -59,13 +59,13 @@ panelDefineIDs <- function(id) {
                                       placeholder = 'Select',
                                       onInitialize = I('function() { this.setValue(""); }'))
                      )  %>%
-                       bs_embed_tooltip(title = defineSingleAna$selectprogrammeID,
+                       bs_embed_tooltip(title = defineSingleAna$portfolioID,
                                         placement = "right")
                  ))),
-      hidden(div(id = ns("divselectprogOasisID"),
+      hidden(div(id = ns("divmodelID"),
                  column(5,
                         div(class = "InlineSelectInputSmall",
-                            selectizeInput(inputId = ns("selectprogOasisID"), label = "Oasis Programme ID",
+                            selectizeInput(inputId = ns("modelID"), label = "Model ID",
                                            choices = c(),
                                            selected = character(0),
                                            options = list(
@@ -73,7 +73,7 @@ panelDefineIDs <- function(id) {
                                              placeholder = 'Select',
                                              onInitialize = I('function() { this.setValue(""); }'))
                             ) %>%
-                              bs_embed_tooltip(title = defineSingleAna$selectprogOasisID,
+                              bs_embed_tooltip(title = defineSingleAna$modelID,
                                                placement = "right")
                         ))))
     )

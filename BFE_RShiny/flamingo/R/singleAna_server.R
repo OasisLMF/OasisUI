@@ -36,7 +36,7 @@ singleAna <- function(input, output, session, dbSettings,
   submodulesList <- list()
 
   #values to stop ping pong effect
-  stop_selProgID <- check_selProgID <- 0
+  stop_selPfID <- check_selPfID <- 0
   stop_selProgOasisID <- check_selProgOasisID <- 0
 
   # > Reactive Values ----------------------------------------------------------
@@ -44,15 +44,15 @@ singleAna <- function(input, output, session, dbSettings,
     # Id of the Process Run
     prrunid = -1,
     # Id of the programme
-    selectprogOasisID = "",
+    modelID = "",
     # Id of the model
-    selectprogrammeID = "",
+    portfolioID = "",
     # Prog table
-    DPProgData = NULL,
+    tbl_portfoliosData = NULL,
     # Prog table row selected
-    DPProgData_rowselected = NULL,
+    tbl_portfoliosData_rowselected = NULL,
     # Prog Name
-    progName = "",
+    pfName = "",
     # List of Prog IDs
     progChoices = NULL,
     # Prog status
@@ -85,18 +85,18 @@ singleAna <- function(input, output, session, dbSettings,
       switch(
         workflowSteps$step(),
         "1" = {
-          logMessage("showing Section 'Choose Programme' = '1'")
+          logMessage("showing Section 'Choose Portfolio' = '1'")
           hide("panelDefineIDs")
         },
         "2" = {
           logMessage("showing Section 'Choose Model' = '2'")
           show("panelDefineIDs")
-          hide("divselectprogOasisID")
+          hide("divmodelID")
         },
         "3" = {
           logMessage("showing Section 'Configure Output & Run' = '3'")
           show("panelDefineIDs")
-          show("divselectprogOasisID")
+          show("divmodelID")
         }
       )
     }
@@ -112,7 +112,7 @@ singleAna <- function(input, output, session, dbSettings,
     active = reactive({active() && workflowSteps$step() == 1}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
-    selectprogrammeID = reactive(result$selectprogrammeID)
+    portfolioID = reactive(result$portfolioID)
   )
 
   submodulesList$step2_chooseModel <- callModule(
@@ -123,11 +123,11 @@ singleAna <- function(input, output, session, dbSettings,
     active = reactive({active() && workflowSteps$step() == 2}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
-    selectprogrammeID = reactive(input$selectprogrammeID),
-    selectprogOasisID = reactive(input$selectprogOasisID),
-    progName = reactive({result$progName}),
+    selectprogrammeID = reactive(input$portfolioID),
+    selectprogOasisID = reactive(input$modelID),
+    progName = reactive({result$pfName}),
     progStatus = reactive({result$progStatus}),
-    DPProgData = reactive({result$DPProgData})
+    DPProgData = reactive({result$tbl_portfoliosData})
   )
 
   submodulesList$step3_configureOutput <- callModule(
@@ -138,8 +138,8 @@ singleAna <- function(input, output, session, dbSettings,
     active = reactive({active() && workflowSteps$step() == 3}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
-    selectprogrammeID = reactive(input$selectprogrammeID),
-    selectprogOasisID = reactive(input$selectprogOasisID),
+    selectprogrammeID = reactive(input$portfolioID),
+    selectprogOasisID = reactive(input$modelID),
     progOasisName = reactive({result$progOasisName}),
     progOasisStatus = reactive({result$progOasisStatus})
   )
@@ -165,21 +165,21 @@ singleAna <- function(input, output, session, dbSettings,
     result$prrunid <- submodulesList$step3_configureOutput$prrunid()
   })
 
-  # > selectprogrammeID --------------------------------------------------------
-  observeEvent(submodulesList$step1_choosePortfolio$selectprogrammeID(), ignoreInit = TRUE, {
-    prgId <- submodulesList$step1_choosePortfolio$selectprogrammeID()
+  # > portfolioID --------------------------------------------------------
+  observeEvent(submodulesList$step1_choosePortfolio$portfolioID(), ignoreInit = TRUE, {
+    prgId <- submodulesList$step1_choosePortfolio$portfolioID()
     #Avoid updating input if not necessary
-    if (!is.na(prgId) &&  result$selectprogrammeID != prgId) {
-      logMessage(paste0("updating result$selectprogrammeID because submodulesList$step1_choosePortfolio$selectprogrammeID() changed to: ", prgId ))
-      result$selectprogrammeID <- prgId
+    if (!is.na(prgId) &&  result$portfolioID != prgId) {
+      logMessage(paste0("updating result$portfolioID because submodulesList$step1_choosePortfolio$portfolioID() changed to: ", prgId ))
+      result$portfolioID <- prgId
     }
   })
 
-  observeEvent(input$selectprogrammeID, ignoreInit = TRUE,{
+  observeEvent(input$portfolioID, ignoreInit = TRUE,{
     #Avoid updating input if not necessary
-    if (input$selectprogrammeID != result$selectprogrammeID) {
-      logMessage(paste0("updating result$selectprogrammeID because input$selectprogrammeID changed to: ", input$selectprogrammeID ))
-      result$selectprogrammeID <- input$selectprogrammeID
+    if (input$portfolioID != result$portfolioID) {
+      logMessage(paste0("updating result$portfolioID because input$portfolioID changed to: ", input$portfolioID ))
+      result$portfolioID <- input$portfolioID
     }
   })
 
@@ -187,90 +187,90 @@ singleAna <- function(input, output, session, dbSettings,
     workflowSteps$step()
   }, {if (workflowSteps$step() != 1) {
     #Avoid updating input if not necessary
-    if (input$selectprogrammeID != result$selectprogrammeID) {
-      logMessage(paste0("updating input$selectprogrammeID because result$selectprogrammeID changed to: ", result$selectprogrammeID ))
-      updateSelectizeInput(session, inputId = "selectprogrammeID", selected = result$selectprogrammeID, choices = result$progChoices)
-    }  else if (input$selectprogrammeID == "" && input$selectprogrammeID == result$selectprogrammeID) {
-      logMessage(paste0("updating input$selectprogrammeID choices"))
-      updateSelectizeInput(session, inputId = "selectprogrammeID", selected = character(0), choices = result$progChoices)
+    if (input$portfolioID != result$portfolioID) {
+      logMessage(paste0("updating input$portfolioID because result$portfolioID changed to: ", result$portfolioID ))
+      updateSelectizeInput(session, inputId = "portfolioID", selected = result$portfolioID, choices = result$progChoices)
+    }  else if (input$portfolioID == "" && input$portfolioID == result$portfolioID) {
+      logMessage(paste0("updating input$portfolioID choices"))
+      updateSelectizeInput(session, inputId = "portfolioID", selected = character(0), choices = result$progChoices)
     }
   }
   })
 
   # > prog Table reactives -----------------------------------------------------
-  observeEvent(submodulesList$step1_choosePortfolio$DPProgData(), ignoreInit = TRUE,{
-    if (is.null(submodulesList$step1_choosePortfolio$DPProgData()) || nrow(submodulesList$step1_choosePortfolio$DPProgData()) == 0) {
+  observeEvent(submodulesList$step1_choosePortfolio$tbl_portfoliosData(), ignoreInit = TRUE,{
+    if (is.null(submodulesList$step1_choosePortfolio$tbl_portfoliosData()) || nrow(submodulesList$step1_choosePortfolio$tbl_portfoliosData()) == 0) {
       stmt <- buildDbQuery("getProgData")
-      result$DPProgData <- executeDbQuery(dbSettings, stmt) %>%
+      result$tbl_portfoliosData <- executeDbQuery(dbSettings, stmt) %>%
         replaceWithIcons()
     } else {
-      result$DPProgData <- submodulesList$step1_choosePortfolio$DPProgData()
+      result$tbl_portfoliosData <- submodulesList$step1_choosePortfolio$tbl_portfoliosData()
     }
-    result$progChoices <- result$DPProgData[, DPProgData.ProgrammeID]
+    result$progChoices <- result$tbl_portfoliosData[, tbl_portfoliosData.ProgrammeID]
   })
 
   observeEvent({
-    result$selectprogrammeID
+    result$portfolioID
     result$progChoices
-    result$DPProgData
+    result$tbl_portfoliosData
   }, ignoreInit = TRUE, {
-    result$DPProgData_rowselected <- match(result$selectprogrammeID, result$progChoices)
-    result$progName <- result$DPProgData[result$DPProgData_rowselected, DPProgData.ProgrammeName]
+    result$tbl_portfoliosData_rowselected <- match(result$portfolioID, result$progChoices)
+    result$pfName <- result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.ProgrammeName]
     progStatus <- ""
-    if (!is.na(result$DPProgData_rowselected) && !is.na(result$DPProgData) && length(result$DPProgData_rowselected) > 0) {
-      if (result$DPProgData[result$DPProgData_rowselected, DPProgData.Status] == StatusCompleted) {
+    if (!is.na(result$tbl_portfoliosData_rowselected) && !is.na(result$tbl_portfoliosData) && length(result$tbl_portfoliosData_rowselected) > 0) {
+      if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusCompleted) {
         progStatus <- "- Status: Completed"
-      } else if (result$DPProgData[result$DPProgData_rowselected, DPProgData.Status] == StatusProcessing) {
+      } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusProcessing) {
         progStatus <- "- Status: in Progress"
-      } else if (result$DPProgData[result$DPProgData_rowselected, DPProgData.Status] == StatusFailed) {
+      } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusFailed) {
         progStatus <- "- Status: Failed"
       }
     }
     result$progStatus <- progStatus
   })
 
-  # > selectprogOasisID --------------------------------------------------------
+  # > modelID --------------------------------------------------------
   observeEvent(submodulesList$step2_chooseModel$selectprogOasisID(), ignoreInit = TRUE, {
     progOasisId <- submodulesList$step2_chooseModel$selectprogOasisID()
-    if (!is.null(progOasisId) && result$selectprogOasisID != progOasisId) {
-      logMessage(paste0("updating result$selectprogOasisID because submodulesList$step2_chooseModel$selectprogrammeID() changed to: ", progOasisId ))
-      result$selectprogOasisID <- submodulesList$step2_chooseModel$selectprogOasisID()
+    if (!is.null(progOasisId) && result$modelID != progOasisId) {
+      logMessage(paste0("updating result$modelID because submodulesList$step2_chooseModel$portfolioID() changed to: ", progOasisId ))
+      result$modelID <- submodulesList$step2_chooseModel$selectprogOasisID()
     }
   })
 
   observeEvent({
-    input$selectprogOasisID
+    input$modelID
     }, ignoreInit = TRUE, {
     #Avoid updating input if not necessary
-    if (input$selectprogOasisID != "" && result$selectprogOasisID != input$selectprogOasisID) {
-      logMessage(paste0("updating result$selectprogOasisID because input$selectprogOasisID changed to: ", input$selectprogOasisID ))
-      result$selectprogOasisID <- input$selectprogOasisID
+    if (input$modelID != "" && result$modelID != input$modelID) {
+      logMessage(paste0("updating result$modelID because input$modelID changed to: ", input$modelID ))
+      result$modelID <- input$modelID
     }
   })
 
   # If programmeID changes, then we select the first progOasis
   observeEvent({
     result$POData_rowselected
-    result$selectprogrammeID
+    result$portfolioID
     }, ignoreInit = TRUE, {
     progOasisId <- ""
     if (!is.null(result$POData) && nrow(result$POData) > 0) {
       progOasisId <- result$POData[result$POData_rowselected, POData.ProgOasisId]
     }
-    if (!is.null(progOasisId) && !is.na(progOasisId) && progOasisId != result$selectprogOasisID) {
-      logMessage(paste0("updating result$selectprogOasisID because result$POData_rowselected changed to: ", result$POData_rowselected ))
-      result$selectprogOasisID <- progOasisId
+    if (!is.null(progOasisId) && !is.na(progOasisId) && progOasisId != result$modelID) {
+      logMessage(paste0("updating result$modelID because result$POData_rowselected changed to: ", result$POData_rowselected ))
+      result$modelID <- progOasisId
     }
   })
 
   observeEvent({
     workflowSteps$step()
-    result$selectprogOasisID
+    result$modelID
   }, ignoreInit = TRUE, {
     if (workflowSteps$step() == 3) {
       #Avoid updating input if not necessary
-      if (input$selectprogOasisID  != result$selectprogOasisID) {
-        updateSelectizeInput(session, inputId = "selectprogOasisID", selected = result$selectprogOasisID, choices = result$progOasisChoices)
+      if (input$modelID  != result$modelID) {
+        updateSelectizeInput(session, inputId = "modelID", selected = result$modelID, choices = result$progOasisChoices)
       }
     }
   })
@@ -278,10 +278,10 @@ singleAna <- function(input, output, session, dbSettings,
   # > prog Model Table reactives -----------------------------------------------
   observeEvent({
     submodulesList$step2_chooseModel$POData()
-    result$selectprogrammeID
+    result$portfolioID
   }, ignoreInit = TRUE, {
-    if (result$selectprogrammeID != "" & !is.null(result$selectprogrammeID)) {
-      result$POData <- getProgOasisForProgdata(dbSettings, result$selectprogrammeID) %>%
+    if (result$portfolioID != "" & !is.null(result$portfolioID)) {
+      result$POData <- getProgOasisForProgdata(dbSettings, result$portfolioID) %>%
         replaceWithIcons()
       if (nrow(result$POData) != 0) {
         result$progOasisChoices <-  result$POData[, POData.ProgOasisId]
@@ -293,12 +293,12 @@ singleAna <- function(input, output, session, dbSettings,
   })
 
   observeEvent({
-    result$selectprogrammeID
-    result$selectprogOasisID
+    result$portfolioID
+    result$modelID
     result$progOasisChoices
     result$POData
   }, ignoreInit = TRUE, {
-    prgOasisId <- result$selectprogOasisID
+    prgOasisId <- result$modelID
     rowToSelect <- match(prgOasisId, result$progOasisChoices)
     result$POData_rowselected <- ifelse(is.na(rowToSelect), 1, rowToSelect)
     result$progOasisName <- ifelse(nrow(result$POData) > 0, result$POData[result$POData_rowselected, POData.ProgName], "")

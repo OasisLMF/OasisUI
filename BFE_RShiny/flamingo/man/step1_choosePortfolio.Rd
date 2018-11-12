@@ -9,7 +9,7 @@ step1_choosePortfolioUI(id)
 
 step1_choosePortfolio(input, output, session, dbSettings, apiSettings,
   user, active = reactive(TRUE), logMessage = message,
-  currstep = reactive(-1), selectprogrammeID = reactive(""))
+  currstep = reactive(-1), portfolioID = reactive(""))
 }
 \arguments{
 \item{id}{module id}
@@ -32,7 +32,7 @@ step1_choosePortfolio(input, output, session, dbSettings, apiSettings,
 
 \item{currstep}{current selected step.}
 
-\item{selectprogrammeID}{selected programme ID.}
+\item{portfolioID}{selected portfolio ID.}
 
 \item{id}{Namespace ID for the module.}
 }
@@ -42,9 +42,9 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-selectprogrammeID Id of selected programmeID
+portfolioID Id of selected portfolioID
 
-DPProgData POData model association table.
+tbl_portfoliosData POData model association table.
 
 newstep navigation step
 }

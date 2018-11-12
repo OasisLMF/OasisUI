@@ -10,5 +10,5 @@ panelLinkFiles(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to link files to a programme.
+Function wrapping panel to link files to a portfolio
 }
