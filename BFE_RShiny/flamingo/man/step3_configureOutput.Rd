@@ -47,7 +47,7 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-prrunid id of selected run.
+anaid id of selected run.
 }
 \description{
 UI/View for the step3_configureOutput.

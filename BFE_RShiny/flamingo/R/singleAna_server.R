@@ -42,7 +42,7 @@ singleAna <- function(input, output, session, dbSettings,
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # Id of the Process Run
-    prrunid = -1,
+    anaid = -1,
     # Id of the programme
     modelID = "",
     # Id of the model
@@ -159,17 +159,17 @@ singleAna <- function(input, output, session, dbSettings,
   })
 
   # > RunId --------------------------------------------------------------------
-  observeEvent(submodulesList$step3_configureOutput$prrunid(), ignoreInit = TRUE, {
-    result$prrunid <- submodulesList$step3_configureOutput$prrunid()
+  observeEvent(submodulesList$step3_configureOutput$anaid(), ignoreInit = TRUE, {
+    result$anaid <- submodulesList$step3_configureOutput$anaid()
   })
 
-  # > portfolioID --------------------------------------------------------
+  # > portfolioID --------------------------------------------------------------
   observeEvent(submodulesList$step1_choosePortfolio$portfolioID(), ignoreInit = TRUE, {
-    prgId <- submodulesList$step1_choosePortfolio$portfolioID()
+    portfolioID <- submodulesList$step1_choosePortfolio$portfolioID()
     #Avoid updating input if not necessary
-    if (!is.na(prgId) &&  result$portfolioID != prgId) {
-      logMessage(paste0("updating result$portfolioID because submodulesList$step1_choosePortfolio$portfolioID() changed to: ", prgId ))
-      result$portfolioID <- prgId
+    if (!is.na(portfolioID) &&  result$portfolioID != portfolioID) {
+      logMessage(paste0("updating result$portfolioID because submodulesList$step1_choosePortfolio$portfolioID() changed to: ", portfolioID ))
+      result$portfolioID <- portfolioID
     }
   })
 
@@ -227,11 +227,11 @@ singleAna <- function(input, output, session, dbSettings,
     result$progStatus <- progStatus
   })
 
-  # > modelID --------------------------------------------------------
+  # > modelID ------------------------------------------------------------------
   observeEvent(submodulesList$step2_chooseModel$modelID(), ignoreInit = TRUE, {
-    progOasisId <- submodulesList$step2_chooseModel$modelID()
-    if (!is.null(progOasisId) && result$modelID != progOasisId) {
-      logMessage(paste0("updating result$modelID because submodulesList$step2_chooseModel$modelID() changed to: ", progOasisId ))
+    modelID <- submodulesList$step2_chooseModel$modelID()
+    if (!is.null(modelID) && result$modelID != modelID) {
+      logMessage(paste0("updating result$modelID because submodulesList$step2_chooseModel$modelID() changed to: ", modelID ))
       result$modelID <- submodulesList$step2_chooseModel$modelID()
     }
   })
@@ -318,7 +318,7 @@ singleAna <- function(input, output, session, dbSettings,
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      processRunId = reactive(result$prrunid)
+      processRunId = reactive(result$anaid)
     )
   )
 

@@ -598,7 +598,7 @@ panel_configureAdvancedRI <- function(id) {
 #' @param modelName Name of selected progOasis.
 #' @param progOasisStatus Status of selected progOasis.
 #'
-#' @return prrunid id of selected run.
+#' @return anaid id of selected run.
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -642,9 +642,9 @@ step3_configureOutput <- function(input, output, session,
     # reactive value for process runs table
     tbl_analysisData = NULL,
     # flag to know if the user is creating a new output configuration or rerunning a process
-    prrun_flag = "C",
+    ana_flag = "C",
     # Id of the Process Run
-    prrunid = -1
+    anaid = -1
   )
 
   # Reset Param
@@ -657,7 +657,7 @@ step3_configureOutput <- function(input, output, session,
     .hideDivs()
     if (currstep() == 3 ) {
       .defaultRun()
-      .reloadRunData()
+      .reloadAnaData()
     }
   })
 
@@ -666,7 +666,7 @@ step3_configureOutput <- function(input, output, session,
     if (active()) {
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      .reloadRunData()
+      .reloadAnaData()
     }
   })
 
@@ -676,17 +676,17 @@ step3_configureOutput <- function(input, output, session,
   observeEvent(input$radioanaAllOrInProgress, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste0("filter changed to ", input$radioanaAllOrInProgress))
-      .reloadRunData()
+      .reloadAnaData()
     }
   })
 
   #Content of the process run table
   .getProcessRunWithUserChoices <- function() {
     logMessage(".getProcessRunWithUserChoices called")
-    prcid <- modelID()
+    modelID <- modelID()
     # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
     # 'In Progress' (not handled by stored procedure in the DB due to bug!)
-    tbl_analysisData <- getProcessRun(dbSettings, prcid, input$radioanaAllOrInProgress) %>%
+    tbl_analysisData <- getProcessRun(dbSettings, modelID, input$radioanaAllOrInProgress) %>%
       rename(Status = tbl_analysisData.ProcessRunStatus.old) %>%
       as.data.frame()
     # RSc TODO: should probably allow NULL to clear connections when selecting
@@ -742,11 +742,11 @@ step3_configureOutput <- function(input, output, session,
 
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
-    if (result$prrun_flag  == "R") {
-      processRunId <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
-      processRunName <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName]
-      processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
-      paste0('Re-Define Output Configuration for Run id ', processRunId, ' ', processRunName)
+    if (result$ana_flag  == "R") {
+      analysisID <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
+      analysisName <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName]
+      analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
+      paste0('Re-Define Output Configuration for Run id ', analysisID, ' ', analysisName)
     } else {
       "New Output Configuration"
     }
@@ -783,7 +783,7 @@ step3_configureOutput <- function(input, output, session,
     .showPerils()
     logMessage("showing panelDefineOutputs")
     logMessage(paste("updating dt_analysisa select because defining new output configuration"))
-    result$prrun_flag <- "C"
+    result$ana_flag <- "C"
   })
 
   onclick("abuttonrerunana", {
@@ -791,14 +791,14 @@ step3_configureOutput <- function(input, output, session,
     show("panelDefineOutputs")
     .showPerils()
     logMessage("showing panelDefineOutputs")
-    result$prrun_flag <- "R"
+    result$ana_flag <- "R"
     .updateOutputConfig()
   })
 
   # Hide Output Configuration panel
   onclick("abuttonehidepanelconfigureoutput", {
     hide("panelDefineOutputs")
-    result$prrun_flag <- "C"
+    result$ana_flag <- "C"
   })
 
   # simplified view selection
@@ -975,7 +975,7 @@ step3_configureOutput <- function(input, output, session,
   # A function to generate process run
   .generateRun <- function() {
 
-    processrunname <- isolate(input$tinputananame)
+    analysisName <- isolate(input$tinputananame)
     nosample <- isolate(input$tinputnoofsample)
     sthreshold <- isolate(input$tinputthreshold)
     eventsetid <- isolate(input$sinputeventset)
@@ -991,8 +991,8 @@ step3_configureOutput <- function(input, output, session,
     summaryreports <- tolower(isolate(input$chkinputsummaryoption))
 
     # functionality to handle model resource based metrics
-    prgId <- ifelse(modelID() == "", -1,modelID())
-    stmt <- buildDbQuery("getRuntimeParamList", prgId)
+    modelID <- ifelse(modelID() == "", -1,modelID())
+    stmt <- buildDbQuery("getRuntimeParamList", modelID)
     runparamlist <- executeDbQuery(dbSettings, stmt)
 
     rows <- nrow(runparamlist)
@@ -1022,7 +1022,7 @@ step3_configureOutput <- function(input, output, session,
                                input$chkricounty, input$chkriloc, input$chkrilob))
 
     stmt <- paste0("exec dbo.WorkflowFlattener ",
-                   "@ProgOasisID= ", prgId, ", ",
+                   "@ProgOasisID= ", modelID, ", ",
                    "@WorkflowID= 1", ", ",
                    "@NumberOfSamples=", nosample, ", ",
                    "@GULThreshold= ", sthreshold, ", ",
@@ -1038,32 +1038,32 @@ step3_configureOutput <- function(input, output, session,
                    "@PerilFlood='", floodperil, "', ",
                    "@DemandSurge= '", dmdsurge, "', ",
                    "@LeakageFactor= '" , leakagefactor, "', ",
-                   "@ProcessRunName= '" , processrunname, "', ",
+                   "@ProcessRunName= '" , analysisName, "', ",
                    "@SummaryReports='", summaryreports , "'")
 
     logMessage(paste("Workflow flattener query: ", stmt))
-    runId <- executeDbQuery(dbSettings, stmt)
-    logMessage(paste("Process Run ID: ", runId))
+    anaID <- executeDbQuery(dbSettings, stmt)
+    logMessage(paste("Process Run ID: ", anaID))
 
-    return(runId)
+    return(anaID)
   }
 
   # Execute Process run: When "Execute Run" button is clicked - switsches view to Run panel
   onclick("abuttonexecuteanarun", {
-    runId <- .generateRun()
-    if (is.null(runId)) {
+    anaID <- .generateRun()
+    if (is.null(anaID)) {
       flamingoNotification(type = "error",
                            "Process Run ID could not be generated. So process run cannot be executed")
     } else {
-      status <- runProcess(apiSettings, runId)
+      status <- runProcess(apiSettings, anaID)
       if (grepl("success", status, ignore.case = TRUE)) {
         flamingoNotification(type = "message",
                              sprintf("Created Process Run ID: %s and process run is executing",
-                                     runId))
-        .reloadRunData()
+                                     anaID))
+        .reloadAnaData()
         #logMessage(paste("colnames are:", paste(colnames(result$tbl_analysisData), collapse = ", ")))
         logMessage(paste("updating dt_analysisa select because executing a new run"))
-        rowToSelect <- match(runId, result$tbl_analysisData[, tbl_analysisData.ProcessRunID])
+        rowToSelect <- match(anaID, result$tbl_analysisData[, tbl_analysisData.ProcessRunID])
         pageSel <- ceiling(rowToSelect/pageLength)
         selectRows(dataTableProxy("dt_analysis"), rowToSelect)
         selectPage(dataTableProxy("dt_analysis"), pageSel)
@@ -1071,7 +1071,7 @@ step3_configureOutput <- function(input, output, session,
       } else {
         flamingoNotification(type = "warning",
                              sprintf("Created Process Run ID: %s. But process run executing failed",
-                                     runId))
+                                     anaID))
         show("panelAnalysisLogs")
         logMessage("showing prrunlogtable")
       }
@@ -1095,7 +1095,7 @@ step3_configureOutput <- function(input, output, session,
       # manual refresh button
       invisible(input$abuttonanarefreshlogs)
 
-      wfid <- result$prrunid
+      wfid <- result$anaid
 
       logdata <- getProcessRunDetails(dbSettings, wfid) %>%
         replaceWithIcons()
@@ -1112,25 +1112,25 @@ step3_configureOutput <- function(input, output, session,
           options = .getPRTableOptions()
         )
       } else {
-        .nothingToShowTable(contentMessage = paste0("no log files associated with Process Run ID ", ifelse(!is.null(result$prrunid), result$prrunid, "NULL")))
+        .nothingToShowTable(contentMessage = paste0("no log files associated with Process Run ID ", ifelse(!is.null(result$anaid), result$anaid, "NULL")))
       }
     }
   })
 
   # run logs title
   output$paneltitle_AnaLogs <- renderUI({
-    processRunId <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
-    processRunName <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName]
-    processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
-    paste0('Logs for Run id ', processRunId, ' ', processRunName)
+    analysisID <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
+    analysisName <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName]
+    analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
+    paste0('Logs for Run id ', analysisID, ' ', analysisName)
   })
 
   # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonanarefresh", {
-    .reloadRunData()
+    .reloadAnaData()
   } )
 
-  # Updates dependent on changed: dt_analysis_rows_selected ------------
+  # Updates dependent on changed: dt_analysis_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(input$dt_analysis_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -1138,13 +1138,13 @@ step3_configureOutput <- function(input, output, session,
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
       if (length(input$dt_analysis_rows_selected) > 0 && !is.null(result$tbl_analysisData)) {
-        result$prrunid <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
+        result$anaid <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
         if (result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunStatus] != StatusCompleted) {
           show("panelAnalysisLogs")
           logMessage("showing prrunlogtable")
         }
       } else {
-        result$prrunid <- -1
+        result$anaid <- -1
       }
     }
   })
@@ -1177,8 +1177,8 @@ step3_configureOutput <- function(input, output, session,
   }
 
   # Reload Process Runs table
-  .reloadRunData <- function() {
-    logMessage(".reloadRunData called")
+  .reloadAnaData <- function() {
+    logMessage(".reloadAnaData called")
     if (modelID() != "") {
       .getProcessRunWithUserChoices()
       logMessage("process run table refreshed")
@@ -1248,12 +1248,12 @@ step3_configureOutput <- function(input, output, session,
     updateTextInput(session, "tinputananame", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
 
-    prgId <- ifelse(modelID() == "", -1,modelID())
-    if (prgId != -1) {
+    modelID <- ifelse(modelID() == "", -1,modelID())
+    if (modelID != -1) {
       updateSelectInput(session, "sinputeventset",
-                        choices = getEventSet(dbSettings, prgId ))
+                        choices = getEventSet(dbSettings, modelID ))
       updateSelectInput(session, "sinputeventocc",
-                        choices = getEventOccurrence(dbSettings, prgId ))
+                        choices = getEventOccurrence(dbSettings, modelID ))
     }
     updateCheckboxInput(session, "chkinputprwind", "Peril: Wind", value = TRUE)
     updateCheckboxInput(session, "chkinputprstsurge", "Peril: Surge", value = TRUE)
@@ -1272,8 +1272,8 @@ step3_configureOutput <- function(input, output, session,
 
   #Show available perils
   .showPerils <- function() {
-    prgId <- ifelse(modelID() == "", -1,modelID())
-    stmt <- buildDbQuery("getRuntimeParamList", prgId)
+    modelID <- ifelse(modelID() == "", -1,modelID())
+    stmt <- buildDbQuery("getRuntimeParamList", modelID)
     runparamlist <- executeDbQuery(dbSettings, stmt)
 
     hide("perilwind")
@@ -1294,24 +1294,24 @@ step3_configureOutput <- function(input, output, session,
   # Update output configuration for rerun
   .updateOutputConfig <- function() {
     logMessage(".updateOutputConfig called")
-    outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid ))
-    runparamsforpr <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$prrunid ))
+    outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$anaid ))
+    anaparams <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$anaid ))
 
     updateTextInput(session, "tinputananame", value = result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName])
 
-    if (nrow(runparamsforpr) > 0) {
-      for (i in 1:nrow(runparamsforpr)) {
-        switch(runparamsforpr[i,1],
-               "number_of_samples" = {updateTextInput(session, "tinputnoofsample", value = runparamsforpr[i,2])},
-               "gul_threshold" = {updateTextInput(session, "tinputthreshold", value = runparamsforpr[i,2])},
-               "event_set" = {updateSelectInput(session, "sinputeventocc", selected = runparamsforpr[i,2])},
-               "event_occurrence_id" = {updateSelectInput(session, "sinputeventocc", selected = runparamsforpr[i,2])},
-               "peril_wind" = {updateCheckboxInput(session, "chkinputprwind", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
-               "peril_surge" = {updateCheckboxInput(session, "chkinputprstsurge", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
-               "peril_quake" = {updateCheckboxInput(session, "chkinputprquake", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
-               "peril_flood" = {updateCheckboxInput(session, "chkinputprflood", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
-               "demand_surge" = {updateCheckboxInput(session, "chkinputdsurge", value = eval(parse(text = toString(runparamsforpr[i,2]))))},
-               "leakage_factor" = {updateSliderInput(session, "sliderleakagefac", value = runparamsforpr[i,2])}
+    if (nrow(anaparams) > 0) {
+      for (i in 1:nrow(anaparams)) {
+        switch(anaparams[i,1],
+               "number_of_samples" = {updateTextInput(session, "tinputnoofsample", value = anaparams[i,2])},
+               "gul_threshold" = {updateTextInput(session, "tinputthreshold", value = anaparams[i,2])},
+               "event_set" = {updateSelectInput(session, "sinputeventocc", selected = anaparams[i,2])},
+               "event_occurrence_id" = {updateSelectInput(session, "sinputeventocc", selected = anaparams[i,2])},
+               "peril_wind" = {updateCheckboxInput(session, "chkinputprwind", value = eval(parse(text = toString(anaparams[i,2]))))},
+               "peril_surge" = {updateCheckboxInput(session, "chkinputprstsurge", value = eval(parse(text = toString(anaparams[i,2]))))},
+               "peril_quake" = {updateCheckboxInput(session, "chkinputprquake", value = eval(parse(text = toString(anaparams[i,2]))))},
+               "peril_flood" = {updateCheckboxInput(session, "chkinputprflood", value = eval(parse(text = toString(anaparams[i,2]))))},
+               "demand_surge" = {updateCheckboxInput(session, "chkinputdsurge", value = eval(parse(text = toString(anaparams[i,2]))))},
+               "leakage_factor" = {updateSliderInput(session, "sliderleakagefac", value = anaparams[i,2])}
         )
       }
     }
@@ -1379,7 +1379,7 @@ step3_configureOutput <- function(input, output, session,
   moduleOutput <- c(
     list(
       navigationstate = reactive(result$navigationstate),
-      prrunid = reactive({result$prrunid})
+      anaid = reactive({result$anaid})
     )
   )
 

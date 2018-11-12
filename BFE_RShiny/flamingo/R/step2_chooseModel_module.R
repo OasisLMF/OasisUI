@@ -220,7 +220,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
 
-  # Define portfolioID ---------------------------------------------------
+  # Define portfolioID ---------------------------------------------------------
 
   # If portfolioID changes, reload programme model table and set view back to default
   observeEvent(result$portfolioID, ignoreInit = TRUE, {
@@ -233,7 +233,7 @@ step2_chooseModel <- function(input, output, session,
     }
   })
 
-  # Define modelID ---------------------------------------------------
+  # Define modelID -------------------------------------------------------------
   observeEvent(result$tbl_modelsData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       if (result$modelID != "" && !is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0) {
@@ -446,7 +446,7 @@ step2_chooseModel <- function(input, output, session,
     .reloadtbl_modelsDetails()
   } )
 
-  # Updates dependent on changed: dt_models_rows_selected --------------
+  # Updates dependent on changed: dt_models_rows_selected ----------------------
   # Output configuration: manage what to show based on  status of row selected in programme Model table
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {

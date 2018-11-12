@@ -274,7 +274,7 @@ step1_choosePortfolio <- function(input, output, session,
     # SA file to view
     viewSAfile = NULL,
     # reactive value for details of portfolio table
-    portfolioDetails = NULL,
+    tbl_portfolioDetails = NULL,
     # flag to know if the user is creating or amending a portfolio
     portfolio_flag = "C"
   )
@@ -321,10 +321,10 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Portfolio Details Table ----------------------------------------------------
   output$dt_portfolioDetails <- renderDT({
-    if (!is.null(result$portfolioDetails) && nrow(result$portfolioDetails) > 0) {
+    if (!is.null(result$tbl_portfolioDetails) && nrow(result$tbl_portfolioDetails) > 0) {
       logMessage("re-rendering portfolio details table")
       datatable(
-        result$portfolioDetails,
+        result$tbl_portfolioDetails,
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -371,7 +371,7 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelLinkFiles")
     show("panelPortfolioDetails")
     logMessage("showing panelPortfolioDetails")
-    .reloadportfolioDetails()
+    .reloadtbl_portfolioDetails()
   })
 
   # Hide portfolio Details
@@ -591,7 +591,7 @@ step1_choosePortfolio <- function(input, output, session,
         if (!is.null(recordId)) {
           flamingoNotification(type = "message",
                                paste("New File record id: ", recordId, " created"))
-          #.reloadportfolioDetails()
+          #.reloadtbl_portfolioDetails()
         } else {
           flamingoNotification(type = "error", "Could not create file record")
         }
@@ -822,7 +822,7 @@ step1_choosePortfolio <- function(input, output, session,
 
   output$tableviewSRSfile <-  .renderDTSourceFile(SourceFile = result$viewSRSfile)
 
-  # Define portfolioID ---------------------------------------------------
+  # Define portfolioID ---------------------------------------------------------
   # Add choices to portfolioID, update portfolioID
   observeEvent(result$tbl_portfoliosData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -881,10 +881,10 @@ step1_choosePortfolio <- function(input, output, session,
   } )
 
   onclick("abuttondefpfrfsh", {
-    .reloadportfolioDetails()
+    .reloadtbl_portfolioDetails()
   } )
 
-  # Updates dependent on changed: dt_Portfolios_rows_selected --------------------
+  # Updates dependent on changed: dt_Portfolios_rows_selected ------------------
   observeEvent(input$dt_Portfolios_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$dt_Portfolios_rows_selected is changed to:", input$dt_Portfolios_rows_selected))
@@ -947,20 +947,20 @@ step1_choosePortfolio <- function(input, output, session,
   }
 
   # Reload portfolio Details table
-  .reloadportfolioDetails <- function() {
-    logMessage(".reloadportfolioDetails called")
+  .reloadtbl_portfolioDetails <- function() {
+    logMessage(".reloadtbl_portfolioDetails called")
     if (length(input$dt_Portfolios_rows_selected) > 0) {
       pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.ProgrammeID]
 
       stmt <- buildDbQuery("getProgFileDetails", pfId)
-      portfolioDetails <- executeDbQuery(dbSettings, stmt)
-      if (!is.null(portfolioDetails)) {
-        result$portfolioDetails  <- portfolioDetails %>%
+      tbl_portfolioDetails <- executeDbQuery(dbSettings, stmt)
+      if (!is.null(tbl_portfolioDetails)) {
+        result$tbl_portfolioDetails  <- tbl_portfolioDetails %>%
           replaceWithIcons()
       }
       logMessage("portfolio details table refreshed")
     } else {
-      result$portfolioDetails  <- NULL
+      result$tbl_portfolioDetails  <- NULL
     }
     invisible()
   }
