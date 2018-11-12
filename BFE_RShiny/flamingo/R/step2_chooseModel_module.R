@@ -140,13 +140,12 @@ panelAssociateModel <- function(id) {
 #' @template params-flamingo-module
 #' 
 #' @param currstep current selected step.
-#' @param selectprogrammeID selected programme ID.
-#' @param selectprogOasisID selected ProgOasis ID.
-#' @param progName Name of selected programme.
+#' @param portfolioID selected programme ID.
+#' @param modelID selected ProgOasis ID.
+#' @param pfName Name of selected programme.
 #' @param progStatus Status of selected programme.
-#' @param DPProgData Dataframe of programmes.
 #'
-#' @return selectprogOasisID Id of selected progOasis.
+#' @return modelID Id of selected progOasis.
 #' @return POData model association table.
 #' @return newstep navigation step
 #'
@@ -168,11 +167,10 @@ step2_chooseModel <- function(input, output, session,
                               active = reactive(TRUE),
                               logMessage = message,
                               currstep = reactive(-1),
-                              selectprogrammeID = reactive({""}),
-                              selectprogOasisID = reactive({""}),
-                              progName = reactive({""}),
-                              progStatus = reactive({""}),
-                              DPProgData = reactive(NULL)
+                              portfolioID = reactive({""}),
+                              modelID = reactive({""}),
+                              pfName = reactive({""}),
+                              progStatus = reactive({""})
 
 ) {
 
@@ -188,10 +186,10 @@ step2_chooseModel <- function(input, output, session,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
-    # reactive for selectprogrammeID
-    selectprogrammeID = "",
-    # reactive for selectprogOasisID
-    selectprogOasisID = "",
+    # reactive for portfolioID
+    portfolioID = "",
+    # reactive for modelID
+    modelID = "",
     # reactive value for model table
     POData = NULL,
     # reactive value for detail of model table
@@ -199,17 +197,17 @@ step2_chooseModel <- function(input, output, session,
   )
 
   #Set Params
-  observeEvent(selectprogrammeID(), {
-    if (!is.null(selectprogrammeID())) {
-      result$selectprogrammeID <- selectprogrammeID()
+  observeEvent(portfolioID(), {
+    if (!is.null(portfolioID())) {
+      result$portfolioID <- portfolioID()
     } else {
-      result$selectprogrammeID <- ""
+      result$portfolioID <- ""
     }
 
   })
 
   observe(if (active()) {
-    result$selectprogOasisID <- selectprogOasisID()
+    result$modelID <- modelID()
   })
 
   # Panels Visualization -------------------------------------------------------
@@ -222,11 +220,11 @@ step2_chooseModel <- function(input, output, session,
   })
 
 
-  # Define selectprogrammeID ---------------------------------------------------
+  # Define portfolioID ---------------------------------------------------
 
-  # If selectprogrammeID changes, reload programme model table and set view back to default
-  observeEvent(result$selectprogrammeID, ignoreInit = TRUE, {
-    logMessage(paste0("updating Programme Model Table because result$selectprogrammeID changed to ", result$selectprogrammeID))
+  # If portfolioID changes, reload programme model table and set view back to default
+  observeEvent(result$portfolioID, ignoreInit = TRUE, {
+    logMessage(paste0("updating Programme Model Table because result$portfolioID changed to ", result$portfolioID))
     if (active()) {
       .reloadPOData()
       # Update Associate Model Panel
@@ -235,25 +233,25 @@ step2_chooseModel <- function(input, output, session,
     }
   })
 
-  # Define selectprogOasisID ---------------------------------------------------
+  # Define modelID ---------------------------------------------------
   observeEvent(result$POData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
-      if (result$selectprogOasisID != "" && !is.null(result$POData) && nrow(result$POData) > 0) {
-        logMessage(paste0("updating selectprogOasisID choices because Programme Model Table was reloaded - contains ", nrow(result$POData), " rows"))
-        result$selectprogOasisID <- result$POData[1, POData.ProgOasisId]
+      if (result$modelID != "" && !is.null(result$POData) && nrow(result$POData) > 0) {
+        logMessage(paste0("updating modelID choices because Programme Model Table was reloaded - contains ", nrow(result$POData), " rows"))
+        result$modelID <- result$POData[1, POData.ProgOasisId]
       }
     }
   })
 
-  # If selectprogOasisID changes, reload process run table and set view back to default
-  observeEvent(result$selectprogOasisID, ignoreInit = TRUE, {
+  # If modelID changes, reload process run table and set view back to default
+  observeEvent(result$modelID, ignoreInit = TRUE, {
     if (active()) {
       bl_dirty1 <- stop_selProgOasisID > check_selProgOasisID
       #.defaultview(session)
       hide("panelModelDetails")
-      if (result$selectprogOasisID != "") {
+      if (result$modelID != "") {
         if (!is.null(result$POData) && nrow(result$POData) > 0   && !bl_dirty1 ) {
-          rowToSelect <- match(result$selectprogOasisID, result$POData[, POData.ProgOasisId])
+          rowToSelect <- match(result$modelID, result$POData[, POData.ProgOasisId])
           pageSel <- ceiling(rowToSelect/pageLength)
           if (!is.null(input$tableProgOasisOOK_rows_selected) && rowToSelect != input$tableProgOasisOOK_rows_selected) {
             # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
@@ -274,8 +272,8 @@ step2_chooseModel <- function(input, output, session,
   # Programme Model Table ------------------------------------------------------
   output$tableProgOasisOOK <- renderDT(
     if (!is.null(result$POData) && nrow(result$POData) > 0 ) {
-      if (isolate(result$selectprogOasisID) != "") {
-        rowToSelect <- match(isolate(result$selectprogOasisID), result$POData[,POData.ProgOasisId])
+      if (isolate(result$modelID) != "") {
+        rowToSelect <- match(isolate(result$modelID), result$POData[,POData.ProgOasisId])
       } else {
         rowToSelect <- 1
       }
@@ -292,15 +290,15 @@ step2_chooseModel <- function(input, output, session,
         options = .getPRTableOptions()
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no Models associated with Programme ID ", result$selectprogrammeID))
+      .nothingToShowTable(contentMessage = paste0("no Models associated with Programme ID ", result$portfolioID))
     }
   )
 
   #  Programme Model Table title
   output$paneltitleProgrammeModelTable <- renderUI({
-    if (result$selectprogrammeID != "") {
-      progName <- ifelse(toString(progName()) == " " | toString(progName()) == "" | toString(progName()) == "NA", "", paste0('"', toString(progName()), '"'))
-      paste0('Model Associations for Programme id ', toString(result$selectprogrammeID), ' ', progName,' ', toString(progStatus()))
+    if (result$portfolioID != "") {
+      pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
+      paste0('Model Associations for Programme id ', toString(result$portfolioID), ' ', pfName,' ', toString(progStatus()))
     } else {
       paste0("Models")
     }
@@ -308,9 +306,9 @@ step2_chooseModel <- function(input, output, session,
 
   # Associate Model Table Title
   output$paneltitleAssociateModel <- renderUI({
-    if (result$selectprogrammeID != "") {
-      progName <- ifelse(toString(progName()) == " " | toString(progName()) == "" | toString(progName()) == "NA", "", paste0('"', toString(progName()), '"'))
-      paste0('Create Model Association to Programme id ', toString(result$selectprogrammeID), ' ', progName,' ', toString(progStatus()))
+    if (result$portfolioID != "") {
+      pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
+      paste0('Create Model Association to Programme id ', toString(result$portfolioID), ' ', pfName,' ', toString(progStatus()))
     } else {
       paste0("Create Model Association")
     }
@@ -331,7 +329,7 @@ step2_chooseModel <- function(input, output, session,
         options = .getPRTableOptions()
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$selectprogOasisID ))
+      .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$modelID ))
     })
 
   # Details Model title
@@ -389,7 +387,7 @@ step2_chooseModel <- function(input, output, session,
     input$sinputookmodelid
     input$sinputProgModTransform
   }, ignoreInit = TRUE, {
-    if (input$sinputookmodelid > 0 && input$sinputProgModTransform > 0 && result$selectprogrammeID != "") {
+    if (input$sinputookmodelid > 0 && input$sinputProgModTransform > 0 && result$portfolioID != "") {
       enable("abuttoncrprogoasis")
     } else {
       disable("abuttoncrprogoasis")
@@ -400,7 +398,7 @@ step2_chooseModel <- function(input, output, session,
   onclick("abuttoncrprogoasis", {
     if (progStatus() == "- Status: Completed") {
       prgId <- createProgOasis(dbSettings,
-                               result$selectprogrammeID,
+                               result$portfolioID,
                                isolate(input$sinputookmodelid),
                                isolate(input$sinputProgModTransform))
       prgId <- ifelse(is.null(prgId), -1, prgId)
@@ -461,8 +459,8 @@ step2_chooseModel <- function(input, output, session,
         prgId <- result$POData[input$tableProgOasisOOK_rows_selected, POData.ProgOasisId]
         procId <- toString(prgId)
 
-        logMessage(paste("updating selectprogOasisID because selection in programme model table changed to",  prgId))
-        result$selectprogOasisID <- prgId
+        logMessage(paste("updating modelID because selection in programme model table changed to",  prgId))
+        result$modelID <- prgId
 
         if (result$POData[input$tableProgOasisOOK_rows_selected, POData.Status] == StatusCompleted) {
           paramlist <- executeDbQuery(dbSettings,
@@ -482,7 +480,7 @@ step2_chooseModel <- function(input, output, session,
         }
 
       } else {
-        result$selectprogOasisID <- ""
+        result$modelID <- ""
       }
     }
   })
@@ -509,8 +507,8 @@ step2_chooseModel <- function(input, output, session,
   # Reload Programme Model table
   .reloadPOData <- function() {
     logMessage(".reloadPOData called")
-    if (result$selectprogrammeID != "") {
-      POData <- getProgOasisForProgdata(dbSettings, result$selectprogrammeID)
+    if (result$portfolioID != "") {
+      POData <- getProgOasisForProgdata(dbSettings, result$portfolioID)
       if (!is.null(POData)) {
         result$POData <- POData %>%
           select(c(POData.ProgOasisId, POData.ProgName, POData.ModelName, POData.TransformName, POData.SourceFileId, POData.FileID, POData.Status)) %>%
@@ -598,7 +596,7 @@ step2_chooseModel <- function(input, output, session,
 
   moduleOutput <- c(
     list(
-      selectprogOasisID = reactive({result$selectprogOasisID}),
+      modelID = reactive({result$modelID}),
       POData = reactive({result$POData}),
       newstep = reactive({input$abuttonpgotonextstep})
     )

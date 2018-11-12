@@ -123,11 +123,10 @@ singleAna <- function(input, output, session, dbSettings,
     active = reactive({active() && workflowSteps$step() == 2}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
-    selectprogrammeID = reactive(input$portfolioID),
-    selectprogOasisID = reactive(input$modelID),
-    progName = reactive({result$pfName}),
-    progStatus = reactive({result$progStatus}),
-    DPProgData = reactive({result$tbl_portfoliosData})
+    portfolioID = reactive(input$portfolioID),
+    modelID = reactive(input$modelID),
+    pfName = reactive({result$pfName}),
+    progStatus = reactive({result$progStatus})
   )
 
   submodulesList$step3_configureOutput <- callModule(
@@ -230,11 +229,11 @@ singleAna <- function(input, output, session, dbSettings,
   })
 
   # > modelID --------------------------------------------------------
-  observeEvent(submodulesList$step2_chooseModel$selectprogOasisID(), ignoreInit = TRUE, {
-    progOasisId <- submodulesList$step2_chooseModel$selectprogOasisID()
+  observeEvent(submodulesList$step2_chooseModel$modelID(), ignoreInit = TRUE, {
+    progOasisId <- submodulesList$step2_chooseModel$modelID()
     if (!is.null(progOasisId) && result$modelID != progOasisId) {
-      logMessage(paste0("updating result$modelID because submodulesList$step2_chooseModel$portfolioID() changed to: ", progOasisId ))
-      result$modelID <- submodulesList$step2_chooseModel$selectprogOasisID()
+      logMessage(paste0("updating result$modelID because submodulesList$step2_chooseModel$modelID() changed to: ", progOasisId ))
+      result$modelID <- submodulesList$step2_chooseModel$modelID()
     }
   })
 

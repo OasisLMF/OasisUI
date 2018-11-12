@@ -9,10 +9,9 @@ step2_chooseModelUI(id)
 
 step2_chooseModel(input, output, session, dbSettings, apiSettings,
   active = reactive(TRUE), logMessage = message,
-  currstep = reactive(-1), selectprogrammeID = reactive({     "" }),
-  selectprogOasisID = reactive({     "" }), progName = reactive({    
-  "" }), progStatus = reactive({     "" }),
-  DPProgData = reactive(NULL))
+  currstep = reactive(-1), portfolioID = reactive({     "" }),
+  modelID = reactive({     "" }), pfName = reactive({     "" }),
+  progStatus = reactive({     "" }))
 }
 \arguments{
 \item{id}{module id}
@@ -33,15 +32,13 @@ step2_chooseModel(input, output, session, dbSettings, apiSettings,
 
 \item{currstep}{current selected step.}
 
-\item{selectprogrammeID}{selected programme ID.}
+\item{portfolioID}{selected programme ID.}
 
-\item{selectprogOasisID}{selected ProgOasis ID.}
+\item{modelID}{selected ProgOasis ID.}
 
-\item{progName}{Name of selected programme.}
+\item{pfName}{Name of selected programme.}
 
 \item{progStatus}{Status of selected programme.}
-
-\item{DPProgData}{Dataframe of programmes.}
 
 \item{id}{Namespace ID for the module.}
 
@@ -53,7 +50,7 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-selectprogOasisID Id of selected progOasis.
+modelID Id of selected progOasis.
 
 POData model association table.
 
