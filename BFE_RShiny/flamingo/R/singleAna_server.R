@@ -204,7 +204,7 @@ singleAna <- function(input, output, session, dbSettings,
     } else {
       result$tbl_portfoliosData <- submodulesList$step1_choosePortfolio$tbl_portfoliosData()
     }
-    result$progChoices <- result$tbl_portfoliosData[, tbl_portfoliosData.ProgrammeID]
+    result$progChoices <- result$tbl_portfoliosData[, tbl_portfoliosData.PortfolioID]
   })
 
   observeEvent({
@@ -213,7 +213,7 @@ singleAna <- function(input, output, session, dbSettings,
     result$tbl_portfoliosData
   }, ignoreInit = TRUE, {
     result$tbl_portfoliosData_rowselected <- match(result$portfolioID, result$progChoices)
-    result$pfName <- result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.ProgrammeName]
+    result$pfName <- result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.PortfolioName]
     progStatus <- ""
     if (!is.na(result$tbl_portfoliosData_rowselected) && !is.na(result$tbl_portfoliosData) && length(result$tbl_portfoliosData_rowselected) > 0) {
       if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusCompleted) {
@@ -340,8 +340,8 @@ singleAna <- function(input, output, session, dbSettings,
 #' @export
 replaceWithIcons <- function(df){
   #Status
-  StatusGood <- c("success", "completed", "loaded")
-  StatusBad <- c("cancelled", "failed",  NA_character_)
+  StatusGood <- c("success", "completed", "loaded", "200")
+  StatusBad <- c("cancelled", "failed",  NA_character_, "404")
 
   # Help function
   '%notin%' <- Negate('%in%')

@@ -21,7 +21,7 @@ library(flamingo, warn.conflicts = FALSE)
 
 source(file.path(".", "helper_text.R"), local = TRUE)
 
-### logger ----
+### logger ---------------------------------------------------------------------
 #addHandler(writeToFile, logger = "flamingo",
 #    file = file.path("var", "log", "shinyproxy", "flamingo.log"))
 
@@ -33,7 +33,7 @@ loginfo("testing logger", logger = "flamingo.module")
 
 logMessage <- function(msg) loginfo(msg, logger = "flamingo.module")
 
-### flamingo database ----
+### flamingo database ----------------------------------------------------------
 dbSettings <- flamingoDB(
   server = Sys.getenv("FLAMINGO_DB_IP"),
   port = Sys.getenv("FLAMINGO_DB_PORT"),
@@ -56,8 +56,9 @@ tryCatch({
 # (300000 == 5 mins)
 reloadMillis <- 300000
 
-# flamingo django API ---
+# flamingo django API ----------------------------------------------------------
 options(flamingo.settings.api = api_init("localhost", "8000"))
+options(flamingo.settings.api.version = "v1")
 
 loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
 tryCatch({
@@ -66,12 +67,16 @@ tryCatch({
   logerror(e$message, logger = "flamingo.module")
 })
 
-### Icons ----
+# Staus Code for files
+status_code_exist <- 200
+status_code_notfound <- 404
+
+### Icons ----------------------------------------------------------------------
 StatusFailed <- '<i class="fa fa-times-circle"></i>'
 StatusCompleted <- '<i class="fa fa-check-circle"></i>'
 StatusProcessing <- '<i class="fa fa-spinner"></i>'
 
-### Default Selection Items ----
+### Default Selection Items ----------------------------------------------------
 defaultSelectChoicesGUL <- c(
   "gulprogSummary", "gulprogELT", "gulprogAAL",
   "gulprogPLT", "gulprogFullUncAEP", "gulprogFullUncOEP"
@@ -88,7 +93,7 @@ defaultSelectChoicesRI <- c(
 )
 
 
-### Plots types ------
+### Plots types ----------------------------------------------------------------
 plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
                                                       "keycols" = c("loss"),
                                                       "uncertaintycols" = c(),
@@ -124,7 +129,7 @@ plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full 
                             # )
 )
 
-#Output options
+#Output options ----------------------------------------------------------------
 granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
 losstypes <- c("GUL", "IL", "RI")
 variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")
@@ -134,13 +139,18 @@ variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Fu
 ### Creating Variables for col names of Programme Table
 #result$tbl_portfoliosData
 #"Programme ID", "Programme Name", "Account ID", "Account Name", "Transform ID", "Transform", "Status"
-tbl_portfoliosData.ProgrammeID <- "Programme ID" #reactive(names(result$tbl_portfoliosData)[1])
-tbl_portfoliosData.ProgrammeName <- "Programme Name" #reactive(names(result$tbl_portfoliosData)[2])
-tbl_portfoliosData.AccountID <- "Account ID" #reactive(names(result$tbl_portfoliosData)[3])
-tbl_portfoliosData.AccountName <- "Account Name" #reactive(names(result$tbl_portfoliosData)[4])
-tbl_portfoliosData.TranformID <- "Transform ID" #reactive(names(result$tbl_portfoliosData)[5])
-tbl_portfoliosData.Tranform <- "Transform" #reactive(names(result$tbl_portfoliosData)[6])
-tbl_portfoliosData.Status <-  "Status" #reactive(names(result$tbl_portfoliosData)[7])
+# tbl_portfoliosData.ProgrammeID <- "Programme ID" #reactive(names(result$tbl_portfoliosData)[1])
+# tbl_portfoliosData.ProgrammeName <- "Programme Name" #reactive(names(result$tbl_portfoliosData)[2])
+# tbl_portfoliosData.AccountID <- "Account ID" #reactive(names(result$tbl_portfoliosData)[3])
+# tbl_portfoliosData.AccountName <- "Account Name" #reactive(names(result$tbl_portfoliosData)[4])
+# tbl_portfoliosData.TranformID <- "Transform ID" #reactive(names(result$tbl_portfoliosData)[5])
+# tbl_portfoliosData.Tranform <- "Transform" #reactive(names(result$tbl_portfoliosData)[6])
+# tbl_portfoliosData.Status <-  "Status" #reactive(names(result$tbl_portfoliosData)[7])
+tbl_portfoliosData.PortfolioID <- "id"
+tbl_portfoliosData.PortfolioName <- "name"
+tbl_portfoliosData.PortfolioCreated <- "created"
+tbl_portfoliosData.PortfolioModified <- "modified"
+tbl_portfoliosData.Status <- "Status"
 
 ### Creating Variables for col names of Programme Model Table
 # result$tbl_modelsData
