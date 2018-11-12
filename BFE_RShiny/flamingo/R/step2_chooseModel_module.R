@@ -71,14 +71,14 @@ panelModelDetails <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("progmodeldtl"),
+    ns("panel_model_details"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitleProgrammeModelDetails"), inline = TRUE),
-      actionButton(inputId = ns("abuttonprgoasisrfsh"), label = "Refresh", style = "float: right;"),
+      uiOutput(ns("paneltitle_ModelDetails"), inline = TRUE),
+      actionButton(inputId = ns("abuttonmodeldetailrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("tabledisplayprogoasisfiles"))
+    DTOutput(ns("dt_modelDetails"))
   )
 }
 
@@ -97,28 +97,28 @@ panelAssociateModel <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("progmodel"),
+    ns("panel_modelassociation"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitleAssociateModel"), inline = TRUE),
+      uiOutput(ns("paneltitle_AssociateModel"), inline = TRUE),
       actionButton(inputId = ns("abuttonhideassociatemodel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     fluidRow(
       column(4,
-             selectizeInput(ns("sinputookmodelid"), "Model", choices = c(""), selected = character(0),
+             selectizeInput(ns("sinputmodelid"), "Model", choices = c(""), selected = character(0),
                             options = list(
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
              )),
       column(4,
-             selectizeInput(ns("sinputProgModTransform"), "Transform Name", choices = c("") , selected = character(0),
+             selectizeInput(ns("sinputModTransform"), "Transform Name", choices = c("") , selected = character(0),
                             options = list(
                               allowEmptyOption = TRUE,
                               placeholder = 'Select',
                               onInitialize = I('function() { this.setValue(""); }'))
              )) %>%
-        bs_embed_tooltip(title = defineSingleAna$sinputProgModTransform,
+        bs_embed_tooltip(title = defineSingleAna$sinputModTransform,
                          placement = "right")),
 
     div(flamingoButton(inputId = ns("abuttoncrprogoasis"), label = "Create") %>%
@@ -305,7 +305,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
   # Associate Model Table Title
-  output$paneltitleAssociateModel <- renderUI({
+  output$paneltitle_AssociateModel <- renderUI({
     if (result$portfolioID != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
       paste0('Create Model Association to Programme id ', toString(result$portfolioID), ' ', pfName,' ', toString(progStatus()))
@@ -315,7 +315,7 @@ step2_chooseModel <- function(input, output, session,
   })
 
   # Model Details Table --------------------------------------------------------
-  output$tabledisplayprogoasisfiles <- renderDT(
+  output$dt_modelDetails <- renderDT(
     if (!is.null(result$progFiles) && nrow(result$progFiles) > 0 ) {
       logMessage("re-rendering programme model details table")
       datatable(
@@ -333,7 +333,7 @@ step2_chooseModel <- function(input, output, session,
     })
 
   # Details Model title
-  output$paneltitleProgrammeModelDetails <- renderUI({
+  output$paneltitle_ModelDetails <- renderUI({
     progOasisId <- result$POData[ input$dt_models_rows_selected,POData.ProgOasisId]
     progOasisName <- result$POData[ input$dt_models_rows_selected,POData.ProgName]
     progOasisName <- ifelse(progOasisName == " " | progOasisName == "", "", paste0('"', progOasisName, '"'))
@@ -384,10 +384,10 @@ step2_chooseModel <- function(input, output, session,
 
   # Enable and disable create button
   observeEvent({
-    input$sinputookmodelid
-    input$sinputProgModTransform
+    input$sinputmodelid
+    input$sinputModTransform
   }, ignoreInit = TRUE, {
-    if (input$sinputookmodelid > 0 && input$sinputProgModTransform > 0 && result$portfolioID != "") {
+    if (input$sinputmodelid > 0 && input$sinputModTransform > 0 && result$portfolioID != "") {
       enable("abuttoncrprogoasis")
     } else {
       disable("abuttoncrprogoasis")
@@ -399,8 +399,8 @@ step2_chooseModel <- function(input, output, session,
     if (progStatus() == "- Status: Completed") {
       prgId <- createProgOasis(dbSettings,
                                result$portfolioID,
-                               isolate(input$sinputookmodelid),
-                               isolate(input$sinputProgModTransform))
+                               isolate(input$sinputmodelid),
+                               isolate(input$sinputModTransform))
       prgId <- ifelse(is.null(prgId), -1, prgId)
       if (prgId == -1) {
         flamingoNotification(type = "error", paste("No Prog Oasis created"))
@@ -442,7 +442,7 @@ step2_chooseModel <- function(input, output, session,
     .reloadPOData()
   } )
 
-  onclick("abuttonprgoasisrfsh", {
+  onclick("abuttonmodeldetailrfsh", {
     .reloadProgFiles()
   } )
 
@@ -568,7 +568,7 @@ step2_chooseModel <- function(input, output, session,
   .clearOOKModelSelection <- function() {
     logMessage(".clearOOKModelSelection called")
     models <- getModelList(dbSettings)
-    updateSelectizeInput(session, "sinputookmodelid",
+    updateSelectizeInput(session, "sinputmodelid",
                          choices = createSelectOptions(models, "Select Model"),
                          selected = character(0))
   }
@@ -576,7 +576,7 @@ step2_chooseModel <- function(input, output, session,
   .clearOOKTransformSelection <- function() {
     logMessage(".clearOOKTransformSelection called")
     transforms <- getTransformNameCanModel(dbSettings)
-    updateSelectizeInput(session, "sinputProgModTransform",
+    updateSelectizeInput(session, "sinputModTransform",
                          choices = createSelectOptions(transforms, "Select Transform", labelCol = 1, valueCol = 2),
                          selected = character(0))
   }

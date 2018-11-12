@@ -47,7 +47,7 @@ landing_page <- list(
 
 defineSingleAna <- list(
   sinputTransformname = "Transformation Description to be added here",
-  sinputProgModTransform = "Transformation Description to be added here",
+  sinputModTransform = "Transformation Description to be added here",
   portfolioID = "Select a portfolio ID to which associate a model",
   modelID = "Select the Model to associate with the Portfolio",
   abuttonpfdetails = "Please select a Programme to show details",
