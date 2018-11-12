@@ -56,9 +56,9 @@ defineSingleAna <- list(
   abuttondeletepf = "Please select a Programme to Delete",
   abuttonmodeldetails = "Please select a Programme Model to show details",
   abuttoncrprogoasis = "Please select both fields",
-  abuttonrerunpr = "Please select a completed Programme Model to perform rerun",
+  abuttonrerunana = "Please select a completed Analysis to perform rerun",
   abuttonsaveoutput = "Please select Output Configuration",
-  abuttonexecuteprrun = "Please select Output Configuration",
+  abuttonexecuteanarun = "Please select Output Configuration",
   abuttonshowlog = "Please select a Process Run to show log",
   abuttondisplayoutput = "Please select a Process Run to display output"
 )

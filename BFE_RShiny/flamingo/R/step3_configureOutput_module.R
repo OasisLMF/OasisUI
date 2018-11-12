@@ -19,16 +19,16 @@ step3_configureOutputUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    hidden(div(id = ns("panelProcessRunTable"), panelProcessRunTable(id))),
+    hidden(div(id = ns("panelAnalysisTable"), panelAnalysisTable(id))),
     hidden(div(id = ns("panelDefineOutputs"), panelDefineOutputs(id))),
-    hidden(div(id = ns("panelProcessRunLogs"), panelProcessRunLogs(id)))
+    hidden(div(id = ns("panelAnalysisLogs"), panelAnalysisLogs(id)))
   )
 }
 
 
-#' panelProcessRunTable
+#' panelAnalysisTable
 #'
-#' @rdname panelProcessRunTable
+#' @rdname panelAnalysisTable
 #'
 #' @description Function wrapping panel to show process run table.
 #'
@@ -38,26 +38,26 @@ step3_configureOutputUI <- function(id) {
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
-panelProcessRunTable <- function(id) {
+panelAnalysisTable <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = TRUE,
     show = TRUE,
-    ns("runs"),
+    ns("panel_analysis"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitlepanelProcessRunTable"), inline = TRUE),
-      actionButton(inputId = ns("abuttonrefreshprrun"), label = "Refresh", style = "float: right;")
+      uiOutput(ns("paneltitle_AnalysisTable"), inline = TRUE),
+      actionButton(inputId = ns("abuttonanarefresh"), label = "Refresh", style = "float: right;")
     ),
-    div(id = "divProcessRun",
+    div(id = "divAnalysis",
         fluidRow(column(12,
-                        radioButtons(inputId = ns("radioprrunsAllOrInProgress"), "Processes' Status", list("All", "In Progress"), inline = TRUE))),
-        DTOutput(ns("tableprocessrundata")),
+                        radioButtons(inputId = ns("radioanaAllOrInProgress"), "Processes' Status", list("All", "In Progress"), inline = TRUE))),
+        DTOutput(ns("dt_analysis")),
         fluidRow(column(12,
-                        div(id = ns("divprocessRunButtons"),
+                        div(id = ns("divAnalysisButtons"),
                             flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration"),
-                            flamingoButton(inputId = ns("abuttonrerunpr"), label = "Rerun") %>%
-                              bs_embed_tooltip(title = defineSingleAna$abuttonrerunpr, placement = "right"),
+                            flamingoButton(inputId = ns("abuttonrerunana"), label = "Rerun") %>%
+                              bs_embed_tooltip(title = defineSingleAna$abuttonrerunana, placement = "right"),
                             flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
                             div(
@@ -69,9 +69,9 @@ panelProcessRunTable <- function(id) {
   )
 }
 
-#' panelProcessRunLogs
+#' panelAnalysisLogs
 #'
-#' @rdname panelProcessRunLogs
+#' @rdname panelAnalysisLogs
 #'
 #' @description Function wrapping panel to show log table for specific Process Run.
 #'
@@ -80,17 +80,17 @@ panelProcessRunTable <- function(id) {
 #' @importFrom DT DTOutput
 #'
 #' @export
-panelProcessRunLogs <- function(id) {
+panelAnalysisLogs <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("runlogs"),
+    ns("panel_analogs"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitleProcessRunLogs"), inline = TRUE),
+      uiOutput(ns("paneltitle_AnaLogs"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("tablelog"))
+    DTOutput(ns("dt_analogs"))
   )
 }
 
@@ -109,22 +109,22 @@ panelDefineOutputs <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("progout"),
+    ns("panel_anaoutput"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitleReDefineProgramme"), inline = TRUE),
+      uiOutput(ns("paneltitle_defAnaConfigOutput"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     fluidRow(
       column(4,
              panelDefineOutputsDetails(id)),
       column(8,
-             panelDefineOutputConfiguration(id))
+             panelDefOutputConfiguration(id))
     ),
     fluidRow(
       column(12,
-             flamingoButton(inputId = ns("abuttonexecuteprrun"), label = "Execute Run"), align = "right")) %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonexecuteprrun, placement = "right")
+             flamingoButton(inputId = ns("abuttonexecuteanarun"), label = "Execute Run"), align = "right")) %>%
+      bs_embed_tooltip(title = defineSingleAna$abuttonexecuteanarun, placement = "right")
   )
 }
 
@@ -144,17 +144,17 @@ panelDefineOutputsDetails <- function(id) {
   tagList(
     flamingoPanel(
       collapsible = FALSE,
-      ns("configdtl"),
+      ns("panel_ConfigDetails"),
       heading = h4("Configuration Details"),
       selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = ""),
-      textInput(ns("tinputprocessrunname"), label = "Process Run Name:", value = "")
+      textInput(ns("tinputananame"), label = "Analysis Name:", value = "")
     ),
     flamingoPanel(
       collapsible = FALSE,
-      ns("modelpar"),
+      ns("panel_defAnaOutputDetails"),
       heading = h4("Model Parameters"),
       div(id = ns("noofsample"), style = "width:100%; margin: 0 auto;", textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10")),
-      hidden(div(id = ns("configureModelParamsAdvanced"), align = "left",
+      hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
                  selectInput(ns("sinputeventset"), label = "Event Set:", choices = "Probabilistic"),
                  selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "Long Term"),
@@ -176,9 +176,9 @@ panelDefineOutputsDetails <- function(id) {
   )
 }
 
-#' panelDefineOutputConfiguration
+#' panelDefOutputConfiguration
 #'
-#' @rdname panelDefineOutputConfiguration
+#' @rdname panelDefOutputConfiguration
 #'
 #' @description Function wrapping sub-panel to define outputs configuration.
 #'
@@ -188,18 +188,18 @@ panelDefineOutputsDetails <- function(id) {
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
-panelDefineOutputConfiguration <- function(id) {
+panelDefOutputConfiguration <- function(id) {
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("outconfig"),
+    ns("panel_outconfig"),
     heading = h4("Output Configuration"),
     checkboxInput(ns("chkinputGUL"), label = "Ground Up Loss", value = TRUE),
-    hidden(div(id = ns("configureAdvancedGUL"), configureAdvancedGUL(id))),
+    hidden(div(id = ns("panel_configureAdvancedGUL"), panel_configureAdvancedGUL(id))),
     checkboxInput(ns("chkinputIL"), label = "Insured Loss", value = FALSE),
-    hidden(div(id = ns("configureAdvancedIL"), configureAdvancedIL(id))),
+    hidden(div(id = ns("panel_configureAdvancedIL"), panel_configureAdvancedIL(id))),
     checkboxInput(ns("chkinputRI"), label = "Net RI Loss", value = FALSE),
-    hidden(div(id = ns("configureAdvancedRI"), configureAdvancedRI(id))),
+    hidden(div(id = ns("panel_configureAdvancedRI"), panel_configureAdvancedRI(id))),
     flamingoButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
     hidden(flamingoButton(inputId = ns("abuttonbasic"), label = "Basic")),
     hidden(flamingoButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration")) %>%
@@ -208,16 +208,16 @@ panelDefineOutputConfiguration <- function(id) {
   )
 }
 
-#' configureAdvancedGUL
+#' panel_configureAdvancedGUL
 #'
-#' @rdname configureAdvancedGUL
+#' @rdname panel_configureAdvancedGUL
 #'
 #' @description Function wrapping sub-panel to define outputs advanced configuration GUL.
 #'
 #' @template params-module-ui
 #'
 #' @export
-configureAdvancedGUL <- function(id) {
+panel_configureAdvancedGUL <- function(id) {
   ns <- NS(id)
   fluidRow(
     # Few outputs commented/disabled for the first release. To be enabled for later releases.
@@ -341,16 +341,16 @@ configureAdvancedGUL <- function(id) {
   )
 }
 
-#' configureAdvancedIL
+#' panel_configureAdvancedIL
 #'
-#' @rdname configureAdvancedIL
+#' @rdname panel_configureAdvancedIL
 #'
 #' @description Function wrapping sub-panel to define outputs advanced configuration IL.
 #'
 #' @template params-module-ui
 #'
 #' @export
-configureAdvancedIL <- function(id) {
+panel_configureAdvancedIL <- function(id) {
   ns <- NS(id)
   fluidRow(
     column(4,
@@ -472,16 +472,16 @@ configureAdvancedIL <- function(id) {
   )
 }
 
-#' configureAdvancedRI
+#' panel_configureAdvancedRI
 #'
-#' @rdname configureAdvancedRI
+#' @rdname panel_configureAdvancedRI
 #'
 #' @description Function wrapping sub-panel to define outputs advanced configuration RI.
 #'
 #' @template params-module-ui
 #'
 #' @export
-configureAdvancedRI <- function(id) {
+panel_configureAdvancedRI <- function(id) {
   ns <- NS(id)
   fluidRow(
     column(4,
@@ -667,7 +667,7 @@ step3_configureOutput <- function(input, output, session,
   observeEvent(selectprogOasisID(), ignoreInit = TRUE, {
     if (active()) {
       hide("panelDefineOutputs")
-      hide("panelProcessRunLogs")
+      hide("panelAnalysisLogs")
       .reloadRunData()
     }
   })
@@ -675,9 +675,9 @@ step3_configureOutput <- function(input, output, session,
 
   # Process Run Table ----------------------------------------------------------
   # reload if radio buttons for 'All' vs 'In_Progress' change
-  observeEvent(input$radioprrunsAllOrInProgress, ignoreInit = TRUE, {
+  observeEvent(input$radioanaAllOrInProgress, ignoreInit = TRUE, {
     if (active()) {
-      logMessage(paste0("filter changed to ", input$radioprrunsAllOrInProgress))
+      logMessage(paste0("filter changed to ", input$radioanaAllOrInProgress))
       .reloadRunData()
     }
   })
@@ -688,7 +688,7 @@ step3_configureOutput <- function(input, output, session,
     prcid <- selectprogOasisID()
     # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
     # 'In Progress' (not handled by stored procedure in the DB due to bug!)
-    prcrundata <- getProcessRun(dbSettings, prcid, input$radioprrunsAllOrInProgress) %>%
+    prcrundata <- getProcessRun(dbSettings, prcid, input$radioanaAllOrInProgress) %>%
       rename(Status = prcrundata.ProcessRunStatus.old) %>%
       as.data.frame()
     # RSc TODO: should probably allow NULL to clear connections when selecting
@@ -697,7 +697,7 @@ step3_configureOutput <- function(input, output, session,
       result$prcrundata <- prcrundata %>%
         replaceWithIcons()
       #Handling bug for 'In Progress'
-      if (input$radioprrunsAllOrInProgress == "In_Progress") {
+      if (input$radioanaAllOrInProgress == "In_Progress") {
         result$prcrundata <- result$prcrundata %>% filter(ProcessRunStatus == StatusProcessing)
       }
     } else {
@@ -705,7 +705,7 @@ step3_configureOutput <- function(input, output, session,
     }
   }
 
-  output$tableprocessrundata <- renderDT(
+  output$dt_analysis <- renderDT(
 
     if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0) {
       index <- 1
@@ -726,7 +726,7 @@ step3_configureOutput <- function(input, output, session,
     })
 
   # Process Run Table Title
-  output$paneltitlepanelProcessRunTable <- renderUI({
+  output$paneltitle_AnalysisTable <- renderUI({
     if (selectprogOasisID() != "") {
       progOasisName <- ifelse(toString(progOasisName()) == " " | toString(progOasisName()) == "" | toString(progOasisName()) == "NA", "", paste0('"',  toString(progOasisName()), '"'))
       paste0('Runs for Model id ', toString(selectprogOasisID()), ' ', progOasisName,' ', toString(progOasisStatus()))
@@ -743,10 +743,10 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # configuration title
-  output$paneltitleReDefineProgramme <- renderUI({
+  output$paneltitle_defAnaConfigOutput <- renderUI({
     if (result$prrun_flag  == "R") {
-      processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
-      processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName]
+      processRunId <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunID]
+      processRunName <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunName]
       processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
       paste0('Re-Define Output Configuration for Run id ', processRunId, ' ', processRunName)
     } else {
@@ -760,17 +760,17 @@ step3_configureOutput <- function(input, output, session,
     selectprogOasisID()
     progOasisStatus()
     currstep()
-    input$tableprocessrundata_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      disable("abuttonrerunpr")
+    input$dt_analysis_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      disable("abuttonrerunana")
       disable("abuttondisplayoutput")
       disable("abuttonshowlog")
       disable("abuttonconfigoutput")
       if (selectprogOasisID() != "" && progOasisStatus() == "- Status: Completed") {
         enable("abuttonconfigoutput")
-        if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0 && length(input$tableprocessrundata_rows_selected) > 0) {
-          enable("abuttonrerunpr")
+        if (!is.null(result$prcrundata) && nrow(result$prcrundata) > 0 && length(input$dt_analysis_rows_selected) > 0) {
+          enable("abuttonrerunana")
           enable("abuttonshowlog")
-          if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] == StatusCompleted) {
+          if (result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunStatus] == StatusCompleted) {
             enable("abuttondisplayoutput")
           }
         }
@@ -784,11 +784,11 @@ step3_configureOutput <- function(input, output, session,
     show("panelDefineOutputs")
     .showPerils()
     logMessage("showing panelDefineOutputs")
-    logMessage(paste("updating tableprocessrundataa select because defining new output configuration"))
+    logMessage(paste("updating dt_analysisa select because defining new output configuration"))
     result$prrun_flag <- "C"
   })
 
-  onclick("abuttonrerunpr", {
+  onclick("abuttonrerunana", {
     .defaultview(session)
     show("panelDefineOutputs")
     .showPerils()
@@ -944,10 +944,10 @@ step3_configureOutput <- function(input, output, session,
   observeEvent(outputOptionsList, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (outputOptionsList() != "") {
       enable("abuttonsaveoutput")
-      enable("abuttonexecuteprrun")
+      enable("abuttonexecuteanarun")
     } else {
       disable("abuttonsaveoutput")
-      disable("abuttonexecuteprrun")
+      disable("abuttonexecuteanarun")
     }
   })
 
@@ -977,7 +977,7 @@ step3_configureOutput <- function(input, output, session,
   # A function to generate process run
   .generateRun <- function() {
 
-    processrunname <- isolate(input$tinputprocessrunname)
+    processrunname <- isolate(input$tinputananame)
     nosample <- isolate(input$tinputnoofsample)
     sthreshold <- isolate(input$tinputthreshold)
     eventsetid <- isolate(input$sinputeventset)
@@ -1051,7 +1051,7 @@ step3_configureOutput <- function(input, output, session,
   }
 
   # Execute Process run: When "Execute Run" button is clicked - switsches view to Run panel
-  onclick("abuttonexecuteprrun", {
+  onclick("abuttonexecuteanarun", {
     runId <- .generateRun()
     if (is.null(runId)) {
       flamingoNotification(type = "error",
@@ -1064,17 +1064,17 @@ step3_configureOutput <- function(input, output, session,
                                      runId))
         .reloadRunData()
         #logMessage(paste("colnames are:", paste(colnames(result$prcrundata), collapse = ", ")))
-        logMessage(paste("updating tableprocessrundataa select because executing a new run"))
+        logMessage(paste("updating dt_analysisa select because executing a new run"))
         rowToSelect <- match(runId, result$prcrundata[, prcrundata.ProcessRunID])
         pageSel <- ceiling(rowToSelect/pageLength)
-        selectRows(dataTableProxy("tableprocessrundata"), rowToSelect)
-        selectPage(dataTableProxy("tableprocessrundata"), pageSel)
-        logMessage(paste("selected row is:", input$tableprocessrundata_rows_selected))
+        selectRows(dataTableProxy("dt_analysis"), rowToSelect)
+        selectPage(dataTableProxy("dt_analysis"), pageSel)
+        logMessage(paste("selected row is:", input$dt_analysis_rows_selected))
       } else {
         flamingoNotification(type = "warning",
                              sprintf("Created Process Run ID: %s. But process run executing failed",
                                      runId))
-        show("panelProcessRunLogs")
+        show("panelAnalysisLogs")
         logMessage("showing prrunlogtable")
       }
     }
@@ -1083,19 +1083,19 @@ step3_configureOutput <- function(input, output, session,
 
   # Logs -----------------------------------------------------------------------
   onclick("abuttonshowlog", {
-    show("panelProcessRunLogs")
+    show("panelAnalysisLogs")
     logMessage("showing prrunlogtable")
   })
 
   onclick("abuttonhidelog", {
-    hide("panelProcessRunLogs")
+    hide("panelAnalysisLogs")
   })
 
   ### Log Table
-  output$tablelog <- renderDT({
-    if (length(input$tableprocessrundata_rows_selected) > 0) {
+  output$dt_analogs <- renderDT({
+    if (length(input$dt_analysis_rows_selected) > 0) {
       # manual refresh button
-      invisible(input$abuttonrefreshprrunlogs)
+      invisible(input$abuttonanarefreshlogs)
 
       wfid <- result$prrunid
 
@@ -1120,29 +1120,29 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # run logs title
-  output$paneltitleProcessRunLogs <- renderUI({
-    processRunId <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
-    processRunName <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName]
+  output$paneltitle_AnaLogs <- renderUI({
+    processRunId <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunID]
+    processRunName <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunName]
     processRunName <- ifelse(processRunName == " ", "", paste0('"', processRunName, '"'))
     paste0('Logs for Run id ', processRunId, ' ', processRunName)
   })
 
   # Refresh Buttons ------------------------------------------------------------
-  onclick("abuttonrefreshprrun", {
+  onclick("abuttonanarefresh", {
     .reloadRunData()
   } )
 
-  # Updates dependent on changed: tableprocessrundata_rows_selected ------------
+  # Updates dependent on changed: dt_analysis_rows_selected ------------
   # Allow display output option only if run successful. Otherwise default view is logs
-  observeEvent(input$tableprocessrundata_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$dt_analysis_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
-      logMessage(paste("input$tableprocessrundata_rows_selected is changed to:", input$tableprocessrundata_rows_selected))
+      logMessage(paste("input$dt_analysis_rows_selected is changed to:", input$dt_analysis_rows_selected))
       hide("panelDefineOutputs")
-      hide("panelProcessRunLogs")
-      if (length(input$tableprocessrundata_rows_selected) > 0 && !is.null(result$prcrundata)) {
-        result$prrunid <- result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunID]
-        if (result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
-          show("panelProcessRunLogs")
+      hide("panelAnalysisLogs")
+      if (length(input$dt_analysis_rows_selected) > 0 && !is.null(result$prcrundata)) {
+        result$prrunid <- result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunID]
+        if (result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunStatus] != StatusCompleted) {
+          show("panelAnalysisLogs")
           logMessage("showing prrunlogtable")
         }
       } else {
@@ -1162,17 +1162,17 @@ step3_configureOutput <- function(input, output, session,
   .hideDivs <- function() {
     logMessage(".hideDivs called")
     #Section "Configure Output & Run" = "3"
-    hide("panelProcessRunTable")
+    hide("panelAnalysisTable")
     hide("panelDefineOutputs")
-    hide("panelProcessRunLogs")
+    hide("panelAnalysisLogs")
   }
 
   #show default view for Section "Configure Output & Run" = "3"
   .defaultRun <- function(){
     logMessage(".defaultRun called")
-    show("panelProcessRunTable")
+    show("panelAnalysisTable")
     disable("chkgulpolicy")
-    disable("abuttonrerunpr")
+    disable("abuttonrerunana")
     disable("abuttondisplayoutput")
     disable("abuttonshowlog")
     disable("abuttonconfigoutput")
@@ -1247,7 +1247,7 @@ step3_configureOutput <- function(input, output, session,
     updateSelectInput(session, "sinoutputoptions",
                       choices = c(getOutputOptions(dbSettings)),
                       selected = character(0))
-    updateTextInput(session, "tinputprocessrunname", value = "")
+    updateTextInput(session, "tinputananame", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
 
     prgId <- ifelse(selectprogOasisID() == "", -1,selectprogOasisID())
@@ -1299,7 +1299,7 @@ step3_configureOutput <- function(input, output, session,
     outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$prrunid ))
     runparamsforpr <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$prrunid ))
 
-    updateTextInput(session, "tinputprocessrunname", value = result$prcrundata[input$tableprocessrundata_rows_selected, prcrundata.ProcessRunName])
+    updateTextInput(session, "tinputananame", value = result$prcrundata[input$dt_analysis_rows_selected, prcrundata.ProcessRunName])
 
     if (nrow(runparamsforpr) > 0) {
       for (i in 1:nrow(runparamsforpr)) {
@@ -1334,10 +1334,10 @@ step3_configureOutput <- function(input, output, session,
   # Output view
   .advancedview <- function() {
     logMessage(".advancedview called")
-    show("configureAdvancedGUL")
-    show("configureAdvancedIL")
-    show("configureAdvancedRI")
-    show("configureModelParamsAdvanced")
+    show("panel_configureAdvancedGUL")
+    show("panel_configureAdvancedIL")
+    show("panel_configureAdvancedRI")
+    show("configureAnaParamsAdvanced")
     show("abuttonbasic")
     hide("abuttonadvanced")
     show("abuttonsaveoutput")
@@ -1346,10 +1346,10 @@ step3_configureOutput <- function(input, output, session,
 
   .basicview <- function() {
     logMessage(".basicview called")
-    hide("configureAdvancedGUL")
-    hide("configureAdvancedIL")
-    hide("configureAdvancedRI")
-    hide("configureModelParamsAdvanced")
+    hide("panel_configureAdvancedGUL")
+    hide("panel_configureAdvancedIL")
+    hide("panel_configureAdvancedRI")
+    hide("configureAnaParamsAdvanced")
     hide("abuttonbasic")
     show("abuttonadvanced")
     hide("abuttonsaveoutput")
