@@ -8,3 +8,15 @@
 #'
 #' @md
 '%>%' <- dplyr::'%>%'
+
+
+#' Negate in operator
+#'
+#' @rdname negate
+#'
+#' @description negate in operator
+#'
+#' @export
+#'
+#' @md
+'%notin%' <- Negate('%in%')

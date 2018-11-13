@@ -85,9 +85,6 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     fileData = NULL
   )
   
-  # Help function
-  '%notin%' <- Negate('%in%')
-  
   # Add buttons ----------------------------------------------------------------
   observeEvent(filesListData(), ignoreNULL = FALSE, {
     filesListData <- filesListData()

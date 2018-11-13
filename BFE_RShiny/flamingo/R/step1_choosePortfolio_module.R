@@ -331,7 +331,7 @@ step1_choosePortfolio <- function(input, output, session,
         escape = FALSE,
         selection = "none",
         colnames = c('Row Number' = 1),
-        options = .getPRTableOptions()
+        options = .getPRTableOptions(pageLengthVal = 10) #details max 10 rows, no need for double page
       )
     } else {
       .nothingToShowTable(contentMessage = paste0("No files available for portfolio ID ", result$portfolioID))
@@ -359,12 +359,6 @@ step1_choosePortfolio <- function(input, output, session,
       enable("abuttonpfdetails")
       enable("abuttondeletepf")
       enable("abuttonamendpf")
-      
-      print("result$tbl_portfoliosData")
-      print(result$tbl_portfoliosData)
-      print("result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status]")
-      print(result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status])
-      
       if (result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status] == StatusCompleted) {
         enable("abuttonpgotonextstep")
       }
@@ -943,7 +937,7 @@ step1_choosePortfolio <- function(input, output, session,
   # Reload portfolio table
   .reloadtbl_portfoliosData <- function() {
     # manual refresh button
-    # logMessage(".reloadtbl_portfoliosData called")
+    logMessage(".reloadtbl_portfoliosData called")
     # stmt <- buildDbQuery("getProgData")
     # tbl_portfoliosData <- executeDbQuery(dbSettings, stmt)
     tbl_portfoliosData <- return_tbl_portfoliosData()
@@ -960,13 +954,13 @@ step1_choosePortfolio <- function(input, output, session,
     logMessage(".reloadtbl_portfolioDetails called")
     if (length(input$dt_Portfolios_rows_selected) > 0) {
       pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
-
-      stmt <- buildDbQuery("getProgFileDetails", pfId)
-      tbl_portfolioDetails <- executeDbQuery(dbSettings, stmt)
-      if (!is.null(tbl_portfolioDetails)) {
-        result$tbl_portfolioDetails  <- tbl_portfolioDetails %>%
-          replaceWithIcons()
-      }
+      # stmt <- buildDbQuery("getProgFileDetails", pfId)
+      # tbl_portfolioDetails <- executeDbQuery(dbSettings, stmt)
+      # if (!is.null(tbl_portfolioDetails)) {
+      #   result$tbl_portfolioDetails  <- tbl_portfolioDetails %>%
+      #     replaceWithIcons()
+      # }
+      result$tbl_portfolioDetails  <- return_tbl_portfolioDetails(pfId)
       logMessage("portfolio details table refreshed")
     } else {
       result$tbl_portfolioDetails  <- NULL
@@ -975,12 +969,12 @@ step1_choosePortfolio <- function(input, output, session,
   }
 
   # table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function() {
+  .getPRTableOptions <- function(pageLengthVal = pageLength) {
     options <- list(
       search = list(caseInsensitive = TRUE),
       searchHighlight = TRUE,
       processing = 0,
-      pageLength = pageLength,
+      pageLength = pageLengthVal,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }

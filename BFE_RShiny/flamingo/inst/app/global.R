@@ -136,7 +136,7 @@ variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Fu
 
 
 # > Variables for cols positions -----------------------------------------------
-### Creating Variables for col names of Programme Table
+### Creating Variables for col names of Portfolio Table
 #result$tbl_portfoliosData
 #"Programme ID", "Programme Name", "Account ID", "Account Name", "Transform ID", "Transform", "Status"
 # tbl_portfoliosData.ProgrammeID <- "Programme ID" #reactive(names(result$tbl_portfoliosData)[1])
@@ -152,7 +152,17 @@ tbl_portfoliosData.PortfolioCreated <- "created"
 tbl_portfoliosData.PortfolioModified <- "modified"
 tbl_portfoliosData.Status <- "Status"
 
-### Creating Variables for col names of Programme Model Table
+### Creating Variables for portfolio Details table
+tbl_portfolioDetails.PortfolioID <- "id"
+tbl_portfolioDetails.PortfolioName <- "name"
+tbl_portfolioDetails.PortfolioCreated <- "created"
+tbl_portfolioDetails.PortfolioModified <- "modified"
+tbl_portfolioDetails.PortfolioLoc <- "location_file"
+tbl_portfolioDetails.PortfolioAcc <- "accounts_file"
+tbl_portfolioDetails.PortfolioRIinfo <- "reinsurance_info_file"
+tbl_portfolioDetails.PortfolioRIsource <- "reinsurance_source_file"
+
+### Creating Variables for col names of Model Table
 # result$tbl_modelsData
 #"ProgOasisId", "ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status"
 tbl_modelsData.ProgOasisId <- "ProgOasisId" #reactive(names(result$tbl_modelsData)[1])

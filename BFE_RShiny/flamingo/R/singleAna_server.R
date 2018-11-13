@@ -343,9 +343,6 @@ replaceWithIcons <- function(df){
   StatusGood <- c("success", "completed", "loaded", "200")
   StatusBad <- c("cancelled", "failed",  NA_character_, "404")
 
-  # Help function
-  '%notin%' <- Negate('%in%')
-
   #Replace Status in df
   if (!is.null(df)) {
     logMessage(paste0("replacing icons"))

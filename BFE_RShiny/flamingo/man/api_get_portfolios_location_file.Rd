@@ -7,7 +7,7 @@
 api_get_portfolios_location_file(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{a unique integer value identifying this portfolio.}
 }
 \value{
 previously posted portfolios location files.
