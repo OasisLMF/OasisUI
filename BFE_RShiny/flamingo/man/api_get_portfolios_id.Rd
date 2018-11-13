@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_portfolios.R
 \name{api_get_portfolios_id}
 \alias{api_get_portfolios_id}
-\title{Get portfolios id}
+\title{Get portfolios info by id}
 \usage{
 api_get_portfolios_id(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{a unique integer value identifying this portfolio}
 }
 \value{
 previously posted portfolios id.
 }
 \description{
-Returns the specific analysis entry.
+Returns the specific portfolio entry.
 }

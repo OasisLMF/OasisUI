@@ -45,13 +45,59 @@ api_get_portfolios <- function(name = "") {
   )
 }
 
-#' Get portfolios id
+#' Post portfolios
 #' 
-#' Returns the specific analysis entry.
+#' Creates a portfolio based on the input data.
+#' 
+#' @rdname api_post_portfolios
+#' 
+#' @param name name of the portfolio.
+#' 
+#' @return the posted portfolio. 
+#' 
+#' @importFrom httr POST 
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_post_portfolios <- function(name) {
+  
+  response <- POST(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())#,
+    ),
+    body = list(name = name),
+    encode = "json",
+    path = paste(get_version(), "portfolios", "", sep = "/")
+  )
+  
+  logWarning = warning
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
+
+
+#' Get portfolios info by id
+#' 
+#' Returns the specific portfolio entry.
 #' 
 #' @rdname api_get_portfolios_id
 #' 
-#' @param id a unique integer value identifying this analysis.
+#' @param id a unique integer value identifying this portfolio
 #' 
 #' @return previously posted portfolios id. 
 #' 
@@ -64,6 +110,44 @@ api_get_portfolios <- function(name = "") {
 api_get_portfolios_id <- function(id) {
   
   response <- GET(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())
+    ),
+    path = paste(get_version(), "portfolios", id, "", sep = "/")
+  )
+  
+  logWarning = warning
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
+#' Delete portfolios by id
+#' 
+#' @rdname api_delete_portfolios_id
+#' 
+#' @param id a unique integer value identifying this portfolio.
+#' 
+#' @importFrom httr DELETE
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_delete_portfolios_id <- function(id) {
+  
+  response <- DELETE(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
@@ -141,6 +225,8 @@ return_tbl_portfoliosData <- function(name = ""){
   }
   tbl_portfoliosData <- cbind(tbl_portfoliosData, status) %>%
     as.data.frame()
+  tbl_portfoliosData <- tbl_portfoliosData %>%
+    arrange(desc(id))
   return(tbl_portfoliosData)
 }
 

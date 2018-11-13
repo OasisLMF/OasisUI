@@ -348,8 +348,8 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Enable and disable buttons
   observeEvent({
-    result$tbl_portfoliosData
-    input$dt_Portfolios_rows_selected
+    result$portfolioID
+    # input$dt_Portfolios_rows_selected
     }, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonpfdetails")
       disable("abuttondeletepf")
@@ -451,12 +451,14 @@ step1_choosePortfolio <- function(input, output, session,
       # query <- paste0("exec dbo.createProg [", input$tinputpfName,
       #                 "],", input$sinputDPAccountName, ", [",
       #                 input$sinputTransformname, "]")
-      res <- executeDbQuery(dbSettings, query)
-      if (is.null(res)) {
-
-      } else {
+      # res <- executeDbQuery(dbSettings, query)
+      post_portfolios <- api_post_portfolios(input$tinputpfName)
+      if (post_portfolios$status == "Success") {
         flamingoNotification(type = "message",
                              paste("portfolio ", input$tinputpfName, " created."))
+      } else {
+        flamingoNotification(type = "Error",
+                             paste("An error has occurred. Portfolio ", input$tinputpfName, " has not been created."))
       }
     } else if (result$portfolio_flag == "A") { # && length(input$dt_Portfolios_rows_selected) > 0
       idxSel <- input$dt_Portfolios_rows_selected
@@ -562,10 +564,18 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelPortfolioDetails")
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
-    stmt <- buildDbQuery("deleteProg", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID])
-    executeDbQuery(dbSettings, stmt)
-    flamingoNotification(type = "message",
-                         sprintf("portfolio %s deleted", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName]))
+    # stmt <- buildDbQuery("deleteProg", result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID])
+    # executeDbQuery(dbSettings, stmt)
+    pfid <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
+    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName]
+    delete_portfolios_id <- api_delete_portfolios_id(pfid)
+    if (delete_portfolios_id$status == "Success") {
+      flamingoNotification(type = "message",
+                           sprintf("portfolio %s deleted", pfName))
+    } else {
+      flamingoNotification(type = "error",
+                           sprintf("An error occurred. Portfolio %s has not deleted", pfName))
+    }
     .reloadtbl_portfoliosData()
     removeModal()
   })
@@ -826,7 +836,7 @@ step1_choosePortfolio <- function(input, output, session,
   # Add choices to portfolioID, update portfolioID
   observeEvent(result$tbl_portfoliosData, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
-      logMessage(paste0("updating portfolioID choices because programme table was reloaded - contains ", nrow(result$tbl_portfoliosData), " rows"))
+      logMessage(paste0("updating portfolioID choices because portfolio table was reloaded - contains ", nrow(result$tbl_portfoliosData), " rows"))
       if (result$portfolioID == "") {
         # initial selection last portfolio created
         pfID <- result$tbl_portfoliosData[1, tbl_portfoliosData.PortfolioID]
