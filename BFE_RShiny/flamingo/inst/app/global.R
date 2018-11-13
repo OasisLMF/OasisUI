@@ -72,6 +72,9 @@ status_code_exist <- 200
 status_code_notfound <- 404
 
 ### Icons ----------------------------------------------------------------------
+icon_failed <- "times-circle"
+icon_completed <- "check-circle"
+icon_inporgress <- "spinner"
 StatusFailed <- '<i class="fa fa-times-circle"></i>'
 StatusCompleted <- '<i class="fa fa-check-circle"></i>'
 StatusProcessing <- '<i class="fa fa-spinner"></i>'

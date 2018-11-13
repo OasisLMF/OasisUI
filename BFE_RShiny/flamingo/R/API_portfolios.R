@@ -89,6 +89,49 @@ api_post_portfolios <- function(name) {
   )
 }
 
+#' Put portfolios id
+#' 
+#' Updates the specified analysis.
+#' 
+#' @rdname api_put_portfolios_id
+#' 
+#' @inheritParams api_post_portofolios
+#' 
+#' @return the updated analysis. 
+#' 
+#' @importFrom httr PUT
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_put_portfolios_id <- function(name) {
+  
+  response <- PUT(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())#,
+    ),
+    body = list(name = name),
+    encode = "json",
+    path = paste(get_version(), "portfolios", id, "", sep = "/")
+  )
+  
+  logWarning = warning
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
 
 
 #' Get portfolios info by id
@@ -207,9 +250,19 @@ return_portfolios_df <- function(name = ""){
 #' 
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
+#' @importFrom dplyr arrange
 #' 
 #' @export
 return_tbl_portfoliosData <- function(name = ""){
+  
+  #Help function to replace variable with icon
+  .replacewithIcon <- function(var){
+    var <- case_when(var %in% status_code_exist ~ StatusCompleted,
+                     var %in% status_code_notfound ~ StatusProcessing,
+                     var %notin% c(status_code_notfound, status_code_exist) ~ StatusFailed)
+    return(var)
+  }
+  
   tbl_portfoliosData <- return_portfolios_df(name) %>%
     select(-contains("file") ) %>% 
     as.data.frame()
@@ -219,7 +272,7 @@ return_tbl_portfoliosData <- function(name = ""){
   for (i in seq(numpf) ) {
     id <- as.integer(idx[i])
     get_portfolios_location_file <- api_get_portfolios_location_file(id)
-    status[i, "Status"] <- toString(get_portfolios_location_file$result$status_code)
+    status[i, "Status"] <- toString(get_portfolios_location_file$result$status_code) %>% .replacewithIcon()
     tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] , format = "%d-%m-%YT%H:%M:%S"))
     tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified], format = "%d-%m-%YT%H:%M:%S"))
   }
@@ -263,6 +316,7 @@ return_portfolio_details_df <- function(id){
 #' 
 #' @importFrom dplyr select
 #' @importFrom dplyr case_when
+#' @importFrom dplyr contains
 #' @importFrom tidyr gather
 #' 
 #' @export
@@ -271,12 +325,13 @@ return_tbl_portfolioDetails <- function(id){
   #Help function to replace variable with icon
   .replacewithIcon <- function(var){
     var <- case_when(var %in% status_code_exist ~ StatusCompleted,
-                     var %in% status_code_notfound ~ StatusFailed,
-                     var %notin% c(status_code_notfound, status_code_exist) ~ StatusProcessing)
+                     var %in% status_code_notfound ~ StatusProcessing,
+                     var %notin% c(status_code_notfound, status_code_exist) ~ StatusFailed)
     return(var)
   }
   
   tbl_portfolioDetails <- return_portfolio_details_df(id) %>%
+    select(contains("file") ) %>% 
     as.data.frame()
   #format date
   tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioCreated ]] <- toString(as.POSIXct(tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioCreated ]], format = "%d-%m-%YT%H:%M:%S"))

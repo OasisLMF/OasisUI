@@ -11,7 +11,7 @@ landing_page <- list(
   abuttonanalysis = "Define analysis to run",
   abuttonbrowse = "Choose browse option",
   abuttondefineaccount = "Create/amend/delete account",
-  abuttondefineprogramme = "Create/amend/delete Programme; Associate Model; Run Process",
+  abuttondefineprogramme = "Create/amend/delete Programme; Associate Model; Run Portfolio",
   abuttondefineanasingle = "Define single analysis",
   abuttondefineanabatch = "Define batch analysis",
   abuttonbrowseSBR = "Visualize outputs from single run",
@@ -46,8 +46,8 @@ landing_page <- list(
   )
 
 defineSingleAna <- list(
-  sinputTransformname = "Transformation Description to be added here",
   sinputModTransform = "Transformation Description to be added here",
+  abuttonuploadsourcefiles = "Upload Source Files to portfolio",
   portfolioID = "Select a portfolio ID to which associate a model",
   modelID = "Select the Model to associate with the Portfolio",
   abuttonpfdetails = "Please select a Programme to show details",
@@ -59,8 +59,8 @@ defineSingleAna <- list(
   abuttonrerunana = "Please select a completed Analysis to perform rerun",
   abuttonsaveoutput = "Please select Output Configuration",
   abuttonexecuteanarun = "Please select Output Configuration",
-  abuttonshowlog = "Please select a Process Run to show log",
-  abuttondisplayoutput = "Please select a Process Run to display output"
+  abuttonshowlog = "Please select a Analysis to show log",
+  abuttondisplayoutput = "Please select a Analysis to display output"
 )
 
 ### Panel Browse ----

@@ -20,7 +20,7 @@ landingPageUI <- function(id) {
     wellPanel(
       h4("Analyses Table"),
       DTOutput(ns("dt_anaInbox")),
-      flamingoButton(ns("abuttongotorun"), "Browse Processes Outputs",
+      flamingoButton(ns("abuttongotorun"), "Dashboard of Analysis Outputs",
                      align = "right") %>%
         bs_embed_tooltip(title = landing_page$abuttongotorun, placement = "right"),
       actionButton(inputId = ns("refreshInbox"), label = "Refresh", align = "right"),
