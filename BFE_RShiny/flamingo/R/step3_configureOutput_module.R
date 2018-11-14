@@ -616,6 +616,7 @@ step3_configureOutput <- function(input, output, session,
                                   active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
+                                  portfolioID = reactive(""),
                                   modelID = reactive("")
 ) {
 
@@ -636,7 +637,7 @@ step3_configureOutput <- function(input, output, session,
     # reactve value for navigation
     navigationstate = NULL,
     # reactive value for process runs table
-    tbl_analysisData = NULL,
+    tbl_analysesData = NULL,
     # flag to know if the user is creating a new output configuration or rerunning a process
     ana_flag = "C",
     # Id of the Process Run
@@ -676,55 +677,32 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
-  #Content of the process run table
-  .getProcessRunWithUserChoices <- function() {
-    logMessage(".getProcessRunWithUserChoices called")
-    modelID <- modelID()
-    # For processes in all states (completed, created, in progress etc), pass 'All', for just in progress pass
-    # 'In Progress' (not handled by stored procedure in the DB due to bug!)
-    tbl_analysisData <- getProcessRun(dbSettings, modelID, input$radioanaAllOrInProgress) %>%
-      rename(Status = tbl_analysisData.ProcessRunStatus.old) %>%
-      as.data.frame()
-    # RSc TODO: should probably allow NULL to clear connections when selecting
-    # a ProgOasisID that has no runs
-    if (!is.null(tbl_analysisData) && nrow(tbl_analysisData) > 0 ) {
-      result$tbl_analysisData <- tbl_analysisData %>%
-        replaceWithIcons()
-      #Handling bug for 'In Progress'
-      if (input$radioanaAllOrInProgress == "In_Progress") {
-        result$tbl_analysisData <- result$tbl_analysisData %>% filter(ProcessRunStatus == StatusProcessing)
-      }
-    } else {
-      result$tbl_analysisData <- NULL
-    }
-  }
-
   output$dt_analysis <- renderDT(
 
-    if (!is.null(result$tbl_analysisData) && nrow(result$tbl_analysisData) > 0) {
+    if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- 1
-      logMessage("re-rendering process run table")
+      logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysisData,
+        result$tbl_analysesData,
         class = "flamingo-table display",
         rownames = TRUE,
         selection = list(mode = 'single',
-                         selected = rownames(result$tbl_analysisData)[c(as.integer(index))]),
+                         selected = rownames(result$tbl_analysesData)[c(as.integer(index))]),
         escape = FALSE,
         colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = .getPRTableOptions()
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no runs available for Model ID ", modelID()))
+      .nothingToShowTable(contentMessage = paste0("no analysis available"))
     })
 
   # Process Run Table Title
   output$paneltitle_AnalysisTable <- renderUI({
     if (modelID() != "") {
-      paste0('Runs for Model id ', toString(modelID()))
+      paste0('Analyses')
     } else {
-      paste0("Runs")
+      paste0("Analyses")
     }
 
   })
@@ -738,8 +716,8 @@ step3_configureOutput <- function(input, output, session,
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
     if (result$ana_flag  == "R") {
-      analysisID <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
-      analysisName <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName]
+      analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
+      analysisName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
       analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
       paste0('Re-Define Output Configuration for Run id ', analysisID, ' ', analysisName)
     } else {
@@ -749,7 +727,7 @@ step3_configureOutput <- function(input, output, session,
 
   # Enable and disable buttons
   observeEvent({
-    result$tbl_analysisData
+    result$tbl_analysesData
     modelID()
     currstep()
     input$dt_analysis_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -759,10 +737,10 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttonconfigoutput")
       if (modelID() != "") {
         enable("abuttonconfigoutput")
-        if (!is.null(result$tbl_analysisData) && nrow(result$tbl_analysisData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
+        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
           enable("abuttonrerunana")
           enable("abuttonshowlog")
-          if (result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunStatus] == StatusCompleted) {
+          if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
             enable("abuttondisplayoutput")
           }
         }
@@ -776,7 +754,7 @@ step3_configureOutput <- function(input, output, session,
     show("panelDefineOutputs")
     .showPerils()
     logMessage("showing panelDefineOutputs")
-    logMessage(paste("updating dt_analysisa select because defining new output configuration"))
+    logMessage(paste("updating dt_analysis select because defining new output configuration"))
     result$ana_flag <- "C"
   })
 
@@ -1047,24 +1025,24 @@ step3_configureOutput <- function(input, output, session,
     anaID <- .generateRun()
     if (is.null(anaID)) {
       flamingoNotification(type = "error",
-                           "Process Run ID could not be generated. So process run cannot be executed")
+                           "Analysis could not be generated. So run cannot be executed")
     } else {
       status <- runProcess(apiSettings, anaID)
       if (grepl("success", status, ignore.case = TRUE)) {
         flamingoNotification(type = "message",
-                             sprintf("Created Process Run ID: %s and process run is executing",
+                             sprintf("Created Analysis ID: %s and run is executing",
                                      anaID))
         .reloadAnaData()
-        #logMessage(paste("colnames are:", paste(colnames(result$tbl_analysisData), collapse = ", ")))
-        logMessage(paste("updating dt_analysisa select because executing a new run"))
-        rowToSelect <- match(anaID, result$tbl_analysisData[, tbl_analysisData.ProcessRunID])
+        #logMessage(paste("colnames are:", paste(colnames(result$tbl_analysesData), collapse = ", ")))
+        logMessage(paste("updating dt_analysis select because executing a new run"))
+        rowToSelect <- match(anaID, result$tbl_analysesData[, tbl_analysesData.AnaID])
         pageSel <- ceiling(rowToSelect/pageLength)
         selectRows(dataTableProxy("dt_analysis"), rowToSelect)
         selectPage(dataTableProxy("dt_analysis"), pageSel)
         logMessage(paste("selected row is:", input$dt_analysis_rows_selected))
       } else {
         flamingoNotification(type = "warning",
-                             sprintf("Created Process Run ID: %s. But process run executing failed",
+                             sprintf("Created Analysis Run ID: %s. But run executing failed",
                                      anaID))
         show("panelAnalysisLogs")
         logMessage("showing prrunlogtable")
@@ -1092,8 +1070,8 @@ step3_configureOutput <- function(input, output, session,
       wfid <- result$anaid
 
       logdata <- getProcessRunDetails(dbSettings, wfid) %>%
-        replaceWithIcons()
-      logMessage("re-rendering process run log table")
+        .replaceWithIcons()
+      logMessage("re-rendering analysis log table")
       if (!is.null(logdata)) {
         datatable(
           logdata,
@@ -1106,15 +1084,15 @@ step3_configureOutput <- function(input, output, session,
           options = .getPRTableOptions()
         )
       } else {
-        .nothingToShowTable(contentMessage = paste0("no log files associated with Process Run ID ", ifelse(!is.null(result$anaid), result$anaid, "NULL")))
+        .nothingToShowTable(contentMessage = paste0("no log files associated with analysis ID ", ifelse(!is.null(result$anaid), result$anaid, "NULL")))
       }
     }
   })
 
   # run logs title
   output$paneltitle_AnaLogs <- renderUI({
-    analysisID <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
-    analysisName <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName]
+    analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
+    analysisName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
     paste0('Logs for Run id ', analysisID, ' ', analysisName)
   })
@@ -1131,9 +1109,9 @@ step3_configureOutput <- function(input, output, session,
       logMessage(paste("input$dt_analysis_rows_selected is changed to:", input$dt_analysis_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (length(input$dt_analysis_rows_selected) > 0 && !is.null(result$tbl_analysisData)) {
-        result$anaid <- result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunID]
-        if (result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunStatus] != StatusCompleted) {
+      if (length(input$dt_analysis_rows_selected) > 0 && !is.null(result$tbl_analysesData)) {
+        result$anaid <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
+        if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] != StatusCompleted) {
           show("panelAnalysisLogs")
           logMessage("showing prrunlogtable")
         }
@@ -1169,15 +1147,30 @@ step3_configureOutput <- function(input, output, session,
     disable("abuttonshowlog")
     disable("abuttonconfigoutput")
   }
+  
+  #Content of the process run table
+  .getAnaWithUserChoices <- function() {
+    logMessage(".getAnaWithUserChoices called")
+    tbl_analysesData <- return_tbl_analysesData()
+    if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0 ) {
+      result$tbl_analysesData <- tbl_analysesData
+      #Handling bug for 'In Progress'
+      if (input$radioanaAllOrInProgress == "In_Progress") {
+        result$tbl_analysesData <- result$tbl_analysesData %>% filter(status == StatusProcessing)
+      }
+    } else {
+      result$tbl_analysesData <- NULL
+    }
+  }
 
   # Reload Process Runs table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
     if (modelID() != "") {
-      .getProcessRunWithUserChoices()
+      .getAnaWithUserChoices()
       logMessage("process run table refreshed")
     }  else {
-      result$tbl_analysisData <- NULL
+      result$tbl_analysesData <- NULL
     }
     invisible()
   }
@@ -1291,7 +1284,7 @@ step3_configureOutput <- function(input, output, session,
     outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$anaid ))
     anaparams <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$anaid ))
 
-    updateTextInput(session, "tinputananame", value = result$tbl_analysisData[input$dt_analysis_rows_selected, tbl_analysisData.ProcessRunName])
+    updateTextInput(session, "tinputananame", value = result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName])
 
     if (nrow(anaparams) > 0) {
       for (i in 1:nrow(anaparams)) {
