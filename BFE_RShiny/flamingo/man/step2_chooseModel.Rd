@@ -11,7 +11,7 @@ step2_chooseModel(input, output, session, dbSettings, apiSettings,
   active = reactive(TRUE), logMessage = message,
   currstep = reactive(-1), portfolioID = reactive({     "" }),
   modelID = reactive({     "" }), pfName = reactive({     "" }),
-  progStatus = reactive({     "" }))
+  pftatus = reactive({     "" }))
 }
 \arguments{
 \item{id}{module id}
@@ -32,13 +32,13 @@ step2_chooseModel(input, output, session, dbSettings, apiSettings,
 
 \item{currstep}{current selected step.}
 
-\item{portfolioID}{selected programme ID.}
+\item{portfolioID}{selected portfolio ID.}
 
-\item{modelID}{selected ProgOasis ID.}
+\item{modelID}{selected model ID.}
 
-\item{pfName}{Name of selected programme.}
+\item{pfName}{Name of selected portfolio}
 
-\item{progStatus}{Status of selected programme.}
+\item{pftatus}{Status of selected portfolio}
 
 \item{id}{Namespace ID for the module.}
 
@@ -50,9 +50,7 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-modelID Id of selected progOasis.
-
-tbl_modelsData model association table.
+modelID Id of selected model
 
 newstep navigation step
 }

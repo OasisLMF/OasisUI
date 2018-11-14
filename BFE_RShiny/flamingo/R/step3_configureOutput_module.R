@@ -595,8 +595,6 @@ panel_configureAdvancedRI <- function(id) {
 #' 
 #' @param currstep current selected step.
 #' @param modelID selected ProgOasis ID.
-#' @param modelName Name of selected progOasis.
-#' @param progOasisStatus Status of selected progOasis.
 #'
 #' @return anaid id of selected run.
 #'
@@ -618,9 +616,7 @@ step3_configureOutput <- function(input, output, session,
                                   active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
-                                  modelID = reactive(""),
-                                  modelName = reactive(""),
-                                  progOasisStatus = reactive("")
+                                  modelID = reactive("")
 ) {
 
   ns <- session$ns
@@ -726,8 +722,7 @@ step3_configureOutput <- function(input, output, session,
   # Process Run Table Title
   output$paneltitle_AnalysisTable <- renderUI({
     if (modelID() != "") {
-      modelName <- ifelse(toString(modelName()) == " " | toString(modelName()) == "" | toString(modelName()) == "NA", "", paste0('"',  toString(modelName()), '"'))
-      paste0('Runs for Model id ', toString(modelID()), ' ', modelName,' ', toString(progOasisStatus()))
+      paste0('Runs for Model id ', toString(modelID()))
     } else {
       paste0("Runs")
     }
@@ -756,14 +751,13 @@ step3_configureOutput <- function(input, output, session,
   observeEvent({
     result$tbl_analysisData
     modelID()
-    progOasisStatus()
     currstep()
     input$dt_analysis_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonrerunana")
       disable("abuttondisplayoutput")
       disable("abuttonshowlog")
       disable("abuttonconfigoutput")
-      if (modelID() != "" && progOasisStatus() == "- Status: Completed") {
+      if (modelID() != "") {
         enable("abuttonconfigoutput")
         if (!is.null(result$tbl_analysisData) && nrow(result$tbl_analysisData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
           enable("abuttonrerunana")

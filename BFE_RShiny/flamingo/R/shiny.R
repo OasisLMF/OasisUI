@@ -138,7 +138,7 @@ flamingoNotification <- function(ui, type = c("default", "message", "warning", "
 #' @description Converts a table into a named list of choices for use in
 #' \link{selectInput}.
 #'
-#' @inheritParams replaceWithIcons
+#' @param df \code{data.frame}.
 #' @param label Label for extra option to add at the top. If \code{NA} (default)
 #' no extra option will be added to the top.
 #' @param value value for extra option to add at the top.

@@ -141,14 +141,6 @@ variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Fu
 # > Variables for cols positions -----------------------------------------------
 ### Creating Variables for col names of Portfolio Table
 #result$tbl_portfoliosData
-#"Programme ID", "Programme Name", "Account ID", "Account Name", "Transform ID", "Transform", "Status"
-# tbl_portfoliosData.ProgrammeID <- "Programme ID" #reactive(names(result$tbl_portfoliosData)[1])
-# tbl_portfoliosData.ProgrammeName <- "Programme Name" #reactive(names(result$tbl_portfoliosData)[2])
-# tbl_portfoliosData.AccountID <- "Account ID" #reactive(names(result$tbl_portfoliosData)[3])
-# tbl_portfoliosData.AccountName <- "Account Name" #reactive(names(result$tbl_portfoliosData)[4])
-# tbl_portfoliosData.TranformID <- "Transform ID" #reactive(names(result$tbl_portfoliosData)[5])
-# tbl_portfoliosData.Tranform <- "Transform" #reactive(names(result$tbl_portfoliosData)[6])
-# tbl_portfoliosData.Status <-  "Status" #reactive(names(result$tbl_portfoliosData)[7])
 tbl_portfoliosData.PortfolioID <- "id"
 tbl_portfoliosData.PortfolioName <- "name"
 tbl_portfoliosData.PortfolioCreated <- "created"
@@ -156,6 +148,7 @@ tbl_portfoliosData.PortfolioModified <- "modified"
 tbl_portfoliosData.Status <- "Status"
 
 ### Creating Variables for portfolio Details table
+#result$tbl_portfolioDetails
 tbl_portfolioDetails.PortfolioID <- "id"
 tbl_portfolioDetails.PortfolioName <- "name"
 tbl_portfolioDetails.PortfolioCreated <- "created"
@@ -168,13 +161,18 @@ tbl_portfolioDetails.PortfolioRIsource <- "reinsurance_source_file"
 ### Creating Variables for col names of Model Table
 # result$tbl_modelsData
 #"ProgOasisId", "ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status"
-tbl_modelsData.ProgOasisId <- "ProgOasisId" #reactive(names(result$tbl_modelsData)[1])
-tbl_modelsData.ProgName <- "ProgName" #reactive(names(result$tbl_modelsData)[2])
-tbl_modelsData.ModelName <- "ModelName" #reactive(names(result$tbl_modelsData)[3])
-tbl_modelsData.TransformName <- "TransformName" #reactive(names(result$tbl_modelsData)[4])
-tbl_modelsData.SourceFileId <- "SourceFileId" #reactive(names(result$tbl_modelsData)[5])
-tbl_modelsData.FileID <- "FileID" #reactive(names(result$tbl_modelsData)[6])
-tbl_modelsData.Status <- "Status" #reactive(names(result$tbl_modelsData)[7])
+# tbl_modelsData.ProgOasisId <- "ProgOasisId" #reactive(names(result$tbl_modelsData)[1])
+# tbl_modelsData.ProgName <- "ProgName" #reactive(names(result$tbl_modelsData)[2])
+# tbl_modelsData.ModelName <- "ModelName" #reactive(names(result$tbl_modelsData)[3])
+# tbl_modelsData.TransformName <- "TransformName" #reactive(names(result$tbl_modelsData)[4])
+# tbl_modelsData.SourceFileId <- "SourceFileId" #reactive(names(result$tbl_modelsData)[5])
+# tbl_modelsData.FileID <- "FileID" #reactive(names(result$tbl_modelsData)[6])
+# tbl_modelsData.Status <- "Status" #reactive(names(result$tbl_modelsData)[7])
+tbl_modelsData.ModelId <- "id"
+tbl_modelsData.ModelSupplierId <- "supplier_id"
+tbl_modelsData.ModelVersionId <- "version_id"
+tbl_modelsData.ModelCreated <- "created"
+tbl_modelsData.ModelModified <- "modified"
 
 ### Creating Variables for col names of Process Runs Table
 # result$tbl_analysisData

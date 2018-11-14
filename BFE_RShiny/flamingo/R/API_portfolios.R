@@ -251,6 +251,8 @@ return_portfolios_df <- function(name = ""){
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
 #' @importFrom dplyr arrange
+#' @importFrom dplyr sym
+#' @importFrom dplyr desc
 #' 
 #' @export
 return_tbl_portfoliosData <- function(name = ""){
@@ -279,7 +281,7 @@ return_tbl_portfoliosData <- function(name = ""){
   tbl_portfoliosData <- cbind(tbl_portfoliosData, status) %>%
     as.data.frame()
   tbl_portfoliosData <- tbl_portfoliosData %>%
-    arrange(desc(id))
+    arrange(desc(!! sym(tbl_portfoliosData.PortfolioID)))
   return(tbl_portfoliosData)
 }
 

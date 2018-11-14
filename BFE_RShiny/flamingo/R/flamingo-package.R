@@ -9,7 +9,6 @@
 #' @md
 '%>%' <- dplyr::'%>%'
 
-
 #' Negate in operator
 #'
 #' @rdname negate

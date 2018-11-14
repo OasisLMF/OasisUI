@@ -10,5 +10,5 @@ panelModelTable(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to show created programme model table.
+Function wrapping panel to show list of models table.
 }

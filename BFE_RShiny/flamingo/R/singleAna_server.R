@@ -35,10 +35,6 @@ singleAna <- function(input, output, session, dbSettings,
   # Submodules list
   submodulesList <- list()
 
-  #values to stop ping pong effect
-  stop_selPfID <- check_selPfID <- 0
-  stop_selProgOasisID <- check_selProgOasisID <- 0
-
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # Id of the Process Run
@@ -56,17 +52,13 @@ singleAna <- function(input, output, session, dbSettings,
     # List of Prog IDs
     progChoices = NULL,
     # Prog status
-    progStatus = "",
+    pftatus = "",
     # Model table
     tbl_modelsData = NULL,
     # Model table row selected
     tbl_modelsData_rowselected = NULL,
-    # Model Name
-    modelName = "",
     # List of Model IDs
-    progOasisChoices = NULL,
-    # Model status
-    progOasisStatus = ""
+    modelsChoices = NULL
   )
 
   # Panels switch --------------------------------------------------------------
@@ -126,7 +118,7 @@ singleAna <- function(input, output, session, dbSettings,
     portfolioID = reactive(input$portfolioID),
     modelID = reactive(input$modelID),
     pfName = reactive({result$pfName}),
-    progStatus = reactive({result$progStatus})
+    pftatus = reactive({result$pftatus})
   )
 
   submodulesList$step3_configureOutput <- callModule(
@@ -137,9 +129,7 @@ singleAna <- function(input, output, session, dbSettings,
     active = reactive({active() && workflowSteps$step() == 3}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
-    modelID = reactive(input$modelID),
-    modelName = reactive({result$modelName}),
-    progOasisStatus = reactive({result$progOasisStatus})
+    modelID = reactive(input$modelID)
   )
 
   # Sub-Modules output ---------------------------------------------------------
@@ -198,9 +188,7 @@ singleAna <- function(input, output, session, dbSettings,
   # > prog Table reactives -----------------------------------------------------
   observeEvent(submodulesList$step1_choosePortfolio$tbl_portfoliosData(), ignoreInit = TRUE,{
     if (is.null(submodulesList$step1_choosePortfolio$tbl_portfoliosData()) || nrow(submodulesList$step1_choosePortfolio$tbl_portfoliosData()) == 0) {
-      stmt <- buildDbQuery("getProgData")
-      result$tbl_portfoliosData <- executeDbQuery(dbSettings, stmt) %>%
-        replaceWithIcons()
+      result$tbl_portfoliosData <- return_tbl_portfoliosData()
     } else {
       result$tbl_portfoliosData <- submodulesList$step1_choosePortfolio$tbl_portfoliosData()
     }
@@ -214,21 +202,24 @@ singleAna <- function(input, output, session, dbSettings,
   }, ignoreInit = TRUE, {
     result$tbl_portfoliosData_rowselected <- match(result$portfolioID, result$progChoices)
     result$pfName <- result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.PortfolioName]
-    progStatus <- ""
+    pftatus <- ""
     if (!is.na(result$tbl_portfoliosData_rowselected) && !is.na(result$tbl_portfoliosData) && length(result$tbl_portfoliosData_rowselected) > 0) {
       if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusCompleted) {
-        progStatus <- "- Status: Completed"
+        pftatus <- "- Status: Completed"
       } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusProcessing) {
-        progStatus <- "- Status: in Progress"
+        pftatus <- "- Status: in Progress"
       } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusFailed) {
-        progStatus <- "- Status: Failed"
+        pftatus <- "- Status: Failed"
       }
     }
-    result$progStatus <- progStatus
+    result$pftatus <- pftatus
   })
 
   # > modelID ------------------------------------------------------------------
-  observeEvent(submodulesList$step2_chooseModel$modelID(), ignoreInit = TRUE, {
+
+  observeEvent({
+    submodulesList$step2_chooseModel$modelID()
+    }, ignoreInit = TRUE, {
     modelID <- submodulesList$step2_chooseModel$modelID()
     if (!is.null(modelID) && result$modelID != modelID) {
       logMessage(paste0("updating result$modelID because submodulesList$step2_chooseModel$modelID() changed to: ", modelID ))
@@ -246,21 +237,6 @@ singleAna <- function(input, output, session, dbSettings,
     }
   })
 
-  # If programmeID changes, then we select the first progOasis
-  observeEvent({
-    result$tbl_modelsData_rowselected
-    result$portfolioID
-    }, ignoreInit = TRUE, {
-    progOasisId <- ""
-    if (!is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0) {
-      progOasisId <- result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.ProgOasisId]
-    }
-    if (!is.null(progOasisId) && !is.na(progOasisId) && progOasisId != result$modelID) {
-      logMessage(paste0("updating result$modelID because result$tbl_modelsData_rowselected changed to: ", result$tbl_modelsData_rowselected ))
-      result$modelID <- progOasisId
-    }
-  })
-
   observeEvent({
     workflowSteps$step()
     result$modelID
@@ -268,49 +244,35 @@ singleAna <- function(input, output, session, dbSettings,
     if (workflowSteps$step() == 3) {
       #Avoid updating input if not necessary
       if (input$modelID  != result$modelID) {
-        updateSelectizeInput(session, inputId = "modelID", selected = result$modelID, choices = result$progOasisChoices)
+        updateSelectizeInput(session, inputId = "modelID", selected = result$modelID, choices = result$modelsChoices)
       }
     }
   })
 
-  # > prog Model Table reactives -----------------------------------------------
-  observeEvent({
-    submodulesList$step2_chooseModel$tbl_modelsData()
-    result$portfolioID
-  }, ignoreInit = TRUE, {
-    if (result$portfolioID != "" & !is.null(result$portfolioID)) {
-      result$tbl_modelsData <- getProgOasisForProgdata(dbSettings, result$portfolioID) %>%
-        replaceWithIcons()
-      if (nrow(result$tbl_modelsData) != 0) {
-        result$progOasisChoices <-  result$tbl_modelsData[, tbl_modelsData.ProgOasisId]
-      } else {
-        result$progOasisChoices <- c("")
-      }
+  # > Model Table reactives ----------------------------------------------------
 
+  observeEvent({
+    result$portfolioID
+    result$modelID
+  },{
+    if (result$portfolioID != "" & !is.null(result$portfolioID)) {
+      result$tbl_modelsData <- return_tbl_modelsData()
+      if (nrow(result$tbl_modelsData) != 0) {
+        result$modelsChoices <-  result$tbl_modelsData[, tbl_modelsData.ModelId]
+      } else {
+        result$modelsChoices <- c("")
+      }
     }
   })
 
   observeEvent({
     result$portfolioID
     result$modelID
-    result$progOasisChoices
+    result$modelsChoices
     result$tbl_modelsData
   }, ignoreInit = TRUE, {
-    prgOasisId <- result$modelID
-    rowToSelect <- match(prgOasisId, result$progOasisChoices)
+    rowToSelect <- match(result$modelID, result$modelsChoices)
     result$tbl_modelsData_rowselected <- ifelse(is.na(rowToSelect), 1, rowToSelect)
-    result$modelName <- ifelse(nrow(result$tbl_modelsData) > 0, result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.ProgName], "")
-    progOasisStatus <- ""
-    if (!is.na(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0 && length(result$tbl_modelsData_rowselected) > 0) {
-      if (result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.Status] == StatusCompleted) {
-        progOasisStatus <- "- Status: Completed"
-      } else if (result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.Status] == StatusProcessing) {
-        progOasisStatus <- "- Status: in Progress"
-      } else if (result$tbl_modelsData[result$tbl_modelsData_rowselected, tbl_modelsData.Status] == StatusFailed) {
-        progOasisStatus <- "- Status: Failed"
-      }
-    }
-    result$progOasisStatus <- progOasisStatus
   })
 
 
