@@ -9,7 +9,8 @@ step3_configureOutputUI(id)
 
 step3_configureOutput(input, output, session, dbSettings, apiSettings,
   active = reactive(TRUE), logMessage = message,
-  currstep = reactive(-1), modelID = reactive(""))
+  currstep = reactive(-1), portfolioID = reactive(""),
+  modelID = reactive(""))
 }
 \arguments{
 \item{id}{module id}

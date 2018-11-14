@@ -215,6 +215,49 @@ api_delete_portfolios_id <- function(id) {
 }
 
 
+#' Post portfolios create analysis
+#' 
+#' Creates an analysis object from the portfolio.
+#' 
+#' @rdname api_post_portfolios_create_analysis
+#' 
+#' @inheritParams api_post_portfolios
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return the posted portfolio analysis created. 
+#' 
+#' @importFrom httr POST
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_post_portfolios_create_analysis <- function(id, name, model) {
+  
+  response <- POST(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())
+    ),
+    body = list(name = name, model = model),
+    encode = "json",
+    path = paste(get_version(), "portfolios", id, "create_analysis", "", sep = "/")
+  )
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
 # R functions calling Portfolio API functions and manipulating the output ------
 
 #' Return Portfolios Dataframe
@@ -228,6 +271,7 @@ api_delete_portfolios_id <- function(id) {
 #' @return dataframe of previously posted portfolios. Default empty string returns all portfolios.
 #' 
 #' @importFrom dplyr bind_rows
+#' @importFrom httr content
 #' 
 #' @export
 return_portfolios_df <- function(name = ""){
@@ -296,6 +340,7 @@ return_tbl_portfoliosData <- function(name = ""){
 #' @return dataframe of details of previously posted portfolio
 #' 
 #' @importFrom dplyr bind_rows
+#' @importFrom httr content
 #' 
 #' @export
 return_portfolio_details_df <- function(id){

@@ -56,6 +56,7 @@ api_get_analyses <- function(name = "") {
 #' @return dataframe of previously posted analyses Default empty string returns all analyses.
 #' 
 #' @importFrom dplyr bind_rows
+#' @importFrom httr content
 #' 
 #' @export
 return_analyses_df <- function(name = ""){
@@ -81,20 +82,42 @@ return_analyses_df <- function(name = ""){
 #' @importFrom dplyr arrange
 #' @importFrom dplyr sym
 #' @importFrom dplyr desc
+#' @importFrom dplyr case_when
 #' 
 #' @export
 return_tbl_analysesData <- function(name = ""){
   
+  .replaceWithIcons <- function(df){
+    #Status
+    StatusGood <- c("RUN_COMPLETED")
+    StatusBad <- c("INPUTS_GENERATION_ERROR", NA_character_)
+    StatusAvailable <- c("READY")
+    
+    #Replace status in df
+    if (!is.null(df)) {
+      logMessage(paste0("replacing icons"))
+      df <- df %>%
+        mutate(status = tolower(status)) %>%
+        mutate(status = case_when(status %in% StatusGood ~ StatusCompleted,
+                                  status %in% StatusBad ~ StatusFailed,
+                                  status %in% StatusAvailable ~ StatusReady,
+                                  status %notin% c(StatusBad, StatusGood, StatusAvailable) ~ StatusProcessing)) %>%
+        as.data.frame()
+    }
+    df
+  }
+  
   tbl_analysesData <- return_analyses_df(name) %>%
     select(-contains("file") ) %>% 
     as.data.frame()
-  idx <- tbl_analysesData[[tbl_analysesData]]
+  idx <- tbl_analysesData[[tbl_analysesData.AnaID]]
   numpf <- length(idx)
   for (i in seq(numpf) ) {
     tbl_analysesData[i, tbl_analysesData.AnaCreated] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesData.AnaCreated] , format = "%d-%m-%YT%H:%M:%S"))
     tbl_analysesData[i, tbl_analysesData.AnaModified] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesData.AnaModified], format = "%d-%m-%YT%H:%M:%S"))
   }
   tbl_analysesData <- tbl_analysesData %>%
-    arrange(desc(!! sym(tbl_analysesData.AnaID)))
+    arrange(desc(!! sym(tbl_analysesData.AnaID))) %>%
+    .replaceWithIcons()
   return(tbl_analysesData)
 }

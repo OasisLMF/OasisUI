@@ -129,6 +129,7 @@ singleAna <- function(input, output, session, dbSettings,
     active = reactive({active() && workflowSteps$step() == 3}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
+    portfolioID =  reactive(input$portfolioID),
     modelID = reactive(input$modelID)
   )
 

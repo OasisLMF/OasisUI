@@ -56,6 +56,7 @@ api_get_models <- function(supplier_id = "") {
 #' @return dataframe of previously posted models. Default empty string returns all portfolios.
 #' 
 #' @importFrom dplyr bind_rows
+#' @importFrom httr content
 #' 
 #' @export
 return_models_df <- function(supplier_id = ""){
