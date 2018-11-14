@@ -160,14 +160,6 @@ tbl_portfolioDetails.PortfolioRIsource <- "reinsurance_source_file"
 
 ### Creating Variables for col names of Model Table
 # result$tbl_modelsData
-#"ProgOasisId", "ProgName", "ModelName", "TransformName", "SourceFileId", "FileID", "Status"
-# tbl_modelsData.ProgOasisId <- "ProgOasisId" #reactive(names(result$tbl_modelsData)[1])
-# tbl_modelsData.ProgName <- "ProgName" #reactive(names(result$tbl_modelsData)[2])
-# tbl_modelsData.ModelName <- "ModelName" #reactive(names(result$tbl_modelsData)[3])
-# tbl_modelsData.TransformName <- "TransformName" #reactive(names(result$tbl_modelsData)[4])
-# tbl_modelsData.SourceFileId <- "SourceFileId" #reactive(names(result$tbl_modelsData)[5])
-# tbl_modelsData.FileID <- "FileID" #reactive(names(result$tbl_modelsData)[6])
-# tbl_modelsData.Status <- "Status" #reactive(names(result$tbl_modelsData)[7])
 tbl_modelsData.ModelId <- "id"
 tbl_modelsData.ModelSupplierId <- "supplier_id"
 tbl_modelsData.ModelVersionId <- "version_id"
@@ -176,12 +168,19 @@ tbl_modelsData.ModelModified <- "modified"
 
 ### Creating Variables for col names of Process Runs Table
 # result$tbl_analysisData
-#"ProcessRunID", "ProcessRunName", "ProgOasisID", "ProcessRunStatus"
-tbl_analysisData.ProcessRunID <- "ProcessRunID" #reactive(names(result$tbl_analysisData)[1])
-tbl_analysisData.ProcessRunName <- "ProcessRunName" #reactive(names(result$tbl_analysisData)[2])
-tbl_analysisData.ProgOasisID <- "ProgOasisID" #reactive(names(result$tbl_analysisData)[3])
-tbl_analysisData.ProcessRunStatus <- "Status" #reactive(names(result$tbl_analysisData)[4])
-tbl_analysisData.ProcessRunStatus.old <- "ProcessRunStatus"
+tbl_analysesData.AnaID <- "id"
+tbl_analysesData.AnaModified <- "modified"
+tbl_analysesData.AnaCreated <- "created"
+tbl_analysesData.AnaName <- "name"
+tbl_analysesData.PortfolioID <- "portfolio"
+tbl_analysesData.ModelID <- "model"
+tbl_analysesData.AnaStatus <- "status"
+tbl_analysesData.AnaInputFile <- "input_file"
+tbl_analysesData.AnaSettingFile <- "settings_file"
+tbl_analysesData.AnaInputErrFile <- "input_errors_file"
+tbl_analysesData.AnaInputGenTraceBackFile <- "input_generation_traceback_file"
+tbl_analysesData.AnaOutputFile <- "output_file"
+tbl_analysesData.AnaRunTracebackFile <- "run_traceback_file"
 
 
 ### Creating Variables for  col names of filesListData
