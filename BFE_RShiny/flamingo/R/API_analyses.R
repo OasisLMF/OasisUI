@@ -61,7 +61,7 @@ api_get_analyses <- function(name = "") {
 return_analyses_df <- function(name = ""){
   get_analyses <- api_get_analyses(name)
   analysesList <- content(get_analyses$result)
-  analysess_df <- bind_rows(analysesList) %>% 
+  analyses_df <- bind_rows(analysesList) %>% 
     as.data.frame()
   return(analyses_df)
 }
