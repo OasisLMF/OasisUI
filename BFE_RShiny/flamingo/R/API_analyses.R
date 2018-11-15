@@ -118,6 +118,10 @@ return_tbl_analysesData <- function(name = ""){
   }
   tbl_analysesData <- tbl_analysesData %>%
     arrange(desc(!! sym(tbl_analysesData.AnaID))) %>%
-    .replaceWithIcons()
+    .replaceWithIcons() %>%
+    select(c(!! sym(tbl_analysesData.AnaID), !! sym(tbl_analysesData.AnaName),
+             !! sym(tbl_analysesData.PortfolioID), !! sym(tbl_analysesData.ModelID),
+             !! sym(tbl_analysesData.AnaModified), !! sym (tbl_analysesData.AnaCreated),
+             !! sym(tbl_analysesData.AnaStatus)))
   return(tbl_analysesData)
 }
