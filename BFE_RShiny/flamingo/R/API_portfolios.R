@@ -95,7 +95,8 @@ api_post_portfolios <- function(name) {
 #' 
 #' @rdname api_put_portfolios_id
 #' 
-#' @inheritParams api_post_portofolios
+#' @param name name of the portfolio.
+#' @param id a unique integer value identifying this portfolio.
 #' 
 #' @return the updated analysis. 
 #' 
@@ -105,7 +106,7 @@ api_post_portfolios <- function(name) {
 #' @importFrom httr http_status
 #' 
 #' @export
-api_put_portfolios_id <- function(name) {
+api_put_portfolios_id <- function(id, name) {
   
   response <- PUT(
     get_url(),
@@ -221,8 +222,9 @@ api_delete_portfolios_id <- function(id) {
 #' 
 #' @rdname api_post_portfolios_create_analysis
 #' 
-#' @inheritParams api_post_portfolios
+#' @param name name of the portfolio.
 #' @param id a unique integer value identifying this analysis.
+#' @param model id of model
 #' 
 #' @return the posted portfolio analysis created. 
 #' 
@@ -380,9 +382,6 @@ return_tbl_portfolioDetails <- function(id){
   tbl_portfolioDetails <- return_portfolio_details_df(id) %>%
     select(contains("file") ) %>% 
     as.data.frame()
-  #format date
-  tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioCreated ]] <- toString(as.POSIXct(tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioCreated ]], format = "%d-%m-%YT%H:%M:%S"))
-  tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioModified]] <- toString(as.POSIXct(tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioModified]], format = "%d-%m-%YT%H:%M:%S"))
   #Replace files with Icons
     #Location file
     get_portfolios_location_file <- api_get_portfolios_location_file(id) 

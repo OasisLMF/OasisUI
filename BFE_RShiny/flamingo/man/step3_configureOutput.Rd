@@ -10,7 +10,7 @@ step3_configureOutputUI(id)
 step3_configureOutput(input, output, session, dbSettings, apiSettings,
   active = reactive(TRUE), logMessage = message,
   currstep = reactive(-1), portfolioID = reactive(""),
-  modelID = reactive(""))
+  modelID = reactive(""), analysisID = reactive(""))
 }
 \arguments{
 \item{id}{module id}
@@ -32,6 +32,8 @@ step3_configureOutput(input, output, session, dbSettings, apiSettings,
 \item{currstep}{current selected step.}
 
 \item{modelID}{selected ProgOasis ID.}
+
+\item{analysisID}{selected analysis ID}
 
 \item{id}{Namespace ID for the module.}
 

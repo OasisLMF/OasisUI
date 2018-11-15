@@ -10,5 +10,5 @@ panelAnalysisTable(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to show process run table.
+Function wrapping panel to show analysestable.
 }

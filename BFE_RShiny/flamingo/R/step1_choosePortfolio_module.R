@@ -68,7 +68,7 @@ panelPortfolioTable <- function(id) {
       bs_embed_tooltip(title = defineSingleAna$abuttonuploadsourcefiles, placement = "right"),
     flamingoButton(ns("abuttonpfdetails"), "Show Details", align = "centre") %>%
       bs_embed_tooltip(title = defineSingleAna$abuttonpfdetails, placement = "right"),
-    actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Model", style = "float:right")
+    actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Analysis", style = "float:right")
   )
 }
 
@@ -332,6 +332,7 @@ step1_choosePortfolio <- function(input, output, session,
     result$portfolioID
     # input$dt_Portfolios_rows_selected
   }, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    
     disable("abuttonpfdetails")
     disable("abuttondeletepf")
     disable("abuttonamendpf")
@@ -433,7 +434,7 @@ step1_choosePortfolio <- function(input, output, session,
       idxSel <- input$dt_Portfolios_rows_selected
       pageSel <- ceiling(input$dt_Portfolios_rows_selected/pageLength)
       pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
-      put_portfolios_id <- api_put_portfolios_id(pfId)
+      put_portfolios_id <- api_put_portfolios_id(id = pfId, name = input$tinputpfName)
       if (put_portfolios_id$status == "Success") {
         flamingoNotification(type = "message",
                              paste("portfolio ",pfId, " updated."))

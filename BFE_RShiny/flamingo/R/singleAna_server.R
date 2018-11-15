@@ -50,9 +50,9 @@ singleAna <- function(input, output, session, dbSettings,
     # Prog Name
     pfName = "",
     # List of Prog IDs
-    progChoices = NULL,
+    pfChoices = NULL,
     # Prog status
-    pftatus = "",
+    pfstatus = "",
     # Model table
     tbl_modelsData = NULL,
     # Model table row selected
@@ -107,9 +107,9 @@ singleAna <- function(input, output, session, dbSettings,
     portfolioID = reactive(result$portfolioID)
   )
 
-  submodulesList$step2_chooseModel <- callModule(
-    step2_chooseModel,
-    id = "step2_chooseModel",
+  submodulesList$step2_chooseAnalysis <- callModule(
+    step2_chooseAnalysis,
+    id = "step2_chooseAnalysis",
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     active = reactive({active() && workflowSteps$step() == 2}),
@@ -118,7 +118,7 @@ singleAna <- function(input, output, session, dbSettings,
     portfolioID = reactive(input$portfolioID),
     modelID = reactive(input$modelID),
     pfName = reactive({result$pfName}),
-    pftatus = reactive({result$pftatus})
+    pfstatus = reactive({result$pfstatus})
   )
 
   submodulesList$step3_configureOutput <- callModule(
@@ -130,7 +130,8 @@ singleAna <- function(input, output, session, dbSettings,
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID =  reactive(input$portfolioID),
-    modelID = reactive(input$modelID)
+    modelID = reactive(input$modelID),
+    analysisID = reactive(submodulesList$step2_chooseAnalysis$analysisID())
   )
 
   # Sub-Modules output ---------------------------------------------------------
@@ -145,7 +146,7 @@ singleAna <- function(input, output, session, dbSettings,
     workflowSteps$update(analysisWorkflowSteps[[2]])
   })
 
-  observeEvent(submodulesList$step2_chooseModel$newstep(), ignoreInit = TRUE, {
+  observeEvent(submodulesList$step2_chooseAnalysis$newstep(), ignoreInit = TRUE, {
     workflowSteps$update(analysisWorkflowSteps[[3]])
   })
 
@@ -178,10 +179,10 @@ singleAna <- function(input, output, session, dbSettings,
     #Avoid updating input if not necessary
     if (input$portfolioID != result$portfolioID) {
       logMessage(paste0("updating input$portfolioID because result$portfolioID changed to: ", result$portfolioID ))
-      updateSelectizeInput(session, inputId = "portfolioID", selected = result$portfolioID, choices = result$progChoices)
+      updateSelectizeInput(session, inputId = "portfolioID", selected = result$portfolioID, choices = result$pfChoices)
     }  else if (input$portfolioID == "" && input$portfolioID == result$portfolioID) {
       logMessage(paste0("updating input$portfolioID choices"))
-      updateSelectizeInput(session, inputId = "portfolioID", selected = character(0), choices = result$progChoices)
+      updateSelectizeInput(session, inputId = "portfolioID", selected = character(0), choices = result$pfChoices)
     }
   }
   })
@@ -193,38 +194,39 @@ singleAna <- function(input, output, session, dbSettings,
     } else {
       result$tbl_portfoliosData <- submodulesList$step1_choosePortfolio$tbl_portfoliosData()
     }
-    result$progChoices <- result$tbl_portfoliosData[, tbl_portfoliosData.PortfolioID]
+    result$pfChoices <- result$tbl_portfoliosData[, tbl_portfoliosData.PortfolioID]
   })
 
   observeEvent({
     result$portfolioID
-    result$progChoices
+    result$pfChoices
     result$tbl_portfoliosData
   }, ignoreInit = TRUE, {
-    result$tbl_portfoliosData_rowselected <- match(result$portfolioID, result$progChoices)
+    result$tbl_portfoliosData_rowselected <- match(result$portfolioID, result$pfChoices)
     result$pfName <- result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.PortfolioName]
-    pftatus <- ""
+    pfstatus <- ""
     if (!is.na(result$tbl_portfoliosData_rowselected) && !is.na(result$tbl_portfoliosData) && length(result$tbl_portfoliosData_rowselected) > 0) {
       if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusCompleted) {
-        pftatus <- "- Status: Completed"
+        pfstatus <- "- Status: Completed"
       } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusProcessing) {
-        pftatus <- "- Status: in Progress"
+        pfstatus <- "- Status: in Progress"
       } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusFailed) {
-        pftatus <- "- Status: Failed"
+        pfstatus <- "- Status: Failed"
       }
+      print 
     }
-    result$pftatus <- pftatus
+    result$pfstatus <- pfstatus
   })
 
   # > modelID ------------------------------------------------------------------
 
   observeEvent({
-    submodulesList$step2_chooseModel$modelID()
+    submodulesList$step2_chooseAnalysis$modelID()
     }, ignoreInit = TRUE, {
-    modelID <- submodulesList$step2_chooseModel$modelID()
+    modelID <- submodulesList$step2_chooseAnalysis$modelID()
     if (!is.null(modelID) && result$modelID != modelID) {
-      logMessage(paste0("updating result$modelID because submodulesList$step2_chooseModel$modelID() changed to: ", modelID ))
-      result$modelID <- submodulesList$step2_chooseModel$modelID()
+      logMessage(paste0("updating result$modelID because submodulesList$step2_chooseAnalysis$modelID() changed to: ", modelID ))
+      result$modelID <- submodulesList$step2_chooseAnalysis$modelID()
     }
   })
 

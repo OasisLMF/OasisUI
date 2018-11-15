@@ -4,7 +4,12 @@
 \alias{api_put_portfolios_id}
 \title{Put portfolios id}
 \usage{
-api_put_portfolios_id(name)
+api_put_portfolios_id(id, name)
+}
+\arguments{
+\item{id}{a unique integer value identifying this portfolio.}
+
+\item{name}{name of the portfolio.}
 }
 \value{
 the updated analysis.

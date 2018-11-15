@@ -2,7 +2,7 @@
 # N.B.: checkbox values need to have type = "character", otherwise jQuery errors
 # are thrown when programmatically setting choices
 # analysisWorkflowSteps <- list("Choose Portfolio" = "1",
-#                               "Choose Model"" = "2",
+#                               "Choose Analysis"" = "2",
 #                               "Configure Output & Run" = "4")
 
 #' analysisWorkflowSteps
@@ -13,7 +13,7 @@
 #'
 #' @export
 analysisWorkflowSteps <- list("Choose Portfolio" = "1",
-                               "Choose Model" = "2",
+                               "Choose Analysis" = "2",
                                "Configure Output & Run" = "3")
 
 #' singleAnaWorkflowStepsUI

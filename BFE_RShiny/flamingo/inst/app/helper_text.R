@@ -46,7 +46,9 @@ landing_page <- list(
   )
 
 defineSingleAna <- list(
-  # sinputModTransform = "Transformation Description to be added here",
+  abuttoncreateana = "Please select a completed Portfolio to create ana analysis",
+  abuttonshowanadetails = "Please select a Analysis to show details",
+  abuttondelana = "Please select a Analysis to delete",
   abuttonuploadsourcefiles = "Upload Source Files to portfolio",
   portfolioID = "Select a portfolio ID to which associate a model",
   modelID = "Select the Model to associate with the Portfolio",
@@ -55,7 +57,6 @@ defineSingleAna <- list(
   abuttonpfsubmit = "Please fill all fields",
   abuttondeletepf = "Please select a Portfolio to Delete",
   # abuttonmodeldetails = "Please select a Portfolio Model to show details",
-  # abuttoncrprogoasis = "Please select both fields",
   abuttonrerunana = "Please select a completed Analysis to perform rerun",
   abuttonsaveoutput = "Please select Output Configuration",
   abuttonexecuteanarun = "Please select Output Configuration",

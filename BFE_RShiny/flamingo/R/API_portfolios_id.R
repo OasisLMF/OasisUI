@@ -56,6 +56,7 @@ api_get_portfolios_location_file <- function(id) {
 #' @importFrom httr add_headers 
 #' @importFrom httr warn_for_status 
 #' @importFrom httr http_status
+#' @importFrom httr upload_file
 #' 
 #' @export
 api_post_portfolios_location_file <- function(id, filepath_location) {
@@ -100,6 +101,7 @@ api_post_portfolios_location_file <- function(id, filepath_location) {
 #' @importFrom httr add_headers 
 #' @importFrom httr warn_for_status 
 #' @importFrom httr http_status
+#' @importFrom httr upload_file
 #' 
 #' @export
 api_get_portfolios_accounts_file <- function(id) {
@@ -187,6 +189,7 @@ api_post_portfolios_accounts_file <- function(id, filepath_accounts) {
 #' @importFrom httr add_headers 
 #' @importFrom httr warn_for_status 
 #' @importFrom httr http_status
+#' @importFrom httr upload_file
 #' 
 #' @export
 api_get_portfolios_reinsurance_info_file <- function(id) {
@@ -274,6 +277,7 @@ api_post_portfolios_reinsurance_info_file <- function(id, filepath_reinsurance_i
 #' @importFrom httr add_headers 
 #' @importFrom httr warn_for_status 
 #' @importFrom httr http_status
+#' @importFrom httr upload_file
 #' 
 #' @export
 api_get_portfolios_reinsurance_source_file <- function(id) {

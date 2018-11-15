@@ -43,6 +43,90 @@ api_get_analyses <- function(name = "") {
   )
 }
 
+#' Get analyses id
+#' 
+#' Returns the specific analysis entry.
+#' 
+#' @rdname api_get_analyses_id
+#' 
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return previously posted analyses id. 
+#' 
+#' @importFrom httr GET
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_get_analyses_id <- function(id) {
+  
+  response <- GET(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())
+    ),
+    path = paste(get_version(), "analyses", id, "", sep = "/")
+  )
+  
+  logWarning = warning
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
+#' Delete analyses id
+#' 
+#' Removes an analysis.
+#' 
+#' @rdname api_delete_analyses_id
+#' 
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return presponse to analysis deletion. 
+#' 
+#' @importFrom httr DELETE
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_delete_analyses_id <- function(id) {
+  
+  response <- DELETE(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())
+    ),
+    path = paste(get_version(), "analyses", id, "", sep = "/")
+  )
+  
+  logWarning = warning
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
 # R functions calling Analyses API Calls ---------------------------------------
 
 #' Return analyses Dataframe
@@ -93,11 +177,11 @@ return_tbl_analysesData <- function(name = ""){
     StatusBad <- c("INPUTS_GENERATION_ERROR", NA_character_)
     StatusAvailable <- c("READY")
     
-    #Replace status in df
+    #Replace Status in df
     if (!is.null(df)) {
       logMessage(paste0("replacing icons"))
       df <- df %>%
-        mutate(status = tolower(status)) %>%
+        mutate(tatus = tolower(status)) %>%
         mutate(status = case_when(status %in% StatusGood ~ StatusCompleted,
                                   status %in% StatusBad ~ StatusFailed,
                                   status %in% StatusAvailable ~ StatusReady,
@@ -124,4 +208,89 @@ return_tbl_analysesData <- function(name = ""){
              !! sym(tbl_analysesData.AnaModified), !! sym (tbl_analysesData.AnaCreated),
              !! sym(tbl_analysesData.AnaStatus)))
   return(tbl_analysesData)
+}
+
+
+#' Return analysis details Dataframe
+#' 
+#' @rdname return_analyses_id_df
+#' 
+#' @description Returns a dataframe of analysis details
+#' 
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return dataframe of details of previously posted analysis
+#' 
+#' @importFrom dplyr bind_rows
+#' @importFrom httr content
+#' 
+#' @export
+return_analyses_id_df <- function(id){
+  get_analyses_id <- api_get_analyses_id(id)
+  analysesIdList <- content(get_analyses_id$result)
+  analyses_id_df <- bind_rows(analysesIdList) %>% 
+    as.data.frame()
+  return(analyses_id_df)
+}
+
+#' Return analysis Details fot DT
+#' 
+#' @rdname return_tbl_analysisdetails
+#' 
+#' @description Returns a dataframe of analysis details ready for being rendered as a data table
+#' 
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return dataframe of details of previously posted analysis
+#' 
+#' @importFrom dplyr select
+#' @importFrom dplyr contains
+#' @importFrom dplyr arrange
+#' @importFrom dplyr sym
+#' @importFrom dplyr desc
+#' @importFrom dplyr case_when
+#' 
+#' @export
+return_tbl_analysisdetails <- function(id){
+  
+  #Help function to replace variable with icon
+  .replacewithIcon <- function(var){
+    var <- case_when(var %in% status_code_exist ~ StatusCompleted,
+                     var %in% status_code_notfound ~ StatusProcessing,
+                     var %notin% c(status_code_notfound, status_code_exist) ~ StatusFailed)
+    return(var)
+  }
+  
+  tbl_analysisdetails <- return_analyses_id_df(id) %>%
+    select(contains("file") ) %>% 
+    as.data.frame()
+  #Replace files with Icons
+    #Input File
+    get_analyses_input_file <- api_get_analyses_input_file(id) 
+    tbl_analysisdetails[[tbl_analysesData.AnaInputFile]] <- toString(get_analyses_input_file$result$status_code) %>%
+      .replacewithIcon()
+    #Setting File
+    get_analyses_settings_file <- api_get_analyses_settings_file(id) 
+    tbl_analysisdetails[[tbl_analysesData.AnaSettingFile]] <- toString(get_analyses_settings_file$result$status_code) %>%
+      .replacewithIcon()
+    #Input errors file
+    get_analyses_input_errors_file <- api_get_analyses_input_errors_file(id) 
+    tbl_analysisdetails[[tbl_analysesData.AnaInputErrFile]] <- toString(get_analyses_input_errors_file$result$status_code) %>%
+      .replacewithIcon()
+    #input generation traceback file
+    get_analyses_input_generation_traceback_file <- api_get_analyses_input_generation_traceback_file(id) 
+    tbl_analysisdetails[[tbl_analysesData.AnaInputGenTraceBackFile]] <- toString(get_analyses_input_generation_traceback_file$result$status_code) %>%
+      .replacewithIcon()
+    #output file
+    get_analyses_input_file <- api_get_analyses_input_file(id) 
+    tbl_analysisdetails[[tbl_analysesData.AnaOutputFile]] <- toString(get_analyses_input_file$result$status_code) %>%
+      .replacewithIcon()
+    #run traceback file
+    get_analyses_run_traceback_file <- api_get_analyses_run_traceback_file(id) 
+    tbl_analysisdetails[[tbl_analysesData.AnaRunTracebackFile]] <- toString(get_analyses_run_traceback_file$result$status_code) %>%
+      .replacewithIcon()
+  # reshape df
+    tbl_analysisdetails <- gather(tbl_analysisdetails,  key = "fields", value = "value") %>%
+    as.data.frame()
+  return(tbl_analysisdetails)
 }

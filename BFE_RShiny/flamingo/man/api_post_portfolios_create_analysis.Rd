@@ -10,6 +10,8 @@ api_post_portfolios_create_analysis(id, name, model)
 \item{id}{a unique integer value identifying this analysis.}
 
 \item{name}{name of the portfolio.}
+
+\item{model}{id of model}
 }
 \value{
 the posted portfolio analysis created.

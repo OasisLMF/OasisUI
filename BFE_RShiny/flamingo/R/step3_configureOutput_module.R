@@ -30,7 +30,7 @@ step3_configureOutputUI <- function(id) {
 #'
 #' @rdname panelAnalysisTable
 #'
-#' @description Function wrapping panel to show process run table.
+#' @description Function wrapping panel to show analysestable.
 #'
 #' @template params-module-ui
 #'
@@ -595,6 +595,7 @@ panel_configureAdvancedRI <- function(id) {
 #' 
 #' @param currstep current selected step.
 #' @param modelID selected ProgOasis ID.
+#' @param analysisID selected analysis ID
 #'
 #' @return anaid id of selected run.
 #'
@@ -617,7 +618,8 @@ step3_configureOutput <- function(input, output, session,
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
-                                  modelID = reactive("")
+                                  modelID = reactive(""),
+                                  analysisID = reactive("")
 ) {
 
   ns <- session$ns
@@ -668,7 +670,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
 
-  # Process Run Table ----------------------------------------------------------
+  # Analyses  Table ------------------------------------------------------------
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioanaAllOrInProgress, ignoreInit = TRUE, {
     if (active()) {
@@ -1168,7 +1170,7 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".reloadAnaData called")
     if (modelID() != "") {
       .getAnaWithUserChoices()
-      logMessage("process run table refreshed")
+      logMessage("analyses table refreshed")
     }  else {
       result$tbl_analysesData <- NULL
     }
