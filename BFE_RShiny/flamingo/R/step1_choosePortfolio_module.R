@@ -66,7 +66,7 @@ panelPortfolioTable <- function(id) {
       bs_embed_tooltip(title = defineSingleAna$abuttondeletepf, placement = "right"),
     flamingoButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
       bs_embed_tooltip(title = defineSingleAna$abuttonuploadsourcefiles, placement = "right"),
-    flamingoButton(ns("abuttonpfdetails"), "Show Details", align = "centre") %>%
+    flamingoButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
       bs_embed_tooltip(title = defineSingleAna$abuttonpfdetails, placement = "right"),
     actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Analysis", style = "float:right")
   )
@@ -89,7 +89,7 @@ panelPortfolioDetails <- function(id) {
     collapsible = FALSE,
     ns("panel_portfolio_details"),
     heading = tagAppendChildren(
-      h4("Details of Portfolio"),
+      h4("Source Files for Portfolio"),
       uiOutput(ns("paneltitle_pfDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttondefpfrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")

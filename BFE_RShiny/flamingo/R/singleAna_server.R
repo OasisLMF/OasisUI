@@ -37,28 +37,20 @@ singleAna <- function(input, output, session, dbSettings,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
-    # Id of the Process Run
-    anaid = -1,
-    # Id of the programme
-    modelID = "",
-    # Id of the model
+    # Id of the analysis
+    anaID = -1,
+    # Id of the portfolio
     portfolioID = "",
-    # Prog table
+    # Portfolio table
     tbl_portfoliosData = NULL,
-    # Prog table row selected
+    # Portfolio table row selected
     tbl_portfoliosData_rowselected = NULL,
-    # Prog Name
+    # Portfolio Name
     pfName = "",
-    # List of Prog IDs
+    # List of Portfolio IDs
     pfChoices = NULL,
-    # Prog status
-    pfstatus = "",
-    # Model table
-    tbl_modelsData = NULL,
-    # Model table row selected
-    tbl_modelsData_rowselected = NULL,
-    # List of Model IDs
-    modelsChoices = NULL
+    # Portfolio status
+    pfstatus = ""
   )
 
   # Panels switch --------------------------------------------------------------
@@ -83,12 +75,10 @@ singleAna <- function(input, output, session, dbSettings,
         "2" = {
           logMessage("showing Section 'Choose Model' = '2'")
           show("panelDefineIDs")
-          hide("divmodelID")
         },
         "3" = {
           logMessage("showing Section 'Configure Output & Run' = '3'")
           show("panelDefineIDs")
-          show("divmodelID")
         }
       )
     }
@@ -116,7 +106,6 @@ singleAna <- function(input, output, session, dbSettings,
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID = reactive(input$portfolioID),
-    modelID = reactive(input$modelID),
     pfName = reactive({result$pfName}),
     pfstatus = reactive({result$pfstatus})
   )
@@ -130,7 +119,7 @@ singleAna <- function(input, output, session, dbSettings,
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID =  reactive(input$portfolioID),
-    modelID = reactive(input$modelID),
+    modelID = reactive(submodulesList$step2_chooseAnalysis$modelID()),
     analysisID = reactive(submodulesList$step2_chooseAnalysis$analysisID())
   )
 
@@ -151,8 +140,8 @@ singleAna <- function(input, output, session, dbSettings,
   })
 
   # > RunId --------------------------------------------------------------------
-  observeEvent(submodulesList$step3_configureOutput$anaid(), ignoreInit = TRUE, {
-    result$anaid <- submodulesList$step3_configureOutput$anaid()
+  observeEvent(submodulesList$step3_configureOutput$anaID(), ignoreInit = TRUE, {
+    result$anaID <- submodulesList$step3_configureOutput$anaID()
   })
 
   # > portfolioID --------------------------------------------------------------
@@ -218,72 +207,11 @@ singleAna <- function(input, output, session, dbSettings,
     result$pfstatus <- pfstatus
   })
 
-  # > modelID ------------------------------------------------------------------
-
-  observeEvent({
-    submodulesList$step2_chooseAnalysis$modelID()
-    }, ignoreInit = TRUE, {
-    modelID <- submodulesList$step2_chooseAnalysis$modelID()
-    if (!is.null(modelID) && result$modelID != modelID) {
-      logMessage(paste0("updating result$modelID because submodulesList$step2_chooseAnalysis$modelID() changed to: ", modelID ))
-      result$modelID <- submodulesList$step2_chooseAnalysis$modelID()
-    }
-  })
-
-  observeEvent({
-    input$modelID
-    }, ignoreInit = TRUE, {
-    #Avoid updating input if not necessary
-    if (input$modelID != "" && result$modelID != input$modelID) {
-      logMessage(paste0("updating result$modelID because input$modelID changed to: ", input$modelID ))
-      result$modelID <- input$modelID
-    }
-  })
-
-  observeEvent({
-    workflowSteps$step()
-    result$modelID
-  }, ignoreInit = TRUE, {
-    if (workflowSteps$step() == 3) {
-      #Avoid updating input if not necessary
-      if (input$modelID  != result$modelID) {
-        updateSelectizeInput(session, inputId = "modelID", selected = result$modelID, choices = result$modelsChoices)
-      }
-    }
-  })
-
-  # > Model Table reactives ----------------------------------------------------
-
-  observeEvent({
-    result$portfolioID
-    result$modelID
-  },{
-    if (result$portfolioID != "" & !is.null(result$portfolioID)) {
-      result$tbl_modelsData <- return_tbl_modelsData()
-      if (nrow(result$tbl_modelsData) != 0) {
-        result$modelsChoices <-  result$tbl_modelsData[, tbl_modelsData.ModelId]
-      } else {
-        result$modelsChoices <- c("")
-      }
-    }
-  })
-
-  observeEvent({
-    result$portfolioID
-    result$modelID
-    result$modelsChoices
-    result$tbl_modelsData
-  }, ignoreInit = TRUE, {
-    rowToSelect <- match(result$modelID, result$modelsChoices)
-    result$tbl_modelsData_rowselected <- ifelse(is.na(rowToSelect), 1, rowToSelect)
-  })
-
-
   # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      processRunId = reactive(result$anaid)
+      processRunId = reactive(result$anaID)
     )
   )
 

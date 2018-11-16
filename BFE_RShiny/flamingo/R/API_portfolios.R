@@ -247,6 +247,8 @@ api_post_portfolios_create_analysis <- function(id, name, model) {
     path = paste(get_version(), "portfolios", id, "create_analysis", "", sep = "/")
   )
   
+  logWarning = warning
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))

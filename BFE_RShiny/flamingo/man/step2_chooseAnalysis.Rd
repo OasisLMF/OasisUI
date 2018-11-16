@@ -10,8 +10,7 @@ step2_chooseAnalysisUI(id)
 step2_chooseAnalysis(input, output, session, dbSettings, apiSettings,
   active = reactive(TRUE), logMessage = message,
   currstep = reactive(-1), portfolioID = reactive({     "" }),
-  modelID = reactive({     "" }), pfName = reactive({     "" }),
-  pfstatus = reactive({     "" }))
+  pfName = reactive({     "" }), pfstatus = reactive({     "" }))
 }
 \arguments{
 \item{id}{module id}
@@ -33,8 +32,6 @@ step2_chooseAnalysis(input, output, session, dbSettings, apiSettings,
 \item{currstep}{current selected step.}
 
 \item{portfolioID}{selected portfolio ID.}
-
-\item{modelID}{selected model ID.}
 
 \item{pfName}{Name of selected portfolio}
 

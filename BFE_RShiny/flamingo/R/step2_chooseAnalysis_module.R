@@ -116,7 +116,7 @@ panelAnalysisLog <- function(id) {
       h4(""),
       uiOutput(ns("paneltitle_panelAnalysisLog"), inline = TRUE),
       actionButton(inputId = ns("abuttonanalogrefresh"), label = "Refresh", style = "float: right;"),
-     actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
+      actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_analysislog"))
   )
@@ -197,7 +197,6 @@ panelModelTable <- function(id) {
 #' 
 #' @param currstep current selected step.
 #' @param portfolioID selected portfolio ID.
-#' @param modelID selected model ID.
 #' @param pfName Name of selected portfolio
 #' @param pfstatus Status of selected portfolio
 #'
@@ -225,7 +224,6 @@ step2_chooseAnalysis <- function(input, output, session,
                                  logMessage = message,
                                  currstep = reactive(-1),
                                  portfolioID = reactive({""}),
-                                 modelID = reactive({""}),
                                  pfName = reactive({""}),
                                  pfstatus = reactive({""})
                                  
@@ -237,9 +235,6 @@ step2_chooseAnalysis <- function(input, output, session,
   
   #number of Rows per Page in a dataable
   pageLength <- 5
-  
-  #values to stop ping pong effect
-  stop_selmodelID <- check_selmodelID <- 0
   
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
@@ -271,16 +266,13 @@ step2_chooseAnalysis <- function(input, output, session,
     
   })
   
-  observe(if (active()) {
-    result$modelID <- modelID()
-  })
-  
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
     if (currstep() == 2 ) {
       .defaultAssociateModel()
       .reloadAnaData()
+      .reloadtbl_modelsData()
     }
   })
   
@@ -330,11 +322,13 @@ step2_chooseAnalysis <- function(input, output, session,
     }
   })
   
+  
   # Analysis detais ------------------------------------------------------------
   
   onclick("abuttonshowanadetails", {
-    .hideDivs()
-    .defaultAssociateModel()
+    hide("panelAnalysisLog")
+    hide("panelModelTable")
+    #hide("panelModelDetails")
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
     .reloadAnaDetails()
@@ -355,7 +349,7 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         selection = list(mode = 'none'),
         colnames = c('Row Number' = 1),
-        options = .getPRTableOptions()
+        options = .getPRTableOptions(pageLengthVal = 10)
       )
     } else {
       .nothingToShowTable(contentMessage = paste0("no files associtated with analysis id ", result$analysisID))
@@ -374,9 +368,10 @@ step2_chooseAnalysis <- function(input, output, session,
   
   # Analysis Logs --------------------------------------------------------------
   onclick("abuttonshowlog", {
-    .hideDivs()
-    .defaultAssociateModel()
-   logMessage("showing panelAnalysisLog")
+    hide("panelAnalysisDetails")
+    hide("panelModelTable")
+    #hide("panelModelDetails")
+    logMessage("showing panelAnalysisLog")
     show("panelAnalysisLog")
     .reloadAnaLog()
   })
@@ -427,61 +422,27 @@ step2_chooseAnalysis <- function(input, output, session,
   })
   
   # ModelID --------------------------------------------------------------------
-  observeEvent(result$tbl_modelsData, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (active()) {
-      if (result$modelID != "" && !is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0) {
-        logMessage(paste0("updating modelID choices because Programme Model Table was reloaded - contains ", nrow(result$tbl_modelsData), " rows"))
-        result$modelID <- result$tbl_modelsData[1, tbl_modelsData.ModelId]
-      }
-    }
-  })
   
-  # If modelID changes, reload models table and set view back to default
-  observeEvent(result$modelID, ignoreInit = TRUE, {
-    if (active()) {
-      bl_dirty1 <- stop_selmodelID > check_selmodelID
-      .hideDivs()
-      .defaultAssociateModel()
-      if (result$modelID != "") {
-        if (!is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0   && !bl_dirty1 ) {
-          rowToSelect <- match(result$modelID, result$tbl_modelsData[, tbl_modelsData.ModelId])
-          pageSel <- ceiling(rowToSelect/pageLength)
-          if (!is.null(input$dt_models_rows_selected) && rowToSelect != input$dt_models_rows_selected) {
-            # re-selecting the same row would trigger event-observers on input$tableprocessrundata_rows_selected
-            selectRows(dataTableProxy("dt_models"), rowToSelect)
-            selectPage(dataTableProxy("dt_models"), pageSel)
-            logMessage(paste("selected row is:", input$dt_models_rows_selected))
-          }
-        }
+  observeEvent({
+    input$dt_analyses_rows_selected
+    result$analysisID}, ignoreNULL = FALSE, {
+      if (!is.null(input$dt_analyses_rows_selected)) {
+        result$modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID ]
       } else {
-        selectRows(dataTableProxy("dt_models"), NULL)
-        selectPage(dataTableProxy("dt_models"), 1)
-        logMessage(paste("selected row is:", input$dt_models_rows_selected))
+        result$modelID <- "" 
       }
-      if (bl_dirty1) check_selmodelID <<- check_selmodelID + 1
-    }
-  })
-  
-  observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (active()) {
-      .hideDivs()
-      .defaultAssociateModel()
-      if (length(input$dt_models_rows_selected) > 0 ) {
-        modelId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
-        logMessage(paste("updating modelID because selection in programme model table changed to",  modelId))
-        result$modelID <- modelId
-      }
-    }
-  })
+    })
   
   # Model Table ----------------------------------------------------------------
   
   onclick("abuttoncreateana", {
-    .hideDivs()
-    .defaultAssociateModel()
+    hide("panelAnalysisDetails")
+    hide("panelAnalysisLog")
+    #hide("panelModelDetails")
     logMessage("showing panelModelTable")
     show("panelModelTable")
     .reloadtbl_modelsData()
+    .clearinputanaName()
   })
   
   onclick("buttonhidemodel", {
@@ -526,8 +487,8 @@ step2_chooseAnalysis <- function(input, output, session,
   
   # # Show/hide Model Details Panel
   # onclick("abuttonmodeldetails", {
-  #   .hideDivs()
-  #   .defaultAssociateModel()
+  # hide("panelAnalysisDetails")
+  # hide("panelAnalysisLog")
   #   logMessage("showing panelModelDetails")
   #   .reloadtbl_modelsDetails()
   #   show("panelModelDetails")
@@ -566,17 +527,30 @@ step2_chooseAnalysis <- function(input, output, session,
   
   onclick("abuttonsubmit", {
     if (input$anaName != "") {
-    post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID, 
-                                                                           name = input$anaName, 
-                                                                           model = result$modelID)
-    if (post_portfolios_create_analysis$status == "Success") {
-      flamingoNotification(type = "message",
-                           paste("New analysis ", input$anaName, " created."))
-      .reloadAnaData()
-    } else {
-      flamingoNotification(type = "error",
-                           paste("Analysis ", input$anaName, " not created."))
-    }
+      print(" result$tbl_analysesData")
+      print(result$tbl_analysesData)
+      print("input$dt_analyses_rows_selected")
+      print(input$dt_analyses_rows_selected)
+      print("result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID ]")
+      print(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID ])
+      print("result$tbl_analysesData[input$dt_analyses_rows_selected, ]")
+      print(result$tbl_analysesData[input$dt_analyses_rows_selected, ])
+      
+      modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
+      post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID, 
+                                                                             name = input$anaName, 
+                                                                             model = modelID)
+      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID, " name ", input$anaName, " model ",  modelID))
+      print("status")
+      print(post_portfolios_create_analysis$status)
+      if (post_portfolios_create_analysis$status == "Success") {
+        flamingoNotification(type = "message",
+                             paste("New analysis ", input$anaName, " created."))
+        .reloadAnaData()
+      } else {
+        flamingoNotification(type = "error",
+                             paste("Analysis ", input$anaName, " not created."))
+      }
     } else {
       flamingoNotification(type = "error",
                            paste("Provide name for analysis creation."))
@@ -609,13 +583,15 @@ step2_chooseAnalysis <- function(input, output, session,
     })
   
   #Not allowed creation of an analysis for an incomplete portfolio
-  observeEvent(result$portfolioID, {
-    if (pfstatus() == "- Status: Completed") {
-      enable("abuttoncreateana")
-    } else {
-      disable("abuttoncreateana")
-    }
-  })
+  observeEvent({
+    result$portfolioID
+    pfstatus()}, {
+      if (pfstatus() == "- Status: Completed") {
+        enable("abuttoncreateana")
+      } else {
+        disable("abuttoncreateana")
+      }
+    })
   
   # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonanarefresh", {
@@ -671,13 +647,19 @@ step2_chooseAnalysis <- function(input, output, session,
     invisible()
   }
   
+  #clear text input
+  .clearinputanaName <- function(){
+    updateTextInput(session = session, inputId = "anaName", value = "")
+  }
+  
+  
   # Reload Analysis Details table
   .reloadAnaDetails <- function() {
     logMessage(".reloadAnaDetails called")
     if (!is.null(result$analysisID) && result$analysisID != "") {
       result$tbl_analysisdetails <- return_tbl_analysisdetails(result$analysisID)
     } else {
-    result$tbl_analysisdetails <-  NULL
+      result$tbl_analysisdetails <-  NULL
     }
   }
   
@@ -722,12 +704,12 @@ step2_chooseAnalysis <- function(input, output, session,
   # }
   
   # table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function() {
+  .getPRTableOptions <- function(pageLengthVal = pageLength) {
     options <- list(
       search = list(caseInsensitive = TRUE),
       searchHighlight = TRUE,
       processing = 0,
-      pageLength = pageLength,
+      pageLength = pageLengthVal,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }

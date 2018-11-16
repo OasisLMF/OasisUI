@@ -72,6 +72,8 @@ api_post_analyses_input_file <- function(id, filepath_input) {
     path = paste(get_version(), "analyses", id, "input_file", "", sep = "/")
   )
   
+  logWarning = warning
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
@@ -158,6 +160,8 @@ api_post_analyses_settings_file <- function(id, filepath_settings) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "settings_file", "", sep = "/")
   )
+  
+  logWarning = warning
   
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
@@ -246,6 +250,8 @@ api_post_analyses_input_errors_file <- function(id, filepath_input_errors) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "input_errors_file", "", sep = "/")
   )
+  
+  logWarning = warning
   
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
@@ -336,6 +342,8 @@ api_post_analyses_input_generation_traceback_file <- function(id, filepath_input
     path = paste(get_version(), "analyses", id, "input_generation_traceback_file", "", sep = "/")
   )
   
+  logWarning = warning
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
@@ -357,7 +365,7 @@ api_post_analyses_input_generation_traceback_file <- function(id, filepath_input
 #' 
 #' @param id a unique integer value identifying this analysis.
 #' 
-#' @return dataframe of iinput_generation_traceback_file
+#' @return dataframe of input_generation_traceback_file
 #' 
 #' @importFrom dplyr bind_rows
 #' @importFrom httr content
@@ -366,8 +374,15 @@ api_post_analyses_input_generation_traceback_file <- function(id, filepath_input
 return_input_generation_traceback_file_df <- function(id){
   get_input_generation_traceback_file <- api_get_analyses_input_generation_traceback_file(id)
   input_generation_traceback_fileList <- content(get_input_generation_traceback_file$result)
-  input_generation_traceback_file_df <- bind_rows(input_generation_traceback_fileList) %>% 
-    as.data.frame()
+  if (is.null(names(input_generation_traceback_fileList))) {
+    input_generation_traceback_file_df <- strsplit(input_generation_traceback_fileList, split = "\n") %>% 
+      as.data.frame(stringsAsFactors = FALSE)
+    colnames(input_generation_traceback_file_df) <- input_generation_traceback_file_df[1, ]
+    input_generation_traceback_file_df <- input_generation_traceback_file_df %>% filter(!! sym(colnames(input_generation_traceback_file_df)) != colnames(input_generation_traceback_file_df) ) 
+  } else {
+    input_generation_traceback_file_df <- bind_rows(input_generation_traceback_fileList) %>% 
+      as.data.frame()
+  }
   return(input_generation_traceback_file_df)
 }
 
@@ -445,6 +460,8 @@ api_post_analyses_output_file <- function(id, filepath_output) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "output_file", "", sep = "/")
   )
+  
+  logWarning = warning
   
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
@@ -532,6 +549,8 @@ api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
     path = paste(get_version(), "analyses", id, "run_traceback_file", "", sep = "/")
   )
   
+  logWarning = warning
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
@@ -543,4 +562,34 @@ api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
     ),
     class = c("apiresponse")
   )
+}
+
+
+#' Return analyses_run_traceback_file Dataframe
+#' 
+#' @rdname return_analyses_run_traceback_file_df
+#' 
+#' @description Returns a dataframe of analyses_run_traceback_file
+#' 
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return dataframe of analyses_run_traceback_file
+#' 
+#' @importFrom dplyr bind_rows
+#' @importFrom httr content
+#' 
+#' @export
+return_analyses_run_traceback_file_df <- function(id){
+  get_analyses_run_traceback_file <- api_get_analyses_analyses_run_traceback_file(id)
+  analyses_run_traceback_fileList <- content(get_analyses_run_traceback_file$result)
+  if (is.null(names(analyses_run_traceback_fileList))) {
+    analyses_run_traceback_file_df <- strsplit(analyses_run_traceback_fileList, split = "\n") %>% 
+      as.data.frame(stringsAsFactors = FALSE)
+    colnames(analyses_run_traceback_file_df) <- analyses_run_traceback_file_df[1, ]
+    analyses_run_traceback_file_df <- analyses_run_traceback_file_df %>% filter(!! sym(colnames(analyses_run_traceback_file_df)) != colnames(analyses_run_traceback_file_df) ) 
+  } else {
+    analyses_run_traceback_file_df <- bind_rows(analyses_run_traceback_fileList) %>% 
+      as.data.frame()
+  }
+  return(analyses_run_traceback_file_df)
 }

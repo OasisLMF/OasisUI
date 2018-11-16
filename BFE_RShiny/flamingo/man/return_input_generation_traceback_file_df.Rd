@@ -10,7 +10,7 @@ return_input_generation_traceback_file_df(id)
 \item{id}{a unique integer value identifying this analysis.}
 }
 \value{
-dataframe of iinput_generation_traceback_file
+dataframe of input_generation_traceback_file
 }
 \description{
 Returns a dataframe of input_generation_traceback_file

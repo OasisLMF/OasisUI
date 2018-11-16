@@ -14,16 +14,16 @@
 #'
 #' @export
 singleAnaUI <- function(id) {
-
-ns <- NS(id)
-
-tagList(
-  singleAnaWorkflowStepsUI(ns("workflowsteps")),
-  hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
-  step1_choosePortfolioUI(ns("step1_choosePortfolio")),
-  step2_chooseAnalysisUI(ns("step2_chooseAnalysis")),
-  step3_configureOutputUI(ns("step3_configureOutput"))
-)
+  
+  ns <- NS(id)
+  
+  tagList(
+    singleAnaWorkflowStepsUI(ns("workflowsteps")),
+    hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
+    step1_choosePortfolioUI(ns("step1_choosePortfolio")),
+    step2_chooseAnalysisUI(ns("step2_chooseAnalysis")),
+    step3_configureOutputUI(ns("step3_configureOutput"))
+  )
 }
 
 
@@ -44,11 +44,13 @@ tagList(
 #' @export
 panelDefineIDs <- function(id) {
   ns <- NS(id)
-
+  
   panel(
     status = "primary",
     fluidRow(
       div(id = ns("divportfolioID"),
+          column(1,
+                 h4("Filter for:")),
           column(4,
                  div(class = "InlineSelectInputSmall",
                      selectizeInput(inputId = ns("portfolioID"), label = "Portfolio ID",
@@ -61,21 +63,9 @@ panelDefineIDs <- function(id) {
                      )  %>%
                        bs_embed_tooltip(title = defineSingleAna$portfolioID,
                                         placement = "right")
-                 ))),
-      hidden(div(id = ns("divmodelID"),
-                 column(5,
-                        div(class = "InlineSelectInputSmall",
-                            selectizeInput(inputId = ns("modelID"), label = "Model ID",
-                                           choices = c(),
-                                           selected = character(0),
-                                           options = list(
-                                             allowEmptyOption = TRUE,
-                                             placeholder = 'Select',
-                                             onInitialize = I('function() { this.setValue(""); }'))
-                            ) %>%
-                              bs_embed_tooltip(title = defineSingleAna$modelID,
-                                               placement = "right")
-                        ))))
+                 )
+          )
+      )
     )
   )
 }

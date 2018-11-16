@@ -72,6 +72,8 @@ api_post_portfolios_location_file <- function(id, filepath_location) {
     path = paste(get_version(), "portfolios", id, "location_file", "", sep = "/")
   )
   
+  logWarning = warning
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
@@ -159,6 +161,8 @@ api_post_portfolios_accounts_file <- function(id, filepath_accounts) {
     encode = "multipart",
     path = paste(get_version(), "portfolios", id, "accounts_file", "", sep = "/")
   )
+  
+  logWarning = warning
   
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
@@ -248,6 +252,8 @@ api_post_portfolios_reinsurance_info_file <- function(id, filepath_reinsurance_i
     path = paste(get_version(), "portfolios", id, "reinsurance_info_file", "", sep = "/")
   )
   
+  logWarning = warning
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
@@ -335,6 +341,8 @@ api_post_portfolios_reinsurance_source_file <- function(id, filepath_reinsurance
     encode = "multipart",
     path = paste(get_version(), "portfolios", id, "reinsurance_source_file", "", sep = "/")
   )
+  
+  logWarning = warning
   
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),

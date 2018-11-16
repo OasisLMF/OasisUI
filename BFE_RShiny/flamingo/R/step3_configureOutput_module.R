@@ -90,7 +90,7 @@ panelAnalysisLogs <- function(id) {
       uiOutput(ns("paneltitle_AnaLogs"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analogs"))
+    DTOutput(ns("dt_analysisrunlog"))
   )
 }
 
@@ -597,7 +597,7 @@ panel_configureAdvancedRI <- function(id) {
 #' @param modelID selected ProgOasis ID.
 #' @param analysisID selected analysis ID
 #'
-#' @return anaid id of selected run.
+#' @return anaID id of selected run.
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -640,36 +640,75 @@ step3_configureOutput <- function(input, output, session,
     navigationstate = NULL,
     # reactive value for process runs table
     tbl_analysesData = NULL,
+    # analysis run logs table
+    tbl_analysisrunlog = NULL,
     # flag to know if the user is creating a new output configuration or rerunning a process
     ana_flag = "C",
     # Id of the Process Run
-    anaid = -1
+    anaID = -1
   )
 
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
+    result$anaID <- analysisID()
   })
 
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
     if (currstep() == 3 ) {
-      .defaultRun()
+      .defaultstep3()
       .reloadAnaData()
     }
   })
 
-  # If modelID changes, reload process run table and set view back to default
-  observeEvent(modelID(), ignoreInit = TRUE, {
+  # If portfolioID changes, reload analysis table and set view back to default
+  observeEvent(portfolioID(), ignoreInit = TRUE, {
     if (active()) {
-      hide("panelDefineOutputs")
-      hide("panelAnalysisLogs")
+      .hideDivs()
+      show("panelAnalysisTable")
       .reloadAnaData()
     }
   })
 
-
+  # Enable and disable buttons -------------------------------------------------
+  
+  #Enabling based on analysis
+  observeEvent({
+    result$tbl_analysesData
+    portfolioID()
+    currstep()
+    input$dt_analysis_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      disable("abuttonrerunana")
+      disable("abuttondisplayoutput")
+      disable("abuttonshowlog")
+      disable("abuttonconfigoutput")
+      if (portfolioID() != "") {
+        enable("abuttonconfigoutput")
+        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
+          enable("abuttonrerunana")
+          enable("abuttonshowlog")
+          if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
+            enable("abuttondisplayoutput")
+          }
+        }
+      }
+    }
+  )
+  
+  
+  # Enable and disable buttons based on output confifig
+  observeEvent(outputOptionsList, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (outputOptionsList() != "") {
+      enable("abuttonsaveoutput")
+      enable("abuttonexecuteanarun")
+    } else {
+      disable("abuttonsaveoutput")
+      disable("abuttonexecuteanarun")
+    }
+  })
+  
   # Analyses  Table ------------------------------------------------------------
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioanaAllOrInProgress, ignoreInit = TRUE, {
@@ -701,8 +740,8 @@ step3_configureOutput <- function(input, output, session,
 
   # Process Run Table Title
   output$paneltitle_AnalysisTable <- renderUI({
-    if (modelID() != "") {
-      paste0('Analyses')
+    if (portfolioID() != "") {
+      paste0('Analyses associated with portfolio id ', portfolioID())
     } else {
       paste0("Analyses")
     }
@@ -721,34 +760,11 @@ step3_configureOutput <- function(input, output, session,
       analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
       analysisName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
       analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
-      paste0('Re-Define Output Configuration for Run id ', analysisID, ' ', analysisName)
+      paste0('Re-Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
     } else {
       "New Output Configuration"
     }
   })
-
-  # Enable and disable buttons
-  observeEvent({
-    result$tbl_analysesData
-    modelID()
-    currstep()
-    input$dt_analysis_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      disable("abuttonrerunana")
-      disable("abuttondisplayoutput")
-      disable("abuttonshowlog")
-      disable("abuttonconfigoutput")
-      if (modelID() != "") {
-        enable("abuttonconfigoutput")
-        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
-          enable("abuttonrerunana")
-          enable("abuttonshowlog")
-          if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
-            enable("abuttondisplayoutput")
-          }
-        }
-      }
-    }
-  )
 
   #Show Output Configuration Panel
   onclick("abuttonconfigoutput", {
@@ -897,6 +913,8 @@ step3_configureOutput <- function(input, output, session,
     input$chkrilob
   ))})
 
+  # > Save output configuration ------------------------------------------------
+  
   # Save output for later use as presets
   .modalsaveoutput <- function() {
     ns <- session$ns
@@ -911,17 +929,6 @@ step3_configureOutput <- function(input, output, session,
                 easyClose = TRUE
     )
   }
-
-  # Enable and disable buttons
-  observeEvent(outputOptionsList, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (outputOptionsList() != "") {
-      enable("abuttonsaveoutput")
-      enable("abuttonexecuteanarun")
-    } else {
-      disable("abuttonsaveoutput")
-      disable("abuttonexecuteanarun")
-    }
-  })
 
   onclick("abuttonsaveoutput", {
     showModal(.modalsaveoutput())
@@ -1047,7 +1054,7 @@ step3_configureOutput <- function(input, output, session,
                              sprintf("Created Analysis Run ID: %s. But run executing failed",
                                      anaID))
         show("panelAnalysisLogs")
-        logMessage("showing prrunlogtable")
+        logMessage("showing analysis run log table")
       }
     }
     .defaultview(session)
@@ -1056,7 +1063,8 @@ step3_configureOutput <- function(input, output, session,
   # Logs -----------------------------------------------------------------------
   onclick("abuttonshowlog", {
     show("panelAnalysisLogs")
-    logMessage("showing prrunlogtable")
+    logMessage("showing analysis run log table")
+    .reloadAnaRunLog()
   })
 
   onclick("abuttonhidelog", {
@@ -1064,19 +1072,12 @@ step3_configureOutput <- function(input, output, session,
   })
 
   ### Log Table
-  output$dt_analogs <- renderDT({
+  output$dt_analysisrunlog <- renderDT({
     if (length(input$dt_analysis_rows_selected) > 0) {
-      # manual refresh button
-      invisible(input$abuttonanarefreshlogs)
-
-      wfid <- result$anaid
-
-      logdata <- getProcessRunDetails(dbSettings, wfid) %>%
-        .replaceWithIcons()
       logMessage("re-rendering analysis log table")
-      if (!is.null(logdata)) {
+      if (!is.null(result$tbl_analysisrunlog)) {
         datatable(
-          logdata,
+          result$tbl_analysisrunlog,
           class = "flamingo-table display",
           rownames = TRUE,
           selection = "none",
@@ -1086,7 +1087,7 @@ step3_configureOutput <- function(input, output, session,
           options = .getPRTableOptions()
         )
       } else {
-        .nothingToShowTable(contentMessage = paste0("no log files associated with analysis ID ", ifelse(!is.null(result$anaid), result$anaid, "NULL")))
+        .nothingToShowTable(contentMessage = paste0("no log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL")))
       }
     }
   })
@@ -1096,7 +1097,7 @@ step3_configureOutput <- function(input, output, session,
     analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
     analysisName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
-    paste0('Logs for Run id ', analysisID, ' ', analysisName)
+    paste0('Logs for Analysis id ', analysisID, ' ', analysisName)
   })
 
   # Refresh Buttons ------------------------------------------------------------
@@ -1104,6 +1105,11 @@ step3_configureOutput <- function(input, output, session,
     .reloadAnaData()
   } )
 
+  onclick("abuttonanarefreshlogs", {
+    .reloadAnaRunLog()
+  })
+  
+  
   # Updates dependent on changed: dt_analysis_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(input$dt_analysis_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -1112,13 +1118,13 @@ step3_configureOutput <- function(input, output, session,
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
       if (length(input$dt_analysis_rows_selected) > 0 && !is.null(result$tbl_analysesData)) {
-        result$anaid <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
-        if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] != StatusCompleted) {
+        result$anaID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
+        if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] == StatusFailed) {
           show("panelAnalysisLogs")
-          logMessage("showing prrunlogtable")
+          logMessage("showing analysis run log table")
         }
       } else {
-        result$anaid <- -1
+        result$anaID <- -1
       }
     }
   })
@@ -1140,8 +1146,8 @@ step3_configureOutput <- function(input, output, session,
   }
 
   #show default view for Section "Configure Output & Run" = "3"
-  .defaultRun <- function(){
-    logMessage(".defaultRun called")
+  .defaultstep3 <- function(){
+    logMessage(".defaultstep3 called")
     show("panelAnalysisTable")
     disable("chkgulpolicy")
     disable("abuttonrerunana")
@@ -1168,8 +1174,11 @@ step3_configureOutput <- function(input, output, session,
   # Reload Process Runs table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
-    if (modelID() != "") {
-      .getAnaWithUserChoices()
+    if (portfolioID()  != "") {
+      tbl_analysesData  <- return_tbl_analysesData()
+      if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
+        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesData.PortfolioID) == portfolioID())
+      }
       logMessage("analyses table refreshed")
     }  else {
       result$tbl_analysesData <- NULL
@@ -1177,6 +1186,16 @@ step3_configureOutput <- function(input, output, session,
     invisible()
   }
 
+  # Reload Analysis Run Log table
+  .reloadAnaRunLog <- function() {
+    logMessage(".reloadAnaRunLog called")
+    if (!is.null(result$anaID) && result$anaID != "") {
+      result$tbl_analysisrunlog <- return_input_generation_traceback_file_df(result$anaID)
+    } else {
+      result$tbl_analysisrunlog <-  NULL
+    }
+  }
+  
   # table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function() {
     options <- list(
@@ -1283,8 +1302,8 @@ step3_configureOutput <- function(input, output, session,
   # Update output configuration for rerun
   .updateOutputConfig <- function() {
     logMessage(".updateOutputConfig called")
-    outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$anaid ))
-    anaparams <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$anaid ))
+    outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$anaID ))
+    anaparams <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$anaID ))
 
     updateTextInput(session, "tinputananame", value = result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName])
 
@@ -1368,7 +1387,7 @@ step3_configureOutput <- function(input, output, session,
   moduleOutput <- c(
     list(
       navigationstate = reactive(result$navigationstate),
-      anaid = reactive({result$anaid})
+      anaID = reactive({result$anaID})
     )
   )
 
