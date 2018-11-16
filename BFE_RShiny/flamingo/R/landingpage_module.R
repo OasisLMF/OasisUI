@@ -21,8 +21,8 @@ landingPageUI <- function(id) {
       h4("Analyses Table"),
       DTOutput(ns("dt_anaInbox")),
 
-      flamingoButton(ns("abuttongotorun"), "Dashboard of Analyses Outputs", align = "right") %>%
-        bs_embed_tooltip(title = landing_page$abuttongotorun, placement = "right"),
+      flamingoButton(ns("abuttongotoana"), "Dashboard of Analyses Outputs", align = "right") %>%
+        bs_embed_tooltip(title = landing_page$abuttongotoana, placement = "right"),
 
       flamingoButton(inputId = ns("abuttondelana"), label = "Delete Analysis") %>%
         bs_embed_tooltip(title = defineSingleAna$abuttondelana, placement = "right"),
@@ -71,7 +71,7 @@ landingPage <- function(input, output, session, user, dbSettings,
   )
 
   # navigation -----------------------------------------------------------------
-  observeEvent(input$abuttongotorun,
+  observeEvent(input$abuttongotoana,
                updateNavigation(navigation_state, "SBR"))
 
   observe(if (active()) {

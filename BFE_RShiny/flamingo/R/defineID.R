@@ -36,11 +36,11 @@ defineIDUI <- function(id, w, batch = FALSE){
                                border: none;
                                 ") %>%
            bs_embed_tooltip(title = browse_programmes$selectAnaID, placement = "right"),
-         div(textOutput(ns("selectRunInfo1"), inline = TRUE),
+         div(textOutput(ns("selectAnaInfo1"), inline = TRUE),
                style = "font-weight:bold; font-color: #2d2d2d;
                         display:inline;
                         padding:10px; margin: 5px; "),
-         div(textOutput(ns("selectRunInfo2"), inline = TRUE),
+         div(textOutput(ns("selectAnaInfo2"), inline = TRUE),
              style = "display:inline;"
                       # font-weight:bold; font-color: #2d2d2d;
                       # padding:10px; margin: 5px; border-style: solid;"
@@ -82,7 +82,7 @@ defineID <- function(input, output, session,
   result <- reactiveValues(
     inbox = NULL,
     selectAnaID = "",
-    selectRunName = "",
+    selectAnaName = "",
     LProw = NULL,
     PRrow = NULL,
     preselRow = NULL
@@ -100,13 +100,13 @@ defineID <- function(input, output, session,
   # Modal for AnaID selection --------------------------------------------------
 
   # > Modal Panel
-  RunsList <- modalDialog(
+  AnaList <- modalDialog(
     easyClose = TRUE,
     size = "l",
     flamingoTableUI(ns("tableInboxpanel")),
     footer = tagList(
-      flamingoButton(ns("abuttonselectRun"),
-                     label = "Select Run", align = "left"),
+      flamingoButton(ns("abuttonselectAna"),
+                     label = "Select Analysis", align = "left"),
       actionButton(ns("abuttonccancel"),
                    label = "Cancel", align = "right")
     )
@@ -118,7 +118,7 @@ defineID <- function(input, output, session,
     result$inbox <- data  %>%
       replaceWithIcons() %>%
       filter(Status == StatusCompleted)
-    showModal(RunsList)
+    showModal(AnaList)
   })
 
 
@@ -150,7 +150,7 @@ defineID <- function(input, output, session,
       }
     })
 
-  #Find row of anaid preselected in model run server step 3
+  #Find row of anaid preselected in model analysis server step 3
   observeEvent({
     processRunId()},{
       idx <- which(result$inbox[, inbox.AnaID] ==  processRunId())
@@ -181,10 +181,10 @@ defineID <- function(input, output, session,
     currName <- ""
     if (!is.null(sub_modules$tableInboxpanel$rows_selected())) {
       currid <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.AnaID]
-      currName <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.RunName]
+      currName <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.AnaName]
     }
     result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
-    result$selectRunName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
+    result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
   })
 
   # > close modal
@@ -192,14 +192,14 @@ defineID <- function(input, output, session,
     removeModal()
   })
 
-  observeEvent(input$abuttonselectRun, {
+  observeEvent(input$abuttonselectAna, {
     if (!is.null(sub_modules$tableInboxpanel$rows_selected())) {
       result$preselRow <- sub_modules$tableInboxpanel$rows_selected()
     }
     removeModal()
   })
 
-  output$selectRunInfo1 <- renderText({
+  output$selectAnaInfo1 <- renderText({
     if (result$selectAnaID == "") {
       info <- paste0("Select ", labelana, ":   ")
     } else {
@@ -208,11 +208,11 @@ defineID <- function(input, output, session,
     info
   })
 
-  output$selectRunInfo2 <- renderText({
+  output$selectAnaInfo2 <- renderText({
     if (result$selectAnaID == "") {
       info <- " "
     } else {
-      info <- paste0(result$selectAnaID, ' "' ,result$selectRunName, '"  ')
+      info <- paste0(result$selectAnaID, ' "' ,result$selectAnaName, '"  ')
     }
     info
   })

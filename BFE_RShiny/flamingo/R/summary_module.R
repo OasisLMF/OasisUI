@@ -5,7 +5,7 @@
 #'
 #' @rdname summarytab
 #'
-#' @description UI/View of summary elements of a run.
+#' @description UI/View of summary elements of an analysis.
 #'
 #' @template params-module-ui
 #'
@@ -104,13 +104,13 @@ summarytab <- function(input, output, session, dbSettings,
       SummaryData2 <- NULL
       SummaryData <- NULL
 
-      #Check for run 1
+      #Check for analysis 1
       if (selectAnaID1() != "") {
         SummaryData1 <- executeDbQuery(dbSettings,
                                        paste("exec getOutputSummary", selectAnaID1()))
       }
 
-      #check for run2
+      #check for analysis 2
       if (selectAnaID2() != "") {
         SummaryData2 <- executeDbQuery(dbSettings,
                                        paste("exec getOutputSummary", selectAnaID2()))
@@ -190,7 +190,7 @@ summarytab <- function(input, output, session, dbSettings,
     if (!is.null(result$outputSummaryData)) {
       data <- result$outputSummaryData
       if (compare) {
-        colnames <- names(select(data, contains("run", ignore.case = TRUE)))
+        colnames <- names(select(data, contains("analysis", ignore.case = TRUE)))
         data <- data %>% gather(key = "anaid", value = "value",colnames)
       }
         data <- cbind(data,do.call(rbind.data.frame,  lapply(data[,"SummaryType"], function(i){

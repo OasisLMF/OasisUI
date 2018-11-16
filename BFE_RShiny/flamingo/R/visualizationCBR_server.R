@@ -1,10 +1,10 @@
-#' Compare Runs Definition Module Server ---------------------------------------
+#' Compare Analyses Definition Module Server ---------------------------------------
 
 #' visualizationCBR
 #'
 #' @rdname visualizationCBR
 #'
-#' @description Server logic for comparing runs run page.
+#' @description Server logic for comparing runs analyses page.
 #'
 #' @template return-outputNavigation
 #' @template params-module

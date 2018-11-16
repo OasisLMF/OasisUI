@@ -1,8 +1,8 @@
 
 test_that("query builder produces correct queries", {
 
-      stmt11 <- "exec dbo.ListModelRun 1, 'test'"
-      stmt12 <- buildDbQuery("ListModelRun", 1, "test")
+      stmt11 <- "exec dbo.ListModelAna 1, 'test'"
+      stmt12 <- buildDbQuery("ListModelAna", 1, "test")
 
       expect_equal(stmt11, stmt12)
 

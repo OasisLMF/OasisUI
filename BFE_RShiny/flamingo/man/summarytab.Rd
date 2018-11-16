@@ -38,7 +38,7 @@ list of tags
 list of tags
 }
 \description{
-UI/View of summary elements of a run.
+UI/View of summary elements of an analysis.
 
 Server logic of summary elements of an analysis.
 }

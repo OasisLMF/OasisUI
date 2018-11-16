@@ -4,7 +4,7 @@
 \name{visualizationCBR}
 \alias{visualizationCBR}
 \alias{visualizationCBRUI}
-\title{Compare Runs Definition Module Server ---------------------------------------
+\title{Compare Analyses Definition Module Server ---------------------------------------
 visualizationCBR}
 \usage{
 visualizationCBR(input, output, session, dbSettings, apiSettings, user,
@@ -49,7 +49,7 @@ preselPanel panel to show in the model session.
 List of tags.
 }
 \description{
-Server logic for comparing runs run page.
+Server logic for comparing runs analyses page.
 
 UI/View for comparing runs run page.
 }

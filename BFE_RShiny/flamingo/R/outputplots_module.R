@@ -376,7 +376,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                                                    Variable %in% chkbox$chkboxgrpvariables(),
                                                    Granularity %in%  chkbox$chkboxgrpgranularities())
         if (nrow(filesToPlot) != prod(plotstrc)) {
-          flamingoNotification("The run did not produce the selected output. Please check the logs", type = "error")
+          flamingoNotification("The analysis did not produce the selected output. Please check the logs", type = "error")
           filesToPlot <- NULL
         }
       }

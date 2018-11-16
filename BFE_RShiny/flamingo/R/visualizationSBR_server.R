@@ -4,7 +4,7 @@
 #'
 #' @rdname visualizationSBR
 #'
-#' @description Server logic for viewing results of a single run.
+#' @description Server logic for viewing results of a single analysis.
 #'
 #' @template return-outputNavigation
 #' @template params-module

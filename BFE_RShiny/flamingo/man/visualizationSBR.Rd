@@ -49,7 +49,7 @@ preselPanel panel to show in the model session
 List of tags.
 }
 \description{
-Server logic for viewing results of a single run.
+Server logic for viewing results of a single analysis.
 
 UI/View for viewing results of a single run.
 }
