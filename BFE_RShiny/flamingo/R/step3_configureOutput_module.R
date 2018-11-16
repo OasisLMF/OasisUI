@@ -142,13 +142,13 @@ panelDefineOutputs <- function(id) {
 panelDefineOutputsDetails <- function(id) {
   ns <- NS(id)
   tagList(
-    flamingoPanel(
-      collapsible = FALSE,
-      ns("panel_ConfigDetails"),
-      heading = h4("Configuration Details"),
-      selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = ""),
-      textInput(ns("tinputananame"), label = "Analysis Name:", value = "")
-    ),
+    # flamingoPanel(
+    #   collapsible = FALSE,
+    #   ns("panel_ConfigDetails"),
+    #   heading = h4("Configuration Details"),
+    #   selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = ""),
+    #   textInput(ns("tinputananame"), label = "Analysis Name:", value = "")
+    # ),
     flamingoPanel(
       collapsible = FALSE,
       ns("panel_defAnaOutputDetails"),
@@ -769,6 +769,7 @@ step3_configureOutput <- function(input, output, session,
   #Show Output Configuration Panel
   onclick("abuttonconfigoutput", {
     .defaultview(session)
+    hide("panelAnalysisLogs")
     show("panelDefineOutputs")
     .showPerils()
     logMessage("showing panelDefineOutputs")
@@ -866,24 +867,25 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Update button in sidebar panel to update checkboxes for pre-populated values
-  observeEvent(input$sinoutputoptions, {
-    if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
-      outputlist <- executeDbQuery(dbSettings,
-                                   buildDbQuery("getOutputOptionOutputs", input$sinoutputoptions))
-
-      if (nrow(outputlist) > 0) {
-        # print(paste0("outputlist"))
-        # print(outputlist)
-        for (i in 1:nrow(outputlist)) {
-          grpid <- paste0("chk",outputlist$Group[i])
-          grpinputid <- strsplit(toString(grpid), " ")[[1]]
-          chkboxid <- outputlist$Parameter[i]
-          selchoices <- as.list(strsplit(toString(chkboxid), ",")[[1]])
-          updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
-        }
-      }
-    }
-  })
+  #To-Do update output configuration based on analysis setting
+  # observeEvent(input$sinoutputoptions, {
+  #   if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
+  #     outputlist <- executeDbQuery(dbSettings,
+  #                                  buildDbQuery("getOutputOptionOutputs", input$sinoutputoptions))
+  # 
+  #     if (nrow(outputlist) > 0) {
+  #       # print(paste0("outputlist"))
+  #       # print(outputlist)
+  #       for (i in 1:nrow(outputlist)) {
+  #         grpid <- paste0("chk",outputlist$Group[i])
+  #         grpinputid <- strsplit(toString(grpid), " ")[[1]]
+  #         chkboxid <- outputlist$Parameter[i]
+  #         selchoices <- as.list(strsplit(toString(chkboxid), ",")[[1]])
+  #         updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
+  #       }
+  #     }
+  #   }
+  # })
 
   # Clear the checkbox groups and preset dropdown - Set back to default
   onclick("abuttonclroutopt", {
@@ -946,7 +948,7 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
       updateTextInput(session, "tinputoutputname", value = "")
       removeModal()
-      .clearOutputOptions()
+      # .clearOutputOptions()
       #.defaultview(session)
     }
   })
@@ -956,7 +958,7 @@ step3_configureOutput <- function(input, output, session,
   # A function to generate process run
   .generateRun <- function() {
 
-    analysisName <- isolate(input$tinputananame)
+    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName] #isolate(input$tinputananame)
     nosample <- isolate(input$tinputnoofsample)
     sthreshold <- isolate(input$tinputthreshold)
     eventsetid <- isolate(input$sinputeventset)
@@ -1062,6 +1064,7 @@ step3_configureOutput <- function(input, output, session,
 
   # Logs -----------------------------------------------------------------------
   onclick("abuttonshowlog", {
+    hide("panelDefineOutputs")
     show("panelAnalysisLogs")
     logMessage("showing analysis run log table")
     .reloadAnaRunLog()
@@ -1250,10 +1253,10 @@ step3_configureOutput <- function(input, output, session,
   # Clear other runtime params
   .clearotherparams <- function() {
     logMessage(".clearotherparams called")
-    updateSelectInput(session, "sinoutputoptions",
-                      choices = c(getOutputOptions(dbSettings)),
-                      selected = character(0))
-    updateTextInput(session, "tinputananame", value = "")
+    # updateSelectInput(session, "sinoutputoptions",
+    #                   choices = c(getOutputOptions(dbSettings)),
+    #                   selected = character(0))
+    # updateTextInput(session, "tinputananame", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
 
     modelID <- ifelse(modelID() == "", -1,modelID())
@@ -1271,32 +1274,33 @@ step3_configureOutput <- function(input, output, session,
   }
 
   # Clear Custom Configuration option
-  .clearOutputOptions <- function() {
-    logMessage(".clearOutputOptions called")
-    updateSelectInput(session, "sinoutputoptions",
-                      choices = c(getOutputOptions(dbSettings)),
-                      selected = character(0))
-  }
+  # .clearOutputOptions <- function() {
+  #   logMessage(".clearOutputOptions called")
+  #   updateSelectInput(session, "sinoutputoptions",
+  #                     choices = c(getOutputOptions(dbSettings)),
+  #                     selected = character(0))
+  # }
 
   #Show available perils
+  # To-Do: retrieve perils from model. currently showing all
   .showPerils <- function() {
-    modelID <- ifelse(modelID() == "", -1,modelID())
-    stmt <- buildDbQuery("getRuntimeParamList", modelID)
-    runparamlist <- executeDbQuery(dbSettings, stmt)
-
-    hide("perilwind")
-    hide("perilsurge")
-    hide("perilquake")
-    hide("perilflood")
-    hide("demandsurge")
-    hide("leakagefactor")
-
-    if (nrow(runparamlist) > 0) {
-      for (i in 1:nrow(runparamlist)) {
-        ctrname <- gsub("_", "", runparamlist[i, 1], fixed = TRUE)
-        show(ctrname)
-      }
-    }
+    # modelID <- ifelse(modelID() == "", -1,modelID())
+    # stmt <- buildDbQuery("getRuntimeParamList", modelID)
+    # runparamlist <- executeDbQuery(dbSettings, stmt)
+    # 
+    # hide("perilwind")
+    # hide("perilsurge")
+    # hide("perilquake")
+    # hide("perilflood")
+    # hide("demandsurge")
+    # hide("leakagefactor")
+    # 
+    # if (nrow(runparamlist) > 0) {
+    #   for (i in 1:nrow(runparamlist)) {
+    #     ctrname <- gsub("_", "", runparamlist[i, 1], fixed = TRUE)
+    #     show(ctrname)
+    #   }
+    # }
   }
 
   # Update output configuration for rerun
@@ -1305,7 +1309,7 @@ step3_configureOutput <- function(input, output, session,
     outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$anaID ))
     anaparams <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$anaID ))
 
-    updateTextInput(session, "tinputananame", value = result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName])
+    # updateTextInput(session, "tinputananame", value = result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName])
 
     if (nrow(anaparams) > 0) {
       for (i in 1:nrow(anaparams)) {
@@ -1333,7 +1337,7 @@ step3_configureOutput <- function(input, output, session,
         updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
       }
     }
-    .clearOutputOptions()
+    # .clearOutputOptions()
     invisible()
   }
 
@@ -1379,7 +1383,7 @@ step3_configureOutput <- function(input, output, session,
     updateCheckboxInput(session, "chkinputRI", value = FALSE)
     .clearchkboxRIgrp()
     .clearotherparams()
-    .clearOutputOptions()
+    # .clearOutputOptions()
     .basicview()
   }
 
