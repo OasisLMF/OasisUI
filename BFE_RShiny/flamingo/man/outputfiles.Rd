@@ -37,7 +37,7 @@ outputfiles(input, output, session, dbSettings, apiSettings,
 List of tags.
 }
 \description{
-UI/View for output files of a run.
+UI/View for output files of an analysis.
 
-Server logic for output files of a run.
+Server logic for output files of an analysis.
 }

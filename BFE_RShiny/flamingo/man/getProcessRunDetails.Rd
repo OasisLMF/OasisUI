@@ -22,5 +22,5 @@ Log details; \code{data.frame} of 5 variables:
 }.
 }
 \description{
-Get log details for a run.
+Get log details for an analysis.
 }

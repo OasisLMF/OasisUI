@@ -21,7 +21,7 @@ panelOutputModule(input, output, session, logMessage = message,
 
 \item{logMessage}{function that will be passed info messages.}
 
-\item{filesListData}{table of output files for a given runID}
+\item{filesListData}{table of output files for a given anaID}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

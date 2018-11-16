@@ -20,12 +20,16 @@ landingPageUI <- function(id) {
     wellPanel(
       h4("Analyses Table"),
       DTOutput(ns("dt_anaInbox")),
-      flamingoButton(ns("abuttongotorun"), "Dashboard of Analysis Outputs",
-                     align = "right") %>%
-        bs_embed_tooltip(title = landing_page$abuttongotorun, placement = "right"),
+
+      flamingoButton(ns("abuttongotoana"), "Dashboard of Analyses Outputs", align = "right") %>%
+        bs_embed_tooltip(title = landing_page$abuttongotoana, placement = "right"),
+
+      flamingoButton(inputId = ns("abuttondelana"), label = "Delete Analysis") %>%
+        bs_embed_tooltip(title = landing_page$abuttondelana, placement = "right"),
+
       actionButton(inputId = ns("refreshInbox"), label = "Refresh", align = "right"),
-      downloadButton(ns("downloadexcel_ana"),
-                     label = "Export to csv") %>%
+
+      downloadButton(ns("downloadexcel_ana"), label = "Export to csv") %>%
         bs_embed_tooltip(title = landing_page$downloadexcel_ana, placement = "right")
     )
   )
@@ -54,6 +58,8 @@ landingPageUI <- function(id) {
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
 #'
 #' @export
 landingPage <- function(input, output, session, user, dbSettings,
@@ -67,21 +73,28 @@ landingPage <- function(input, output, session, user, dbSettings,
   )
 
   # navigation -----------------------------------------------------------------
-  observeEvent(input$abuttongotorun,
+  observeEvent(input$abuttongotoana,
                updateNavigation(navigation_state, "SBR"))
 
+  # Inbox table ----------------------------------------------------------------
+  
+  # Reload Process Runs table
+  .reloadAnaData <- function() {
+    logMessage(".reloadAnaData called")
+    result$tbl_anaInbox <- return_tbl_analysesData()
+    logMessage("analyses table refreshed")
+    invisible()
+  }
+  
   observe(if (active()) {
     # invalidate if the refresh button updates
     force(input$refreshInbox)
 
     # reload automatically every so often
     invalidateLater(reloadMillis)
-
-    # landingPageButtonUpdate(session, dbSettings)
-
-    result$tbl_anaInbox <- return_tbl_analysesData()
-
-    logMessage("inbox refreshed")
+    
+    #refesh table
+    .reloadAnaData()
   })
 
   output$dt_anaInbox <- renderDT(if (!is.null(result$tbl_anaInbox)) {
@@ -108,13 +121,35 @@ landingPage <- function(input, output, session, user, dbSettings,
     }
   )
 
+  # Delete analysis ------------------------------------------------------------
+  observeEvent(input$dt_anaInbox_rows_selected, ignoreNULL = FALSE, {
+    if (length(input$dt_anaInbox_rows_selected) > 0) {
+      enable("abuttondelana")
+    } else {
+      disable("abuttondelana")
+    }
+  })
+  
+  onclick("abuttondelana", {
+    analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesData.AnaID]
+    delete_analyses_id <- api_delete_analyses_id(analysisID)
+    if (delete_analyses_id$status == "Success") {
+      flamingoNotification(type = "message",
+                           paste("Analysis id ", analysisID, " deleted."))
+      .reloadAnaData()
+    } else {
+      flamingoNotification(type = "error",
+                           paste("Analysis id ", analysisID, " could not be deleted."))
+    }
+  })
+
   ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
       anaid = reactive(if (length(i <- input$dt_anaInbox_rows_selected) == 1) {
         result$tbl_anaInbox[i, 2]} else -1),
-      # this is needed in processRun, probably shouldn't
+      # this is needed in processAna, probably shouldn't
       modelid = reactive(if (length(i <- input$dt_anaInbox_rows_selected) == 1) {
         result$tbl_anaInbox[i, 1]} else -1)
     )

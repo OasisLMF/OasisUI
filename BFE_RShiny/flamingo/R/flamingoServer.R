@@ -138,9 +138,9 @@ testFlamingoServer <- function(apiSettings, ...) {
 
 }
 
-#' runProcess
+#' runModel
 #'
-#' @rdname runProcess
+#' @rdname runModel
 #'
 #' @description Submit a GET request to the Flamingo API Server to execute
 #' the workflow.
@@ -157,14 +157,14 @@ testFlamingoServer <- function(apiSettings, ...) {
 #' @importFrom httr warn_for_status
 #'
 #' @export
-runProcess <- function(
+runModel <- function(
     apiSettings,
     anaid,
     logWarning = warning,
     ...) {
 
   if (anaid == "") {
-    stop("unexpected empty run id")
+    stop("unexpected empty analysis id")
   }
 
   url <- modify_url(apiSettings$url, path = c("runprogoasis", anaid))

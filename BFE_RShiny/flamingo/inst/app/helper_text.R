@@ -14,10 +14,11 @@ landing_page <- list(
   abuttondefineprogramme = "Create/amend/delete Programme; Associate Model; Run Portfolio",
   abuttondefineanasingle = "Define single analysis",
   abuttondefineanabatch = "Define batch analysis",
-  abuttonbrowseSBR = "Visualize outputs from single run",
-  abuttonbrowseBBR = "Visualize results across runs or from batch runs",
+  abuttonbrowseSBR = "Visualize outputs from single analysis",
+  abuttonbrowseBBR = "Visualize results across analyses or from batch runs",
   abuttonbrowseCBR = "Compare runs",
-  abuttongotorun = "Go to run details",
+  abuttongotoana = "Go to analysis details",
+  abuttondelana = "Please select a Analysis to delete",
   downloadexcel_ana = "Download Analyses table",
   abuttonfilemngt = "Access input/output files",
   abuttonsysconf = "System configuration",
@@ -48,7 +49,6 @@ landing_page <- list(
 defineSingleAna <- list(
   abuttoncreateana = "Please select a completed Portfolio to create ana analysis",
   abuttonshowanadetails = "Please select a Analysis to show details",
-  abuttondelana = "Please select a Analysis to delete",
   abuttonuploadsourcefiles = "Upload Source Files to portfolio",
   portfolioID = "Select a portfolio ID to which associate a model",
   modelID = "Select the Model to associate with the Portfolio",
@@ -67,7 +67,7 @@ defineSingleAna <- list(
 ### Panel Browse ----
 
 browse_programmes <- list(
-  selectRunID = "Select RunID",
-  selectBatchRunID = "Select Batch RunID",
+  selectAnaID = "Select AnaID",
+  selectBatchAnaID = "Select Batch AnaID",
   abuttonplusplot = "Add a new plot"
   )

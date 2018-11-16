@@ -7,7 +7,7 @@
 \usage{
 outputplotsUI(id)
 
-outputplots(input, output, session, dbSettings, apiSettings, selectRunID,
+outputplots(input, output, session, dbSettings, apiSettings, selectAnaID,
   n_panels, filesListData = reactive(NULL), active,
   logMessage = message)
 }

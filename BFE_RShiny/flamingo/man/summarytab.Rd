@@ -8,7 +8,7 @@
 summarytabUI(id)
 
 summarytab(input, output, session, dbSettings, apiSettings,
-  selectRunID1 = reactive(""), selectRunID2 = reactive(""),
+  selectAnaID1 = reactive(""), selectAnaID2 = reactive(""),
   compare = FALSE, active, logMessage = message)
 }
 \arguments{
@@ -38,10 +38,10 @@ list of tags
 list of tags
 }
 \description{
-UI/View of summary elements of a run.
+UI/View of summary elements of an analysis.
 
-Server logic of summary elements of a run.
+Server logic of summary elements of an analysis.
 }
 \details{
-Run Summary Server
+Analysis Summary Server
 }
