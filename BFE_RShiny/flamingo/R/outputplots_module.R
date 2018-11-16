@@ -3,51 +3,51 @@
 # UI ---------------------------------------------------------------------------
 
 #' outputplotsUI
-#' 
+#'
 #' @rdname outputplots
-#' 
+#'
 #' @description UI/View for output plots of a run.
-#' 
+#'
 #' @template params-module-ui
-#' 
+#'
 #' @return List of tags.
-#' 
+#'
 #' @export
 outputplotsUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   flamingoIncrementalPanelUI(
     id = ns("flamingoIncrementalPanelOutput-0"),
     heading = "New Plot",
     collapsible = FALSE, show = FALSE, removable = FALSE)
-  
+
 }
 
 # Server -----------------------------------------------------------------------
 
 #' outputplots
-#' 
+#'
 #' @rdname outputplots
-#' 
+#'
 #' @description Server logic for outputplots of a run.
-#' 
+#'
 #' @template params-module
 #' @template params-flamingo-module
-#' 
+#'
 #' @export
 outputplots <- function(input, output, session, dbSettings,
                         apiSettings,
-                        selectRunID, 
+                        selectAnaID,
                         n_panels,
                         filesListData = reactive(NULL),
                         active, logMessage = message) {
-  
+
   ns <- session$ns
-  
+
   # list of sub-modules
   sub_modules <- list()
-  
+
   #incremental panels
   panel_names <- paste0("flamingoIncrementalPanelOutput-", c(seq_len(n_panels)))
   content_IDs <- paste0("flamingoIncrementalPanelOutputcontent-", seq_len(n_panels))
@@ -66,11 +66,11 @@ outputplots <- function(input, output, session, dbSettings,
   lapply(seq_along(plotsubmodules), function(i) {
     output[[paste0("paneltitle", i)]] <- renderflamingoPanelHeading(plotsubmodules[[i]]())
   })
-  
-  observeEvent(selectRunID(), {
+
+  observeEvent(selectAnaID(), {
     plotPanels$remove_all()
   })
-  
+
   return(invisible())
 }
 
@@ -78,15 +78,15 @@ outputplots <- function(input, output, session, dbSettings,
 
 # UI ---------------------------------------------------------------------------
 #' panelOutputModuleUI
-#' 
+#'
 #' @rdname panelOutputModule
-#' 
+#'
 #' @template params-module-ui
-#' 
+#'
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @importFrom plotly plotlyOutput
-#' 
+#'
 #' @export
 panelOutputModuleUI <- function(id){
   ns <- NS(id)
@@ -117,7 +117,7 @@ panelOutputModuleUI <- function(id){
              hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
       flamingoButton(inputId = ns("abuttondraw"), label = "Draw Plot",  style = "float:right")
     ),
-    
+
     panel(
       # heading = h4("Plot"),
       plotlyOutput(ns("outputplot"))
@@ -128,18 +128,18 @@ panelOutputModuleUI <- function(id){
 # Server -----------------------------------------------------------------------
 
 #' panelOutputModule
-#' 
+#'
 #' @rdname panelOutputModule
-#' 
+#'
 #' @description Server logic to show graphical output such as plots.
-#' 
+#'
 #' @template params-module
 #' @template params-flamingo-module
-#' 
-#' @param filesListData table of output files for a given runID
-#' 
+#'
+#' @param filesListData table of output files for a given anaID
+#'
 #' @return reactive value of the title
-#' 
+#'
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs show
@@ -152,12 +152,12 @@ panelOutputModuleUI <- function(id){
 #' @importFrom tidyr separate
 #' @importFrom tidyr  spread
 #' @importFrom ggplot2 geom_line
-#' @importFrom ggplot2 geom_hline 
-#' @importFrom ggplot2 ggplot 
-#' @importFrom ggplot2 labs 
+#' @importFrom ggplot2 geom_hline
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 labs
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2  aes
-#' @importFrom ggplot2 element_text 
+#' @importFrom ggplot2 element_text
 #' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 element_blank
 #' @importFrom ggplot2 geom_point
@@ -168,15 +168,15 @@ panelOutputModuleUI <- function(id){
 #' @importFrom ggplot2 geom_violin
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
-#' 
+#'
 #' @export
-panelOutputModule <- function(input, output, session, logMessage = message, 
+panelOutputModule <- function(input, output, session, logMessage = message,
                               filesListData = reactive(NULL), active) {
-  
+
   ns <- session$ns
-  
+
   # Reactive values & parameters -----------------------------------------------
-  
+
   result <- reactiveValues(
     #plot and panel title
     Title = "",
@@ -184,7 +184,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     Losstypes = character(0),
     Variables = character(0)
   )
-  
+
   # > Variables for cols positions
   ### Creating Variables for col names of filesToPlot dataframe
   #filesToPlot
@@ -202,25 +202,25 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   filesToPlot.Granularity <- "Granularity"
   filesToPlot.Losstype <- "Losstype"
   filesToPlot.Variable <- "Variable"
-  
+
   # reactive values holding checkbox state
   chkbox <- list(
     chkboxgrplosstypes = reactiveVal(NULL),
     chkboxgrpvariables = reactiveVal(NULL),
     chkboxgrpgranularities = reactiveVal(NULL)
   )
-  
+
   lapply(names(isolate(chkbox)), function(id) {
     observe(chkbox[[id]](input[[id]]))
   })
-  
+
   #reactive triggered by the existence of the input$plottype and the changes in the data. It hoplds the selected plottype
   inputplottype <- reactive(if (active()) {
     filesListData()
     input$inputplottype
   })
-  
-  
+
+
   #clean up panel objects when inactive
   observe(if (!active()) {
     result$Title <- ""
@@ -231,7 +231,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     output$outputplot <- renderPlotly(NULL)
     for (id in names(chkbox)) chkbox[[id]](NULL)
   })
-  
+
   observeEvent(inputplottype(), {
     result$Title <- ""
     # plotlyOutput persists to re-creating the UI
@@ -243,12 +243,12 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       hide("chkboxuncertainty")
     }
   })
-  
-  
+
+
   # Enable / Disable options ---------------------------------------------------
-  
-  # > based on run ID ----------------------------------------------------------
-  #Gather the Granularities, Variables and Losstypes based on the runID output presets
+
+  # > based on analysis ID ----------------------------------------------------------
+  #Gather the Granularities, Variables and Losstypes based on the anaID output presets
   observe(if (active()) {
     if (!is.null(filesListData() )) {
       result$Granularities <- unique(filesListData()$Granularity)
@@ -260,7 +260,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       result$Variables <-  character(0)
     }
   })
-  
+
   observeEvent({
     inputplottype()
     result$Losstypes
@@ -277,7 +277,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       }
     }
   })
-  
+
   # > based on inputs ----------------------------------------------------------
   #GUL does not have policy
   observeEvent({
@@ -293,12 +293,12 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", inputplottype())
     .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
   })
-  
+
   # Extract dataframe to plot --------------------------------------------------
   #Logic to filter the files to plot
   #Missing logic in case either variables or granularities are not selected. For the moment not allowed
   observeEvent(input$abuttondraw, {
-    
+
     # > print current selection
     logMessage(paste0("Plotting ", inputplottype(),
                       " for loss types: ", chkbox$chkboxgrplosstypes(),
@@ -306,20 +306,20 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                       ", granularities: ",chkbox$chkboxgrpgranularities()
                       # ", aggregated to Portfolio Level: ", input$chkboxaggregate
     ))
-    
+
     # > Setup ------------------------------------------------------------------
     # >> clear data
     # Content to plot
     fileData <- NULL
     # List of files to plot
     filesToPlot <- NULL
-    # ggplot friendly dataframe to plot 
+    # ggplot friendly dataframe to plot
     data <- NULL
     # DF indicating structure of the plot
     plotstrc <- data.frame("Loss" = NULL, "Variable" = NULL, "Granularity" = NULL)
     # single plot or grid
     multipleplots = FALSE
-    
+
     # >> Plot parameters
     key <- plottypeslist[[inputplottype()]]$keycols
     uncertainty <- plottypeslist[[inputplottype()]]$uncertaintycols
@@ -332,14 +332,14 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     xlabel <- plottypeslist[[inputplottype()]]$xlabel
     ylabel <- plottypeslist[[inputplottype()]]$ylabel
     plottype <- plottypeslist[[inputplottype()]]$plottype
-    
+
     # >> sanity checks
     # something must be selected
     # only one granularity is allowed
     # we can compare either multi-variables or multi-losstypes
     l_losstypes <- length(chkbox$chkboxgrplosstypes())
     l_variables <- length(chkbox$chkboxgrpvariables())
-    l_granularities <- length(chkbox$chkboxgrpgranularities()) 
+    l_granularities <- length(chkbox$chkboxgrpgranularities())
     sanytyChecks <- FALSE
     if (l_losstypes == 0 | l_variables == 0 | l_granularities == 0) {
       flamingoNotification("Select the perspective(s), the summary level(s) and the report to plot", type = "error")
@@ -353,7 +353,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         plotstrc <- data.frame("Loss" = c(l_losstypes), "Variable" = c(l_variables), "Granularity" = c(l_granularities))
       }
     }
-    
+
     # >> define dynamic default title
     if (sanytyChecks) {
       if (input$textinputtitle != "") {
@@ -368,7 +368,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         }
       }
     }
-    
+
     # > filter out files to read -----------------------------------------------
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
@@ -381,7 +381,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         }
       }
     }
-    
+
     # > read files to plot -----------------------------------------------------
     if (!is.null(filesToPlot)) {
       for (i in seq(nrow(filesToPlot))) { # i<- 1
@@ -412,7 +412,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         }
       }
     }
-    
+
     # Make ggplot friendly -----------------------------------------------------
     if (!is.null(fileData)) {
       data <- fileData %>% gather(key = variables, value = value, -nonkey) %>% separate(variables, into = c("variables", "keyval"), sep = "\\.") %>% spread(variables, value)
@@ -445,7 +445,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         }
       }
     }
-    
+
     # > draw plot --------------------------------------------------------------
     if (!is.null(data)) {
       if (plottype == "line") {
@@ -456,17 +456,17 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       }else if (plottype == "violin") {
         p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
                            multipleplots = multipleplots)
-      } 
+      }
       output$outputplot <- renderPlotly({ggplotly(p)})
     } else {
       flamingoNotification("No data to plot", type = "error")
     }
-    
+
   })
-  
-  
+
+
   # Helper functions -----------------------------------------------------------
-  
+
   # Helper function to enable and dosable checkboxes based on condition
   .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
     # disable and untick variables that are not relevant
@@ -483,7 +483,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                          disableIdx = which(listvalues %in% setdiff(listvalues, selectable)) - 1)
     updateCheckboxGroupInput(session = session, inputId = inputid, selected = selection)
   }
-  
+
   .enableDisableUponCondition <- function(ID, condition){
     if (condition ) {
       disable(id = ID)
@@ -491,8 +491,8 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       enable(id = ID)
     }
   }
-  
-  
+
+
   # Helper function to read one file from DB
   .readFile <- function(fileName){
     if (!is.na(fileName)) {
@@ -512,7 +512,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     }
     return(fileData)
   }
-  
+
   #Helper functions to plot DF
   #Expected DF with columns:
   # xaxis : column for aes x
@@ -533,7 +533,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       )
     p
   }
-  
+
   # add a horizontal line
   .addRefLine <- function(p, reference){
     if (!is.null(reference)) {
@@ -541,7 +541,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     }
     p
   }
-  
+
   # add facets
   .multiplot <- function(p, multipleplots = FALSE){
     if (multipleplots) {
@@ -549,7 +549,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     }
     p
   }
-  
+
   # Line plot
   .linePlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE){
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
@@ -559,7 +559,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     p <- .multiplot(p, multipleplots)
     p
   }
-  
+
   # Bar Plot
   .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE, multipleplots = FALSE, xtickslabels = NULL ){
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
@@ -573,23 +573,23 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                       width = .2,                    # Width of the error bars
                       position = position_dodge(.9))
       # if ("reference" %in% names(data)) {
-      #   p <- .addRefLine(p, unique(data$reference)) 
+      #   p <- .addRefLine(p, unique(data$reference))
       # }
     }
     p <- .multiplot(p,multipleplots)
     p
   }
-  
+
   # Violin Plot
   .violinPlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE){
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
-      geom_violin(aes(fill = colour, alpha = 0.2), show.legend = FALSE) 
+      geom_violin(aes(fill = colour, alpha = 0.2), show.legend = FALSE)
     p <- .multiplot(p,multipleplots)
     p
   }
-  
-  
+
+
   # Module Output --------------------------------------------------------------
   reactive(result$Title)
 }

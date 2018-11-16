@@ -8,7 +8,7 @@
 defineIDUI(id, w, batch = FALSE)
 
 defineID(input, output, session, dbSettings, user,
-  preselRunId = reactive(-1), processRunId = reactive(-1),
+  preselAnaId = reactive(-1), processRunId = reactive(-1),
   batch = FALSE, logMessage = message)
 }
 \arguments{
@@ -28,7 +28,7 @@ defineID(input, output, session, dbSettings, user,
 
 \item{user}{reactive expression yielding user}
 
-\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
+\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
 
 \item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
 
@@ -40,7 +40,7 @@ defineID(input, output, session, dbSettings, user,
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{batch}{Flag indicating if it is a batch or a simple run.}
+\item{batch}{Flag indicating if it is a batch or a simple analysis.}
 }
 \value{
 List of tags.
@@ -48,10 +48,10 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-selectRunID reactive for runID selected.
+selectAnaID reactive for anaID selected.
 }
 \description{
-UI/View for defining one run ID
+UI/View for defining one analysis ID
 
-Server logic for defining one run ID.
+Server logic for defining one analysis ID.
 }

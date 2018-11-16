@@ -168,7 +168,7 @@ tbl_modelsData.ModelVersionId <- "version_id"
 tbl_modelsData.ModelCreated <- "created"
 tbl_modelsData.ModelModified <- "modified"
 
-### Creating Variables for col names of Process Runs Table
+### Creating Variables for col names of Model Runs Table
 # result$tbl_analysisData
 tbl_analysesData.AnaID <- "id"
 tbl_analysesData.AnaModified <- "modified"
@@ -195,9 +195,9 @@ filesListData.key <- "Resource Key"
 
 ### Creating Variables for  col names of  $inbox
 # result$inbox
-# "ProgOasisID"  "RunID"        "Run Name"     "Model"        "Status"       "Completed At"
+# "ProgOasisID"  "AnaID"        "Run Name"     "Model"        "Status"       "Completed At"
 inbox.ProgOasisID <- "ProgOasisID"
-inbox.RunID <- "RunID"
+inbox.AnaID <- "AnaID"
 inbox.RunName <- "Run Name"
 inbox.Model <- "Model"
 inbox.Status <- "Status"

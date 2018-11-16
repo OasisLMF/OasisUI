@@ -19,7 +19,7 @@ getInboxData(dbSettings, user, ...)
 Inbox; \code{data.frame} of 6 variables:
 \itemize{
 \item \code{ProgOasisID}
-\item \code{RunID}
+\item \code{AnaID}
 \item \code{Run Name}
 \item \code{Model}
 \item \code{Status}
@@ -27,5 +27,5 @@ Inbox; \code{data.frame} of 6 variables:
 }.
 }
 \description{
-Get the process run overview from the database.
+Get the model run overview from the database.
 }

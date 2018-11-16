@@ -114,7 +114,7 @@ landingPage <- function(input, output, session, user, dbSettings,
     list(
       anaid = reactive(if (length(i <- input$dt_anaInbox_rows_selected) == 1) {
         result$tbl_anaInbox[i, 2]} else -1),
-      # this is needed in processRun, probably shouldn't
+      # this is needed in processAna, probably shouldn't
       modelid = reactive(if (length(i <- input$dt_anaInbox_rows_selected) == 1) {
         result$tbl_anaInbox[i, 1]} else -1)
     )

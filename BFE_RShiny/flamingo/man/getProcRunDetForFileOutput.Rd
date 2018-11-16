@@ -9,11 +9,11 @@ getProcRunDetForFileOutput(dbSettings, processRunId)
 \arguments{
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{processRunId}{identifier selected process run.}
+\item{processRunId}{identifier selected model analysis.}
 }
 \value{
-Process run details.
+Model run details.
 }
 \description{
-Get Process Run Details.
+Get Model Run Details.
 }

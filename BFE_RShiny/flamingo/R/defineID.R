@@ -5,7 +5,7 @@
 #'
 #' @rdname defineID
 #'
-#' @description UI/View for defining one run ID
+#' @description UI/View for defining one analysis ID
 #'
 #' @template params-module-ui
 #'
@@ -21,13 +21,13 @@
 defineIDUI <- function(id, w, batch = FALSE){
   ns <- NS(id)
 
-  labelrun <- "Run ID"
+  labelana <- "Ana ID"
   if (batch) {
-    labelrun <- "Batch ID"
+    labelana <- "Batch ID"
   }
 
   column(w,
-         actionButton(ns(paste0("chooseRunID")), label = NULL, icon = icon("list-alt"),
+         actionButton(ns(paste0("chooseAnaID")), label = NULL, icon = icon("list-alt"),
                       style = " color: rgb(71, 73, 73);
                                background-color: white;
                                padding: 0px;
@@ -35,7 +35,7 @@ defineIDUI <- function(id, w, batch = FALSE){
                                background-image: none;
                                border: none;
                                 ") %>%
-           bs_embed_tooltip(title = browse_programmes$selectRunID, placement = "right"),
+           bs_embed_tooltip(title = browse_programmes$selectAnaID, placement = "right"),
          div(textOutput(ns("selectRunInfo1"), inline = TRUE),
                style = "font-weight:bold; font-color: #2d2d2d;
                         display:inline;
@@ -55,23 +55,23 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @rdname defineID
 #'
-#' @description Server logic for defining one run ID.
+#' @description Server logic for defining one analysis ID.
 #'
 #' @template return-outputNavigation
 #' @template params-module
 #' @template params-flamingo-module
 #'
-#' @param preselRunId reactive string expression for reselected run id from \link{landingpage}.
+#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingpage}.
 #' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
 #'
-#' @param batch Flag indicating if it is a batch or a simple run.
+#' @param batch Flag indicating if it is a batch or a simple analysis.
 #'
-#' @return selectRunID reactive for runID selected.
+#' @return selectAnaID reactive for anaID selected.
 #'
 #' @export
 defineID <- function(input, output, session,
                      dbSettings, user,
-                     preselRunId = reactive(-1),
+                     preselAnaId = reactive(-1),
                      processRunId = reactive(-1),
                      batch = FALSE,
                      logMessage = message) {
@@ -81,7 +81,7 @@ defineID <- function(input, output, session,
   # Reactive Values and parameters ---------------------------------------------
   result <- reactiveValues(
     inbox = NULL,
-    selectRunID = "",
+    selectAnaID = "",
     selectRunName = "",
     LProw = NULL,
     PRrow = NULL,
@@ -92,12 +92,12 @@ defineID <- function(input, output, session,
   sub_modules <- list()
 
   #label
-  labelrun <- "Run"
+  labelana <- "Ana"
   if (batch) {
-    labelrun <- "Batch"
+    labelana <- "Batch"
   }
 
-  # Modal for RunID selection --------------------------------------------------
+  # Modal for AnaID selection --------------------------------------------------
 
   # > Modal Panel
   RunsList <- modalDialog(
@@ -113,7 +113,7 @@ defineID <- function(input, output, session,
   )
 
   # > open modal
-  observeEvent(input$chooseRunID, {
+  observeEvent(input$chooseAnaID, {
     data <- getInboxData(dbSettings, user())
     result$inbox <- data  %>%
       replaceWithIcons() %>%
@@ -141,8 +141,8 @@ defineID <- function(input, output, session,
 
   #Find row of anaid preselected in landing page
   observeEvent({
-    preselRunId()},{
-      idx <- which(result$inbox[, inbox.RunID] == preselRunId())
+    preselAnaId()},{
+      idx <- which(result$inbox[, inbox.AnaID] == preselAnaId())
       status <- result$inbox[idx,  inbox.Status]
 
       if (length(idx) > 0 && status == StatusCompleted){
@@ -150,10 +150,10 @@ defineID <- function(input, output, session,
       }
     })
 
-  #Find row of anaid preselected in process run server step 3
+  #Find row of anaid preselected in model run server step 3
   observeEvent({
     processRunId()},{
-      idx <- which(result$inbox[, inbox.RunID] ==  processRunId())
+      idx <- which(result$inbox[, inbox.AnaID] ==  processRunId())
       status <- result$inbox[idx,  inbox.Status]
 
       if (length(idx) > 0 && status == StatusCompleted){
@@ -175,15 +175,15 @@ defineID <- function(input, output, session,
   })
 
 
-  # > select run ID
+  # > select analysis ID
   observeEvent(sub_modules$tableInboxpanel$rows_selected(), ignoreNULL = FALSE, {
     currid <- ""
     currName <- ""
     if (!is.null(sub_modules$tableInboxpanel$rows_selected())) {
-      currid <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.RunID]
+      currid <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.AnaID]
       currName <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.RunName]
     }
-    result$selectRunID <- ifelse(is.null(currid) | is.na(currid), "", currid)
+    result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
     result$selectRunName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
   })
 
@@ -200,29 +200,29 @@ defineID <- function(input, output, session,
   })
 
   output$selectRunInfo1 <- renderText({
-    if (result$selectRunID == "") {
-      info <- paste0("Select ", labelrun, ":   ")
+    if (result$selectAnaID == "") {
+      info <- paste0("Select ", labelana, ":   ")
     } else {
-      info <- paste0('Selected ', labelrun, ': ')
+      info <- paste0('Selected ', labelana, ': ')
     }
     info
   })
 
   output$selectRunInfo2 <- renderText({
-    if (result$selectRunID == "") {
+    if (result$selectAnaID == "") {
       info <- " "
     } else {
-      info <- paste0(result$selectRunID, ' "' ,result$selectRunName, '"  ')
+      info <- paste0(result$selectAnaID, ' "' ,result$selectRunName, '"  ')
     }
     info
   })
 
   # Module Outout --------------------------------------------------------------
-  selectRunID <- reactive({ifelse(is.null(result$selectRunID) | is.na(result$selectRunID), "", result$selectRunID)})
+  selectAnaID <- reactive({ifelse(is.null(result$selectAnaID) | is.na(result$selectAnaID), "", result$selectAnaID)})
 
   moduleOutput <- c(
     list(
-      selectRunID = reactive(selectRunID())
+      selectAnaID = reactive(selectAnaID())
     )
   )
 

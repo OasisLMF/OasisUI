@@ -4,12 +4,12 @@
 \alias{getFileList}
 \title{Get Output Files}
 \usage{
-getFileList(dbSettings, prrunid)
+getFileList(dbSettings, pranaid)
 }
 \arguments{
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{prrunid}{Process run id.}
+\item{pranaid}{Model analysis id.}
 }
 \value{
 Output files; \code{data.frame} of 10 variables:
@@ -27,5 +27,5 @@ Output files; \code{data.frame} of 10 variables:
 }.
 }
 \description{
-Get the list of output files for a given process run id.
+Get the list of output files for a given model analysis id.
 }

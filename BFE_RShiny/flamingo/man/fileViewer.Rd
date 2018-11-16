@@ -6,7 +6,7 @@
 \title{File Viewer Module}
 \usage{
 fileViewer(input, output, session, dbSettings,
-  preselRunId = reactive(-1), active, logMessage = message)
+  preselAnaId = reactive(-1), active, logMessage = message)
 
 fileViewerUI(id)
 }
@@ -19,7 +19,7 @@ fileViewerUI(id)
 
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{preselRunId}{Reactive string expression for reselected run id from landingpage.}
+\item{preselAnaId}{Reactive string expression for reselected analysis id from landingpage.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

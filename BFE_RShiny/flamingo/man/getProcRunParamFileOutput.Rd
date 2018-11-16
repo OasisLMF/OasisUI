@@ -15,5 +15,5 @@ getProcRunParamFileOutput(dbSettings, processRunId)
 Param details.
 }
 \description{
-Get Process Runtime Param Details.
+Get Model Runtime Param Details.
 }

@@ -8,7 +8,7 @@
 visualizationCBR}
 \usage{
 visualizationCBR(input, output, session, dbSettings, apiSettings, user,
-  active = reactive(TRUE), preselRunId = reactive(-1),
+  active = reactive(TRUE), preselAnaId = reactive(-1),
   processRunId = reactive(-1), logMessage = message)
 
 visualizationCBRUI(id)
@@ -28,7 +28,7 @@ visualizationCBRUI(id)
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
+\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
 
 \item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
 
@@ -36,7 +36,7 @@ visualizationCBRUI(id)
 
 \item{id}{Namespace ID for the module.}
 
-\item{runIdList}{List of runs and their status.}
+\item{anaIdList}{List of analyses and their status.}
 
 \item{id}{module id}
 }
@@ -44,7 +44,7 @@ visualizationCBRUI(id)
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-preselPanel panel to show in the process session.
+preselPanel panel to show in the model session.
 
 List of tags.
 }

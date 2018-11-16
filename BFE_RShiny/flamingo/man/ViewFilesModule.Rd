@@ -21,7 +21,7 @@ ViewFilesModule(input, output, session, logMessage = message,
 
 \item{logMessage}{function that will be passed info messages.}
 
-\item{filesListData}{Table of output files for a given runID.}
+\item{filesListData}{Table of output files for a given anaID.}
 
 \item{id}{Namespace ID for the module.}
 

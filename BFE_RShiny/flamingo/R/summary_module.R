@@ -2,29 +2,29 @@
 
 # UI ---------------------------------------------------------------------------
 #' @title summarytab_ui
-#' 
+#'
 #' @rdname summarytab
-#' 
+#'
 #' @description UI/View of summary elements of a run.
-#' 
+#'
 #' @template params-module-ui
-#' 
+#'
 #' @return list of tags
-#' 
+#'
 #' @importFrom plotly plotlyOutput
-#' 
+#'
 #' @export
 summarytabUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   flamingoPanel(
     id = ns("flamingoPanelSummaryTable"),
     collapsible = FALSE,
     heading =  tagAppendChildren(
       h4("Summary Table")
     ),
-    
+
     fluidRow(
       column(6,
              div(
@@ -42,23 +42,23 @@ summarytabUI <- function(id) {
       )
     )
   )
-  
+
 }
 
 # Server -----------------------------------------------------------------------
 
-#' Run Summary Server
+#' Analysis Summary Server
 #' @title summarytab_server
-#' 
+#'
 #' @rdname summarytab
-#' 
-#' @description Server logic of summary elements of a run.
-#' 
+#'
+#' @description Server logic of summary elements of an analysis.
+#'
 #' @template params-module
 #' @template params-flamingo-module
-#' 
+#'
 #' @return list of tags
-#' 
+#'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
 #' @importFrom dplyr filter
@@ -66,70 +66,70 @@ summarytabUI <- function(id) {
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
 #' @importFrom dplyr left_join
-#' @importFrom plotly ggplotly 
-#' @importFrom plotly renderPlotly 
+#' @importFrom plotly ggplotly
+#' @importFrom plotly renderPlotly
 #' @importFrom tidyr gather
-#' 
+#'
 #' @export
 summarytab <- function(input, output, session, dbSettings,
                        apiSettings,
-                       selectRunID1 = reactive(""), selectRunID2 = reactive(""),
+                       selectAnaID1 = reactive(""), selectAnaID2 = reactive(""),
                        compare = FALSE,
                        active, logMessage = message) {
-  
+
   ns <- session$ns
-  
+
   # Reactive Values & Params ---------------------------------------------------
   result <- reactiveValues(
     inputSummaryData = NULL,
     paramSummaryData = NULL,
     outputSummaryData = NULL
   )
-  
+
   # list of sub-modules
   sub_modules <- list()
-  
+
   # strings to filer
   outputStrg <- c("portfolio")
   paramStrg <- c("treshold|number|peril|set")
-  
+
   # Extract Summary Data -------------------------------------------------------
-  
+
   observeEvent({
-    selectRunID1()
-    selectRunID2()
+    selectAnaID1()
+    selectAnaID2()
     active()}, {
       # Initialize variables
       SummaryData1 <- NULL
       SummaryData2 <- NULL
       SummaryData <- NULL
-      
+
       #Check for run 1
-      if (selectRunID1() != "") {
+      if (selectAnaID1() != "") {
         SummaryData1 <- executeDbQuery(dbSettings,
-                                       paste("exec getOutputSummary", selectRunID1()))
+                                       paste("exec getOutputSummary", selectAnaID1()))
       }
-      
+
       #check for run2
-      if (selectRunID2() != "") {
+      if (selectAnaID2() != "") {
         SummaryData2 <- executeDbQuery(dbSettings,
-                                       paste("exec getOutputSummary", selectRunID2()))
+                                       paste("exec getOutputSummary", selectAnaID2()))
       }
-      
+
       #define df to use
       if (compare) {
         if (!is.null(SummaryData1) && !is.null(SummaryData2)) {
           idx1 <- which(names(SummaryData1) == "Value")
-          names(SummaryData1)[idx1] <- paste0("Run Id ", selectRunID1())
-          idx2 <- which(names(SummaryData2) == "Value") 
-          names(SummaryData2)[idx2] <- paste0("Run Id ", selectRunID2())
+          names(SummaryData1)[idx1] <- paste0("Analysis Id ", selectAnaID1())
+          idx2 <- which(names(SummaryData2) == "Value")
+          names(SummaryData2)[idx2] <- paste0("Analysis Id ", selectAnaID2())
           SummaryData <- left_join(SummaryData1, SummaryData2, "SummaryType")
         }
       } else {
         SummaryData <- SummaryData1
       }
-      
-      
+
+
       if (!is.null(SummaryData)) {
         result$inputSummaryData <- .extractinputSummaryData(SummaryData)
         result$paramSummaryData <- .extractparamSummaryData(SummaryData)
@@ -158,7 +158,7 @@ summarytab <- function(input, output, session, dbSettings,
     colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
-  
+
   sub_modules$summaryTable <- callModule(
     flamingoTable,
     id = "summaryParamsTable",
@@ -171,7 +171,7 @@ summarytab <- function(input, output, session, dbSettings,
     colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
-  
+
   sub_modules$summaryTable <- callModule(
     flamingoTable,
     id = "summaryOutputTable",
@@ -183,15 +183,15 @@ summarytab <- function(input, output, session, dbSettings,
     colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
-  
-  
+
+
   # Plot -----------------------------------------------------------------------
   output$summaryOutputPlot <- renderPlotly({
     if (!is.null(result$outputSummaryData)) {
       data <- result$outputSummaryData
       if (compare) {
         colnames <- names(select(data, contains("run", ignore.case = TRUE)))
-        data <- data %>% gather(key = "runid", value = "value",colnames)
+        data <- data %>% gather(key = "anaid", value = "value",colnames)
       }
         data <- cbind(data,do.call(rbind.data.frame,  lapply(data[,"SummaryType"], function(i){
           x <- as.character(i)
@@ -201,19 +201,19 @@ summarytab <- function(input, output, session, dbSettings,
         })))
         if (compare) {
           data <- data %>% tidyr::unite("identifier", c("Loss.Type","Sample.Type"))
-          data <- data %>% 
+          data <- data %>%
             rename("description" = "SummaryType") %>%
-            rename("colour" = "runid") %>%
+            rename("colour" = "anaid") %>%
             rename("xaxis" = "identifier")
         } else {
-          data <- data %>% 
+          data <- data %>%
             rename("description" = "SummaryType") %>%
             rename("colour" = "Sample.Type") %>%
             rename("xaxis" = "Loss.Type") %>%
             rename("value" = "Value")
         }
 
-      
+
       xlabel <- "Sample Type"
       ylabel <- "Loss"
       titleToUse <- "AAL"
@@ -221,39 +221,39 @@ summarytab <- function(input, output, session, dbSettings,
       ggplotly(p)
     }
   })
-  
+
   # Helper functions -----------------------------------------------------------
   .extractinputSummaryData <- function(SummaryData) {
     inputSummaryData <- NULL
     if (!is.null(SummaryData)) {
-      inputSummaryData <- SummaryData %>% 
+      inputSummaryData <- SummaryData %>%
         filter(!grepl(paste0(outputStrg, "|", paramStrg), SummaryType)) %>%
         as.data.frame()
     }
     return(inputSummaryData)
   }
-  
+
   .extractparamSummaryData <- function(SummaryData) {
     paramSummaryData <- NULL
     if (!is.null(SummaryData)) {
-      paramSummaryData <- SummaryData %>% 
+      paramSummaryData <- SummaryData %>%
         filter(grepl(paramStrg, SummaryType)) %>%
         as.data.frame()
     }
     return(paramSummaryData)
   }
-  
+
   .extractoutputSummaryData <- function(SummaryData) {
     outputSummaryData <- NULL
     if (!is.null(SummaryData)) {
-      outputSummaryData <- SummaryData %>% 
+      outputSummaryData <- SummaryData %>%
         filter(grepl(outputStrg, SummaryType)) %>%
         as.data.frame()
     }
     return(outputSummaryData)
   }
-  
-  
+
+
   # Module output --------------------------------------------------------------
   invisible()
 }
@@ -262,21 +262,21 @@ summarytab <- function(input, output, session, dbSettings,
 
 #' basicplot structure
 #' @title basicplot
-#' 
+#'
 #' @rdname basicplot
-#' 
+#'
 #' @description basic plot
-#' 
-#' @importFrom ggplot2 ggplot 
-#' @importFrom ggplot2 labs 
-#' @importFrom ggplot2 theme 
-#' @importFrom ggplot2 aes 
-#' @importFrom ggplot2 element_text 
-#' @importFrom ggplot2 element_line 
+#'
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 element_blank
 
 #' @export
-#' 
+#'
 # Expected DF with columns:
 # xaxis : column for aes x
 # value : column for aes y
@@ -300,16 +300,16 @@ basicplot <- function(xlabel, ylabel, titleToUse, data){
 
 #' barPlot structure
 #' @title barPlot
-#' 
+#'
 #' @rdname barPlot
-#' 
+#'
 #' @description bar plot
-#' 
-#' @importFrom ggplot2 aes 
-#' @importFrom ggplot2 scale_x_continuous 
+#'
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 scale_x_continuous
 #' @importFrom ggplot2 geom_bar
-#' @importFrom ggplot2 geom_bar 
-#' 
+#' @importFrom ggplot2 geom_bar
+#'
 #' @export
 # Expected DF with columns:
 # xaxis : column for aes x
@@ -319,6 +319,6 @@ basicplot <- function(xlabel, ylabel, titleToUse, data){
 
 barPlot <- function(xlabel, ylabel, titleToUse, data, xtickslabels = NULL ){
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
-    geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(data$colour))) 
+    geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(data$colour)))
   p
 }

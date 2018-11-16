@@ -233,7 +233,7 @@ getCompanyList <- function(dbSettings) {
 #'
 #' @rdname getInboxData
 #'
-#' @description Get the process run overview from the database.
+#' @description Get the model run overview from the database.
 #'
 #' @param ... Other arguments to [executeDbQuery()].
 #' @param dbSettings as returned from \link{flamingoDB}
@@ -244,7 +244,7 @@ getCompanyList <- function(dbSettings) {
 #' @return Inbox; `data.frame` of 6 variables:
 #' \itemize{
 #' 		\item `ProgOasisID`
-#' 		\item `RunID`
+#' 		\item `AnaID`
 #'    \item `Run Name`
 #' 		\item `Model`
 #' 		\item `Status`
@@ -256,25 +256,25 @@ getCompanyList <- function(dbSettings) {
 #' @md
 getInboxData <- function(dbSettings, user, ...) {
 #TODO API:
-  stmt <- paste0("exec dbo.getUserProcessDetails ", user)
+  stmt <- paste0("exec dbo.getUserModelDetails ", user)
   res <- executeDbQuery(dbSettings, stmt, ...)
 
   return(res)
 }
 
-#' getProcessData
+#' getModelData
 #'
-#' @rdname getProcessData
+#' @rdname getModelData
 #'
-#' @description Get Process Data.
+#' @description Get Model Data.
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
-#' @param pruser Process user.
-#' @param prmodel Process model.
-#' @param prprogramme Process programme.
-#' @param prworkflow Process workflow.
+#' @param pruser Model user.
+#' @param prmodel Model model.
+#' @param prprogramme Model programme.
+#' @param prworkflow Model workflow.
 #'
-#' @return Process data; `data.frame` of 3 variables:
+#' @return Model data; `data.frame` of 3 variables:
 #' \itemize{
 #'   \item `ProgOasisId`
 #'   \item `ProgName`
@@ -284,10 +284,10 @@ getInboxData <- function(dbSettings, user, ...) {
 #' @export
 #'
 #' @md
-getProcessData <- function(dbSettings, pruser, prmodel, prprogramme,
+getModelData <- function(dbSettings, pruser, prmodel, prprogramme,
     prworkflow) {
 
-  stmt <- buildDbQuery("getProcessData", pruser, prmodel, prprogramme,
+  stmt <- buildDbQuery("getModelData", pruser, prmodel, prprogramme,
       prworkflow)
 
   res <- executeDbQuery(dbSettings, stmt)
@@ -319,31 +319,31 @@ getOasisSystemId <- function(dbSettings) {
   return(res)
 }
 
-#' getProcessRun
+#' getModelRun
 #'
-#' @rdname getProcessRun
+#' @rdname getModelRun
 #'
-#' @description Get Process Run.
+#' @description Get Model Run.
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
-#' @param procid Process id.
-#' @param prstatus Process status.
+#' @param modelid Model id.
+#' @param prstatus Model status.
 #'
 #' @export
 #'
 #' @md
-getProcessRun <- function(dbSettings, procid, prstatus) {
+getModelRun <- function(dbSettings, modelid, prstatus) {
 
-  stmt <- buildDbQuery("ListProcessRun", procid, prstatus)
+  stmt <- buildDbQuery("ListModelRun", modelid, prstatus)
 
   res <- executeDbQuery(dbSettings, stmt)
 
   return(res)
 }
 
-#' getProcessRunDetails
+#' getModelRunDetails
 #'
-#' @rdname getProcessRunDetails
+#' @rdname getModelRunDetails
 #'
 #' @description Get log details for a run.
 #'
@@ -362,11 +362,11 @@ getProcessRun <- function(dbSettings, procid, prstatus) {
 #' @export
 #'
 #' @md
-getProcessRunDetails <- function(dbSettings, wfid) {
+getModelRunDetails <- function(dbSettings, wfid) {
 
   if ( wfid != 0 ) {
 
-    res <- executeDbQuery(dbSettings, buildDbQuery("getProcessRunDetails", wfid))
+    res <- executeDbQuery(dbSettings, buildDbQuery("getModelRunDetails", wfid))
 
   } else {
 
@@ -382,10 +382,10 @@ getProcessRunDetails <- function(dbSettings, wfid) {
 #'
 #' @rdname getFileList
 #'
-#' @description Get the list of output files for a given process run id.
+#' @description Get the list of output files for a given model analysis id.
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
-#' @param prrunid Process run id.
+#' @param pranaid Model analysis id.
 #'
 #' @return Output files; `data.frame` of 10 variables:
 #' \itemize{
@@ -404,16 +404,16 @@ getProcessRunDetails <- function(dbSettings, wfid) {
 #' @export
 #'
 #' @md
-getFileList <- function(dbSettings, prrunid) {
+getFileList <- function(dbSettings, pranaid) {
 
-  if ( prrunid != 0) {
+  if ( pranaid != 0) {
 
-    stmt <- paste("exec dbo.getFileViewerTable @ProcessRunID = ", prrunid)
+    stmt <- paste("exec dbo.getFileViewerTable @processRunId = ", pranaid)
     res <- executeDbQuery(dbSettings, stmt)
 
   } else {
 
-    warning("process run id is 0; returning NULL")
+    warning("model analysis id is 0; returning NULL")
     res <- NULL
 
   }
@@ -776,7 +776,7 @@ getProgrammeList <- function(dbSettings) {
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
 #' @param user reactive expression yielding user
-#' 
+#'
 #' @export
 #'
 #' @md
@@ -844,7 +844,7 @@ getOasisUsers <- function(dbSettings) {
 #'
 #' @rdname getProcRunParamFileOutput
 #'
-#' @description Get Process Runtime Param Details.
+#' @description Get Model Runtime Param Details.
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
 #' @param processRunId Reactive string expression for reselected run id from defineProgramme.
@@ -854,7 +854,7 @@ getOasisUsers <- function(dbSettings) {
 #' @export
 getProcRunParamFileOutput <- function(dbSettings, processRunId){
 
-  stmt <- buildDbQuery("getUserParamsForProcessRun", processRunId)
+  stmt <- buildDbQuery("getUserParamsForModelRun", processRunId)
   res <- executeDbQuery(dbSettings, stmt)
 
   return(res)
@@ -865,17 +865,17 @@ getProcRunParamFileOutput <- function(dbSettings, processRunId){
 #'
 #' @rdname getProcRunDetForFileOutput
 #'
-#' @description Get Process Run Details.
+#' @description Get Model Run Details.
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
-#' @param processRunId identifier selected process run.
+#' @param processRunId identifier selected model analysis.
 #'
-#' @return Process run details.
+#' @return Model run details.
 #'
 #' @export
 getProcRunDetForFileOutput <- function(dbSettings, processRunId) {
 
-  stmt <- buildDbQuery("getProcessRunDetailsForFileOutput", processRunId)
+  stmt <- buildDbQuery("getModelRunDetailsForFileOutput", processRunId)
   res <- executeDbQuery(dbSettings, stmt)
 
   return(res)
