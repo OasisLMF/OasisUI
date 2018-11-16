@@ -20,12 +20,16 @@ landingPageUI <- function(id) {
     wellPanel(
       h4("Analyses Table"),
       DTOutput(ns("dt_anaInbox")),
-      flamingoButton(ns("abuttongotorun"), "Dashboard of Analysis Outputs",
-                     align = "right") %>%
+
+      flamingoButton(ns("abuttongotorun"), "Dashboard of Analyses Outputs", align = "right") %>%
         bs_embed_tooltip(title = landing_page$abuttongotorun, placement = "right"),
+
+      flamingoButton(inputId = ns("abuttondelana"), label = "Delete Analysis") %>%
+        bs_embed_tooltip(title = defineSingleAna$abuttondelana, placement = "right"),
+
       actionButton(inputId = ns("refreshInbox"), label = "Refresh", align = "right"),
-      downloadButton(ns("downloadexcel_ana"),
-                     label = "Export to csv") %>%
+
+      downloadButton(ns("downloadexcel_ana"), label = "Export to csv") %>%
         bs_embed_tooltip(title = landing_page$downloadexcel_ana, placement = "right")
     )
   )
@@ -107,6 +111,19 @@ landingPage <- function(input, output, session, user, dbSettings,
       write.csv(result$tbl_anaInbox, file)
     }
   )
+
+  # Delete analysis ------------------------------------------------------------
+  onclick("abuttondelana", {
+    delete_analyses_id <- api_delete_analyses_id(result$analysisID)
+    if (delete_analyses_id$status == "Success") {
+      flamingoNotification(type = "message",
+                           paste("Analysis id ", result$analysisID, " deleted."))
+      .reloadAnaData()
+    } else {
+      flamingoNotification(type = "error",
+                           paste("Analysis id ", result$analysisID, " could not be deleted."))
+    }
+  })
 
   ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
