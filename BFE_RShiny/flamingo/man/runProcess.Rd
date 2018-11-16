@@ -4,12 +4,12 @@
 \alias{runProcess}
 \title{runProcess}
 \usage{
-runProcess(apiSettings, runId, logWarning = warning, ...)
+runProcess(apiSettings, anaid, logWarning = warning, ...)
 }
 \arguments{
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{runId}{Run identifier.}
+\item{anaid}{Analysis identifier.}
 
 \item{logWarning}{Warning message callback-}
 

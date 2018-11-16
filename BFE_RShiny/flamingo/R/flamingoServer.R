@@ -146,7 +146,7 @@ testFlamingoServer <- function(apiSettings, ...) {
 #' the workflow.
 #'
 #' @param apiSettings as returned from \link{flamingoServer}
-#' @param runId Run identifier.
+#' @param anaid Analysis identifier.
 #' @param logWarning Warning message callback-
 #' @param ... Further arguments to \link{GET}.
 #'
@@ -159,15 +159,15 @@ testFlamingoServer <- function(apiSettings, ...) {
 #' @export
 runProcess <- function(
     apiSettings,
-    runId,
+    anaid,
     logWarning = warning,
     ...) {
 
-  if (runId == "") {
+  if (anaid == "") {
     stop("unexpected empty run id")
   }
 
-  url <- modify_url(apiSettings$url, path = c("runprogoasis", runId))
+  url <- modify_url(apiSettings$url, path = c("runprogoasis", anaid))
 
   response <- GET(url, ...)
 

@@ -88,8 +88,8 @@ server <- function(input, output, session) {
     id = "singleAna",
     apiSettings = apiSettings,
     user = reactive(result$user),
-    preselRunId =  auth_modules$landingPage$runId,
-    preselProcId =  auth_modules$landingPage$procId,
+    preselRunId =  auth_modules$landingPage$anaid,
+    preselProcId =  auth_modules$landingPage$modelid,
     preselPanel = reactive(result$preselPanel),
     logMessage = logMessage,
     reloadMillis = reloadMillis,
@@ -110,7 +110,7 @@ server <- function(input, output, session) {
     id = "visualizationSBR",
     apiSettings = apiSettings,
     user = reactive(result$user),
-    preselRunId =  auth_modules$landingPage$runId,
+    preselRunId =  auth_modules$landingPage$anaid,
     processRunId = auth_modules$singleAna$processRunId,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "SBR")
@@ -132,7 +132,7 @@ server <- function(input, output, session) {
     id = "visualizationCBR",
     apiSettings = apiSettings,
     user = reactive(result$user),
-    preselRunId = auth_modules$landingPage$runId,
+    preselRunId = auth_modules$landingPage$anaid,
     processRunId =  auth_modules$singleAna$processRunId,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "CBR")

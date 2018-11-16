@@ -45,8 +45,8 @@ constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
 For \code{landingPage()}, list of reactives:
 \itemize{
-		\item{\code{runId}: }{id of selected run or -1 if nothing is selected}
-		\item{\code{procId}: }{id of selected process or -1 if nothing is selected}
+		\item{\code{anaid}: }{id of selected analysis or -1 if nothing is selected}
+		\item{\code{modelid}: }{id of selected model or -1 if nothing is selected}
 }
 }
 \description{

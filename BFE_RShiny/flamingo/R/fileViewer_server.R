@@ -7,7 +7,7 @@
 #' @template return-outputNavigation
 #' @template params-module
 #' @template params-flamingo-module
-#' 
+#'
 #' @param preselRunId Reactive string expression for reselected run id from landingpage.
 #'
 #' @importFrom dplyr select
@@ -48,7 +48,7 @@ fileViewer <- function(
     result$FLdata <- FLdata %>% select(-c(Source))
   })
 
-  # Pre-select the correct runId
+  # Pre-select the correct anaid
   initialSelection <- reactive({
     if (preselRunId() == -1) {
       index <- 1
