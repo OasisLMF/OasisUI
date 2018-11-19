@@ -10,5 +10,5 @@ panelAnalysisLogs(id)
 \item{id}{module id}
 }
 \description{
-Function wrapping panel to show log table for specific Process Run.
+Function wrapping panel to show log table for specific Analysis.
 }

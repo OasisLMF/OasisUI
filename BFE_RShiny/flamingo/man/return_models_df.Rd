@@ -10,7 +10,7 @@ return_models_df(supplier_id = "")
 \item{supplier_id}{the supplier ID for the model. Default is empty string.}
 }
 \value{
-dataframe of previously posted models. Default empty string returns all portfolios.
+dataframe of previously posted models. Default empty string returns all models.
 }
 \description{
 Returns a dataframe of models

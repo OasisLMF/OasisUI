@@ -198,7 +198,6 @@ panelModelTable <- function(id) {
 #' @param pfName Name of selected portfolio
 #' @param pfstatus Status of selected portfolio
 #'
-#' @return modelID Id of selected model
 #' @return newstep navigation step
 #' @return analysisID analysis ID
 #'
@@ -406,9 +405,9 @@ step2_chooseAnalysis <- function(input, output, session,
   output$paneltitle_panelAnalysisLog <- renderUI({
     if (result$analysisID != "") {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
-      paste0('Logs of analysis id ', toString(result$analysisID), ' ', anaName)
+      paste0('Input generation Logs of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
-      paste0("Logs")
+      paste0("Input generation Logs")
     }
   })
 
@@ -431,11 +430,6 @@ onclick("buttonhidemodel", {
 
 output$dt_models <- renderDT(
   if (!is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0 ) {
-    if (isolate(result$modelID) != "") {
-      rowToSelect <- match(isolate(result$modelID), result$tbl_modelsData[,tbl_modelsData.ModelId])
-    } else {
-      rowToSelect <- 1
-    }
     logMessage("re-rendering model table")
     datatable(
       result$tbl_modelsData,
@@ -444,7 +438,7 @@ output$dt_models <- renderDT(
       filter = "none",
       escape = FALSE,
       selection = list(mode = 'single',
-                       selected = rownames(result$tbl_modelsData)[rowToSelect]),
+                       selected = rownames(result$tbl_modelsData)[1]),
       colnames = c('Row Number' = 1),
       options = .getPRTableOptions()
     )
@@ -512,8 +506,6 @@ onclick("abuttonsubmit", {
                                                                            name = input$anaName, 
                                                                            model = modelID)
     logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID, " name ", input$anaName, " model ",  modelID))
-    print("status")
-    print(post_portfolios_create_analysis$status)
     if (post_portfolios_create_analysis$status == "Success") {
       flamingoNotification(type = "message",
                            paste("New analysis ", input$anaName, " created."))
@@ -602,7 +594,7 @@ onclick("abuttonmodelrefresh", {
   show("panelCreateAnalysesTable")
 }
 
-# Reload Process Runs table
+# Reload Analysis table
 .reloadAnaData <- function() {
   logMessage(".reloadAnaData called")
   if (result$portfolioID  != "") {
@@ -702,7 +694,6 @@ onclick("abuttonmodelrefresh", {
 
 moduleOutput <- c(
   list(
-    modelID = reactive({result$modelID}),
     analysisID = reactive({result$analysisID}),
     newstep = reactive({input$abuttonpgotonextstep})
   )

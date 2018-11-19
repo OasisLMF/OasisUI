@@ -119,7 +119,6 @@ singleAna <- function(input, output, session, dbSettings,
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID =  reactive(input$portfolioID),
-    modelID = reactive(submodulesList$step2_chooseAnalysis$modelID()),
     analysisID = reactive(submodulesList$step2_chooseAnalysis$analysisID())
   )
 

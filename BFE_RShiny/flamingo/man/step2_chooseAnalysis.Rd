@@ -47,8 +47,6 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-modelID Id of selected model
-
 newstep navigation step
 
 analysisID analysis ID

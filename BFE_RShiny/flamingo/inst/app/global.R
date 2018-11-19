@@ -163,6 +163,7 @@ tbl_portfolioDetails.PortfolioRIsource <- "reinsurance_source_file"
 ### Creating Variables for col names of Model Table
 # result$tbl_modelsData
 tbl_modelsData.ModelId <- "id"
+tbl_modelsData.ModelNameId <- "model_id"
 tbl_modelsData.ModelSupplierId <- "supplier_id"
 tbl_modelsData.ModelVersionId <- "version_id"
 tbl_modelsData.ModelCreated <- "created"

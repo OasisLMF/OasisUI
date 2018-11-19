@@ -176,6 +176,220 @@ api_post_analyses_settings_file <- function(id, filepath_settings) {
   )
 }
 
+#' Return ianalyses_settings_file List
+#' 
+#' @rdname return_analyses_settings_file_list
+#' 
+#' @description Returns a list of analyses_settings
+#' 
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return list of analyses_settings_file
+#' 
+#' @importFrom httr content
+#' 
+#' @export
+return_analyses_settings_file_list <- function(id){
+  get_analyses_settings_file <- api_get_analyses_settings_file(id)
+  analyses_settings_fileList <- content(get_analyses_settings_file$result)
+  return(analyses_settings_fileList)
+}
+
+
+#' Construct analysis settings list
+#' 
+#' Construct analysis_settingsList
+#' 
+#' @rdname construct_analysis_settingsList
+#' 
+#' @description Constructs a list of analysis settings
+#' 
+#' @param source_tag model associated to the analysis.
+#' @param prog_id portfolio id?
+#' @param number_of_samples user input number of samples
+#' @param module_supplier_id identification of model supplied
+#' @param model_version_id identification of model version
+#' @param event_occurrence_file_id user input Event Occurrence Set
+#' @param use_random_number_file use_random_number_file
+#' @param event_set user input Event Set
+#' @param peril_wind peril wind
+#' @param demand_surge demand surge
+#' @param peril_quake peril quake
+#' @param peril_flood peril flood
+#' @param peril_surge peril surge
+#' @param leakage_factor user input Leakage factor
+#' @param gul_threshold user input gul threshold
+#' @param exposure_location exposure_location
+#' @param chkinputsummaryoption logical to include summaries
+#' @param outputsGUL output config GUL
+#' @param outputsIL output config IL
+#' @param outputsRI output config RI
+#' @param analysis_tag analysis id?
+#' @param gul_output logical for GUL
+#' @param il_output logical for IL
+#' @param ri_output logical for RI
+#' @param return_period_file param = TRUE
+#' @param uniqueItems uniqueItems
+#' @param id id
+#' 
+#' @return list of analysis settings. 
+#' 
+#' @export
+construct_tbl_analyses_settings <- function(source_tag, prog_id, number_of_samples,
+                                            module_supplier_id, model_version_id,
+                                            event_occurrence_file_id,use_random_number_file = FALSE, event_set,
+                                            peril_wind, demand_surge, peril_quake, peril_flood, peril_surge, leakage_factor,
+                                            gul_threshold,exposure_location = 'L',
+                                            outputsGUL, outputsIL, outputsRI, chkinputsummaryoption, 
+                                            gul_output, il_output, ri_output,
+                                            return_period_file,
+                                            analysis_tag, uniqueItems = FALSE, id = 1){
+  
+  # > Params -------------------------------------------------------------------
+  parameterStub <- c('Summary',
+                     'ELT',
+                     'FullUncAEP',
+                     'FullUncOEP',
+                     'AEPWheatsheaf',
+                     'OEPWheatsheaf',
+                     'MeanAEPWheatsheaf',
+                     'MeanOEPWheatsheaf',
+                     'SampleMeanAEP',
+                     'SampleMeanOEP',
+                     'AAL',
+                     'PLT')
+  analysisFileNameStub <- c('summarycalc',
+                            'eltcalc',
+                            'full_uncertainty_aep',
+                            'full_uncertainty_oep',
+                            'wheatsheaf_aep',
+                            'wheatsheaf_oep',
+                            'wheatsheaf_mean_aep',
+                            'wheatsheaf_mean_oep',
+                            'sample_mean_aep',
+                            'sample_mean_oep',
+                            'aalcalc',
+                            'pltcalc')
+  
+  # > Utility functions --------------------------------------------------------
+  .addsummaryGUL <- function(summaryreports, outputsGUL) {
+    if (summaryreports) {
+      outputsGUL <- unique(c(outputsGUL, c('gulprogFullUncAEP', 'gulprogFullUncOEP', 'gulprogAAL')))
+    }
+    outputsStringGUL <- paste(collapse = ", ",outputsGUL)
+  }
+  
+  .addsummaryIL <- function(summaryreports, outputsIL) {
+    if (summaryreports) {
+      outputsIL  <- unique(c(outputsIL,  c('ilprogFullUncAEP', 'ilprogFullUncOEP', 'ilprogAAL')))
+    }
+    outputsStringIL <- paste(collapse = ", ",outputsIL)
+  }
+  
+  .addsummaryRI <- function(summaryreports, outputsRI) {
+    if (summaryreports) {
+      outputsRI  <- unique(c(outputsRI,  c('riprogFullUncAEP', 'riprogFullUncOEP', 'riprogAAL')))
+    }
+    outputsStringRI <- paste(collapse = ", ",outputsRI)
+  }
+  
+  .gatheModelSettings <- function(event_occurrence_file_id,use_random_number_file, event_set, perilsvec){
+    
+    model_settings <- list()
+    model_settings[["event_set"]] <- event_set
+    for (p in names(perilsvec)) {
+      if (!is.null(perilsvec[[p]]) && perilsvec[[p]])
+        model_settings[[p]] <- perilsvec[[p]]
+    }
+    model_settings[["use_random_number_file"]] <- use_random_number_file
+    model_settings[["event_occurrence_file_id"]] <- event_occurrence_file_id
+    model_settings
+  }
+  
+  .gaterSummaries <- function(parameterStub,  outputsString, summaryreports, uniqueItems, id){
+    
+    aalcalc <- grepl(parameterStub[11], outputsString)
+    eltcalc <- grepl(parameterStub[2], outputsString)
+    pltcalc <- grepl(parameterStub[12], outputsString)
+    full_uncertainty_aep <- grepl(parameterStub[3], outputsString)
+    full_uncertainty_oep <- grepl(parameterStub[4], outputsString)
+    wheatsheaf_aep <- grepl(parameterStub[5], outputsString)
+    wheatsheaf_oep <- grepl(parameterStub[6], outputsString)
+    wheatsheaf_mean_aep <- wheatsheaf_aep #grepl(parameterStub[7], outputsString)
+    wheatsheaf_mean_oep <- wheatsheaf_oep #grepl(parameterStub[8], outputsString)
+    sample_mean_aep <- wheatsheaf_aep #grepl(parameterStub[9], outputsString)
+    sample_mean_oep <-  wheatsheaf_oep #grepl(parameterStub[10], outputsString)
+    leccalcoutputs <- data.frame("full_uncertainty_aep" = full_uncertainty_aep,
+                                 "full_uncertainty_oep" = full_uncertainty_oep,
+                                 "wheatsheaf_aep" = wheatsheaf_aep,
+                                 "wheatsheaf_oep" = wheatsheaf_oep,
+                                 "wheatsheaf_mean_aep" = wheatsheaf_mean_aep,
+                                 "wheatsheaf_mean_oep" = wheatsheaf_mean_oep,
+                                 "sample_mean_aep" = sample_mean_aep,
+                                 "sample_mean_oep" = sample_mean_oep)
+    leccal <- data.frame("outputs" = I(leccalcoutputs),
+                         "return_period_file" = return_period_file)
+    lec_output <- any(leccalcoutputs == TRUE)
+    df <- data.frame("uniqueItems" = c(uniqueItems),
+                     "summarycalc" = c(summaryreports),
+                     "aalcalc" = c(aalcalc),
+                     "eltcalc" = c(eltcalc),
+                     "pltcalc" = c(pltcalc),
+                     "id" = c(id),
+                     "lec_output" = lec_output,
+                     "leccalc" = I(leccal))
+  }
+  
+  # > Restructure inputs -------------------------------------------------------
+  outputsStringGUL <- .addsummaryGUL(summaryreports = chkinputsummaryoption, outputsGUL)
+  outputsStringIL <- .addsummaryIL(summaryreports = chkinputsummaryoption, outputsIL)
+  outputsStringRI <- .addsummaryRI(summaryreports = chkinputsummaryoption, outputsRI)
+  
+  
+  # > Make analysis settings list ----------------------------------------------
+  analysis_settings <- list()
+  analysis_settings[["analysis_settings"]] <- list()
+  analysis_settings[["analysis_settings"]][["analysis_tag"]] <- analysis_tag
+  analysis_settings[["analysis_settings"]][["exposure_location"]] <- exposure_location
+  
+  analysis_settings[["analysis_settings"]][["gul_output"]] <- gul_output
+  analysis_settings[["analysis_settings"]][["gul_summaries"]] <- .gaterSummaries(parameterStub, 
+                                                                                 outputsStringGUL, 
+                                                                                 summaryreports = chkinputsummaryoption,
+                                                                                 uniqueItems, 
+                                                                                 id)
+  analysis_settings[["analysis_settings"]][["gul_threshold"]] <- gul_threshold
+  
+  analysis_settings[["analysis_settings"]][["il_output"]] <- il_output
+  analysis_settings[["analysis_settings"]][["il_summaries"]] <- .gaterSummaries(parameterStub, 
+                                                                                outputsStringIL,  
+                                                                                summaryreports = chkinputsummaryoption,
+                                                                                uniqueItems, 
+                                                                                id)
+  analysis_settings[["analysis_settings"]][["ri_output"]] <- ri_output
+  analysis_settings[["analysis_settings"]][["ri_summaries"]] <- .gaterSummaries(parameterStub, 
+                                                                                outputsStringRI,  
+                                                                                summaryreports = chkinputsummaryoption,
+                                                                                uniqueItems, 
+                                                                                id)
+  perilsvec <- list("peril_wind" = peril_wind,
+                    "demand_surge" = demand_surge, 
+                    "peril_quake" =  peril_quake,
+                    "peril_flood" = peril_flood,
+                    "peril_surge" = peril_surge,
+                    "leakage_factor" = leakage_factor)
+  analysis_settings[["analysis_settings"]][["model_settings"]] <- .gatheModelSettings(event_occurrence_file_id,use_random_number_file, event_set, perilsvec)
+  analysis_settings[["analysis_settings"]][["model_version_id"]] <- model_version_id
+  analysis_settings[["analysis_settings"]][["module_supplier_id"]] <- module_supplier_id
+  
+  analysis_settings[["analysis_settings"]][["number_of_samples"]] <- number_of_samples
+  analysis_settings[["analysis_settings"]][["prog_id"]] <- prog_id
+  analysis_settings[["analysis_settings"]][["source_tag"]] <- source_tag
+  
+  return(analysis_settings)
+  
+}
+
 # Input errors file ------------------------------------------------------------
 
 #' Get analysis input_errors file
@@ -592,4 +806,69 @@ return_analyses_run_traceback_file_df <- function(id){
       as.data.frame()
   }
   return(analyses_run_traceback_file_df)
+}
+
+# Run --------------------------------------------------------------------------
+#' Run analyses id
+#' 
+#' Returns the analysis status
+#' 
+#' @rdname api_post_analyses_run
+#' 
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return analysis status.. 
+#' 
+#' @importFrom httr POST
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_post_analyses_run <- function(id) {
+  
+  response <- GET(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())
+    ),
+    path = paste(get_version(), "analyses", id, "run","", sep = "/")
+  )
+  
+  logWarning = warning
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
+#' Return analyses run Dataframe
+#' 
+#' @rdname return_analyses_run_df
+#' 
+#' @description Returns a dataframe of analyses after run started
+#' 
+#' @param id a unique integer value identifying this analysis.
+#'  
+#' @return dataframe of previously posted analysis states.
+#' 
+#' @importFrom dplyr bind_rows
+#' @importFrom httr content
+#' 
+#' @export
+return_analyses_run_df <- function(id){
+  analyses_run <- api_post_analyses_run(id)
+  analyses_runList <- content(analyses_run$result)
+  analyses_run_df <- bind_rows(analyses_runList) %>% 
+    as.data.frame()
+  return(analyses_run_df)
 }

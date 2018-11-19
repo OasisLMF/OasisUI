@@ -55,7 +55,8 @@ panelAnalysisTable <- function(id) {
         DTOutput(ns("dt_analysis")),
         fluidRow(column(12,
                         div(id = ns("divAnalysisButtons"),
-                            flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration"),
+                            flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration") %>%
+                              bs_embed_tooltip(title = defineSingleAna$abuttonconfigoutput, placement = "right"),
                             flamingoButton(inputId = ns("abuttonrerunana"), label = "Rerun") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonrerunana, placement = "right"),
                             flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
@@ -73,7 +74,7 @@ panelAnalysisTable <- function(id) {
 #'
 #' @rdname panelAnalysisLogs
 #'
-#' @description Function wrapping panel to show log table for specific Process Run.
+#' @description Function wrapping panel to show log table for specific Analysis.
 #'
 #' @template params-module-ui
 #'
@@ -594,7 +595,7 @@ panel_configureAdvancedRI <- function(id) {
 #' @template params-flamingo-module
 #' 
 #' @param currstep current selected step.
-#' @param modelID selected ProgOasis ID.
+#' @param portfolioID selected portfolio ID.
 #' @param analysisID selected analysis ID
 #'
 #' @return anaID id of selected run.
@@ -618,7 +619,6 @@ step3_configureOutput <- function(input, output, session,
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
-                                  modelID = reactive(""),
                                   analysisID = reactive("")
 ) {
 
@@ -638,14 +638,16 @@ step3_configureOutput <- function(input, output, session,
   result <- reactiveValues(
     # reactve value for navigation
     navigationstate = NULL,
-    # reactive value for process runs table
+    # reactive value for Analysis table
     tbl_analysesData = NULL,
     # analysis run logs table
     tbl_analysisrunlog = NULL,
-    # flag to know if the user is creating a new output configuration or rerunning a process
+    # flag to know if the user is creating a new output configuration or rerunning an analysis
     ana_flag = "C",
-    # Id of the Process Run
-    anaID = -1
+    # Id of the Analysis
+    anaID = -1,
+    # analysis_ setting
+    analysis_settings = NULL
   )
 
   # Reset Param
@@ -685,10 +687,10 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttonshowlog")
       disable("abuttonconfigoutput")
       if (portfolioID() != "") {
-        enable("abuttonconfigoutput")
         if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
           enable("abuttonrerunana")
           enable("abuttonshowlog")
+          enable("abuttonconfigoutput")
           if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
             enable("abuttondisplayoutput")
           }
@@ -738,7 +740,7 @@ step3_configureOutput <- function(input, output, session,
       .nothingToShowTable(contentMessage = paste0("no analysis available"))
     })
 
-  # Process Run Table Title
+  # Analyses Table Title
   output$paneltitle_AnalysisTable <- renderUI({
     if (portfolioID() != "") {
       paste0('Analyses associated with portfolio id ', portfolioID())
@@ -747,6 +749,7 @@ step3_configureOutput <- function(input, output, session,
     }
 
   })
+  
 
   # Configure Output -----------------------------------------------------------
   # hide panel
@@ -773,12 +776,12 @@ step3_configureOutput <- function(input, output, session,
     show("panelDefineOutputs")
     .showPerils()
     logMessage("showing panelDefineOutputs")
-    logMessage(paste("updating dt_analysis select because defining new output configuration"))
     result$ana_flag <- "C"
   })
 
   onclick("abuttonrerunana", {
     .defaultview(session)
+    hide("panelAnalysisLogs")
     show("panelDefineOutputs")
     .showPerils()
     logMessage("showing panelDefineOutputs")
@@ -915,7 +918,7 @@ step3_configureOutput <- function(input, output, session,
     input$chkrilob
   ))})
 
-  # > Save output configuration ------------------------------------------------
+  # Save output configuration --------------------------------------------------
   
   # Save output for later use as presets
   .modalsaveoutput <- function() {
@@ -936,129 +939,103 @@ step3_configureOutput <- function(input, output, session,
     showModal(.modalsaveoutput())
   })
 
-  # Submit output configuration (to be saved)
-  onclick("abuttonsubmitoutput", {
-    if (input$tinputoutputname == "") {
-      flamingoNotification(type = "warning", "Please enter Output Configuration Name")
-    } else {
-      stmt <- paste0("exec dbo.saveoutputoption @OutputOptionName = '",
-                     input$tinputoutputname, "',@OutputOptionsList = '",
-                     outputOptionsList(), "'")
-      executeDbQuery(dbSettings, stmt)
-      flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
-      updateTextInput(session, "tinputoutputname", value = "")
-      removeModal()
-      # .clearOutputOptions()
-      #.defaultview(session)
-    }
-  })
+  # # Submit output configuration (to be saved)
+  # onclick("abuttonsubmitoutput", {
+  #   if (input$tinputoutputname == "") {
+  #     flamingoNotification(type = "warning", "Please enter Output Configuration Name")
+  #   } else {
+  #     stmt <- paste0("exec dbo.saveoutputoption @OutputOptionName = '",
+  #                    input$tinputoutputname, "',@OutputOptionsList = '",
+  #                    outputOptionsList(), "'")
+  #     executeDbQuery(dbSettings, stmt)
+  #     flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
+  #     updateTextInput(session, "tinputoutputname", value = "")
+  #     removeModal()
+  #     # .clearOutputOptions()
+  #     #.defaultview(session)
+  #   }
+  # })
 
 
-  # Run Process ----------------------------------------------------------------
-  # A function to generate process run
-  .generateRun <- function() {
+  # Run Analyses ---------------------------------------------------------------
 
-    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName] #isolate(input$tinputananame)
-    nosample <- isolate(input$tinputnoofsample)
-    sthreshold <- isolate(input$tinputthreshold)
-    eventsetid <- isolate(input$sinputeventset)
-    eventoccid <- isolate(input$sinputeventocc)
-
-    windperil <- NULL
-    surgeperil <- NULL
-    quakeperil <- NULL
-    floodperil <- NULL
-    dmdsurge <- NULL
-    leakagefactor <- NULL
-
-    summaryreports <- tolower(isolate(input$chkinputsummaryoption))
-
-    # functionality to handle model resource based metrics
-    modelID <- ifelse(modelID() == "", -1,modelID())
-    stmt <- buildDbQuery("getRuntimeParamList", modelID)
-    runparamlist <- executeDbQuery(dbSettings, stmt)
-
-    rows <- nrow(runparamlist)
-    if (rows > 0) {
-      for (i in 1:rows) {
-        switch(runparamlist[i, 1],
-               'demand_surge'   = {dmdsurge <- tolower(isolate(input$chkinputdsurge))},
-               'peril_wind'     = {windperil <- tolower(isolate(input$chkinputprwind))},
-               'peril_surge'    = {surgeperil <- tolower(isolate(input$chkinputprstsurge))},
-               'peril_quake'    = {quakeperil <- tolower(isolate(input$chkinputprquake))},
-               'peril_flood'    = {floodperil <- tolower(isolate(input$chkinputprflood))},
-               'leakage_factor' = {leakagefactor <- isolate(input$sliderleakagefac)}
-        )
-      }
-    }
-
-    outputsStringGUL <- paste(collapse = ", ",
-                              c(input$chkgulprog, input$chkgulpolicy, input$chkgulstate,
-                                input$chkgulcounty, input$chkgulloc, input$chkgullob))
-
-    outputsStringIL <- paste(collapse = ", ",
-                             c(input$chkilprog, input$chkilpolicy, input$chkilstate,
-                               input$chkilcounty, input$chkilloc, input$chkillob))
-
-    outputsStringRI <- paste(collapse = ", ",
-                             c(input$chkriprog, input$chkripolicy, input$chkristate,
-                               input$chkricounty, input$chkriloc, input$chkrilob))
-
-    stmt <- paste0("exec dbo.WorkflowFlattener ",
-                   "@ProgOasisID= ", modelID, ", ",
-                   "@WorkflowID= 1", ", ",
-                   "@NumberOfSamples=", nosample, ", ",
-                   "@GULThreshold= ", sthreshold, ", ",
-                   "@UseRandomNumberFile= 0, ",
-                   "@OutputsStringGUL= '", outputsStringGUL, "', ",
-                   "@OutputsStringIL= '", outputsStringIL, "', ",
-                   "@OutputsStringRI= '", outputsStringRI, "', ",
-                   "@EventSetID= '", eventsetid ,"', ",
-                   "@EventOccurrenceID= '", eventoccid, "', ",
-                   "@PerilWind = '", windperil ,"', ",
-                   "@PerilSurge='", surgeperil, "', ",
-                   "@PerilQuake='", quakeperil, "', ",
-                   "@PerilFlood='", floodperil, "', ",
-                   "@DemandSurge= '", dmdsurge, "', ",
-                   "@LeakageFactor= '" , leakagefactor, "', ",
-                   "@ProcessRunName= '" , analysisName, "', ",
-                   "@SummaryReports='", summaryreports , "'")
-
-    logMessage(paste("Workflow flattener query: ", stmt))
-    anaID <- executeDbQuery(dbSettings, stmt)
-    logMessage(paste("Process Run ID: ", anaID))
-
-    return(anaID)
-  }
-
-  # Execute Process run: When "Execute Run" button is clicked - switsches view to Run panel
+  # Execute analysis
   onclick("abuttonexecuteanarun", {
-    anaID <- .generateRun()
-    if (is.null(anaID)) {
-      flamingoNotification(type = "error",
-                           "Analysis could not be generated. So run cannot be executed")
+    # Assign analysis settings to analysis
+    #model data
+    modelID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.ModelID]
+    modelData <- return_tbl_modelData(modelID)
+    
+    #Reassigned variables for consistency
+    model_version_id <- modelData[[tbl_modelsData.ModelNameId]]
+    source_tag <- tolower(model_version_id)
+    module_supplier_id <- modelData[[tbl_modelsData.ModelSupplierId]]
+    number_of_samples <- as.integer(input$tinputnoofsample)
+    prog_id <- as.integer(result$portfolioID)
+    event_occurrence_file_id <- 1 # getEventOccurrence(dbSettings, prgId )  as.integer(input$sinputeventocc)
+    event_set <- input$sinputeventset
+    peril_wind <- input$chkinputprwind 
+    demand_surge <- input$chkinputdsurge
+    peril_quake <- input$chkinputprquake
+    peril_flood <- input$chkinputprflood
+    peril_surge <- input$chkinputprstsurge 
+    leakage_factor <- input$sliderleakagefac
+    gul_output <- input$chkinputGUL
+    il_output <- input$chkinputIL
+    ri_output <- input$chkinputRI
+    gul_threshold <- as.integer(input$tinputthreshold)
+    analysis_tag <- as.integer(result$anaID) 
+    uniqueItems <- FALSE
+    id <- 1
+    exposure_location <- "L:" 
+    use_random_number_file <- FALSE
+    return_period_file <- TRUE
+    chkinputsummaryoption <- input$chkinputsummaryoption
+    outputsGUL <- c(input$chkgulprog, input$chkgulpolicy, input$chkgulstate, input$chkgulcounty, input$chkgulloc, input$chkgullob)
+    outputsIL <- c(input$chkilprog, input$chkilpolicy, input$chkilstate, input$chkilcounty, input$chkilloc, input$chkillob)
+    outputsRI <- c(input$chkriprog, input$chkripolicy, input$chkristate, input$chkricounty, input$chkriloc, input$chkrilob)
+
+    #generate analysis_settings_file
+    analyses_settingsList <- construct_tbl_analyses_settings(source_tag, prog_id, number_of_samples,
+                                                module_supplier_id, model_version_id,
+                                                event_occurrence_file_id,use_random_number_file = FALSE, event_set,
+                                                peril_wind, demand_surge, peril_quake, peril_flood, peril_surge, leakage_factor,
+                                                gul_threshold,exposure_location = 'L',
+                                                outputsGUL, outputsIL, outputsRI, chkinputsummaryoption, 
+                                                gul_output,  il_output, ri_output, 
+                                                return_period_file,
+                                                analysis_tag, uniqueItems = FALSE, id = 1)
+    
+    #write out file to be uploades
+    write_json(analyses_settingsList, "./analysis_settings.json", pretty = TRUE, auto_unbox = TRUE)
+    
+    #post analysis settings
+    post_analyses_settings_file <- api_post_analyses_settings_file(result$anaID, "./analysis_settings.json")
+    
+    if (post_analyses_settings_file$status == "Success") {
+      flamingoNotification(type = "message",
+                           paste0("Analysis  settings posted to ", result$anaID ,"."))
     } else {
-      status <- runProcess(apiSettings, anaID)
-      if (grepl("success", status, ignore.case = TRUE)) {
-        flamingoNotification(type = "message",
-                             sprintf("Created Analysis ID: %s and run is executing",
-                                     anaID))
-        .reloadAnaData()
-        #logMessage(paste("colnames are:", paste(colnames(result$tbl_analysesData), collapse = ", ")))
-        logMessage(paste("updating dt_analysis select because executing a new run"))
-        rowToSelect <- match(anaID, result$tbl_analysesData[, tbl_analysesData.AnaID])
-        pageSel <- ceiling(rowToSelect/pageLength)
-        selectRows(dataTableProxy("dt_analysis"), rowToSelect)
-        selectPage(dataTableProxy("dt_analysis"), pageSel)
-        logMessage(paste("selected row is:", input$dt_analysis_rows_selected))
-      } else {
-        flamingoNotification(type = "warning",
-                             sprintf("Created Analysis Run ID: %s. But run executing failed",
-                                     anaID))
-        show("panelAnalysisLogs")
-        logMessage("showing analysis run log table")
-      }
+      flamingoNotification(type = "error",
+                           paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analyses_settings_file$status))
     }
+    
+    analyses_run <- return_analyses_run_df(result$anaID)
+    
+    if (nrow(analyses_run) > 1) {
+      if (analyses_run[[tbl_analysesData.AnaStatus]] == "RUN_STARTED") {
+        flamingoNotification(type = "message",
+                             paste0("Analysis ", result$anaID ," is executing"))
+      } else {
+        flamingoNotification(type = "error",
+                             paste0("Error in executing analysis ", result$anaID, " status: ", analyses_run[[tbl_analysesData.AnaStatus]] ))
+      }
+    } else {
+      flamingoNotification(type = "error",
+                           paste0("Error in executing analysis ", result$anaID, " status: ", analyses_run$detail ))
+    }
+    .reloadAnaData()
+    hide("panelDefineOutputs")
     .defaultview(session)
   })
 
@@ -1100,7 +1077,7 @@ step3_configureOutput <- function(input, output, session,
     analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
     analysisName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
-    paste0('Logs for Analysis id ', analysisID, ' ', analysisName)
+    paste0('Run Logs for Analysis id ', analysisID, ' ', analysisName)
   })
 
   # Refresh Buttons ------------------------------------------------------------
@@ -1111,7 +1088,6 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonanarefreshlogs", {
     .reloadAnaRunLog()
   })
-  
   
   # Updates dependent on changed: dt_analysis_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
@@ -1159,28 +1135,17 @@ step3_configureOutput <- function(input, output, session,
     disable("abuttonconfigoutput")
   }
   
-  #Content of the process run table
-  .getAnaWithUserChoices <- function() {
-    logMessage(".getAnaWithUserChoices called")
-    tbl_analysesData <- return_tbl_analysesData()
-    if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0 ) {
-      result$tbl_analysesData <- tbl_analysesData
-      #Handling bug for 'In Progress'
-      if (input$radioanaAllOrInProgress == "In_Progress") {
-        result$tbl_analysesData <- result$tbl_analysesData %>% filter(status == StatusProcessing)
-      }
-    } else {
-      result$tbl_analysesData <- NULL
-    }
-  }
-
-  # Reload Process Runs table
+  # Reload Analyses table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
     if (portfolioID()  != "") {
       tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
         result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesData.PortfolioID) == portfolioID())
+        #Handling filter for 'In Progress'
+        if (input$radioanaAllOrInProgress == "In_Progress") {
+          result$tbl_analysesData <- result$tbl_analysesData %>% filter(status == StatusProcessing)
+        }
       }
       logMessage("analyses table refreshed")
     }  else {
@@ -1259,18 +1224,19 @@ step3_configureOutput <- function(input, output, session,
     # updateTextInput(session, "tinputananame", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
 
-    modelID <- ifelse(modelID() == "", -1,modelID())
-    if (modelID != -1) {
-      updateSelectInput(session, "sinputeventset",
-                        choices = getEventSet(dbSettings, modelID ))
-      updateSelectInput(session, "sinputeventocc",
-                        choices = getEventOccurrence(dbSettings, modelID ))
-    }
-    updateCheckboxInput(session, "chkinputprwind", "Peril: Wind", value = TRUE)
-    updateCheckboxInput(session, "chkinputprstsurge", "Peril: Surge", value = TRUE)
-    updateCheckboxInput(session, "chkinputprquake", "Peril: Quake", value = TRUE)
-    updateCheckboxInput(session, "chkinputprflood", "Peril: Flood", value = TRUE)
-    updateCheckboxInput(session, "chkinputdsurge", "Demand Surge", value = TRUE)
+    modelID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.ModelID]
+    modelID <- ifelse(modelID == "", -1,modelID)
+    # if (modelID != -1) {
+    #   updateSelectInput(session, "sinputeventset",
+    #                     choices = getEventSet(dbSettings, modelID ))
+    #   updateSelectInput(session, "sinputeventocc",
+    #                     choices = getEventOccurrence(dbSettings, modelID ))
+    # }
+    # updateCheckboxInput(session, "chkinputprwind", "Peril: Wind", value = TRUE)
+    # updateCheckboxInput(session, "chkinputprstsurge", "Peril: Surge", value = TRUE)
+    # updateCheckboxInput(session, "chkinputprquake", "Peril: Quake", value = TRUE)
+    # updateCheckboxInput(session, "chkinputprflood", "Peril: Flood", value = TRUE)
+    # updateCheckboxInput(session, "chkinputdsurge", "Demand Surge", value = TRUE)
   }
 
   # Clear Custom Configuration option
@@ -1284,7 +1250,9 @@ step3_configureOutput <- function(input, output, session,
   #Show available perils
   # To-Do: retrieve perils from model. currently showing all
   .showPerils <- function() {
-    # modelID <- ifelse(modelID() == "", -1,modelID())
+    # modelID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.ModelID]
+    # modelID <- ifelse(modelID == "", -1,modelID)
+    #
     # stmt <- buildDbQuery("getRuntimeParamList", modelID)
     # runparamlist <- executeDbQuery(dbSettings, stmt)
     # 
@@ -1306,38 +1274,43 @@ step3_configureOutput <- function(input, output, session,
   # Update output configuration for rerun
   .updateOutputConfig <- function() {
     logMessage(".updateOutputConfig called")
-    outputlist <- executeDbQuery(dbSettings, paste0("exec dbo.getOutputOptionOutputs @processrunid = ", result$anaID ))
-    anaparams <- executeDbQuery(dbSettings, paste0("exec dbo.getProcessRunParams ", result$anaID ))
-
-    # updateTextInput(session, "tinputananame", value = result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName])
-
-    if (nrow(anaparams) > 0) {
-      for (i in 1:nrow(anaparams)) {
-        switch(anaparams[i,1],
-               "number_of_samples" = {updateTextInput(session, "tinputnoofsample", value = anaparams[i,2])},
-               "gul_threshold" = {updateTextInput(session, "tinputthreshold", value = anaparams[i,2])},
-               "event_set" = {updateSelectInput(session, "sinputeventocc", selected = anaparams[i,2])},
-               "event_occurrence_id" = {updateSelectInput(session, "sinputeventocc", selected = anaparams[i,2])},
-               "peril_wind" = {updateCheckboxInput(session, "chkinputprwind", value = eval(parse(text = toString(anaparams[i,2]))))},
-               "peril_surge" = {updateCheckboxInput(session, "chkinputprstsurge", value = eval(parse(text = toString(anaparams[i,2]))))},
-               "peril_quake" = {updateCheckboxInput(session, "chkinputprquake", value = eval(parse(text = toString(anaparams[i,2]))))},
-               "peril_flood" = {updateCheckboxInput(session, "chkinputprflood", value = eval(parse(text = toString(anaparams[i,2]))))},
-               "demand_surge" = {updateCheckboxInput(session, "chkinputdsurge", value = eval(parse(text = toString(anaparams[i,2]))))},
-               "leakage_factor" = {updateSliderInput(session, "sliderleakagefac", value = anaparams[i,2])}
-        )
-      }
+    analyses_settings <- return_analyses_settings_file_list(result$anaID)
+    number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]] 
+    updateTextInput(session, "tinputnoofsample", value = number_of_samples)
+    gul_threshold <- analysis_settings[["analysis_settings"]][["gul_threshold"]]
+    updateTextInput(session, "tinputthreshold", value = gul_threshold)
+    event_set <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_set"]]
+    updateSelectInput(session, "sinputeventocc", selected = event_set)
+    event_occurrence_file_id <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_occurrence_file_id"]]
+    updateSelectInput(session, "sinputeventocc", selected = event_occurrence_file_id)
+    peril_wind <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_wind"]]
+    if (!is.null(peril_wind)) {
+      updateCheckboxInput(session, "chkinputprwind", value = peril_wind)
     }
-    orows <- nrow(outputlist)
-    if (orows > 0) {
-      for (i in 1:orows) {
-        grpid <- paste0("chk",outputlist$Group[i])
-        grpinputid <- strsplit(toString(grpid), " ")[[1]]
-        chkboxid <- outputlist$Parameter[i]
-        selchoices <- as.list(strsplit(toString(chkboxid), ",")[[1]])
-        updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
-      }
+    peril_surge <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_surge"]]
+    if (!is.null(peril_surge)) {
+      updateCheckboxInput(session, "chkinputprstsurge", value = peril_surge)
     }
-    # .clearOutputOptions()
+    peril_quake <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_quake"]]
+    if (!is.null(peril_quake)) {
+      updateCheckboxInput(session, "chkinputprquake", value = peril_quake)
+    }
+    peril_flood <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_flood"]]
+    if (!is.null(peril_flood)) {
+      updateCheckboxInput(session, "chkinputprflood", value = peril_flood)
+    }
+    demand_surge <- analyses_settings[["analysis_settings"]][["model_settings"]][["demand_surge"]]
+    if (!is.null(demand_surge)) {
+      updateCheckboxInput(session, "chkinputdsurge", value = demand_surge)
+    }
+    leakage_factor <- analyses_settings[["analysis_settings"]][["model_settings"]][["leakage_factor"]]
+    if (!is.null(leakage_factor)) {
+      updateCheckboxInput(session, "sliderleakagefac", value = leakage_factor)
+    }
+    
+    #missing part to extract granularities from analysis settings
+    #updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
+    
     invisible()
   }
 

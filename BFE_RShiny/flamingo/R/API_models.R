@@ -43,6 +43,48 @@ api_get_models <- function(supplier_id = "") {
   )
 }
 
+#' Get models id
+#' 
+#' Returns the specific model entry.
+#' 
+#' @rdname api_get_models_id
+#' 
+#' @param id a unique integer value identifying this analysis.
+#' 
+#' @return previously posted models id. 
+#' 
+#' @importFrom httr GET
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_get_models_id <- function(id) {
+  
+  response <- GET(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())
+    ),
+    path = paste(get_version(), "models", id, "", sep = "/")
+  )
+  
+  logWarning = warning
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
 # R functions calling Models API Calls -----------------------------------------
 
 #' Return Models Dataframe
@@ -53,7 +95,7 @@ api_get_models <- function(supplier_id = "") {
 #' 
 #' @param supplier_id the supplier ID for the model. Default is empty string.
 #' 
-#' @return dataframe of previously posted models. Default empty string returns all portfolios.
+#' @return dataframe of previously posted models. Default empty string returns all models.
 #' 
 #' @importFrom dplyr bind_rows
 #' @importFrom httr content
@@ -96,4 +138,52 @@ return_tbl_modelsData <- function(supplier_id = ""){
   tbl_modelsData <- tbl_modelsData %>%
     arrange(desc(!! sym(tbl_modelsData.ModelId)))
   return(tbl_modelsData)
+}
+
+
+#' Return Model Dataframe
+#' 
+#' @rdname return_model_df
+#' 
+#' @description Returns a dataframe of model
+#' 
+#' @param id the ID for the model.
+#' 
+#' @return dataframe of previously posted model.
+#' 
+#' @importFrom dplyr bind_rows
+#' @importFrom httr content
+#' 
+#' @export
+return_model_df <- function(id){
+  get_model <- api_get_models_id(id)
+  modelList <- content(get_model$result)
+  model_df <- bind_rows(modelList) %>% 
+    as.data.frame()
+  return(model_df)
+}
+
+#' Return Model Data fot DT
+#' 
+#' @rdname return_tbl_modelData
+#' 
+#' @description Returns a dataframe of model ready for being rendered as a data table
+#' 
+#' @param id the ID for the model.
+#' 
+#' @return dataframe of previously posted model.
+#' 
+#' @importFrom dplyr arrange
+#' @importFrom dplyr sym
+#' @importFrom dplyr desc
+#' 
+#' @export
+return_tbl_modelData <- function(id){
+  tbl_modelData <- return_model_df(id) %>%
+    as.data.frame()
+    tbl_modelData[[tbl_modelsData.ModelCreated]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsData.ModelCreated]], format = "%d-%m-%YT%H:%M:%S"))
+    tbl_modelData[[tbl_modelsData.ModelModified]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsData.ModelModified]], format = "%d-%m-%YT%H:%M:%S"))
+  tbl_modelData <- tbl_modelData %>%
+    arrange(desc(!! sym(tbl_modelsData.ModelId)))
+  return(tbl_modelData)
 }
