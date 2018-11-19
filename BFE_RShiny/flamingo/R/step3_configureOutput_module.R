@@ -25,7 +25,6 @@ step3_configureOutputUI <- function(id) {
   )
 }
 
-
 #' panelAnalysisTable
 #'
 #' @rdname panelAnalysisTable
@@ -57,6 +56,8 @@ panelAnalysisTable <- function(id) {
                         div(id = ns("divAnalysisButtons"),
                             flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonconfigoutput, placement = "right"),
+                            flamingoButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis") %>%
+                              bs_embed_tooltip(title = defineSingleAna$abuttoncancelana, placement = "right"),
                             flamingoButton(inputId = ns("abuttonrerunana"), label = "Rerun") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonrerunana, placement = "right"),
                             flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
@@ -593,7 +594,7 @@ panel_configureAdvancedRI <- function(id) {
 #' @template return-outputNavigation
 #' @template params-module
 #' @template params-flamingo-module
-#' 
+#'
 #' @param currstep current selected step.
 #' @param portfolioID selected portfolio ID.
 #' @param analysisID selected analysis ID
@@ -653,7 +654,7 @@ step3_configureOutput <- function(input, output, session,
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
-    result$anaID <- analysisID()
+    # result$anaID <- analysisID()
   })
 
   # Panels Visualization -------------------------------------------------------
@@ -675,7 +676,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Enable and disable buttons -------------------------------------------------
-  
+
   #Enabling based on analysis
   observeEvent({
     result$tbl_analysesData
@@ -686,11 +687,13 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttondisplayoutput")
       disable("abuttonshowlog")
       disable("abuttonconfigoutput")
+      disable("abuttoncancelana")
       if (portfolioID() != "") {
         if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
           enable("abuttonrerunana")
           enable("abuttonshowlog")
           enable("abuttonconfigoutput")
+          enable("abuttoncancelana")
           if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
             enable("abuttondisplayoutput")
           }
@@ -698,8 +701,8 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   )
-  
-  
+
+
   # Enable and disable buttons based on output confifig
   observeEvent(outputOptionsList, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (outputOptionsList() != "") {
@@ -710,7 +713,7 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttonexecuteanarun")
     }
   })
-  
+
   # Analyses  Table ------------------------------------------------------------
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioanaAllOrInProgress, ignoreInit = TRUE, {
@@ -749,7 +752,7 @@ step3_configureOutput <- function(input, output, session,
     }
 
   })
-  
+
 
   # Configure Output -----------------------------------------------------------
   # hide panel
@@ -787,6 +790,31 @@ step3_configureOutput <- function(input, output, session,
     logMessage("showing panelDefineOutputs")
     result$ana_flag <- "R"
     .updateOutputConfig()
+  })
+
+  # Delete analysis button
+  observeEvent(input$dt_analysesData_rows_selected, ignoreNULL = FALSE, {
+    if (length(input$dt_analysesData_rows_selected) > 0) {
+      enable("abuttoncancelana")
+    } else {
+      disable("abuttoncancelana")
+    }
+  })
+
+  onclick("abuttoncancelana", {
+
+    analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
+    delete_analyses_id <- api_delete_analyses_id(analysisID)
+
+    if (delete_analyses_id$status == "Success") {
+      flamingoNotification(type = "message",
+                           paste("Analysis id ", analysisID, " deleted."))
+      .reloadAnaData()
+    } else {
+      flamingoNotification(type = "error",
+                           paste("Analysis id ", analysisID, " could not be deleted."))
+    }
+
   })
 
   # Hide Output Configuration panel
@@ -875,7 +903,7 @@ step3_configureOutput <- function(input, output, session,
   #   if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
   #     outputlist <- executeDbQuery(dbSettings,
   #                                  buildDbQuery("getOutputOptionOutputs", input$sinoutputoptions))
-  # 
+  #
   #     if (nrow(outputlist) > 0) {
   #       # print(paste0("outputlist"))
   #       # print(outputlist)
@@ -919,7 +947,7 @@ step3_configureOutput <- function(input, output, session,
   ))})
 
   # Save output configuration --------------------------------------------------
-  
+
   # Save output for later use as presets
   .modalsaveoutput <- function() {
     ns <- session$ns
@@ -965,7 +993,7 @@ step3_configureOutput <- function(input, output, session,
     #model data
     modelID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.ModelID]
     modelData <- return_tbl_modelData(modelID)
-    
+
     #Reassigned variables for consistency
     model_version_id <- modelData[[tbl_modelsData.ModelNameId]]
     source_tag <- tolower(model_version_id)
@@ -974,20 +1002,20 @@ step3_configureOutput <- function(input, output, session,
     prog_id <- as.integer(result$portfolioID)
     event_occurrence_file_id <- 1 # getEventOccurrence(dbSettings, prgId )  as.integer(input$sinputeventocc)
     event_set <- input$sinputeventset
-    peril_wind <- input$chkinputprwind 
+    peril_wind <- input$chkinputprwind
     demand_surge <- input$chkinputdsurge
     peril_quake <- input$chkinputprquake
     peril_flood <- input$chkinputprflood
-    peril_surge <- input$chkinputprstsurge 
+    peril_surge <- input$chkinputprstsurge
     leakage_factor <- input$sliderleakagefac
     gul_output <- input$chkinputGUL
     il_output <- input$chkinputIL
     ri_output <- input$chkinputRI
     gul_threshold <- as.integer(input$tinputthreshold)
-    analysis_tag <- as.integer(result$anaID) 
+    analysis_tag <- as.integer(result$anaID)
     uniqueItems <- FALSE
     id <- 1
-    exposure_location <- "L:" 
+    exposure_location <- "L:"
     use_random_number_file <- FALSE
     return_period_file <- TRUE
     chkinputsummaryoption <- input$chkinputsummaryoption
@@ -1001,17 +1029,17 @@ step3_configureOutput <- function(input, output, session,
                                                 event_occurrence_file_id,use_random_number_file = FALSE, event_set,
                                                 peril_wind, demand_surge, peril_quake, peril_flood, peril_surge, leakage_factor,
                                                 gul_threshold,exposure_location = 'L',
-                                                outputsGUL, outputsIL, outputsRI, chkinputsummaryoption, 
-                                                gul_output,  il_output, ri_output, 
+                                                outputsGUL, outputsIL, outputsRI, chkinputsummaryoption,
+                                                gul_output,  il_output, ri_output,
                                                 return_period_file,
                                                 analysis_tag, uniqueItems = FALSE, id = 1)
-    
+
     #write out file to be uploades
     write_json(analyses_settingsList, "./analysis_settings.json", pretty = TRUE, auto_unbox = TRUE)
-    
+
     #post analysis settings
     post_analyses_settings_file <- api_post_analyses_settings_file(result$anaID, "./analysis_settings.json")
-    
+
     if (post_analyses_settings_file$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis  settings posted to ", result$anaID ,"."))
@@ -1019,9 +1047,9 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "error",
                            paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analyses_settings_file$status))
     }
-    
+
     analyses_run <- return_analyses_run_df(result$anaID)
-    
+
     if (nrow(analyses_run) > 1) {
       if (analyses_run[[tbl_analysesData.AnaStatus]] == "RUN_STARTED") {
         flamingoNotification(type = "message",
@@ -1088,7 +1116,7 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonanarefreshlogs", {
     .reloadAnaRunLog()
   })
-  
+
   # Updates dependent on changed: dt_analysis_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(input$dt_analysis_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -1133,8 +1161,9 @@ step3_configureOutput <- function(input, output, session,
     disable("abuttondisplayoutput")
     disable("abuttonshowlog")
     disable("abuttonconfigoutput")
+    disable("abuttoncancelana")
   }
-  
+
   # Reload Analyses table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
@@ -1163,7 +1192,7 @@ step3_configureOutput <- function(input, output, session,
       result$tbl_analysisrunlog <-  NULL
     }
   }
-  
+
   # table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function() {
     options <- list(
@@ -1255,14 +1284,14 @@ step3_configureOutput <- function(input, output, session,
     #
     # stmt <- buildDbQuery("getRuntimeParamList", modelID)
     # runparamlist <- executeDbQuery(dbSettings, stmt)
-    # 
+    #
     # hide("perilwind")
     # hide("perilsurge")
     # hide("perilquake")
     # hide("perilflood")
     # hide("demandsurge")
     # hide("leakagefactor")
-    # 
+    #
     # if (nrow(runparamlist) > 0) {
     #   for (i in 1:nrow(runparamlist)) {
     #     ctrname <- gsub("_", "", runparamlist[i, 1], fixed = TRUE)
@@ -1275,7 +1304,7 @@ step3_configureOutput <- function(input, output, session,
   .updateOutputConfig <- function() {
     logMessage(".updateOutputConfig called")
     analyses_settings <- return_analyses_settings_file_list(result$anaID)
-    number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]] 
+    number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]]
     updateTextInput(session, "tinputnoofsample", value = number_of_samples)
     gul_threshold <- analysis_settings[["analysis_settings"]][["gul_threshold"]]
     updateTextInput(session, "tinputthreshold", value = gul_threshold)
@@ -1307,10 +1336,10 @@ step3_configureOutput <- function(input, output, session,
     if (!is.null(leakage_factor)) {
       updateCheckboxInput(session, "sliderleakagefac", value = leakage_factor)
     }
-    
+
     #missing part to extract granularities from analysis settings
     #updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
-    
+
     invisible()
   }
 

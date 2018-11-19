@@ -62,7 +62,8 @@ defineSingleAna <- list(
   abuttonexecuteanarun = "Please select Output Configuration",
   abuttonshowlog = "Please select a Analysis to show log",
   abuttondisplayoutput = "Please select an Analysis to display output",
-  abuttonconfigoutput = "Please select an Analysis to wich associate an output configuration."
+  abuttonconfigoutput = "Please select an Analysis to wich associate an output configuration.",
+  abuttoncancelana = "Please select an Analysis to delete"
 )
 
 ### Panel Browse ----
