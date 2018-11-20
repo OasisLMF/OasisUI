@@ -56,7 +56,7 @@ panelAnalysisTable <- function(id) {
                         div(id = ns("divAnalysisButtons"),
                             flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonconfigoutput, placement = "right"),
-                            flamingoButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis") %>%
+                            flamingoButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttoncancelana, placement = "right"),
                             flamingoButton(inputId = ns("abuttonrerunana"), label = "Rerun") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonrerunana, placement = "right"),
@@ -654,7 +654,7 @@ step3_configureOutput <- function(input, output, session,
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
-    # result$anaID <- analysisID()
+    result$anaID <- analysisID()
   })
 
   # Panels Visualization -------------------------------------------------------
@@ -792,20 +792,12 @@ step3_configureOutput <- function(input, output, session,
     .updateOutputConfig()
   })
 
-  # Delete analysis button
-  observeEvent(input$dt_analysesData_rows_selected, ignoreNULL = FALSE, {
-    if (length(input$dt_analysesData_rows_selected) > 0) {
-      enable("abuttoncancelana")
-    } else {
-      disable("abuttoncancelana")
-    }
-  })
-
+  # Delete analysis button -----------------------------------------------------
   onclick("abuttoncancelana", {
     showModal(.cancelAnaModal())
   })
 
-  output$cancelAnaModal <- renderUI({
+  output$cancelAnaModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
     AnaName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
     paste0('Cancel ', AnaId, ' ', AnaName)
@@ -814,12 +806,12 @@ step3_configureOutput <- function(input, output, session,
   .cancelAnaModal <- function(){
     ns <- session$ns
     modalDialog(label = "cancelAnaModal",
-                title = uiOutput(ns("cancelAnaModal"), inline = TRUE),
+                title = uiOutput(ns("cancelAnaModaltitle"), inline = TRUE),
                 paste0("Are you sure you want to cancel this analysis?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonConfirmDelAna"),
                                  label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = sys_conf$abuttonConfirmDel, placement = "right"),
+                    bs_embed_tooltip(title = defineSingleAna$abuttonConfirmDel, placement = "right"),
                   actionButton(ns("btnCancelAnaDel"),
                                label = "Go back", align = "right")
                 ),
@@ -836,6 +828,7 @@ step3_configureOutput <- function(input, output, session,
     removeModal()
 
     analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
+    #should use /v1/analyses/{id}/cancel/
     delete_analyses_id <- api_delete_analyses_id(analysisID)
 
     if (delete_analyses_id$status == "Success") {

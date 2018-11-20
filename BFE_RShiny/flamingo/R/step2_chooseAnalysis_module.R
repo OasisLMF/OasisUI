@@ -56,8 +56,8 @@ panelCreateAnalysesTable <- function(id) {
       column(12,
              flamingoButton(inputId = ns("abuttoncreateana"), label = "Create Analysis") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttoncreateana, placement = "right"),
-             flamingoButton(inputId = ns("abuttongenInput"), label = "Generate Input") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttongenInput, placement = "right"),
+             flamingoButton(inputId = ns("abuttonstartIG"), label = "Start Input Generation") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttonstartIG, placement = "right"),
              flamingoButton(inputId = ns("abuttoncancelIG"), label = "Cancel Input Generation") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttoncancelIG, placement = "right"),
              flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
@@ -330,63 +330,42 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
 
-  # Analysis detais ------------------------------------------------------------
+  # Generate input -------------------------------------------------------------
+  onclick("abuttonstartIG", {
 
-  # Generate input
-
-  observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
-    if (length(input$dt_analyses_rows_selected) > 0) {
-      enable("abuttongenInput")
-    } else {
-      disable("abuttongenInput")
-    }
-  })
-
-  onclick("abuttongenInput", {
-
-    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
-    input_generation_id <- api_post_analyses_generate_inputs(analysisID)
-
+    input_generation_id <- api_post_analyses_generate_inputs(result$analysisID)
+    
     if (input_generation_id$status == "Success") {
       flamingoNotification(type = "message",
-                           paste("Input generation id ", analysisID, " created."))
-      .reloadAnaData()
+                           paste("Input generation id ", result$analysisID, " started."))
     } else {
       flamingoNotification(type = "error",
-                           paste("Input generation id ", analysisID, " could not be created."))
+                           paste("Input generation id ", result$analysisID, " could not be started."))
     }
-
+    .reloadAnaData()
+    #need part to reselect previously selected row.
   })
-
-
-  ## Cancel input generation button
-  observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
-    if (length(input$dt_analyses_rows_selected) > 0) {
-      enable("abuttoncancelIG")
-    } else {
-      disable("abuttoncancelIG")
-    }
-  })
-
+  
+  
   onclick("abuttoncancelIG", {
     showModal(.cancelIGModal())
   })
-
-  output$cancelIGModal <- renderUI({
+  
+  output$cancelIGModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
     paste0('Cancel ', AnaId, ' ', AnaName)
   })
-
+  
   .cancelIGModal <- function(){
     ns <- session$ns
-    modalDialog(label = "cancelIGModal",
+    modalDialog(label = "cancelIGModaltitle",
                 title = uiOutput(ns("cancelIGModal"), inline = TRUE),
                 paste0("Are you sure you want to cancel this input generation?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonConfirmDelIG"),
                                  label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = sys_conf$abuttonConfirmDel, placement = "right"),
+                    bs_embed_tooltip(title = defineSingleAna$abuttonConfirmDelIG, placement = "right"),
                   actionButton(ns("btnCancelIGDel"),
                                label = "Go back", align = "right")
                 ),
@@ -394,28 +373,29 @@ step2_chooseAnalysis <- function(input, output, session,
                 easyClose = TRUE
     )
   }
-
+  
   observeEvent(input$btnCancelIGDel, {
     removeModal()
   })
-
+  
   observeEvent(input$abuttonConfirmDelIG, {
     removeModal()
-
+    
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     delete_analyses_id <- api_post_analyses_cancel_generate_inputs(analysisID)
-
+    
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
-                           paste("Input Generation id ", analysisID, " deleted."))
+                           paste("Cancelled Input Generation for analysis id ", analysisID, "."))
       .reloadAnaData()
     } else {
       flamingoNotification(type = "error",
                            paste("Input Generation id ", analysisID, " could not be deleted."))
     }
-
+    
   })
-
+  
+  # Analysis detais ------------------------------------------------------------
   onclick("abuttonshowanadetails", {
     hide("panelAnalysisLog")
     hide("panelModelTable")
@@ -619,7 +599,7 @@ observeEvent({
     disable("abuttonshowanadetails")
     disable("abuttondelana")
     disable("abuttoncancelIG")
-    disable("abuttongenInput")
+    disable("abuttonstartIG")
     # disable("abuttonmodeldetails")
     disable("abuttonpgotonextstep")
     if (length(input$dt_models_rows_selected) > 0) {
@@ -630,7 +610,7 @@ observeEvent({
       enable("abuttonshowlog")
       enable("abuttondelana")
       enable("abuttoncancelIG")
-      enable("abuttongenInput")
+      enable("abuttonstartIG")
       if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusReady) {
         enable("abuttonpgotonextstep")
       }
