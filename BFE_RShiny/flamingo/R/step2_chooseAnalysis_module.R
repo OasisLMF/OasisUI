@@ -16,9 +16,9 @@
 #'
 #' @export
 step2_chooseAnalysisUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   tagList(
     hidden(div(id = ns("panelCreateAnalysesTable"), panelCreateAnalysesTable(id))),
     hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
@@ -56,6 +56,10 @@ panelCreateAnalysesTable <- function(id) {
       column(12,
              flamingoButton(inputId = ns("abuttoncreateana"), label = "Create Analysis") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttoncreateana, placement = "right"),
+             flamingoButton(inputId = ns("abuttongenInput"), label = "Generate Input") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttongenInput, placement = "right"),
+             flamingoButton(inputId = ns("abuttoncancelIG"), label = "Cancel Input Generation") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttoncancelIG, placement = "right"),
              flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
              flamingoButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
@@ -223,16 +227,16 @@ step2_chooseAnalysis <- function(input, output, session,
                                  portfolioID = reactive({""}),
                                  pfName = reactive({""}),
                                  pfstatus = reactive({""})
-                                 
+
 ) {
-  
+
   ns <- session$ns
-  
+
   # Reactive Values and parameters ---------------------------------------------
-  
+
   #number of Rows per Page in a dataable
   pageLength <- 5
-  
+
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # reactive for portfolioID
@@ -252,7 +256,7 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis ID
     analysisID = ""
   )
-  
+
   #Set Params
   observeEvent(portfolioID(), {
     if (!is.null(portfolioID())) {
@@ -260,9 +264,9 @@ step2_chooseAnalysis <- function(input, output, session,
     } else {
       result$portfolioID <- ""
     }
-    
+
   })
-  
+
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
@@ -272,16 +276,16 @@ step2_chooseAnalysis <- function(input, output, session,
       .reloadtbl_modelsData()
     }
   })
-  
+
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelModelTable")
   })
-  
+
   # Analyses  Table ------------------------------------------------------------
   output$dt_analyses <- renderDT(
-    
+
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- 1
       logMessage("re-rendering analysis table")
@@ -299,7 +303,7 @@ step2_chooseAnalysis <- function(input, output, session,
     } else {
       .nothingToShowTable(contentMessage = paste0("no analysis available"))
     })
-  
+
   # Create Analyses Table  Title
   output$paneltitle_CreateAnalysesTable <- renderUI({
     if (result$portfolioID != "") {
@@ -309,14 +313,14 @@ step2_chooseAnalysis <- function(input, output, session,
       paste0('Analyses')
     }
   })
-  
+
   observeEvent(result$portfolioID, {
     .reloadAnaData()
   })
-  
-  
+
+
   # Analysis ID ----------------------------------------------------------------
-  
+
   observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
     if (!is.null(input$dt_analyses_rows_selected)) {
       result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
@@ -324,10 +328,63 @@ step2_chooseAnalysis <- function(input, output, session,
       result$analysisID <- ""
     }
   })
-  
-  
+
+
   # Analysis detais ------------------------------------------------------------
-  
+
+  # Generate input
+
+  observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
+    if (length(input$dt_analyses_rows_selected) > 0) {
+      enable("abuttongenInput")
+    } else {
+      disable("abuttongenInput")
+    }
+  })
+
+  onclick("abuttongenInput", {
+
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+    input_generation_id <- api_post_analyses_generate_inputs(analysisID)
+
+    if (input_generation_id$status == "Success") {
+      flamingoNotification(type = "message",
+                           paste("Input generation id ", analysisID, " created."))
+      .reloadAnaData()
+    } else {
+      flamingoNotification(type = "error",
+                           paste("Input generation id ", analysisID, " could not be created."))
+    }
+
+  })
+
+
+  ## Cancel input generation button
+  observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
+    if (length(input$dt_analyses_rows_selected) > 0) {
+      enable("abuttoncancelIG")
+    } else {
+      disable("abuttoncancelIG")
+    }
+  })
+
+
+  onclick("abuttoncancelIG", {
+
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+    delete_analyses_id <- api_post_analyses_cancel_generate_inputs(analysisID)
+
+    if (delete_analyses_id$status == "Success") {
+      flamingoNotification(type = "message",
+                           paste("Input Generation id ", analysisID, " deleted."))
+      .reloadAnaData()
+    } else {
+      flamingoNotification(type = "error",
+                           paste("Input Generation id ", analysisID, " could not be deleted."))
+    }
+
+  })
+
   onclick("abuttonshowanadetails", {
     hide("panelAnalysisLog")
     hide("panelModelTable")
@@ -336,11 +393,11 @@ step2_chooseAnalysis <- function(input, output, session,
     show("panelAnalysisDetails")
     .reloadAnaDetails()
   })
-  
+
   onclick("buttonhideanadetails", {
     hide("panelAnalysisDetails")
   })
-  
+
   output$dt_analysisdetails <- renderDT(
     if (!is.null(result$tbl_analysisdetails) && nrow(result$tbl_analysisdetails) > 0 ) {
       logMessage("re-rendering analysis details table")
@@ -358,7 +415,7 @@ step2_chooseAnalysis <- function(input, output, session,
       .nothingToShowTable(contentMessage = paste0("no files associtated with analysis id ", result$analysisID))
     }
   )
-  
+
   #  panelAnalysisDetails Table title
   output$paneltitle_panelAnalysisDetails <- renderUI({
     if (result$analysisID != "") {
@@ -368,7 +425,7 @@ step2_chooseAnalysis <- function(input, output, session,
       paste0("Analysis Details")
     }
   })
-  
+
   # Analysis Logs --------------------------------------------------------------
   onclick("abuttonshowlog", {
     hide("panelAnalysisDetails")
@@ -378,11 +435,11 @@ step2_chooseAnalysis <- function(input, output, session,
     show("panelAnalysisLog")
     .reloadAnaLog()
   })
-  
+
   onclick("buttonhideanalog", {
     hide("panelAnalysisLog")
   })
-  
+
   output$dt_analysislog <- renderDT(
     if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 0 ) {
       logMessage("re-rendering analysis log table")
@@ -400,7 +457,7 @@ step2_chooseAnalysis <- function(input, output, session,
       .nothingToShowTable(contentMessage = paste0("no log files associtated with analysis id ", result$analysisID))
     }
   )
-  
+
   #  panelAnalysisLog Table title
   output$paneltitle_panelAnalysisLog <- renderUI({
     if (result$analysisID != "") {
@@ -502,8 +559,8 @@ output$paneltitle_ModelTable <- renderUI({
 onclick("abuttonsubmit", {
   if (input$anaName != "") {
     modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
-    post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID, 
-                                                                           name = input$anaName, 
+    post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID,
+                                                                           name = input$anaName,
                                                                            model = modelID)
     logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID, " name ", input$anaName, " model ",  modelID))
     if (post_portfolios_create_analysis$status == "Success") {
@@ -530,6 +587,8 @@ observeEvent({
     disable("abuttonshowlog")
     disable("abuttonshowanadetails")
     disable("abuttondelana")
+    disable("abuttoncancelIG")
+    disable("abuttongenInput")
     # disable("abuttonmodeldetails")
     disable("abuttonpgotonextstep")
     if (length(input$dt_models_rows_selected) > 0) {
@@ -539,6 +598,8 @@ observeEvent({
       enable("abuttonshowanadetails")
       enable("abuttonshowlog")
       enable("abuttondelana")
+      enable("abuttoncancelIG")
+      enable("abuttongenInput")
       if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusReady) {
         enable("abuttonpgotonextstep")
       }
