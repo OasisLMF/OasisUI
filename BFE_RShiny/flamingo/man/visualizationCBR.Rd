@@ -30,7 +30,7 @@ visualizationCBRUI(id)
 
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
 
-\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+\item{processRunId}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{logMessage}{function that will be passed info messages.}
 

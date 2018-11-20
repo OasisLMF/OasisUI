@@ -51,7 +51,7 @@ panelAnalysisTable <- function(id) {
     div(id = "divAnalysis",
         fluidRow(column(12,
                         radioButtons(inputId = ns("radioanaAllOrInProgress"), "Processes' Status", list("All", "In Progress"), inline = TRUE))),
-        DTOutput(ns("dt_analysis")),
+        DTOutput(ns("dt_analyses")),
         fluidRow(column(12,
                         div(id = ns("divAnalysisButtons"),
                             flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration") %>%
@@ -92,7 +92,7 @@ panelAnalysisLogs <- function(id) {
       uiOutput(ns("paneltitle_AnaLogs"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analysisrunlog"))
+    DTOutput(ns("dt_analysesrunlog"))
   )
 }
 
@@ -682,19 +682,19 @@ step3_configureOutput <- function(input, output, session,
     result$tbl_analysesData
     portfolioID()
     currstep()
-    input$dt_analysis_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    input$dt_analyses_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonrerunana")
       disable("abuttondisplayoutput")
       disable("abuttonshowlog")
       disable("abuttonconfigoutput")
       disable("abuttoncancelana")
       if (portfolioID() != "") {
-        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analysis_rows_selected) > 0) {
+        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
           enable("abuttonrerunana")
           enable("abuttonshowlog")
           enable("abuttonconfigoutput")
           enable("abuttoncancelana")
-          if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
+          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
             enable("abuttondisplayoutput")
           }
         }
@@ -723,7 +723,7 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
-  output$dt_analysis <- renderDT(
+  output$dt_analyses <- renderDT(
 
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- 1
@@ -763,8 +763,8 @@ step3_configureOutput <- function(input, output, session,
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
     if (result$ana_flag  == "R") {
-      analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
-      analysisName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
+      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+      analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
       analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
       paste0('Re-Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
     } else {
@@ -798,8 +798,8 @@ step3_configureOutput <- function(input, output, session,
   })
 
   output$cancelAnaModaltitle <- renderUI({
-    AnaId <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
-    AnaName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
+    AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+    AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
     paste0('Cancel ', AnaId, ' ', AnaName)
   })
 
@@ -827,7 +827,7 @@ step3_configureOutput <- function(input, output, session,
   observeEvent(input$abuttonConfirmDelAna, {
     removeModal()
 
-    analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     #should use /v1/analyses/{id}/cancel/
     delete_analyses_id <- api_delete_analyses_id(analysisID)
 
@@ -1016,7 +1016,7 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonexecuteanarun", {
     # Assign analysis settings to analysis
     #model data
-    modelID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.ModelID]
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
     modelData <- return_tbl_modelData(modelID)
 
     #Reassigned variables for consistency
@@ -1105,8 +1105,8 @@ step3_configureOutput <- function(input, output, session,
   })
 
   ### Log Table
-  output$dt_analysisrunlog <- renderDT({
-    if (length(input$dt_analysis_rows_selected) > 0) {
+  output$dt_analysesrunlog <- renderDT({
+    if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
       if (!is.null(result$tbl_analysisrunlog)) {
         datatable(
@@ -1127,8 +1127,8 @@ step3_configureOutput <- function(input, output, session,
 
   # run logs title
   output$paneltitle_AnaLogs <- renderUI({
-    analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
-    analysisName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
     paste0('Run Logs for Analysis id ', analysisID, ' ', analysisName)
   })
@@ -1141,17 +1141,17 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonanarefreshlogs", {
     .reloadAnaRunLog()
   })
-
-  # Updates dependent on changed: dt_analysis_rows_selected --------------------
+  
+  # Updates dependent on changed: dt_analyses_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
-  observeEvent(input$dt_analysis_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
-      logMessage(paste("input$dt_analysis_rows_selected is changed to:", input$dt_analysis_rows_selected))
+      logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (length(input$dt_analysis_rows_selected) > 0 && !is.null(result$tbl_analysesData)) {
-        result$anaID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
-        if (result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaStatus] == StatusFailed) {
+      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData)) {
+        result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusFailed) {
           show("panelAnalysisLogs")
           logMessage("showing analysis run log table")
         }
@@ -1278,7 +1278,7 @@ step3_configureOutput <- function(input, output, session,
     # updateTextInput(session, "tinputananame", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
 
-    modelID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.ModelID]
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
     modelID <- ifelse(modelID == "", -1,modelID)
     # if (modelID != -1) {
     #   updateSelectInput(session, "sinputeventset",
@@ -1304,7 +1304,7 @@ step3_configureOutput <- function(input, output, session,
   #Show available perils
   # To-Do: retrieve perils from model. currently showing all
   .showPerils <- function() {
-    # modelID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.ModelID]
+    # modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
     # modelID <- ifelse(modelID == "", -1,modelID)
     #
     # stmt <- buildDbQuery("getRuntimeParamList", modelID)

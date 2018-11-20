@@ -12,7 +12,7 @@
 #'
 #' @param anaIdList List of analyses and their status.
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingpage}.
-#' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
+#' @param anaID  reactive string expression for reselected run id from \link{step3_configureOutput}.
 #'
 #' @importFrom dplyr select
 #'
@@ -23,7 +23,7 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
                              user,
                             active = reactive(TRUE),
                             preselAnaId = reactive(-1),
-                            processRunId = reactive(-1),
+                            anaID  = reactive(-1),
                             logMessage = message) {
 
   ns <- session$ns
@@ -60,7 +60,7 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     dbSettings = dbSettings,
     user = reactive(user()),
     preselAnaId = preselAnaId,
-    processRunId =  processRunId,
+    anaID =  anaID,
     logMessage = logMessage)
 
   sub_modules$defineID2 <- callModule(
@@ -69,7 +69,7 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     dbSettings = dbSettings,
     user = reactive(user()),
     preselAnaId = preselAnaId,
-    processRunId =  processRunId,
+    anaID =  anaID,
     logMessage = logMessage)
 
 

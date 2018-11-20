@@ -8,8 +8,8 @@
 defineIDUI(id, w, batch = FALSE)
 
 defineID(input, output, session, dbSettings, user,
-  preselAnaId = reactive(-1), processRunId = reactive(-1),
-  batch = FALSE, logMessage = message)
+  preselAnaId = reactive(-1), anaID = reactive(-1), batch = FALSE,
+  logMessage = message)
 }
 \arguments{
 \item{id}{module id}
@@ -30,7 +30,7 @@ defineID(input, output, session, dbSettings, user,
 
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
 
-\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+\item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{logMessage}{function that will be passed info messages.}
 

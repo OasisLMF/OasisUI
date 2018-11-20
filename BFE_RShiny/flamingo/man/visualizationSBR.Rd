@@ -8,7 +8,7 @@
 \usage{
 visualizationSBR(input, output, session, dbSettings, apiSettings, user,
   anaIdList = reactive(c(-1)), preselAnaId = reactive(-1),
-  processRunId = reactive(-1), active = reactive(TRUE),
+  anaID = reactive(-1), active = reactive(TRUE),
   logMessage = message)
 
 visualizationSBRUI(id)
@@ -30,7 +30,7 @@ visualizationSBRUI(id)
 
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
 
-\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+\item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

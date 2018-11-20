@@ -13,7 +13,7 @@
 #' @param preselPanel selectedstep to visualize as returned from either
 #'  \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}
 #'
-#' @return processRunId selected process run ID
+#' @return anaID  selected analysis ID
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
@@ -205,12 +205,12 @@ singleAna <- function(input, output, session, dbSettings,
     }
     result$pfstatus <- pfstatus
   })
-
+  
   # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      processRunId = reactive(result$anaID)
+      anaID  = reactive(result$anaID)
     )
   )
 

@@ -62,17 +62,20 @@ defineIDUI <- function(id, w, batch = FALSE){
 #' @template params-flamingo-module
 #'
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingpage}.
-#' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
+#' @param anaID reactive string expression for reselected run id from \link{step3_configureOutput}.
 #'
 #' @param batch Flag indicating if it is a batch or a simple analysis.
 #'
 #' @return selectAnaID reactive for anaID selected.
+#' 
+#' @importFrom dplyr sym
+#' @importFrom dplyr filter
 #'
 #' @export
 defineID <- function(input, output, session,
                      dbSettings, user,
                      preselAnaId = reactive(-1),
-                     processRunId = reactive(-1),
+                     anaID = reactive(-1),
                      batch = FALSE,
                      logMessage = message) {
 
@@ -80,11 +83,11 @@ defineID <- function(input, output, session,
 
   # Reactive Values and parameters ---------------------------------------------
   result <- reactiveValues(
-    inbox = NULL,
+    tbl_analysesData = NULL,
     selectAnaID = "",
     selectAnaName = "",
     LProw = NULL,
-    PRrow = NULL,
+    SArow = NULL,
     preselRow = NULL
   )
 
@@ -103,30 +106,29 @@ defineID <- function(input, output, session,
   AnaList <- modalDialog(
     easyClose = TRUE,
     size = "l",
-    flamingoTableUI(ns("tableInboxpanel")),
+    flamingoTableUI(ns("dt_analyses")),
     footer = tagList(
       flamingoButton(ns("abuttonselectAna"),
                      label = "Select Analysis", align = "left"),
-      actionButton(ns("abuttonccancel"),
+      actionButton(ns("abuttoncancel"),
                    label = "Cancel", align = "right")
     )
   )
 
   # > open modal
   observeEvent(input$chooseAnaID, {
-    data <- getInboxData(dbSettings, user())
-    result$inbox <- data  %>%
-      replaceWithIcons() %>%
-      filter(Status == StatusCompleted)
+    tbl_analysesData  <- return_tbl_analysesData()
+    result$tbl_analysesData <- tbl_analysesData  %>%
+      filter(!! sym(tbl_analysesData.AnaStatus) == StatusCompleted)
     showModal(AnaList)
   })
 
 
   # > modal content
-  sub_modules$tableInboxpanel <- callModule(
+  sub_modules$dt_analyses <- callModule(
     flamingoTable,
-    id = "tableInboxpanel",
-    data = reactive(result$inbox),
+    id = "dt_analyses",
+    data = reactive(result$tbl_analysesData),
     selection = "single",
     escape = FALSE,
     scrollX = TRUE,
@@ -142,9 +144,8 @@ defineID <- function(input, output, session,
   #Find row of anaid preselected in landing page
   observeEvent({
     preselAnaId()},{
-      idx <- which(result$inbox[, inbox.AnaID] == preselAnaId())
-      status <- result$inbox[idx,  inbox.Status]
-
+      idx <- which(result$tbl_analysesData[,tbl_analysesData.AnaID] == preselAnaId())
+      status <- result$tbl_analysesData[idx,  tbl_analysesData.AnaStatus]
       if (length(idx) > 0 && status == StatusCompleted){
         result$LProw <- idx
       }
@@ -152,23 +153,22 @@ defineID <- function(input, output, session,
 
   #Find row of anaid preselected in model analysis server step 3
   observeEvent({
-    processRunId()},{
-      idx <- which(result$inbox[, inbox.AnaID] ==  processRunId())
-      status <- result$inbox[idx,  inbox.Status]
-
+    anaID()},{
+      idx <- which(result$tbl_analysesData[, tbl_analysesData.AnaID] ==  anaID())
+      status <- result$tbl_analysesData[idx,  tbl_analysesData.AnaStatus]
       if (length(idx) > 0 && status == StatusCompleted){
-        result$PRrow <- idx
+        result$SArow <- idx
       }
     })
 
   observeEvent({
     result$LProw
-    result$PRrow
-  },ignoreNULL = FALSE, {
+    result$SArow
+  }, ignoreNULL = FALSE, {
     if (!is.null(result$LProw)) {
       result$preselRow <- result$LProw
-    } else if (!is.null(result$PRrow)) {
-      result$preselRow <- result$PRrow
+    } else if (!is.null(result$SArow)) {
+      result$preselRow <- result$SArow
     } else {
       result$preselRow <- 1
     }
@@ -176,25 +176,25 @@ defineID <- function(input, output, session,
 
 
   # > select analysis ID
-  observeEvent(sub_modules$tableInboxpanel$rows_selected(), ignoreNULL = FALSE, {
+  observeEvent(sub_modules$dt_analyses$rows_selected(), ignoreNULL = FALSE, {
     currid <- ""
     currName <- ""
-    if (!is.null(sub_modules$tableInboxpanel$rows_selected())) {
-      currid <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.AnaID]
-      currName <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.AnaName]
+    if (!is.null(sub_modules$dt_analyses$rows_selected())) {
+      currid <- result$tbl_analysesData[sub_modules$dt_analyses$rows_selected(),tbl_analysesData.AnaID]
+      currName <- result$tbl_analysesData[sub_modules$dt_analyses$rows_selected(),tbl_analysesData.AnaName]
     }
     result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
   })
 
   # > close modal
-  observeEvent(input$abuttonccancel, {
+  observeEvent(input$abuttoncancel, {
     removeModal()
   })
 
   observeEvent(input$abuttonselectAna, {
-    if (!is.null(sub_modules$tableInboxpanel$rows_selected())) {
-      result$preselRow <- sub_modules$tableInboxpanel$rows_selected()
+    if (!is.null(sub_modules$dt_analyses$rows_selected())) {
+      result$preselRow <- sub_modules$dt_analyses$rows_selected()
     }
     removeModal()
   })
@@ -216,7 +216,7 @@ defineID <- function(input, output, session,
     }
     info
   })
-
+  
   # Module Outout --------------------------------------------------------------
   selectAnaID <- reactive({ifelse(is.null(result$selectAnaID) | is.na(result$selectAnaID), "", result$selectAnaID)})
 
