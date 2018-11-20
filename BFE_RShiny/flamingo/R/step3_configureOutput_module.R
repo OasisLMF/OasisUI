@@ -802,6 +802,38 @@ step3_configureOutput <- function(input, output, session,
   })
 
   onclick("abuttoncancelana", {
+    showModal(.cancelAnaModal())
+  })
+
+  output$cancelAnaModal <- renderUI({
+    AnaId <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
+    AnaName <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaName]
+    paste0('Cancel ', AnaId, ' ', AnaName)
+  })
+
+  .cancelAnaModal <- function(){
+    ns <- session$ns
+    modalDialog(label = "cancelAnaModal",
+                title = uiOutput(ns("cancelAnaModal"), inline = TRUE),
+                paste0("Are you sure you want to cancel this analysis?"),
+                footer = tagList(
+                  flamingoButton(ns("abuttonConfirmDelAna"),
+                                 label = "Confirm", align = "center") %>%
+                    bs_embed_tooltip(title = sys_conf$abuttonConfirmDel, placement = "right"),
+                  actionButton(ns("btnCancelAnaDel"),
+                               label = "Go back", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+
+  observeEvent(input$btnCancelAnaDel, {
+    removeModal()
+  })
+
+  observeEvent(input$abuttonConfirmDelAna, {
+    removeModal()
 
     analysisID <- result$tbl_analysesData[input$dt_analysis_rows_selected, tbl_analysesData.AnaID]
     delete_analyses_id <- api_delete_analyses_id(analysisID)

@@ -368,8 +368,39 @@ step2_chooseAnalysis <- function(input, output, session,
     }
   })
 
-
   onclick("abuttoncancelIG", {
+    showModal(.cancelIGModal())
+  })
+
+  output$cancelIGModal <- renderUI({
+    AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+    AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+    paste0('Cancel ', AnaId, ' ', AnaName)
+  })
+
+  .cancelIGModal <- function(){
+    ns <- session$ns
+    modalDialog(label = "cancelIGModal",
+                title = uiOutput(ns("cancelIGModal"), inline = TRUE),
+                paste0("Are you sure you want to cancel this input generation?"),
+                footer = tagList(
+                  flamingoButton(ns("abuttonConfirmDelIG"),
+                                 label = "Confirm", align = "center") %>%
+                    bs_embed_tooltip(title = sys_conf$abuttonConfirmDel, placement = "right"),
+                  actionButton(ns("btnCancelIGDel"),
+                               label = "Go back", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+
+  observeEvent(input$btnCancelIGDel, {
+    removeModal()
+  })
+
+  observeEvent(input$abuttonConfirmDelIG, {
+    removeModal()
 
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     delete_analyses_id <- api_post_analyses_cancel_generate_inputs(analysisID)
