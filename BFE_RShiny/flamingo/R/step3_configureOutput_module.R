@@ -829,15 +829,15 @@ step3_configureOutput <- function(input, output, session,
 
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     #should use /v1/analyses/{id}/cancel/
-    delete_analyses_id <- api_delete_analyses_id(analysisID)
+    delete_analyses_id <- api_post_analyses_cancel(analysisID)
 
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
-                           paste("Analysis id ", analysisID, " deleted."))
+                           paste0("Analysis id ", analysisID, " cancelled."))
       .reloadAnaData()
     } else {
       flamingoNotification(type = "error",
-                           paste("Analysis id ", analysisID, " could not be deleted."))
+                           paste0("Error in cancelling analysis ", result$anaID, ". Analysis is not running."))
     }
 
   })
@@ -1141,7 +1141,7 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonanarefreshlogs", {
     .reloadAnaRunLog()
   })
-  
+
   # Updates dependent on changed: dt_analyses_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {

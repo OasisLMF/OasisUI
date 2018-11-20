@@ -87,7 +87,55 @@ api_post_analyses_input_file <- function(id, filepath_input) {
   )
 }
 
-# Settings File -----------------------------------------------------------------
+# Cancel analysis --------------------------------------------------------------
+
+#' Cancel analysis
+#'
+#' Cancel the selected analysis.
+#'
+#' @rdname api_post_analyses_cancel
+#'
+#' @param id a unique integer value identifying this analysis.
+#'
+#' @return the cancelled analysis.
+#'
+#' @importFrom httr POST
+#' @importFrom httr add_headers
+#' @importFrom httr warn_for_status
+#' @importFrom httr http_status
+#' @importFrom httr upload_file
+#'
+#' @export
+api_post_analyses_cancel <- function(id) {
+
+  response <- POST(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())
+    ),
+    body = list(id = id),
+    encode = "multipart",
+    path = paste(get_version(), "analyses", id, "cancel", "", sep = "/")
+  )
+
+  logWarning = warning
+
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
+
+# Settings File ----------------------------------------------------------------
 #' Get analysis settings file
 #'
 #' Gets the analysis settings_file contents
