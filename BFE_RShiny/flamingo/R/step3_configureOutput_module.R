@@ -795,17 +795,15 @@ step3_configureOutput <- function(input, output, session,
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis id ", analysisID, " cancelled."))
+      .reloadAnaData()
+      idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesData.AnaID])
+      pageSel <- ceiling(idxSel/pageLength)
+      selectRows(dataTableProxy("dt_analyses"), idxSel)
+      selectPage(dataTableProxy("dt_analyses"), pageSel)
     } else {
       flamingoNotification(type = "error",
                            paste0("Error in cancelling analysis ", result$anaID, ". Analysis is not running."))
     }
-
-    .reloadAnaData()
-    idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesData.AnaID])
-    pageSel <- ceiling(idxSel/pageLength)
-    selectRows(dataTableProxy("dt_analyses"), idxSel)
-    selectPage(dataTableProxy("dt_analyses"), pageSel)
-
 
   })
 
@@ -1092,13 +1090,12 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "error",
                            paste0("Error in executing analysis ", result$anaID, " status: ", analyses_run$detail ))
     }
-    .reloadAnaData()
-    hide("panelDefineOutputs")
-    .defaultview(session)
-
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesData.AnaID])
     pageSel <- ceiling(idxSel/pageLength)
+    .reloadAnaData()
+    hide("panelDefineOutputs")
+    .defaultview(session)
     selectRows(dataTableProxy("dt_analyses"), idxSel)
     selectPage(dataTableProxy("dt_analyses"), pageSel)
 
