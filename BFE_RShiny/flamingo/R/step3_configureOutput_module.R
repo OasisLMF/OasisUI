@@ -753,45 +753,6 @@ step3_configureOutput <- function(input, output, session,
 
   })
 
-
-  # Configure Output -----------------------------------------------------------
-  # hide panel
-  onclick("abuttonhidepanelconfigureoutput", {
-    hide("panelDefineOutputs")
-  })
-
-  # configuration title
-  output$paneltitle_defAnaConfigOutput <- renderUI({
-    if (result$ana_flag  == "R") {
-      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
-      analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
-      analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
-      paste0('Re-Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
-    } else {
-      "New Output Configuration"
-    }
-  })
-
-  #Show Output Configuration Panel
-  onclick("abuttonconfigoutput", {
-    .defaultview(session)
-    hide("panelAnalysisLogs")
-    show("panelDefineOutputs")
-    .showPerils()
-    logMessage("showing panelDefineOutputs")
-    result$ana_flag <- "C"
-  })
-
-  onclick("abuttonrerunana", {
-    .defaultview(session)
-    hide("panelAnalysisLogs")
-    show("panelDefineOutputs")
-    .showPerils()
-    logMessage("showing panelDefineOutputs")
-    result$ana_flag <- "R"
-    .updateOutputConfig()
-  })
-
   # Delete analysis button -----------------------------------------------------
   onclick("abuttoncancelana", {
     showModal(.cancelAnaModal())
@@ -834,12 +795,56 @@ step3_configureOutput <- function(input, output, session,
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis id ", analysisID, " cancelled."))
-      .reloadAnaData()
     } else {
       flamingoNotification(type = "error",
                            paste0("Error in cancelling analysis ", result$anaID, ". Analysis is not running."))
     }
 
+    .reloadAnaData()
+    idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesData.AnaID])
+    pageSel <- ceiling(idxSel/pageLength)
+    selectRows(dataTableProxy("dt_analyses"), idxSel)
+    selectPage(dataTableProxy("dt_analyses"), pageSel)
+
+
+  })
+
+  # Configure Output -----------------------------------------------------------
+  # hide panel
+  onclick("abuttonhidepanelconfigureoutput", {
+    hide("panelDefineOutputs")
+  })
+
+  # configuration title
+  output$paneltitle_defAnaConfigOutput <- renderUI({
+    if (result$ana_flag  == "R") {
+      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+      analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+      analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
+      paste0('Re-Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
+    } else {
+      "New Output Configuration"
+    }
+  })
+
+  #Show Output Configuration Panel
+  onclick("abuttonconfigoutput", {
+    .defaultview(session)
+    hide("panelAnalysisLogs")
+    show("panelDefineOutputs")
+    .showPerils()
+    logMessage("showing panelDefineOutputs")
+    result$ana_flag <- "C"
+  })
+
+  onclick("abuttonrerunana", {
+    .defaultview(session)
+    hide("panelAnalysisLogs")
+    show("panelDefineOutputs")
+    .showPerils()
+    logMessage("showing panelDefineOutputs")
+    result$ana_flag <- "R"
+    .updateOutputConfig()
   })
 
   # Hide Output Configuration panel
@@ -1090,6 +1095,13 @@ step3_configureOutput <- function(input, output, session,
     .reloadAnaData()
     hide("panelDefineOutputs")
     .defaultview(session)
+
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+    idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesData.AnaID])
+    pageSel <- ceiling(idxSel/pageLength)
+    selectRows(dataTableProxy("dt_analyses"), idxSel)
+    selectPage(dataTableProxy("dt_analyses"), pageSel)
+
   })
 
   # Logs -----------------------------------------------------------------------
@@ -1331,7 +1343,7 @@ step3_configureOutput <- function(input, output, session,
     analyses_settings <- return_analyses_settings_file_list(result$anaID)
     number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]]
     updateTextInput(session, "tinputnoofsample", value = number_of_samples)
-    gul_threshold <- analysis_settings[["analysis_settings"]][["gul_threshold"]]
+    gul_threshold <- analyses_settings[["analysis_settings"]][["gul_threshold"]]
     updateTextInput(session, "tinputthreshold", value = gul_threshold)
     event_set <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_set"]]
     updateSelectInput(session, "sinputeventocc", selected = event_set)

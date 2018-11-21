@@ -284,6 +284,7 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
   # Analyses  Table ------------------------------------------------------------
+
   output$dt_analyses <- renderDT(
 
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
@@ -294,7 +295,7 @@ step2_chooseAnalysis <- function(input, output, session,
         class = "flamingo-table display",
         rownames = TRUE,
         selection = list(mode = 'single',
-                         selected = rownames(result$tbl_analysesData)[c(as.integer(index))]),
+			                   selected = rownames(result$tbl_analysesData)[c(as.integer(index))]),
         escape = FALSE,
         colnames = c('Row Number' = 1),
         filter = 'bottom',
@@ -334,7 +335,7 @@ step2_chooseAnalysis <- function(input, output, session,
   onclick("abuttonstartIG", {
 
     input_generation_id <- api_post_analyses_generate_inputs(result$analysisID)
-    
+
     if (input_generation_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste("Input generation id ", result$analysisID, " started."))
@@ -342,21 +343,25 @@ step2_chooseAnalysis <- function(input, output, session,
       flamingoNotification(type = "error",
                            paste("Input generation id ", result$analysisID, " could not be started."))
     }
+    anaid <- result$analysisID
     .reloadAnaData()
-    #need part to reselect previously selected row.
+    idxSel <- match(anaid, result$tbl_analysesData[, tbl_analysesData.AnaID])
+    pageSel <- ceiling(idxSel/pageLength)
+    selectRows(dataTableProxy("dt_analyses"), idxSel)
+    selectPage(dataTableProxy("dt_analyses"), pageSel)
   })
-  
-  
+
+
   onclick("abuttoncancelIG", {
     showModal(.cancelIGModal())
   })
-  
+
   output$cancelIGModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
     paste0('Cancel ', AnaId, ' ', AnaName)
   })
-  
+
   .cancelIGModal <- function(){
     ns <- session$ns
     modalDialog(label = "cancelIGModaltitle",
@@ -373,28 +378,34 @@ step2_chooseAnalysis <- function(input, output, session,
                 easyClose = TRUE
     )
   }
-  
+
   observeEvent(input$btnCancelIGDel, {
     removeModal()
   })
-  
+
   observeEvent(input$abuttonConfirmDelIG, {
     removeModal()
-    
+
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     delete_analyses_id <- api_post_analyses_cancel_generate_inputs(analysisID)
-    
+
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste("Cancelled Input Generation for analysis id ", analysisID, "."))
-      .reloadAnaData()
     } else {
       flamingoNotification(type = "error",
-                           paste("Input Generation id ", analysisID, " could not be deleted."))
+                           paste("Input Generation id ", analysisID, " could not be cancelled."))
     }
-    
+
+    anaid <- result$analysisID
+    .reloadAnaData()
+    idxSel <- match(anaid, result$tbl_analysesData[, tbl_analysesData.AnaID])
+    pageSel <- ceiling(idxSel/pageLength)
+    selectRows(dataTableProxy("dt_analyses"), idxSel)
+    selectPage(dataTableProxy("dt_analyses"), pageSel)
+
   })
-  
+
   # Analysis detais ------------------------------------------------------------
   onclick("abuttonshowanadetails", {
     hide("panelAnalysisLog")
@@ -480,297 +491,297 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
 
-# Model Table ----------------------------------------------------------------
+  # Model Table ----------------------------------------------------------------
 
-onclick("abuttoncreateana", {
-  hide("panelAnalysisDetails")
-  hide("panelAnalysisLog")
-  #hide("panelModelDetails")
-  logMessage("showing panelModelTable")
-  show("panelModelTable")
-  .reloadtbl_modelsData()
-  .clearinputanaName()
-})
+  onclick("abuttoncreateana", {
+    hide("panelAnalysisDetails")
+    hide("panelAnalysisLog")
+    #hide("panelModelDetails")
+    logMessage("showing panelModelTable")
+    show("panelModelTable")
+    .reloadtbl_modelsData()
+    .clearinputanaName()
+  })
 
-onclick("buttonhidemodel", {
-  hide("panelModelTable")
-})
+  onclick("buttonhidemodel", {
+    hide("panelModelTable")
+  })
 
-output$dt_models <- renderDT(
-  if (!is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0 ) {
-    logMessage("re-rendering model table")
-    datatable(
-      result$tbl_modelsData,
-      class = "flamingo-table display",
-      rownames = TRUE,
-      filter = "none",
-      escape = FALSE,
-      selection = list(mode = 'single',
-                       selected = rownames(result$tbl_modelsData)[1]),
-      colnames = c('Row Number' = 1),
-      options = .getPRTableOptions()
-    )
-  } else {
-    .nothingToShowTable(contentMessage = paste0("no Models associated with Portfolio ID ", result$portfolioID))
-  }
-)
+  output$dt_models <- renderDT(
+    if (!is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0 ) {
+      logMessage("re-rendering model table")
+      datatable(
+        result$tbl_modelsData,
+        class = "flamingo-table display",
+        rownames = TRUE,
+        filter = "none",
+        escape = FALSE,
+        selection = list(mode = 'single',
+                         selected = rownames(result$tbl_modelsData)[1]),
+        colnames = c('Row Number' = 1),
+        options = .getPRTableOptions()
+      )
+    } else {
+      .nothingToShowTable(contentMessage = paste0("no Models associated with Portfolio ID ", result$portfolioID))
+    }
+  )
 
-# Model Table title
-output$paneltitle_ModelTable <- renderUI({
-  if (result$portfolioID != "") {
-    pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
-    paste0('Pick a model to associate with portfolio id ', toString(result$portfolioID), ' ', pfName)
-  } else {
-    paste0("List of Models")
-  }
-})
+  # Model Table title
+  output$paneltitle_ModelTable <- renderUI({
+    if (result$portfolioID != "") {
+      pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
+      paste0('Pick a model to associate with portfolio id ', toString(result$portfolioID), ' ', pfName)
+    } else {
+      paste0("List of Models")
+    }
+  })
 
-# Model Details Table --------------------------------------------------------
+  # Model Details Table --------------------------------------------------------
 
-# # Show/hide Model Details Panel
-# onclick("abuttonmodeldetails", {
-# hide("panelAnalysisDetails")
-# hide("panelAnalysisLog")
-#   logMessage("showing panelModelDetails")
-#   .reloadtbl_modelsDetails()
-#   show("panelModelDetails")
-#   logMessage("showing panelModelDetails")
-# })
+  # # Show/hide Model Details Panel
+  # onclick("abuttonmodeldetails", {
+  # hide("panelAnalysisDetails")
+  # hide("panelAnalysisLog")
+  #   logMessage("showing panelModelDetails")
+  #   .reloadtbl_modelsDetails()
+  #   show("panelModelDetails")
+  #   logMessage("showing panelModelDetails")
+  # })
 
-# onclick("buttonhidemodeldetails", {
-#   hide("panelModelDetails")
-#   logMessage("hiding panelModelDetails")
-# })
+  # onclick("buttonhidemodeldetails", {
+  #   hide("panelModelDetails")
+  #   logMessage("hiding panelModelDetails")
+  # })
 
-# output$dt_modelDetails <- renderDT(
-#   if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
-#     logMessage("re-rendering model details table")
-#     datatable(
-#       result$tbl_modelsDetails,
-#       class = "flamingo-table display",
-#       rownames = TRUE,
-#       filter = "none",
-#       escape = FALSE,
-#       selection = "none",
-#       colnames = c('Row Number' = 1),
-#       options = .getPRTableOptions()
-#     )
-#   } else {
-#     .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$modelID ))
-#   })
+  # output$dt_modelDetails <- renderDT(
+  #   if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
+  #     logMessage("re-rendering model details table")
+  #     datatable(
+  #       result$tbl_modelsDetails,
+  #       class = "flamingo-table display",
+  #       rownames = TRUE,
+  #       filter = "none",
+  #       escape = FALSE,
+  #       selection = "none",
+  #       colnames = c('Row Number' = 1),
+  #       options = .getPRTableOptions()
+  #     )
+  #   } else {
+  #     .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$modelID ))
+  #   })
 
-# # Details Model title
-# output$paneltitle_ModelDetails <- renderUI({
-#   modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ModelId]
-#   paste0('Details of Model Association id ', modelId)
-# })
+  # # Details Model title
+  # output$paneltitle_ModelDetails <- renderUI({
+  #   modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ModelId]
+  #   paste0('Details of Model Association id ', modelId)
+  # })
 
-# Create new Analysis --------------------------------------------------------
+  # Create new Analysis --------------------------------------------------------
 
-onclick("abuttonsubmit", {
-  if (input$anaName != "") {
-    modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
-    post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID,
-                                                                           name = input$anaName,
-                                                                           model = modelID)
-    logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID, " name ", input$anaName, " model ",  modelID))
-    if (post_portfolios_create_analysis$status == "Success") {
-      flamingoNotification(type = "message",
-                           paste("New analysis ", input$anaName, " created."))
-      .reloadAnaData()
+  onclick("abuttonsubmit", {
+    if (input$anaName != "") {
+      modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
+      post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID,
+                                                                             name = input$anaName,
+                                                                             model = modelID)
+      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID, " name ", input$anaName, " model ",  modelID))
+      if (post_portfolios_create_analysis$status == "Success") {
+        flamingoNotification(type = "message",
+                             paste("New analysis ", input$anaName, " created."))
+        .reloadAnaData()
+      } else {
+        flamingoNotification(type = "error",
+                             paste("Analysis ", input$anaName, " not created."))
+      }
     } else {
       flamingoNotification(type = "error",
-                           paste("Analysis ", input$anaName, " not created."))
+                           paste("Provide name for analysis creation."))
     }
-  } else {
-    flamingoNotification(type = "error",
-                         paste("Provide name for analysis creation."))
-  }
-  hide("panelModelTable")
-})
+    hide("panelModelTable")
+  })
 
-# Enable and disable buttons -------------------------------------------------
-observeEvent({
-  result$tbl_analysesData
-  input$dt_analyses_rows_selected
-  result$tbl_modelsData
-  input$dt_models_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    disable("abuttonshowlog")
-    disable("abuttonshowanadetails")
-    disable("abuttondelana")
-    disable("abuttoncancelIG")
-    disable("abuttonstartIG")
-    # disable("abuttonmodeldetails")
-    disable("abuttonpgotonextstep")
-    if (length(input$dt_models_rows_selected) > 0) {
-      # enable("abuttonmodeldetails")
-    }
-    if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
-      enable("abuttonshowanadetails")
-      enable("abuttonshowlog")
-      enable("abuttondelana")
-      enable("abuttoncancelIG")
-      enable("abuttonstartIG")
-      if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusReady) {
-        enable("abuttonpgotonextstep")
+  # Enable and disable buttons -------------------------------------------------
+  observeEvent({
+    result$tbl_analysesData
+    input$dt_analyses_rows_selected
+    result$tbl_modelsData
+    input$dt_models_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      disable("abuttonshowlog")
+      disable("abuttonshowanadetails")
+      disable("abuttondelana")
+      disable("abuttoncancelIG")
+      disable("abuttonstartIG")
+      # disable("abuttonmodeldetails")
+      disable("abuttonpgotonextstep")
+      if (length(input$dt_models_rows_selected) > 0) {
+        # enable("abuttonmodeldetails")
       }
-    }
+      if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
+        enable("abuttonshowanadetails")
+        enable("abuttonshowlog")
+        enable("abuttondelana")
+        enable("abuttoncancelIG")
+        enable("abuttonstartIG")
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusReady) {
+          enable("abuttonpgotonextstep")
+        }
+      }
+    })
+
+  #Not allowed creation of an analysis for an incomplete portfolio
+  observeEvent({
+    result$portfolioID
+    pfstatus()}, {
+      if (pfstatus() == "- Status: Completed") {
+        enable("abuttoncreateana")
+      } else {
+        disable("abuttoncreateana")
+      }
+    })
+  # Refresh Buttons ------------------------------------------------------------
+  onclick("abuttonanarefresh", {
+    .reloadAnaData()
+  } )
+
+  onclick("abuttonanadetailsrefresh", {
+    .reloadAnaDetails()
   })
 
-#Not allowed creation of an analysis for an incomplete portfolio
-observeEvent({
-  result$portfolioID
-  pfstatus()}, {
-    if (pfstatus() == "- Status: Completed") {
-      enable("abuttoncreateana")
+  onclick("abuttonanalogrefresh", {
+    .reloadAnaLog()
+  })
+
+  onclick("abuttonmodelrefresh", {
+    .reloadtbl_modelsData()
+  } )
+
+  # onclick("abuttonmodeldetailrfsh", {
+  #   .reloadtbl_modelsDetails()
+  # } )
+
+  # Help Functions -------------------------------------------------------------
+  # hide all panels
+  .hideDivs <- function() {
+    logMessage(".hideDivs called")
+    #Section "Choose Analysis" = "2"
+    hide("panelCreateAnalysesTable")
+    hide("panelAnalysisDetails")
+    hide("panelAnalysisLog")
+    hide("panelModelTable")
+    #hide("panelModelDetails")
+  }
+
+  #show default view for Section "Choose Analysis" = "2"
+  .defaultAssociateModel <- function(){
+    logMessage(".defaultAssociateModel called")
+    show("panelCreateAnalysesTable")
+  }
+
+  # Reload Analysis table
+  .reloadAnaData <- function() {
+    logMessage(".reloadAnaData called")
+    if (result$portfolioID  != "") {
+      tbl_analysesData  <- return_tbl_analysesData()
+      if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
+        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesData.PortfolioID) == result$portfolioID)
+      }
+      logMessage("analyses table refreshed")
+    }  else {
+      result$tbl_analysesData <- NULL
+    }
+    invisible()
+  }
+
+  #clear text input
+  .clearinputanaName <- function(){
+    updateTextInput(session = session, inputId = "anaName", value = "")
+  }
+
+
+  # Reload Analysis Details table
+  .reloadAnaDetails <- function() {
+    logMessage(".reloadAnaDetails called")
+    if (!is.null(result$analysisID) && result$analysisID != "") {
+      result$tbl_analysisdetails <- return_tbl_analysisdetails(result$analysisID)
     } else {
-      disable("abuttoncreateana")
+      result$tbl_analysisdetails <-  NULL
     }
-  })
-# Refresh Buttons ------------------------------------------------------------
-onclick("abuttonanarefresh", {
-  .reloadAnaData()
-} )
+  }
 
-onclick("abuttonanadetailsrefresh", {
-  .reloadAnaDetails()
-})
-
-onclick("abuttonanalogrefresh", {
-  .reloadAnaLog()
-})
-
-onclick("abuttonmodelrefresh", {
-  .reloadtbl_modelsData()
-} )
-
-# onclick("abuttonmodeldetailrfsh", {
-#   .reloadtbl_modelsDetails()
-# } )
-
-# Help Functions -------------------------------------------------------------
-# hide all panels
-.hideDivs <- function() {
-  logMessage(".hideDivs called")
-  #Section "Choose Analysis" = "2"
-  hide("panelCreateAnalysesTable")
-  hide("panelAnalysisDetails")
-  hide("panelAnalysisLog")
-  hide("panelModelTable")
-  #hide("panelModelDetails")
-}
-
-#show default view for Section "Choose Analysis" = "2"
-.defaultAssociateModel <- function(){
-  logMessage(".defaultAssociateModel called")
-  show("panelCreateAnalysesTable")
-}
-
-# Reload Analysis table
-.reloadAnaData <- function() {
-  logMessage(".reloadAnaData called")
-  if (result$portfolioID  != "") {
-    tbl_analysesData  <- return_tbl_analysesData()
-    if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
-      result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesData.PortfolioID) == result$portfolioID)
+  # Reload Analysis Log table
+  .reloadAnaLog <- function() {
+    logMessage(".reloadAnaLog called")
+    if (!is.null(result$analysisID) && result$analysisID != "") {
+      result$tbl_analysislog <- return_input_generation_traceback_file_df(result$analysisID)
+    } else {
+      result$tbl_analysislog <-  NULL
     }
-    logMessage("analyses table refreshed")
-  }  else {
-    result$tbl_analysesData <- NULL
   }
-  invisible()
-}
 
-#clear text input
-.clearinputanaName <- function(){
-  updateTextInput(session = session, inputId = "anaName", value = "")
-}
-
-
-# Reload Analysis Details table
-.reloadAnaDetails <- function() {
-  logMessage(".reloadAnaDetails called")
-  if (!is.null(result$analysisID) && result$analysisID != "") {
-    result$tbl_analysisdetails <- return_tbl_analysisdetails(result$analysisID)
-  } else {
-    result$tbl_analysisdetails <-  NULL
+  # Reload Programme Model table
+  .reloadtbl_modelsData <- function() {
+    logMessage(".reloadtbl_modelsData called")
+    if (result$portfolioID != "") {
+      result$tbl_modelsData <- return_tbl_modelsData()
+      logMessage("models table refreshed")
+    } else {
+      result$tbl_modelsData <- NULL
+    }
+    invisible()
   }
-}
 
-# Reload Analysis Log table
-.reloadAnaLog <- function() {
-  logMessage(".reloadAnaLog called")
-  if (!is.null(result$analysisID) && result$analysisID != "") {
-    result$tbl_analysislog <- return_input_generation_traceback_file_df(result$analysisID)
-  } else {
-    result$tbl_analysislog <-  NULL
+  # # Reload Programme Model Details table
+  # .reloadtbl_modelsDetails <- function() {
+  #   logMessage(".reloadtbl_modelsDetails called")
+  #   if (length(input$dt_models_rows_selected) > 0) {
+  #     prgId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
+  #     stmt <- buildDbQuery("getProgOasisFileDetails", prgId)
+  #     tbl_modelsDetails <- executeDbQuery(dbSettings, stmt)
+  #     if (!is.null(tbl_modelsDetails)) {
+  #       result$tbl_modelsDetails <-  tbl_modelsDetails %>%
+  #         replaceWithIcons()
+  #     }
+  #     logMessage("files table refreshed")
+  #   } else {
+  #     result$tbl_modelsDetails <- NULL
+  #   }
+  #   invisible()
+  # }
+
+  # table settings for pr tab: returns option list for datatable
+  .getPRTableOptions <- function(pageLengthVal = pageLength) {
+    options <- list(
+      search = list(caseInsensitive = TRUE),
+      searchHighlight = TRUE,
+      processing = 0,
+      pageLength = pageLengthVal,
+      columnDefs = list(list(visible = FALSE, targets = 0)))
+    return(options)
   }
-}
 
-# Reload Programme Model table
-.reloadtbl_modelsData <- function() {
-  logMessage(".reloadtbl_modelsData called")
-  if (result$portfolioID != "") {
-    result$tbl_modelsData <- return_tbl_modelsData()
-    logMessage("models table refreshed")
-  } else {
-    result$tbl_modelsData <- NULL
+  #empty table
+  .nothingToShowTable <- function(contentMessage){
+    datatable(
+      data.frame(content = contentMessage),
+      class = "flamingo-table display",
+      selection = "none",
+      rownames = FALSE,
+      #filter = 'bottom',
+      colnames = c(""),
+      escape = FALSE,
+      options = list(searchHighlight = TRUE)
+    )
   }
-  invisible()
-}
 
-# # Reload Programme Model Details table
-# .reloadtbl_modelsDetails <- function() {
-#   logMessage(".reloadtbl_modelsDetails called")
-#   if (length(input$dt_models_rows_selected) > 0) {
-#     prgId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
-#     stmt <- buildDbQuery("getProgOasisFileDetails", prgId)
-#     tbl_modelsDetails <- executeDbQuery(dbSettings, stmt)
-#     if (!is.null(tbl_modelsDetails)) {
-#       result$tbl_modelsDetails <-  tbl_modelsDetails %>%
-#         replaceWithIcons()
-#     }
-#     logMessage("files table refreshed")
-#   } else {
-#     result$tbl_modelsDetails <- NULL
-#   }
-#   invisible()
-# }
+  # Model Outout ---------------------------------------------------------------
 
-# table settings for pr tab: returns option list for datatable
-.getPRTableOptions <- function(pageLengthVal = pageLength) {
-  options <- list(
-    search = list(caseInsensitive = TRUE),
-    searchHighlight = TRUE,
-    processing = 0,
-    pageLength = pageLengthVal,
-    columnDefs = list(list(visible = FALSE, targets = 0)))
-  return(options)
-}
-
-#empty table
-.nothingToShowTable <- function(contentMessage){
-  datatable(
-    data.frame(content = contentMessage),
-    class = "flamingo-table display",
-    selection = "none",
-    rownames = FALSE,
-    #filter = 'bottom',
-    colnames = c(""),
-    escape = FALSE,
-    options = list(searchHighlight = TRUE)
+  moduleOutput <- c(
+    list(
+      analysisID = reactive({result$analysisID}),
+      newstep = reactive({input$abuttonpgotonextstep})
+    )
   )
-}
 
-# Model Outout ---------------------------------------------------------------
-
-moduleOutput <- c(
-  list(
-    analysisID = reactive({result$analysisID}),
-    newstep = reactive({input$abuttonpgotonextstep})
-  )
-)
-
-moduleOutput
+  moduleOutput
 
 }
