@@ -61,6 +61,19 @@ get_token <- function() {
   getOption("flamingo.settings.api.token")
 }
 
+#' Get access token
+#'
+#' Gets access token.
+#'
+#' @rdname get_access_token
+#'
+#' @return Access token.
+#'
+#' @export
+get_access_token <- function() {
+  getOption("flamingo.settings.api.refresh")
+}
+
 #' Get http type
 #'
 #' @rdname get_http_type
@@ -101,6 +114,47 @@ api_refresh_token <- function(user, pwd) {
     body = list(username = user, password = pwd),
     encode = "json",
     path = "refresh_token/"
+  )
+
+  logWarning = warning
+
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
+#' Post access token
+#'
+#' Fetches a new access token from a username and password.
+#'
+#' @rdname api_access_token
+#'
+#' @return Response containing the new token.
+#'
+#' @importFrom httr POST
+#' @importFrom httr add_headers
+#' @importFrom httr warn_for_status
+#' @importFrom httr http_status
+#'
+#' @export
+api_access_token <- function() {
+
+  response <- POST(
+    get_url(),
+    config = add_headers(
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_access_token())
+    ),
+    encode = "json",
+    path = "access_token/"
   )
 
   logWarning = warning

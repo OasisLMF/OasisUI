@@ -15,7 +15,7 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #' @rdname loginDialog
 #'
 #' @description Server logic to login an user.
-#' 
+#'
 #'@template params-module
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
@@ -57,6 +57,7 @@ loginDialog <- function(input, output, session, dbSettings, logout,
         result$user <- 1 #TODO for now, this is a workaround
         #result$user <- user # for later
         options(flamingo.settings.api.token = content(res$result)$access_token)
+        options(flamingo.settings.api.refresh = content(res$result)$refresh_token)
       } else {
         options(flamingo.settings.api.token = NULL)
         flamingoNotification("Login Failed, please check your credentials.",
