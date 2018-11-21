@@ -9,7 +9,7 @@ visualizationCBR}
 \usage{
 visualizationCBR(input, output, session, dbSettings, apiSettings, user,
   active = reactive(TRUE), preselAnaId = reactive(-1),
-  processRunId = reactive(-1), logMessage = message)
+  anaID = reactive(-1), logMessage = message)
 
 visualizationCBRUI(id)
 }
@@ -30,7 +30,7 @@ visualizationCBRUI(id)
 
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
 
-\item{processRunId}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
+\item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{logMessage}{function that will be passed info messages.}
 

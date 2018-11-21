@@ -44,7 +44,7 @@ singleAnaUI(id)
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-processRunId selected process run ID
+anaID  selected analysis ID
 
 List of tags.
 }
