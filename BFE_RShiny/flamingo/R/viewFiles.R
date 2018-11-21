@@ -171,7 +171,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   )
 
   output$FLTdownloadexcel <- downloadHandler(
-    filename = "dt_outputFL.csv",
+    filename = "outputFL.csv",
     content = function(file) {
       write.csv(result$filesListData, file)
     }
@@ -256,7 +256,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         downloadButton(ns("FVEdownloadexcel"), label = "Export to csv"),
         style = "inline:true"),
       hidden(flamingoPanel(
-        id = ns("flamingoPaneldt_FVExposureSelected"),
+        id = ns("flamingoPaneltableFVExposureSelected"),
         collapsible = FALSE,
         heading =  tagAppendChildren(
           h4("File Content"),
@@ -276,11 +276,11 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
 
   # Panel View Content
   observeEvent(input$buttonhidedt_FVExposureSelected, {
-    hide("flamingoPaneldt_FVExposureSelected")
+    hide("flamingoPaneltableFVExposureSelected")
   })
 
   onclick("abuttonview", {
-    show("flamingoPaneldt_FVExposureSelected")
+    show("flamingoPaneltableFVExposureSelected")
   })
 
   # Exposure table

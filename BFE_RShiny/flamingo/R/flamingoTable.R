@@ -16,7 +16,7 @@
 flamingoTableUI <-  function(id){
   ns <- NS(id)
   tagList(
-    DTOutput(ns("tbl_flamingoTable"))
+    DTOutput(ns("st_flamingoTable"))
   )
 }
 
@@ -71,17 +71,17 @@ flamingoTable <- function(input, output, session,
 
   ns <- session$ns
 
-    output$tbl_flamingoTable <- renderDT({
+    output$dt_flamingoTable <- renderDT({
 
       if (!is.null(data())) {
-        data <- data()
+        tbl_flamingoTable <- data()
       } else {
-        data <- data.frame(content = "nothing to show")
+        tbl_flamingoTable <- data.frame(content = "nothing to show")
       }
 
       colnamesToUse <- ""
       if (colnames) {
-        colnamesToUse <- names(data)
+        colnamesToUse <- names(tbl_flamingoTable)
         if (rownames) {
           colnamesToUse <- c('Row Number', colnamesToUse)
         }
@@ -89,7 +89,7 @@ flamingoTable <- function(input, output, session,
 
 
       datatable(
-          data,
+        tbl_flamingoTable,
           class = "flamingo-table display",
           rownames = rownames,
           selection = list(mode = selection,
@@ -130,8 +130,8 @@ flamingoTable <- function(input, output, session,
     # Module Outout --------------------------------------------------------------
     moduleOutput <- c(
       list(
-        rows_selected = reactive({input$tbl_flamingoTable_rows_selected}),
-        rows_current = reactive({input$tbl_flamingoTable_rows_current})
+        rows_selected = reactive({input$dt_flamingoTable_rows_selected}),
+        rows_current = reactive({input$dt_flamingoTable_rows_current})
       )
     )
 }
