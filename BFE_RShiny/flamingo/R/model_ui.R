@@ -14,24 +14,24 @@
 #'
 #' @export
 modelSupplierPageUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   tagList(
-    
+
     fluidRow(
       column(12,
-             
+
              div(class = "flamingo-page-division",
                  helpText(h4("Model", class = "flamingo-table-title")),
-                 DTOutput(ns("tablemodel")),
+                 DTOutput(ns("dt_model")),
                  downloadButton(ns("Modeldownloadexcel"), label="Export to csv")
              ),
-             
+
              hidden(
                div(id = ns("divmr"), class = "flamingo-page-division",
                    h4("Model Resource", class = "flamingo-table-title"),
-                   DTOutput(ns("mrtable")),
+                   DTOutput(ns("dt_model_resource")),
                    flamingoButton(ns("abuttoncreate"), "Create",
                                   align = "left"),
                    flamingoButton(ns("abuttonamend"), "Amend",
@@ -44,9 +44,9 @@ modelSupplierPageUI <- function(id) {
                    downloadButton(ns("MRdownloadexcel"), label="Export to csv")
                )
              )
-             
+
       )
     )
   )
-  
+
 }

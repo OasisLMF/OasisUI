@@ -13,19 +13,19 @@
 #'
 #' @export
 companyDefinitionUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   tagList(
-    
+
     fluidRow(
       column(12,
              div(class = "flamingo-page-division",
-                 
+
                  helpText(h4("Company List", class = "flamingo-table-title")),
-                 
-                 DTOutput(ns("tablecompanylist")),
-                 
+
+                 DTOutput(ns("dt_companylist")),
+
                  flamingoButton(ns("abuttoncompcrt"),
                                 label = "Create", align = "left"),
                  flamingoButton(ns("abuttoncompupdate"),
@@ -37,7 +37,7 @@ companyDefinitionUI <- function(id) {
              )
       )
     )
-    
+
   )
-  
+
 }

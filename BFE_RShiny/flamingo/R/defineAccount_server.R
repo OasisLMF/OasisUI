@@ -26,29 +26,29 @@ accountDefinition <- function(input, output, session, dbSettings,
     # either "", "C" for create or "A" for amend
     accFlag = "",
     # data for account table
-    DAAccountData = NULL,
+    tbl_DAAccountData = NULL,
     # counter for account table
-    DAAccountDataCounter = 0
+    tbl_DAAccountDataCounter = 0
   )
 
-  .reloadDAAccountData <- function() {
-    result$DAAccountDataCounter <- result$DAAccountDataCounter + 1
+  .reloadtbl_DAAccountDataa <- function() {
+    result$tbl_DAAccountDataCounter <- result$tbl_DAAccountDataCounter + 1
     invisible()
   }
 
   # Account Table --------------------------------------------------------------
   observe(if (active()) {
 
-    force(result$DAAccountDataCounter)
+    force(result$tbl_DAAccountDataCounter)
 
     stmt <- paste0("exec dbo.getAccount")
-    result$DAAccountData <- executeDbQuery(dbSettings, stmt)
+    result$tbl_DAAccountData <- executeDbQuery(dbSettings, stmt)
 
   })
 
-  output$tableDAAccount <- renderDT(if (!is.null(result$DAAccountData)) {
+  output$dt_DAAccount <- renderDT(if (!is.null(result$tbl_DAAccountData)) {
     datatable(
-      result$DAAccountData,
+      result$tbl_DAAccountData,
       class = "flamingo-table display",
       rownames = TRUE,
       filter = "none",
@@ -65,7 +65,7 @@ accountDefinition <- function(input, output, session, dbSettings,
   output$DAAdownloadexcel <- downloadHandler(
     filename = "accounts.csv",
     content = function(file) {
-      write.csv(result$DAAccountData, file)
+      write.csv(result$tbl_DAAccountData, file)
     }
   )
 
@@ -95,8 +95,8 @@ accountDefinition <- function(input, output, session, dbSettings,
   })
 
   # Enable and disable buttons
-  observeEvent(input$tableDAAccount_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (length(input$tableDAAccount_rows_selected) > 0) {
+  observeEvent(input$dt_DAAccount_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (length(input$dt_DAAccount_rows_selected) > 0) {
       enable("abuttonamendac")
       enable("abuttondeleteac")
     } else {
@@ -110,7 +110,7 @@ accountDefinition <- function(input, output, session, dbSettings,
 
     showModal(.crtupModal())
     updateTextInput(session, "tinputDAAccountName",
-                    value = result$DAAccountData[row, 2])
+                    value = result$tbl_DAAccountData[row, 2])
   })
 
   onclick("abuttonAccSubmit", {
@@ -131,19 +131,19 @@ accountDefinition <- function(input, output, session, dbSettings,
 
     } else if (result$accFlag == "A") {
 
-      if (length(row <- input$tableDAAccount_rows_selected) > 0) {
+      if (length(row <- input$dt_DAAccount_rows_selected) > 0) {
 
         stmt <- buildDbQuery("updateAccount ",
-                             result$DAAccountData[row, 1], input$tinputDAAccountName)
+                             result$tbl_DAAccountData[row, 1], input$tinputDAAccountName)
         res <- executeDbQuery(dbSettings, stmt)
 
         if (is.null(res)) {
           flamingoNotification(type = "error",
-                               paste("Failed to amend an account - ", result$DAAccountData[row, 2]))
+                               paste("Failed to amend an account - ", result$tbl_DAAccountData[row, 2]))
 
         } else {
           flamingoNotification(type = "message",
-                               paste("Account ", result$DAAccountData[row, 2], " amended."))
+                               paste("Account ", result$tbl_DAAccountData[row, 2], " amended."))
         }
 
       }
@@ -152,7 +152,7 @@ accountDefinition <- function(input, output, session, dbSettings,
 
     result$accFlag <- ""
     removeModal()
-    .reloadDAAccountData()
+    .reloadtbl_DAAccountData()
 
   })
 
@@ -184,7 +184,7 @@ accountDefinition <- function(input, output, session, dbSettings,
 
   onclick("abuttondeleteac", {
 
-    if (length(input$tableDAAccount_rows_selected) > 0) {
+    if (length(input$dt_DAAccount_rows_selected) > 0) {
       showModal(.delModal())
     } else {
       flamingoNotification(type = "warning",
@@ -200,24 +200,24 @@ accountDefinition <- function(input, output, session, dbSettings,
   observeEvent(input$abuttonconfirmdel, {
     removeModal()
 
-    if (length(row <- input$tableDAAccount_rows_selected) > 0) {
+    if (length(row <- input$dt_DAAccount_rows_selected) > 0) {
 
-      stmt <- buildDbQuery("deleteAccount", result$DAAccountData[row ,1])
+      stmt <- buildDbQuery("deleteAccount", result$tbl_DAAccountData[row ,1])
       res <- executeDbQuery(dbSettings, stmt)
 
       if (is.null(res)) {
         flamingoNotification(type = "message",
                              sprintf("Failed to delete account %s",
-                                     result$DAAccountData[row, 2]))
+                                     result$tbl_DAAccountData[row, 2]))
       } else {
 
         flamingoNotification(type = "message",
                              sprintf("Account %s deleted",
-                                     result$DAAccountData[row, 2]))
+                                     result$tbl_DAAccountData[row, 2]))
 
       }
     }
-    .reloadDAAccountData()
+    .reloadtbl_DAAccountData()
 
   })
 

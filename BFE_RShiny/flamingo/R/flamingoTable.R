@@ -3,59 +3,59 @@
 # UI ---------------------------------------------------------------------------
 
 #' flamingoTableUI
-#' 
+#'
 #' @rdname flamingoTable
-#' 
+#'
 #' @template params-module-ui
-#' 
+#'
 #' @return List of tags.
-#' 
+#'
 #' @importFrom DT DTOutput
-#' 
+#'
 #' @export
 flamingoTableUI <-  function(id){
   ns <- NS(id)
   tagList(
-    DTOutput(ns("flamingoTable"))
+    DTOutput(ns("tbl_flamingoTable"))
   )
 }
 
 # Server -----------------------------------------------------------------------
 
 #' flamingoTable
-#' 
+#'
 #' @rdname flamingoTable
-#' 
+#'
 #' @description Server logic to show the flamingo table output
-#' 
+#'
 #' @template params-module
-#' 
+#'
 #' @param data dataframe to show in table.
-#' 
+#'
 #' @param selection param of datatable, default"none".
-#' 
+#'
 #' @param escape param of datatable, default TRUE.
-#' 
+#'
 #' @param scrollX param of datatable, default FALSE.
-#' 
+#'
 #' @param filter param of datatable, default FALSE.
-#' 
+#'
 #' @param rownames param of datatable, default FALSE.
-#' 
+#'
 #' @param colnames param of datatable, default TRUE.
-#' 
+#'
 #' @param preselRow reactive of preselected row default reactive({NULL}).
-#' 
+#'
 #' @param maxrowsperpage param of datatable, default 10.
-#' 
+#'
 #' @return rows_selected reactive of selected rows as returned from datatable.
-#' 
+#'
 #' @return  rows_current reactive of current rows as returned from datatable.
-#' 
-#' @importFrom DT renderDT 
-#' 
+#'
+#' @importFrom DT renderDT
+#'
 #' @importFrom DT datatable
-#' 
+#'
 #' @export
 flamingoTable <- function(input, output, session,
                           data,
@@ -68,17 +68,17 @@ flamingoTable <- function(input, output, session,
                           preselRow = reactive({NULL}),
                           maxrowsperpage = 10,
                           logMessage = message ) {
-  
+
   ns <- session$ns
-  
-    output$flamingoTable <- renderDT({
-      
+
+    output$tbl_flamingoTable <- renderDT({
+
       if (!is.null(data())) {
         data <- data()
       } else {
         data <- data.frame(content = "nothing to show")
       }
-      
+
       colnamesToUse <- ""
       if (colnames) {
         colnamesToUse <- names(data)
@@ -87,7 +87,7 @@ flamingoTable <- function(input, output, session,
         }
       }
 
-      
+
       datatable(
           data,
           class = "flamingo-table display",
@@ -99,11 +99,11 @@ flamingoTable <- function(input, output, session,
           colnames = colnamesToUse,
           options = .getPRTableOptions(scrollX, maxrowsperpage, filter)
         )
-        
+
     })
 
   # Helper functions -----------------------------------------------------------
-  
+
   #table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function(scrollX, maxrowsperpage, filter) {
     options <- list(
@@ -126,12 +126,12 @@ flamingoTable <- function(input, output, session,
     }
     return(options)
   }
-  
+
     # Module Outout --------------------------------------------------------------
     moduleOutput <- c(
       list(
-        rows_selected = reactive({input$flamingoTable_rows_selected}),
-        rows_current = reactive({input$flamingoTable_rows_current})
+        rows_selected = reactive({input$tbl_flamingoTable_rows_selected}),
+        rows_current = reactive({input$tbl_flamingoTable_rows_current})
       )
     )
 }

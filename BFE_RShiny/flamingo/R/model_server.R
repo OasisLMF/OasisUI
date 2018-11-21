@@ -23,21 +23,21 @@ modelSupplierPage <- function(input, output, session, dbSettings,
                               logMessage = message, active = reactive(TRUE)) {
 
   result <- reactiveValues(
-    MData = NULL,
-    MDataCounter = 0,
+    tbl_MData = NULL,
+    tbl_MDataCounter = 0,
     MID = -1,
-    MRData = NULL,
-    MRDataCounter = 0,
+    tbl_MRData = NULL,
+    tbl_MRDataCounter = 0,
     crtAmFlag = "" # either "", "C" for create or "A" for amend
   )
 
-  .reloadMData <- function() {
-    result$MDataCounter <- result$MDataCounter + 1
+  .reloadtbl_MData <- function() {
+    result$tbl_MDataCounter <- result$tbl_MDataCounter + 1
     invisible()
   }
 
-  .reloadMRData <- function() {
-    result$MRDataCounter <- result$MRDataCounter + 1
+  .reloadtbl_MRData <- function() {
+    result$tbl_MRDataCounter <- result$tbl_MRDataCounter + 1
     invisible()
   }
 
@@ -45,20 +45,20 @@ modelSupplierPage <- function(input, output, session, dbSettings,
 
   # when navigated to Model tab, model table should be updated
   observe(if (active()) {
-    # reload if .reloadMData is called
-    force(result$MDataCounter)
+    # reload if .reloadtbl_MData is called
+    force(result$tbl_MDataCounter)
 
     hide("divmr")
     hide("cramndelmodres")
     hide("submitmodrescreate")
     hide("ConfirmModResDel")
 
-    result$MData <- getModelList(dbSettings)
+    result$tbl_MData <- getModelList(dbSettings)
   })
 
-  output$tablemodel <- renderDT({
+  output$dt_model <- renderDT({
     datatable(
-      result$MData,
+      result$tbl_MData,
       class = "flamingo-table display",
       rownames = TRUE,
       filter = "none",
@@ -75,23 +75,23 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   output$Modeldownloadexcel <- downloadHandler(
     filename = "model.csv",
     content = function(file) {
-      write.csv(result$MData, file)
+      write.csv(result$tbl_MData, file)
     }
   )
 
   # Model Resource Table -------------------------------------------------------
 
   # Model resource table to be displayed at the click a row of Model table
-  observe(if (active() && length(input$tablemodel_rows_selected) > 0) {
+  observe(if (active() && length(input$dt_model_rows_selected) > 0) {
 
-    # reload if .reloadMRData is called
-    force(result$MRDataCounter)
+    # reload if .reloadtbl_MRData is called
+    force(result$tbl_MRDataCounter)
 
     show("divmr")
-    MID <- result$MData[(input$tablemodel_rows_selected),1]
+    MID <- result$tbl_MData[(input$dt_model_rows_selected),1]
 
     stmt <- buildDbQuery("getmodelresource", result$MID)
-    result$MRData <- executeDbQuery(dbSettings, stmt)
+    result$tbl_MRData <- executeDbQuery(dbSettings, stmt)
 
     result$MID <- MID
 
@@ -102,10 +102,10 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     hide("ConfirmModResDel")
   })
 
-  output$mrtable <- renderDT({
+  output$dt_model_resource <- renderDT({
 
     datatable(
-      result$MRData,
+      result$tbl_MRData,
       class = "flamingo-table display",
       rownames = TRUE,
       filter = "none",
@@ -122,7 +122,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   output$MRdownloadexcel <- downloadHandler(
     filename = "modelresource.csv",
     content = function(file) {
-      write.csv(result$MRData, file)
+      write.csv(result$tbl_MRData, file)
     }
   )
 
@@ -162,9 +162,9 @@ modelSupplierPage <- function(input, output, session, dbSettings,
 
   # Enable and disable buttons
   observeEvent({
-    result$MRData
-    input$mrtable_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      if (length(input$mrtable_rows_selected) > 0) {
+    result$tbl_MRData
+    input$dt_model_resource_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      if (length(input$dt_model_resource_rows_selected) > 0) {
         enable("abuttonamend")
         enable("abuttondelete")
         enable("abuttonConfirmDel")
@@ -183,8 +183,8 @@ modelSupplierPage <- function(input, output, session, dbSettings,
 
   # title for delete button
   output$delModal <- renderUI({
-    modelId <- result$MRData[input$mrtable_rows_selected, 1]
-    modelName <- result$MRData[input$mrtable_rows_selected, 2]
+    modelId <- result$tbl_MRData[input$dt_model_resource_rows_selected, 1]
+    modelName <- result$tbl_MRData[input$dt_model_resource_rows_selected, 2]
     paste0('Delete ', modelId, ' ', modelName)
   })
 
@@ -229,14 +229,14 @@ modelSupplierPage <- function(input, output, session, dbSettings,
         flamingoNotification(sprintf("Model Resource %s created.", crtmodres),
                              type = "message")
 
-        .reloadMRData()
+        .reloadtbl_MRData()
 
       }
 
     } else if (result$crtAmFlag == "A") {
 
       updtmodres <- updateModelResource(dbSettings,
-                                        result$MRData[row, 1],
+                                        result$tbl_MRData[row, 1],
                                         input$tinmodelresname,
                                         isolate(input$sinresrctype),
                                         isolate(input$sinoasissysname),
@@ -246,7 +246,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
       flamingoNotification(sprintf("Model Resource %s updated.", updtmodres),
                            type = "message")
 
-      .reloadMRData()
+      .reloadtbl_MRData()
     }
     removeModal()
   })
@@ -256,7 +256,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   })
 
   observeEvent(input$abuttonConfirmDel, {
-    modResId <- deleteModelResource(dbSettings, result$MRData[input$mrtable_rows_selected,1])
+    modResId <- deleteModelResource(dbSettings, result$tbl_MRData[input$dt_model_resource_rows_selected,1])
 
     if (!is.null(modResId)) {
       flamingoNotification(sprintf("Model Resource %s deleted.", modResId),
@@ -266,7 +266,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
       flamingoNotification(sprintf("Model Resource could not be deleted."))
     }
 
-    .reloadMRData()
+    .reloadtbl_MRData()
     removeModal()
   })
 
@@ -297,20 +297,20 @@ modelSupplierPage <- function(input, output, session, dbSettings,
   .autoFillCrtAm <- function(row) {
 
     updateTextInput(session, "tinmodelresname",
-                    value = result$MRData[row, 2])
+                    value = result$tbl_MRData[row, 2])
 
     resourceType <- getResourceType(dbSettings)
     updateSelectInput(session, "sinresrctype",
                       choices = createSelectOptions(resourceType, "Select Resource Type"),
-                      selected = result$MRData[row, 3])
+                      selected = result$tbl_MRData[row, 3])
 
     oasisSys <- getOasisSystemId(dbSettings)
     updateSelectInput(session, "sinoasissysname",
                       choices = createSelectOptions(oasisSys, "Select Oasis System"),
-                      selected = result$MRData[row, 4])
+                      selected = result$tbl_MRData[row, 4])
 
     updateTextInput(session, "tinmodelresvalue",
-                    value = result$MRData[row, 6])
+                    value = result$tbl_MRData[row, 6])
 
   }
 
