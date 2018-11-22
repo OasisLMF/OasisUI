@@ -723,6 +723,8 @@ api_post_analyses_input_generation_traceback_file <- function(id, filepath_input
 #' @return dataframe of input_generation_traceback_file
 #'
 #' @importFrom dplyr bind_rows
+#' @importFrom dplyr filter
+#' @importFrom dplyr sym
 #' @importFrom httr content
 #'
 #' @export
@@ -733,7 +735,7 @@ return_input_generation_traceback_file_df <- function(id){
     input_generation_traceback_file_df <- strsplit(input_generation_traceback_fileList, split = "\n") %>%
       as.data.frame(stringsAsFactors = FALSE)
     colnames(input_generation_traceback_file_df) <- input_generation_traceback_file_df[1, ]
-    input_generation_traceback_file_df <- input_generation_traceback_file_df %>% filter(!! sym(colnames(input_generation_traceback_file_df)) != colnames(input_generation_traceback_file_df) )
+    # input_generation_traceback_file_df <- input_generation_traceback_file_df %>% filter(!! sym(colnames(input_generation_traceback_file_df)) != colnames(input_generation_traceback_file_df) )
   } else {
     input_generation_traceback_file_df <- bind_rows(input_generation_traceback_fileList) %>%
       as.data.frame()
@@ -941,7 +943,7 @@ return_analyses_run_traceback_file_df <- function(id){
     analyses_run_traceback_file_df <- strsplit(analyses_run_traceback_fileList, split = "\n") %>%
       as.data.frame(stringsAsFactors = FALSE)
     colnames(analyses_run_traceback_file_df) <- analyses_run_traceback_file_df[1, ]
-    analyses_run_traceback_file_df <- analyses_run_traceback_file_df %>% filter(!! sym(colnames(analyses_run_traceback_file_df)) != colnames(analyses_run_traceback_file_df) )
+    # analyses_run_traceback_file_df <- analyses_run_traceback_file_df %>% filter(!! sym(colnames(analyses_run_traceback_file_df)) != colnames(analyses_run_traceback_file_df) )
   } else {
     analyses_run_traceback_file_df <- bind_rows(analyses_run_traceback_fileList) %>%
       as.data.frame()

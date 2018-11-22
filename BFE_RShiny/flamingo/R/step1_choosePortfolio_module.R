@@ -94,7 +94,8 @@ panelPortfolioDetails <- function(id) {
       actionButton(inputId = ns("abuttondefpfrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_portfolioDetails"))
+    #DTOutput(ns("dt_portfolioDetails"))
+    ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
   )
 }
 
@@ -243,6 +244,9 @@ step1_choosePortfolio <- function(input, output, session,
 
   #values to stop ping pong effect
   stop_selPfID <- check_selPfID <- 0
+  
+  # list of sub-modules
+  sub_modules <- list()
 
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
@@ -301,23 +305,14 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   # Portfolio Details Table ----------------------------------------------------
-  output$dt_portfolioDetails <- renderDT({
-    if (!is.null(result$tbl_portfolioDetails) && nrow(result$tbl_portfolioDetails) > 0) {
-      logMessage("re-rendering portfolio details table")
-      datatable(
-        result$tbl_portfolioDetails,
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = "none",
-        colnames = c('Row Number' = 1),
-        options = .getPRTableOptions()
-      )
-    } else {
-      .nothingToShowTable(contentMessage = paste0("No files available for portfolio ID ", result$portfolioID))
-    }
-  })
+
+  sub_modules$portfolioDetails <- callModule(
+    ViewFilesInTable,
+    id = "portfolioDetails",
+    tbl_filesListData =  reactive(result$tbl_portfolioDetails),
+    param = reactive(result$portfolioID),
+    logMessage = logMessage,
+    includechkbox = TRUE)
 
   # Title Portfolio Details Panel
   output$paneltitle_pfDetails <- renderUI({

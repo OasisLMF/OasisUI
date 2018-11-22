@@ -87,6 +87,37 @@ api_post_portfolios_location_file <- function(id, filepath_location) {
   )
 }
 
+#' Return location_file Dataframe
+#'
+#' @rdname return_location_file_df
+#'
+#' @description Returns a dataframe of location_file
+#'
+#' @param id a unique integer value identifying the portfolio.
+#'
+#' @return dataframe of location_file
+#'
+#' @importFrom dplyr bind_rows
+#' @importFrom dplyr filter
+#' @importFrom dplyr sym
+#' @importFrom httr content
+#'
+#' @export
+return_location_file_df <- function(id){
+  get_location_file <- api_get_portfolios_location_file(id)
+  location_fileList <- content(get_location_file$result)
+  if (is.null(names(location_fileList))) {
+    location_file_df <- strsplit(location_fileList, split = "\n") %>%
+      as.data.frame(stringsAsFactors = FALSE)
+    colnames(location_file_df) <- location_file_df[1, ]
+  } else {
+    location_file_df <- bind_rows(location_fileList) %>%
+      as.data.frame()
+  }
+  return(location_file_df)
+}
+
+
 # Account File -----------------------------------------------------------------
 
 #' Get portfolios accounts file
@@ -177,7 +208,38 @@ api_post_portfolios_accounts_file <- function(id, filepath_accounts) {
   )
 }
 
-# Reinsurance Infor File -------------------------------------------------------
+#' Return accounts_file Dataframe
+#'
+#' @rdname return_accounts_file_df
+#'
+#' @description Returns a dataframe of accounts_file
+#'
+#' @param id a unique integer value identifying the portfolio.
+#'
+#' @return dataframe of accounts_file
+#'
+#' @importFrom dplyr bind_rows
+#' @importFrom dplyr filter
+#' @importFrom dplyr sym
+#' @importFrom httr content
+#'
+#' @export
+return_accounts_file_df <- function(id){
+  get_accounts_file <- api_get_portfolios_accounts_file(id)
+  accounts_fileList <- content(get_accounts_file$result)
+  if (is.null(names(accounts_fileList))) {
+    accounts_file_df <- strsplit(accounts_fileList, split = "\n") %>%
+      as.data.frame(stringsAsFactors = FALSE)
+    colnames(accounts_file_df) <- accounts_file_df[1, ]
+  } else {
+    accounts_file_df <- bind_rows(accounts_fileList) %>%
+      as.data.frame()
+  }
+  return(accounts_file_df)
+}
+
+
+# Reinsurance Info File -------------------------------------------------------
 
 #' Get portfolios reinsurance info file
 #' 
@@ -267,6 +329,36 @@ api_post_portfolios_reinsurance_info_file <- function(id, filepath_reinsurance_i
   )
 }
 
+#' Return reinsurance_info_file Dataframe
+#'
+#' @rdname return_reinsurance_info_file_df
+#'
+#' @description Returns a dataframe of reinsurance_info_file
+#'
+#' @param id a unique integer value identifying the portfolio.
+#'
+#' @return dataframe of reinsurance_info_file
+#'
+#' @importFrom dplyr bind_rows
+#' @importFrom dplyr filter
+#' @importFrom dplyr sym
+#' @importFrom httr content
+#'
+#' @export
+return_reinsurance_info_file_df <- function(id){
+  get_reinsurance_info_file <- api_get_portfolios_reinsurance_info_file(id)
+  reinsurance_info_fileList <- content(get_reinsurance_info_file$result)
+  if (is.null(names(reinsurance_info_fileList))) {
+    reinsurance_info_file_df <- strsplit(reinsurance_info_fileList, split = "\n") %>%
+      as.data.frame(stringsAsFactors = FALSE)
+    colnames(reinsurance_info_file_df) <- reinsurance_info_file_df[1, ]
+  } else {
+    reinsurance_info_file_df <- bind_rows(reinsurance_info_fileList) %>%
+      as.data.frame()
+  }
+  return(reinsurance_info_file_df)
+}
+
 # Reinsurance Source File ------------------------------------------------------
 
 #' Get portfolios reinsurance source file
@@ -312,6 +404,8 @@ api_get_portfolios_reinsurance_source_file <- function(id) {
   )
 }
 
+
+
 #' Post portfolios reinsurance source file
 #' 
 #' Sets the portfolios reinsurance_source contents.
@@ -355,4 +449,35 @@ api_post_portfolios_reinsurance_source_file <- function(id, filepath_reinsurance
     ),
     class = c("apiresponse")
   )
+}
+
+
+#' Return reinsurance_source_file Dataframe
+#'
+#' @rdname return_reinsurance_source_file_df
+#'
+#' @description Returns a dataframe of reinsurance_source_file
+#'
+#' @param id a unique integer value identifying the portfolio.
+#'
+#' @return dataframe of reinsurance_source_file
+#'
+#' @importFrom dplyr bind_rows
+#' @importFrom dplyr filter
+#' @importFrom dplyr sym
+#' @importFrom httr content
+#'
+#' @export
+return_reinsurance_source_file_df <- function(id){
+  get_reinsurance_source_file <- api_get_portfolios_reinsurance_source_file(id)
+  reinsurance_source_fileList <- content(get_reinsurance_source_file$result)
+  if (is.null(names(reinsurance_source_fileList))) {
+    reinsurance_source_file_df <- strsplit(reinsurance_source_fileList, split = "\n") %>%
+      as.data.frame(stringsAsFactors = FALSE)
+    colnames(reinsurance_source_file_df) <- reinsurance_source_file_df[1, ]
+  } else {
+    reinsurance_source_file_df <- bind_rows(reinsurance_source_fileList) %>%
+      as.data.frame()
+  }
+  return(reinsurance_source_file_df)
 }
