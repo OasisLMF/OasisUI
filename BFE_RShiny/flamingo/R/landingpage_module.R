@@ -17,18 +17,18 @@ landingPageUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    wellPanel(
-      h4("Analyses Table"),
+    flamingoPanel(
+      collapsible = FALSE,
+      ns("panel_landingpage"),
+      heading = tagAppendChildren(
+        h4("Table"),
+        actionButton(inputId = ns("abuttonrefreshanaInbox"), label = "Refresh", style = "float: right;")
+      ), 
       DTOutput(ns("dt_anaInbox")),
-
       flamingoButton(ns("abuttongotoana"), "Dashboard of Analyses Outputs", align = "right") %>%
         bs_embed_tooltip(title = landing_page$abuttongotoana, placement = "right"),
-
       flamingoButton(inputId = ns("abuttondelana"), label = "Delete Analysis") %>%
         bs_embed_tooltip(title = landing_page$abuttondelana, placement = "right"),
-
-      actionButton(inputId = ns("refreshInbox"), label = "Refresh", align = "right"),
-
       downloadButton(ns("downloadexcel_ana"), label = "Export to csv") %>%
         bs_embed_tooltip(title = landing_page$downloadexcel_ana, placement = "right")
     )
@@ -88,7 +88,7 @@ landingPage <- function(input, output, session, user, dbSettings,
   
   observe(if (active()) {
     # invalidate if the refresh button updates
-    force(input$refreshInbox)
+    force(input$abuttonrefreshanaInbox)
 
     # reload automatically every so often
     invalidateLater(reloadMillis)
@@ -125,7 +125,9 @@ landingPage <- function(input, output, session, user, dbSettings,
   observeEvent(input$dt_anaInbox_rows_selected, ignoreNULL = FALSE, {
     if (length(input$dt_anaInbox_rows_selected) > 0) {
       enable("abuttondelana")
+      enable("abuttongotoana")
     } else {
+      disable("abuttongotoana")
       disable("abuttondelana")
     }
   })
