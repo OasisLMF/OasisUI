@@ -165,15 +165,9 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
   output$FLdownloadzip <- downloadHandler(
     filename = "files.zip",
     content = function(fname){
-      zip(zipfile = fname, files = fs())
+      fs <- file.path(result$filesListData[, filesListData.path], result$filesListData[ filesListData.fileName])
+      zip(zipfile = fname, files = fs)
       if (file.exists(paste0(fname, "./"))) {file.rename(paste0(fname, ".zip"), fname)}
-    }
-  )
-
-  output$FLTdownloadexcel <- downloadHandler(
-    filename = "outputFL.csv",
-    content = function(file) {
-      write.csv(result$filesListData, file)
     }
   )
 
@@ -364,7 +358,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
     options <- list(
       search = list(caseInsensitive = TRUE),
       searchHighlight = TRUE,
-      columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
+      # columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
       processing = 0,
       scrollX = FALSE,
       pageLength = maxrowsperpage,
