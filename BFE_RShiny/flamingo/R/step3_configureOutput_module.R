@@ -144,13 +144,12 @@ panelDefineOutputs <- function(id) {
 panelDefineOutputsDetails <- function(id) {
   ns <- NS(id)
   tagList(
-    # flamingoPanel(
-    #   collapsible = FALSE,
-    #   ns("panel_ConfigDetails"),
-    #   heading = h4("Configuration Details"),
-    #   selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = ""),
-    #   textInput(ns("tinputananame"), label = "Analysis Name:", value = "")
-    # ),
+    flamingoPanel(
+      collapsible = FALSE,
+      ns("panel_ConfigDetails"),
+      heading = h4("Configuration Details"),
+      selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = "")
+    ),
     flamingoPanel(
       collapsible = FALSE,
       ns("panel_defAnaOutputDetails"),
@@ -612,6 +611,8 @@ panel_configureAdvancedRI <- function(id) {
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
 #' @importFrom dplyr filter
+#' @importFrom jsonlite write_json
+#' @importFrom jsonlite read_json
 #'
 #' @export
 step3_configureOutput <- function(input, output, session,
@@ -842,7 +843,8 @@ step3_configureOutput <- function(input, output, session,
     .showPerils()
     logMessage("showing panelDefineOutputs")
     result$ana_flag <- "R"
-    .updateOutputConfig()
+    analyses_settings <- return_analyses_settings_file_list(result$anaID)
+    .updateOutputConfig(analyses_settings)
   })
 
   # Hide Output Configuration panel
@@ -927,24 +929,15 @@ step3_configureOutput <- function(input, output, session,
 
   # Update button in sidebar panel to update checkboxes for pre-populated values
   #To-Do update output configuration based on analysis setting
-  # observeEvent(input$sinoutputoptions, {
-  #   if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
-  #     outputlist <- executeDbQuery(dbSettings,
-  #                                  buildDbQuery("getOutputOptionOutputs", input$sinoutputoptions))
-  #
-  #     if (nrow(outputlist) > 0) {
-  #       # print(paste0("outputlist"))
-  #       # print(outputlist)
-  #       for (i in 1:nrow(outputlist)) {
-  #         grpid <- paste0("chk",outputlist$Group[i])
-  #         grpinputid <- strsplit(toString(grpid), " ")[[1]]
-  #         chkboxid <- outputlist$Parameter[i]
-  #         selchoices <- as.list(strsplit(toString(chkboxid), ",")[[1]])
-  #         updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
-  #       }
-  #     }
-  #   }
-  # })
+  observeEvent(input$sinoutputoptions, {
+    if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
+      #read the right analysis settings file
+      analyses_settings <- read_json(paste0("./analysis_settings/",input$sinoutputoptions,".json"),  simplifyVector = TRUE)
+      #Set inputs
+      .updateOutputConfig(analyses_settings)
+      
+    }
+  })
 
   # Clear the checkbox groups and preset dropdown - Set back to default
   onclick("abuttonclroutopt", {
@@ -995,72 +988,28 @@ step3_configureOutput <- function(input, output, session,
     showModal(.modalsaveoutput())
   })
 
-  # # Submit output configuration (to be saved)
-  # onclick("abuttonsubmitoutput", {
-  #   if (input$tinputoutputname == "") {
-  #     flamingoNotification(type = "warning", "Please enter Output Configuration Name")
-  #   } else {
-  #     stmt <- paste0("exec dbo.saveoutputoption @OutputOptionName = '",
-  #                    input$tinputoutputname, "',@OutputOptionsList = '",
-  #                    outputOptionsList(), "'")
-  #     executeDbQuery(dbSettings, stmt)
-  #     flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
-  #     updateTextInput(session, "tinputoutputname", value = "")
-  #     removeModal()
-  #     # .clearOutputOptions()
-  #     #.defaultview(session)
-  #   }
-  # })
+  # Submit output configuration (to be saved)
+  onclick("abuttonsubmitoutput", {
+    if (input$tinputoutputname == "") {
+      flamingoNotification(type = "warning", "Please enter Output Configuration Name")
+    } else {
+      dir.create("./analysis_settings")
+      #write out file to be uploades
+      analyses_settingsList <- .gen_analysis_settings()
+      write_json(analyses_settingsList, paste0("./analysis_settings/",input$tinputoutputname,".json"), pretty = TRUE, auto_unbox = TRUE)
+      flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
+      updateTextInput(session, "tinputoutputname", value = "")
+      removeModal()
+      .clearOutputOptions()
+    }
+  })
 
 
   # Run Analyses ---------------------------------------------------------------
 
   # Execute analysis
   onclick("abuttonexecuteanarun", {
-    # Assign analysis settings to analysis
-    #model data
-    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
-    modelData <- return_tbl_modelData(modelID)
-
-    #Reassigned variables for consistency
-    model_version_id <- modelData[[tbl_modelsData.ModelNameId]]
-    source_tag <- tolower(model_version_id)
-    module_supplier_id <- modelData[[tbl_modelsData.ModelSupplierId]]
-    number_of_samples <- as.integer(input$tinputnoofsample)
-    prog_id <- as.integer(result$portfolioID)
-    event_occurrence_file_id <- 1 # getEventOccurrence(dbSettings, prgId )  as.integer(input$sinputeventocc)
-    event_set <- input$sinputeventset
-    peril_wind <- input$chkinputprwind
-    demand_surge <- input$chkinputdsurge
-    peril_quake <- input$chkinputprquake
-    peril_flood <- input$chkinputprflood
-    peril_surge <- input$chkinputprstsurge
-    leakage_factor <- input$sliderleakagefac
-    gul_output <- input$chkinputGUL
-    il_output <- input$chkinputIL
-    ri_output <- input$chkinputRI
-    gul_threshold <- as.integer(input$tinputthreshold)
-    analysis_tag <- as.integer(result$anaID)
-    uniqueItems <- FALSE
-    id <- 1
-    exposure_location <- "L:"
-    use_random_number_file <- FALSE
-    return_period_file <- TRUE
-    chkinputsummaryoption <- input$chkinputsummaryoption
-    outputsGUL <- c(input$chkgulprog, input$chkgulpolicy, input$chkgulstate, input$chkgulcounty, input$chkgulloc, input$chkgullob)
-    outputsIL <- c(input$chkilprog, input$chkilpolicy, input$chkilstate, input$chkilcounty, input$chkilloc, input$chkillob)
-    outputsRI <- c(input$chkriprog, input$chkripolicy, input$chkristate, input$chkricounty, input$chkriloc, input$chkrilob)
-
-    #generate analysis_settings_file
-    analyses_settingsList <- construct_tbl_analyses_settings(source_tag, prog_id, number_of_samples,
-                                                module_supplier_id, model_version_id,
-                                                event_occurrence_file_id,use_random_number_file = FALSE, event_set,
-                                                peril_wind, demand_surge, peril_quake, peril_flood, peril_surge, leakage_factor,
-                                                gul_threshold,exposure_location = 'L',
-                                                outputsGUL, outputsIL, outputsRI, chkinputsummaryoption,
-                                                gul_output,  il_output, ri_output,
-                                                return_period_file,
-                                                analysis_tag, uniqueItems = FALSE, id = 1)
+    analyses_settingsList <- .gen_analysis_settings()
 
     #write out file to be uploades
     write_json(analyses_settingsList, "./analysis_settings.json", pretty = TRUE, auto_unbox = TRUE)
@@ -1281,10 +1230,8 @@ step3_configureOutput <- function(input, output, session,
   # Clear other runtime params
   .clearotherparams <- function() {
     logMessage(".clearotherparams called")
-    # updateSelectInput(session, "sinoutputoptions",
-    #                   choices = c(getOutputOptions(dbSettings)),
-    #                   selected = character(0))
-    # updateTextInput(session, "tinputananame", value = "")
+    .clearOutputOptions()
+    updateTextInput(session, "tinputananame", value = "")
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
 
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
@@ -1303,12 +1250,12 @@ step3_configureOutput <- function(input, output, session,
   }
 
   # Clear Custom Configuration option
-  # .clearOutputOptions <- function() {
-  #   logMessage(".clearOutputOptions called")
-  #   updateSelectInput(session, "sinoutputoptions",
-  #                     choices = c(getOutputOptions(dbSettings)),
-  #                     selected = character(0))
-  # }
+  .clearOutputOptions <- function() {
+    logMessage(".clearOutputOptions called")
+    updateSelectInput(session, "sinoutputoptions",
+                      choices = gsub(".json", "", list.files("./analysis_settings")),
+                      selected = character(0))
+  }
 
   #Show available perils
   # To-Do: retrieve perils from model. currently showing all
@@ -1334,18 +1281,71 @@ step3_configureOutput <- function(input, output, session,
     # }
   }
 
+  #Generate Analysis settings file
+  .gen_analysis_settings <- function(){
+    # Assign analysis settings to analysis
+    #model data
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
+    modelData <- return_tbl_modelData(modelID)
+    
+    #Reassigned variables for consistency
+    model_version_id <- modelData[[tbl_modelsData.ModelNameId]]
+    source_tag <- tolower(model_version_id)
+    module_supplier_id <- modelData[[tbl_modelsData.ModelSupplierId]]
+    number_of_samples <- as.integer(input$tinputnoofsample)
+    prog_id <- as.integer(result$portfolioID)
+    event_occurrence_file_id <- 1 # getEventOccurrence(dbSettings, prgId )  as.integer(input$sinputeventocc)
+    event_set <- input$sinputeventset
+    peril_wind <- input$chkinputprwind
+    demand_surge <- input$chkinputdsurge
+    peril_quake <- input$chkinputprquake
+    peril_flood <- input$chkinputprflood
+    peril_surge <- input$chkinputprstsurge
+    leakage_factor <- input$sliderleakagefac
+    gul_output <- input$chkinputGUL
+    il_output <- input$chkinputIL
+    ri_output <- input$chkinputRI
+    gul_threshold <- as.integer(input$tinputthreshold)
+    analysis_tag <- as.integer(result$anaID)
+    uniqueItems <- FALSE
+    id <- 1
+    exposure_location <- "L:"
+    use_random_number_file <- FALSE
+    return_period_file <- TRUE
+    chkinputsummaryoption <- input$chkinputsummaryoption
+    outputsGUL <- c(input$chkgulprog, input$chkgulpolicy, input$chkgulstate, input$chkgulcounty, input$chkgulloc, input$chkgullob)
+    outputsIL <- c(input$chkilprog, input$chkilpolicy, input$chkilstate, input$chkilcounty, input$chkilloc, input$chkillob)
+    outputsRI <- c(input$chkriprog, input$chkripolicy, input$chkristate, input$chkricounty, input$chkriloc, input$chkrilob)
+    
+    #generate analysis_settings_file
+    analyses_settingsList <- construct_tbl_analyses_settings(source_tag, prog_id, number_of_samples,
+                                                             module_supplier_id, model_version_id,
+                                                             event_occurrence_file_id,use_random_number_file = FALSE, event_set,
+                                                             peril_wind, demand_surge, peril_quake, peril_flood, peril_surge, leakage_factor,
+                                                             gul_threshold,exposure_location = 'L',
+                                                             outputsGUL, outputsIL, outputsRI, chkinputsummaryoption,
+                                                             gul_output,  il_output, ri_output,
+                                                             return_period_file,
+                                                             analysis_tag, uniqueItems = FALSE, id = 1)
+    return(analyses_settingsList)
+  }
+  
   # Update output configuration for rerun
-  .updateOutputConfig <- function() {
+  .updateOutputConfig <- function(analyses_settings) {
     logMessage(".updateOutputConfig called")
-    analyses_settings <- return_analyses_settings_file_list(result$anaID)
+    
     number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]]
     updateTextInput(session, "tinputnoofsample", value = number_of_samples)
+    
     gul_threshold <- analyses_settings[["analysis_settings"]][["gul_threshold"]]
     updateTextInput(session, "tinputthreshold", value = gul_threshold)
+    
     event_set <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_set"]]
     updateSelectInput(session, "sinputeventocc", selected = event_set)
+    
     event_occurrence_file_id <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_occurrence_file_id"]]
     updateSelectInput(session, "sinputeventocc", selected = event_occurrence_file_id)
+    
     peril_wind <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_wind"]]
     if (!is.null(peril_wind)) {
       updateCheckboxInput(session, "chkinputprwind", value = peril_wind)
@@ -1370,9 +1370,8 @@ step3_configureOutput <- function(input, output, session,
     if (!is.null(leakage_factor)) {
       updateCheckboxInput(session, "sliderleakagefac", value = leakage_factor)
     }
-
-    #missing part to extract granularities from analysis settings
-    #updateCheckboxGroupInput(session, inputId = grpinputid, selected = c(selchoices))
+    
+    #To-do retrieve checkboxes selection from analysis_settings and update inputs accordingly 
 
     invisible()
   }
@@ -1419,7 +1418,7 @@ step3_configureOutput <- function(input, output, session,
     updateCheckboxInput(session, "chkinputRI", value = FALSE)
     .clearchkboxRIgrp()
     .clearotherparams()
-    # .clearOutputOptions()
+    .clearOutputOptions()
     .basicview()
   }
 

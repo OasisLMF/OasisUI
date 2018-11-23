@@ -8,7 +8,8 @@
 ViewFilesInTableUI(id, includechkbox = FALSE)
 
 ViewFilesInTable(input, output, session, logMessage = message,
-  tbl_filesListData, param = NULL, includechkbox = FALSE)
+  tbl_filesListData, param = NULL, file_column = "fields",
+  includechkbox = FALSE)
 }
 \arguments{
 \item{id}{module id}
@@ -22,6 +23,10 @@ ViewFilesInTable(input, output, session, logMessage = message,
 \item{logMessage}{function that will be passed info messages.}
 
 \item{tbl_filesListData}{dataframe of output files.}
+
+\item{param}{id to be used}
+
+\item{file_column}{name of the column containing filename. Default "fields}
 
 \item{id}{Namespace ID for the module.}
 
