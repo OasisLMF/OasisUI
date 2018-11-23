@@ -21,7 +21,7 @@ landingPageUI <- function(id) {
       collapsible = FALSE,
       ns("panel_landingpage"),
       heading = tagAppendChildren(
-        h4("Table"),
+        h4("Analyses Table"),
         actionButton(inputId = ns("abuttonrefreshanaInbox"), label = "Refresh", style = "float: right;")
       ), 
       DTOutput(ns("dt_anaInbox")),
