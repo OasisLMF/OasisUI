@@ -85,7 +85,10 @@ visualizationSBR <- function(input, output, session, dbSettings,
   # Extract Output files for given anaID----------------------------------------
   observeEvent( sub_modules$defineID$selectAnaID(), {
     if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
-      result$tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
+      tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
+      result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
+                                    do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
+                                                                     .addDescription)))
       result$tbl_filesListDatapf <- return_tbl_portfolioDetails(sub_modules$defineID$selectPortfolioID())
       result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectAnaID())
       if (nrow(result$filesListData) > 0) {
@@ -144,6 +147,15 @@ visualizationSBR <- function(input, output, session, dbSettings,
     z <- data.frame("Granularity" = y[2], "Losstype" = y[4], "Variable" = paste(y[5:length(y)], collapse = " "), stringsAsFactors = FALSE)
     return(z)}
   
+  #Add descritption fields to output files
+  .addDescription <- function(x){
+    #x <- as.character(tbl_filesListDataana$files[1])
+    x <- as.character(x)
+    x <- strsplit(x, split = "[.]")[[1]][1]
+    y <- unlist(strsplit(x, split = "_"))
+    report <-  paste(y[3:(length(y))], collapse = "_")
+    z <- data.frame("Perspective" = y[1], "Summary Level" = y[2], "Report" = reportToVar[[ report ]])
+  }
   
   # Module Outout --------------------------------------------------------------
   

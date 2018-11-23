@@ -99,6 +99,22 @@ defaultSelectChoicesRI <- c(
 )
 
 
+### Report to Variable conversion ----------------------------------------------
+reportToVar <- list(
+  "aalcalc" = "AAL",
+  "eltcalc" = "ELT",
+  "leccalc_full_uncertainty_aep" = "AEP",
+  "leccalc_full_uncertainty_oep" = "OEP",
+  "leccalc_sample_mean_aep" ="AEP",
+  "leccalc_sample_mean_oep" ="OEP",
+  "leccalc_wheatsheaf_aep" ="Multi AEP",
+  "leccalc_wheatsheaf_oep" ="Multi OEP",
+  "leccalc_wheatsheaf_mean_aep" ="Multi AEP",
+  "leccalc_wheatsheaf_mean_oep" ="Multi OEP",
+  "pltcalc" = "PLT",
+  "summarycalc" = "Full Sample"
+)
+
 ### Plots types ----------------------------------------------------------------
 plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
                                                       "keycols" = c("loss"),
