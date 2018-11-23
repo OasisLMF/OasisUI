@@ -26,31 +26,35 @@ visualizationSBR <- function(input, output, session, dbSettings,
                              preselAnaId = reactive(-1),
                              anaID  = reactive(-1),
                              active = reactive(TRUE), logMessage = message) {
-
+  
   ns <- session$ns
   # Reactive Values and parameters ------------------------------------------
   navigation_state <- reactiveNavigation()
-
+  
   # list of sub-modules
   sub_modules <- list()
-
+  
   result <- reactiveValues(
     #Panel to select
     preselPanel = 1,
     # output files table
-    filesListData = NULL
+    filesListData = NULL,
+    # df analysis output files
+    tbl_filesListDataana = NULL,
+    # df portfolio input files
+    tbl_filesListDatapf = NULL
   )
-
+  
   #number of plot output panels
   n_panels <- 5
-
+  
   #clean value
   observeEvent(active(), {
     if (active()) {
       result$preselPanel <- 1
     }
   })
-
+  
   # Selected anaID -------------------------------------------------------------
   sub_modules$defineID <- callModule(
     defineID,
@@ -60,13 +64,13 @@ visualizationSBR <- function(input, output, session, dbSettings,
     preselAnaId = preselAnaId,
     anaID =  anaID,
     logMessage = logMessage)
-
+  
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
     updateNavigation(navigation_state, "PS")
     result$preselPanel <- 3
   })
-
+  
   # Tab Summary ----------------------------------------------------------------
   sub_modules$summary <- callModule(
     summarytab,
@@ -76,55 +80,50 @@ visualizationSBR <- function(input, output, session, dbSettings,
     apiSettings = apiSettings,
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)
-
-  # Extract Output files for given anaID------------------------------------
-  observeEvent( input$selectAnaID, {if (input$selectAnaID != "") {
-    if (!is.null(anaIdList())) {
-      index <- match(c(input$selectAnaID), anaIdList()$AnaID)
-      status <- anaIdList()[index, "Status"]
-      if (!is.na(status) && status == StatusCompleted) {
-        result$filesListData <- getFileList(dbSettings, input$selectAnaID)
-        result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
+  
+  
+  # Extract Output files for given anaID----------------------------------------
+  observeEvent( sub_modules$defineID$selectAnaID(), {
+    if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
+      result$tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
+      result$tbl_filesListDatapf <- return_tbl_portfolioDetails(sub_modules$defineID$selectPortfolioID())
+      result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectAnaID())
+      if (nrow(result$filesListData) > 0) {
+        result$filesListData <- cbind(result$filesListData,
+                                      do.call(rbind.data.frame, lapply(result$filesListData$Description,
+                                                                       .splitDescription)))
       } else {
         result$filesListData <- NULL
       }
     } else {
       result$filesListData <- NULL
     }
-  }
   })
-
-  # Extract Output files for given anaID----------------------------------------
-  observeEvent( sub_modules$defineID$selectAnaID(), {
-    if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
-          result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectAnaID())
-          result$filesListData <- cbind(result$filesListData,
-                                        do.call(rbind.data.frame, lapply(result$filesListData$Description,
-                                                                         .splitDescription)))
-        } else {
-          result$filesListData <- NULL
-        }
-    })
-
+  
   filesListDatatoview <- reactive({
-    if (!is.null(result$filesListData)) {
+    if (!is.null(result$filesListData) ) {
       result$filesListData %>% select(-c("Variable", "Granularity", "Losstype"))
     } else {
       result$filesListData
     }
   })
-
+  
+  
+  
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
     outputfiles,
     id = "outputfiles",
-    filesListDatatoview =  filesListDatatoview,
+    tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
+    tbl_filesListDatapf = reactive(result$tbl_filesListDatapf),
+    anaId = sub_modules$defineID$selectAnaID,
+    portfolioId = sub_modules$defineID$selectPortfolioID, 
     dbSettings = dbSettings,
     apiSettings = apiSettings,
     active = reactive({active() && input$tabsSBR == "taboutputfiles"}),
     logMessage = logMessage)
-
-
+  
+  
   # Tab Output Plots -----------------------------------------------------------
   sub_modules$outputplots <- callModule(
     outputplots,
@@ -136,25 +135,25 @@ visualizationSBR <- function(input, output, session, dbSettings,
     apiSettings = apiSettings,
     active = reactive({active() && input$tabsSBR == "tabplots"}),
     logMessage = logMessage)
-
-
+  
+  
   # Helper functions -----------------------------------------------------------
   #function to split the description field of result$filesListData
   .splitDescription <- function(x){
     y <- unlist(strsplit(x,split = " "))
     z <- data.frame("Granularity" = y[2], "Losstype" = y[4], "Variable" = paste(y[5:length(y)], collapse = " "), stringsAsFactors = FALSE)
     return(z)}
-
-
+  
+  
   # Module Outout --------------------------------------------------------------
-
+  
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
       preselPanel = reactive({result$preselPanel})
     )
   )
-
+  
   moduleOutput
 }
 

@@ -86,6 +86,7 @@ defineID <- function(input, output, session,
     tbl_analysesData = NULL,
     selectAnaID = "",
     selectAnaName = "",
+    selectportfolioID = "",
     LProw = NULL,
     SArow = NULL,
     preselRow = NULL
@@ -106,7 +107,7 @@ defineID <- function(input, output, session,
   AnaList <- modalDialog(
     easyClose = TRUE,
     size = "l",
-    flamingoTableUI(ns("dt_analyses")),
+    flamingoTableUI(ns("flamingo_analyses")),
     footer = tagList(
       flamingoButton(ns("abuttonselectAna"),
                      label = "Select Analysis", align = "left"),
@@ -125,9 +126,9 @@ defineID <- function(input, output, session,
 
 
   # > modal content
-  sub_modules$dt_analyses <- callModule(
+  sub_modules$flamingo_analyses <- callModule(
     flamingoTable,
-    id = "dt_analyses",
+    id = "flamingo_analyses",
     data = reactive(result$tbl_analysesData),
     selection = "single",
     escape = FALSE,
@@ -176,15 +177,18 @@ defineID <- function(input, output, session,
 
 
   # > select analysis ID
-  observeEvent(sub_modules$dt_analyses$rows_selected(), ignoreNULL = FALSE, {
+  observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
     currid <- ""
     currName <- ""
-    if (!is.null(sub_modules$dt_analyses$rows_selected())) {
-      currid <- result$tbl_analysesData[sub_modules$dt_analyses$rows_selected(),tbl_analysesData.AnaID]
-      currName <- result$tbl_analysesData[sub_modules$dt_analyses$rows_selected(),tbl_analysesData.AnaName]
+    currpfId <- ""
+    if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
+      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaID]
+      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaName]
+      currpfId <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.PortfolioID]
     }
     result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
+    result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
   })
 
   # > close modal
@@ -193,8 +197,8 @@ defineID <- function(input, output, session,
   })
 
   observeEvent(input$abuttonselectAna, {
-    if (!is.null(sub_modules$dt_analyses$rows_selected())) {
-      result$preselRow <- sub_modules$dt_analyses$rows_selected()
+    if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
+      result$preselRow <- sub_modules$flamingo_analyses$rows_selected()
     }
     removeModal()
   })
@@ -219,10 +223,12 @@ defineID <- function(input, output, session,
   
   # Module Outout --------------------------------------------------------------
   selectAnaID <- reactive({ifelse(is.null(result$selectAnaID) | is.na(result$selectAnaID), "", result$selectAnaID)})
-
+  selectPortfolioID <- reactive({result$selectportfolioID})
+  
   moduleOutput <- c(
     list(
-      selectAnaID = reactive(selectAnaID())
+      selectAnaID = selectAnaID,
+      selectPortfolioID = selectPortfolioID
     )
   )
 

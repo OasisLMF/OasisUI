@@ -16,7 +16,7 @@
 flamingoTableUI <-  function(id){
   ns <- NS(id)
   tagList(
-    DTOutput(ns("st_flamingoTable"))
+    DTOutput(ns("dt_flamingoTable"))
   )
 }
 
@@ -86,7 +86,6 @@ flamingoTable <- function(input, output, session,
           colnamesToUse <- c('Row Number', colnamesToUse)
         }
       }
-
 
       datatable(
         tbl_flamingoTable,

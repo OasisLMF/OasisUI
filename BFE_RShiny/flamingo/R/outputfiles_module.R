@@ -22,7 +22,7 @@ outputfilesUI <- function(id) {
       collapsible = TRUE,
       show = TRUE,
       heading = "Output Files Table",
-      ViewFilesModuleUI(id  = ns("ViewOutputFilesModule"), includechkbox = TRUE)
+      ViewFilesModuleUI(id  = ns("ViewOutputFiles"), includechkbox = TRUE)
     ),
 
     flamingoPanel(
@@ -30,7 +30,7 @@ outputfilesUI <- function(id) {
       collapsible = TRUE,
       show = FALSE,
       heading = "Input Files Table",
-      ViewFilesModuleUI(id  = ns("ViewInputFilesModule"), includechkbox = TRUE)
+      ViewFilesInTableUI(id  = ns("ViewInputFiles"), includechkbox = TRUE)
     )
 
   )
@@ -53,24 +53,47 @@ outputfilesUI <- function(id) {
 #' @export
 outputfiles <- function(input, output, session, dbSettings,
                         apiSettings,
-                        filesListDatatoview, active, logMessage = message) {
+                        tbl_filesListDataana = reactive(NULL), 
+                        tbl_filesListDatapf = reactive(NULL),
+                        anaId = reactive(""),
+                        portfolioId = reactive(""),
+                        active, logMessage = message) {
 
   ns <- session$ns
 
+  
+  
   # list of sub-modules
   sub_modules <- list()
 
-  sub_modules$ViewFilesModule <- callModule(
-    ViewFilesModule,
-    id = "ViewOutputFilesModule",
-    filesListData =  filesListDatatoview,
+  # sub_modules$ViewFilesModule <- callModule(
+  #   ViewFilesModule,
+  #   id = "ViewOutputFilesModule",
+  #   filesListData =  filesListDatatoview,
+  #   logMessage = logMessage,
+  #   includechkbox = TRUE)
+  sub_modules$ViewOutputFiles <- callModule(
+    ViewFilesInTable,
+    id = "ViewOutputFiles",
+    tbl_filesListData =  tbl_filesListDataana,
+    param = anaId,
     logMessage = logMessage,
+    file_column = "files",
     includechkbox = TRUE)
 
-  sub_modules$ViewFilesModule <- callModule(
-    ViewFilesModule,
-    id = "ViewInputFilesModule",
-    filesListData =  reactive(NULL),
+  # sub_modules$ViewFilesModule <- callModule(
+  #   ViewFilesModule,
+  #   id = "ViewInputFilesModule",
+  #   filesListData =  reactive(NULL),
+  #   logMessage = logMessage,
+  #   includechkbox = TRUE)
+  
+  sub_modules$ViewInputFiles <- callModule(
+    ViewFilesInTable,
+    id = "ViewInputFiles",
+    tbl_filesListData =  tbl_filesListDatapf,
+    param = portfolioId,
     logMessage = logMessage,
     includechkbox = TRUE)
+  
 }

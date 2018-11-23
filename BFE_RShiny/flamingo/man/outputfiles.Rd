@@ -8,7 +8,9 @@
 outputfilesUI(id)
 
 outputfiles(input, output, session, dbSettings, apiSettings,
-  filesListDatatoview, active, logMessage = message)
+  tbl_filesListDataana = reactive(NULL),
+  tbl_filesListDatapf = reactive(NULL), anaId = reactive(""),
+  portfolioId = reactive(""), active, logMessage = message)
 }
 \arguments{
 \item{id}{module id}
@@ -23,8 +25,6 @@ outputfiles(input, output, session, dbSettings, apiSettings,
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
 
-\item{filesListDatatoview}{dataframe of files to view}
-
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
@@ -32,6 +32,8 @@ outputfiles(input, output, session, dbSettings, apiSettings,
 \item{id}{Namespace ID for the module.}
 
 \item{user}{reactive expression yielding user}
+
+\item{filesListDatatoview}{dataframe of files to view}
 }
 \value{
 List of tags.

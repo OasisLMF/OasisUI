@@ -50,6 +50,8 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #' @template params-flamingo-module
 #'
 #' @param tbl_filesListData dataframe of output files.
+#' @param param id to be used
+#' @param file_column name of the column containing filename. Default "fields
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
@@ -71,6 +73,7 @@ ViewFilesInTable <- function(input, output, session,
                              logMessage = message, 
                              tbl_filesListData, 
                              param = NULL,
+                             file_column = "fields",
                              includechkbox = FALSE) {
   
   ns <- session$ns
@@ -315,10 +318,20 @@ ViewFilesInTable <- function(input, output, session,
     idx <- as.numeric(splitidx[[1]][length(splitidx[[1]])])
     showModal(FileContent)
     session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_vbutton"))
+    
     #Get dataframe
-    result$currentFile <- result$tbl_filesListData_wButtons[idx, "fields"]
-    func <- get(paste0("return_", result$currentFile, "_df"))
-    result$tbl_fileData <- func(param())
+    result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column]
+    returnfunc <- paste0("return_", result$currentFile, "_df")
+    if (exists(returnfunc)) {
+      func <- get(returnfunc)
+      result$tbl_fileData <- func(param())
+    } else {
+      extractFolder <- file.path(".", paste0(param(), "_output/output"))
+      print("file")
+      print(file.path(extractFolder, result$currentFile))
+      result$tbl_fileData <- read.csv(file.path(extractFolder, result$currentFile))
+    }
+
     #Show buttons
     if ("LATITUDE" %in% names(result$currentFile)) {
       show("abuttonmap")

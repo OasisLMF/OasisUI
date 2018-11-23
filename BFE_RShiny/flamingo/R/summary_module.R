@@ -187,39 +187,39 @@ summarytab <- function(input, output, session, dbSettings,
 
   # Plot -----------------------------------------------------------------------
   output$summaryOutputPlot <- renderPlotly({
-    if (!is.null(result$outputSummaryData)) {
-      data <- result$outputSummaryData
-      if (compare) {
-        colnames <- names(select(data, contains("analysis", ignore.case = TRUE)))
-        data <- data %>% gather(key = "anaid", value = "value",colnames)
-      }
-        data <- cbind(data,do.call(rbind.data.frame,  lapply(data[,"SummaryType"], function(i){
-          x <- as.character(i)
-          y <- unlist(strsplit(x,split = " "))
-          z <- data.frame("Loss Type" = y[2], "Sample Type" = y[4], stringsAsFactors = FALSE)
-          return(z)
-        })))
-        if (compare) {
-          data <- data %>% tidyr::unite("identifier", c("Loss.Type","Sample.Type"))
-          data <- data %>%
-            rename("description" = "SummaryType") %>%
-            rename("colour" = "anaid") %>%
-            rename("xaxis" = "identifier")
-        } else {
-          data <- data %>%
-            rename("description" = "SummaryType") %>%
-            rename("colour" = "Sample.Type") %>%
-            rename("xaxis" = "Loss.Type") %>%
-            rename("value" = "Value")
-        }
-
-
-      xlabel <- "Sample Type"
-      ylabel <- "Loss"
-      titleToUse <- "AAL"
-      p <- barPlot(xlabel, ylabel, titleToUse, data, xtickslabels = c("Numerically Integrated", "Sample Statistics") )
-      ggplotly(p)
-    }
+    # if (!is.null(result$outputSummaryData)) {
+    #   data <- result$outputSummaryData
+    #   if (compare) {
+    #     colnames <- names(select(data, contains("analysis", ignore.case = TRUE)))
+    #     data <- data %>% gather(key = "anaid", value = "value",colnames)
+    #   }
+    #     data <- cbind(data,do.call(rbind.data.frame,  lapply(data[,"SummaryType"], function(i){
+    #       x <- as.character(i)
+    #       y <- unlist(strsplit(x,split = " "))
+    #       z <- data.frame("Loss Type" = y[2], "Sample Type" = y[4], stringsAsFactors = FALSE)
+    #       return(z)
+    #     })))
+    #     if (compare) {
+    #       data <- data #%>% tidyr::unite("identifier", c("Loss.Type","Sample.Type"))
+    #       # data <- data %>%
+    #       #   rename("description" = "SummaryType") %>%
+    #       #   rename("colour" = "anaid") %>%
+    #       #   rename("xaxis" = "identifier")
+    #     } else {
+    #       data <- data # %>%
+    #         # rename("description" = "SummaryType") %>%
+    #         # rename("colour" = "Sample.Type") %>%
+    #         # rename("xaxis" = "Loss.Type") %>%
+    #         # rename("value" = "Value")
+    #     }
+    # 
+    # 
+    #   # xlabel <- "Sample Type"
+    #   # ylabel <- "Loss"
+    #   # titleToUse <- "AAL"
+    #   # p <- barPlot(xlabel, ylabel, titleToUse, data, xtickslabels = c("Numerically Integrated", "Sample Statistics") )
+    #   # ggplotly(p)
+    # }
   })
 
   # Helper functions -----------------------------------------------------------

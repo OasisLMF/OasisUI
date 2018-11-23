@@ -57,7 +57,8 @@ tryCatch({
 reloadMillis <- 300000
 
 # flamingo django API ----------------------------------------------------------
-options(flamingo.settings.api = api_init("localhost", "8000"))
+# options(flamingo.settings.api = api_init("localhost", "8000"))
+options(flamingo.settings.api = api_init("10.10.0.182", "8000"))
 options(flamingo.settings.api.version = "v1")
 
 loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")

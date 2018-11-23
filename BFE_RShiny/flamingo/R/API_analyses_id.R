@@ -763,14 +763,21 @@ return_input_generation_traceback_file_df <- function(id){
 #' @export
 api_get_analyses_output_file <- function(id) {
 
+  dest <- file.path(".", paste0(id, "_outputs.tar"))
+  extractFolder <- file.path(".", paste0(id, "_output"))
+  dir.create(extractFolder, showWarnings = FALSE)
+  
   response <- GET(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
-    path = paste(get_version(), "analyses", id, "output_file", "", sep = "/")
+    path = paste(get_version(), "analyses", id, "output_file", "", sep = "/"),
+    write_disk(dest, overwrite = TRUE)
   )
+  
+ untar(tarfile = dest, exdir = extractFolder)
 
   logWarning = warning
 
@@ -785,6 +792,27 @@ api_get_analyses_output_file <- function(id) {
     ),
     class = c("apiresponse")
   )
+}
+
+#' Return analyses output files  Dataframe
+#'
+#' @rdname return_analyses_output_file_df
+#'
+#' @description Returns a dataframe of output files 
+#'
+#' @param id a unique integer value identifying this analysis.
+#'
+#' @return dataframe of output files.
+#'
+#' @importFrom stats setNames
+#'
+#' @export
+
+return_analyses_output_file_df <- function(id) {
+  extractFolder <- file.path(".", paste0(id, "_output/output"))
+  api_get_analyses_output_file(id)
+  analyses_output_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
+  return(analyses_output_file_df)
 }
 
 #' Post analysis output file
@@ -832,6 +860,7 @@ api_post_analyses_output_file <- function(id, filepath_output) {
     class = c("apiresponse")
   )
 }
+
 # run traceback file -----------------------------------------------------------
 #' Get analysis run_traceback file
 #'
@@ -970,7 +999,7 @@ return_analyses_run_traceback_file_df <- function(id){
 #' @export
 api_post_analyses_run <- function(id) {
 
-  response <- GET(
+  response <- POST(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),

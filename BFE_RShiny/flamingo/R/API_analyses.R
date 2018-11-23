@@ -127,6 +127,53 @@ api_delete_analyses_id <- function(id) {
   )
 }
 
+#' Post analyses
+#' 
+#' Creates an analysis based on the input data
+#' 
+#' @rdname api_post_analyses
+#' 
+#' @param name the name of the analysis. 
+#' @param portfolio the id of the portfolio. 
+#' @param model the id of the model.
+#' 
+#' @return the posted analysis. 
+#' 
+#' @importFrom httr POST 
+#' @importFrom httr add_headers 
+#' @importFrom httr warn_for_status 
+#' @importFrom httr http_status
+#' 
+#' @export
+api_post_analyses <- function(name, portfolio, model) {
+  
+  response <- POST(
+    get_url(),
+    config = add_headers(
+      Accept =  get_http_type(),
+      Authorization = sprintf("Bearer %s", get_token())
+    ),
+    body = list(name = name, portfolio = portfolio, model = model),
+    encode = "json",
+    path = paste(get_version(), "analyses", "", sep = "/")
+  )
+  
+  logWarning = warning
+  
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+  
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
+  )
+}
+
+
 # R functions calling Analyses API Calls ---------------------------------------
 
 #' Return analyses Dataframe
