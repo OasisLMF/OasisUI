@@ -71,8 +71,9 @@ defineSingleAna <- list(
 
 ### Panel Browse ----
 
-browse_programmes <- list(
+dashboard <- list(
   selectAnaID = "Select AnaID.",
   selectBatchAnaID = "Select Batch AnaID.",
-  abuttonplusplot = "Add a new plot."
+  abuttonplusplot = "Add a new plot.",
+  abuttonselectAna = "Please select an analysis."
   )

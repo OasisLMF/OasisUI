@@ -759,6 +759,7 @@ return_input_generation_traceback_file_df <- function(id){
 #' @importFrom httr add_headers
 #' @importFrom httr warn_for_status
 #' @importFrom httr http_status
+#' @importFrom httr write_disk
 #'
 #' @export
 api_get_analyses_output_file <- function(id) {

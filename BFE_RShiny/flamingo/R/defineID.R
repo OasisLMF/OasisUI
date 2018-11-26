@@ -35,7 +35,7 @@ defineIDUI <- function(id, w, batch = FALSE){
                                background-image: none;
                                border: none;
                                 ") %>%
-           bs_embed_tooltip(title = browse_programmes$selectAnaID, placement = "right"),
+           bs_embed_tooltip(title = dashboard$selectAnaID, placement = "right"),
          div(textOutput(ns("selectAnaInfo1"), inline = TRUE),
                style = "font-weight:bold; font-color: #2d2d2d;
                         display:inline;
@@ -70,6 +70,8 @@ defineIDUI <- function(id, w, batch = FALSE){
 #' 
 #' @importFrom dplyr sym
 #' @importFrom dplyr filter
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
 #'
 #' @export
 defineID <- function(input, output, session,
@@ -110,7 +112,8 @@ defineID <- function(input, output, session,
     flamingoTableUI(ns("flamingo_analyses")),
     footer = tagList(
       flamingoButton(ns("abuttonselectAna"),
-                     label = "Select Analysis", align = "left"),
+                     label = "Select Analysis", align = "left") %>%
+        bs_embed_tooltip(title = dashboard$abuttonselectAna, placement = "right"),
       actionButton(ns("abuttoncancel"),
                    label = "Cancel", align = "right")
     )
@@ -162,6 +165,7 @@ defineID <- function(input, output, session,
       }
     })
 
+  #Assign preselected row
   observeEvent({
     result$LProw
     result$SArow
@@ -177,7 +181,7 @@ defineID <- function(input, output, session,
 
 
   # > select analysis ID
-  observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
+  observeEvent(input$abuttonselectAna, {
     currid <- ""
     currName <- ""
     currpfId <- ""
@@ -189,6 +193,16 @@ defineID <- function(input, output, session,
     result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
+    removeModal()
+  })
+  
+  # > Enable/disable select button
+  observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
+    if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
+      enable("abuttonselectAna")
+    } else {
+      disable("abuttonselectAna")
+    }
   })
 
   # > close modal
@@ -196,15 +210,9 @@ defineID <- function(input, output, session,
     removeModal()
   })
 
-  observeEvent(input$abuttonselectAna, {
-    if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
-      result$preselRow <- sub_modules$flamingo_analyses$rows_selected()
-    }
-    removeModal()
-  })
-
+  # > ifo selected analysis
   output$selectAnaInfo1 <- renderText({
-    if (result$selectAnaID == "") {
+    if (is.null(sub_modules$flamingo_analyses$rows_selected())) {
       info <- paste0("Select ", labelana, ":   ")
     } else {
       info <- paste0('Selected ', labelana, ': ')
@@ -213,22 +221,22 @@ defineID <- function(input, output, session,
   })
 
   output$selectAnaInfo2 <- renderText({
-    if (result$selectAnaID == "") {
+    if (is.null(sub_modules$flamingo_analyses$rows_selected())) {
       info <- " "
     } else {
-      info <- paste0(result$selectAnaID, ' "' ,result$selectAnaName, '"  ')
+      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaID]
+      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaName]
+      info <- paste0(currid, ' "' ,currName, '"  ')
     }
     info
   })
   
   # Module Outout --------------------------------------------------------------
-  selectAnaID <- reactive({ifelse(is.null(result$selectAnaID) | is.na(result$selectAnaID), "", result$selectAnaID)})
-  selectPortfolioID <- reactive({result$selectportfolioID})
   
   moduleOutput <- c(
     list(
-      selectAnaID = selectAnaID,
-      selectPortfolioID = selectPortfolioID
+      selectAnaID = reactive({result$selectAnaID}),
+      selectPortfolioID = reactive({result$selectportfolioID})
     )
   )
 
