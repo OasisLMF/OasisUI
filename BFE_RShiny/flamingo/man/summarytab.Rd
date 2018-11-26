@@ -9,6 +9,7 @@ summarytabUI(id)
 
 summarytab(input, output, session, dbSettings, apiSettings,
   selectAnaID1 = reactive(""), selectAnaID2 = reactive(""),
+  portfolioID1 = reactive(""), portfolioID2 = reactive(""),
   compare = FALSE, active, logMessage = message)
 }
 \arguments{

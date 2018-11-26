@@ -816,6 +816,32 @@ return_analyses_output_file_df <- function(id) {
   return(analyses_output_file_df)
 }
 
+#' Return specific analyses output file as Dataframe
+#'
+#' @rdname return_analyses_spec_output_file_df
+#'
+#' @description Returns a dataframe of specific output file
+#'
+#' @param id a unique integer value identifying this analysis.
+#' @param fileName name of file to read
+#'
+#' @return dataframe of specific output file.
+#'
+#' @importFrom stats setNames
+#'
+#' @export
+
+return_analyses_spec_output_file_df <- function(id, fileName) {
+  filePathr <- file.path(".", paste0(id, "_output/output/", fileName))
+  info <- file.info(filePathr)
+  analyses_spec_output_file_df <- NULL
+  if (!is.na(info$size) && info$size != 0 ) {
+    analyses_spec_output_file_df <- read.csv(filePathr)
+  }
+  return(analyses_spec_output_file_df)
+}
+
+
 #' Post analysis output file
 #'
 #' Sets the analysis output_file contents.
