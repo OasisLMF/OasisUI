@@ -268,7 +268,9 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
   # Panels Visualization -------------------------------------------------------
-  observeEvent(currstep(), {
+  observeEvent({
+    currstep()
+    portfolioID()}, {
     .hideDivs()
     if (currstep() == 2 ) {
       .defaultAssociateModel()
@@ -452,7 +454,6 @@ step2_chooseAnalysis <- function(input, output, session,
   onclick("abuttonshowlog", {
     hide("panelAnalysisDetails")
     hide("panelModelTable")
-    #hide("panelModelDetails")
     logMessage("showing panelAnalysisLog")
     show("panelAnalysisLog")
     .reloadAnaLog()
@@ -496,7 +497,6 @@ step2_chooseAnalysis <- function(input, output, session,
   onclick("abuttoncreateana", {
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
-    #hide("panelModelDetails")
     logMessage("showing panelModelTable")
     show("panelModelTable")
     .reloadtbl_modelsData()

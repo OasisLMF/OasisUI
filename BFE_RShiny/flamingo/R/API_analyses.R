@@ -221,7 +221,7 @@ return_tbl_analysesData <- function(name = ""){
   .replaceWithIcons <- function(df){
     #Status
     StatusGood <- c("RUN_COMPLETED")
-    StatusBad <- c("INPUTS_GENERATION_ERROR", NA_character_)
+    StatusBad <- c("INPUTS_GENERATION_ERROR", "RUN_ERROR", NA_character_)
     StatusAvailable <- c("READY")
     
     #Replace Status in df

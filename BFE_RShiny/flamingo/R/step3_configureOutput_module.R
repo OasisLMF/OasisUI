@@ -203,8 +203,8 @@ panelDefOutputConfiguration <- function(id) {
     hidden(div(id = ns("panel_configureAdvancedRI"), panel_configureAdvancedRI(id))),
     flamingoButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
     hidden(flamingoButton(inputId = ns("abuttonbasic"), label = "Basic")),
-    hidden(flamingoButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration")) %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonsaveoutput, placement = "right"),
+    # hidden(flamingoButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration")) %>%
+    #   bs_embed_tooltip(title = defineSingleAna$abuttonsaveoutput, placement = "right"),
     hidden(flamingoButton(inputId = ns("abuttonclroutopt"), label = "Default"))
   )
 }
@@ -705,12 +705,12 @@ step3_configureOutput <- function(input, output, session,
 
 
   # Enable and disable buttons based on output confifig
-  observeEvent(outputOptionsList, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(outputOptionsList(), ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (outputOptionsList() != "") {
-      enable("abuttonsaveoutput")
+      # enable("abuttonsaveoutput")
       enable("abuttonexecuteanarun")
     } else {
-      disable("abuttonsaveoutput")
+      # disable("abuttonsaveoutput")
       disable("abuttonexecuteanarun")
     }
   })
@@ -930,12 +930,26 @@ step3_configureOutput <- function(input, output, session,
   # Update button in sidebar panel to update checkboxes for pre-populated values
   #To-Do update output configuration based on analysis setting
   observeEvent(input$sinoutputoptions, {
+    # if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
+    #   #read the right analysis settings file
+    #   analyses_settings <- read_json(paste0("./analysis_settings/",input$sinoutputoptions,".json"),  simplifyVector = TRUE)
+    #   #Set inputs
+    #   .updateOutputConfig(analyses_settings)
+    # }
+    # Using analyses names to select the output configuration of a previously posted analyses
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
-      #read the right analysis settings file
-      analyses_settings <- read_json(paste0("./analysis_settings/",input$sinoutputoptions,".json"),  simplifyVector = TRUE)
-      #Set inputs
-      .updateOutputConfig(analyses_settings)
-      
+      tbl_analysesData  <- return_tbl_analysesData()
+      tbl_analysesData <- tbl_analysesData %>% filter(status == StatusProcessing)
+      idx <- which(tbl_analysesData[,tbl_analysesData.AnaName] == input$sinoutputoptions)
+      analysisID <- tbl_analysesData[idx, tbl_analysesData.AnaID]
+      analyses_settings <-  return_analyses_settings_file_list(analysisID)
+      if (!is.null(analyses_settings$detail) && analyses_settings$detail == "Not found.") {
+        flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", input$sinoutputoptions," id ", analysisID))
+      } else {
+        logMessage(paste0("appling the output configuration of analysis ", input$sinoutputoptions," id ", analysisID))
+        #Set inputs
+        .updateOutputConfig(analyses_settings) 
+      }
     }
   })
 
@@ -967,42 +981,42 @@ step3_configureOutput <- function(input, output, session,
     input$chkrilob
   ))})
 
-  # Save output configuration --------------------------------------------------
-
-  # Save output for later use as presets
-  .modalsaveoutput <- function() {
-    ns <- session$ns
-    modalDialog(label = "modalsaveoutput",
-                title = "Save Configuration",
-                textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
-                footer = tagList(
-                  flamingoButton(inputId = ns("abuttonsubmitoutput"),
-                                 label = "Submit")
-                ),
-                size = "s",
-                easyClose = TRUE
-    )
-  }
-
-  onclick("abuttonsaveoutput", {
-    showModal(.modalsaveoutput())
-  })
-
-  # Submit output configuration (to be saved)
-  onclick("abuttonsubmitoutput", {
-    if (input$tinputoutputname == "") {
-      flamingoNotification(type = "warning", "Please enter Output Configuration Name")
-    } else {
-      dir.create("./analysis_settings")
-      #write out file to be uploades
-      analyses_settingsList <- .gen_analysis_settings()
-      write_json(analyses_settingsList, paste0("./analysis_settings/",input$tinputoutputname,".json"), pretty = TRUE, auto_unbox = TRUE)
-      flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
-      updateTextInput(session, "tinputoutputname", value = "")
-      removeModal()
-      .clearOutputOptions()
-    }
-  })
+  # # Save output configuration --------------------------------------------------
+  # 
+  # # Save output for later use as presets
+  # .modalsaveoutput <- function() {
+  #   ns <- session$ns
+  #   modalDialog(label = "modalsaveoutput",
+  #               title = "Save Configuration",
+  #               textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
+  #               footer = tagList(
+  #                 flamingoButton(inputId = ns("abuttonsubmitoutput"),
+  #                                label = "Submit")
+  #               ),
+  #               size = "s",
+  #               easyClose = TRUE
+  #   )
+  # }
+  # 
+  # onclick("abuttonsaveoutput", {
+  #   showModal(.modalsaveoutput())
+  # })
+  # 
+  # # Submit output configuration (to be saved)
+  # onclick("abuttonsubmitoutput", {
+  #   if (input$tinputoutputname == "") {
+  #     flamingoNotification(type = "warning", "Please enter Output Configuration Name")
+  #   } else {
+  #     dir.create("./analysis_settings")
+  #     #write out file to be uploades
+  #     analyses_settingsList <- .gen_analysis_settings()
+  #     write_json(analyses_settingsList, paste0("./analysis_settings/",input$tinputoutputname,".json"), pretty = TRUE, auto_unbox = TRUE)
+  #     flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
+  #     updateTextInput(session, "tinputoutputname", value = "")
+  #     removeModal()
+  #     .clearOutputOptions()
+  #   }
+  # })
 
 
   # Run Analyses ---------------------------------------------------------------
@@ -1170,7 +1184,7 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
     if (!is.null(result$anaID) && result$anaID != "") {
-      result$tbl_analysisrunlog <- return_input_generation_traceback_file_df(result$anaID)
+      result$tbl_analysisrunlog <- return_analyses_run_traceback_file_df(result$anaID)
     } else {
       result$tbl_analysisrunlog <-  NULL
     }
@@ -1252,8 +1266,14 @@ step3_configureOutput <- function(input, output, session,
   # Clear Custom Configuration option
   .clearOutputOptions <- function() {
     logMessage(".clearOutputOptions called")
+    # updateSelectInput(session, "sinoutputoptions",
+    #                   choices = gsub(".json", "", list.files("./analysis_settings")),
+    #                   selected = character(0))
+    tbl_analysesData  <- return_tbl_analysesData()
+    tbl_analysesData <- tbl_analysesData %>% filter(status != StatusProcessing & status != StatusReady)
+    namesList <- tbl_analysesData[,tbl_analysesData.AnaName]
     updateSelectInput(session, "sinoutputoptions",
-                      choices = gsub(".json", "", list.files("./analysis_settings")),
+                      choices = namesList,
                       selected = character(0))
   }
 
@@ -1334,6 +1354,12 @@ step3_configureOutput <- function(input, output, session,
   .updateOutputConfig <- function(analyses_settings) {
     logMessage(".updateOutputConfig called")
     
+    #clear checkboxes
+    .clearotherparams()
+    .clearchkboxGULgrp()
+    .clearchkboxILgrp()
+    .clearchkboxRIgrp()
+  
     number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]]
     updateTextInput(session, "tinputnoofsample", value = number_of_samples)
     
@@ -1385,7 +1411,7 @@ step3_configureOutput <- function(input, output, session,
     show("configureAnaParamsAdvanced")
     show("abuttonbasic")
     hide("abuttonadvanced")
-    show("abuttonsaveoutput")
+    # show("abuttonsaveoutput")
     show("abuttonclroutopt")
   }
 
@@ -1397,7 +1423,7 @@ step3_configureOutput <- function(input, output, session,
     hide("configureAnaParamsAdvanced")
     hide("abuttonbasic")
     show("abuttonadvanced")
-    hide("abuttonsaveoutput")
+    # hide("abuttonsaveoutput")
     hide("abuttonclroutopt")
   }
 
