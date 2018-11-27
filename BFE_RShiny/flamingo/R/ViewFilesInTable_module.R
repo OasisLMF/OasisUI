@@ -326,9 +326,8 @@ ViewFilesInTable <- function(input, output, session,
       func <- get(returnfunc)
       result$tbl_fileData <- func(param())
     } else {
-      extractFolder <- file.path(".", paste0(param(), "_output/output"))
-      print("file")
-      print(file.path(extractFolder, result$currentFile))
+      currfolder <- getOption("flamingo.settins.api.share_filepath")
+      extractFolder <- file.path(currfolder, paste0(param(), "_output/output"))
       result$tbl_fileData <- read.csv(file.path(extractFolder, result$currentFile))
     }
 

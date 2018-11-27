@@ -764,8 +764,9 @@ return_input_generation_traceback_file_df <- function(id){
 #' @export
 api_get_analyses_output_file <- function(id) {
 
-  dest <- file.path(".", paste0(id, "_outputs.tar"))
-  extractFolder <- file.path(".", paste0(id, "_output"))
+  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  dest <- file.path(currfolder, paste0(id, "_outputs.tar"))
+  extractFolder <- file.path(currfolder, paste0(id, "_output"))
   dir.create(extractFolder, showWarnings = FALSE)
   
   response <- GET(
@@ -810,7 +811,8 @@ api_get_analyses_output_file <- function(id) {
 #' @export
 
 return_analyses_output_file_df <- function(id) {
-  extractFolder <- file.path(".", paste0(id, "_output/output"))
+  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  extractFolder <- file.path(currfolder, paste0(id, "_output/output"))
   api_get_analyses_output_file(id)
   analyses_output_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
   return(analyses_output_file_df)
@@ -832,7 +834,8 @@ return_analyses_output_file_df <- function(id) {
 #' @export
 
 return_analyses_spec_output_file_df <- function(id, fileName) {
-  filePathr <- file.path(".", paste0(id, "_output/output/", fileName))
+  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  filePathr <- file.path(currfolder, paste0(id, "_output/output/", fileName))
   info <- file.info(filePathr)
   analyses_spec_output_file_df <- NULL
   if (!is.na(info$size) && info$size != 0 ) {

@@ -60,6 +60,7 @@ reloadMillis <- 300000
 # options(flamingo.settings.api = api_init("localhost", "8000"))
 options(flamingo.settings.api = api_init("10.10.0.182", "8000"))
 options(flamingo.settings.api.version = "v1")
+options(flamingo.settins.api.share_filepath = "./downloads")
 
 loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
 tryCatch({
