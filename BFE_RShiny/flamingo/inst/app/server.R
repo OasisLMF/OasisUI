@@ -9,6 +9,9 @@ source(file.path(".", "ui_auth.R"), local = TRUE)$value
 
 
 server <- function(input, output, session) {
+  
+  #clean up folder upon login
+  clean_downloadedData()
 
   # active main panel based on the reactive navigation state
   navigation_state <- reactiveNavigation("LP")
@@ -138,15 +141,6 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "CBR")
   )
 
-  # preselected panel
-  observe({
-    if (!is.null(auth_modules$visualizationSBR$preselPanel)) {
-      result$preselPanel <- auth_modules$visualizationSBR$preselPanel()
-    } else {
-      result$preselPanel <- 1
-    }
-  })
-
   auth_modules$fileViewer <- .callModule(
     fileViewer,
     id = "fileViewer",
@@ -199,6 +193,15 @@ server <- function(input, output, session) {
   callModule(dynamicColumn, "main", reactive(result$WidthMain))
 
   observe(result$logout <- auth_modules$pageheader$logout())
+  
+  # preselected panel
+  observe({
+    if (!is.null(auth_modules$visualizationSBR$preselPanel)) {
+      result$preselPanel <- auth_modules$visualizationSBR$preselPanel()
+    } else {
+      result$preselPanel <- 1
+    }
+  })
 
   # collapse / expand sidebar ----
   observe({
