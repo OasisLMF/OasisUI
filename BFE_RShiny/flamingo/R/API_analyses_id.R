@@ -780,6 +780,13 @@ api_get_analyses_output_file <- function(id) {
   )
   
  untar(tarfile = dest, exdir = extractFolder)
+ 
+ #wait for untar to finish
+ oldfileList <- NULL
+ while (all.equal(oldfileList, list.files(extractFolder)) != TRUE) {
+   oldfileList <- list.files(extractFolder)
+   Sys.sleep(2)
+ }
 
   logWarning = warning
 
@@ -795,6 +802,24 @@ api_get_analyses_output_file <- function(id) {
     class = c("apiresponse")
   )
 }
+
+#' Extract analyses output files
+#'
+#' @rdname extract_analyses_output_file
+#'
+#' @description extract the output files in afixed location
+#'
+#' @param id a unique integer value identifying this analysis.
+#'
+#' @export
+
+extract_analyses_output_file <- function(id) {
+  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  extractFolder <- file.path(currfolder, paste0(id, "_output/output"))
+  api_get_analyses_output_file(id)
+  invisible()
+}
+
 
 #' Return analyses output files  Dataframe
 #'
@@ -813,7 +838,9 @@ api_get_analyses_output_file <- function(id) {
 return_analyses_output_file_df <- function(id) {
   currfolder <- getOption("flamingo.settins.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_output/output"))
-  api_get_analyses_output_file(id)
+  if (!file.exists(extractFolder)) {
+    extract_analyses_output_file(id)
+  }
   analyses_output_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
   return(analyses_output_file_df)
 }
@@ -835,6 +862,7 @@ return_analyses_output_file_df <- function(id) {
 
 return_analyses_spec_output_file_df <- function(id, fileName) {
   currfolder <- getOption("flamingo.settins.api.share_filepath")
+  extractFolder <- file.path(currfolder, paste0(id, "_output/output/"))
   filePathr <- file.path(currfolder, paste0(id, "_output/output/", fileName))
   info <- file.info(filePathr)
   analyses_spec_output_file_df <- NULL

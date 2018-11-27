@@ -113,7 +113,7 @@ summarytab <- function(input, output, session, dbSettings,
       if (selectAnaID2() != "" && portfolioID2() != "") {
         SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
       }
-      
+
       #define df to use
       if (compare) {
         if (!is.null(SummaryData1) && !is.null(SummaryData2)) {
@@ -145,12 +145,20 @@ summarytab <- function(input, output, session, dbSettings,
   # Output Summary Tables ------------------------------------------------------
   
   # Summary Input tables
+  dt_dataInput <- reactive({
+    data <- result$SummaryData %>% 
+      filter(Type == "input") 
+    if (!is.null(data) && nrow(data) > 0) {
+      data <- data %>%
+        select(-Type)
+    }
+    data
+  })
+  
   sub_modules$summaryTable <- callModule(
     flamingoTable,
     id = "summaryInputTable",
-    data = reactive({result$SummaryData %>% 
-        filter(Type == "input") %>%
-        select(-Type)}),
+    data = dt_dataInput,
     selection = "none",
     escape = TRUE,
     scrollX = FALSE,
@@ -159,13 +167,21 @@ summarytab <- function(input, output, session, dbSettings,
     colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
+  
+  dt_dataParam <- reactive({
+    data <- result$SummaryData %>% 
+      filter(Type == "param") 
+    if (!is.null(data) && nrow(data) > 0) {
+      data <- data %>%
+        select(-Type)
+    }
+    data
+  })
 
   sub_modules$summaryTable <- callModule(
     flamingoTable,
     id = "summaryParamsTable",
-    data = reactive({result$SummaryData %>% 
-        filter(Type == "param") %>%
-        select(-Type)}),
+    data = dt_dataParam,
     selection = "none",
     escape = TRUE,
     scrollX = FALSE,
@@ -174,13 +190,21 @@ summarytab <- function(input, output, session, dbSettings,
     colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
+  
+  dt_dataOutput <- reactive({
+    data <- result$SummaryData %>% 
+      filter(Type == "output") 
+    if (!is.null(data) && nrow(data) > 0) {
+      data <- data %>%
+        select(-Type)
+    }
+    data
+  })
 
   sub_modules$summaryTable <- callModule(
     flamingoTable,
     id = "summaryOutputTable",
-    data = reactive({result$SummaryData %>%
-        filter(Type == "output") %>%
-        select(-Type)}),
+    data = dt_dataOutput,
     selection = "none",
     escape = TRUE,
     scrollX = FALSE,
@@ -196,37 +220,40 @@ summarytab <- function(input, output, session, dbSettings,
   output$summaryAALOutputPlot <- renderPlotly({
     data <- result$SummaryData %>% 
       filter(Type == "AALplot")
-    DFtype <- data.frame("Type" = {lapply(data$SummaryType, function(s) {
-      gsub("Mean AAL ", "", s)
-    }) %>% 
-        unlist()}
-    ) %>%
-      separate(Type,into = c("perspective", "type"), sep = " ")
-    data <- cbind(data, DFtype)
-    multipleplots <- FALSE
-    if (compare) {
-      colnames <- names(select(data, contains("analysis", ignore.case = TRUE)))
-      data <- data %>% gather(key = "gridcol", value = "Value",colnames)
-      multipleplots <- TRUE
+    p <- NULL
+    if (!is.null(data) && nrow(data) > 0) {
+      DFtype <- data.frame("Type" = {lapply(data$SummaryType, function(s) {
+        gsub("Mean AAL ", "", s)
+      }) %>% 
+          unlist()}
+      ) %>%
+        separate(Type,into = c("perspective", "type"), sep = " ")
+      data <- cbind(data, DFtype)
+      multipleplots <- FALSE
+      if (compare) {
+        colnames <- names(select(data, contains("analysis", ignore.case = TRUE)))
+        data <- data %>% gather(key = "gridcol", value = "Value",colnames)
+        multipleplots <- TRUE
+      }
+      data <- data  %>%
+        rename("colour" = "SummaryType") %>%
+        rename("xaxis" = "perspective") %>%
+        rename("value" = "Value") %>%
+        mutate(value = as.numeric(value) / 1000000)
+      xlabel <- "Sample Type"
+      ylabel <- "Loss in Millions"
+      titleToUse <- "AAL"
+      
+      p <- barPlot(xlabel, ylabel, titleToUse, data, multipleplots )
     }
-    data <- data  %>%
-      rename("colour" = "SummaryType") %>%
-      rename("xaxis" = "perspective") %>%
-      rename("value" = "Value") %>%
-      mutate(value = as.numeric(value) / 1000000)
-    xlabel <- "Sample Type"
-    ylabel <- "Loss in Millions"
-    titleToUse <- "AAL"
-    
-    p <- barPlot(xlabel, ylabel, titleToUse, data, multipleplots )
-    
+    p
   })
   
   # OEP / AEP
   output$summaryGULOutputPlot <- renderPlotly({
     p <- NULL
     data <- .prepareDataLinePlot("gul")
-    if (!is.null(data)) {
+    if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
       titleToUse <- "GUL EP Curve"
@@ -238,7 +265,7 @@ summarytab <- function(input, output, session, dbSettings,
   output$summaryILOutputPlot <- renderPlotly({
     p <- NULL
     data <- .prepareDataLinePlot("il")
-    if (!is.null(data)) {
+    if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
       titleToUse <- "IL EP Curve"
@@ -250,7 +277,7 @@ summarytab <- function(input, output, session, dbSettings,
   output$summaryRIOutputPlot <- renderPlotly({
     p <- NULL
     data <- .prepareDataLinePlot("ri")
-    if (!is.null(data)) {
+    if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
       titleToUse <- "RI EP Curve"
@@ -268,10 +295,11 @@ summarytab <- function(input, output, session, dbSettings,
     for (p in 1:length(perspectives)) {
       for (v in 1:length(variables)) {
         if (variables[v] == "aal") {
-          output_file_df <- return_analyses_spec_output_file_df(id, paste0(perspectives[p], "_S1_", filepattern, ".csv"))
+          fileName <- paste0(perspectives[p], "_S1_", filepattern, ".csv")
         } else {
-          output_file_df <- return_analyses_spec_output_file_df(id, paste0(perspectives[p], "_S1_", filepattern, "_", variables[v], ".csv"))
+          fileName <- paste0(perspectives[p], "_S1_", filepattern, "_", variables[v], ".csv")
         }
+        output_file_df <- return_analyses_spec_output_file_df(id, fileName)
         if (!is.null(output_file_df)) {
           c <- length(DFList) + 1
           DFList[[c]] <- output_file_df %>%
@@ -289,18 +317,48 @@ summarytab <- function(input, output, session, dbSettings,
     analyses_settings <- return_analyses_settings_file_list(selectAnaID)
     #read aal files
     AAL <- .getData(id = selectAnaID, filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("aal"))
+    if (!is.null(AAL)) {
+      #infer params
+      tiv <- AAL %>% 
+        filter(grepl("exposure_value", variable)) %>% 
+        select(value) %>%
+        unique() %>%
+        as.character()
+      #AAL output
+      outputsAALtmp <- AAL %>%
+        select(-c("summary_id")) %>%
+        filter(grepl("mean", variable)) %>%
+        separate(variable, into = c("variables", "report", "perspective"), sep = "\\.")
+      outputsAALtmp <- outputsAALtmp %>%
+        mutate(type = replace(type, type == "1", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (NI)"))) %>%
+        mutate(type = replace(type, type == "2", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
+      outputsAAL <- data.frame("SummaryType" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
+      # AAL plot
+      plotAALtmp <- data.frame("SummaryType" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
+    } else {
+      tiv <- 0
+      outputsAAL <- NULL
+      plotAALtmp <- NULL
+    }
     #read OEP & aEP files 
-    leccalc <- .getData(id = selectAnaID, filepattern = "leccalc_full_uncertainty", nonkeycols = c("summary_id", "return_period"), variables = c("aep", "oep")) %>% 
-      mutate(variable = paste0(variable, ".", return_period)) 
+    leccalc <- .getData(id = selectAnaID, filepattern = "leccalc_full_uncertainty", nonkeycols = c("summary_id", "return_period"),
+                        variables = c("aep", "oep"))
+    if (!is.null(leccalc)) {
+      leccalc <- leccalc  %>%
+        mutate(variable = paste0(variable, ".", return_period))
+      plotleccalc <- data.frame("SummaryType" = leccalc$variable, "Value" = leccalc$value, "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
+    } else {
+      plotleccalc <- NULL
+    }
     #Location file
     Location <- return_location_file_df(portfolioID)
-    #infer params
-    locnum <- length(unique(Location$LOCNUM))
-    tiv <- AAL %>% 
-      filter(grepl("exposure_value", variable)) %>% 
-      select(value) %>%
-      unique() %>%
-      as.character()
+    if (!is.null(Location)) {
+      #infer params
+      locnum <- length(unique(Location$LOCNUM))
+    } else {
+      locnum <- 0
+    }
+    
     gul_threshold <- analyses_settings[["analysis_settings"]][["gul_threshold"]]
     gul_threshold <- ifelse(is.null(gul_threshold), 0, gul_threshold)
     number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]]
@@ -325,46 +383,47 @@ summarytab <- function(input, output, session, dbSettings,
     TypeRows <- c("input", "input", "param", "param", "param", "param", "param", "param", "param", "param", "param")
     summary_df <- data.frame("SummaryType" = SummaryTypeRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE)
     #add AAL outputs
-    outputsAALtmp <- AAL %>%
-      select(-c("summary_id")) %>%
-      filter(grepl("mean", variable)) %>%
-      separate(variable, into = c("variables", "report", "perspective"), sep = "\\.")
-    outputsAALtmp <- outputsAALtmp %>%
-      mutate(type = replace(type, type == "1", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (NI)"))) %>%
-      mutate(type = replace(type, type == "2", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
-    outputsAAL <- data.frame("SummaryType" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
-    summary_df <- rbind(summary_df, outputsAAL)
+    if (!is.null(outputsAAL)) {
+      summary_df <- rbind(summary_df, outputsAAL)
+    }
     # add AAL plot
-    plotAALtmp <- data.frame("SummaryType" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
-    summary_df <- rbind(summary_df, plotAALtmp)
+    if (!is.null(plotAALtmp)) {
+      summary_df <- rbind(summary_df, plotAALtmp)
+    }
     # add oep/aep plot output
-    summary_df <- rbind(summary_df, data.frame("SummaryType" = leccalc$variable, "Value" = leccalc$value, "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE))
+    if (!is.null(plotleccalc)) {
+      summary_df <- rbind(summary_df, plotleccalc)
+    }
+    
     return(summary_df)
   }
   
   .prepareDataLinePlot <- function(P){
     data <- result$SummaryData %>% 
       filter(Type == "leccalcplot") 
-    if (compare) {
+    if (nrow(data) > 0) {
+      if (compare) {
+        data <- data %>%
+          gather(key = "gridcol", value = "Value",colnames) 
+      }
       data <- data %>%
-        gather(key = "gridcol", value = "Value",colnames) 
-    }
-    data <- data %>%
-      separate(SummaryType, into = c("loss", "variable", "perspective", "returnperiod"), sep = "\\.") %>%
-      mutate(returnperiod = as.numeric(returnperiod)) %>%
-      mutate(variable = as.factor(variable))
-    data <- data %>%
-      filter(perspective == P)
-    if (nrow(data) > 0 ) {
+        separate(SummaryType, into = c("loss", "variable", "perspective", "returnperiod"), sep = "\\.") %>%
+        mutate(returnperiod = as.numeric(returnperiod)) %>%
+        mutate(variable = as.factor(variable))
       data <- data %>%
-        rename("colour" = "variable") %>%
-        rename("xaxis" = "returnperiod") %>%
-        rename("value" = "Value") %>%
-        mutate(value = as.numeric(value) / 1000000)
+        filter(perspective == P)
+      if (nrow(data) > 0 ) {
+        data <- data %>%
+          rename("colour" = "variable") %>%
+          rename("xaxis" = "returnperiod") %>%
+          rename("value" = "Value") %>%
+          mutate(value = as.numeric(value) / 1000000)
+      } else {
+        data <- NULL
+      }
     } else {
       data <- NULL
     }
-
     data
   }
   
