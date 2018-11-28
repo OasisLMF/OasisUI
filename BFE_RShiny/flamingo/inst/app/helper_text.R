@@ -66,6 +66,7 @@ defineSingleAna <- list(
   abuttonConfirmDel = "Please confirm to delete analysis.",
   abuttoncancelIG = "Please select an Analysis to stop input generation.",
   abuttonstartIG = "Start input generation.",
+  abuttonshowIG = "Please select an analysis to visualize the generated input",
   abuttonConfirmDelIG = "Pleas confirm to cancel input generation."
 )
 

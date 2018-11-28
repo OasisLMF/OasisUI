@@ -9,7 +9,7 @@ ViewFilesInTableUI(id, includechkbox = FALSE)
 
 ViewFilesInTable(input, output, session, logMessage = message,
   tbl_filesListData, param = NULL, file_column = "fields",
-  includechkbox = FALSE)
+  folderpath = "_output/output/", includechkbox = FALSE)
 }
 \arguments{
 \item{id}{module id}
@@ -27,6 +27,8 @@ ViewFilesInTable(input, output, session, logMessage = message,
 \item{param}{id to be used}
 
 \item{file_column}{name of the column containing filename. Default "fields}
+
+\item{folderpath}{path to files. Can be "_output/output/" or "_inputs/"; default output path.}
 
 \item{id}{Namespace ID for the module.}
 

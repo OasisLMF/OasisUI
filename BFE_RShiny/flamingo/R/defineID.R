@@ -194,7 +194,7 @@ defineID <- function(input, output, session,
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
     logMessage("Extract output files")
-    extract_analyses_output_file(result$selectAnaID)
+    api_get_analyses_output_file(result$selectAnaID)
     removeModal()
   })
   

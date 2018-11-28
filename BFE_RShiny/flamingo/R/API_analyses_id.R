@@ -13,17 +13,24 @@
 #' @importFrom httr add_headers
 #' @importFrom httr warn_for_status
 #' @importFrom httr http_status
+#' @importFrom httr write_disk
 #'
 #' @export
 api_get_analyses_input_file <- function(id) {
-
+  
+  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  dest <- file.path(currfolder, paste0(id, "_inputs.tar"))
+  extractFolder <- file.path(currfolder, paste0(id, "_inputs"))
+  dir.create(extractFolder, showWarnings = FALSE)
+  
   response <- GET(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
-    path = paste(get_version(), "analyses", id, "input_file", "", sep = "/")
+    path = paste(get_version(), "analyses", id, "input_file", "", sep = "/"),
+    write_disk(dest, overwrite = TRUE)
   )
 
   logWarning = warning
@@ -39,53 +46,107 @@ api_get_analyses_input_file <- function(id) {
     ),
     class = c("apiresponse")
   )
+  
+  untar(tarfile = dest, exdir = extractFolder)
+  
+  #wait for untar to finish
+  oldfileList <- NULL
+  while (all.equal(oldfileList, list.files(extractFolder)) != TRUE) {
+    oldfileList <- list.files(extractFolder)
+    Sys.sleep(2)
+  }
 }
 
-#' Post analysis input file
+
+#' Return analyses input files  Dataframe
 #'
-#' Sets the analysis input_file contents.
+#' @rdname return_analyses_input_file_df
 #'
-#' @rdname api_post_analyses_input_file
+#' @description Returns a dataframe of input files 
 #'
 #' @param id a unique integer value identifying this analysis.
-#' @param filepath_input path to the input file.
 #'
-#' @return the posted analysis input file.
+#' @return dataframe of input files.
 #'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
-#' @importFrom httr upload_file
+#' @importFrom stats setNames
 #'
 #' @export
-api_post_analyses_input_file <- function(id, filepath_input) {
 
-  response <- POST(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(file = upload_file(filepath_input)),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "input_file", "", sep = "/")
-  )
-
-  logWarning = warning
-
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+return_analyses_input_file_df <- function(id) {
+  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  extractFolder <- file.path(currfolder, paste0(id, "_inputs"))
+  if (!file.exists(extractFolder)) {
+    api_get_analyses_input_file(id)
+  }
+  analyses_input_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
+  return(analyses_input_file_df)
 }
+
+#' Return analyses input files  Dataframe with Icons
+#'
+#' @rdname return_analyses_input_file_wicons_df
+#'
+#' @description Returns a dataframe of input files with Icons
+#'
+#' @param id a unique integer value identifying this analysis.
+#'
+#' @return dataframe of input files with Icons.
+#'
+#' @export
+
+return_analyses_input_file_wicons_df <- function(id) {
+
+  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
+  
+  analyses_input_file_df <- return_analyses_input_file_df(id)
+  fnames <- analyses_input_file_df$files
+  fnum <- length(fnames)
+  status <- data.frame(Status = rep(status_code_notfound, fnum))
+  for (i in seq(fnum) ) {
+    fname <- as.character(fnames[i])
+    filePath <- file.path(extractFolder, fname)
+    info <- file.info(filePath)
+    if (is.na(info$size)) {
+      status[i, "Status"] <- StatusProcessing
+    } else if (info$size == 0) {
+      status[i, "Status"] <- StatusFailed
+    } else {
+      status[i, "Status"] <- StatusCompleted
+    }
+  }
+  analyses_input_file_df <- cbind(analyses_input_file_df, status) %>%
+    as.data.frame()
+  return(analyses_input_file_df)
+}
+
+#' Return specific analyses input file as Dataframe
+#'
+#' @rdname return_analyses_spec_input_file_df
+#'
+#' @description Returns a dataframe of specific input file
+#'
+#' @param id a unique integer value identifying this analysis.
+#' @param fileName name of file to read
+#'
+#' @return dataframe of specific input file.
+#'
+#' @importFrom stats setNames
+#'
+#' @export
+
+return_analyses_spec_input_file_df <- function(id, fileName) {
+  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
+  filePath <- file.path(extractFolde, fileName)
+  info <- file.info(filePath)
+  analyses_spec_input_file_df <- NULL
+  if (!is.na(info$size) && info$size != 0 ) {
+    analyses_spec_input_file_df <- read.csv(filePath)
+  }
+  return(analyses_spec_input_file_df)
+}
+
 
 # Cancel analysis --------------------------------------------------------------
 
@@ -803,24 +864,6 @@ api_get_analyses_output_file <- function(id) {
   )
 }
 
-#' Extract analyses output files
-#'
-#' @rdname extract_analyses_output_file
-#'
-#' @description extract the output files in afixed location
-#'
-#' @param id a unique integer value identifying this analysis.
-#'
-#' @export
-
-extract_analyses_output_file <- function(id) {
-  currfolder <- getOption("flamingo.settins.api.share_filepath")
-  extractFolder <- file.path(currfolder, paste0(id, "_output/output"))
-  api_get_analyses_output_file(id)
-  invisible()
-}
-
-
 #' Return analyses output files  Dataframe
 #'
 #' @rdname return_analyses_output_file_df
@@ -839,7 +882,7 @@ return_analyses_output_file_df <- function(id) {
   currfolder <- getOption("flamingo.settins.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_output/output"))
   if (!file.exists(extractFolder)) {
-    extract_analyses_output_file(id)
+    api_get_analyses_output_file(id)
   }
   analyses_output_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
   return(analyses_output_file_df)
@@ -863,11 +906,11 @@ return_analyses_output_file_df <- function(id) {
 return_analyses_spec_output_file_df <- function(id, fileName) {
   currfolder <- getOption("flamingo.settins.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_output/output/"))
-  filePathr <- file.path(currfolder, paste0(id, "_output/output/", fileName))
-  info <- file.info(filePathr)
+  filePath <- file.path(currfolder, paste0(id, "_output/output/", fileName))
+  info <- file.info(filePath)
   analyses_spec_output_file_df <- NULL
   if (!is.na(info$size) && info$size != 0 ) {
-    analyses_spec_output_file_df <- read.csv(filePathr)
+    analyses_spec_output_file_df <- read.csv(filePath)
   }
   return(analyses_spec_output_file_df)
 }

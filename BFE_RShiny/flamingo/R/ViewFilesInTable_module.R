@@ -52,6 +52,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #' @param tbl_filesListData dataframe of output files.
 #' @param param id to be used
 #' @param file_column name of the column containing filename. Default "fields
+#' @param folderpath  path to files. Can be "_output/output/" or "_inputs/"; default output path.
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
@@ -74,6 +75,7 @@ ViewFilesInTable <- function(input, output, session,
                              tbl_filesListData, 
                              param = NULL,
                              file_column = "fields",
+                             folderpath = "_output/output/",
                              includechkbox = FALSE) {
   
   ns <- session$ns
@@ -327,7 +329,7 @@ ViewFilesInTable <- function(input, output, session,
       result$tbl_fileData <- func(param())
     } else {
       currfolder <- getOption("flamingo.settins.api.share_filepath")
-      extractFolder <- file.path(currfolder, paste0(param(), "_output/output"))
+      extractFolder <- file.path(currfolder, paste0(param(), folderpath))
       result$tbl_fileData <- read.csv(file.path(extractFolder, result$currentFile))
     }
 
@@ -341,9 +343,9 @@ ViewFilesInTable <- function(input, output, session,
     output$FVExposureStatisticInfo <- renderUI({
       column(12,
              p(paste0("File Name: ", result$currentFile)),
-             p(paste0("Number of Rows", nrow(result$tbl_fileData))),
+             p(paste0("Number of Rows ", nrow(result$tbl_fileData))),
              p("Column names"),
-             p(paste(names(result$tbl_fileData), sep = " "))
+             p(paste(names(result$tbl_fileData), collapse = " "))
       )
     })
     
