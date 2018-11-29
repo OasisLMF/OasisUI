@@ -425,7 +425,7 @@ CREATE TABLE [dbo].[OasisITEMS]
 	(
 	[item_id] [int] NOT NULL,
 	[coverage_id] [int] NOT NULL,
-	[areaperil_id] [int] NOT NULL,
+	[areaperil_id] [bigint] NOT NULL,
 	[vulnerability_id] [int] NOT NULL,
 	[group_id] [int] NOT NULL
 	)
@@ -2060,7 +2060,7 @@ update progoasis set [status] = 'Generating Oasis Files' where progoasisid = @Pr
 --Item Staging File
 Create Table #Item (ItemId int identity(1,1) primary key, InterestGroupId int, InterestRiskID int, InterestSubRiskID int, InterestExposureID int,
 					GroupId int NULL, LocId int NULL, PerilId nvarchar(255) NULL, CoverageTypeId nvarchar(255) NULL, TIV float NULL, 
-					AreaPerilId int NULL, VulnerabilityId int NULL, PolicyID int NULL, AltItemID int NULL, CoverageId int NULL, StateCode nvarchar(255) NULL,
+					AreaPerilId bigint NULL, VulnerabilityId int NULL, PolicyID int NULL, AltItemID int NULL, CoverageId int NULL, StateCode nvarchar(255) NULL,
 					CountyCode nvarchar(255) NULL, PostCode nvarchar(255) NULL, SourceLocNumber nvarchar(255) NULL, OccScheme nvarchar(255) NULL, 
 					OccCode nvarchar(255) NULL, LineOfBusiness nvarchar(255) NULL, AccountNumber nvarchar(255) NULL, SubLimitRef nvarchar(255) NULL, ElementDimensionID int NULL, ProgID int NULL,
 					IsValid bit null)
