@@ -927,22 +927,13 @@ step3_configureOutput <- function(input, output, session,
     # }
     # Using analyses names to select the output configuration of a previously posted analyses
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
-      tbl_analysesData  <- return_tbl_analysesData()
-      tbl_analysesData <- tbl_analysesData %>% filter(status != StatusProcessing)
-      idx <- which(tbl_analysesData[,tbl_analysesData.AnaName] == input$sinoutputoptions)
-      analysisID <- tbl_analysesData[idx, tbl_analysesData.AnaID]
-      analyses_settings <-  return_analyses_settings_file_list(analysisID)
-      print("analysisID")
-      print(analysisID)
-      print("idx")
-      print(idx)
-      
-      print("analyses_settings")
-      print(analyses_settings)
+      anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
+      anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
+      analyses_settings <-  return_analyses_settings_file_list(anaID)
       if (!is.null(analyses_settings$detail) && analyses_settings$detail == "Not found.") {
-        flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", input$sinoutputoptions," id ", analysisID))
+        flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", anaName," id ", anaID))
       } else {
-        logMessage(paste0("appling the output configuration of analysis ", input$sinoutputoptions," id ", analysisID))
+        logMessage(paste0("appling the output configuration of analysis ", anaName," id ", anaID))
         #Set inputs
         .updateOutputConfig(analyses_settings) 
       }
@@ -1289,8 +1280,10 @@ step3_configureOutput <- function(input, output, session,
     tbl_analysesData  <- return_tbl_analysesData()
     tbl_analysesData <- tbl_analysesData %>% filter(status != StatusProcessing & status != StatusReady)
     namesList <- tbl_analysesData[,tbl_analysesData.AnaName]
+    idList <- tbl_analysesData[,tbl_analysesData.AnaID]
+    choicesList <- paste(idList, namesList, sep = " / ")
     updateSelectInput(session, "sinoutputoptions",
-                      choices = namesList,
+                      choices = choicesList,
                       selected = character(0))
   }
 
@@ -1450,10 +1443,6 @@ step3_configureOutput <- function(input, output, session,
           choice <- paste0( perspective, gran[g], varslist[[v]])
           choices <- c(choices, choice)
         }
-        print("chk_persp_gran")
-        print(chk_persp_gran)
-        print("choices")
-        print(choices)
         updateCheckboxGroupInput(session = session, inputId = chk_persp_gran, selected = choices)
       }
     }
