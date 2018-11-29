@@ -49,9 +49,7 @@ panelDefineIDs <- function(id) {
     status = "primary",
     fluidRow(
       div(id = ns("divportfolioID"),
-          column(1,
-                 h4("Filter for:")),
-          column(4,
+          column(12,
                  div(class = "InlineSelectInputSmall",
                      selectizeInput(inputId = ns("portfolioID"), label = "Portfolio ID",
                                     choices = c(),

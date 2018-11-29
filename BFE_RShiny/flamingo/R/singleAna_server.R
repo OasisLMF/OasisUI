@@ -217,34 +217,3 @@ singleAna <- function(input, output, session, dbSettings,
   moduleOutput
 
 }
-
-#' replaceWithIcons
-#'
-#' @rdname replaceWithIcons
-#'
-#' @description Function to replace status with icons in table.
-#'
-#' @param df \code{data.frame}.
-#'
-#' @importFrom dplyr mutate
-#' @importFrom dplyr case_when
-#'
-#' @export
-replaceWithIcons <- function(df){
-  #Status
-  StatusGood <- c("success", "completed", "loaded", "200")
-  StatusBad <- c("cancelled", "failed",  NA_character_, "404")
-
-  #Replace Status in df
-  if (!is.null(df)) {
-    logMessage(paste0("replacing icons"))
-    df <- df %>%
-      mutate(Status = tolower(Status)) %>%
-      mutate(Status = case_when(Status %in% StatusGood ~ StatusCompleted,
-                                Status %in% StatusBad ~ StatusFailed,
-                                Status %notin% c(StatusBad, StatusGood) ~ StatusProcessing)) %>%
-      as.data.frame()
-  }
-
-  df
-}

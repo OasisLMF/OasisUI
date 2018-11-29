@@ -102,17 +102,17 @@ return_analyses_input_file_wicons_df <- function(id) {
   analyses_input_file_df <- return_analyses_input_file_df(id)
   fnames <- analyses_input_file_df$files
   fnum <- length(fnames)
-  status <- data.frame(Status = rep(status_code_notfound, fnum))
+  status <- data.frame(status = rep(status_code_notfound, fnum))
   for (i in seq(fnum) ) {
     fname <- as.character(fnames[i])
     filePath <- file.path(extractFolder, fname)
     info <- file.info(filePath)
     if (is.na(info$size)) {
-      status[i, "Status"] <- StatusProcessing
+      status[i, "status"] <- StatusProcessing
     } else if (info$size == 0) {
-      status[i, "Status"] <- StatusFailed
+      status[i, "status"] <- StatusFailed
     } else {
-      status[i, "Status"] <- StatusCompleted
+      status[i, "status"] <- StatusCompleted
     }
   }
   analyses_input_file_df <- cbind(analyses_input_file_df, status) %>%
@@ -132,6 +132,7 @@ return_analyses_input_file_wicons_df <- function(id) {
 #' @return dataframe of specific input file.
 #'
 #' @importFrom stats setNames
+#' @importFrom data.table fread
 #'
 #' @export
 
@@ -142,7 +143,7 @@ return_analyses_spec_input_file_df <- function(id, fileName) {
   info <- file.info(filePath)
   analyses_spec_input_file_df <- NULL
   if (!is.na(info$size) && info$size != 0 ) {
-    analyses_spec_input_file_df <- read.csv(filePath)
+    analyses_spec_input_file_df <- fread(filePath)
   }
   return(analyses_spec_input_file_df)
 }
@@ -900,6 +901,7 @@ return_analyses_output_file_df <- function(id) {
 #' @return dataframe of specific output file.
 #'
 #' @importFrom stats setNames
+#' @importFrom data.table fread
 #'
 #' @export
 
@@ -910,7 +912,7 @@ return_analyses_spec_output_file_df <- function(id, fileName) {
   info <- file.info(filePath)
   analyses_spec_output_file_df <- NULL
   if (!is.na(info$size) && info$size != 0 ) {
-    analyses_spec_output_file_df <- read.csv(filePath)
+    analyses_spec_output_file_df <- fread(filePath)
   }
   return(analyses_spec_output_file_df)
 }

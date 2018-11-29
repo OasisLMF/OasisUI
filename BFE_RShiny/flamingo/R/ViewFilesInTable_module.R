@@ -51,7 +51,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #'
 #' @param tbl_filesListData dataframe of output files.
 #' @param param id to be used
-#' @param file_column name of the column containing filename. Default "fields
+#' @param file_column name of the column containing filename. Default "files"
 #' @param folderpath  path to files. Can be "_output/output/" or "_inputs/"; default output path.
 #'
 #' @importFrom shinyjs show
@@ -67,14 +67,16 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #' @importFrom dplyr contains
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet leafletOutput
-#' @importFrom utils write.csv
+#' @importFrom data.table fwrite
+#' @importFrom data.table fread
+#' @importFrom utils count.fields
 #'
 #' @export
 ViewFilesInTable <- function(input, output, session, 
                              logMessage = message, 
                              tbl_filesListData, 
                              param = NULL,
-                             file_column = "fields",
+                             file_column = "files",
                              folderpath = "_output/output/",
                              includechkbox = FALSE) {
   
@@ -90,6 +92,8 @@ ViewFilesInTable <- function(input, output, session,
     tbl_filesListData_wButtons = NULL,
     #View output file content
     currentFile = NULL,
+    # Filepath of file to view
+    currfilepath = NULL,
     #content of curr file
     tbl_fileData = NULL
   )
@@ -98,8 +102,9 @@ ViewFilesInTable <- function(input, output, session,
   observeEvent(tbl_filesListData(), ignoreNULL = FALSE, {
     filesListData <- tbl_filesListData()
     if (length(filesListData) > 0) {
+      names(filesListData) <- tolower(names(filesListData))
       if (includechkbox) {
-        filesListData <- cbind(data.frame(Selected = .shinyInput(flamingoCheckboxButton,"srows_", nrow(filesListData), Label = NULL,
+        filesListData <- cbind(data.frame(selected = .shinyInput(flamingoCheckboxButton,"srows_", nrow(filesListData), Label = NULL,
                                                                  hidden = FALSE,
                                                                  style = "background-color: white;
                                                                           border-color: black;
@@ -114,7 +119,7 @@ ViewFilesInTable <- function(input, output, session,
         )),
         filesListData)
       }
-      filesListData <- cbind(filesListData,data.frame(Explore = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "Explore", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+      filesListData <- cbind(filesListData,data.frame(view = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       result$tbl_filesListData_wButtons <- filesListData
     } else {
       result$tbl_filesListData_wButtons <- NULL
@@ -135,7 +140,7 @@ ViewFilesInTable <- function(input, output, session,
         rownames = TRUE,
         escape = FALSE,
         selection =  selectionUsed,
-        colnames = c('Row Number' = 1),
+        colnames = c('row number' = 1),
         options = .getFLTableOptions()
       )
     } else {
@@ -160,12 +165,12 @@ ViewFilesInTable <- function(input, output, session,
       #path of files to download in Zip bundle
       fs <- c()
       for (f in 1:nrow(result$tbl_filesListData_wButtons)) {
-        filename <- result$tbl_filesListData_wButtons[f, "fields"]
+        filename <- result$tbl_filesListData_wButtons[f, file_column]
         func <- get(paste0("return_", filename, "_df"))
         return_df <- func(param())
         if (nrow(return_df) > 0) {
           fpath <- file.path(".", paste0(filename, ".csv"))
-          write.csv(x = return_df, file = fpath)
+          fwrite(x = return_df, file = fpath, row.names = TRUE, quote = TRUE)
           fs <- c(fs, fpath)
         }
       }
@@ -235,12 +240,12 @@ ViewFilesInTable <- function(input, output, session,
     size = "l",
     fluidPage(
       fluidRow(
-               h4("File Contents", class = "flamingo-table-title")),
+        h4("File Summary", class = "flamingo-table-title")),
       fluidRow(
-               htmlOutput(ns("FVExposureStatisticInfo"))),
+        htmlOutput(ns("FVExposureStatisticInfo"))),
       br(),
       fluidRow(
-        flamingoButton(inputId = ns("abuttonview"), label = "View", icon = icon("file")),
+        flamingoButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(flamingoButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
         downloadButton(ns("FVEdownloadexcel"), label = "Export to csv"),
         style = "inline:true"),
@@ -281,7 +286,7 @@ ViewFilesInTable <- function(input, output, session,
         rownames = TRUE,
         selection = "none",
         filter = 'bottom',
-        colnames = c("Row Number" = 1),
+        colnames = c("row number" = 1),
         width = "100%",
         options = list(searchHighlight = TRUE,
                        scrollX = TRUE))
@@ -303,7 +308,7 @@ ViewFilesInTable <- function(input, output, session,
   output$FVEdownloadexcel <- downloadHandler(
     filename = result$currentFile,
     content = function(file) {
-      write.csv(result$tbl_fileData, file)}
+      fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)}
   )
   
   # Panel Map
@@ -324,35 +329,69 @@ ViewFilesInTable <- function(input, output, session,
     #Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column]
     returnfunc <- paste0("return_", result$currentFile, "_df")
+    filerows <- NULL
+    filecolumns <- NULL
     if (exists(returnfunc)) {
       func <- get(returnfunc)
       result$tbl_fileData <- func(param())
+      if (!is.null(result$tbl_fileData )) {
+        names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
+        filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
+        filerows <- nrow(result$tbl_fileData)
+      }
     } else {
       currfolder <- getOption("flamingo.settins.api.share_filepath")
       extractFolder <- file.path(currfolder, paste0(param(), folderpath))
-      result$tbl_fileData <- read.csv(file.path(extractFolder, result$currentFile))
+      result$currfilepath <- file.path(extractFolder, result$currentFile)
+      result$tbl_fileData <- fread(result$currfilepath )
+      if (!is.null(result$tbl_fileData )) {
+        names(result$tbl_fileData) <- tolower(names(result$tbl_fileData)) 
+      }
+      filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
+      filerows <- length(count.fields(result$currfilepath, skip = 1))
     }
-
+    
     #Show buttons
     if ("LATITUDE" %in% names(result$currentFile)) {
+      if (!is.null(result$tbl_fileData)) {
+        output$plainmap <- renderLeaflet({createPlainMap(result$currfilepath)})
+      }
       show("abuttonmap")
     } else {
       hide("abuttonmap")
     }
     # Extra info table
     output$FVExposureStatisticInfo <- renderUI({
-      column(12,
-             p(paste0("File Name: ", result$currentFile)),
-             p(paste0("Number of Rows ", nrow(result$tbl_fileData))),
-             p("Column names"),
-             p(paste(names(result$tbl_fileData), collapse = " "))
+      tagList(
+        fluidRow(
+          column(2,
+                 h5("File Name: ")
+          ),
+          column(10,
+                 p(result$currentFile, style = "margin-top: 10px;")
+          )
+        ),
+        fluidRow(
+          column(2,
+                 h5("Number of Rows ")
+          ),
+          column(10,
+                 p(filerows, style = "margin-top: 10px;")
+          )
+        ),
+        fluidRow(
+          column(2,
+                 h5("Column names")
+          ),
+          column(10,
+                 p(filecolumns, style = "margin-top: 10px;")
+          )
+        )
       )
     })
     
-    if (!is.null(result$tbl_fileData)) {
-      output$plainmap <- renderLeaflet({createPlainMap(result$currentFile)})
-    }
   })#end observeEvent
+  
   
   # Helper functions -----------------------------------------------------------
   

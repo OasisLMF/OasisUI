@@ -736,7 +736,7 @@ step3_configureOutput <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = rownames(result$tbl_analysesData)[c(as.integer(index))]),
         escape = FALSE,
-        colnames = c('Row Number' = 1),
+        colnames = c('row number' = 1),
         filter = 'bottom',
         options = .getPRTableOptions()
       )
@@ -836,17 +836,6 @@ step3_configureOutput <- function(input, output, session,
     result$ana_flag <- "C"
   })
 
-  onclick("abuttonrerunana", {
-    .defaultview(session)
-    hide("panelAnalysisLogs")
-    show("panelDefineOutputs")
-    .showPerils()
-    logMessage("showing panelDefineOutputs")
-    result$ana_flag <- "R"
-    analyses_settings <- return_analyses_settings_file_list(result$anaID)
-    .updateOutputConfig(analyses_settings)
-  })
-
   # Hide Output Configuration panel
   onclick("abuttonehidepanelconfigureoutput", {
     hide("panelDefineOutputs")
@@ -939,10 +928,17 @@ step3_configureOutput <- function(input, output, session,
     # Using analyses names to select the output configuration of a previously posted analyses
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
       tbl_analysesData  <- return_tbl_analysesData()
-      tbl_analysesData <- tbl_analysesData %>% filter(status == StatusProcessing)
+      tbl_analysesData <- tbl_analysesData %>% filter(status != StatusProcessing)
       idx <- which(tbl_analysesData[,tbl_analysesData.AnaName] == input$sinoutputoptions)
       analysisID <- tbl_analysesData[idx, tbl_analysesData.AnaID]
       analyses_settings <-  return_analyses_settings_file_list(analysisID)
+      print("analysisID")
+      print(analysisID)
+      print("idx")
+      print(idx)
+      
+      print("analyses_settings")
+      print(analyses_settings)
       if (!is.null(analyses_settings$detail) && analyses_settings$detail == "Not found.") {
         flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", input$sinoutputoptions," id ", analysisID))
       } else {
@@ -981,6 +977,24 @@ step3_configureOutput <- function(input, output, session,
     input$chkrilob
   ))})
 
+  onclick("abuttonrerunana", {
+    .defaultview(session)
+    hide("panelAnalysisLogs")
+    show("panelDefineOutputs")
+    .showPerils()
+    logMessage("showing panelDefineOutputs")
+    result$ana_flag <- "R"
+    analyses_settings <- return_analyses_settings_file_list(result$anaID)
+    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+    if (!is.null(analyses_settings$detail) && analyses_settings$detail == "Not found.") {
+      flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID))
+    } else {
+      logMessage(paste0("appling the output configuration of analysis ",analysisName," id ", result$anaID))
+      #Set inputs
+      .updateOutputConfig(analyses_settings) 
+    }
+  })
+  
   # # Save output configuration --------------------------------------------------
   # 
   # # Save output for later use as presets
@@ -1087,7 +1101,7 @@ step3_configureOutput <- function(input, output, session,
           rownames = TRUE,
           selection = "none",
           escape = FALSE,
-          colnames = c('Row Number' = 1),
+          colnames = c('row number' = 1),
           filter = 'bottom',
           options = .getPRTableOptions()
         )
@@ -1116,7 +1130,10 @@ step3_configureOutput <- function(input, output, session,
 
   # Updates dependent on changed: dt_analyses_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
-  observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent({
+    input$dt_analyses_rows_selected
+    portfolioID()
+    }, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
@@ -1355,50 +1372,91 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".updateOutputConfig called")
     
     #clear checkboxes
-    .clearotherparams()
     .clearchkboxGULgrp()
     .clearchkboxILgrp()
     .clearchkboxRIgrp()
-  
+
     number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]]
-    updateTextInput(session, "tinputnoofsample", value = number_of_samples)
+    updateTextInput(session =  session, "tinputnoofsample", value = as.character(number_of_samples))
     
     gul_threshold <- analyses_settings[["analysis_settings"]][["gul_threshold"]]
-    updateTextInput(session, "tinputthreshold", value = gul_threshold)
+    updateTextInput(session =  session, "tinputthreshold", value = gul_threshold)
     
     event_set <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_set"]]
-    updateSelectInput(session, "sinputeventocc", selected = event_set)
+    updateSelectInput(session =  session, "sinputeventocc", selected = event_set)
     
     event_occurrence_file_id <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_occurrence_file_id"]]
-    updateSelectInput(session, "sinputeventocc", selected = event_occurrence_file_id)
+    updateSelectInput(session =  session, "sinputeventocc", selected = event_occurrence_file_id)
     
     peril_wind <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_wind"]]
     if (!is.null(peril_wind)) {
-      updateCheckboxInput(session, "chkinputprwind", value = peril_wind)
+      updateCheckboxInput(session =  session, "chkinputprwind", value = peril_wind)
     }
     peril_surge <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_surge"]]
     if (!is.null(peril_surge)) {
-      updateCheckboxInput(session, "chkinputprstsurge", value = peril_surge)
+      updateCheckboxInput(session =  session, "chkinputprstsurge", value = peril_surge)
     }
     peril_quake <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_quake"]]
     if (!is.null(peril_quake)) {
-      updateCheckboxInput(session, "chkinputprquake", value = peril_quake)
+      updateCheckboxInput(session =  session, "chkinputprquake", value = peril_quake)
     }
     peril_flood <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_flood"]]
     if (!is.null(peril_flood)) {
-      updateCheckboxInput(session, "chkinputprflood", value = peril_flood)
+      updateCheckboxInput(session =  session, "chkinputprflood", value = peril_flood)
     }
     demand_surge <- analyses_settings[["analysis_settings"]][["model_settings"]][["demand_surge"]]
     if (!is.null(demand_surge)) {
-      updateCheckboxInput(session, "chkinputdsurge", value = demand_surge)
+      updateCheckboxInput(session =  session, "chkinputdsurge", value = demand_surge)
     }
     leakage_factor <- analyses_settings[["analysis_settings"]][["model_settings"]][["leakage_factor"]]
     if (!is.null(leakage_factor)) {
-      updateCheckboxInput(session, "sliderleakagefac", value = leakage_factor)
+      updateCheckboxInput(session =  session, "sliderleakagefac", value = leakage_factor)
     }
     
     #To-do retrieve checkboxes selection from analysis_settings and update inputs accordingly 
-
+    varslist <- list('uniqueItems' = 'Summary',
+                     'eltcalc' = 'ELT',
+                     'full_uncertainty_aep' = 'FullUncAEP',
+                     'full_uncertainty_oep' = 'FullUncOEP',
+                     'wheatsheaf_aep' = 'AEPWheatsheaf',
+                     'wheatsheaf_oep' = 'OEPWheatsheaf',
+                     'wheatsheaf_mean_aep' = 'MeanAEPWheatsheaf',
+                     'wheatsheaf_mean_oep' = 'MeanOEPWheatsheaf',
+                     'sample_mean_aep' = 'SampleMeanAEP',
+                     'sample_mean_oep' = 'SampleMeanOEP',
+                     'aalcalc' = 'AAL',
+                     'pltcalc' = 'PLT')
+    gran <- c('prog', 'policy', 'state', 'county', 'loc', 'lob')
+    output_perspectives <- names(analyses_settings[[1]])[grepl("_summaries", names(analyses_settings[[1]]))]
+    for (op in output_perspectives) {
+      perspective <- gsub("_summaries", "", op)
+      nidx <- length(analyses_settings[[1]][[op]])
+      for (i in 1:nidx) {
+        curr_gran_list <- analyses_settings[[1]][[op]][[i]]
+        # index of granularity
+        g <- curr_gran_list[["id"]]
+        #update summary input
+        updateCheckboxInput(session = session, inputId = "chkinputsummaryoption", value = curr_gran_list[["summarycalc"]])
+        #checkbox group input name
+        chk_persp_gran <- paste0("chk", perspective, gran[g])
+        #variables for given granularity
+        vars <- names(curr_gran_list)
+        leccalcvars <- names(curr_gran_list[["leccalc"]][["outputs"]])
+        vars <- vars[which(vars != "id" & vars != "summarycalc" & vars != "lec_output" & vars != "leccalc")]
+        vars <- c(vars, leccalcvars)
+        #create vector of choices
+        choices <- c()
+        for (v in vars) {
+          choice <- paste0( perspective, gran[g], varslist[[v]])
+          choices <- c(choices, choice)
+        }
+        print("chk_persp_gran")
+        print(chk_persp_gran)
+        print("choices")
+        print(choices)
+        updateCheckboxGroupInput(session = session, inputId = chk_persp_gran, selected = choices)
+      }
+    }
     invisible()
   }
 

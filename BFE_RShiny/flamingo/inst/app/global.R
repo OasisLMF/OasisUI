@@ -165,7 +165,7 @@ tbl_portfoliosData.PortfolioID <- "id"
 tbl_portfoliosData.PortfolioName <- "name"
 tbl_portfoliosData.PortfolioCreated <- "created"
 tbl_portfoliosData.PortfolioModified <- "modified"
-tbl_portfoliosData.Status <- "Status"
+tbl_portfoliosData.Status <- "status"
 
 ### Creating Variables for portfolio Details table
 #result$tbl_portfolioDetails
@@ -204,10 +204,10 @@ tbl_analysesData.AnaOutputFile <- "output_file"
 tbl_analysesData.AnaRunTracebackFile <- "run_traceback_file"
 
 
-### Creating Variables for  col names of filesListData
-# result$filesListData
-# "FileID", "File Name", "Description", "Location","Location Unix", "File Type", "Owner", "Resource Table", "Resource Key"
-filesListData.fileID <- "FileID"
-filesListData.fileName <- "File Name"
-filesListData.path <- "Location Unix"
-filesListData.key <- "Resource Key"
+# ### Creating Variables for  col names of filesListData
+# # result$filesListData
+# # "FileID", "File Name", "Description", "Location","Location Unix", "File Type", "Owner", "Resource Table", "Resource Key"
+# filesListData.fileID <- "FileID"
+# filesListData.fileName <- "File Name"
+# filesListData.path <- "Location Unix"
+# filesListData.key <- "Resource Key"

@@ -60,6 +60,7 @@ landingPageUI <- function(id) {
 #' @importFrom DT datatable
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
+#' @importFrom data.table fwrite
 #'
 #' @export
 landingPage <- function(input, output, session, user, dbSettings,
@@ -103,7 +104,7 @@ landingPage <- function(input, output, session, user, dbSettings,
       class = "flamingo-table display",
       rownames = TRUE,
       selection = "single",
-      colnames = c("Row Number" = 1),
+      colnames = c("row number" = 1),
       filter = 'bottom',
       escape = FALSE,
       plugins = 'natural',
@@ -117,7 +118,7 @@ landingPage <- function(input, output, session, user, dbSettings,
   output$downloadexcel_ana <- downloadHandler(
     filename = "analyses_inbox.csv",
     content = function(file) {
-      write.csv(result$tbl_anaInbox, file)
+      fwrite(result$tbl_anaInbox, file, row.names = TRUE, quote = TRUE)
     }
   )
 

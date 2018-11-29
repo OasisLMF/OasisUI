@@ -318,11 +318,11 @@ return_tbl_portfoliosData <- function(name = ""){
     as.data.frame()
   idx <- tbl_portfoliosData[[tbl_portfoliosData.PortfolioID]]
   numpf <- length(idx)
-  status <- data.frame(Status = rep(status_code_notfound, numpf))
+  status <- data.frame(status = rep(status_code_notfound, numpf))
   for (i in seq(numpf) ) {
     id <- as.integer(idx[i])
     get_portfolios_location_file <- api_get_portfolios_location_file(id)
-    status[i, "Status"] <- toString(get_portfolios_location_file$result$status_code) %>% .replacewithIcon()
+    status[i, "status"] <- toString(get_portfolios_location_file$result$status_code) %>% .replacewithIcon()
     tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] , format = "%d-%m-%YT%H:%M:%S"))
     tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified], format = "%d-%m-%YT%H:%M:%S"))
   }
@@ -402,7 +402,7 @@ return_tbl_portfolioDetails <- function(id){
     tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioRIsource]] <- toString(get_portfolios_reinsurance_source_file$result$status_code) %>%
       .replacewithIcon()
   # reshape df
-  tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "fields", value = "value") %>%
+  tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "status") %>%
     as.data.frame()
   return(tbl_portfolioDetails)
 }

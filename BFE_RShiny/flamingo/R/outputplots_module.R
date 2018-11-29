@@ -168,6 +168,7 @@ panelOutputModuleUI <- function(id){
 #' @importFrom ggplot2 geom_violin
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
+#' @importFrom data.table fread
 #'
 #' @export
 panelOutputModule <- function(input, output, session, logMessage = message,
@@ -498,8 +499,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     if (!is.na(fileName)) {
       logMessage(paste0("Reading file ", fileName))
       tryCatch({
-        fileData <- read.csv(fileName, header = TRUE, sep = ",",
-                             quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+        fileData <- fread(fileName) #read.csv(fileName, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE, comment.char = "")
       }, error = function(e) {
         flamingoNotification(type = "error",
                              paste("Could not read file:", e$message))

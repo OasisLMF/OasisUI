@@ -296,7 +296,7 @@ step1_choosePortfolio <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = rowToSelect,
                          target = 'row'),
-        colnames = c('Row Number' = 1),
+        colnames = c('row number' = 1),
         options = .getPRTableOptions()
       )
     } else {

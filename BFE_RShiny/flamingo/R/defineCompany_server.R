@@ -58,7 +58,7 @@ companyDefinition <- function(input, output, session, dbSettings,
       rownames = TRUE,
       filter = "none",
       selection = "single",
-      colnames = c('Row Number' = 1),
+      colnames = c('row number' = 1),
       options = list(
         searchHighlight = TRUE,
         columnDefs = list(list(visible = FALSE, targets = 0)),

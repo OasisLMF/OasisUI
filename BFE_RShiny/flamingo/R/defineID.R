@@ -138,7 +138,7 @@ defineID <- function(input, output, session,
     scrollX = TRUE,
     filter = FALSE,
     rownames = FALSE,
-    colnames =  c("Row Number" = 1),
+    colnames =  c("row number" = 1),
     preselRow = reactive({result$preselRow}),
     maxrowsperpage = 10,
     logMessage = logMessage)

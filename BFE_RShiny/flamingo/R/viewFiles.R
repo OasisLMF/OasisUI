@@ -132,7 +132,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         rownames = TRUE,
         escape = FALSE,
         selection =  selectionUsed,
-        colnames = c('Row Number' = 1),
+        colnames = c('row number' = 1),
         options = .getFLTableOptions()
       )
     } else {
@@ -286,7 +286,7 @@ ViewFilesModule <- function(input, output, session, logMessage = message, filesL
         rownames = TRUE,
         selection = "none",
         filter = 'bottom',
-        colnames = c("Row Number" = 1),
+        colnames = c("row number" = 1),
         width = "100%",
         options = list(searchHighlight = TRUE,
                        scrollX = TRUE))

@@ -337,7 +337,7 @@ return_tbl_analysisdetails <- function(id){
     tbl_analysisdetails[[tbl_analysesData.AnaRunTracebackFile]] <- toString(get_analyses_run_traceback_file$result$status_code) %>%
       .replacewithIcon()
   # reshape df
-    tbl_analysisdetails <- gather(tbl_analysisdetails,  key = "fields", value = "value") %>%
+    tbl_analysisdetails <- gather(tbl_analysisdetails,  key = "files", value = "status") %>%
     as.data.frame()
   return(tbl_analysisdetails)
 }

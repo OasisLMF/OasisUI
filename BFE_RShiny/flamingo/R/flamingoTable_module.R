@@ -83,7 +83,7 @@ flamingoTable <- function(input, output, session,
       if (colnames) {
         colnamesToUse <- names(tbl_flamingoTable)
         if (rownames) {
-          colnamesToUse <- c('Row Number', colnamesToUse)
+          colnamesToUse <- c('row number', colnamesToUse)
         }
       }
 
