@@ -55,12 +55,6 @@ panelCreateAnalysesTable <- function(id) {
     DTOutput(ns("dt_analyses")),
     fluidRow(
       column(12,
-             flamingoButton(inputId = ns("abuttoncreateana"), label = "Create Analysis") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttoncreateana, placement = "right")
-      )
-    ),
-    fluidRow(
-      column(12,
              flamingoButton(inputId = ns("abuttonstartIG"), label = "Start Input Generation") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonstartIG, placement = "right"),
              flamingoButton(inputId = ns("abuttoncancelIG"), label = "Cancel Input Generation") %>%
@@ -70,11 +64,19 @@ panelCreateAnalysesTable <- function(id) {
              flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
              flamingoButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonshowanadetails, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna$abuttonshowanadetails, placement = "right")
+             )
+    ),
+    br(),
+    fluidRow(
+      column(12,
+             flamingoButton(inputId = ns("abuttoncreateana"), label = "Create Analysis") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttoncreateana, placement = "right"),
              actionButton(ns("abuttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
+             ),
+      style = "margin-top: 10px;"
       )
     )
-  )
 }
 
 #' panelAnalysisDetails
@@ -314,7 +316,7 @@ step2_chooseAnalysis <- function(input, output, session,
       }
     })
   
-  observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
+  observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelModelTable")
