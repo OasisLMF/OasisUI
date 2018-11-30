@@ -4,7 +4,12 @@
 \alias{api_access_token}
 \title{Post access token}
 \usage{
-api_access_token()
+api_access_token(user, pwd)
+}
+\arguments{
+\item{user}{current user name}
+
+\item{ped}{current user password}
 }
 \value{
 Response containing the new token.

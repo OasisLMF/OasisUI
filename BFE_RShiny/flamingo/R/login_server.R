@@ -52,7 +52,7 @@ loginDialog <- function(input, output, session, dbSettings, logout,
     if (input$abuttonloginbutton > 0) {
       user <- isolate(input$user)
       pwd <- isolate(input$password)
-      res <- api_refresh_token(user, pwd)
+      res <- api_access_token(user, pwd)
       if (res$status == "Success") {
         result$user <- 1 #TODO for now, this is a workaround
         #result$user <- user # for later

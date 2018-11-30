@@ -93,8 +93,8 @@ get_http_type <- function() {
 #'
 #' @description Fetches a new refresh token from a username and password.
 #'
-#' @inheritParams companyDefinition
-#' @inheritParams flamingoDB
+#' @param user current user name
+#' @param ped current user password
 #'
 #' @return List with API return status and response containing the new token.
 #'
@@ -138,6 +138,9 @@ api_refresh_token <- function(user, pwd) {
 #' @rdname api_access_token
 #'
 #' @return Response containing the new token.
+#' 
+#' @param user current user name
+#' @param ped current user password
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
@@ -145,24 +148,24 @@ api_refresh_token <- function(user, pwd) {
 #' @importFrom httr http_status
 #'
 #' @export
-api_access_token <- function() {
-
+api_access_token <- function(user, pwd) {
+  
   response <- POST(
     get_url(),
     config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_access_token())
+      Accept = get_http_type()
     ),
+    body = list(username = user, password = pwd),
     encode = "json",
     path = "access_token/"
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -189,7 +192,7 @@ api_access_token <- function() {
 #' @importFrom httr status_code
 #'
 #' @export
-api_get_helthcheck <- function() {
+api_get_healthcheck <- function() {
 
   tryCatch(
     response <- GET(
@@ -197,15 +200,15 @@ api_get_helthcheck <- function() {
       config = add_headers(
         Accept = get_http_type()
       ),
-      path = "helthcheck/"
+      path = "healthcheck/"
     ),
     error = function(e) {
-      stop(paste("He(a)lth check failed:", e$message))
+      stop(paste("Health check failed:", e$message))
     }
   )
 
   if (status_code(response) != 200) {
-    stop(paste("He(a)lth check failed with:", response$message))
+    stop(paste("Health check failed with:", response$message))
   }
 
   return(status_code(response))

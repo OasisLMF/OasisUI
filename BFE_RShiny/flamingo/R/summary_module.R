@@ -314,7 +314,7 @@ summarytab <- function(input, output, session, dbSettings,
   
   .getSummary <- function(selectAnaID, portfolioID) {
     #analyses settings
-    analyses_settings <- return_analyses_settings_file_list(selectAnaID)
+    analysis_settings <- return_analyses_settings_file_list(selectAnaID)
     #read aal files
     AAL <- .getData(id = selectAnaID, filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("aal"))
     if (!is.null(AAL)) {
@@ -359,23 +359,23 @@ summarytab <- function(input, output, session, dbSettings,
       locnum <- 0
     }
     
-    gul_threshold <- analyses_settings[["analysis_settings"]][["gul_threshold"]]
+    gul_threshold <- analysis_settings[["analysis_settings"]][["gul_threshold"]]
     gul_threshold <- ifelse(is.null(gul_threshold), 0, gul_threshold)
-    number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]]
+    number_of_samples <- analysis_settings[["analysis_settings"]][["number_of_samples"]]
     number_of_samples <- ifelse(is.null(number_of_samples), 0, number_of_samples)
-    event_set <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_set"]]
+    event_set <- analysis_settings[["analysis_settings"]][["model_settings"]][["event_set"]]
     event_set <- ifelse(is.null(event_set), FALSE, event_set)
-    peril_wind <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_wind"]]
+    peril_wind <- analysis_settings[["analysis_settings"]][["model_settings"]][["peril_wind"]]
     peril_wind <- ifelse(is.null(peril_wind), FALSE, peril_wind)
-    peril_surge <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_surge"]]
+    peril_surge <- analysis_settings[["analysis_settings"]][["model_settings"]][["peril_surge"]]
     peril_surge <- ifelse(is.null(peril_surge), FALSE, peril_surge)
-    peril_quake <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_quake"]]
+    peril_quake <- analysis_settings[["analysis_settings"]][["model_settings"]][["peril_quake"]]
     peril_quake <- ifelse(is.null(peril_quake), FALSE, peril_quake)
-    peril_flood <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_flood"]]
+    peril_flood <- analysis_settings[["analysis_settings"]][["model_settings"]][["peril_flood"]]
     peril_flood <- ifelse(is.null(peril_flood), FALSE, peril_flood)
-    demand_surge <- analyses_settings[["analysis_settings"]][["model_settings"]][["demand_surge"]]
+    demand_surge <- analysis_settings[["analysis_settings"]][["model_settings"]][["demand_surge"]]
     demand_surge <- ifelse(is.null(demand_surge), FALSE, demand_surge)
-    leakage_factor <- analyses_settings[["analysis_settings"]][["model_settings"]][["leakage_factor"]]
+    leakage_factor <- analysis_settings[["analysis_settings"]][["model_settings"]][["leakage_factor"]]
     leakage_factor <- ifelse(is.null(leakage_factor), FALSE, leakage_factor)
     #sumamry DF
     SummaryTypeRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", "peril_wind", "peril_surge", "peril_quake", "peril_flood", "demand_surge", "leakage_factor")

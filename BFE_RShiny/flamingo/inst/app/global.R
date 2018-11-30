@@ -64,7 +64,7 @@ options(flamingo.settins.api.share_filepath = "./downloads")
 
 loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
 tryCatch({
-  invisible(api_get_helthcheck())
+  invisible(api_get_healthcheck())
 }, error = function(e) {
   logerror(e$message, logger = "flamingo.module")
 })

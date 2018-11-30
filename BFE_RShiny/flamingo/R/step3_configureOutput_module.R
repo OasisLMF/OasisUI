@@ -921,21 +921,21 @@ step3_configureOutput <- function(input, output, session,
   observeEvent(input$sinoutputoptions, {
     # if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
     #   #read the right analysis settings file
-    #   analyses_settings <- read_json(paste0("./analysis_settings/",input$sinoutputoptions,".json"),  simplifyVector = TRUE)
+    #   analysis_settings <- read_json(paste0("./analysis_settings/",input$sinoutputoptions,".json"),  simplifyVector = TRUE)
     #   #Set inputs
-    #   .updateOutputConfig(analyses_settings)
+    #   .updateOutputConfig(analysis_settings)
     # }
     # Using analyses names to select the output configuration of a previously posted analyses
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
       anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
       anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
-      analyses_settings <-  return_analyses_settings_file_list(anaID)
-      if (!is.null(analyses_settings$detail) && analyses_settings$detail == "Not found.") {
+      analysis_settings <-  return_analyses_settings_file_list(anaID)
+      if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
         flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", anaName," id ", anaID))
       } else {
         logMessage(paste0("appling the output configuration of analysis ", anaName," id ", anaID))
         #Set inputs
-        .updateOutputConfig(analyses_settings) 
+        .updateOutputConfig(analysis_settings) 
       }
     }
   })
@@ -975,14 +975,14 @@ step3_configureOutput <- function(input, output, session,
     .showPerils()
     logMessage("showing panelDefineOutputs")
     result$ana_flag <- "R"
-    analyses_settings <- return_analyses_settings_file_list(result$anaID)
+    analysis_settings <- return_analyses_settings_file_list(result$anaID)
     analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
-    if (!is.null(analyses_settings$detail) && analyses_settings$detail == "Not found.") {
+    if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
       flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID))
     } else {
       logMessage(paste0("appling the output configuration of analysis ",analysisName," id ", result$anaID))
       #Set inputs
-      .updateOutputConfig(analyses_settings) 
+      .updateOutputConfig(analysis_settings) 
     }
   })
   
@@ -1014,8 +1014,8 @@ step3_configureOutput <- function(input, output, session,
   #   } else {
   #     dir.create("./analysis_settings")
   #     #write out file to be uploades
-  #     analyses_settingsList <- .gen_analysis_settings()
-  #     write_json(analyses_settingsList, paste0("./analysis_settings/",input$tinputoutputname,".json"), pretty = TRUE, auto_unbox = TRUE)
+  #     analysis_settingsList <- .gen_analysis_settings()
+  #     write_json(analysis_settingsList, paste0("./analysis_settings/",input$tinputoutputname,".json"), pretty = TRUE, auto_unbox = TRUE)
   #     flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
   #     updateTextInput(session, "tinputoutputname", value = "")
   #     removeModal()
@@ -1028,20 +1028,20 @@ step3_configureOutput <- function(input, output, session,
 
   # Execute analysis
   onclick("abuttonexecuteanarun", {
-    analyses_settingsList <- .gen_analysis_settings()
+    analysis_settingsList <- .gen_analysis_settings()
 
     #write out file to be uploades
-    write_json(analyses_settingsList, "./analysis_settings.json", pretty = TRUE, auto_unbox = TRUE)
+    write_json(analysis_settingsList, "./analysis_settings.json", pretty = TRUE, auto_unbox = TRUE)
 
     #post analysis settings
-    post_analyses_settings_file <- api_post_analyses_settings_file(result$anaID, "./analysis_settings.json")
+    post_analysis_settings_file <- api_post_analyses_settings_file(result$anaID, "./analysis_settings.json")
 
-    if (post_analyses_settings_file$status == "Success") {
+    if (post_analysis_settings_file$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis  settings posted to ", result$anaID ,"."))
     } else {
       flamingoNotification(type = "error",
-                           paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analyses_settings_file$status))
+                           paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analysis_settings_file$status))
     }
 
     analyses_run <- return_analyses_run_df(result$anaID)
@@ -1348,7 +1348,7 @@ step3_configureOutput <- function(input, output, session,
     outputsRI <- c(input$chkriprog, input$chkripolicy, input$chkristate, input$chkricounty, input$chkriloc, input$chkrilob)
     
     #generate analysis_settings_file
-    analyses_settingsList <- construct_tbl_analyses_settings(source_tag, prog_id, number_of_samples,
+    analysis_settingsList <- construct_tbl_analyses_settings(source_tag, prog_id, number_of_samples,
                                                              module_supplier_id, model_version_id,
                                                              event_occurrence_file_id,use_random_number_file = FALSE, event_set,
                                                              peril_wind, demand_surge, peril_quake, peril_flood, peril_surge, leakage_factor,
@@ -1357,11 +1357,11 @@ step3_configureOutput <- function(input, output, session,
                                                              gul_output,  il_output, ri_output,
                                                              return_period_file,
                                                              analysis_tag, uniqueItems = FALSE, id = 1)
-    return(analyses_settingsList)
+    return(analysis_settingsList)
   }
   
   # Update output configuration for rerun
-  .updateOutputConfig <- function(analyses_settings) {
+  .updateOutputConfig <- function(analysis_settings) {
     logMessage(".updateOutputConfig called")
     
     #clear checkboxes
@@ -1369,42 +1369,76 @@ step3_configureOutput <- function(input, output, session,
     .clearchkboxILgrp()
     .clearchkboxRIgrp()
 
-    number_of_samples <- analyses_settings[["analysis_settings"]][["number_of_samples"]]
-    updateTextInput(session =  session, "tinputnoofsample", value = as.character(number_of_samples))
+    settings <- analysis_settings[["analysis_settings"]]
+    model_settings <- settings[["model_settings"]]
+
+    SettingsMapping <- list(
+      "tinputnoofsample"  = list(
+        "UpdateWidget" = "updateTextInput",
+        "SettingPath" = "settings",
+        "SettingElement" = "number_of_samples"
+      ),
+      "tinputthreshold"  = list(
+        "UpdateWidget" = "updateTextInput",
+        "SettingPath" = "settings",
+        "SettingElement" = "gul_threshold"
+      ),
+      "sinputeventset" = list(
+        "UpdateWidget" = "updateSelectInput",
+        "SettingPath" = "model_settings",
+        "SettingElement" = "event_set"
+      ),
+      "sinputeventocc" = list(
+        "UpdateWidget" = "updateSelectInput",
+        "SettingPath" = "model_settings",
+        "SettingElement" = "event_occurrence_file_id"
+      ),
+      "chkinputprwind" = list(
+        "UpdateWidget" = "updateCheckboxInput",
+        "SettingPath" = "model_settings",
+        "SettingElement" = "peril_wind"
+      ),
+      "chkinputprstsurge" = list(
+        "UpdateWidget" = "updateCheckboxInput",
+        "SettingPath" = "model_settings",
+        "SettingElement" = "peril_surge"
+      ),
+      "chkinputprquake" = list(
+        "UpdateWidget" = "updateCheckboxInput",
+        "SettingPath" = "model_settings",
+        "SettingElement" = "peril_quake"
+      ),
+      "chkinputprflood" = list(
+        "UpdateWidget" = "updateCheckboxInput",
+        "SettingPath" = "model_settings",
+        "SettingElement" = "peril_flood"
+      ),
+      "chkinputdsurge" = list(
+        "UpdateWidget" = "updateCheckboxInput",
+        "SettingPath" = "model_settings",
+        "SettingElement" = "demand_surge"
+      ),
+      "sliderleakagefac" = list(
+        "UpdateWidget" = "updateCheckboxInput",
+        "SettingPath" = "model_settings",
+        "SettingElement" = "leakage_factor"
+      )
+    )
     
-    gul_threshold <- analyses_settings[["analysis_settings"]][["gul_threshold"]]
-    updateTextInput(session =  session, "tinputthreshold", value = gul_threshold)
+    .updateWidget <- function(inp) {
+      curr_setting <- SettingsMapping[[inp]]
+      if(curr_setting$UpdateWidget == "updateSelectInput") {
+        get(curr_setting$UpdateWidget)(session = session, inputId = inp, selected = get(curr_setting$SettingPath)[[curr_setting$SettingElement]])
+      } else {
+        get(curr_setting$UpdateWidget)(session = session, inputId = inp, value = get(curr_setting$SettingPath)[[curr_setting$SettingElement]])
+      }
+    }
     
-    event_set <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_set"]]
-    updateSelectInput(session =  session, "sinputeventocc", selected = event_set)
     
-    event_occurrence_file_id <- analyses_settings[["analysis_settings"]][["model_settings"]][["event_occurrence_file_id"]]
-    updateSelectInput(session =  session, "sinputeventocc", selected = event_occurrence_file_id)
-    
-    peril_wind <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_wind"]]
-    if (!is.null(peril_wind)) {
-      updateCheckboxInput(session =  session, "chkinputprwind", value = peril_wind)
-    }
-    peril_surge <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_surge"]]
-    if (!is.null(peril_surge)) {
-      updateCheckboxInput(session =  session, "chkinputprstsurge", value = peril_surge)
-    }
-    peril_quake <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_quake"]]
-    if (!is.null(peril_quake)) {
-      updateCheckboxInput(session =  session, "chkinputprquake", value = peril_quake)
-    }
-    peril_flood <- analyses_settings[["analysis_settings"]][["model_settings"]][["peril_flood"]]
-    if (!is.null(peril_flood)) {
-      updateCheckboxInput(session =  session, "chkinputprflood", value = peril_flood)
-    }
-    demand_surge <- analyses_settings[["analysis_settings"]][["model_settings"]][["demand_surge"]]
-    if (!is.null(demand_surge)) {
-      updateCheckboxInput(session =  session, "chkinputdsurge", value = demand_surge)
-    }
-    leakage_factor <- analyses_settings[["analysis_settings"]][["model_settings"]][["leakage_factor"]]
-    if (!is.null(leakage_factor)) {
-      updateCheckboxInput(session =  session, "sliderleakagefac", value = leakage_factor)
-    }
+    lapply(names(SettingsMapping), function(i){
+      .updateWidget(i)
+    } )
+
     
     #To-do retrieve checkboxes selection from analysis_settings and update inputs accordingly 
     varslist <- list('uniqueItems' = 'Summary',
@@ -1420,12 +1454,12 @@ step3_configureOutput <- function(input, output, session,
                      'aalcalc' = 'AAL',
                      'pltcalc' = 'PLT')
     gran <- c('prog', 'policy', 'state', 'county', 'loc', 'lob')
-    output_perspectives <- names(analyses_settings[[1]])[grepl("_summaries", names(analyses_settings[[1]]))]
+    output_perspectives <- names(analysis_settings[[1]])[grepl("_summaries", names(analysis_settings[[1]]))]
     for (op in output_perspectives) {
       perspective <- gsub("_summaries", "", op)
-      nidx <- length(analyses_settings[[1]][[op]])
+      nidx <- length(analysis_settings[[1]][[op]])
       for (i in 1:nidx) {
-        curr_gran_list <- analyses_settings[[1]][[op]][[i]]
+        curr_gran_list <- analysis_settings[[1]][[op]][[i]]
         # index of granularity
         g <- curr_gran_list[["id"]]
         #update summary input
