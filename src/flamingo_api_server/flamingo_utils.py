@@ -131,7 +131,7 @@ def do_load_programme_data(progid):
 
         rows = flamingo_db_utils.get_profile_details(progid)
         schema_filepath = FILES_DIRECTORY +  "/Exposures/Schema.ini"
-        with open(schema_filepath, "w") as schema_file:
+        with io.open(schema_filepath, "w", encoding='utf-8') as schema_file:
             for line in rows:
                 schema_file.write(str(line[0]) + "\t\n")
 
@@ -528,7 +528,7 @@ def process_keys_response(progoasisid, modelid, apiJSON, sessionid):
     error_file = FILES_DIRECTORY + "/APIOutput/ExposureKeysError_" + str(ts) + ".csv"
     logging.getLogger().info("Writing non-mapped and failed exposure to {}".format(error_file))
     error_file = FILES_DIRECTORY + "/APIOutput/ExposureKeysError_" + str(ts) + ".csv"
-    with open(mapped_exposure_file, "w") as out_file, open(error_file, "w") as error_file:
+    with io.open(mapped_exposure_file, "w", encoding='utf-8') as out_file, open(error_file, "w") as error_file:
 
         out_writer = csv.writer(out_file)
         error_writer = csv.writer(error_file)
