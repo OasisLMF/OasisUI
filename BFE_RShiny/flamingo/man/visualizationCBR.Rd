@@ -7,9 +7,9 @@
 \title{Compare Analyses Definition Module Server ---------------------------------------
 visualizationCBR}
 \usage{
-visualizationCBR(input, output, session, dbSettings, apiSettings, user,
-  active = reactive(TRUE), preselAnaId = reactive(-1),
-  anaID = reactive(-1), logMessage = message)
+visualizationCBR(input, output, session, active = reactive(TRUE),
+  preselAnaId = reactive(-1), anaID = reactive(-1),
+  logMessage = message)
 
 visualizationCBRUI(id)
 }
@@ -20,12 +20,6 @@ visualizationCBRUI(id)
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user}
-
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
@@ -35,6 +29,12 @@ visualizationCBRUI(id)
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{user}{reactive expression yielding user}
 
 \item{anaIdList}{List of analyses and their status.}
 

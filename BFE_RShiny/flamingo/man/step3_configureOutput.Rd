@@ -7,10 +7,9 @@
 \usage{
 step3_configureOutputUI(id)
 
-step3_configureOutput(input, output, session, dbSettings, apiSettings,
-  active = reactive(TRUE), logMessage = message,
-  currstep = reactive(-1), portfolioID = reactive(""),
-  analysisID = reactive(""))
+step3_configureOutput(input, output, session, active = reactive(TRUE),
+  logMessage = message, currstep = reactive(-1),
+  portfolioID = reactive(""), analysisID = reactive(""))
 }
 \arguments{
 \item{id}{module id}
@@ -20,10 +19,6 @@ step3_configureOutput(input, output, session, dbSettings, apiSettings,
 \item{output}{Shiny output object.}
 
 \item{session}{Shiny session object.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
@@ -36,6 +31,10 @@ step3_configureOutput(input, output, session, dbSettings, apiSettings,
 \item{analysisID}{selected analysis ID}
 
 \item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{user}{reactive expression yielding user}
 }

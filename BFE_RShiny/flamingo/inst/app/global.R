@@ -44,23 +44,30 @@ dbSettings <- flamingoDB(
 # timeout for DB connection (secs)
 dbSettings$timeout <- 10
 
-tryCatch({
-  conn <- do.call(DBI::dbConnect, dbSettings)
-  DBI::dbDisconnect(conn)
-  loginfo("sucessfully connected to database", logger = "flamingo.module")
-}, error = function(e) {
-  logerror(paste("Could not connect to database:", e$message), logger = "flamingo.module")
-})
+# tryCatch({
+#   conn <- do.call(DBI::dbConnect, dbSettings)
+#   DBI::dbDisconnect(conn)
+#   loginfo("sucessfully connected to database", logger = "flamingo.module")
+# }, error = function(e) {
+#   logerror(paste("Could not connect to database:", e$message), logger = "flamingo.module")
+# })
 
 # global parameter, number of milliseconds to wait before refreshing tables ----
 # (300000 == 5 mins)
 reloadMillis <- 300000
 
 # flamingo django API ----------------------------------------------------------
+APISettings <- APIgetenv(
+  server = Sys.getenv("API_IP"),
+  port = Sys.getenv("API_PORT"),
+  version = Sys.getenv("API_VERSION"),
+  share_filepath = Sys.getenv("API_SHARE_FILEPATH")
+)
+
 # options(flamingo.settings.api = api_init("localhost", "8000"))
-options(flamingo.settings.api = api_init("10.10.0.182", "8000"))
-options(flamingo.settings.api.version = "v1")
-options(flamingo.settins.api.share_filepath = "./downloads")
+options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
+options(flamingo.settings.api.version = APISettings$version)
+options(flamingo.settins.api.share_filepath = APISettings$share_filepath)
 
 loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
 tryCatch({
@@ -83,22 +90,51 @@ StatusFailed <- '<i class="fa fa-times-circle"></i>'
 StatusCompleted <- '<i class="fa fa-check-circle"></i>'
 StatusProcessing <- '<i class="fa fa-spinner"></i>'
 
+#Output options ----------------------------------------------------------------
+granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
+losstypes <- c("GUL", "IL", "RI")
+variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")
+
+
 ### Default Selection Items ----------------------------------------------------
+LosstypesChoices <- list(
+  " " = "Summary",
+  " " = "ELT",
+  " " = "FullUncAEP",
+  " " = "FullUncOEP",
+  " " = "AEPWheatsheaf",
+  " " = "OEPWheatsheaf",
+  # " " = "MeanAEPWheatsheaf",
+  # " " = "MeanOEPWheatsheaf",
+  # " " = "SampleMeanAEP",
+  # " " = "gSampleMeanOEP",
+  " " = "AAL",
+  " " = "PLT")
+
+ReportChoices <- c('FullUncAEP', 'FullUncOEP', 'AAL')
+
 defaultSelectChoicesGUL <- c(
-  "gulprogSummary", "gulprogELT", "gulprogAAL",
-  "gulprogPLT", "gulprogFullUncAEP", "gulprogFullUncOEP"
+  "Summary", "ELT", "AAL",
+  "PLT", "FullUncAEP", "FullUncOEP"
 )
 defaultSelectChoicesIL <- c(
-  "ilprogSummary", "ilprogELT", "ilprogAAL", "ilprogPLT",
-  "ilprogFullUncAEP", "ilprogFullUncOEP", "ilpolicyELT", "ilpolicyAAL",
-  "ilpolicyPLT", "ilpolicyFullUncAEP", "ilpolicyFullUncOEP"
+  "Summary", "ELT", "AAL", "PLT",
+  "FullUncAEP", "FullUncOEP"
 )
 defaultSelectChoicesRI <- c(
-  "riprogSummary", "riprogELT", "riprogAAL", "riprogPLT",
-  "riprogFullUncAEP", "riprogFullUncOEP", "ripolicyELT", "ripolicyAAL",
-  "ripolicyPLT", "ripolicyFullUncAEP", "ripolicyFullUncOEP"
+  "Summary", "ELT", "AAL", "PLT",
+  "FullUncAEP", "FullUncOEP"
 )
 
+varsdf <- data.frame(vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEPWheatsheaf', 'OEPWheatsheaf', 'MeanAEPWheatsheaf', 'MeanOEPWheatsheaf', 'SampleMeanAEP', 'SampleMeanOEP', 'AAL', 'PLT'), 
+                     fields = c('uniqueItems', 'eltcalc', 'full_uncertainty_aep', 'full_uncertainty_oep', 'wheatsheaf_aep',  'wheatsheaf_oep', 'wheatsheaf_mean_aep', 'wheatsheaf_mean_oep', 'sample_mean_aep', 'sample_mean_oep',  'aalcalc', 'pltcalc'),
+                     lec_output = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE),
+                     stringsAsFactors = FALSE)
+
+granToOed <- data.frame(oed = c("lob", "loc", "county","state", "policy", "prog"),
+                        gran = c("LOB", "Location", "County","State", "Policy", "Portfolio"),
+                        outputlosstype = c("lob", "loc", "county","state", "policy", "prog"),
+                        stringsAsFactors = FALSE)
 
 ### Report to Variable conversion ----------------------------------------------
 reportToVar <- list(
@@ -106,12 +142,12 @@ reportToVar <- list(
   "eltcalc" = "ELT",
   "leccalc_full_uncertainty_aep" = "AEP",
   "leccalc_full_uncertainty_oep" = "OEP",
-  "leccalc_sample_mean_aep" ="AEP",
-  "leccalc_sample_mean_oep" ="OEP",
-  "leccalc_wheatsheaf_aep" ="Multi AEP",
-  "leccalc_wheatsheaf_oep" ="Multi OEP",
-  "leccalc_wheatsheaf_mean_aep" ="Multi AEP",
-  "leccalc_wheatsheaf_mean_oep" ="Multi OEP",
+  "leccalc_sample_mean_aep" = "AEP",
+  "leccalc_sample_mean_oep" = "OEP",
+  "leccalc_wheatsheaf_aep" = "Multi AEP",
+  "leccalc_wheatsheaf_oep" = "Multi OEP",
+  "leccalc_wheatsheaf_mean_aep" = "Multi AEP",
+  "leccalc_wheatsheaf_mean_oep" = "Multi OEP",
   "pltcalc" = "PLT",
   "summarycalc" = "Full Sample"
 )
@@ -151,12 +187,6 @@ plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full 
                             #                               "ylabel" = c("Loss")
                             # )
 )
-
-#Output options ----------------------------------------------------------------
-granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
-losstypes <- c("GUL", "IL", "RI")
-variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")
-
 
 # > Variables for cols positions -----------------------------------------------
 ### Creating Variables for col names of Portfolio Table

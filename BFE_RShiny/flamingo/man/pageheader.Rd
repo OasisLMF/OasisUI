@@ -7,9 +7,8 @@
 \usage{
 pageheaderUI(id)
 
-pageheader(input, output, session, user, dbSettings,
-  reloadMillis = 10000, logMessage = message,
-  active = reactive(TRUE))
+pageheader(input, output, session, user, reloadMillis = 10000,
+  logMessage = message, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{module id}
@@ -22,8 +21,6 @@ pageheader(input, output, session, user, dbSettings,
 
 \item{user}{reactive expression yielding user}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
 \item{reloadMillis}{Amount of time to wait between table updates;
 see \link{invalidateLater}.}
 
@@ -32,6 +29,8 @@ see \link{invalidateLater}.}
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{apiSettings}{as returned from \link{flamingoServer}}
 

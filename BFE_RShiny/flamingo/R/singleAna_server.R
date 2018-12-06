@@ -19,12 +19,12 @@
 #' @importFrom shinyjs hide
 #'
 #' @export
-singleAna <- function(input, output, session, dbSettings,
-                                      apiSettings, user, active = reactive(TRUE), logMessage = message,
-                                      preselRunId = reactive(-1),
-                                      preselProcId = reactive(-1),
-                                      preselPanel = reactive(1),
-                                      reloadMillis = 10000) {
+singleAna <- function(input, output, session,
+                     active = reactive(TRUE), logMessage = message,
+                     preselRunId = reactive(-1),
+                     preselProcId = reactive(-1),
+                     preselPanel = reactive(1),
+                     reloadMillis = 10000) {
 
   ns <- session$ns
 
@@ -88,9 +88,6 @@ singleAna <- function(input, output, session, dbSettings,
   submodulesList$step1_choosePortfolio <- callModule(
     step1_choosePortfolio,
     id = "step1_choosePortfolio",
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
-    user = user,
     active = reactive({active() && workflowSteps$step() == 1}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
@@ -100,8 +97,6 @@ singleAna <- function(input, output, session, dbSettings,
   submodulesList$step2_chooseAnalysis <- callModule(
     step2_chooseAnalysis,
     id = "step2_chooseAnalysis",
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
     active = reactive({active() && workflowSteps$step() == 2}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
@@ -113,8 +108,6 @@ singleAna <- function(input, output, session, dbSettings,
   submodulesList$step3_configureOutput <- callModule(
     step3_configureOutput,
     id = "step3_configureOutput",
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
     active = reactive({active() && workflowSteps$step() == 3}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
@@ -182,7 +175,11 @@ singleAna <- function(input, output, session, dbSettings,
     } else {
       result$tbl_portfoliosData <- submodulesList$step1_choosePortfolio$tbl_portfoliosData()
     }
-    result$pfChoices <- result$tbl_portfoliosData[, tbl_portfoliosData.PortfolioID]
+    if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0) {
+      result$pfChoices <- result$tbl_portfoliosData[, tbl_portfoliosData.PortfolioID]
+    } else {
+      result$pfChoices <- NULL
+    }
   })
 
   observeEvent({

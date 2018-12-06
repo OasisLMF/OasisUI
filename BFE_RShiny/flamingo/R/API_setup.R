@@ -1,3 +1,31 @@
+#' flamingoAPI
+#'
+#' @rdname APIgetenv
+#'
+#' @description Creates am api settings object which can then be used
+#' to create new connections to the Flamingo API
+#'
+#' @param server API Host name.
+#' @param port API Host port.
+#' @param version API version.
+#' @param share_filepath path of shared location where to download files.
+#'
+#' @return A settings object (list).
+#'
+#' @export
+APIgetenv <- function(server, port, version, share_filepath) {
+  
+  struct <- list(
+      server = server,
+      port = port,
+      version = version,
+      share_filepath = share_filepath)
+  
+  return(struct)
+  
+}
+
+
 #' API initialization
 #'
 #' Builds API URL.
@@ -177,18 +205,14 @@ api_access_token <- function(user, pwd) {
 
 #' Perform healthcheck
 #'
-#' @rdname api_get_helthcheck
+#' @rdname api_get_healthcheck
 #'
 #' @description Gets the current status of the api.
 #'
-#' @details Typo in he(a)lthcheck reflects typo in the API.
-#'
-#' @inheritParams loadProgrammeModel
-#' @param ... Other inputs.
-#'
-#' @return Helthcheck files.
+#' @return response containing status of API connection
 #'
 #' @importFrom httr GET
+#' @importFrom httr add_headers
 #' @importFrom httr status_code
 #'
 #' @export

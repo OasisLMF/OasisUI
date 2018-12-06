@@ -15,9 +15,9 @@
 #'
 #' @export
 step3_configureOutputUI <- function(id) {
-
+  
   ns <- NS(id)
-
+  
   tagList(
     hidden(div(id = ns("panelAnalysisTable"), panelAnalysisTable(id))),
     hidden(div(id = ns("panelDefineOutputs"), panelDefineOutputs(id))),
@@ -236,107 +236,36 @@ panel_configureAdvancedGUL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-
+    
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkgulprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "gulprogSummary",
-                                  " " = "gulprogELT",
-                                  " " = "gulprogFullUncAEP",
-                                  " " = "gulprogFullUncOEP",
-                                  " " = "gulprogAEPWheatsheaf",
-                                  " " = "gulprogOEPWheatsheaf",
-                                  # " " = "gulprogMeanAEPWheatsheaf",
-                                  # " " = "gulprogMeanOEPWheatsheaf",
-                                  # " " = "gulprogSampleMeanAEP",
-                                  # " " = "gulprogSampleMeanOEP",
-                                  " " = "gulprogAAL",
-                                  " " = "gulprogPLT"),
+                                choices = LosstypesChoices,
                                 selected = defaultSelectChoicesGUL),
-
+             
              checkboxGroupInput(ns("chkgulstate"),
                                 label = h6("State", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "gulstateSummary",
-                                  " " = "gulstateELT",
-                                  " " = "gulstateFullUncAEP",
-                                  " " = "gulstateFullUncOEP",
-                                  " " = "gulstateAEPWheatsheaf",
-                                  " " = "gulstateOEPWheatsheaf",
-                                  # " " = "gulstateMeanAEPWheatsheaf",
-                                  # " " = "gulstateMeanOEPWheatsheaf",
-                                  # " " = "gulstateSampleMeanAEP",
-                                  # " " = "gulstateSampleMeanOEP",
-                                  " " = "gulstateAAL",
-                                  " " = "gulstatePLT"),
-                                selected = defaultSelectChoicesGUL),
-
+                                choices = LosstypesChoices,
+                                selected = NULL),
+             
              checkboxGroupInput(ns("chkgulcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "gulcountySummary",
-                                  " " = "gulcountyELT",
-                                  " " = "gulcountyFullUncAEP",
-                                  " " = "gulcountyFullUncOEP",
-                                  " " = "gulcountyAEPWheatsheaf",
-                                  " " = "gulcountyOEPWheatsheaf",
-                                  # " " = "gulcountyMeanAEPWheatsheaf",
-                                  # " " = "gulcountyMeanOEPWheatsheaf",
-                                  # " " = "gulcountySampleMeanAEP",
-                                  # " " = "gulcountySampleMeanOEP",
-                                  " " = "gulcountyAAL",
-                                  " " = "gulcountyPLT"),
-                                selected = defaultSelectChoicesGUL),
-
+                                choices =LosstypesChoices,
+                                selected = NULL),
+             
              checkboxGroupInput(ns("chkgulloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "gullocSummary",
-                                  " " = "gullocELT",
-                                  " " = "gullocFullUncAEP",
-                                  " " = "gullocFullUncOEP",
-                                  " " = "gullocAEPWheatsheaf",
-                                  " " = "gullocOEPWheatsheaf",
-                                  # " " = "gullocMeanAEPWheatsheaf",
-                                  # " " = "gullocMeanOEPWheatsheaf",
-                                  # " " = "gullocSampleMeanAEP",
-                                  # " " = "gullocSampleMeanOEP",
-                                  " " = "gullocAAL",
-                                  " " = "gullocPLT"),
-                                selected = defaultSelectChoicesGUL),
-
+                                choices = LosstypesChoices,
+                                selected = NULL),
+             
              checkboxGroupInput(ns("chkgullob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "gullobSummary",
-                                  " " = "gullobELT",
-                                  " " = "gullobFullUncAEP",
-                                  " " = "gullobFullUncOEP",
-                                  " " = "gullobAEPWheatsheaf",
-                                  " " = "gullobOEPWheatsheaf",
-                                  # " " = "gullobMeanAEPWheatsheaf",
-                                  # " " = "gullobMeanOEPWheatsheaf",
-                                  # " " = "gullobSampleMeanAEP",
-                                  # " " = "gullobSampleMeanOEP",
-                                  " " = "gullobAAL",
-                                  " " = "gullobPLT"),
-                                selected = defaultSelectChoicesGUL),
-
+                                choices = LosstypesChoices,
+                                selected = NULL),
+             
              checkboxGroupInput(ns("chkgulpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "gulpolicySummary",
-                                  " " = "gulpolicyELT",
-                                  " " = "gulpolicyFullUncAEP",
-                                  " " = "gulpolicyFullUncOEP",
-                                  " " = "gulpolicyAEPWheatsheaf",
-                                  " " = "gulpolicyOEPWheatsheaf",
-                                  # " " = "gulpolicyMeanAEPWheatsheaf",
-                                  # " " = "gulpolicyMeanOEPWheatsheaf",
-                                  # " " = "gulpolicySampleMeanAEP",
-                                  # " " = "gulpolicySampleMeanOEP",
-                                  " " = "gulpolicyAAL", " " = "gulpolicyPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL)
     )
   )
@@ -368,106 +297,36 @@ panel_configureAdvancedIL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-
+    
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkilprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "ilprogSummary",
-                                  " " = "ilprogELT",
-                                  " " = "ilprogFullUncAEP",
-                                  " " = "ilprogFullUncOEP",
-                                  " " = "ilprogAEPWheatsheaf",
-                                  " " = "ilprogOEPWheatsheaf",
-                                  # " " = "ilprogMeanAEPWheatsheaf",
-                                  # " " = "ilprogMeanOEPWheatsheaf",
-                                  # " " = "ilprogSampleMeanAEP",
-                                  # " " = "ilprogSampleMeanOEP",
-                                  " " = "ilprogAAL",
-                                  " " = "ilprogPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilstate"),
                                 label = h6("State", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "ilstateSummary",
-                                  " " = "ilstateELT",
-                                  " " = "ilstateFullUncAEP",
-                                  " " = "ilstateFullUncOEP",
-                                  " " = "ilstateAEPWheatsheaf",
-                                  " " = "ilstateOEPWheatsheaf",
-                                  # " " = "ilstateMeanAEPWheatsheaf",
-                                  # " " = "ilstateMeanOEPWheatsheaf",
-                                  # " " = "ilstateSampleMeanAEP",
-                                  # " " = "ilstateSampleMeanOEP",
-                                  " " = "ilstateAAL", " " = "ilstatePLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "ilcountySummary",
-                                  " " = "ilcountyELT",
-                                  " " = "ilcountyFullUncAEP",
-                                  " " = "ilcountyFullUncOEP",
-                                  " " = "ilcountyAEPWheatsheaf",
-                                  " " = "ilcountyOEPWheatsheaf",
-                                  # " " = "ilcountyMeanAEPWheatsheaf",
-                                  # " " = "ilcountyMeanOEPWheatsheaf",
-                                  # " " = "ilcountySampleMeanAEP",
-                                  # " " = "ilcountySampleMeanOEP",
-                                  " " = "ilcountyAAL", " " = "ilcountyPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "illocSummary",
-                                  " " = "illocELT",
-                                  " " = "illocFullUncAEP",
-                                  " " = "illocFullUncOEP",
-                                  " " = "illocAEPWheatsheaf",
-                                  " " = "illocOEPWheatsheaf",
-                                  # " " = "illocMeanAEPWheatsheaf",
-                                  # " " = "illocMeanOEPWheatsheaf",
-                                  # " " = "illocSampleMeanAEP",
-                                  # " " = "illocSampleMeanOEP",
-                                  " " = "illocAAL",
-                                  " " = "illocPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkillob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "illobSummary",
-                                  " " = "illobELT",
-                                  " " = "illobFullUncAEP",
-                                  " " = "illobFullUncOEP",
-                                  " " = "illobAEPWheatsheaf",
-                                  " " = "illobOEPWheatsheaf",
-                                  # " " = "illobMeanAEPWheatsheaf",
-                                  # " " = "illobMeanOEPWheatsheaf",
-                                  # " " = "illobSampleMeanAEP",
-                                  # " " = "illobSampleMeanOEP",
-                                  " " = "illobAAL",
-                                  " " = "illobPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
-                                choices = list(
-                                  " " = "ilpolicySummary",
-                                  " " = "ilpolicyELT",
-                                  " " = "ilpolicyFullUncAEP",
-                                  " " = "ilpolicyFullUncOEP",
-                                  " " = "ilpolicyAEPWheatsheaf",
-                                  " " = "ilpolicyOEPWheatsheaf",
-                                  # " " = "ilpolicyMeanAEPWheatsheaf",
-                                  # " " = "ilpolicyMeanOEPWheatsheaf",
-                                  # " " = "ilpolicySampleMeanAEP",
-                                  # " " = "ilpolicySampleMeanOEP",
-                                  " " = "ilpolicyAAL",
-                                  " " = "ilpolicyPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL)
     )
   )
@@ -499,88 +358,43 @@ panel_configureAdvancedRI <- function(id) {
            # h5("Sample Mean OEP", style="font-size: 16.5px;"),
            h5("AAL", style="font-size: 16.5px;"),
            tags$div(class = "h5-align",h5("PLT", style="font-size: 16.5px;"))),
-
+    
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkriprog"),
                                 label = h5("Prog", style = "font-size: 15.0px;"),
-                                choices = list(
-                                  " " = "riprogSummary",
-                                  " " = "riprogELT",
-                                  " " = "riprogFullUncAEP",
-                                  " " = "riprogFullUncOEP",
-                                  " " = "riprogAEPWheatsheaf",
-                                  " " = "riprogOEPWheatsheaf",
-                                  " " = "riprogAAL",
-                                  " " = "riprogPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkristate"),
                                 label = h5("State", style = "font-size: 15.0px;"),
-                                choices = list(
-                                  " " = "ristateSummary",
-                                  " " = "ristateELT",
-                                  " " = "ristateFullUncAEP",
-                                  " " = "ristateFullUncOEP",
-                                  " " = "ristateAEPWheatsheaf",
-                                  " " = "ristateOEPWheatsheaf",
-                                  " " = "ristateAAL",
-                                  " " = "ristatePLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkricounty"),
                                 label = h5("County", style = "font-size: 15.0px;"),
-                                choices = list(
-                                  " " = "ricountySummary",
-                                  " " = "ricountyELT",
-                                  " " = "ricountyFullUncAEP",
-                                  " " = "ricountyFullUncOEP",
-                                  " " = "ricountyAEPWheatsheaf",
-                                  " " = "ricountyOEPWheatsheaf",
-                                  " " = "ricountyAAL",
-                                  " " = "ricountyPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkriloc"),
                                 label = h5("Location", style = "font-size: 15.0px;"),
-                                choices = list(
-                                  " " = "rilocSummary",
-                                  " " = "rilocELT",
-                                  " " = "rilocFullUncAEP",
-                                  " " = "rilocFullUncOEP",
-                                  " " = "rilocAEPWheatsheaf",
-                                  " " = "rilocOEPWheatsheaf",
-                                  " " = "rilocAAL",
-                                  " " = "rilocPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkrilob"),
                                 label = h5("LOB", style = "font-size: 15.0px;"),
-                                choices = list(
-                                  " " = "rilobSummary",
-                                  " " = "rilobELT",
-                                  " " = "rilobFullUncAEP",
-                                  " " = "rilobFullUncOEP",
-                                  " " = "rilobAEPWheatsheaf",
-                                  " " = "rilobOEPWheatsheaf",
-                                  " " = "rilobAAL",
-                                  " " = "rilobPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkripolicy"),
                                 label = h5("Policy", style = "font-size: 15.0px;"),
-                                choices = list(
-                                  " " = "ripolicySummary",
-                                  " " = "ripolicyELT",
-                                  " " = "ripolicyFullUncAEP",
-                                  " " = "ripolicyFullUncOEP",
-                                  " " = "ripolicyAEPWheatsheaf",
-                                  " " = "ripolicyOEPWheatsheaf",
-                                  " " = "ripolicyAAL",
-                                  " " = "ripolicyPLT"),
+                                choices = LosstypesChoices,
                                 selected = NULL)
     )
   )#end of fluidrow RI
 }
+
+
+
 
 # Server -----------------------------------------------------------------------
 
@@ -616,26 +430,25 @@ panel_configureAdvancedRI <- function(id) {
 #'
 #' @export
 step3_configureOutput <- function(input, output, session,
-                                  dbSettings,apiSettings,
                                   active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
                                   analysisID = reactive("")
 ) {
-
+  
   ns <- session$ns
-
+  
   # Reactive Values and parameters ---------------------------------------------
-
+  
   #number of Rows per Page in a dataable
   pageLength <- 5
-
+  
   # Default checkgroup for  GUL, IL and RI
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
   checkrigrplist <- c("chkriprog", "chkristate", "chkricounty", "chkriloc", "chkrilob", "chkripolicy")
-
+  
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # reactve value for navigation
@@ -651,13 +464,13 @@ step3_configureOutput <- function(input, output, session,
     # analysis_ setting
     analysis_settings = NULL
   )
-
+  
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
     result$anaID <- analysisID()
   })
-
+  
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
@@ -666,7 +479,7 @@ step3_configureOutput <- function(input, output, session,
       .reloadAnaData()
     }
   })
-
+  
   # If portfolioID changes, reload analysis table and set view back to default
   observeEvent(portfolioID(), ignoreInit = TRUE, {
     if (active()) {
@@ -675,9 +488,9 @@ step3_configureOutput <- function(input, output, session,
       .reloadAnaData()
     }
   })
-
+  
   # Enable and disable buttons -------------------------------------------------
-
+  
   #Enabling based on analysis
   observeEvent({
     result$tbl_analysesData
@@ -702,8 +515,20 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   )
-
-
+  
+  # reactive expression yielding the output options as a list
+  outputOptionsList <- reactive({paste(collapse = ",", c(
+    input$chkinputGUL, input$chkgulprog, input$chkgulpolicy,
+    input$chkgulstate, input$chkgulcounty, input$chkgulloc,
+    input$chkgullob,
+    input$chkinputIL, input$chkilprog, input$chkilpolicy,
+    input$chkilstate, input$chkilcounty, input$chkilloc,
+    input$chkillob,
+    input$chkinputRI, input$chkriprog, input$chkripolicy,
+    input$chkristate, input$chkricounty, input$chkriloc,
+    input$chkrilob
+  ))})
+  
   # Enable and disable buttons based on output confifig
   observeEvent(outputOptionsList(), ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (outputOptionsList() != "") {
@@ -714,7 +539,7 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttonexecuteanarun")
     }
   })
-
+  
   # Analyses  Table ------------------------------------------------------------
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioanaAllOrInProgress, ignoreInit = TRUE, {
@@ -723,9 +548,8 @@ step3_configureOutput <- function(input, output, session,
       .reloadAnaData()
     }
   })
-
+  
   output$dt_analyses <- renderDT(
-
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- 1
       logMessage("re-rendering analysis table")
@@ -743,7 +567,7 @@ step3_configureOutput <- function(input, output, session,
     } else {
       .nothingToShowTable(contentMessage = paste0("no analysis available"))
     })
-
+  
   # Analyses Table Title
   output$paneltitle_AnalysisTable <- renderUI({
     if (portfolioID() != "") {
@@ -751,48 +575,30 @@ step3_configureOutput <- function(input, output, session,
     } else {
       paste0("Analyses")
     }
-
   })
-
+  
   # Delete analysis button -----------------------------------------------------
   onclick("abuttoncancelana", {
     showModal(.cancelAnaModal())
   })
-
+  
   output$cancelAnaModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
     paste0('Cancel ', AnaId, ' ', AnaName)
   })
-
-  .cancelAnaModal <- function(){
-    ns <- session$ns
-    modalDialog(label = "cancelAnaModal",
-                title = uiOutput(ns("cancelAnaModaltitle"), inline = TRUE),
-                paste0("Are you sure you want to cancel this analysis?"),
-                footer = tagList(
-                  flamingoButton(ns("abuttonConfirmDelAna"),
-                                 label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = defineSingleAna$abuttonConfirmDel, placement = "right"),
-                  actionButton(ns("btnCancelAnaDel"),
-                               label = "Go back", align = "right")
-                ),
-                size = "m",
-                easyClose = TRUE
-    )
-  }
-
+  
   observeEvent(input$btnCancelAnaDel, {
     removeModal()
   })
-
+  
   observeEvent(input$abuttonConfirmDelAna, {
     removeModal()
-
+    
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     #should use /v1/analyses/{id}/cancel/
     delete_analyses_id <- api_post_analyses_cancel(analysisID)
-
+    
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis id ", analysisID, " cancelled."))
@@ -805,15 +611,15 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "error",
                            paste0("Error in cancelling analysis ", result$anaID, ". Analysis is not running."))
     }
-
+    
   })
-
+  
   # Configure Output -----------------------------------------------------------
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
     hide("panelDefineOutputs")
   })
-
+  
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
     if (result$ana_flag  == "R") {
@@ -825,97 +631,97 @@ step3_configureOutput <- function(input, output, session,
       "New Output Configuration"
     }
   })
-
+  
   #Show Output Configuration Panel
   onclick("abuttonconfigoutput", {
-    .defaultview(session)
+    .defaultview()
     hide("panelAnalysisLogs")
     show("panelDefineOutputs")
     .showPerils()
     logMessage("showing panelDefineOutputs")
     result$ana_flag <- "C"
   })
-
+  
   # Hide Output Configuration panel
   onclick("abuttonehidepanelconfigureoutput", {
     hide("panelDefineOutputs")
     result$ana_flag <- "C"
   })
-
+  
   # simplified view selection
   observe({
-    if (length(input$chkgulprog) > 0 |  length(input$chkgulstate) > 0 |
-        length(input$chkgulcounty) > 0 |  length(input$chkgulloc) > 0 |
-        length(input$chkgullob) > 0 | length(input$chkgulpolicy) > 0) {
+    gullistlength <- lapply(checkgulgrplist, function(i){
+      length(input[[i]])
+    }) %>% unlist() %>% sum()
+    if (gullistlength > 0) {
       updateCheckboxInput(session, "chkinputGUL", value = TRUE)
       disable("chkgulpolicy")
     }
-    if (length(input$chkilprog) > 0 |  length(input$chkilstate) > 0 |
-        length(input$chkilcounty) > 0 |  length(input$chkilloc) > 0 |
-        length(input$chkillob) > 0 | length(input$chkilpolicy) > 0) {
+    illistlength <- lapply(checkilgrplist, function(i){
+      length(input[[i]])
+    }) %>% unlist() %>% sum()
+    if (illistlength > 0) {
       updateCheckboxInput(session, "chkinputIL", value = TRUE)
     }
-    if (length(input$chkriprog) > 0 |  length(input$chkristate) > 0 |
-        length(input$chkricounty) > 0 |  length(input$chkriloc) > 0 |
-        length(input$chkrilob) > 0 | length(input$chkripolicy) > 0) {
+    rilistlength <- lapply(checkrigrplist, function(i){
+      length(input[[i]])
+    }) %>% unlist() %>% sum()
+    if (rilistlength > 0) {
       updateCheckboxInput(session, "chkinputRI", value = TRUE)
     }
   })
-
+  
+  
   # Select/deselect GUL
   observeEvent(input$chkinputGUL, ignoreInit = TRUE,  {
     if (active()) {
-      if (input$chkinputGUL == FALSE) {
-        .clearchkboxGULgrp()
+      if (!input$chkinputGUL) {
+        .clearchkboxgrp(checkgulgrplist)
       }  else {
         disable("chkgulpolicy")
-        gullistlength <- length(input$chkgulprog) + length(input$chkgulstate) +
-          length(input$chkgulcounty) + length(input$chkgulloc) +
-          length(input$chkgullob) + length(input$chkgulpolicy)
+        gullistlength <- lapply(checkgulgrplist, function(i){
+          length(input[[i]])
+        }) %>% unlist() %>% sum()
         if (gullistlength == 0) {
-          for (i in checkgulgrplist) {
-            updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesGUL)
-          }
+          .defaultchkboxGULgrp()
         }
       }
     }
   })
-
+  
   # Select/deselect IL
   # Note: the ignoreInit = TRUE does not prevent the trigger once logged in
   observeEvent(input$chkinputIL, ignoreInit = TRUE, {
     if (active()) {
-      if (input$chkinputIL == FALSE) {
-        .clearchkboxILgrp()
+      if (!input$chkinputIL) {
+        .clearchkboxgrp(checkilgrplist)
       } else {
-        if (length(input$chkilprog) == 0 &  length(input$chkilstate) == 0 &
-            length(input$chkilcounty) == 0 &  length(input$chkilloc) == 0 &
-            length(input$chkillob) == 0 & length(input$chkilpolicy) == 0) {
-          for (i in checkilgrplist) {
-            updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesIL)
-          }
+        illistlength <- lapply(checkilgrplist, function(i){
+          length(input[[i]])
+        }) %>% unlist() %>% sum()
+        if (illistlength == 0) {
+          .defaultchkboxILgrp()
         }
       }
     }
   })
-
+  
   # Select/deselect RI
   observeEvent(input$chkinputRI, ignoreInit = TRUE, {
     if (active()) {
-      if (input$chkinputRI == FALSE) {
-        .clearchkboxRIgrp()
+      if (!input$chkinputRI) {
+        .clearchkboxgrp(checkrigrplist)
       } else {
-        if (length(input$chkriprog) == 0 &  length(input$chkristate) == 0 &
-            length(input$chkricounty) == 0 &  length(input$chkriloc) == 0 &
-            length(input$chkrilob) == 0 & length(input$chkripolicy) == 0) {
-          for (i in checkrigrplist) {
-            updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesRI)
-          }
+        rilistlength <- lapply(checkrigrplist, function(i){
+          length(input[[i]])
+        }) %>% unlist() %>% sum()
+        if (rilistlength == 0) {
+          .defaultchkboxRIgrp()
         }
       }
     }
   })
-
+  
   # Update button in sidebar panel to update checkboxes for pre-populated values
   #To-Do update output configuration based on analysis setting
   observeEvent(input$sinoutputoptions, {
@@ -939,37 +745,24 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # Clear the checkbox groups and preset dropdown - Set back to default
   onclick("abuttonclroutopt", {
-    .defaultview(session)
+    .defaultview()
   })
-
+  
   # show advanced view
   onclick("abuttonadvanced", {
     .advancedview()
   })
-
+  
   # show basic view
   onclick("abuttonbasic", {
     .basicview()
   })
-
-  # reactive expression yielding the output options as a list
-  outputOptionsList <- reactive({paste(collapse = ",", c(
-    input$chkinputGUL, input$chkgulprog, input$chkgulpolicy,
-    input$chkgulstate, input$chkgulcounty, input$chkgulloc,
-    input$chkgullob,
-    input$chkinputIL, input$chkilprog, input$chkilpolicy,
-    input$chkilstate, input$chkilcounty, input$chkilloc,
-    input$chkillob,
-    input$chkinputRI, input$chkriprog, input$chkripolicy,
-    input$chkristate, input$chkricounty, input$chkriloc,
-    input$chkrilob
-  ))})
-
+  
   onclick("abuttonrerunana", {
-    .defaultview(session)
+    .defaultview()
     hide("panelAnalysisLogs")
     show("panelDefineOutputs")
     .showPerils()
@@ -1022,20 +815,21 @@ step3_configureOutput <- function(input, output, session,
   #     .clearOutputOptions()
   #   }
   # })
-
-
+  
   # Run Analyses ---------------------------------------------------------------
-
+  
   # Execute analysis
   onclick("abuttonexecuteanarun", {
     analysis_settingsList <- .gen_analysis_settings()
 
     #write out file to be uploades
-    write_json(analysis_settingsList, "./analysis_settings.json", pretty = TRUE, auto_unbox = TRUE)
-
+    currfolder <- getOption("flamingo.settins.api.share_filepath")
+    dest <- file.path(currfolder, "analysis_settings.json")
+    write_json(analysis_settingsList, dest, pretty = TRUE, auto_unbox = TRUE)
+    
     #post analysis settings
-    post_analysis_settings_file <- api_post_analyses_settings_file(result$anaID, "./analysis_settings.json")
-
+    post_analysis_settings_file <- api_post_analyses_settings_file(result$anaID, dest)
+    
     if (post_analysis_settings_file$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis  settings posted to ", result$anaID ,"."))
@@ -1043,10 +837,10 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "error",
                            paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analysis_settings_file$status))
     }
-
+    
     analyses_run <- return_analyses_run_df(result$anaID)
-
-    if (nrow(analyses_run) > 1) {
+    
+    if (!is.null(analyses_run) && nrow(analyses_run) > 1) {
       if (analyses_run[[tbl_analysesData.AnaStatus]] == "RUN_STARTED") {
         flamingoNotification(type = "message",
                              paste0("Analysis ", result$anaID ," is executing"))
@@ -1063,12 +857,12 @@ step3_configureOutput <- function(input, output, session,
     pageSel <- ceiling(idxSel/pageLength)
     .reloadAnaData()
     hide("panelDefineOutputs")
-    .defaultview(session)
+    .defaultview()
     selectRows(dataTableProxy("dt_analyses"), idxSel)
     selectPage(dataTableProxy("dt_analyses"), pageSel)
-
+    
   })
-
+  
   # Logs -----------------------------------------------------------------------
   onclick("abuttonshowlog", {
     hide("panelDefineOutputs")
@@ -1076,11 +870,11 @@ step3_configureOutput <- function(input, output, session,
     logMessage("showing analysis run log table")
     .reloadAnaRunLog()
   })
-
+  
   onclick("abuttonhidelog", {
     hide("panelAnalysisLogs")
   })
-
+  
   ### Log Table
   output$dt_analysesrunlog <- renderDT({
     if (length(input$dt_analyses_rows_selected) > 0) {
@@ -1101,7 +895,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # run logs title
   output$paneltitle_AnaLogs <- renderUI({
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
@@ -1109,22 +903,22 @@ step3_configureOutput <- function(input, output, session,
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
     paste0('Run Logs for Analysis id ', analysisID, ' ', analysisName)
   })
-
+  
   # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonanarefresh", {
     .reloadAnaData()
   } )
-
+  
   onclick("abuttonanarefreshlogs", {
     .reloadAnaRunLog()
   })
-
+  
   # Updates dependent on changed: dt_analyses_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent({
     input$dt_analyses_rows_selected
     portfolioID()
-    }, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  }, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
@@ -1140,14 +934,16 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # Navigation -----------------------------------------------------------------
   # Go to browse section
   onclick("abuttondisplayoutput", {
     result$navigationstate <- "SBR"
   })
-
+  
+  
   # Help Functions -------------------------------------------------------------
+  
   # hide all panels
   .hideDivs <- function() {
     logMessage(".hideDivs called")
@@ -1156,7 +952,7 @@ step3_configureOutput <- function(input, output, session,
     hide("panelDefineOutputs")
     hide("panelAnalysisLogs")
   }
-
+  
   #show default view for Section "Configure Output & Run" = "3"
   .defaultstep3 <- function(){
     logMessage(".defaultstep3 called")
@@ -1168,7 +964,7 @@ step3_configureOutput <- function(input, output, session,
     disable("abuttonconfigoutput")
     disable("abuttoncancelana")
   }
-
+  
   # Reload Analyses table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
@@ -1187,7 +983,7 @@ step3_configureOutput <- function(input, output, session,
     }
     invisible()
   }
-
+  
   # Reload Analysis Run Log table
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
@@ -1197,7 +993,7 @@ step3_configureOutput <- function(input, output, session,
       result$tbl_analysisrunlog <-  NULL
     }
   }
-
+  
   # table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function() {
     options <- list(
@@ -1210,7 +1006,7 @@ step3_configureOutput <- function(input, output, session,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }
-
+  
   #empty table
   .nothingToShowTable <- function(contentMessage){
     datatable(
@@ -1225,52 +1021,23 @@ step3_configureOutput <- function(input, output, session,
     )
   }
 
-  # Clear checkboxgroups GUL
-  .clearchkboxGULgrp <- function() {
-    logMessage(".clearchkboxGULgrp called")
-    for (i in checkgulgrplist) {
-      updateCheckboxGroupInput(session, inputId = i, selected = "None")
-    }
+  .cancelAnaModal <- function(){
+    ns <- session$ns
+    modalDialog(label = "cancelAnaModal",
+                title = uiOutput(ns("cancelAnaModaltitle"), inline = TRUE),
+                paste0("Are you sure you want to cancel this analysis?"),
+                footer = tagList(
+                  flamingoButton(ns("abuttonConfirmDelAna"),
+                                 label = "Confirm", align = "center") %>%
+                    bs_embed_tooltip(title = defineSingleAna$abuttonConfirmDel, placement = "right"),
+                  actionButton(ns("btnCancelAnaDel"),
+                               label = "Go back", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
   }
-
-  # Clear checkboxgroup IL
-  .clearchkboxILgrp <- function() {
-    logMessage(".clearchkboxILgrp called")
-    for (i in checkilgrplist) {
-      updateCheckboxGroupInput(session, inputId = i, selected = "None")
-    }
-  }
-
-  # Clear checkboxgroup RI
-  .clearchkboxRIgrp <- function() {
-    logMessage(".clearchkboxRIgrp called")
-    for (i in checkrigrplist) {
-      updateCheckboxGroupInput(session, inputId = i, selected = "None")
-    }
-  }
-
-  # Clear other runtime params
-  .clearotherparams <- function() {
-    logMessage(".clearotherparams called")
-    .clearOutputOptions()
-    updateTextInput(session, "tinputananame", value = "")
-    updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
-
-    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
-    modelID <- ifelse(modelID == "", -1,modelID)
-    # if (modelID != -1) {
-    #   updateSelectInput(session, "sinputeventset",
-    #                     choices = getEventSet(dbSettings, modelID ))
-    #   updateSelectInput(session, "sinputeventocc",
-    #                     choices = getEventOccurrence(dbSettings, modelID ))
-    # }
-    # updateCheckboxInput(session, "chkinputprwind", "Peril: Wind", value = TRUE)
-    # updateCheckboxInput(session, "chkinputprstsurge", "Peril: Surge", value = TRUE)
-    # updateCheckboxInput(session, "chkinputprquake", "Peril: Quake", value = TRUE)
-    # updateCheckboxInput(session, "chkinputprflood", "Peril: Flood", value = TRUE)
-    # updateCheckboxInput(session, "chkinputdsurge", "Demand Surge", value = TRUE)
-  }
-
+  
   # Clear Custom Configuration option
   .clearOutputOptions <- function() {
     logMessage(".clearOutputOptions called")
@@ -1286,203 +1053,77 @@ step3_configureOutput <- function(input, output, session,
                       choices = choicesList,
                       selected = character(0))
   }
-
-  #Show available perils
-  # To-Do: retrieve perils from model. currently showing all
-  .showPerils <- function() {
-    # modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
-    # modelID <- ifelse(modelID == "", -1,modelID)
-    #
-    # stmt <- buildDbQuery("getRuntimeParamList", modelID)
-    # runparamlist <- executeDbQuery(dbSettings, stmt)
-    #
-    # hide("perilwind")
-    # hide("perilsurge")
-    # hide("perilquake")
-    # hide("perilflood")
-    # hide("demandsurge")
-    # hide("leakagefactor")
-    #
-    # if (nrow(runparamlist) > 0) {
-    #   for (i in 1:nrow(runparamlist)) {
-    #     ctrname <- gsub("_", "", runparamlist[i, 1], fixed = TRUE)
-    #     show(ctrname)
-    #   }
-    # }
-  }
-
-  #Generate Analysis settings file
-  .gen_analysis_settings <- function(){
-    # Assign analysis settings to analysis
-    #model data
+  
+  # Clear other runtime params
+  .clearotherparams <- function() {
+    logMessage(".clearotherparams called")
+    .clearOutputOptions()
+    updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
-    modelData <- return_tbl_modelData(modelID)
-    
-    #Reassigned variables for consistency
-    model_version_id <- modelData[[tbl_modelsData.ModelNameId]]
-    source_tag <- tolower(model_version_id)
-    module_supplier_id <- modelData[[tbl_modelsData.ModelSupplierId]]
-    number_of_samples <- as.integer(input$tinputnoofsample)
-    prog_id <- as.integer(result$portfolioID)
-    event_occurrence_file_id <- 1 # getEventOccurrence(dbSettings, prgId )  as.integer(input$sinputeventocc)
-    event_set <- input$sinputeventset
-    peril_wind <- input$chkinputprwind
-    demand_surge <- input$chkinputdsurge
-    peril_quake <- input$chkinputprquake
-    peril_flood <- input$chkinputprflood
-    peril_surge <- input$chkinputprstsurge
-    leakage_factor <- input$sliderleakagefac
-    gul_output <- input$chkinputGUL
-    il_output <- input$chkinputIL
-    ri_output <- input$chkinputRI
-    gul_threshold <- as.integer(input$tinputthreshold)
-    analysis_tag <- as.integer(result$anaID)
-    uniqueItems <- FALSE
-    id <- 1
-    exposure_location <- "L:"
-    use_random_number_file <- FALSE
-    return_period_file <- TRUE
-    chkinputsummaryoption <- input$chkinputsummaryoption
-    outputsGUL <- c(input$chkgulprog, input$chkgulpolicy, input$chkgulstate, input$chkgulcounty, input$chkgulloc, input$chkgullob)
-    outputsIL <- c(input$chkilprog, input$chkilpolicy, input$chkilstate, input$chkilcounty, input$chkilloc, input$chkillob)
-    outputsRI <- c(input$chkriprog, input$chkripolicy, input$chkristate, input$chkricounty, input$chkriloc, input$chkrilob)
-    
-    #generate analysis_settings_file
-    analysis_settingsList <- construct_tbl_analyses_settings(source_tag, prog_id, number_of_samples,
-                                                             module_supplier_id, model_version_id,
-                                                             event_occurrence_file_id,use_random_number_file = FALSE, event_set,
-                                                             peril_wind, demand_surge, peril_quake, peril_flood, peril_surge, leakage_factor,
-                                                             gul_threshold,exposure_location = 'L',
-                                                             outputsGUL, outputsIL, outputsRI, chkinputsummaryoption,
-                                                             gul_output,  il_output, ri_output,
-                                                             return_period_file,
-                                                             analysis_tag, uniqueItems = FALSE, id = 1)
-    return(analysis_settingsList)
+    modelID <- ifelse(modelID == "", -1,modelID)
+    tbl_modelsDetails <- return_models_id_resource_file_df(modelID)
+    if (modelID != -1 && !is.null(tbl_modelsDetails)) {
+      eventSetChoices <- tbl_modelsDetails$content[grepl("EventSet", tbl_modelsDetails$resource)]
+      updateSelectInput(session, "sinputeventset",
+                        choices = eventSetChoices)
+      occurrenceSetChoices <- tbl_modelsDetails$content[grepl("OccurrenceSet", tbl_modelsDetails$resource)]
+      updateSelectInput(session, "sinputeventocc",
+                        choices = occurrenceSetChoices)
+    }
+    updateCheckboxInput(session, "chkinputprwind", "Peril: Wind", value = TRUE)
+    updateCheckboxInput(session, "chkinputprstsurge", "Peril: Surge", value = TRUE)
+    updateCheckboxInput(session, "chkinputprquake", "Peril: Quake", value = TRUE)
+    updateCheckboxInput(session, "chkinputprflood", "Peril: Flood", value = TRUE)
+    updateCheckboxInput(session, "chkinputdsurge", "Demand Surge", value = TRUE)
   }
   
-  # Update output configuration for rerun
-  .updateOutputConfig <- function(analysis_settings) {
-    logMessage(".updateOutputConfig called")
-    
-    #clear checkboxes
-    .clearchkboxGULgrp()
-    .clearchkboxILgrp()
-    .clearchkboxRIgrp()
-
-    settings <- analysis_settings[["analysis_settings"]]
-    model_settings <- settings[["model_settings"]]
-
-    SettingsMapping <- list(
-      "tinputnoofsample"  = list(
-        "UpdateWidget" = "updateTextInput",
-        "SettingPath" = "settings",
-        "SettingElement" = "number_of_samples"
-      ),
-      "tinputthreshold"  = list(
-        "UpdateWidget" = "updateTextInput",
-        "SettingPath" = "settings",
-        "SettingElement" = "gul_threshold"
-      ),
-      "sinputeventset" = list(
-        "UpdateWidget" = "updateSelectInput",
-        "SettingPath" = "model_settings",
-        "SettingElement" = "event_set"
-      ),
-      "sinputeventocc" = list(
-        "UpdateWidget" = "updateSelectInput",
-        "SettingPath" = "model_settings",
-        "SettingElement" = "event_occurrence_file_id"
-      ),
-      "chkinputprwind" = list(
-        "UpdateWidget" = "updateCheckboxInput",
-        "SettingPath" = "model_settings",
-        "SettingElement" = "peril_wind"
-      ),
-      "chkinputprstsurge" = list(
-        "UpdateWidget" = "updateCheckboxInput",
-        "SettingPath" = "model_settings",
-        "SettingElement" = "peril_surge"
-      ),
-      "chkinputprquake" = list(
-        "UpdateWidget" = "updateCheckboxInput",
-        "SettingPath" = "model_settings",
-        "SettingElement" = "peril_quake"
-      ),
-      "chkinputprflood" = list(
-        "UpdateWidget" = "updateCheckboxInput",
-        "SettingPath" = "model_settings",
-        "SettingElement" = "peril_flood"
-      ),
-      "chkinputdsurge" = list(
-        "UpdateWidget" = "updateCheckboxInput",
-        "SettingPath" = "model_settings",
-        "SettingElement" = "demand_surge"
-      ),
-      "sliderleakagefac" = list(
-        "UpdateWidget" = "updateCheckboxInput",
-        "SettingPath" = "model_settings",
-        "SettingElement" = "leakage_factor"
-      )
-    )
-    
-    .updateWidget <- function(inp) {
-      curr_setting <- SettingsMapping[[inp]]
-      if(curr_setting$UpdateWidget == "updateSelectInput") {
-        get(curr_setting$UpdateWidget)(session = session, inputId = inp, selected = get(curr_setting$SettingPath)[[curr_setting$SettingElement]])
-      } else {
-        get(curr_setting$UpdateWidget)(session = session, inputId = inp, value = get(curr_setting$SettingPath)[[curr_setting$SettingElement]])
-      }
+  # Clear checkboxgroups
+  .clearchkboxgrp <- function(checkgrplist) {
+    logMessage(".clearchkboxgrp called")
+    for (i in checkgrplist) {
+      updateCheckboxGroupInput(session, inputId = i, selected = NULL)
     }
-    
-    
-    lapply(names(SettingsMapping), function(i){
-      .updateWidget(i)
-    } )
-
-    
-    #To-do retrieve checkboxes selection from analysis_settings and update inputs accordingly 
-    varslist <- list('uniqueItems' = 'Summary',
-                     'eltcalc' = 'ELT',
-                     'full_uncertainty_aep' = 'FullUncAEP',
-                     'full_uncertainty_oep' = 'FullUncOEP',
-                     'wheatsheaf_aep' = 'AEPWheatsheaf',
-                     'wheatsheaf_oep' = 'OEPWheatsheaf',
-                     'wheatsheaf_mean_aep' = 'MeanAEPWheatsheaf',
-                     'wheatsheaf_mean_oep' = 'MeanOEPWheatsheaf',
-                     'sample_mean_aep' = 'SampleMeanAEP',
-                     'sample_mean_oep' = 'SampleMeanOEP',
-                     'aalcalc' = 'AAL',
-                     'pltcalc' = 'PLT')
-    gran <- c('prog', 'policy', 'state', 'county', 'loc', 'lob')
-    output_perspectives <- names(analysis_settings[[1]])[grepl("_summaries", names(analysis_settings[[1]]))]
-    for (op in output_perspectives) {
-      perspective <- gsub("_summaries", "", op)
-      nidx <- length(analysis_settings[[1]][[op]])
-      for (i in 1:nidx) {
-        curr_gran_list <- analysis_settings[[1]][[op]][[i]]
-        # index of granularity
-        g <- curr_gran_list[["id"]]
-        #update summary input
-        updateCheckboxInput(session = session, inputId = "chkinputsummaryoption", value = curr_gran_list[["summarycalc"]])
-        #checkbox group input name
-        chk_persp_gran <- paste0("chk", perspective, gran[g])
-        #variables for given granularity
-        vars <- names(curr_gran_list)
-        leccalcvars <- names(curr_gran_list[["leccalc"]][["outputs"]])
-        vars <- vars[which(vars != "id" & vars != "summarycalc" & vars != "lec_output" & vars != "leccalc")]
-        vars <- c(vars, leccalcvars)
-        #create vector of choices
-        choices <- c()
-        for (v in vars) {
-          choice <- paste0( perspective, gran[g], varslist[[v]])
-          choices <- c(choices, choice)
-        }
-        updateCheckboxGroupInput(session = session, inputId = chk_persp_gran, selected = choices)
-      }
-    }
-    invisible()
   }
-
+  
+  # Default GUL output configuration options
+  .defaultchkboxGULgrp <- function() {
+    logMessage(".defaultchkboxGULgrp called")
+    for (i in checkgulgrplist) {
+      if (i == "chkgulprog") {
+        defaultSelectChoices <- defaultSelectChoicesGUL
+      } else {
+        defaultSelectChoices <- NULL
+      }
+      updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
+    }
+  }
+  
+  # Default output configuration options
+  .defaultchkboxILgrp <- function() {
+    logMessage(".defaultchkboxILgrp called")
+    for (i in checkilgrplist) {
+      if (i == "chkilprog" | i == "chkilpolicy") {
+        defaultSelectChoices <- defaultSelectChoicesIL
+      } else {
+        defaultSelectChoices <- NULL
+      }
+      updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
+    }
+  }
+  
+  # Default output configuration options
+  .defaultchkboxRIgrp <- function() {
+    logMessage(".defaultchkboxRIgrp called")
+    for (i in checkrigrplist) {
+      if (i == "chkriprog" | i == "chkripolicy") {
+        defaultSelectChoices <- defaultSelectChoicesRI
+      } else {
+        defaultSelectChoices <- NULL
+      }
+      updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
+    }
+  }
+  
   # Output view
   .advancedview <- function() {
     logMessage(".advancedview called")
@@ -1495,7 +1136,7 @@ step3_configureOutput <- function(input, output, session,
     # show("abuttonsaveoutput")
     show("abuttonclroutopt")
   }
-
+  
   .basicview <- function() {
     logMessage(".basicview called")
     hide("panel_configureAdvancedGUL")
@@ -1507,28 +1148,178 @@ step3_configureOutput <- function(input, output, session,
     # hide("abuttonsaveoutput")
     hide("abuttonclroutopt")
   }
-
-  # Default output configuration options
-  .defaultchkboxGULgrp <- function(session) {
-    logMessage(".defaultchkboxGULgrp called")
-    for (i in checkgulgrplist) {
-      updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoicesGUL)
-    }
-  }
-
-  .defaultview <- function(session) {
+  
+  .defaultview <- function() {
     logMessage(".defaultview called")
     updateCheckboxInput(session, "chkinputGUL", value = TRUE)
-    .defaultchkboxGULgrp(session)
+    .defaultchkboxGULgrp()
     updateCheckboxInput(session, "chkinputIL", value = FALSE)
-    .clearchkboxILgrp()
+    .clearchkboxgrp(checkilgrplist)
     updateCheckboxInput(session, "chkinputRI", value = FALSE)
-    .clearchkboxRIgrp()
+    .clearchkboxgrp(checkrigrplist)
     .clearotherparams()
-    .clearOutputOptions()
     .basicview()
   }
+  
+  #Show available perils
+  # To-Do: retrieve perils from model. currently showing all
+  .showPerils <- function() {
+    logMessage(".showPerils called")
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
+    modelID <- ifelse(modelID == "", -1,modelID)
+    tbl_modelsDetails <- return_models_id_resource_file_df(modelID)
+    if (!is.null(tbl_modelsDetails)) {
 
+      leakIdx <- grepl("leakagefactor", tbl_modelsDetails$resource)
+      if (any(leakIdx) && as.logical(tbl_modelsDetails$content[leakIdx])) {
+        show("sliderleakagefac")
+      } else {
+        hide("sliderleakagefac")
+      }
+
+      perils <- list("perilwind" = "chkinputprwind",
+                     "perilsurge" = "chkinputprstsurge",
+                     "perilquake" = "chkinputprquake",
+                     "perilflood" = "chkinputprflood",
+                     "demandsurge" = "chkinputdsurge")
+      
+      for (p in names(perils)) {
+        periltype <- gsub("peril", "", p)
+        perilIdx <- grepl(periltype, tbl_modelsDetails$resource)
+        if (any(perilIdx) && as.logical(tbl_modelsDetails$content[perilIdx])) {
+          updateCheckboxInput(session, perils[p], value =  tbl_modelsDetails$content[perilIdx])
+          show(perils[p])
+        } else{
+          updateCheckboxInput(session, perils[p], value = FALSE)
+          hide(perils[p])
+        }
+      }
+    }
+  }
+  
+  #Generate Analysis settings file
+  .gen_analysis_settings <- function(){
+    
+    logMessage(".gen_analysis_settings called")
+
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
+    modelID <- ifelse(modelID == "", -1,modelID)
+    modelData <- return_tbl_modelData(modelID)
+    
+    inputsettings <- list(
+      "analysis_tag" = as.integer(result$anaID),
+      "exposure_location" = "L:", # what here?
+      "gul_threshold" = as.integer(input$tinputthreshold),
+      "model_version_id" = ifelse(is.null(modelData[[tbl_modelsData.ModelVersionId]]), "", modelData[[tbl_modelsData.ModelVersionId]]),
+      "module_supplier_id" = ifelse(is.null(modelData[[tbl_modelsData.ModelSupplierId]]), "", modelData[[tbl_modelsData.ModelSupplierId]]),
+      "number_of_samples" = as.integer(input$tinputnoofsample),
+      "prog_id" = ifelse(is.null(result$portfolioID), "", as.integer(result$portfolioID)),
+      "source_tag" = tolower( ifelse(is.null(modelData[[tbl_modelsData.ModelVersionId]]), "", modelData[[tbl_modelsData.ModelVersionId]])),
+      "gul_output" = input$chkinputGUL,
+      "il_output" = input$chkinputIL,
+      "ri_output" = input$chkinputRI,
+      "event_set" = toupper(ifelse(is.null(input$sinputeventset), "", strsplit(input$sinputeventset, "")[[1]][1])),
+      "peril_wind" = input$chkinputprwind,
+      "demand_surge" = input$chkinputdsurge,
+      "peril_quake" = input$chkinputprquake,
+      "peril_flood" = input$chkinputprflood,
+      "peril_surge" = input$chkinputprstsurge,
+      "leakage_factor" = input$sliderleakagefac,
+      "use_random_number_file" = FALSE, # what here?
+      "event_occurrence_file_id" =  input$sinputeventocc, # what here?
+      "uniqueItems" = FALSE, # what here?
+      "summarycalc" = input$chkinputsummaryoption,
+      "return_period_file" = TRUE  # what here?
+    )
+    
+    outputsLossTypes <- list(
+      "gul_output" = list("prog" = input$chkgulprog, "policy" = input$chkgulpolicy, "state" = input$chkgulstate, "county" = input$chkgulcounty, "location" = input$chkgulloc, "lob" = input$chkgullob),
+      "il_output" =  list("prog" = input$chkilprog, "policy" = input$chkilpolicy, "state" = input$chkilstate, "county" = input$chkilcounty, "location" =  input$chkilloc, "lob" = input$chkillob),
+      "ri_output"  = list("prog" = input$chkriprog, "policy" = input$chkripolicy, "state" = input$chkristate, "county" = input$chkricounty, "location" =  input$chkriloc, "lob" = input$chkrilob)
+    )
+    
+    #add summaries
+    if (input$chkinputsummaryoption){
+      for (l in names(outputsLossTypes)) {
+        outputsLossTypes[[l]][["prog"]] <- unique(c(outputsLossTypes[[l]][["prog"]], ReportChoices))
+      }
+    }
+    
+    analysis_settings <- construct_analysis_settings(inputsettings, outputsLossTypes)
+    return(analysis_settings)
+  }
+  
+  #update analyses settings
+  .updateOutputConfig <- function(analysis_settings){
+    logMessage(".updateOutputConfig called")
+    #clean checkboxes
+    .clearchkboxgrp(checkgulgrplist)
+    .clearchkboxgrp(checkilgrplist)
+    .clearchkboxgrp(checkrigrplist)
+    
+    #reduced list
+    settings <- analysis_settings[["analysis_settings"]]
+    
+    SettingsMapping <- list(
+      "threshold"  = list(
+        "inputId" = "tinputthreshold",
+        "UpdateWidget" = "updateTextInput",
+        "SettingElement" = settings[["gul_threshold"]]
+      )
+    )
+    
+    .updateWidget("threshold", SettingsMapping)
+    
+    gran <- c('prog', 'policy', 'state', 'county', 'loc', 'lob')
+    
+    for (L in tolower(losstypes)) {
+      l <- tolower(L)
+      summary_settings <- settings[[paste0(l, "_summaries")]]
+      sel_losstype <- settings[[paste0(l, "_output")]]
+      if (!is.null(sel_losstype)) {
+        SummaryMapping <- list(
+          "chkinput" = list(
+            "inputId" = paste0("chkinput", L),
+            "UpdateWidget" = "updateCheckboxInput",
+            "SettingElement" = settings[[paste0(l, "_output")]]
+          )
+        )
+        .updateWidget("chkinput", SummaryMapping)
+        
+        for (g in seq(length(summary_settings))) {
+          curr_gran <- summary_settings[[g]]
+          oed_gran <- granToOed$outputlosstype[granToOed$oed == curr_gran$oed_fields]
+          chkgroup_name <- paste0("chk", l, oed_gran)
+          nolec_output <- varsdf$fields[!varsdf$lec_output]
+          lec_output <- varsdf$fields[varsdf$lec_output]
+          selection <- c(curr_gran[nolec_output], curr_gran$leccalc$outputs[lec_output])
+          selected_fields <- names(selection)[which(unlist(selection))]
+          selected_choices <- varsdf$vars[which(varsdf$fields %in%  selected_fields)]
+          if (!is.null(selected_choices)) {
+            currchkGroupMapping <- list(
+              "chkgroup" = list(
+                "inputId" = chkgroup_name,
+                "UpdateWidget" = "updateCheckboxGroupInput",
+                "SettingElement" = selected_choices
+              )
+            )
+            .updateWidget("chkgroup", currchkGroupMapping)
+          }
+        }
+      }
+    }
+  }
+  
+  .updateWidget <- function(inp, MappingList) {
+    logMessage(".updateWidget called")
+    curr_setting <- MappingList[[inp]]
+    if (curr_setting$UpdateWidget == "updateSelectInput" | curr_setting$UpdateWidget == "updateCheckboxGroupInput") {
+      get(curr_setting$UpdateWidget)(session = session, inputId = curr_setting$inputId, selected = curr_setting$SettingElement)
+    } else {
+      get(curr_setting$UpdateWidget)(session = session, inputId = curr_setting$inputId, value = curr_setting$SettingElement)
+    }
+  }
+  
   # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     list(
@@ -1536,7 +1327,7 @@ step3_configureOutput <- function(input, output, session,
       anaID = reactive({result$anaID})
     )
   )
-
+  
   moduleOutput
-
+  
 }

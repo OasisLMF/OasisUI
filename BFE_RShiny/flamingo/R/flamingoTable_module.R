@@ -31,30 +31,22 @@ flamingoTableUI <-  function(id){
 #' @template params-module
 #'
 #' @param data dataframe to show in table.
-#'
 #' @param selection param of datatable, default"none".
-#'
 #' @param escape param of datatable, default TRUE.
-#'
 #' @param scrollX param of datatable, default FALSE.
-#'
 #' @param filter param of datatable, default FALSE.
-#'
 #' @param rownames param of datatable, default FALSE.
-#'
 #' @param colnames param of datatable, default TRUE.
-#'
 #' @param preselRow reactive of preselected row default reactive({NULL}).
-#'
 #' @param maxrowsperpage param of datatable, default 10.
 #'
 #' @return rows_selected reactive of selected rows as returned from datatable.
-#'
 #' @return  rows_current reactive of current rows as returned from datatable.
 #'
 #' @importFrom DT renderDT
-#'
 #' @importFrom DT datatable
+#' @importFrom DT dataTableProxy
+#' @importFrom DT selectRows
 #'
 #' @export
 flamingoTable <- function(input, output, session,
@@ -98,9 +90,14 @@ flamingoTable <- function(input, output, session,
           colnames = colnamesToUse,
           options = .getPRTableOptions(scrollX, maxrowsperpage, filter)
         )
-
     })
-
+    
+    observeEvent(data(), ignoreNULL = FALSE, {
+      if (is.null(data()) || length(nrow(data())) == 0) {
+        selectRows(dataTableProxy("dt_flamingoTable"), NULL)
+      }
+    } )
+    
   # Helper functions -----------------------------------------------------------
 
   #table settings for pr tab: returns option list for datatable

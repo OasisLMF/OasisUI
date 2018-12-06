@@ -19,8 +19,7 @@
 #' @return preselPanel panel to show in the model session.
 #'
 #' @export
-visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
-                             user,
+visualizationCBR <- function(input, output, session,
                             active = reactive(TRUE),
                             preselAnaId = reactive(-1),
                             anaID  = reactive(-1),
@@ -57,8 +56,6 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   sub_modules$defineID1 <- callModule(
     defineID,
     id = "defineID-1",
-    dbSettings = dbSettings,
-    user = reactive(user()),
     preselAnaId = preselAnaId,
     anaID =  anaID,
     logMessage = logMessage)
@@ -66,8 +63,6 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   sub_modules$defineID2 <- callModule(
     defineID,
     id = "defineID-2",
-    dbSettings = dbSettings,
-    user = reactive(user()),
     preselAnaId = preselAnaId,
     anaID =  anaID,
     logMessage = logMessage)
@@ -86,8 +81,6 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
     selectAnaID1 = reactive(sub_modules$defineID1$selectAnaID()),
     selectAnaID2 = reactive(sub_modules$defineID2$selectAnaID()),
     compare = TRUE,
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)
 
@@ -96,62 +89,65 @@ visualizationCBR <- function(input, output, session, dbSettings, apiSettings,
   observeEvent( {
     sub_modules$defineID1$selectAnaID()
     sub_modules$defineID2$selectAnaID()}, {
-    if (!is.na(sub_modules$defineID1$selectAnaID()) && sub_modules$defineID1$selectAnaID() != "" &&
-        !is.na(sub_modules$defineID2$selectAnaID()) && sub_modules$defineID2$selectAnaID() != "") {
-        filesListData1 <- getFileList(dbSettings, sub_modules$defineID1$selectAnaID())
-        result$filesListData <- cbind(filesListData1,
-                                      do.call(rbind.data.frame,
-                                              lapply(filesListData1$Description, .splitDescription)))
-        filesListData2 <- getFileList(dbSettings, sub_modules$defineID2$selectAnaID())
-        result$filesListData <- rbind(result$filesListData,
-                                      cbind(filesListData2,
-                                            do.call(rbind.data.frame,
-                                                    lapply(filesListData2$Description, .splitDescription))))
+      if (!is.na(sub_modules$defineID1$selectAnaID()) && sub_modules$defineID1$selectAnaID() != "" &&
+          !is.na(sub_modules$defineID2$selectAnaID()) && sub_modules$defineID2$selectAnaID() != "") {
+      tbl_filesListDataana1 <- return_analyses_output_file_df(sub_modules$defineID1$selectAnaID())
+      analysis_settings1 <- return_analyses_settings_file_list(sub_modules$defineID1$selectAnaID())
+      result$tbl_filesListDataana <- cbind(tbl_filesListDataana1,
+                                           do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
+                                                                            .addDescription, analysis_settings1)))
+      tbl_filesListDataana2 <- return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
+      analysis_settings2 <- return_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
+      bl_filesListDataana2 <- return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
+      analysis_settings2 <- return_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
+      result$tbl_filesListDataana <- rbind(result$tbl_filesListDataana, cbind(tbl_filesListDataana1,
+                                           do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
+                                                                            .addDescription, analysis_settings1))))
+      tbl_filesListDatapf1 <- return_tbl_portfolioDetails(sub_modules$defineID1$selectPortfolioID())
+      tbl_filesListDatapf2 <- return_tbl_portfolioDetails(sub_modules$defineID2$selectPortfolioID())
+      result$tbl_filesListDatapf <- rbind(tbl_filesListDatapf1, tbl_filesListDatapf2)
     } else {
-      result$filesListData <- NULL
+      result$tbl_filesListDatapf <- NULL
+      result$tbl_filesListDataana <- NULL
     }
   })
-
-  filesListDatatoview <- reactive({
-    if (!is.null(result$filesListData)) {
-      result$filesListData %>% select(-c("Variable", "Granularity", "Losstype"))
-    } else {
-      result$filesListData
-    }
-  })
-
+  
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
     outputfiles,
     id = "outputfiles",
-    tbl_filesListDataana =  filesListDatatoview ,
-    anaId = sub_modules$defineID$selectAnaID,
-    portfolioId = sub_modules$defineID$selectPortfolioID, 
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
+    tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
+    tbl_filesListDatapf = reactive(result$tbl_filesListDatapf),
+    anaId = sub_modules$defineID1$selectAnaID,
+    portfolioId = sub_modules$defineID1$selectPortfolioID, 
     active = reactive({active() && input$tabsSBR == "taboutputfiles"}),
     logMessage = logMessage)
-
-
+  
+  
   # Tab Output Plots -----------------------------------------------------------
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
     selectAnaID = reactive(sub_modules$defineID1$selectAnaID()),
-    filesListData =  reactive({result$filesListData}),
+    filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
     active = reactive({active() && input$tabsSBR == "tabplots"}),
     logMessage = logMessage)
+  
 
   # Helper functions -----------------------------------------------------------
-  #function to split the description field of result$filesListData
-  .splitDescription <- function(x){
-    y <- unlist(strsplit(x,split = " "))
-    z <- data.frame("Granularity" = y[2], "Losstype" = y[4], "Variable" = paste(y[5:length(y)], collapse = " "), stringsAsFactors = FALSE)
-    return(z)}
-
+  #Add descritption fields to output files
+  .addDescription <- function(x, analysis_settings){
+    x <- as.character(x)
+    x <- strsplit(x, split = "[.]")[[1]][1]
+    y <- unlist(strsplit(x, split = "_"))
+    report <-  paste(y[3:(length(y))], collapse = "_")
+    g_idx <- as.integer(gsub("S", "", y[2]))
+    g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
+    g <- granToOed[granToOed$oed == g_oed, "gran"]
+    z <- data.frame("perspective" = y[1], "summary_level" = g, "report" = reportToVar[[ report ]])
+  }
+  
   # Module Outout --------------------------------------------------------------
 
   moduleOutput <- c(

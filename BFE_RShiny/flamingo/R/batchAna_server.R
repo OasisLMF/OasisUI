@@ -9,9 +9,9 @@
 #' @template params-flamingo-module
 #'
 #' @export
-batchAna <- function(input, output, session, dbSettings,
-                                     apiSettings, active = reactive(TRUE),
-                                     logMessage = message, reloadMillis = 10000) {
+batchAna <- function(input, output, session,
+                    active = reactive(TRUE),
+                    logMessage = message, reloadMillis = 10000) {
 
   ns <- session$ns
 

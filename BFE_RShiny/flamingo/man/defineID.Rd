@@ -7,9 +7,8 @@
 \usage{
 defineIDUI(id, w, batch = FALSE)
 
-defineID(input, output, session, dbSettings, user,
-  preselAnaId = reactive(-1), anaID = reactive(-1), batch = FALSE,
-  logMessage = message)
+defineID(input, output, session, preselAnaId = reactive(-1),
+  anaID = reactive(-1), batch = FALSE, logMessage = message)
 }
 \arguments{
 \item{id}{module id}
@@ -24,10 +23,6 @@ defineID(input, output, session, dbSettings, user,
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{user}{reactive expression yielding user}
-
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
 
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
@@ -38,7 +33,11 @@ defineID(input, output, session, dbSettings, user,
 
 \item{active}{reactive expression whether the module state should be updated.}
 
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
 \item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{user}{reactive expression yielding user}
 
 \item{batch}{Flag indicating if it is a batch or a simple analysis.}
 }

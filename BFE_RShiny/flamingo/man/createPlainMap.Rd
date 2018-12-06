@@ -4,10 +4,10 @@
 \alias{createPlainMap}
 \title{Create Plain Map}
 \usage{
-createPlainMap(fileName)
+createPlainMap(df)
 }
 \arguments{
-\item{fileName}{name of file to plot as map}
+\item{df}{df to plot as map}
 }
 \value{
 Leaflet map.

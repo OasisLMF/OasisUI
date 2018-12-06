@@ -5,10 +5,10 @@
 \alias{singleAnaUI}
 \title{singleAna}
 \usage{
-singleAna(input, output, session, dbSettings, apiSettings, user,
-  active = reactive(TRUE), logMessage = message,
-  preselRunId = reactive(-1), preselProcId = reactive(-1),
-  preselPanel = reactive(1), reloadMillis = 10000)
+singleAna(input, output, session, active = reactive(TRUE),
+  logMessage = message, preselRunId = reactive(-1),
+  preselProcId = reactive(-1), preselPanel = reactive(1),
+  reloadMillis = 10000)
 
 singleAnaUI(id)
 }
@@ -18,12 +18,6 @@ singleAnaUI(id)
 \item{output}{Shiny output object.}
 
 \item{session}{Shiny session object.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
@@ -37,6 +31,12 @@ singleAnaUI(id)
 \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}}
 
 \item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{user}{reactive expression yielding user}
 
 \item{id}{module id}
 }

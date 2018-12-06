@@ -7,10 +7,10 @@
 \usage{
 step2_chooseAnalysisUI(id)
 
-step2_chooseAnalysis(input, output, session, dbSettings, apiSettings,
-  active = reactive(TRUE), logMessage = message,
-  currstep = reactive(-1), portfolioID = reactive({     "" }),
-  pfName = reactive({     "" }), pfstatus = reactive({     "" }))
+step2_chooseAnalysis(input, output, session, active = reactive(TRUE),
+  logMessage = message, currstep = reactive(-1),
+  portfolioID = reactive({     "" }), pfName = reactive({     "" }),
+  pfstatus = reactive({     "" }))
 }
 \arguments{
 \item{id}{module id}
@@ -20,10 +20,6 @@ step2_chooseAnalysis(input, output, session, dbSettings, apiSettings,
 \item{output}{Shiny output object.}
 
 \item{session}{Shiny session object.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
@@ -38,6 +34,10 @@ step2_chooseAnalysis(input, output, session, dbSettings, apiSettings,
 \item{pfstatus}{Status of selected portfolio}
 
 \item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{user}{reactive expression yielding user}
 }

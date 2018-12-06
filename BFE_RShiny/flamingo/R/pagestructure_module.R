@@ -34,7 +34,7 @@ pagestructureUI <- function(id) {
 #' @importFrom shinyWidgets toggleDropdownButton
 #' 
 #' @export
-pagestructure <- function(input, output, session, dbSettings,
+pagestructure <- function(input, output, session,
                           reloadMillis = 10000, logMessage = message,
                           active = reactive(TRUE)) {
   

@@ -22,7 +22,7 @@ outputfilesUI <- function(id) {
       collapsible = TRUE,
       show = TRUE,
       heading = "Output Files Table",
-      ViewFilesModuleUI(id  = ns("ViewOutputFiles"), includechkbox = TRUE)
+      ViewFilesInTableUI(id  = ns("ViewOutputFiles"), includechkbox = TRUE)
     ),
 
     flamingoPanel(
@@ -51,8 +51,7 @@ outputfilesUI <- function(id) {
 #' @param filesListDatatoview dataframe of files to view
 #'
 #' @export
-outputfiles <- function(input, output, session, dbSettings,
-                        apiSettings,
+outputfiles <- function(input, output, session,
                         tbl_filesListDataana = reactive(NULL), 
                         tbl_filesListDatapf = reactive(NULL),
                         anaId = reactive(""),

@@ -76,8 +76,7 @@ summarytabUI <- function(id) {
 #' @importFrom tidyr separate
 #'
 #' @export
-summarytab <- function(input, output, session, dbSettings,
-                       apiSettings,
+summarytab <- function(input, output, session, 
                        selectAnaID1 = reactive(""), 
                        selectAnaID2 = reactive(""),
                        portfolioID1 = reactive(""),
@@ -146,11 +145,15 @@ summarytab <- function(input, output, session, dbSettings,
   
   # Summary Input tables
   dt_dataInput <- reactive({
-    data <- result$SummaryData %>% 
-      filter(Type == "input") 
-    if (!is.null(data) && nrow(data) > 0) {
-      data <- data %>%
-        select(-Type)
+    if (!is.null(result$SummaryData)) {
+      data <- result$SummaryData %>% 
+        filter(Type == "input") 
+      if (!is.null(data) && nrow(data) > 0) {
+        data <- data %>%
+          select(-Type)
+      }
+    } else {
+      data <- NULL
     }
     data
   })
@@ -169,11 +172,15 @@ summarytab <- function(input, output, session, dbSettings,
     logMessage = logMessage)
   
   dt_dataParam <- reactive({
-    data <- result$SummaryData %>% 
-      filter(Type == "param") 
-    if (!is.null(data) && nrow(data) > 0) {
-      data <- data %>%
-        select(-Type)
+    if (!is.null(result$SummaryData)) {
+      data <- result$SummaryData %>% 
+        filter(Type == "param") 
+      if (!is.null(data) && nrow(data) > 0) {
+        data <- data %>%
+          select(-Type)
+      }
+    } else {
+      data <- NULL
     }
     data
   })
@@ -192,11 +199,15 @@ summarytab <- function(input, output, session, dbSettings,
     logMessage = logMessage)
   
   dt_dataOutput <- reactive({
-    data <- result$SummaryData %>% 
-      filter(Type == "output") 
-    if (!is.null(data) && nrow(data) > 0) {
-      data <- data %>%
-        select(-Type)
+    if (!is.null(result$SummaryData)) {
+      data <- result$SummaryData %>% 
+        filter(Type == "output") 
+      if (!is.null(data) && nrow(data) > 0) {
+        data <- data %>%
+          select(-Type)
+      }
+    } else {
+      data <- NULL
     }
     data
   })
@@ -218,8 +229,12 @@ summarytab <- function(input, output, session, dbSettings,
   
   # AAL histogram
   output$summaryAALOutputPlot <- renderPlotly({
+    if (!is.null(result$SummaryData)) {
     data <- result$SummaryData %>% 
       filter(Type == "AALplot")
+    } else {
+      data <- NULL
+    }
     p <- NULL
     if (!is.null(data) && nrow(data) > 0) {
       DFtype <- data.frame("Type" = {lapply(data$SummaryType, function(s) {
@@ -399,9 +414,13 @@ summarytab <- function(input, output, session, dbSettings,
   }
   
   .prepareDataLinePlot <- function(P){
+    if (!is.null(result$SummaryData)) {
     data <- result$SummaryData %>% 
       filter(Type == "leccalcplot") 
-    if (nrow(data) > 0) {
+    } else {
+      data <- NULL
+    }
+    if (!is.null(data) && nrow(data) > 0) {
       if (compare) {
         data <- data %>%
           gather(key = "gridcol", value = "Value",colnames) 

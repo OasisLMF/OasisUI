@@ -162,12 +162,12 @@ panelLinkFiles <- function(id) {
     fluidRow(
       # Source Location File
       column(3,
-             fileInput(inputId = ns("SLFile"), label = 'Choose a location file to upload:', accept = c('csv', 'comma-separated-values', '.csv'))),
+             fileInput(inputId = ns("SLFile"), label = 'Location file:', accept = c('csv', 'comma-separated-values', '.csv'))),
       column(2,
              flamingoButton(inputId = ns("abuttonSLFileUpload"), label = "Upload File", align = "left", enable = FALSE, style = "margin-top: 25px;display-inline: true;")),
       # Source Account File
       column(3,
-             fileInput(inputId = ns("SAFile"), label = 'Choose an account file to upload:',
+             fileInput(inputId = ns("SAFile"), label = 'Account file:',
                        accept = c('csv', 'comma-separated-values', '.csv'))),
       column(2,
              flamingoButton(inputId = ns("abuttonSAFileUpload"), label = "Upload File", align = "left",
@@ -176,14 +176,14 @@ panelLinkFiles <- function(id) {
     fluidRow(
       # Source Reinsurance File
       column(3,
-             fileInput(inputId = ns("SRFile"), label = 'Choose a RI infor file to upload:',
+             fileInput(inputId = ns("SRFile"), label = 'RI info file:',
                        accept = c('csv', 'comma-separated-values', '.csv'))),
       column(2,
              flamingoButton(inputId = ns("abuttonSRFileUpload"), label = "Upload File", align = "left",
                             style = "margin-top: 25px;display-inline: true;")),
       # Source Reinsurance Scope File
       column(3,
-             fileInput(inputId = ns("SRSFile"), label = 'Choose a RI scope file to upload:',
+             fileInput(inputId = ns("SRSFile"), label = 'RI scope:',
                        accept = c('csv', 'comma-separated-values', '.csv'))),
       column(2,
              flamingoButton(inputId = ns("abuttonSRSFileUpload"), label = "Upload File", align = "left",
@@ -227,7 +227,6 @@ panelLinkFiles <- function(id) {
 #'
 #' @export
 step1_choosePortfolio <- function(input, output, session,
-                                  dbSettings,apiSettings, user,
                                   active = reactive(TRUE),
                                   logMessage = message,
                                   currstep = reactive(-1),
@@ -277,6 +276,29 @@ step1_choosePortfolio <- function(input, output, session,
       .reloadtbl_portfoliosData()
     }
   })
+  
+  # Enable/ Disable buttons ----------------------------------------------------
+  # Enable and disable buttons
+  observeEvent({
+    result$portfolioID
+    result$tbl_portfoliosData
+    # input$dt_Portfolios_rows_selected
+  }, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    disable("abuttonpfdetails")
+    disable("abuttondeletepf")
+    disable("abuttonamendpf")
+    disable("abuttonpgotonextstep")
+    disable("abuttonuploadsourcefiles")
+    if (length(input$dt_Portfolios_rows_selected) > 0) {
+      enable("abuttonpfdetails")
+      enable("abuttondeletepf")
+      enable("abuttonamendpf")
+      enable("abuttonuploadsourcefiles")
+      if (result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status] == StatusCompleted) {
+        enable("abuttonpgotonextstep")
+      }
+    }
+  })
 
   ### Portfolio Table ----------------------------------------------------------
   output$dt_Portfolios <- renderDT({
@@ -322,27 +344,6 @@ step1_choosePortfolio <- function(input, output, session,
     paste0('Details of Portfolio id ', pfId, ' ', pfName)
   })
 
-  # Enable and disable buttons
-  observeEvent({
-    result$portfolioID
-    # input$dt_Portfolios_rows_selected
-  }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-
-    disable("abuttonpfdetails")
-    disable("abuttondeletepf")
-    disable("abuttonamendpf")
-    disable("abuttonpgotonextstep")
-    disable("abuttonuploadsourcefiles")
-    if (length(input$dt_Portfolios_rows_selected) > 0) {
-      enable("abuttonpfdetails")
-      enable("abuttondeletepf")
-      enable("abuttonamendpf")
-      enable("abuttonuploadsourcefiles")
-      if (result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status] == StatusCompleted) {
-        enable("abuttonpgotonextstep")
-      }
-    }
-  })
 
   # Show Portfolio Details
   onclick("abuttonpfdetails", {
@@ -747,7 +748,6 @@ step1_choosePortfolio <- function(input, output, session,
     updateTextInput(session, "tinputpfName",
                     value = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName])
   }
-
 
   # Model Outout ---------------------------------------------------------------
 

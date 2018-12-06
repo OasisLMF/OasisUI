@@ -350,11 +350,10 @@ ViewFilesInTable <- function(input, output, session,
       filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
       filerows <- length(count.fields(result$currfilepath, skip = 1))
     }
-    
     #Show buttons
-    if ("LATITUDE" %in% names(result$currentFile)) {
+    if ("latitude" %in% names(result$tbl_fileData)) {
       if (!is.null(result$tbl_fileData)) {
-        output$plainmap <- renderLeaflet({createPlainMap(result$currfilepath)})
+        output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
       }
       show("abuttonmap")
     } else {

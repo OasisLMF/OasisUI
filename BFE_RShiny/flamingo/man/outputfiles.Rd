@@ -7,7 +7,7 @@
 \usage{
 outputfilesUI(id)
 
-outputfiles(input, output, session, dbSettings, apiSettings,
+outputfiles(input, output, session,
   tbl_filesListDataana = reactive(NULL),
   tbl_filesListDatapf = reactive(NULL), anaId = reactive(""),
   portfolioId = reactive(""), active, logMessage = message)
@@ -21,15 +21,15 @@ outputfiles(input, output, session, dbSettings, apiSettings,
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{user}{reactive expression yielding user}
 

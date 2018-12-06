@@ -62,7 +62,7 @@ pageheaderUI <- function(id) {
 #' @importFrom shinyWidgets toggleDropdownButton
 #'
 #' @export
-pageheader <- function(input, output, session, user, dbSettings,
+pageheader <- function(input, output, session, user,
                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
   
   ns <- session$ns

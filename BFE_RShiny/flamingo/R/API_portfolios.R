@@ -316,20 +316,24 @@ return_tbl_portfoliosData <- function(name = ""){
   tbl_portfoliosData <- return_portfolios_df(name) %>%
     select(-contains("file") ) %>% 
     as.data.frame()
-  idx <- tbl_portfoliosData[[tbl_portfoliosData.PortfolioID]]
-  numpf <- length(idx)
-  status <- data.frame(status = rep(status_code_notfound, numpf))
-  for (i in seq(numpf) ) {
-    id <- as.integer(idx[i])
-    get_portfolios_location_file <- api_get_portfolios_location_file(id)
-    status[i, "status"] <- toString(get_portfolios_location_file$result$status_code) %>% .replacewithIcon()
-    tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] , format = "%d-%m-%YT%H:%M:%S"))
-    tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified], format = "%d-%m-%YT%H:%M:%S"))
+  if (nrow(tbl_portfoliosData) > 0) {
+    idx <- tbl_portfoliosData[[tbl_portfoliosData.PortfolioID]]
+    numpf <- length(idx)
+    status <- data.frame(status = rep(status_code_notfound, numpf))
+    for (i in seq(numpf) ) {
+      id <- as.integer(idx[i])
+      get_portfolios_location_file <- api_get_portfolios_location_file(id)
+      status[i, "status"] <- toString(get_portfolios_location_file$result$status_code) %>% .replacewithIcon()
+      tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] , format = "%d-%m-%YT%H:%M:%S"))
+      tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified], format = "%d-%m-%YT%H:%M:%S"))
+    }
+    tbl_portfoliosData <- cbind(tbl_portfoliosData, status) %>%
+      as.data.frame()
+    tbl_portfoliosData <- tbl_portfoliosData %>%
+      arrange(desc(!! sym(tbl_portfoliosData.PortfolioID))) 
+  } else {
+    tbl_portfoliosData <- NULL
   }
-  tbl_portfoliosData <- cbind(tbl_portfoliosData, status) %>%
-    as.data.frame()
-  tbl_portfoliosData <- tbl_portfoliosData %>%
-    arrange(desc(!! sym(tbl_portfoliosData.PortfolioID)))
   return(tbl_portfoliosData)
 }
 

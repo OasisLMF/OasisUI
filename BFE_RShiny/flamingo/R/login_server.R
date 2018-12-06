@@ -18,7 +18,6 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #'
 #'@template params-module
 #'
-#' @param dbSettings as returned from \link{flamingoDB}
 #' @param logMessage function that will be passed info messages.
 #' @param logError function that will be passed error messages.
 #' @param logout Reactive yielding logout signal.
@@ -34,7 +33,7 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #' @importFrom shinyjs js
 #'
 #' @export
-loginDialog <- function(input, output, session, dbSettings, logout,
+loginDialog <- function(input, output, session, logout,
     logMessage = message, logError = logMessage) {
 
   result <- reactiveValues(
@@ -54,10 +53,11 @@ loginDialog <- function(input, output, session, dbSettings, logout,
       pwd <- isolate(input$password)
       res <- api_access_token(user, pwd)
       if (res$status == "Success") {
-        result$user <- 1 #TODO for now, this is a workaround
-        #result$user <- user # for later
-        options(flamingo.settings.api.token = content(res$result)$access_token)
-        options(flamingo.settings.api.refresh = content(res$result)$refresh_token)
+        #result$user <- 1 #TODO for now, this is a workaround
+        result$user <- user # for later
+        res <- content(res$result)
+        options(flamingo.settings.api.token = res$access_token)
+        options(flamingo.settings.api.refresh = res$refresh_token)
       } else {
         options(flamingo.settings.api.token = NULL)
         flamingoNotification("Login Failed, please check your credentials.",

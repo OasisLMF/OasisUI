@@ -48,7 +48,6 @@ landingPageUI <- function(id) {
 #'
 #' @param reloadMillis Amount of time to wait between table updates;
 #' see \link{invalidateLater}.
-#' @param user reactive expression yielding user
 #'
 #' @return For \code{landingPage()}, list of reactives:
 #' \itemize{
@@ -63,7 +62,7 @@ landingPageUI <- function(id) {
 #' @importFrom data.table fwrite
 #'
 #' @export
-landingPage <- function(input, output, session, user, dbSettings,
+landingPage <- function(input, output, session,
                         reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
 
   # Reactive Values and parameters ---------------------------------------------
@@ -113,7 +112,10 @@ landingPage <- function(input, output, session, user, dbSettings,
         columnDefs = list(list(visible = FALSE, targets = 0, type = 'natural'))
       )
     )
-  })
+  } else {
+    .nothingToShowTable(contentMessage = "No analyses available")
+  }
+  )
 
   output$downloadexcel_ana <- downloadHandler(
     filename = "analyses_inbox.csv",
@@ -123,16 +125,6 @@ landingPage <- function(input, output, session, user, dbSettings,
   )
 
   # Delete analysis ------------------------------------------------------------
-  observeEvent(input$dt_anaInbox_rows_selected, ignoreNULL = FALSE, {
-    if (length(input$dt_anaInbox_rows_selected) > 0) {
-      enable("abuttondelana")
-      enable("abuttongotoana")
-    } else {
-      disable("abuttongotoana")
-      disable("abuttondelana")
-    }
-  })
-  
   onclick("abuttondelana", {
     analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesData.AnaID]
     delete_analyses_id <- api_delete_analyses_id(analysisID)
@@ -145,8 +137,21 @@ landingPage <- function(input, output, session, user, dbSettings,
                            paste("Analysis id ", analysisID, " could not be deleted."))
     }
   })
+  
+  # Enable /Disable buttons ----------------------------------------------------
+  observeEvent(input$dt_anaInbox_rows_selected, ignoreNULL = FALSE, {
+    if (length(input$dt_anaInbox_rows_selected) > 0) {
+      enable("abuttondelana")
+      if (result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesData.Status] == StatusCompleted) {
+        enable("abuttongotoana") 
+      }
+    } else {
+      disable("abuttongotoana")
+      disable("abuttondelana")
+    }
+  })
 
-  ### Module Output ------------------------------------------------------------
+  # Module Output --------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
@@ -157,6 +162,21 @@ landingPage <- function(input, output, session, user, dbSettings,
         result$tbl_anaInbox[i, 1]} else -1)
     )
   )
+  
+  # Help Functions -------------------------------------------------------------
+  #empty table
+  .nothingToShowTable <- function(contentMessage){
+    datatable(
+      data.frame(content = contentMessage),
+      class = "flamingo-table display",
+      selection = "none",
+      rownames = FALSE,
+      #filter = 'bottom',
+      colnames = c(""),
+      escape = FALSE,
+      options = list(searchHighlight = TRUE)
+    )
+  }
 
   moduleOutput
 }

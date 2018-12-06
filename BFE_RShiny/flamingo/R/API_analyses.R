@@ -241,19 +241,23 @@ return_tbl_analysesData <- function(name = ""){
   tbl_analysesData <- return_analyses_df(name) %>%
     select(-contains("file") ) %>% 
     as.data.frame()
-  idx <- tbl_analysesData[[tbl_analysesData.AnaID]]
-  numpf <- length(idx)
-  for (i in seq(numpf) ) {
-    tbl_analysesData[i, tbl_analysesData.AnaCreated] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesData.AnaCreated] , format = "%d-%m-%YT%H:%M:%S"))
-    tbl_analysesData[i, tbl_analysesData.AnaModified] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesData.AnaModified], format = "%d-%m-%YT%H:%M:%S"))
+  if (nrow(tbl_analysesData) > 0) {
+    idx <- tbl_analysesData[[tbl_analysesData.AnaID]]
+    numpf <- length(idx)
+    for (i in seq(numpf) ) {
+      tbl_analysesData[i, tbl_analysesData.AnaCreated] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesData.AnaCreated] , format = "%d-%m-%YT%H:%M:%S"))
+      tbl_analysesData[i, tbl_analysesData.AnaModified] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesData.AnaModified], format = "%d-%m-%YT%H:%M:%S"))
+    }
+    tbl_analysesData <- tbl_analysesData %>%
+      arrange(desc(!! sym(tbl_analysesData.AnaID))) %>%
+      .replaceWithIcons() %>%
+      select(c(!! sym(tbl_analysesData.AnaID), !! sym(tbl_analysesData.AnaName),
+               !! sym(tbl_analysesData.PortfolioID), !! sym(tbl_analysesData.ModelID),
+               !! sym(tbl_analysesData.AnaModified), !! sym (tbl_analysesData.AnaCreated),
+               !! sym(tbl_analysesData.AnaStatus))) 
+  } else {
+    tbl_analysesData <- NULL
   }
-  tbl_analysesData <- tbl_analysesData %>%
-    arrange(desc(!! sym(tbl_analysesData.AnaID))) %>%
-    .replaceWithIcons() %>%
-    select(c(!! sym(tbl_analysesData.AnaID), !! sym(tbl_analysesData.AnaName),
-             !! sym(tbl_analysesData.PortfolioID), !! sym(tbl_analysesData.ModelID),
-             !! sym(tbl_analysesData.AnaModified), !! sym (tbl_analysesData.AnaCreated),
-             !! sym(tbl_analysesData.AnaStatus)))
   return(tbl_analysesData)
 }
 

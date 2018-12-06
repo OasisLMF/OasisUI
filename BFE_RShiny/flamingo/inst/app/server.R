@@ -44,7 +44,7 @@ server <- function(input, output, session) {
     callModule(..., dbSettings = dbSettings)
   }
 
-  loginDialogModule <- .callModule(
+  loginDialogModule <- callModule(
     loginDialog, "login",
     logMessage = logMessage,
     logout = reactive(auth_modules$pageheader$logout())
@@ -57,7 +57,7 @@ server <- function(input, output, session) {
   # list of modules for the authenticated UI
   auth_modules <- list()
 
-  auth_modules$pageheader <- .callModule(
+  auth_modules$pageheader <- callModule(
     pageheader, "pageheader",
     user = reactive(result$user),
     reloadMillis = reloadMillis,
@@ -65,32 +65,29 @@ server <- function(input, output, session) {
     active = reactive(authenticated())
   )
 
-  auth_modules$pagestructure <- .callModule(
+  auth_modules$pagestructure <- callModule(
     pagestructure, "pagestructure",
     reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated())
   )
 
-  auth_modules$landingPage <- .callModule(
+  auth_modules$landingPage <- callModule(
     landingPage, "landingPage",
-    user = reactive(result$user),
     reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "LP")
   )
 
-  auth_modules$DA <- .callModule(
-    accountDefinition,
-    id = "accountDefinition",
-    active = reactive(authenticated() && main_visible() == "DA")
-  )
+  # auth_modules$DA <- .callModule(
+  #   accountDefinition,
+  #   id = "accountDefinition",
+  #   active = reactive(authenticated() && main_visible() == "DA")
+  # )
 
-  auth_modules$singleAna <- .callModule(
+  auth_modules$singleAna <- callModule(
     singleAna,
     id = "singleAna",
-    apiSettings = apiSettings,
-    user = reactive(result$user),
     preselRunId =  auth_modules$landingPage$anaid,
     preselProcId =  auth_modules$landingPage$modelid,
     preselPanel = reactive(result$preselPanel),
@@ -99,73 +96,66 @@ server <- function(input, output, session) {
     active = reactive(authenticated() && main_visible() == "SA")
   )
 
-  auth_modules$batchAna <- .callModule(
+  auth_modules$batchAna <- callModule(
     batchAna,
     id = "batchAna",
-    apiSettings = apiSettings,
     logMessage = logMessage,
     reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "BA")
   )
 
-  auth_modules$visualizationSBR <- .callModule(
+  auth_modules$visualizationSBR <- callModule(
     visualizationSBR,
     id = "visualizationSBR",
-    apiSettings = apiSettings,
-    user = reactive(result$user),
     preselAnaId =  auth_modules$landingPage$anaid,
     anaID = auth_modules$singleAna$anaID,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "SBR")
   )
 
-  auth_modules$visualizationBBR <- .callModule(
+  auth_modules$visualizationBBR <- callModule(
     visualizationBBR,
     id = "visualizationBBR",
-    apiSettings = apiSettings,
-    user = reactive(result$user),
     preselAnaId = reactive(-1),
     anaID = reactive(-1),
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "BBR")
   )
 
-  auth_modules$visualizationCBR <- .callModule(
+  auth_modules$visualizationCBR <- callModule(
     visualizationCBR,
     id = "visualizationCBR",
-    apiSettings = apiSettings,
-    user = reactive(result$user),
     preselAnaId = auth_modules$landingPage$anaid,
     anaID =  auth_modules$singleAna$anaID,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "CBR")
   )
 
-  auth_modules$fileViewer <- .callModule(
-    fileViewer,
-    id = "fileViewer",
-    logMessage = logMessage,
-    active = reactive(authenticated()) # && main_visible() == "FM" ) #&& input$fm == "fileviewer"))
-  )
+  # auth_modules$fileViewer <- .callModule(
+  #   fileViewer,
+  #   id = "fileViewer",
+  #   logMessage = logMessage,
+  #   active = reactive(authenticated()) # && main_visible() == "FM" ) #&& input$fm == "fileviewer"))
+  # )
 
-  auth_modules$modelSupplierPage <- .callModule(
-    modelSupplierPage,
-    id = "modelSupplierPage",
-    active = reactive(authenticated()) # && main_visible() == "SC" )# && input$sc == "Model"))
-  )
+  # auth_modules$modelSupplierPage <- .callModule(
+  #   modelSupplierPage,
+  #   id = "modelSupplierPage",
+  #   active = reactive(authenticated()) # && main_visible() == "SC" )# && input$sc == "Model"))
+  # )
 
-  auth_modules$userAdminDefinition <- .callModule(
-    userAdminDefinition,
-    id = "userAdminDefinition",
-    active = reactive(authenticated() && main_visible() == "UA" && input$ua == "defineuser"),
-    user = reactive(result$user)
-  )
+  # auth_modules$userAdminDefinition <- .callModule(
+  #   userAdminDefinition,
+  #   id = "userAdminDefinition",
+  #   active = reactive(authenticated() && main_visible() == "UA" && input$ua == "defineuser"),
+  #   user = reactive(result$user)
+  # )
 
-  auth_modules$companyDefinition <- .callModule(
-    companyDefinition,
-    id = "companyDefinition",
-    active = reactive(authenticated() && main_visible() == "UA" && input$ua == "definecompany")
-  )
+  # auth_modules$companyDefinition <- .callModule(
+  #   companyDefinition,
+  #   id = "companyDefinition",
+  #   active = reactive(authenticated() && main_visible() == "UA" && input$ua == "definecompany")
+  # )
 
   # authenticated ----
   # show the logged-in part of the UI if login is completed

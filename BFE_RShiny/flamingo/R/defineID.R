@@ -75,7 +75,6 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @export
 defineID <- function(input, output, session,
-                     dbSettings, user,
                      preselAnaId = reactive(-1),
                      anaID = reactive(-1),
                      batch = FALSE,
@@ -143,7 +142,14 @@ defineID <- function(input, output, session,
     maxrowsperpage = 10,
     logMessage = logMessage)
 
-  # > row to select
+  # > enable disable button
+  observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
+    if (is.null(sub_modules$flamingo_analyses$rows_selected())) {
+      disable("abuttonselectAna") 
+    } else {
+      enable("abuttonselectAna")
+    }
+  })
 
   #Find row of anaid preselected in landing page
   observeEvent({
@@ -170,12 +176,16 @@ defineID <- function(input, output, session,
     result$LProw
     result$SArow
   }, ignoreNULL = FALSE, {
-    if (!is.null(result$LProw)) {
-      result$preselRow <- result$LProw
-    } else if (!is.null(result$SArow)) {
-      result$preselRow <- result$SArow
+    if (length(nrow(result$tbl_analysesData)) > 0 ) {
+      if (!is.null(result$LProw)) {
+        result$preselRow <- result$LProw
+      } else if (!is.null(result$SArow)) {
+        result$preselRow <- result$SArow
+      } else {
+        result$preselRow <- 1
+      }
     } else {
-      result$preselRow <- 1
+      result$preselRow <- NULL
     }
   })
 
@@ -214,7 +224,7 @@ defineID <- function(input, output, session,
 
   # > ifo selected analysis
   output$selectAnaInfo1 <- renderText({
-    if (is.null(sub_modules$flamingo_analyses$rows_selected())) {
+    if (is.null(sub_modules$flamingo_analyses$rows_selected()) || is.na(sub_modules$flamingo_analyses$rows_selected())) {
       info <- paste0("Select ", labelana, ":   ")
     } else {
       info <- paste0('Selected ', labelana, ': ')
@@ -223,8 +233,8 @@ defineID <- function(input, output, session,
   })
 
   output$selectAnaInfo2 <- renderText({
-    if (is.null(sub_modules$flamingo_analyses$rows_selected())) {
-      info <- " "
+    if (is.null(sub_modules$flamingo_analyses$rows_selected()) || is.na(sub_modules$flamingo_analyses$rows_selected())) {
+      info <- ("missing")
     } else {
       currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaID]
       currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaName]

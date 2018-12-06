@@ -6,9 +6,9 @@
 \alias{visualizationBBRUI}
 \title{visualizationBBR}
 \usage{
-visualizationBBR(input, output, session, dbSettings, apiSettings, user,
-  preselAnaId = reactive(-1), anaID = reactive(-1),
-  active = reactive(TRUE), logMessage = message)
+visualizationBBR(input, output, session, preselAnaId = reactive(-1),
+  anaID = reactive(-1), active = reactive(TRUE),
+  logMessage = message)
 
 visualizationBBRUI(id)
 }
@@ -19,12 +19,6 @@ visualizationBBRUI(id)
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user}
-
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
 
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
@@ -34,6 +28,12 @@ visualizationBBRUI(id)
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
+
+\item{user}{reactive expression yielding user}
 
 \item{id}{module id}
 }

@@ -4,7 +4,7 @@
 #'
 #' @description Creates a plain map using leaflet.
 #'
-#' @param fileName name of file to plot as map
+#' @param df df to plot as map
 #'
 #' @return Leaflet map.
 #'
@@ -14,19 +14,16 @@
 #' @importFrom leaflet markerClusterOptions
 #'
 #' @export
-createPlainMap <- function(fileName) {
-
-  markerData <- read.csv(fileName, header = TRUE, sep = ",",
-      quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+createPlainMap <- function(df) {
 
   popupData <- tagList(
-      strong("Location ID: "), markerData$LOCNUM,
-      br(), strong("Latitude: "), markerData$LATITUDE,
-      br(), strong("Longitude: "), markerData$LONGITUDE)
+      strong("Location ID: "), df$locnum,
+      br(), strong("Latitude: "), df$latitude,
+      br(), strong("Longitude: "), df$longitude)
 
   leaflet() %>%
       addTiles() %>%
-      addMarkers(data = markerData,
+      addMarkers(data = df,
           clusterOptions= markerClusterOptions(maxClusterRadius = 50),
           popup = toString(popupData))
 }

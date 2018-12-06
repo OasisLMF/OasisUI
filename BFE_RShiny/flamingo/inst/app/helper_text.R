@@ -55,7 +55,7 @@ defineSingleAna <- list(
   abuttonamendpf = "Please select a Portfolio to Amend.",
   abuttonpfsubmit = "Please fill all fields.",
   abuttondeletepf = "Please select a Portfolio to Delete.",
-  # abuttonmodeldetails = "Please select a Portfolio Model to show details",
+  abuttonmodeldetails = "Please select a Portfolio Model to show details",
   abuttonrerunana = "Please select a completed Analysis to perform rerun.",
   abuttonsaveoutput = "Please select Output Configuration.",
   abuttonexecuteanarun = "Please select Output Configuration.",

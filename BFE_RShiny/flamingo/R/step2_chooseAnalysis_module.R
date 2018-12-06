@@ -24,8 +24,8 @@ step2_chooseAnalysisUI <- function(id) {
     hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
     hidden(div(id= ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
-    hidden(div(id = ns("panelAnalysisGenInputs"), panelAnalysisGenInputs(id)))#,
-    # hidden(div(id = ns("panelModelDetails"), panelModelDetails(id)))
+    hidden(div(id = ns("panelAnalysisGenInputs"), panelAnalysisGenInputs(id))),
+    hidden(div(id = ns("panelModelDetails"), panelModelDetails(id)))
   )
 }
 
@@ -154,7 +154,7 @@ panelAnalysisGenInputs <- function(id) {
       actionButton(inputId = ns("abuttonanaIGrefresh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideanaIG"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    ViewFilesModuleUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
+    ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
   )
 }
 
@@ -184,37 +184,37 @@ panelModelTable <- function(id) {
     ),
     DTOutput(ns("dt_models")),
     textInput(inputId = ns("anaName"), label = "Analysis Name"),
-    # flamingoButton(ns("abuttonmodeldetails"), "Show Details", align = "centre") %>%
-    #   bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right"),
+    flamingoButton(ns("abuttonmodeldetails"), "Show Details", align = "centre") %>%
+      bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right"),
     flamingoButton(ns("abuttonsubmit"), "Submit", style = "float:right")
   )
 }
 
-# #' panelModelDetails
-# #'
-# #' @rdname panelModelDetails
-# #'
-# #' @description Function wrapping panel to show details of programme table.
-# #'
-# #' @template params-module-ui
-# #'
-# #' @importFrom DT DTOutput
-# #'
-# #' @export
-# panelModelDetails <- function(id) {
-#   ns <- NS(id)
-#   flamingoPanel(
-#     collapsible = FALSE,
-#     ns("panel_model_details"),
-#     heading = tagAppendChildren(
-#       h4(""),
-#       uiOutput(ns("paneltitle_ModelDetails"), inline = TRUE),
-#       actionButton(inputId = ns("abuttonmodeldetailrfsh"), label = "Refresh", style = "float: right;"),
-#       actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
-#     ),
-#     DTOutput(ns("dt_modelDetails"))
-#   )
-# }
+#' panelModelDetails
+#'
+#' @rdname panelModelDetails
+#'
+#' @description Function wrapping panel to show details of programme table.
+#'
+#' @template params-module-ui
+#'
+#' @importFrom DT DTOutput
+#'
+#' @export
+panelModelDetails <- function(id) {
+  ns <- NS(id)
+  flamingoPanel(
+    collapsible = FALSE,
+    ns("panel_model_details"),
+    heading = tagAppendChildren(
+      h4(""),
+      uiOutput(ns("paneltitle_ModelDetails"), inline = TRUE),
+      actionButton(inputId = ns("abuttonmodeldetailrfsh"), label = "Refresh", style = "float: right;"),
+      actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
+    ),
+    DTOutput(ns("dt_modelDetails"))
+  )
+}
 
 
 # Server -----------------------------------------------------------------------
@@ -252,7 +252,6 @@ panelModelTable <- function(id) {
 #'
 #' @export
 step2_chooseAnalysis <- function(input, output, session,
-                                 dbSettings,apiSettings,
                                  active = reactive(TRUE),
                                  logMessage = message,
                                  currstep = reactive(-1),
@@ -281,7 +280,7 @@ step2_chooseAnalysis <- function(input, output, session,
     # reactive value for model table
     tbl_modelsData = NULL,
     # reactive value for detail of model table
-    #tbl_modelsDetails = NULL,
+    tbl_modelsDetails = NULL,
     # analyses table
     tbl_analysesData = NULL,
     # analysis details
@@ -373,7 +372,11 @@ step2_chooseAnalysis <- function(input, output, session,
   
   # Generate input -------------------------------------------------------------
   onclick("abuttonstartIG", {
-    
+    hide("panelAnalysisDetails")
+    hide("panelAnalysisLog")
+    hide("panelModelTable")
+    hide("panelAnalysisGenInputs")
+    hide("panelModelDetails")
     input_generation_id <- api_post_analyses_generate_inputs(result$analysisID)
     
     if (input_generation_id$status == "Success") {
@@ -421,6 +424,11 @@ step2_chooseAnalysis <- function(input, output, session,
   
   observeEvent(input$btnCancelIGDel, {
     removeModal()
+    hide("panelAnalysisDetails")
+    hide("panelAnalysisLog")
+    hide("panelModelTable")
+    hide("panelAnalysisGenInputs")
+    hide("panelModelDetails")
   })
   
   observeEvent(input$abuttonConfirmDelIG, {
@@ -451,7 +459,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
-    #hide("panelModelDetails")
+    hide("panelModelDetails")
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
     .reloadAnaDetails()
@@ -494,6 +502,8 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisDetails")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
+    hide("panelModelDetails")
+    
     logMessage("showing panelAnalysisLog")
     show("panelAnalysisLog")
     .reloadAnaLog()
@@ -579,44 +589,49 @@ step2_chooseAnalysis <- function(input, output, session,
   
   # Model Details Table --------------------------------------------------------
   
-  # # Show/hide Model Details Panel
-  # onclick("abuttonmodeldetails", {
-  # hide("panelAnalysisDetails")
-  # hide("panelAnalysisLog")
-  # hide("panelAnalysisGenInputs")
-  #   logMessage("showing panelModelDetails")
-  #   .reloadtbl_modelsDetails()
-  #   show("panelModelDetails")
-  #   logMessage("showing panelModelDetails")
-  # })
-  
-  # onclick("buttonhidemodeldetails", {
-  #   hide("panelModelDetails")
-  #   logMessage("hiding panelModelDetails")
-  # })
-  
-  # output$dt_modelDetails <- renderDT(
-  #   if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
-  #     logMessage("re-rendering model details table")
-  #     datatable(
-  #       result$tbl_modelsDetails,
-  #       class = "flamingo-table display",
-  #       rownames = TRUE,
-  #       filter = "none",
-  #       escape = FALSE,
-  #       selection = "none",
-  #       colnames = c('row number' = 1),
-  #       options = .getPRTableOptions()
-  #     )
-  #   } else {
-  #     .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$modelID ))
-  #   })
-  
-  # # Details Model title
-  # output$paneltitle_ModelDetails <- renderUI({
-  #   modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ModelId]
-  #   paste0('Details of Model Association id ', modelId)
-  # })
+  # Show/hide Model Details Panel
+  onclick("abuttonmodeldetails", {
+    hide("panelAnalysisDetails")
+    hide("panelAnalysisLog")
+    hide("panelAnalysisGenInputs")
+    logMessage("showing panelModelDetails")
+    .reloadtbl_modelsDetails()
+    show("panelModelDetails")
+    logMessage("showing panelModelDetails")
+  })
+
+  onclick("buttonhidemodeldetails", {
+    hide("panelModelDetails")
+    logMessage("hiding panelModelDetails")
+  })
+
+  output$dt_modelDetails <- renderDT(
+    if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
+      logMessage("re-rendering model details table")
+      datatable(
+        result$tbl_modelsDetails,
+        class = "flamingo-table display",
+        rownames = TRUE,
+        filter = "none",
+        escape = FALSE,
+        selection = "none",
+        colnames = c('row number' = 1),
+        options = .getPRTableOptions()
+      )
+    } else {
+      .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$modelID ))
+    })
+
+  # Details Model title
+  output$paneltitle_ModelDetails <- renderUI({
+    modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ModelId]
+    paste0('Resources of Model id ', modelId)
+  })
+
+  #Hide panel if model id changes
+  observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
+    hide("panelModelDetails")
+  })
   
   # Create new Analysis --------------------------------------------------------
   
@@ -647,7 +662,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelModelTable")
-    #hide("panelModelDetails")
+    hide("panelModelDetails")
     show("panelAnalysisGenInputs")
     .reloadAnaIG()
   })
@@ -674,10 +689,10 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttoncancelIG")
       disable("abuttonstartIG")
       disable("abuttonshowIG")
-      # disable("abuttonmodeldetails")
+      disable("abuttonmodeldetails")
       disable("abuttonpgotonextstep")
       if (length(input$dt_models_rows_selected) > 0) {
-        # enable("abuttonmodeldetails")
+        enable("abuttonmodeldetails")
       }
       if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
         enable("abuttonshowanadetails")
@@ -727,9 +742,9 @@ step2_chooseAnalysis <- function(input, output, session,
     .reloadtbl_modelsData()
   } )
   
-  # onclick("abuttonmodeldetailrfsh", {
-  #   .reloadtbl_modelsDetails()
-  # } )
+  onclick("abuttonmodeldetailrfsh", {
+    .reloadtbl_modelsDetails()
+  } )
   
   # Help Functions -------------------------------------------------------------
   # hide all panels
@@ -741,7 +756,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
-    #hide("panelModelDetails")
+    hide("panelModelDetails")
   }
   
   #show default view for Section "Choose Analysis" = "2"
@@ -813,22 +828,21 @@ step2_chooseAnalysis <- function(input, output, session,
     invisible()
   }
   
-  # # Reload Programme Model Details table
-  # .reloadtbl_modelsDetails <- function() {
-  #   logMessage(".reloadtbl_modelsDetails called")
-  #   if (length(input$dt_models_rows_selected) > 0) {
-  #     prgId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
-  #     stmt <- buildDbQuery("getProgOasisFileDetails", prgId)
-  #     tbl_modelsDetails <- executeDbQuery(dbSettings, stmt)
-  #     if (!is.null(tbl_modelsDetails)) {
-  #       result$tbl_modelsDetails <-  tbl_modelsDetails 
-  #     }
-  #     logMessage("files table refreshed")
-  #   } else {
-  #     result$tbl_modelsDetails <- NULL
-  #   }
-  #   invisible()
-  # }
+  # Reload Programme Model Details table
+  .reloadtbl_modelsDetails <- function() {
+    logMessage(".reloadtbl_modelsDetails called")
+    if (length(input$dt_models_rows_selected) > 0) {
+      modelId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
+      tbl_modelsDetails <- return_models_id_resource_file_df(modelId)
+      if (!is.null(tbl_modelsDetails)) {
+        result$tbl_modelsDetails <-  tbl_modelsDetails
+      }
+      logMessage("model resources table refreshed")
+    } else {
+      result$tbl_modelsDetails <- NULL
+    }
+    invisible()
+  }
   
   # table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function(pageLengthVal = pageLength) {

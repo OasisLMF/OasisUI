@@ -32,13 +32,13 @@ api_get_analyses_input_file <- function(id) {
     path = paste(get_version(), "analyses", id, "input_file", "", sep = "/"),
     write_disk(dest, overwrite = TRUE)
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -95,7 +95,7 @@ return_analyses_input_file_df <- function(id) {
 #' @export
 
 return_analyses_input_file_wicons_df <- function(id) {
-
+  
   currfolder <- getOption("flamingo.settins.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
   
@@ -169,7 +169,7 @@ return_analyses_spec_input_file_df <- function(id, fileName) {
 #'
 #' @export
 api_post_analyses_cancel <- function(id) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -180,13 +180,13 @@ api_post_analyses_cancel <- function(id) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "cancel", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -195,7 +195,6 @@ api_post_analyses_cancel <- function(id) {
     class = c("apiresponse")
   )
 }
-
 
 # Settings File ----------------------------------------------------------------
 #' Get analysis settings file
@@ -215,7 +214,7 @@ api_post_analyses_cancel <- function(id) {
 #'
 #' @export
 api_get_analyses_settings_file <- function(id) {
-
+  
   response <- GET(
     get_url(),
     config = add_headers(
@@ -224,13 +223,13 @@ api_get_analyses_settings_file <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "settings_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -259,7 +258,7 @@ api_get_analyses_settings_file <- function(id) {
 #'
 #' @export
 api_post_analyses_settings_file <- function(id, filepath_settings) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -270,13 +269,13 @@ api_post_analyses_settings_file <- function(id, filepath_settings) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "settings_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -314,191 +313,144 @@ return_analyses_settings_file_list <- function(id){
 #'
 #' @description Constructs a list of analysis settings
 #'
-#' @param source_tag model associated to the analysis.
-#' @param prog_id portfolio id?
-#' @param number_of_samples user input number of samples
-#' @param module_supplier_id identification of model supplied
-#' @param model_version_id identification of model version
-#' @param event_occurrence_file_id user input Event Occurrence Set
-#' @param use_random_number_file use_random_number_file
-#' @param event_set user input Event Set
-#' @param peril_wind peril wind
-#' @param demand_surge demand surge
-#' @param peril_quake peril quake
-#' @param peril_flood peril flood
-#' @param peril_surge peril surge
-#' @param leakage_factor user input Leakage factor
-#' @param gul_threshold user input gul threshold
-#' @param exposure_location exposure_location
-#' @param chkinputsummaryoption logical to include summaries
-#' @param outputsGUL output config GUL
-#' @param outputsIL output config IL
-#' @param outputsRI output config RI
-#' @param analysis_tag analysis id?
-#' @param gul_output logical for GUL
-#' @param il_output logical for IL
-#' @param ri_output logical for RI
-#' @param return_period_file param = TRUE
-#' @param uniqueItems uniqueItems
-#' @param id id
+#' @param inputsettings list of input settings
+#' @param outputsLossType list of output configuration
 #'
 #' @return list of analysis settings.
 #'
 #' @export
-construct_tbl_analyses_settings <- function(source_tag, prog_id, number_of_samples,
-                                            module_supplier_id, model_version_id,
-                                            event_occurrence_file_id,use_random_number_file = FALSE, event_set,
-                                            peril_wind, demand_surge, peril_quake, peril_flood, peril_surge, leakage_factor,
-                                            gul_threshold,exposure_location = 'L',
-                                            outputsGUL, outputsIL, outputsRI, chkinputsummaryoption,
-                                            gul_output, il_output, ri_output,
-                                            return_period_file,
-                                            analysis_tag, uniqueItems = FALSE, id = 1){
-
-  # > Params -------------------------------------------------------------------
-  parameterStub <- c('Summary',
-                     'ELT',
-                     'FullUncAEP',
-                     'FullUncOEP',
-                     'AEPWheatsheaf',
-                     'OEPWheatsheaf',
-                     'MeanAEPWheatsheaf',
-                     'MeanOEPWheatsheaf',
-                     'SampleMeanAEP',
-                     'SampleMeanOEP',
-                     'AAL',
-                     'PLT')
-  analysisFileNameStub <- c('summarycalc',
-                            'eltcalc',
-                            'full_uncertainty_aep',
-                            'full_uncertainty_oep',
-                            'wheatsheaf_aep',
-                            'wheatsheaf_oep',
-                            'wheatsheaf_mean_aep',
-                            'wheatsheaf_mean_oep',
-                            'sample_mean_aep',
-                            'sample_mean_oep',
-                            'aalcalc',
-                            'pltcalc')
-
-  # > Utility functions --------------------------------------------------------
-  .addsummaryGUL <- function(summaryreports, outputsGUL) {
-    if (summaryreports) {
-      outputsGUL <- unique(c(outputsGUL, c('gulprogFullUncAEP', 'gulprogFullUncOEP', 'gulprogAAL')))
+construct_analysis_settings <- function(inputsettings, outputsLossTypes){
+  
+  .ifnullFALSE <- function(variable) {
+    ifelse(is.null(variable), FALSE, variable)
+  }
+  
+  .list_summary <- function(counter_id, oed_g, inputsettings, losstypeSettingsMapping){
+    list_summary <- data.frame("uniqueItems" = inputsettings$uniqueItems,
+                               "summarycalc" = inputsettings$summarycalc,
+                               "aalcalc" = .ifnullFALSE(losstypeSettingsMapping$aalcalc),
+                               "eltcalc" = .ifnullFALSE(losstypeSettingsMapping$eltcalc),
+                               "pltcalc" = .ifnullFALSE(losstypeSettingsMapping$pltcalc),
+                               "id" = counter_id,
+                               "oed_fields" = oed_g,
+                               "lec_output" = any(losstypeSettingsMapping),
+                               stringsAsFactors = FALSE
+    )
+  }
+  
+  .leccalc_outputs <- function(losstypeSettingsMapping) {
+    leccalcoutputs <- data.frame("full_uncertainty_aep" = .ifnullFALSE(losstypeSettingsMapping$full_uncertainty_aep),
+                                 "full_uncertainty_oep" = .ifnullFALSE(losstypeSettingsMapping$full_uncertainty_oep),
+                                 "wheatsheaf_aep" = .ifnullFALSE(losstypeSettingsMapping$wheatsheaf_aep),
+                                 "wheatsheaf_oep" = .ifnullFALSE(losstypeSettingsMapping$wheatsheaf_oep),
+                                 "wheatsheaf_mean_aep" = .ifnullFALSE(losstypeSettingsMapping$wheatsheaf_mean_aep),
+                                 "wheatsheaf_mean_oep" = .ifnullFALSE(losstypeSettingsMapping$wheatsheaf_mean_oep),
+                                 "sample_mean_aep" = .ifnullFALSE(losstypeSettingsMapping$sample_mean_aep),
+                                 "sample_mean_oep" = .ifnullFALSE(losstypeSettingsMapping$sample_mean_oep),
+                                 stringsAsFactors = FALSE
+    )
+  }
+  
+  analysisSettingsMapping <- list(
+    "analysis_tag" = inputsettings$analysis_tag,
+    "exposure_location" = inputsettings$exposure_location,
+    "gul_threshold" = inputsettings$gul_threshold,
+    "model_version_id" = inputsettings$model_version_id,
+    "module_supplier_id" = inputsettings$module_supplier_id,
+    "number_of_samples" = inputsettings$number_of_samples,
+    "prog_id" = inputsettings$prog_id,
+    "source_tag" = inputsettings$source_tag
+    )
+  
+  outoutSettingsMappings <- list(
+    "gul_output" = inputsettings$gul_output,
+    "il_output" = inputsettings$il_output,
+    "ri_output" = inputsettings$ri_output
+  )
+  
+  modelSettingsMapping <- list(
+    "event_set" = inputsettings$event_set,
+    "peril_wind" = inputsettings$peril_wind,
+    "demand_surge" = inputsettings$demand_surge,
+    "peril_quake" = inputsettings$peril_quake,
+    "peril_flood" = inputsettings$peril_flood,
+    "peril_surge" = inputsettings$peril_surge,
+    "leakage_factor" = inputsettings$leakage_factor,
+    "use_random_number_file" = inputsettings$use_random_number_file,
+    "event_occurrence_file_id" = inputsettings$event_occurrence_file_id
+  )
+  
+  analysis_settings <- list(
+    "analysis_settings" = list(
+    )
+  )
+  
+  analysis_settings$model_settings <- list()
+  for (i in names(analysisSettingsMapping)) {
+    if (!is.null(analysisSettingsMapping[[i]])) {
+      analysis_settings$analysis_settings[i] <- analysisSettingsMapping[[i]]
     }
-    outputsStringGUL <- paste(collapse = ", ",outputsGUL)
   }
-
-  .addsummaryIL <- function(summaryreports, outputsIL) {
-    if (summaryreports) {
-      outputsIL  <- unique(c(outputsIL,  c('ilprogFullUncAEP', 'ilprogFullUncOEP', 'ilprogAAL')))
+  
+  for (j in names(modelSettingsMapping)) {
+    if (!is.null(modelSettingsMapping[[j]])){
+      analysis_settings$model_settings[j] <- modelSettingsMapping[[j]]
     }
-    outputsStringIL <- paste(collapse = ", ",outputsIL)
   }
-
-  .addsummaryRI <- function(summaryreports, outputsRI) {
-    if (summaryreports) {
-      outputsRI  <- unique(c(outputsRI,  c('riprogFullUncAEP', 'riprogFullUncOEP', 'riprogAAL')))
+  
+  for (l in names(outoutSettingsMappings)) {
+    if (!is.null(outoutSettingsMappings[[l]]) && outoutSettingsMappings[[l]]) {
+      analysis_settings$analysis_settings[l] <- outoutSettingsMappings[[l]] 
+      losstype <- gsub( "_output", "", l)
+      losssummary <- paste0(losstype, "_summaries")
+      gran <- names(outputsLossTypes[[l]])
+      counter_id <- 0
+      outputsLossType <- outputsLossTypes[[l]]
+      #define empty summary df
+      leccalc_outputs <-  data.frame("full_uncertainty_aep" = NULL,
+                                     "full_uncertainty_oep" = NULL,
+                                     "wheatsheaf_aep" = NULL,
+                                     "wheatsheaf_oep" = NULL,
+                                     "wheatsheaf_mean_aep" = NULL,
+                                     "wheatsheaf_mean_oep" = NULL,
+                                     "sample_mean_aep" = NULL,
+                                     "sample_mean_oep" = NULL,
+                                     stringsAsFactors = FALSE)
+      list_summary <- data.frame("uniqueItems" = NULL,
+                                 "summarycalc" = NULL,
+                                 "aalcalc" = NULL,
+                                 "eltcalc" = NULL,
+                                 "pltcalc" = NULL,
+                                 "id" = NULL,
+                                 "oed_fields" = NULL,
+                                 "lec_output" = NULL,
+                                 stringsAsFactors = FALSE
+      )
+      #loop over granularities
+      for (g in gran) {
+        outputsLossTypeGran <- outputsLossType[[g]]
+        oed_g <- granToOed$oed[granToOed$outputlosstype == g] # provide here oed field of granularity
+        if (!is.null(outputsLossTypeGran)) {
+          counter_id <- counter_id + 1
+          losstypeSettingsMapping = list()
+          for (v in outputsLossTypeGran) {
+            losstypeSettingsMapping[varsdf$fields[which(varsdf$vars == v)]] = TRUE
+          }
+          leccalc_outputs <- rbind(leccalc_outputs, .leccalc_outputs(losstypeSettingsMapping))
+          list_summary <- rbind(list_summary, .list_summary(counter_id, oed_g, inputsettings, losstypeSettingsMapping))
+        }
+      }
+      #assemble summary element
+      leccal <- data.frame("return_period_file" = rep(inputsettings$return_period_file, counter_id),
+                           stringsAsFactors = FALSE)
+      leccal$outputs <- leccalc_outputs
+      list_summary$leccalc <- leccal
+      analysis_settings$analysis_settings[[losssummary]] <- list_summary
     }
-    outputsStringRI <- paste(collapse = ", ",outputsRI)
   }
-
-  .gatheModelSettings <- function(event_occurrence_file_id,use_random_number_file, event_set, perilsvec){
-
-    model_settings <- list()
-    model_settings[["event_set"]] <- event_set
-    for (p in names(perilsvec)) {
-      if (!is.null(perilsvec[[p]]) && perilsvec[[p]])
-        model_settings[[p]] <- perilsvec[[p]]
-    }
-    model_settings[["use_random_number_file"]] <- use_random_number_file
-    model_settings[["event_occurrence_file_id"]] <- event_occurrence_file_id
-    model_settings
-  }
-
-  .gaterSummaries <- function(parameterStub,  outputsString, summaryreports, uniqueItems, id){
-
-    aalcalc <- grepl(parameterStub[11], outputsString)
-    eltcalc <- grepl(parameterStub[2], outputsString)
-    pltcalc <- grepl(parameterStub[12], outputsString)
-    full_uncertainty_aep <- grepl(parameterStub[3], outputsString)
-    full_uncertainty_oep <- grepl(parameterStub[4], outputsString)
-    wheatsheaf_aep <- grepl(parameterStub[5], outputsString)
-    wheatsheaf_oep <- grepl(parameterStub[6], outputsString)
-    wheatsheaf_mean_aep <- wheatsheaf_aep #grepl(parameterStub[7], outputsString)
-    wheatsheaf_mean_oep <- wheatsheaf_oep #grepl(parameterStub[8], outputsString)
-    sample_mean_aep <- wheatsheaf_aep #grepl(parameterStub[9], outputsString)
-    sample_mean_oep <-  wheatsheaf_oep #grepl(parameterStub[10], outputsString)
-    leccalcoutputs <- data.frame("full_uncertainty_aep" = full_uncertainty_aep,
-                                 "full_uncertainty_oep" = full_uncertainty_oep,
-                                 "wheatsheaf_aep" = wheatsheaf_aep,
-                                 "wheatsheaf_oep" = wheatsheaf_oep,
-                                 "wheatsheaf_mean_aep" = wheatsheaf_mean_aep,
-                                 "wheatsheaf_mean_oep" = wheatsheaf_mean_oep,
-                                 "sample_mean_aep" = sample_mean_aep,
-                                 "sample_mean_oep" = sample_mean_oep)
-    leccal <- data.frame("outputs" = I(leccalcoutputs),
-                         "return_period_file" = return_period_file)
-    lec_output <- any(leccalcoutputs == TRUE)
-    df <- data.frame("uniqueItems" = c(uniqueItems),
-                     "summarycalc" = c(summaryreports),
-                     "aalcalc" = c(aalcalc),
-                     "eltcalc" = c(eltcalc),
-                     "pltcalc" = c(pltcalc),
-                     "id" = c(id),
-                     "lec_output" = lec_output,
-                     "leccalc" = I(leccal))
-  }
-
-  # > Restructure inputs -------------------------------------------------------
-  outputsStringGUL <- .addsummaryGUL(summaryreports = chkinputsummaryoption, outputsGUL)
-  outputsStringIL <- .addsummaryIL(summaryreports = chkinputsummaryoption, outputsIL)
-  outputsStringRI <- .addsummaryRI(summaryreports = chkinputsummaryoption, outputsRI)
-
-
-  # > Make analysis settings list ----------------------------------------------
-  analysis_settings <- list()
-  analysis_settings[["analysis_settings"]] <- list()
-  analysis_settings[["analysis_settings"]][["analysis_tag"]] <- analysis_tag
-  analysis_settings[["analysis_settings"]][["exposure_location"]] <- exposure_location
-
-  analysis_settings[["analysis_settings"]][["gul_output"]] <- gul_output
-  analysis_settings[["analysis_settings"]][["gul_summaries"]] <- .gaterSummaries(parameterStub,
-                                                                                 outputsStringGUL,
-                                                                                 summaryreports = chkinputsummaryoption,
-                                                                                 uniqueItems,
-                                                                                 id)
-  analysis_settings[["analysis_settings"]][["gul_threshold"]] <- gul_threshold
-
-  analysis_settings[["analysis_settings"]][["il_output"]] <- il_output
-  analysis_settings[["analysis_settings"]][["il_summaries"]] <- .gaterSummaries(parameterStub,
-                                                                                outputsStringIL,
-                                                                                summaryreports = chkinputsummaryoption,
-                                                                                uniqueItems,
-                                                                                id)
-  analysis_settings[["analysis_settings"]][["ri_output"]] <- ri_output
-  analysis_settings[["analysis_settings"]][["ri_summaries"]] <- .gaterSummaries(parameterStub,
-                                                                                outputsStringRI,
-                                                                                summaryreports = chkinputsummaryoption,
-                                                                                uniqueItems,
-                                                                                id)
-  perilsvec <- list("peril_wind" = peril_wind,
-                    "demand_surge" = demand_surge,
-                    "peril_quake" =  peril_quake,
-                    "peril_flood" = peril_flood,
-                    "peril_surge" = peril_surge,
-                    "leakage_factor" = leakage_factor)
-  analysis_settings[["analysis_settings"]][["model_settings"]] <- .gatheModelSettings(event_occurrence_file_id,use_random_number_file, event_set, perilsvec)
-  analysis_settings[["analysis_settings"]][["model_version_id"]] <- model_version_id
-  analysis_settings[["analysis_settings"]][["module_supplier_id"]] <- module_supplier_id
-
-  analysis_settings[["analysis_settings"]][["number_of_samples"]] <- number_of_samples
-  analysis_settings[["analysis_settings"]][["prog_id"]] <- prog_id
-  analysis_settings[["analysis_settings"]][["source_tag"]] <- source_tag
-
   return(analysis_settings)
-
 }
+
 
 # Input errors file ------------------------------------------------------------
 
@@ -519,7 +471,7 @@ construct_tbl_analyses_settings <- function(source_tag, prog_id, number_of_sampl
 #'
 #' @export
 api_get_analyses_input_errors_file <- function(id) {
-
+  
   response <- GET(
     get_url(),
     config = add_headers(
@@ -528,13 +480,13 @@ api_get_analyses_input_errors_file <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "input_errors_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -563,7 +515,7 @@ api_get_analyses_input_errors_file <- function(id) {
 #'
 #' @export
 api_post_analyses_input_errors_file <- function(id, filepath_input_errors) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -574,13 +526,13 @@ api_post_analyses_input_errors_file <- function(id, filepath_input_errors) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "input_errors_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -610,7 +562,7 @@ api_post_analyses_input_errors_file <- function(id, filepath_input_errors) {
 #'
 #' @export
 api_post_analyses_generate_inputs <- function(id) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -621,13 +573,13 @@ api_post_analyses_generate_inputs <- function(id) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "generate_inputs", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -635,7 +587,7 @@ api_post_analyses_generate_inputs <- function(id) {
     ),
     class = c("apiresponse")
   )
-
+  
 }
 
 #' Cancel analysis input generation
@@ -656,7 +608,7 @@ api_post_analyses_generate_inputs <- function(id) {
 #'
 #' @export
 api_post_analyses_cancel_generate_inputs <- function(id) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -667,13 +619,13 @@ api_post_analyses_cancel_generate_inputs <- function(id) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "cancel_generate_inputs", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -703,7 +655,7 @@ api_post_analyses_cancel_generate_inputs <- function(id) {
 #'
 #' @export
 api_get_analyses_input_generation_traceback_file <- function(id) {
-
+  
   response <- GET(
     get_url(),
     config = add_headers(
@@ -712,13 +664,13 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "input_generation_traceback_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -747,7 +699,7 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
 #'
 #' @export
 api_post_analyses_input_generation_traceback_file <- function(id, filepath_input_generation_traceback) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -758,13 +710,13 @@ api_post_analyses_input_generation_traceback_file <- function(id, filepath_input
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "input_generation_traceback_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -825,7 +777,7 @@ return_input_generation_traceback_file_df <- function(id){
 #'
 #' @export
 api_get_analyses_output_file <- function(id) {
-
+  
   currfolder <- getOption("flamingo.settins.api.share_filepath")
   dest <- file.path(currfolder, paste0(id, "_outputs.tar"))
   extractFolder <- file.path(currfolder, paste0(id, "_output"))
@@ -841,21 +793,21 @@ api_get_analyses_output_file <- function(id) {
     write_disk(dest, overwrite = TRUE)
   )
   
- untar(tarfile = dest, exdir = extractFolder)
- 
- #wait for untar to finish
- oldfileList <- NULL
- while (all.equal(oldfileList, list.files(extractFolder)) != TRUE) {
-   oldfileList <- list.files(extractFolder)
-   Sys.sleep(2)
- }
-
+  untar(tarfile = dest, exdir = extractFolder)
+  
+  #wait for untar to finish
+  oldfileList <- NULL
+  while (all.equal(oldfileList, list.files(extractFolder)) != TRUE) {
+    oldfileList <- list.files(extractFolder)
+    Sys.sleep(2)
+  }
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -937,7 +889,7 @@ return_analyses_spec_output_file_df <- function(id, fileName) {
 #'
 #' @export
 api_post_analyses_output_file <- function(id, filepath_output) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -948,13 +900,13 @@ api_post_analyses_output_file <- function(id, filepath_output) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "output_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -982,7 +934,7 @@ api_post_analyses_output_file <- function(id, filepath_output) {
 #'
 #' @export
 api_get_analyses_run_traceback_file <- function(id) {
-
+  
   response <- GET(
     get_url(),
     config = add_headers(
@@ -991,13 +943,13 @@ api_get_analyses_run_traceback_file <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "run_traceback_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -1026,7 +978,7 @@ api_get_analyses_run_traceback_file <- function(id) {
 #'
 #' @export
 api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -1037,13 +989,13 @@ api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "run_traceback_file", "", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -1101,7 +1053,7 @@ return_analyses_run_traceback_file_df <- function(id){
 #'
 #' @export
 api_post_analyses_run <- function(id) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -1110,13 +1062,13 @@ api_post_analyses_run <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "run","", sep = "/")
   )
-
+  
   logWarning = warning
-
+  
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
            warning = function(w) logWarning(w$message))
-
+  
   structure(
     list(
       status = http_status(response)$category,
@@ -1143,7 +1095,12 @@ api_post_analyses_run <- function(id) {
 return_analyses_run_df <- function(id){
   analyses_run <- api_post_analyses_run(id)
   analyses_runList <- content(analyses_run$result)
-  analyses_run_df <- bind_rows(analyses_runList) %>%
-    as.data.frame()
+  if (length(names(analyses_runList)) > 1) {
+    analyses_run_df <- bind_rows(analyses_runList) %>%
+      as.data.frame()
+  } else {
+    analyses_run_df <- NULL
+  }
+
   return(analyses_run_df)
 }

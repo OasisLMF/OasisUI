@@ -6,15 +6,9 @@
 \usage{
 api_get_healthcheck()
 }
-\arguments{
-\item{...}{Other inputs.}
-}
 \value{
-Helthcheck files.
+response containing status of API connection
 }
 \description{
 Gets the current status of the api.
-}
-\details{
-Typo in he(a)lthcheck reflects typo in the API.
 }

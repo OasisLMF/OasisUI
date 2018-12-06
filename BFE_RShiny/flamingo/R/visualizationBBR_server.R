@@ -18,9 +18,7 @@
 #' @importFrom dplyr select
 #'
 #' @export
-visualizationBBR <- function(input, output, session, dbSettings,
-                             apiSettings,
-                             user,
+visualizationBBR <- function(input, output, session, 
                              preselAnaId = reactive(-1),
                              anaID  = reactive(-1),
                              active = reactive(TRUE), logMessage = message) {
@@ -55,8 +53,6 @@ visualizationBBR <- function(input, output, session, dbSettings,
   sub_modules$defineID <- callModule(
     defineID,
     id = "defineID",
-    dbSettings = dbSettings,
-    user = reactive(user()),
     preselAnaId = preselAnaId,
     anaID =  anaID,
     logMessage = logMessage)
@@ -73,8 +69,6 @@ visualizationBBR <- function(input, output, session, dbSettings,
     summarytab,
     id = "summarytab",
     selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)
 
@@ -82,53 +76,55 @@ visualizationBBR <- function(input, output, session, dbSettings,
   # Extract Output files for given anaID----------------------------------------
   observeEvent( sub_modules$defineID$selectAnaID(), {
     if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
-      result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectAnaID())
-      result$filesListData <- cbind(result$filesListData,do.call(rbind.data.frame,  lapply(result$filesListData$Description, .splitDescription)))
+      tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
+      analysis_settings <- return_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
+      result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
+                                           do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
+                                                                            .addDescription, analysis_settings)))
+      result$tbl_filesListDatapf <- return_tbl_portfolioDetails(sub_modules$defineID$selectPortfolioID())
     } else {
-      result$filesListData <- NULL
+      result$tbl_filesListDatapf <- NULL
+      result$tbl_filesListDataana <- NULL
     }
   })
-
-  filesListDatatoview <- reactive({
-    if (!is.null(result$filesListData)) {
-      result$filesListData %>% select(-c("Variable", "Granularity", "Losstype"))
-    } else {
-      result$filesListData
-    }
-  })
-
+  
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
     outputfiles,
     id = "outputfiles",
-    tbl_filesListDataana =  filesListDatatoview ,
+    tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
+    tbl_filesListDatapf = reactive(result$tbl_filesListDatapf),
     anaId = sub_modules$defineID$selectAnaID,
     portfolioId = sub_modules$defineID$selectPortfolioID, 
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
     active = reactive({active() && input$tabsSBR == "taboutputfiles"}),
     logMessage = logMessage)
-
-
+  
+  
   # Tab Output Plots -----------------------------------------------------------
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
     selectAnaID = reactive(sub_modules$defineID$selectAnaID()),
-    filesListData =  reactive({result$filesListData}),
+    filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
     active = reactive({active() && input$tabsSBR == "tabplots"}),
     logMessage = logMessage)
-
+  
+  
   # Helper functions -----------------------------------------------------------
   #function to split the description field of result$filesListData
-  .splitDescription <- function(x){
-    y <- unlist(strsplit(x,split = " "))
-    z <- data.frame("Granularity" = y[2], "Losstype" = y[4], "Variable" = paste(y[5:length(y)], collapse = " "), stringsAsFactors = FALSE)
-    return(z)}
-
+  #Add descritption fields to output files
+  .addDescription <- function(x, analysis_settings){
+    x <- as.character(x)
+    x <- strsplit(x, split = "[.]")[[1]][1]
+    y <- unlist(strsplit(x, split = "_"))
+    report <-  paste(y[3:(length(y))], collapse = "_")
+    g_idx <- as.integer(gsub("S", "", y[2]))
+    g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
+    g <- granToOed[granToOed$oed == g_oed, "gran"]
+    z <- data.frame("perspective" = y[1], "summary_level" = g, "report" = reportToVar[[ report ]])
+  }
+  
 
   # Module Outout --------------------------------------------------------------
 

@@ -7,10 +7,10 @@
 \usage{
 summarytabUI(id)
 
-summarytab(input, output, session, dbSettings, apiSettings,
-  selectAnaID1 = reactive(""), selectAnaID2 = reactive(""),
-  portfolioID1 = reactive(""), portfolioID2 = reactive(""),
-  compare = FALSE, active, logMessage = message)
+summarytab(input, output, session, selectAnaID1 = reactive(""),
+  selectAnaID2 = reactive(""), portfolioID1 = reactive(""),
+  portfolioID2 = reactive(""), compare = FALSE, active,
+  logMessage = message)
 }
 \arguments{
 \item{id}{module id}
@@ -21,15 +21,15 @@ summarytab(input, output, session, dbSettings, apiSettings,
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{apiSettings}{as returned from \link{flamingoServer}}
 
 \item{user}{reactive expression yielding user}
 }
