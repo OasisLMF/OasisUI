@@ -33,12 +33,6 @@ defineID(input, output, session, preselAnaId = reactive(-1),
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user}
-
 \item{batch}{Flag indicating if it is a batch or a simple analysis.}
 }
 \value{

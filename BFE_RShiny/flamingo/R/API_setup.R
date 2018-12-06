@@ -32,7 +32,9 @@ APIgetenv <- function(server, port, version, share_filepath) {
 #'
 #' @rdname api_init
 #'
-#' @inheritParams flamingoServer
+#' @param host Host name.
+#' @param port Host port.
+#' @param scheme Communication scheme.
 #'
 #' @export
 api_init <- function(host, port, scheme = c("http", "https")) {

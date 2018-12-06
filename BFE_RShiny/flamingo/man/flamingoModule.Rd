@@ -4,8 +4,7 @@
 \alias{flamingoModule}
 \title{Flamingo Module Template}
 \usage{
-flamingoModule(input, output, session, active, dbSettings, apiSettings,
-  logMessage, logError)
+flamingoModule(input, output, session, active, logMessage, logError)
 }
 \arguments{
 \item{input}{Shiny input object.}
@@ -15,10 +14,6 @@ flamingoModule(input, output, session, active, dbSettings, apiSettings,
 \item{session}{Shiny session object.}
 
 \item{active}{Reactive expression whether the module state should be updated.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{Settings object as returned by \code{\link[=flamingoServer]{flamingoServer()}}.}
 
 \item{logMessage}{Function that will be passed info messages.}
 

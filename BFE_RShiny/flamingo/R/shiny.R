@@ -15,9 +15,6 @@ flamingoModuleUI <- function(id) {}
 #'
 #' @rdname flamingoModule
 #'
-#' @inheritParams loadProgrammeModel
-#' @inheritParams flamingoDBLogin
-#' @inheritParams executeDbQuery
 #' @param input Shiny input object.
 #' @param output Shiny output object.
 #' @param session Shiny session object.
@@ -31,8 +28,6 @@ flamingoModule <- function(
   output,
   session,
   active,
-  dbSettings,
-  apiSettings,
   logMessage,
   logError) {}
 

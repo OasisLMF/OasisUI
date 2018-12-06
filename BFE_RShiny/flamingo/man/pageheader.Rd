@@ -19,7 +19,7 @@ pageheader(input, output, session, user, reloadMillis = 10000,
 
 \item{session}{Shiny session object.}
 
-\item{user}{reactive expression yielding user}
+\item{user}{reactive expression yielding user name}
 
 \item{reloadMillis}{Amount of time to wait between table updates;
 see \link{invalidateLater}.}
@@ -29,12 +29,6 @@ see \link{invalidateLater}.}
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user name}
 }
 \value{
 List of tags.

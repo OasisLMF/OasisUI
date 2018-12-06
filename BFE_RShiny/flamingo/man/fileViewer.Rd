@@ -17,8 +17,6 @@ fileViewerUI(id)
 
 \item{session}{Shiny session object.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
 \item{preselAnaId}{Reactive string expression for reselected analysis id from landingpage.}
 
 \item{active}{reactive expression whether the module state should be updated.}
@@ -26,10 +24,6 @@ fileViewerUI(id)
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user}
 
 \item{id}{module id}
 }

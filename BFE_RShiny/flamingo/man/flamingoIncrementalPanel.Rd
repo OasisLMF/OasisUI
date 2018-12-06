@@ -27,13 +27,7 @@ flamingoIncrementalPanel(input, output, session, panels_state,
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
 \item{logMessage}{function that will be passed info messages.}
-
-\item{user}{reactive expression yielding user}
 }
 \value{
 smth.

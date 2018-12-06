@@ -34,12 +34,6 @@ step2_chooseAnalysis(input, output, session, active = reactive(TRUE),
 \item{pfstatus}{Status of selected portfolio}
 
 \item{id}{Namespace ID for the module.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user}
 }
 \value{
 List of tags.

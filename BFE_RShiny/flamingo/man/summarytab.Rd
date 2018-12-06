@@ -26,12 +26,6 @@ summarytab(input, output, session, selectAnaID1 = reactive(""),
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user}
 }
 \value{
 list of tags

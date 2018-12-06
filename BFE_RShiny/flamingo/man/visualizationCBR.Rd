@@ -30,12 +30,6 @@ visualizationCBRUI(id)
 
 \item{id}{Namespace ID for the module.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{user}{reactive expression yielding user}
-
 \item{anaIdList}{List of analyses and their status.}
 
 \item{id}{module id}
