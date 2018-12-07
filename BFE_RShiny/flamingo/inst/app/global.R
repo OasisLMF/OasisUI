@@ -127,23 +127,23 @@ defaultSelectChoicesRI <- c(
 )
 
 varsdf <- data.frame(vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEPWheatsheaf', 'OEPWheatsheaf', 'MeanAEPWheatsheaf', 'MeanOEPWheatsheaf', 'SampleMeanAEP', 'SampleMeanOEP', 'AAL', 'PLT'), 
-                     fields = c('uniqueItems', 'eltcalc', 'full_uncertainty_aep', 'full_uncertainty_oep', 'wheatsheaf_aep',  'wheatsheaf_oep', 'wheatsheaf_mean_aep', 'wheatsheaf_mean_oep', 'sample_mean_aep', 'sample_mean_oep',  'aalcalc', 'pltcalc'),
+                     fields = c('summarycalc', 'eltcalc', 'full_uncertainty_aep', 'full_uncertainty_oep', 'wheatsheaf_aep',  'wheatsheaf_oep', 'wheatsheaf_mean_aep', 'wheatsheaf_mean_oep', 'sample_mean_aep', 'sample_mean_oep',  'aalcalc', 'pltcalc'),
                      lec_output = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE),
                      stringsAsFactors = FALSE)
 
-granToOed <- data.frame(oed = c("lob", "loc", "county","state", "policy", "prog"),
-                        gran = c("LOB", "Location", "County","State", "Policy", "Portfolio"),
-                        outputlosstype = c("lob", "loc", "county","state", "policy", "prog"),
+granToOed <- data.frame(oed = c("summarycalc", "lob", "loc", "county","state", "policy", "prog"),
+                        gran = c("Full Sample", "LOB", "Location", "County","State", "Policy", "Portfolio"),
+                        outputlosstype = c("summarycalc", "lob", "loc", "county","state", "policy", "prog"),
                         stringsAsFactors = FALSE)
 
 ### Report to Variable conversion ----------------------------------------------
 reportToVar <- list(
   "aalcalc" = "AAL",
   "eltcalc" = "ELT",
-  "leccalc_full_uncertainty_aep" = "AEP",
-  "leccalc_full_uncertainty_oep" = "OEP",
-  "leccalc_sample_mean_aep" = "AEP",
-  "leccalc_sample_mean_oep" = "OEP",
+  "leccalc_full_uncertainty_aep" = "LEC Full Uncertainty AEP",
+  "leccalc_full_uncertainty_oep" = "LEC Full Uncertainty OEP",
+  "leccalc_sample_mean_aep" = "LEC Full Uncertainty AEP",
+  "leccalc_sample_mean_oep" = "LEC Full Uncertainty OEP",
   "leccalc_wheatsheaf_aep" = "Multi AEP",
   "leccalc_wheatsheaf_oep" = "Multi OEP",
   "leccalc_wheatsheaf_mean_aep" = "Multi AEP",

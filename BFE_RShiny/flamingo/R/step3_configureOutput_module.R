@@ -844,14 +844,8 @@ step3_configureOutput <- function(input, output, session,
       if (analyses_run[[tbl_analysesData.AnaStatus]] == "RUN_STARTED") {
         flamingoNotification(type = "message",
                              paste0("Analysis ", result$anaID ," is executing"))
-      } else {
-        flamingoNotification(type = "error",
-                             paste0("Error in executing analysis ", result$anaID, " status: ", analyses_run[[tbl_analysesData.AnaStatus]] ))
       }
-    } else {
-      flamingoNotification(type = "error",
-                           paste0("Error in executing analysis ", result$anaID, " status: ", analyses_run$detail ))
-    }
+    } 
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
     idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesData.AnaID])
     pageSel <- ceiling(idxSel/pageLength)
@@ -1185,12 +1179,11 @@ step3_configureOutput <- function(input, output, session,
       
       for (p in names(perils)) {
         periltype <- gsub("peril", "", p)
-        perilIdx <- grepl(periltype, tbl_modelsDetails$resource)
-        if (any(perilIdx) && as.logical(tbl_modelsDetails$content[perilIdx])) {
-          updateCheckboxInput(session, perils[p], value =  tbl_modelsDetails$content[perilIdx])
+        tbl_modelDetails_perils <- tbl_modelsDetails[grepl("peril", tolower(tbl_modelsDetails$resource)),]
+        perilIdx <- grepl(periltype, tolower(tbl_modelDetails_perils$content))
+        if (any(perilIdx)) {
           show(perils[p])
         } else{
-          updateCheckboxInput(session, perils[p], value = FALSE)
           hide(perils[p])
         }
       }
@@ -1208,16 +1201,16 @@ step3_configureOutput <- function(input, output, session,
     
     inputsettings <- list(
       "analysis_tag" = as.integer(result$anaID),
-      "exposure_location" = "L:", # what here?
-      "gul_threshold" = as.integer(input$tinputthreshold),
+      "exposure_location" = "L:", #Depricated. ok hardcoded. will be removed soon
+      "gul_threshold" =  ifelse(is.null(input$tinputthreshold), 0 , as.integer(input$tinputthreshold)),
       "model_version_id" = ifelse(is.null(modelData[[tbl_modelsData.ModelVersionId]]), "", modelData[[tbl_modelsData.ModelVersionId]]),
       "module_supplier_id" = ifelse(is.null(modelData[[tbl_modelsData.ModelSupplierId]]), "", modelData[[tbl_modelsData.ModelSupplierId]]),
-      "number_of_samples" = as.integer(input$tinputnoofsample),
-      "prog_id" = ifelse(is.null(result$portfolioID), "", as.integer(result$portfolioID)),
+      "number_of_samples" = ifelse(is.null(input$tinputnoofsample), 0, as.integer(input$tinputnoofsample)),
+      "prog_id" = ifelse(is.null(portfolioID()), -1, as.integer(portfolioID())),
       "source_tag" = tolower( ifelse(is.null(modelData[[tbl_modelsData.ModelVersionId]]), "", modelData[[tbl_modelsData.ModelVersionId]])),
-      "gul_output" = input$chkinputGUL,
-      "il_output" = input$chkinputIL,
-      "ri_output" = input$chkinputRI,
+      "gul_output" = ifelse(is.null(input$chkinputGUL), FALSE, input$chkinputGUL),
+      "il_output" = ifelse(is.null(input$chkinputIL), FALSE,input$chkinputIL),
+      "ri_output" = ifelse(is.null(input$chkinputRI), FALSE,input$chkinputRI),
       "event_set" = toupper(ifelse(is.null(input$sinputeventset), "", strsplit(input$sinputeventset, "")[[1]][1])),
       "peril_wind" = input$chkinputprwind,
       "demand_surge" = input$chkinputdsurge,
@@ -1225,11 +1218,10 @@ step3_configureOutput <- function(input, output, session,
       "peril_flood" = input$chkinputprflood,
       "peril_surge" = input$chkinputprstsurge,
       "leakage_factor" = input$sliderleakagefac,
-      "use_random_number_file" = FALSE, # what here?
+      "use_random_number_file" = FALSE,  #Depricated. ok hardcoded. will be removed soon
       "event_occurrence_file_id" =  input$sinputeventocc, # what here?
-      "uniqueItems" = FALSE, # what here?
       "summarycalc" = input$chkinputsummaryoption,
-      "return_period_file" = TRUE  # what here?
+      "return_period_file" = TRUE   #Depricated. ok hardcoded. will be removed soon
     )
     
     outputsLossTypes <- list(
@@ -1293,17 +1285,19 @@ step3_configureOutput <- function(input, output, session,
           nolec_output <- varsdf$fields[!varsdf$lec_output]
           lec_output <- varsdf$fields[varsdf$lec_output]
           selection <- c(curr_gran[nolec_output], curr_gran$leccalc$outputs[lec_output])
-          selected_fields <- names(selection)[which(unlist(selection))]
-          selected_choices <- varsdf$vars[which(varsdf$fields %in%  selected_fields)]
-          if (!is.null(selected_choices)) {
-            currchkGroupMapping <- list(
-              "chkgroup" = list(
-                "inputId" = chkgroup_name,
-                "UpdateWidget" = "updateCheckboxGroupInput",
-                "SettingElement" = selected_choices
+          if (!is.null(selection)) {
+            selected_fields <- names(selection)[which(unlist(selection))]
+            selected_choices <- varsdf$vars[which(varsdf$fields %in%  selected_fields)]
+            if (!is.null(selected_choices)) {
+              currchkGroupMapping <- list(
+                "chkgroup" = list(
+                  "inputId" = chkgroup_name,
+                  "UpdateWidget" = "updateCheckboxGroupInput",
+                  "SettingElement" = selected_choices
+                )
               )
-            )
-            .updateWidget("chkgroup", currchkGroupMapping)
+              .updateWidget("chkgroup", currchkGroupMapping)
+            } 
           }
         }
       }

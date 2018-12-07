@@ -7,7 +7,7 @@
 \usage{
 panelOutputModuleUI(id)
 
-panelOutputModule(input, output, session, logMessage = message,
+panelOutputModule(input, output, session, logMessage = message, anaID,
   filesListData = reactive(NULL), active)
 }
 \arguments{
@@ -20,6 +20,8 @@ panelOutputModule(input, output, session, logMessage = message,
 \item{session}{Shiny session object.}
 
 \item{logMessage}{function that will be passed info messages.}
+
+\item{anaID}{is selectAnaID}
 
 \item{filesListData}{table of output files for a given anaID}
 

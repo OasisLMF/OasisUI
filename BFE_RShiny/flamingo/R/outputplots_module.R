@@ -60,6 +60,7 @@ outputplots <- function(input, output, session,
   plotsubmodules <- lapply(seq_along(content_IDs), function(i) {
     callModule(panelOutputModule, content_IDs[i],
                filesListData =  reactive(filesListData()),
+               anaID = selectAnaID,
                active = reactive(plotPanels$state()[[i]]))
   })
   lapply(seq_along(plotsubmodules), function(i) {
@@ -137,6 +138,7 @@ panelOutputModuleUI <- function(id){
 #' @template params-flamingo-module
 #'
 #' @param filesListData table of output files for a given anaID
+#' @param anaID is selectAnaID
 #'
 #' @return reactive value of the title
 #'
@@ -166,6 +168,7 @@ panelOutputModuleUI <- function(id){
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 geom_errorbar
 #' @importFrom ggplot2 geom_violin
+#' @importFrom ggplot2 position_dodge
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' @importFrom data.table fread
@@ -174,6 +177,7 @@ panelOutputModuleUI <- function(id){
 #'
 #' @export
 panelOutputModule <- function(input, output, session, logMessage = message,
+                              anaID,
                               filesListData = reactive(NULL), active) {
   
   ns <- session$ns
@@ -204,7 +208,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     filesListData()
     input$inputplottype
   })
-  
+
   # Clean up objects------------------------------------------------------------
   #clean up panel objects when inactive
   observe(if (!active()) {
@@ -236,7 +240,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   observe(if (active()) {
     if (!is.null(filesListData() )) {
       result$Granularities <- unique(filesListData()$summary_level)
-      result$Losstypes <- unique(filesListData()$perspective)
+      result$Losstypes <- toupper(unique(filesListData()$perspective))
       result$Variables <- unique(filesListData()$report)
     } else {
       result$Granularities <- character(0)
@@ -255,10 +259,6 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", inputplottype())
       .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
       .reactiveUpdateSelectGroupInput(result$Granularities, granularities, "chkboxgrpgranularities", inputplottype())
-      # Check length(result$Variables) != 0 necessary because this part is triggered two times if inputplottype changes, once when the reactives are cleared and once with the updated reactives
-      if ( length(result$Variables) != 0 && length(intersect(result$Variables, plottypeslist[[inputplottype()]][["Variables"]])) == 0) {
-        flamingoNotification("No data available for this plot type", type = "error")
-      }
     }
   })
   
@@ -308,8 +308,8 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                       ", granularities: ",chkbox$chkboxgrpgranularities()
                       # ", aggregated to Portfolio Level: ", input$chkboxaggregate
     ))
-    
-    # > Setup ------------------------------------------------------------------
+
+        # > Setup ------------------------------------------------------------------
     # >> clear data
     # Content to plot
     fileData <- NULL
@@ -374,7 +374,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     # > filter out files to read -----------------------------------------------
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
-        filesToPlot <- filesListData()  %>% filter(perspective %in% chkbox$chkboxgrplosstypes(),
+        filesToPlot <- filesListData()  %>% filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
                                                    report %in% chkbox$chkboxgrpvariables(),
                                                    summary_level %in%  chkbox$chkboxgrpgranularities())
         if (nrow(filesToPlot) != prod(plotstrc)) {
@@ -388,7 +388,8 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     if (!is.null(filesToPlot)) {
       for (i in seq(nrow(filesToPlot))) { # i<- 1
         currfolder <- getOption("flamingo.settins.api.share_filepath")
-        fileName <- file.path(currfolder, filesToPlot$files[i])
+        ana_folder <- paste0(anaID(), "_output/output")
+        fileName <- file.path(currfolder, ana_folder, filesToPlot$files[i])
         #   oasisBasePath <- "/home/mirai/Desktop/Rprojects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
         #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
         #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
@@ -469,12 +470,13 @@ panelOutputModule <- function(input, output, session, logMessage = message,
   
   # Helper function to enable and dosable checkboxes based on condition
   .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
+    logMessage(".reactiveUpdateSelectGroupInput called with parameters:")
     # disable and untick variables that are not relevant
     if (inputid == "chkboxgrpvariables" && !is.null(plotType)) {
       relevantVariables <- plottypeslist[[plotType]][["Variables"]]
       selectable <- intersect(reactivelistvalues, relevantVariables)
     } else {
-      selectable <- reactivelistvalues
+      selectable <- as.character(reactivelistvalues)
     }
     selection <- intersect(selectable, chkbox[[inputid]]())
     updateCheckboxGroupInput(session = session, inputId = inputid, selected = FALSE)

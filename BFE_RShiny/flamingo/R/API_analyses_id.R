@@ -326,8 +326,7 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
   }
   
   .list_summary <- function(counter_id, oed_g, inputsettings, losstypeSettingsMapping){
-    list_summary <- data.frame("uniqueItems" = inputsettings$uniqueItems,
-                               "summarycalc" = inputsettings$summarycalc,
+    list_summary <- data.frame("summarycalc" = inputsettings$summarycalc,
                                "aalcalc" = .ifnullFALSE(losstypeSettingsMapping$aalcalc),
                                "eltcalc" = .ifnullFALSE(losstypeSettingsMapping$eltcalc),
                                "pltcalc" = .ifnullFALSE(losstypeSettingsMapping$pltcalc),
@@ -399,8 +398,8 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
   }
   
   for (l in names(outoutSettingsMappings)) {
+    analysis_settings$analysis_settings[l] <- outoutSettingsMappings[[l]] 
     if (!is.null(outoutSettingsMappings[[l]]) && outoutSettingsMappings[[l]]) {
-      analysis_settings$analysis_settings[l] <- outoutSettingsMappings[[l]] 
       losstype <- gsub( "_output", "", l)
       losssummary <- paste0(losstype, "_summaries")
       gran <- names(outputsLossTypes[[l]])
@@ -416,8 +415,7 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
                                      "sample_mean_aep" = NULL,
                                      "sample_mean_oep" = NULL,
                                      stringsAsFactors = FALSE)
-      list_summary <- data.frame("uniqueItems" = NULL,
-                                 "summarycalc" = NULL,
+      list_summary <- data.frame("summarycalc" = NULL,
                                  "aalcalc" = NULL,
                                  "eltcalc" = NULL,
                                  "pltcalc" = NULL,
@@ -1021,7 +1019,7 @@ api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
 #'
 #' @export
 return_analyses_run_traceback_file_df <- function(id){
-  get_analyses_run_traceback_file <- api_get_analyses_analyses_run_traceback_file(id)
+  get_analyses_run_traceback_file <- api_get_analyses_run_traceback_file(id)
   analyses_run_traceback_fileList <- content(get_analyses_run_traceback_file$result)
   if (is.null(names(analyses_run_traceback_fileList))) {
     analyses_run_traceback_file_df <- strsplit(analyses_run_traceback_fileList, split = "\n") %>%
