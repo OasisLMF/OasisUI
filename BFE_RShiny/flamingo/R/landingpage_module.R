@@ -142,7 +142,7 @@ landingPage <- function(input, output, session,
   observeEvent(input$dt_anaInbox_rows_selected, ignoreNULL = FALSE, {
     if (length(input$dt_anaInbox_rows_selected) > 0) {
       enable("abuttondelana")
-      if (result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesData.Status] == StatusCompleted) {
+      if (result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
         enable("abuttongotoana") 
       }
     } else {
