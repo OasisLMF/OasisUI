@@ -283,6 +283,7 @@ def do_run_prog_oasis(processrunid):
         df_itemdict = pd.read_csv(itemdict)
         df_fmdict = pd.read_csv(fmdict)
         df_fmdict["policy_layer"] = df_fmdict["policy_name"].map(str) + '--' + df_fmdict["layer_name"].map(str)
+        df_fmdict["summary_id"] = (df_fmdict["agg_id"] * 1000 + df_fmdict["layer_id"]).rank(method="dense").astype(int)
 
         for index, row in df_output_file_details.iterrows():
             output = upload_directory + '/output/' + row['FileName']
@@ -296,10 +297,10 @@ def do_run_prog_oasis(processrunid):
             if SummaryLevelName != "Portfolio":
                 if SummaryLevelName == "Policy":
                     # join fmdict to file
-                    df_summarydict = df_fmdict[['agg_id','policy_layer']]
+                    df_summarydict = df_fmdict[['summary_id','policy_layer']]
                     logging.getLogger().debug("df_summarydict: {}".format(df_summarydict))
                     df_summarydict_distinct = df_summarydict.drop_duplicates()
-                    df_output_temp = df_output.join(df_summarydict_distinct.set_index('agg_id'), on='summary_id')
+                    df_output_temp = df_output.join(df_summarydict_distinct.set_index('summary_id'), on='summary_id')
                 else:
                     # join itemdict to file
                     df_summarydict = df_itemdict[[SummaryLevelId,SummaryLevelDesc]]
