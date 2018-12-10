@@ -136,6 +136,11 @@ granToOed <- data.frame(oed = c("summarycalc", "lob", "loc", "county","state", "
                         outputlosstype = c("summarycalc", "lob", "loc", "county","state", "policy", "prog"),
                         stringsAsFactors = FALSE)
 
+modelResourcesdf <- data.frame(
+  resource = ("event_occurrence_id"),
+  inputId = ("sinputeventocc")
+)
+
 ### Report to Variable conversion ----------------------------------------------
 reportToVar <- list(
   "aalcalc" = "AAL",
