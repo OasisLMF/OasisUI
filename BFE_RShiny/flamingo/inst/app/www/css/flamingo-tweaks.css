@@ -337,6 +337,7 @@ input[type="checkbox"] + span:before {
   width: 16px;
   text-align: center;
   margin-right: 6px;
+  margin-bottom: 5px;
   border: 1px solid black;
   border-radius: 2px;
   background-color: white;
