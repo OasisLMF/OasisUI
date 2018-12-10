@@ -1,8 +1,8 @@
 -- (c) 2013-2016 Oasis LMF Ltd.  Software provided for early adopter evaluation only.
 --Flamingo Database Generation Script
 --Author: Ben Hayes
---Date: 2018-10-10
---Version: 0.395.0
+--Date: 2018-12-10
+--Version: 0.397.0
 
 
 -------------------------------------------------------------------------------
@@ -2048,7 +2048,7 @@ Declare @LineOfBusinessId  int = 61
 Declare @AccountNumber int = 6
 Declare @SubLimitRef int = 54
 Declare @ModelGroupField int = 300
-Declare @SQL nvarchar(2500)
+Declare @SQL nvarchar(max)
 Declare @ProfileElementID int
 Declare @Level int
 Declare @MaxLevel int
@@ -3133,7 +3133,7 @@ declare @fmxreflocartionid int = (select locationid from [file] where fileid = @
 declare @fmxreffilename nvarchar(255) = (select [FileName] From [File] where fileid = @fmxreffileid)
 declare @fmxreflocationname nvarchar(255) = (select LocationName From Location where LocationID = @fmxreflocartionid)
 
-declare @sql nvarchar(2500)
+declare @sql nvarchar(max)
 declare @int int
 declare @perspectiveid int
 declare @summarysetid int
@@ -3216,7 +3216,7 @@ begin
 
 	if @SummaryLevelName = 'Policy_Id'
 		begin
-			set @sql = 'select distinct output_id, agg_id as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
+			set @sql = 'select distinct output_id, dense_rank() over (order by agg_id, layer_id) as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
 						join TempFMDict on TempItemDict.item_id = TempFMDict.agg_id'
 		end
 	else
@@ -3254,7 +3254,7 @@ begin
 
 	if @SummaryLevelName = 'Policy_Id'
 		begin
-			set @sql = 'select distinct output_id, agg_id as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
+			set @sql = 'select distinct output_id, dense_rank() over (order by agg_id, layer_id) as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
 						join TempFMDict on TempItemDict.item_id = TempFMDict.agg_id'
 		end
 	else
@@ -3606,7 +3606,7 @@ Declare @LocationId int			= 102 --Output Files for API
 Declare @locationname nvarchar(255) 
 								= (select locationname from location where locationid = @locationid)
 Declare @ModelId int			= (Select ModelId from ProgOasis Where ProgOasisId = @ProgOasisId)
-Declare @SQL nvarchar(2500)
+Declare @SQL nvarchar(max)
 
 --generate legacy resource record
 Insert Into  [Resource] (ResourceID,ResourceTable,ResourceKey,ResourceQualifier,ResourceTypeID)
@@ -3843,7 +3843,7 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 
 Declare	@File nvarchar(255)
 Declare	@Folder nvarchar(255)
-Declare @SQL nvarchar(2500)
+Declare @SQL nvarchar(max)
 
 Select	@File = [FileName] from [File] where FileId = @FileID
 Select	@Folder = LocationName From Location Where LocationId = (Select LocationId from [File] where FileId = @FileID)
@@ -4493,7 +4493,7 @@ create table #Summary
 declare @FileID int
 declare @FileName nvarchar(255)
 declare @LocationName nvarchar(255)
-declare @SQL nvarchar(2500)
+declare @SQL nvarchar(max)
 declare @progoasisid int = (Select progoasisid from processrun where processrunid = @ProcessRunID)
 
 
@@ -4703,7 +4703,7 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 
 declare @FileName nvarchar(255)
 declare @LocationName nvarchar(255)
-declare @SQL nvarchar(2500)
+declare @SQL nvarchar(max)
 
 Create Table #Files (FileID int null, [FileName] nvarchar(255) null, FileDesc nvarchar(255) null, LocationName nvarchar(255) null)
 
@@ -4844,7 +4844,7 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 
 declare @FileName nvarchar(255)
 declare @LocationName nvarchar(255)
-declare @SQL nvarchar(2500)
+declare @SQL nvarchar(max)
 
 Create Table #Files (FileID int, [FileName] nvarchar(255), FileDesc nvarchar(255), LocationName nvarchar(255))
 
