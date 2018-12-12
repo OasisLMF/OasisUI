@@ -4,26 +4,25 @@
 #'
 #' @rdname dynamicColumn
 #'
-#' @description Shiny module providing support for dynamic UI [column][shiny::column] width
-#' without re-rendering the column content.
+#' @description Shiny module providing support for dynamic UI
+#'   [column][shiny::column] width without re-rendering the column content.
+#'
+#' @template params-module
+#' @param width Width of the column, a reactive value for `dynamicColumn()`,
+#'   non-reactive (or [isolated][shiny::isolate]) for `dynamicColumnUI()`.
+#'
+#' @details Dynamic column width via `renderUI()` based on a reactive value
+#'   forces the re-rendering of the column content. This has the following
+#'   undesired effects: * The state of the existing column UI content (including
+#'   user input) is lost.
+#'   * Depending on the complexity of the content, rendering can slow-down the
+#'   re-sizing.
+#' The _dynamicColumn_ Shiny module prevents re-rendering based on reactive
+#' column width. Instead, it changes the class of the existing column UI element
+#' (`"col-sm-<WIDTH>"`) depending on a reactive `width` value.
 #'
 #' @templateVar shinyjsdep [shinyjs::addClass()] and [shinyjs::removeClass()]
 #' @template note-shinyjs
-#' @template params-module
-#'
-#' @details Dynamic column width via `renderUI()` based on a reactive value forces the
-#' re-rendering of the column content. This has the following undesired effects:
-#'   * The state of the existing column UI content (including user input) is
-#'   lost.
-#'   * Depending on the complexity of the content, rendering can slow-down the
-#'   re-sizing.
-#' The _dynamicColumn_ Shiny module prevents re-rendering based on reactive column
-#' width. Instead, it changes the class of the existing column UI element
-#' (`"col-sm-<WIDTH>"`) depending on a reactive `width` value.
-#'
-#' @param width Width of the column, a reactive value for `dynamicColumn()`,
-#'   non-reactive (or [isolated][shiny::isolate]) for `dynamicColumnUI()`.
-#' @inheritParams shiny::column
 #'
 #' @example man-roxygen/ex-dynamicColumn.R
 #'
@@ -44,15 +43,13 @@ dynamicColumn <- function(input, output, session, width) {
 
 # Module UI function -----------------------------------------------------------
 
-#' dynamicColumn
-#'
 #' @rdname dynamicColumn
 #'
-#' @template params-module-ui
-#' @inheritParams dynamicColumn
-#' @param ... Other inputs.
+#' @param ... Elements to include within the column.
 #'
 #' @export
+#'
+#' @md
 dynamicColumnUI <- function(id, width, ...) {
   ns <- NS(id)
   # NOTE that we do not call shiny::column() directly but set an explict

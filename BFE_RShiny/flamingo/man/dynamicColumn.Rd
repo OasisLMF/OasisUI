@@ -17,24 +17,22 @@ non-reactive (or \link[shiny:isolate]{isolated}) for \code{dynamicColumnUI()}.}
 
 \item{id}{Namespace ID for the module.}
 
-\item{...}{Other inputs.}
-
-\item{id}{module id}
+\item{...}{Elements to include within the column.}
 }
 \description{
-Shiny module providing support for dynamic UI \link[shiny:column]{column} width
-without re-rendering the column content.
+Shiny module providing support for dynamic UI
+\link[shiny:column]{column} width without re-rendering the column content.
 }
 \details{
-Dynamic column width via \code{renderUI()} based on a reactive value forces the
-re-rendering of the column content. This has the following undesired effects:
+Dynamic column width via \code{renderUI()} based on a reactive value
+forces the re-rendering of the column content. This has the following
+undesired effects: * The state of the existing column UI content (including
+user input) is lost.
 \itemize{
-\item The state of the existing column UI content (including user input) is
-lost.
 \item Depending on the complexity of the content, rendering can slow-down the
 re-sizing.
-The \emph{dynamicColumn} Shiny module prevents re-rendering based on reactive column
-width. Instead, it changes the class of the existing column UI element
+The \emph{dynamicColumn} Shiny module prevents re-rendering based on reactive
+column width. Instead, it changes the class of the existing column UI element
 (\code{"col-sm-<WIDTH>"}) depending on a reactive \code{width} value.
 }
 }
