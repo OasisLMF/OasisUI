@@ -12,8 +12,6 @@ getInboxData(dbSettings, user, ...)
 \item{user}{reactive expression yielding user}
 
 \item{...}{Other arguments to \code{\link[=executeDbQuery]{executeDbQuery()}}.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
 }
 \value{
 Inbox; \code{data.frame} of 6 variables:

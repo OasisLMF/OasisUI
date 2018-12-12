@@ -11,11 +11,11 @@ defineID(input, output, session, preselAnaId = reactive(-1),
   anaID = reactive(-1), batch = FALSE, logMessage = message)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{w}{width of the coulmn.}
 
-\item{batch}{flag indicating if it is a batch or a simple run.}
+\item{batch}{Flag indicating if it is a batch or a simple analysis.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -24,10 +24,6 @@ defineID(input, output, session, preselAnaId = reactive(-1),
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{logMessage}{function that will be passed info messages.}
-
-\item{id}{Namespace ID for the module.}
-
-\item{batch}{Flag indicating if it is a batch or a simple analysis.}
 }
 \value{
 List of tags.

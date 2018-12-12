@@ -18,8 +18,6 @@ accountDefinitionUI(id)
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state

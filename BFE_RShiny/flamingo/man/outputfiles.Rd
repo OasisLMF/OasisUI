@@ -13,7 +13,7 @@ outputfiles(input, output, session,
   portfolioId = reactive(""), active, logMessage = message)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -28,8 +28,6 @@ outputfiles(input, output, session,
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

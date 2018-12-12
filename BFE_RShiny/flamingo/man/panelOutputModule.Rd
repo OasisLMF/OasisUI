@@ -11,7 +11,7 @@ panelOutputModule(input, output, session, logMessage = message, anaID,
   filesListData = reactive(NULL), active)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -22,8 +22,6 @@ panelOutputModule(input, output, session, logMessage = message, anaID,
 \item{filesListData}{table of output files for a given anaID}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 reactive value of the title

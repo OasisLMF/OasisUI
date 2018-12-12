@@ -7,8 +7,6 @@
 #'
 #' @description UI/View of summary elements of an analysis.
 #'
-#' @template params-module-ui
-#'
 #' @return list of tags
 #'
 #' @importFrom plotly plotlyOutput

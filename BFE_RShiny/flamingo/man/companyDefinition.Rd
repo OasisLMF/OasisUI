@@ -20,10 +20,6 @@ companyDefinitionUI(id)
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{active}{reactive expression whether the module state should be updated.}
-
-\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state

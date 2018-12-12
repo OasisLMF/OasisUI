@@ -26,8 +26,6 @@ singleAnaUI(id)
 \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}}
 
 \item{id}{Namespace ID for the module.}
-
-\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state

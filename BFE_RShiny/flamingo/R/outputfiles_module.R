@@ -6,8 +6,6 @@
 #'
 #' @description UI/View for output files of an analysis.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @export

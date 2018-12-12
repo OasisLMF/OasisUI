@@ -12,7 +12,7 @@ ViewFilesInTable(input, output, session, logMessage = message,
   folderpath = "_output/output/", includechkbox = FALSE)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{includechkbox}{logical indicating the presence of checkboxes. Default FALSE.}
 
@@ -27,10 +27,6 @@ ViewFilesInTable(input, output, session, logMessage = message,
 \item{file_column}{name of the column containing filename. Default "files"}
 
 \item{folderpath}{path to files. Can be "_output/output/" or "_inputs/"; default output path.}
-
-\item{id}{Namespace ID for the module.}
-
-\item{includechkbox}{logical indicating the presence of checkboxes. Default FALSE.}
 }
 \value{
 List of tags.

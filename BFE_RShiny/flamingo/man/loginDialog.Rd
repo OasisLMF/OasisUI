@@ -20,8 +20,6 @@ loginDialogUI(id)
 \item{logError}{function that will be passed error messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{id}{module id}
 }
 \value{
 List of reactive expressions:

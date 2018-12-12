@@ -6,8 +6,6 @@
 #'
 #' @description UI/View for batchbrowse run page.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #' 
 #' @importFrom shinyWidgets panel

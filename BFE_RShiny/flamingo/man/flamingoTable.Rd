@@ -13,7 +13,7 @@ flamingoTable(input, output, session, data, selection = "none",
   maxrowsperpage = 10, logMessage = message)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -36,8 +36,6 @@ flamingoTable(input, output, session, data, selection = "none",
 \item{maxrowsperpage}{param of datatable, default 10.}
 
 \item{logMessage}{function that will be passed info messages.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

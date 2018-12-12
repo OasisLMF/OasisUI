@@ -8,8 +8,6 @@
 #'
 #' @description UI/View for output plots of a run.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @export
@@ -85,8 +83,6 @@ outputplots <- function(input, output, session,
 #' panelOutputModuleUI
 #'
 #' @rdname panelOutputModule
-#'
-#' @template params-module-ui
 #'
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden

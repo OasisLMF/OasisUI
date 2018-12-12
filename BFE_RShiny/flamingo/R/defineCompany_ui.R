@@ -4,8 +4,6 @@
 #'
 #' @description UI/View to define an account.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom DT DTOutput

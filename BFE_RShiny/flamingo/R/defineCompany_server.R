@@ -8,7 +8,6 @@
 #' @template params-module
 #' @template params-logMessage
 #' @template params-active
-#' @template params-active
 #' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
 #'
 #' @return Empty list.

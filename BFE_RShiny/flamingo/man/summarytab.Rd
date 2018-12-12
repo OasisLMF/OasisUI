@@ -13,7 +13,7 @@ summarytab(input, output, session, selectAnaID1 = reactive(""),
   logMessage = message)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -30,8 +30,6 @@ summarytab(input, output, session, selectAnaID1 = reactive(""),
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 list of tags

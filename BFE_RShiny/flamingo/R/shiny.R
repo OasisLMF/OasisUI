@@ -92,7 +92,7 @@ flamingoCheckboxButton <- function(inputId, label, icon = NULL, width = NULL, cl
 #'
 #' @description Modified version of the default [shiny::showNotification()].
 #'
-#' @inheritParams companyDefinition
+#' @param ui Content of message.
 #' @param type see [shiny::showNotification()].
 #' @param ... other arguments to [shiny::showNotification()].
 #'

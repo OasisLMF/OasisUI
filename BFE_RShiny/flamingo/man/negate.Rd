@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{...}{extra arguments to \code{\link[=Negate]{Negate()}}}
+
+\item{NA}{reqested by check_man}
 }
 \description{
 negate in operator

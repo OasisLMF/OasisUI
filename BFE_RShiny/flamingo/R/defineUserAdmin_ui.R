@@ -5,8 +5,6 @@
 #' @description UI/View for accessing the Company User List for Flamingo
 #' in association with OASIS LMF.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom DT DTOutput

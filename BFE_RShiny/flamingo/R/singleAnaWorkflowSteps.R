@@ -18,9 +18,7 @@ analysisWorkflowSteps <- list("Choose Portfolio" = "1",
 
 #' singleAnaWorkflowStepsUI
 #'
-#' @rdname singleAnaWorkflowStepsUI
-#'
-#' @template params-module-ui
+#' @rdname singleAnaWorkflowSteps
 #'
 #' @return List of tags.
 #'

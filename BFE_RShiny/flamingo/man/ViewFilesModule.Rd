@@ -11,7 +11,7 @@ ViewFilesModule(input, output, session, dbSettings, logMessage = message,
   filesListData, includechkbox = FALSE)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{includechkbox}{logical indicating the presence of checkboxes. Default FALSE.}
 
@@ -22,10 +22,6 @@ ViewFilesModule(input, output, session, dbSettings, logMessage = message,
 \item{logMessage}{function that will be passed info messages.}
 
 \item{filesListData}{Table of output files for a given anaID.}
-
-\item{id}{Namespace ID for the module.}
-
-\item{includechkbox}{logical indicating the presence of checkboxes. Default FALSE.}
 }
 \value{
 List of tags.

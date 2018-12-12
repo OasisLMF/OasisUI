@@ -7,9 +7,6 @@
 #'
 #' @description UI/View to view  files.
 #'
-#' @template params-module-ui
-#' @param includechkbox logical indicating the presence of checkboxes. Default FALSE.
-#'
 #' @return List of tags.
 #'
 #' @importFrom DT DTOutput

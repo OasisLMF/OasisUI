@@ -4,8 +4,6 @@
 #'
 #' @description UI/View to login an user.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @export

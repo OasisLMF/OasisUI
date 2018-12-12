@@ -7,11 +7,7 @@
 #'
 #' @description UI/View for defining one analysis ID
 #'
-#' @template params-module-ui
-#'
 #' @param w width of the coulmn.
-#'
-#' @param batch flag indicating if it is a batch or a simple run.
 #'
 #' @return List of tags.
 #'

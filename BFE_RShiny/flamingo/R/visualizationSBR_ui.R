@@ -6,8 +6,6 @@
 #' 
 #' @description UI/View for viewing results of a single run.
 #' 
-#' @template params-module-ui
-#' 
 #' @return List of tags.
 #' 
 #' @importFrom shinyWidgets panel

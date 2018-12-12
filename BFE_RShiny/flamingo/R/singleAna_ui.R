@@ -6,8 +6,6 @@
 #'
 #' @description UI/Viewt o define an analysis
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom shinyjs hidden

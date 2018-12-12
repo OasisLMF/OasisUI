@@ -60,14 +60,12 @@ server <- function(input, output, session) {
   auth_modules$pageheader <- callModule(
     pageheader, "pageheader",
     user = reactive(result$user),
-    reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated())
   )
 
   auth_modules$pagestructure <- callModule(
     pagestructure, "pagestructure",
-    reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated())
   )
@@ -92,7 +90,6 @@ server <- function(input, output, session) {
     preselProcId =  auth_modules$landingPage$modelid,
     preselPanel = reactive(result$preselPanel),
     logMessage = logMessage,
-    reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "SA")
   )
 
@@ -100,7 +97,6 @@ server <- function(input, output, session) {
     batchAna,
     id = "batchAna",
     logMessage = logMessage,
-    reloadMillis = reloadMillis,
     active = reactive(authenticated() && main_visible() == "BA")
   )
 

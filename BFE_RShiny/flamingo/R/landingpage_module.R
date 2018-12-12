@@ -5,8 +5,6 @@
 #'
 #' @rdname landingPage
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom DT DTOutput

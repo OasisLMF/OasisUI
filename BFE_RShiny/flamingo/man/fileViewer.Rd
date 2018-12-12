@@ -22,8 +22,6 @@ fileViewerUI(id)
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state

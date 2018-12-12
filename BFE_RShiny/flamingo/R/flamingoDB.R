@@ -240,8 +240,6 @@ getCompanyList <- function(dbSettings) {
 #' @param dbSettings as returned from \link{flamingoDB}
 #' @param user reactive expression yielding user
 #'
-#' @param dbSettings as returned from \link{flamingoDB}
-#'
 #' @return Inbox; `data.frame` of 6 variables:
 #' \itemize{
 #' 		\item `ProgOasisID`

@@ -5,8 +5,6 @@
 #'
 #' @rdname pagestructure
 #'
-#' @template params-module-ui
-#'
 #' @return Lits of tags
 #'
 #' @export
@@ -26,9 +24,6 @@ pagestructureUI <- function(id) {
 #' @template params-module
 #' @template params-logMessage
 #' @template params-active
-#'
-#' @param reloadMillis Amount of time to wait between table updates;
-#' see \link{invalidateLater}.
 #' 
 #' @return collapsed status of panel.
 #'
@@ -36,7 +31,7 @@ pagestructureUI <- function(id) {
 #' 
 #' @export
 pagestructure <- function(input, output, session,
-                          reloadMillis = 10000, logMessage = message,
+                          logMessage = message,
                           active = reactive(TRUE)) {
   
   ns <- session$ns

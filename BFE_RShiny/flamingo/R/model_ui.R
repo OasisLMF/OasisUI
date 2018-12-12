@@ -4,8 +4,6 @@
 #'
 #' @description UI/View for the model supplier page.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom shinyjs hidden

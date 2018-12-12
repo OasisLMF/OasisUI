@@ -7,22 +7,17 @@
 \usage{
 pagestructureUI(id)
 
-pagestructure(input, output, session, reloadMillis = 10000,
-  logMessage = message, active = reactive(TRUE))
+pagestructure(input, output, session, logMessage = message,
+  active = reactive(TRUE))
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
-
-\item{reloadMillis}{Amount of time to wait between table updates;
-see \link{invalidateLater}.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 Lits of tags
