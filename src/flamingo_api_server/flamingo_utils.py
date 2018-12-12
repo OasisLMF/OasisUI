@@ -785,8 +785,18 @@ def do_generate_reinsurance_files(progoasisid):
     xref_description['xref_id'] = xref_description.index + 1
     xref_description['coverage_type_id'] = 1
     xref_description['peril_id'] = 1
+    xref_description['portfolio_number'] = ''
+    xref_description['location_group'] = ''
+    xref_description['cedant_name'] = ''
+    xref_description['producer_name'] = ''
+    xref_description['lob'] = ''
+    xref_description['country_code'] = ''
+    xref_description['reins_tag'] = ''
     xref_description['tiv'] = 1
-    xref_description = xref_description[['xref_id','policy_number','account_number','location_number','coverage_type_id','peril_id','tiv']]
+
+    xref_description = xref_description[['portfolio_number','xref_id','policy_number','account_number',
+        'location_number','location_group','cedant_name','producer_name','lob','country_code','reins_tag',
+        'coverage_type_id','peril_id','tiv']]
     xref_description_file = input_location + '/xref_descriptions.csv'
     xref_description.to_csv(xref_description_file, index=False)
 
