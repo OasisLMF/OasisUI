@@ -10,11 +10,7 @@ dynamicColumn(input, output, session, width)
 dynamicColumnUI(id, width, ...)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{width}{Width of the column, a reactive value for \code{dynamicColumn()},
 non-reactive (or \link[shiny:isolate]{isolated}) for \code{dynamicColumnUI()}.}

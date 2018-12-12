@@ -15,11 +15,7 @@ summarytab(input, output, session, selectAnaID1 = reactive(""),
 \arguments{
 \item{id}{module id}
 
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

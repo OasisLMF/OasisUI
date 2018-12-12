@@ -11,11 +11,7 @@ fileViewer(input, output, session, dbSettings,
 fileViewerUI(id)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{preselAnaId}{Reactive string expression for reselected analysis id from landingpage.}
 

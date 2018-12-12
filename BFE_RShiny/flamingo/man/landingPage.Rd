@@ -13,11 +13,7 @@ landingPage(input, output, session, reloadMillis = 10000,
 \arguments{
 \item{id}{module id}
 
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{reloadMillis}{Amount of time to wait between table updates;
 see \link{invalidateLater}.}

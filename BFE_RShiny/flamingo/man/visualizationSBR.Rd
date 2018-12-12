@@ -14,11 +14,7 @@ visualizationSBR(input, output, session, dbSettings, apiSettings, user,
 visualizationSBRUI(id)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{anaIdList}{List of analyses and their status.}
 

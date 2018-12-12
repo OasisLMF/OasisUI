@@ -7,11 +7,7 @@
 singleAnaWorkflowSteps(input, output, session)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{id}{Namespace ID for the module.}
 }

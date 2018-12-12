@@ -9,11 +9,7 @@ flamingoIncrementalPanel(input, output, session, panels_state,
   collapsible = FALSE, show = TRUE)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{panels_state}{State of panel.}
 

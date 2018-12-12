@@ -3,18 +3,14 @@
 \name{reactiveConditionalPanel}
 \alias{reactiveConditionalPanel}
 \alias{reactiveConditionalPanelUI}
-\title{Reactive Conditional Panel}
+\title{reactiveConditionalPanel}
 \usage{
 reactiveConditionalPanel(input, output, session, condition)
 
 reactiveConditionalPanelUI(id, ...)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{condition}{Reactive boolean expression determining the visibility of
 the panel.}
@@ -24,20 +20,23 @@ the panel.}
 \item{...}{Elements to include in the panel.}
 }
 \value{
-smth.
+SERVER => TO BE REVIEWED AND HAMRONIZED, CONSIDER A SECTION Module
+Outputs INSTEAD
 
-List of tags.
+UI => TO BE REVIEWED AND HAMRONIZED
 }
 \description{
-Shiny module handling the visibility of a panel based on a reactive \code{condition}.
+Shiny module handling the visibility of a panel based on a
+reactive \code{condition}.
 }
 \details{
-In comparison to \code{\link[shiny:conditionalPanel]{shiny::conditionalPanel()}}, the
-\emph{reactiveConditionalPanel} module provides a convenient abstraction from the
-JavaScript condition details, relying on the reactive \code{condition} instead.
+In comparison to \code{\link[shiny:conditionalPanel]{shiny::conditionalPanel()}}, the \emph{reactiveConditionalPanel}
+module provides a convenient abstraction from the JavaScript condition
+details and only relies on the reactive input \code{condition}, to
+determine which panels are visible.
 }
 \note{
-The module relies on the package \pkg{shinyjs}, which means
+The module relies on the \pkg{shinyjs} package, which means
 \code{\link[shinyjs:useShinyjs]{shinyjs::useShinyjs()}} must be included in the app \code{ui} definition.
 }
 \examples{
