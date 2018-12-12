@@ -2,20 +2,20 @@
 % Please edit documentation in R/flamingoPanel.R
 \name{flamingoPanelHeadingOutput}
 \alias{flamingoPanelHeadingOutput}
-\title{flamingoPanelHeadingOutput}
+\title{Panel Heading UI Output}
 \usage{
 flamingoPanelHeadingOutput(outputId, ...)
 }
 \arguments{
-\item{outputId}{Output Id.}
+\item{outputId}{ID of the dynamical panel heading.}
 
-\item{...}{Additional parameters.}
-
-\item{inline}{boolean for inline css tag}
-}
-\value{
-smth.
+\item{...}{Other arguments to pass to the container tag function. This is
+useful for providing additional classes for the tag.}
 }
 \description{
-flamingoPanelHeadingOutput
+Panel heading UI placeholder to be rendered dynamically via
+\code{\link[=renderFlamingoPanelHeading]{renderFlamingoPanelHeading()}}.
+}
+\seealso{
+\code{\link[=flamingoPanelHeadingOutput]{flamingoPanelHeadingOutput()}}
 }
