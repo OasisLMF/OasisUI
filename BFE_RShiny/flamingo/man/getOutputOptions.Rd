@@ -8,6 +8,8 @@ getOutputOptions(dbSettings, simplify = TRUE)
 }
 \arguments{
 \item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{simplify}{logical}
 }
 \value{
 Output options.

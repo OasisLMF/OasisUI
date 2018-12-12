@@ -15,7 +15,7 @@ visualizationBBRUI(id)
 \arguments{
 \item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
+\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingPage}.}
 
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 

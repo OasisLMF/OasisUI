@@ -14,6 +14,7 @@
 #' @importFrom httr warn_for_status
 #' @importFrom httr http_status
 #' @importFrom httr write_disk
+#' @importFrom utils untar
 #'
 #' @export
 api_get_analyses_input_file <- function(id) {
@@ -305,16 +306,16 @@ return_analyses_settings_file_list <- function(id){
 }
 
 
-#' Construct analysis settings list
+#' Construct analysis settings
 #'
-#' Construct analysis_settingsList
+#' Construct analysis settings
 #'
-#' @rdname construct_analysis_settingsList
+#' @rdname construct_analysis_settings
 #'
 #' @description Constructs a list of analysis settings
 #'
 #' @param inputsettings list of input settings
-#' @param outputsLossType list of output configuration
+#' @param outputsLossTypes list of output configuration
 #'
 #' @return list of analysis settings.
 #'
@@ -772,6 +773,7 @@ return_input_generation_traceback_file_df <- function(id){
 #' @importFrom httr warn_for_status
 #' @importFrom httr http_status
 #' @importFrom httr write_disk
+#' @importFrom utils untar
 #'
 #' @export
 api_get_analyses_output_file <- function(id) {

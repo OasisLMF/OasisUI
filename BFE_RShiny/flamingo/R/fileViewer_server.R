@@ -6,7 +6,9 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
 #'
 #' @param preselAnaId Reactive string expression for reselected analysis id from landingpage.
 #'

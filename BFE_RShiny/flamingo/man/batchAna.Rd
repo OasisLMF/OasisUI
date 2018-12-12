@@ -6,7 +6,7 @@
 \title{batchAna}
 \usage{
 batchAna(input, output, session, active = reactive(TRUE),
-  logMessage = message, reloadMillis = 10000)
+  logMessage = message)
 
 batchAnaUI(id)
 }

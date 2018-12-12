@@ -10,6 +10,8 @@ getEventSet(dbSettings, prgoasisid, simplify = TRUE)
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
 \item{prgoasisid}{Oasis programme id.}
+
+\item{simplify}{logical}
 }
 \value{
 Event set.

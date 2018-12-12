@@ -8,6 +8,8 @@ getProgOasisForProgdata(dbSettings, progId)
 }
 \arguments{
 \item{dbSettings}{as returned from \link{flamingoDB}}
+
+\item{progId}{programme id}
 }
 \value{
 \code{data.frame} of 11 variables:

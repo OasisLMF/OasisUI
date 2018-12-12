@@ -13,11 +13,15 @@ companyDefinitionUI(id)
 \arguments{
 \item{input, output, session}{Shiny input, output, and session objects.}
 
+\item{dbSettings}{Setting object as returned by e.g. [flamingoDB()].}
+
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
+
+\item{active}{reactive expression whether the module state should be updated.}
 
 \item{id}{module id}
 }

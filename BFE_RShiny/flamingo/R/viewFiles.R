@@ -7,6 +7,7 @@
 #' @description UI/View to view  files.
 #'
 #' @template params-module-ui
+#' @param includechkbox logical indicating the presence of checkboxes. Default FALSE.
 #'
 #' @return List of tags.
 #'
@@ -46,9 +47,11 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
 #'
 #' @param filesListData Table of output files for a given anaID.
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
+#' @param includechkbox logical indicating the presence of checkboxes. Default FALSE.
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
@@ -63,9 +66,14 @@ ViewFilesModuleUI <-  function(id, includechkbox = FALSE){
 #' @importFrom dplyr contains
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet leafletOutput
+#' @importFrom utils zip
+#' @importFrom utils write.csv
+#' @importFrom utils read.csv
 #'
 #' @export
-ViewFilesModule <- function(input, output, session, logMessage = message, filesListData, includechkbox = FALSE) {
+ViewFilesModule <- function(input, output, session, 
+                            dbSettings,
+                            logMessage = message, filesListData, includechkbox = FALSE) {
 
   ns <- session$ns
 

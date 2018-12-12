@@ -6,10 +6,9 @@
 \alias{visualizationSBRUI}
 \title{visualizationSBR}
 \usage{
-visualizationSBR(input, output, session, dbSettings, apiSettings, user,
-  anaIdList = reactive(c(-1)), preselAnaId = reactive(-1),
-  anaID = reactive(-1), active = reactive(TRUE),
-  logMessage = message)
+visualizationSBR(input, output, session, anaIdList = reactive(c(-1)),
+  preselAnaId = reactive(-1), anaID = reactive(-1),
+  active = reactive(TRUE), logMessage = message)
 
 visualizationSBRUI(id)
 }
@@ -18,7 +17,7 @@ visualizationSBRUI(id)
 
 \item{anaIdList}{List of analyses and their status.}
 
-\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
+\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingPage}.}
 
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 

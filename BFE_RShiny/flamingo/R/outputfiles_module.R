@@ -46,9 +46,12 @@ outputfilesUI <- function(id) {
 #' @description  Server logic for output files of an analysis.
 #'
 #' @template params-module
-#' @template params-flamingo-module
-#'
-#' @param filesListDatatoview dataframe of files to view
+#' @template params-logMessage
+#' @template params-active
+#' @param tbl_filesListDataana tbl of output files to view
+#' @param tbl_filesListDatapf dataframe of input files to view
+#' @param anaId id of analysis
+#' @param portfolioId id of portfolio associated to the analysis
 #'
 #' @export
 outputfiles <- function(input, output, session,

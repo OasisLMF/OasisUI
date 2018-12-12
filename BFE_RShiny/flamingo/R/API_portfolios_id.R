@@ -291,7 +291,7 @@ api_get_portfolios_reinsurance_info_file <- function(id) {
 #' @rdname api_post_portfolios_reinsurance_info
 #' 
 #' @param id a unique integer value identifying this analysis.
-#' @param filepath_reinsurance_infos path to reinsurance info file.
+#' @param filepath_reinsurance_info path to reinsurance info file.
 #' 
 #' @return the posted portfolio reinsurance info file. 
 #' 

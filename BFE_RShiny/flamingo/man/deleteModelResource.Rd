@@ -9,7 +9,7 @@ deleteModelResource(dbSettings, modresid)
 \arguments{
 \item{dbSettings}{as returned from \link{flamingoDB}}
 
-\item{modelid}{Model id.}
+\item{modresid}{Model resource id.}
 }
 \value{
 Model resource id.

@@ -13,6 +13,8 @@ flamingoDB(server, port, database, uid, pwd, driver = "{FreeTDS}")
 
 \item{database}{Database name.}
 
+\item{uid}{user id}
+
 \item{pwd}{User pass.}
 
 \item{driver}{Connection driver.}

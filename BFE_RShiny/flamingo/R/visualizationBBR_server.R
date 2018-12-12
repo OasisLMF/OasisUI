@@ -8,9 +8,10 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
 #'
-#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingpage}.
+#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
 #' @param anaID  reactive string expression for reselected run id from \link{step3_configureOutput}.
 #'
 #' @return preselPanel panel to show in the model session.

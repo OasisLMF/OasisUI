@@ -48,7 +48,8 @@ pageheaderUI <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
 #' 
 #' @param reloadMillis Amount of time to wait between table updates;
 #' see \link{invalidateLater}.
@@ -136,8 +137,9 @@ pageheader <- function(input, output, session, user,
 #'
 #' @description Disable/Enable menu buttons based on permissions in database.
 #'
-#' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
+#' @param session Shiny session object.
 #' 
 #' @return NULL
 #'

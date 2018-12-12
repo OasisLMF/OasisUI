@@ -58,7 +58,13 @@ summarytabUI <- function(id) {
 #' @description Server logic of summary elements of an analysis.
 #'
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
+#' @param selectAnaID1 id of selected analysis
+#' @param selectAnaID2 id of selected analysis
+#' @param portfolioID1 portfolio id associated with selected analysis
+#' @param portfolioID2 portfolio id associated with selected analysis
+#' @param compare logical indicating comparison
 #'
 #' @return list of tags
 #'
@@ -458,6 +464,11 @@ summarytab <- function(input, output, session,
 #' @rdname basicplot
 #'
 #' @description basic plot
+#' 
+#' @param xlabel label x axis
+#' @param ylabel label y axis
+#' @param titleToUse plot title
+#' @param data dataset to plot
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 labs

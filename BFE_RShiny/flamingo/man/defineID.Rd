@@ -19,15 +19,13 @@ defineID(input, output, session, preselAnaId = reactive(-1),
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingpage}.}
+\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingPage}.}
 
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{active}{reactive expression whether the module state should be updated.}
 
 \item{batch}{Flag indicating if it is a batch or a simple analysis.}
 }

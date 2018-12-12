@@ -59,9 +59,9 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
 #'
-#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingpage}.
+#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
 #' @param anaID reactive string expression for reselected run id from \link{step3_configureOutput}.
 #'
 #' @param batch Flag indicating if it is a batch or a simple analysis.

@@ -6,6 +6,9 @@
 \usage{
 ... \%notin\% NA
 }
+\arguments{
+\item{...}{extra arguments to \code{\link[=Negate]{Negate()}}}
+}
 \description{
 negate in operator
 }

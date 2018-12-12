@@ -8,10 +8,11 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
 #'
 #' @param anaIdList List of analyses and their status.
-#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingpage}.
+#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
 #' @param anaID  reactive string expression for reselected run id from \link{step3_configureOutput}.
 #'
 #' @return preselPanel panel to show in the model session
@@ -19,9 +20,7 @@
 #' @importFrom dplyr select
 #'
 #' @export
-visualizationSBR <- function(input, output, session, dbSettings,
-                             apiSettings,
-                             user,
+visualizationSBR <- function(input, output, session,
                              anaIdList = reactive(c(-1)),
                              preselAnaId = reactive(-1),
                              anaID  = reactive(-1),

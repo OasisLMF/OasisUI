@@ -44,7 +44,8 @@ landingPageUI <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
 #'
 #' @param reloadMillis Amount of time to wait between table updates;
 #' see \link{invalidateLater}.

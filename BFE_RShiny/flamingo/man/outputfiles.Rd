@@ -17,13 +17,19 @@ outputfiles(input, output, session,
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
+\item{tbl_filesListDataana}{tbl of output files to view}
+
+\item{tbl_filesListDatapf}{dataframe of input files to view}
+
+\item{anaId}{id of analysis}
+
+\item{portfolioId}{id of portfolio associated to the analysis}
+
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{filesListDatatoview}{dataframe of files to view}
 }
 \value{
 List of tags.

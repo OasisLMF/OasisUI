@@ -33,7 +33,11 @@ outputplotsUI <- function(id) {
 #' @description Server logic for outputplots of a run.
 #'
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
+#' @param selectAnaID id of selected analysis
+#' @param n_panels number of panels
+#' @param filesListData Table of output files for a given analysis id
 #'
 #' @export
 outputplots <- function(input, output, session,
@@ -135,7 +139,8 @@ panelOutputModuleUI <- function(id){
 #' @description Server logic to show graphical output such as plots.
 #'
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
 #'
 #' @param filesListData table of output files for a given anaID
 #' @param anaID is selectAnaID

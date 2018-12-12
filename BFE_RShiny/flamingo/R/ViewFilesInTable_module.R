@@ -8,6 +8,7 @@
 #' @description UI/View to view  files.
 #'
 #' @template params-module-ui
+#' @param includechkbox logical indicating the presence of checkboxes. Default FALSE.
 #'
 #' @return List of tags.
 #'
@@ -47,12 +48,13 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
 #'
 #' @param tbl_filesListData dataframe of output files.
 #' @param param id to be used
 #' @param file_column name of the column containing filename. Default "files"
 #' @param folderpath  path to files. Can be "_output/output/" or "_inputs/"; default output path.
+#' @param includechkbox logical indicating the presence of checkboxes. Default FALSE.
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
@@ -70,6 +72,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #' @importFrom data.table fwrite
 #' @importFrom data.table fread
 #' @importFrom utils count.fields
+#' @importFrom utils zip
 #'
 #' @export
 ViewFilesInTable <- function(input, output, session, 

@@ -6,12 +6,13 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
 #'
 #' @export
 batchAna <- function(input, output, session,
                     active = reactive(TRUE),
-                    logMessage = message, reloadMillis = 10000) {
+                    logMessage = message) {
 
   ns <- session$ns
 

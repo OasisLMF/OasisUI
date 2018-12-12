@@ -14,6 +14,8 @@ ViewFilesInTable(input, output, session, logMessage = message,
 \arguments{
 \item{id}{module id}
 
+\item{includechkbox}{logical indicating the presence of checkboxes. Default FALSE.}
+
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{logMessage}{function that will be passed info messages.}
@@ -28,7 +30,7 @@ ViewFilesInTable(input, output, session, logMessage = message,
 
 \item{id}{Namespace ID for the module.}
 
-\item{active}{reactive expression whether the module state should be updated.}
+\item{includechkbox}{logical indicating the presence of checkboxes. Default FALSE.}
 }
 \value{
 List of tags.

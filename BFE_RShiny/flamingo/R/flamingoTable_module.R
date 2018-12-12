@@ -29,6 +29,7 @@ flamingoTableUI <-  function(id){
 #' @description Server logic to show the flamingo table output
 #'
 #' @template params-module
+#' @template params-logMessage
 #'
 #' @param data dataframe to show in table.
 #' @param selection param of datatable, default"none".

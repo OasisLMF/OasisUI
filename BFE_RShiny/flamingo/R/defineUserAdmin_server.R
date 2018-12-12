@@ -7,7 +7,9 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-active
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
+#' @param user current user name
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -16,6 +18,7 @@
 #' @importFrom shinyjs onclick
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
+#' @importFrom utils write.csv
 #'
 #' @export
 userAdminDefinition <- function(input, output, session, dbSettings, user,

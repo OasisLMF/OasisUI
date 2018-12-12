@@ -35,6 +35,8 @@ flamingoTable(input, output, session, data, selection = "none",
 
 \item{maxrowsperpage}{param of datatable, default 10.}
 
+\item{logMessage}{function that will be passed info messages.}
+
 \item{id}{Namespace ID for the module.}
 }
 \value{

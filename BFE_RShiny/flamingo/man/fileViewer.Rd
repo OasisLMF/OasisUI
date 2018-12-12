@@ -13,6 +13,8 @@ fileViewerUI(id)
 \arguments{
 \item{input, output, session}{Shiny input, output, and session objects.}
 
+\item{dbSettings}{Setting object as returned by e.g. [flamingoDB()].}
+
 \item{preselAnaId}{Reactive string expression for reselected analysis id from landingpage.}
 
 \item{active}{reactive expression whether the module state should be updated.}

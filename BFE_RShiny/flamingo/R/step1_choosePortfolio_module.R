@@ -203,7 +203,8 @@ panelLinkFiles <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
 #'
 #' @param currstep current selected step.
 #' @param portfolioID selected portfolio ID.

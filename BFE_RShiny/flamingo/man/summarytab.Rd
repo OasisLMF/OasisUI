@@ -17,6 +17,16 @@ summarytab(input, output, session, selectAnaID1 = reactive(""),
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
+\item{selectAnaID1}{id of selected analysis}
+
+\item{selectAnaID2}{id of selected analysis}
+
+\item{portfolioID1}{portfolio id associated with selected analysis}
+
+\item{portfolioID2}{portfolio id associated with selected analysis}
+
+\item{compare}{logical indicating comparison}
+
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}

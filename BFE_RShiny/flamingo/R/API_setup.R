@@ -124,7 +124,7 @@ get_http_type <- function() {
 #' @description Fetches a new refresh token from a username and password.
 #'
 #' @param user current user name
-#' @param ped current user password
+#' @param pwd current user password
 #'
 #' @return List with API return status and response containing the new token.
 #'
@@ -170,7 +170,7 @@ api_refresh_token <- function(user, pwd) {
 #' @return Response containing the new token.
 #' 
 #' @param user current user name
-#' @param ped current user password
+#' @param pwd current user password
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers

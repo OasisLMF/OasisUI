@@ -6,7 +6,8 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-active
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
 #'
 #' @return Empty list.
 #'
@@ -15,6 +16,7 @@
 #' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
+#' @importFrom utils write.csv
 #'
 #' @export
 accountDefinition <- function(input, output, session, dbSettings,

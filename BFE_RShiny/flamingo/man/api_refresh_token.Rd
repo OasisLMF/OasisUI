@@ -9,7 +9,7 @@ api_refresh_token(user, pwd)
 \arguments{
 \item{user}{current user name}
 
-\item{ped}{current user password}
+\item{pwd}{current user password}
 }
 \value{
 List with API return status and response containing the new token.

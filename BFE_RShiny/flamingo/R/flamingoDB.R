@@ -116,6 +116,7 @@ buildDbQuery <- function(
 #' @param server Host name.
 #' @param port Host port.
 #' @param database Database name.
+#' @param uid user id
 #' @param pwd User pass.
 #' @param driver Connection driver.
 #'
@@ -428,6 +429,7 @@ getFileList <- function(dbSettings, pranaid) {
 #' @description Get the list of output presets.
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
+#' @param simplify logical
 #'
 #' @return Output options.
 #'
@@ -448,6 +450,7 @@ getOutputOptions <- function(dbSettings, simplify = TRUE) {
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
 #' @param prgoasisid Oasis programme id.
+#' @param simplify logical
 #'
 #' @return Event set.
 #'
@@ -709,6 +712,7 @@ getFileSourceReinsuranceScopeFile <- function(dbSettings){
 #' @details Run getProgOasisForProg against the database.
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
+#' @param progId programme id
 #'
 #' @return `data.frame` of 11 variables:
 #' \itemize{
@@ -1034,7 +1038,7 @@ updateModelResource <- function(
 #' @description Delete Model Resource.
 #'
 #' @param dbSettings as returned from \link{flamingoDB}
-#' @param modelid Model id.
+#' @param modresid Model resource id.
 #'
 #' @return Model resource id.
 #'

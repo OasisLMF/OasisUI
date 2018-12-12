@@ -1,16 +1,3 @@
-
-#' flamingoModuleUI
-#'
-#' @rdname flamingoModuleUI
-#'
-#' @description Flamingo Module Template UI.
-#'
-#' @inheritParams accountDefinitionUI
-#'
-#' @return No value.
-flamingoModuleUI <- function(id) {}
-
-
 #' Flamingo Module Template
 #'
 #' @rdname flamingoModule
@@ -39,6 +26,10 @@ flamingoModule <- function(
 #' @description Modified version of the default [shiny::actionButton()].
 #'
 #' @param class HTML class attribute.
+#' @param inputId widget id
+#' @param label widget label 
+#' @param icon widget icon
+#' @param width widget width
 #' @param ... Arguments to [shiny::actionButton()].
 #'
 #' @return Acces to Oasis UI.
@@ -67,7 +58,11 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
 #'
 #' @description Modified version of the default [shiny::actionButton()].
 #'
-#' @inheritParams flamingoButton
+#' @param inputId widget id
+#' @param label widget label 
+#' @param icon widget icon
+#' @param width widget width
+#' @param class HTML class attribute.
 #' @param ... Arguments to [shiny::actionButton()].
 #'
 #' @return List of tags.
