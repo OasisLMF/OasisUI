@@ -1,13 +1,14 @@
-#' reactiveNavigation
+#' Reactive navigation
 #'
-#' @rdname reactiveNavigation
-#'
-#' @description Set of utilities for storing reactive navigation state and propagating it as
+#' Set of utilities for storing reactive navigation state and propagating it as
 #' module output or retrieving it from module outputs, supporting navigation
 #' across nested modules. This provides a common, aligned way of handling
 #' navigation, abstracting from the specific implementation details.
 #'
-#' @details The details behind how the navigation state is stored, propagated and
+#' @param value Desired value of the navigation state.
+#'
+#' @details
+#' The details behind how the navigation state is stored, propagated and
 #' observed are encapsulated using utilities for initializing the state
 #' (`reactiveNavigation()`), updating it (`updateNavigation()`), adding it as
 #' part of the module output list (`outputNavigation()`), retrieving it from a
@@ -37,12 +38,10 @@
 #' getNavigation(outputNavigation(navigation_state))
 #' [...]
 #' ```
-#' @param value Desired value of the navigation state.
 #'
-#' @return Returns the navigation state to be used by the
+#' @return `reactiveNavigation()` returns the navigation state to be used by the
 #'   other functions, initialized with `value`.
 #'
-#' @example man-roxygen/ex-reactiveNavigation.R
 #' @example man-roxygen/ex-reactiveNavigation.R
 #'
 #' @export
@@ -66,7 +65,7 @@ reactiveNavigation <- function(value = NULL) {
 #'   state, thus forcing rectivity. This is especially desirable within inner
 #'   modules.
 #'
-#' @return Returns `NULL`, invisibly, and is called for its
+#' @return `updateNavigation()` returns `NULL`, invisibly, and is called for its
 #'   side-effect of updating the input `state` with the supplied `value`.
 #'
 #' @export
@@ -81,13 +80,10 @@ updateNavigation <- function(state, value, force_react = TRUE) {
   invisible()
 }
 
-#' outputNavigation
+
+#' @rdname reactiveNavigation
 #'
-#' @rdname outputNavigation
-#'
-#' @inheritParams updateNavigation
-#'
-#' @return `Returns a list containing the reactive
+#' @return `outputNavigation()` returns a list containing the reactive
 #'   navigation state, to be possibliy `c`ombined with other module outputs. The
 #'   reactive navigation state can then be extracted using `getNavigation()`.
 #'
@@ -117,7 +113,7 @@ outputNavigation <- function(state, force_react = TRUE) {
 #' @param output A list possibly containing a reactive navigation state
 #'   component (created with `outputNavigation()`).
 #'
-#' @return Returns the reactive navigation state extracted
+#' @return `getNavigation()` returns the reactive navigation state extracted
 #'   from `output` if present, `reactive(NULL)` otherwise.
 #'
 #' @export
@@ -128,8 +124,6 @@ getNavigation <- function(output) {
 }
 
 
-#' reactiveNavigation
-#'
 #' @rdname reactiveNavigation
 #'
 #' @param modules A list of modules output lists, each possibly containing a
@@ -137,7 +131,7 @@ getNavigation <- function(output) {
 #' @param logger Optional logging function to log the observed navigation state
 #'   updates.
 #'
-#' @return Returns `NULL`, invisibly, and is called
+#' @return `observeModuleNavigation()` returns `NULL`, invisibly, and is called
 #'   for its side-effect of updating the input navigation `state` by observing
 #'   the navigation state of the input `modules`.
 #'
