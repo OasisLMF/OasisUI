@@ -2,27 +2,80 @@
 % Please edit documentation in R/flamingoPanel.R
 \name{flamingoPanel}
 \alias{flamingoPanel}
-\title{flamingoPanel}
+\title{Flamingo UI Panel}
 \usage{
 flamingoPanel(id, ..., heading = NULL, footer = NULL,
   status = "default", collapsible = FALSE, show = TRUE)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{String ID of the panel.}
 
-\item{...}{Additional parameters.}
+\item{...}{UI elements to include inside the panel.}
 
-\item{heading}{NULL by default.}
+\item{heading}{Title for the panel.}
 
-\item{footer}{NULL by default.}
+\item{footer}{Footer for the panel.}
 
-\item{status}{default.}
+\item{status}{Bootstrap status for contextual alternative.}
 
-\item{collapsible}{FALSE.}
+\item{collapsible}{Logical flag specifying if the panel is collapsible.}
 
-\item{show}{TRUE.}
+\item{show}{Logical flag specifying if a collapsible panel should be
+initially shown as not collapsed.}
+}
+\value{
+The UI definition of the panel.
 }
 \description{
-Adapted from shinyWidgets::panel() including IDs and collapsible
-(inspired by shinyBS::bsCollapsePanel()).
+Flamingo UI panel with collapsing capabilities.
+}
+\details{
+Adapted from \code{\link[shinyWidgets:panel]{shinyWidgets::panel()}} including IDs and collapsible
+(inspired by \code{\link[shinyBS:bsCollapsePanel]{shinyBS::bsCollapsePanel()}}).
+}
+\examples{
+if (interactive()) {
+  library(shiny)
+  ui <- fluidPage(
+    # replace eventually with flamingo-tweaks.css via system.file()
+    tags$style(HTML('
+                    .collapsebtn:after {
+                    font-family: "FontAwesome"; font-weight: 900; content: "\\\\f068";
+                    float: right;
+                    }
+                    .collapsebtn.collapsed:after {
+                    content: "\\\\f065";
+                    }
+                    '
+    )),
+    titlePanel("`flamingoPanel` examples"),
+    flamingoPanel(
+      "apanel",
+      "...Yeah yeah yeah",
+      heading = h4("She loves you...")
+    ),
+    flamingoPanel(
+      "bpanel",
+      "...Yeah yeah yeah",
+      heading = h4("She loves you..."),
+      collapsible = TRUE
+    ),
+    flamingoPanel(
+      "cpanel",
+      "...Yeah yeah yeah",
+      heading = tagList(
+        "She loves you...",
+        actionButton("aa", icon("times"), style = "float: right")
+      ),
+      footer = fluidRow(column(
+        12,
+        "footer"
+      )),
+      collapsible = TRUE,
+      show = FALSE
+    )
+  )
+  server <- function(input, output) {}
+  shinyApp(ui, server)
+}
 }

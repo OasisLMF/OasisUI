@@ -11,11 +11,7 @@ modelSupplierPage(input, output, session, dbSettings,
 modelSupplierPageUI(id)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{logMessage}{function that will be passed info messages.}
 

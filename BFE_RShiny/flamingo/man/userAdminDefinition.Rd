@@ -12,11 +12,7 @@ userAdminDefinition(input, output, session, dbSettings, user,
 userAdminDefinitionUI(id)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 

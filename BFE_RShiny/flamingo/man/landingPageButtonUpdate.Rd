@@ -7,13 +7,9 @@
 landingPageButtonUpdate(session, dbSettings, logMessage = message)
 }
 \arguments{
-\item{session}{Shiny session object.}
-
 \item{logMessage}{function that will be passed info messages.}
 
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{id}{Namespace ID for the module.}
 

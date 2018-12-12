@@ -3,13 +3,16 @@
 \name{reactiveNavigation}
 \alias{reactiveNavigation}
 \alias{updateNavigation}
+\alias{outputNavigation}
 \alias{getNavigation}
 \alias{observeModuleNavigation}
-\title{reactiveNavigation}
+\title{Reactive navigation}
 \usage{
 reactiveNavigation(value = NULL)
 
 updateNavigation(state, value, force_react = TRUE)
+
+outputNavigation(state, force_react = TRUE)
 
 getNavigation(output)
 
@@ -36,16 +39,20 @@ reactive navigation state component (created with \code{outputNavigation()}).}
 updates.}
 }
 \value{
-Returns the navigation state to be used by the
+\code{reactiveNavigation()} returns the navigation state to be used by the
 other functions, initialized with \code{value}.
 
-Returns \code{NULL}, invisibly, and is called for its
+\code{updateNavigation()} returns \code{NULL}, invisibly, and is called for its
 side-effect of updating the input \code{state} with the supplied \code{value}.
 
-Returns the reactive navigation state extracted
+\code{outputNavigation()} returns a list containing the reactive
+navigation state, to be possibliy \code{c}ombined with other module outputs. The
+reactive navigation state can then be extracted using \code{getNavigation()}.
+
+\code{getNavigation()} returns the reactive navigation state extracted
 from \code{output} if present, \code{reactive(NULL)} otherwise.
 
-Returns \code{NULL}, invisibly, and is called
+\code{observeModuleNavigation()} returns \code{NULL}, invisibly, and is called
 for its side-effect of updating the input navigation \code{state} by observing
 the navigation state of the input \code{modules}.
 }
@@ -86,97 +93,6 @@ getNavigation(outputNavigation(navigation_state))
 }
 }
 \examples{
-if (interactive()) {
-  library(shiny)
-  nav_states <- LETTERS[1:8]
-  prefixlog <- function(prefix, logger = message) {
-    function(...) cat(prefix, ">", ..., "\\n", sep = "")
-  }
-  # navigation button module ----
-  navigationButtonUI <- function(id, nav_to) {
-    ns <- NS(id)
-    actionButton(
-      ns("action"),
-      label = sprintf("Navigate to \%s", nav_to)
-    )
-  }
-  navigationButton <- function(input, output, session, nav_to) {
-    navigation_state <- reactiveNavigation()
-    observeEvent(input$action, {
-      cat("Navigate to", nav_to, "\\n")
-      updateNavigation(navigation_state, nav_to)
-    })
-    outputNavigation(navigation_state)
-  }
-  # sidebar module, a collection of navigationButton modules ----
-  navigationSidebarUI <- function(id) {
-    ns <- NS(id)
-    tagList(lapply(
-      nav_states,
-      function(nav_to) {
-        fluidRow(navigationButtonUI(ns(sprintf("action-\%s", nav_to)), nav_to))
-      }
-    ))
-  }
-  navigationSidebar <- function(input, output, session) {
-    modules <- lapply(
-      nav_states, function(nav_to) {
-        callModule(navigationButton, sprintf("action-\%s", nav_to), nav_to)
-      }
-    )
-    # observe and return navigation from the inner modules
-    navigation_state <- reactiveNavigation()
-    observeModuleNavigation(
-      navigation_state, modules,
-      logger = prefixlog("> SIDEBAR")
-    )
-    outputNavigation(navigation_state)
-  }
-  # main panel module ----
-  mainPanelModuleUI <- function(id) {
-    ns <- NS(id)
-    fluidPage(
-      selectInput(ns("main_slider"), "Navigate to:", nav_states)
-    )
-  }
-  mainPanelModule <- function(input, output, session) {
-    # observe and return navigation
-    navigation_state <- reactiveNavigation()
-    observeEvent(input$main_slider, {
-      cat("Navigate to", input$main_slider, "\\n")
-      updateNavigation(navigation_state, input$main_slider)
-    })
-    outputNavigation(navigation_state)
-  }
-  # actual app ----
-  ui <- fluidPage(
-    shinyjs::useShinyjs(),
-    titlePanel("Modular reactive navigation"),
-    fluidPage(
-      div("App navigation state"),
-      verbatimTextOutput("nav_display", placeholder = TRUE)
-    ),
-    sidebarLayout(
-      sidebarPanel(navigationSidebarUI("sidebar")),
-      mainPanel(mainPanelModuleUI("main"))
-    )
-  )
-  server <- function(input, output) {
-    navigation_state <- reactiveNavigation(head(nav_states, 1))
-    # reactive app-level navigation state, force_react = FALSE allows reacting
-    # only to actual changes
-    nav_to <- getNavigation(outputNavigation(navigation_state, force_react = FALSE))
-    output$nav_display <- nav_to
-    observe(prefixlog("> APP_NAV")(" => " , nav_to()))
-    # call modules abd observe their navigation
-    modules <- list(
-      callModule(navigationSidebar, "sidebar"),
-      callModule(mainPanelModule, "main")
-    )
-    observeModuleNavigation(navigation_state, modules, logger = prefixlog("> SERVER"))
-  }
-  shinyApp(ui = ui, server = server)
-}
 if (interactive()) {
   library(shiny)
   nav_states <- LETTERS[1:8]

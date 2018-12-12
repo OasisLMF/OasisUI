@@ -13,11 +13,7 @@ panelOutputModule(input, output, session, logMessage = message, anaID,
 \arguments{
 \item{id}{module id}
 
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{logMessage}{function that will be passed info messages.}
 

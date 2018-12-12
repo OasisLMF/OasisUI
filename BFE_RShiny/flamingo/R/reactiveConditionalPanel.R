@@ -1,23 +1,25 @@
 # Module server function -------------------------------------------------------
 
-#' Reactive Conditional Panel
+#' reactiveConditionalPanel
 #'
 #' @rdname reactiveConditionalPanel
 #'
-#' @description Shiny module handling the visibility of a panel based on a reactive `condition`.
+#' @description Shiny module handling the visibility of a panel based on a
+#'   reactive `condition`.
 #'
 #' @template params-module
-#' @templateVar shinyjsdep the package \pkg{shinyjs}
-#' @template note-shinyjs
-#'
-#' @details In comparison to [shiny::conditionalPanel()], the
-#'   _reactiveConditionalPanel_ module provides a convenient abstraction from the
-#'   JavaScript condition details, relying on the reactive `condition` instead.
-#'
 #' @param condition Reactive boolean expression determining the visibility of
 #'   the panel.
 #'
-#' @return smth.
+#' @templateVar module reactiveConditionalPanel
+#' @templateVar reactive condition
+#' @template details-conditionalPanel-js-abstract
+#
+#' @return SERVER => TO BE REVIEWED AND HAMRONIZED, CONSIDER A SECTION Module
+#'   Outputs INSTEAD
+#'
+#' @templateVar shinyjsdep the \pkg{shinyjs} package
+#' @template note-shinyjs
 #'
 #' @seealso Module _[reactiveConditionalPanels]_, providing similar
 #'   functionality for multiple panels.
@@ -28,7 +30,7 @@
 #'
 #' @md
 reactiveConditionalPanel <- function(input, output, session, condition) {
-  output$visible <- condition # reactive(FALSE) #
+  output$visible <- condition
   outputOptions(output, "visible", suspendWhenHidden = FALSE)
   invisible()
 }
@@ -36,13 +38,11 @@ reactiveConditionalPanel <- function(input, output, session, condition) {
 
 # Module UI function -----------------------------------------------------------
 
-#' reactiveConditionalPanelUI
-#'
 #' @rdname reactiveConditionalPanel
 #'
 #' @inheritParams shiny::conditionalPanel
 #'
-#' @return List of tags.
+#' @return UI => TO BE REVIEWED AND HAMRONIZED
 #'
 #' @export
 #'

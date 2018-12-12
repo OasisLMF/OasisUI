@@ -13,11 +13,7 @@ pageheader(input, output, session, user, reloadMillis = 10000,
 \arguments{
 \item{id}{module id}
 
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{user}{reactive expression yielding user name}
 
