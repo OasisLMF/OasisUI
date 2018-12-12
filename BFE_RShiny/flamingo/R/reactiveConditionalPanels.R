@@ -4,29 +4,27 @@
 #'
 #' @rdname reactiveConditionalPanels
 #'
-#' @description Shiny module handling the visibility of a set of panels depending on a
-#' reactive input.
+#' @description Shiny module handling the visibility of a set of panels
+#'   depending on a reactive input.
 #'
 #' @template params-module
-#' @templateVar shinyjsdep the package \pkg{shinyjs}
-#' @template note-shinyjs
-#'
-#' @details In comparison to [shiny::conditionalPanel()], the
-#'   _reactiveConditionalPanels_ module provides a convenient abstraction from the
-#'   JavaScript condition details and only relies on the reactive input
-#'   `visible` to determine which panels are visible.
-#'
 #' @param visible Reactive string expression determining the visibility of
 #'   panels.
-#' @template params-module
-#' @template params-flamingo-module
+#'
+#' @templateVar module reactiveConditionalPanels
+#' @templateVar reactive visible
+#' @template details-conditionalPanel-js-abstract
 #
+#' @return SERVER => TO BE REVIEWED AND HAMRONIZED, CONSIDER A SECTION Module
+#'   Outputs INSTEAD
+#'
+#' @templateVar shinyjsdep the \pkg{shinyjs} package
+#' @template note-shinyjs
+#'
 #' @seealso Module _[reactiveConditionalPanel]_, providing similar functionality
 #'   for a single panel.
 #'
 #' @example man-roxygen/ex-reactiveConditionalPanels.R
-#'
-#' @return smth.
 #'
 #' @export
 #'
@@ -40,16 +38,14 @@ reactiveConditionalPanels <- function(input, output, session, visible) {
 
 # Module UI function -----------------------------------------------------------
 
-#' reactiveConditionalPanelsUI
-#'
 #' @rdname reactiveConditionalPanels
 #'
-#' @template params-module-ui
-#' @param panels Named list of UI content for a set of panels. Only the panel
+#' @param panels Named list of UI content for a set of panels. Only the panels
 #'   whose name matches the `visible` reactive input to the module server
-#'   function is shown.
+#'   function are shown. Panels with the same name are supported and shown
+#'   together.
 #'
-#' @return Panels.
+#' @return UI => TO BE REVIEWED AND HAMRONIZED
 #'
 #' @export
 #'
