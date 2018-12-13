@@ -1,29 +1,3 @@
-#' @rdname flamingoIncrementalPanel
-#'
-#' @inheritParams flamingoPanel
-#' @param removable Logical flag specifying if the panel can be removed.
-#'
-#' @export
-#'
-#' @md
-flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, status = "default",
-                                       collapsible = FALSE, show = TRUE, removable = TRUE) {
-  ns <- NS(id)
-  flamingoPanel(
-    id = id,
-    ...,
-    heading = tagAppendChildren(
-      flamingoPanelHeading(heading),
-      actionButton(ns("add"), icon("plus"), style = "float: left; margin-right: 12px"),
-      if (removable) actionButton(ns("delete"), icon("times"), style = "float: right")
-    ),
-    footer = footer,
-    status = status,
-    collapsible = collapsible,
-    show = show
-  )
-}
-
 #' flamingoIncrementalPanel
 #'
 #' @rdname flamingoIncrementalPanel
@@ -38,6 +12,9 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
 #' @param new_content_IDs Character vector of IDs to be used for the content of
 #'   each panel upon its creation.
 #' @param new_content_fun Function used to populate any new panel.
+#' @param ...  For the module server function, additional aruments passed to
+#'   `new_content_fun`. For the module UI function, the elements to include
+#'   inside the panel.
 #' @param new_headings Heading content to be used for each panel upon its
 #'   creation, as a character vector or list.
 #'
@@ -49,7 +26,7 @@ flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, s
 #'
 #' @md
 flamingoIncrementalPanel <- function(input, output, session, panels_state,
-                                     new_content_IDs, new_content_fun, new_headings = NULL,
+                                     new_content_IDs, new_content_fun, ..., new_headings = NULL,
                                      collapsible = FALSE, show = TRUE) {
   id <- session$ns(NULL)
   observeEvent(input$add, {
@@ -91,12 +68,41 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state,
   })
 }
 
+
+#' @rdname flamingoIncrementalPanel
+#'
+#' @inheritParams flamingoPanel
+#' @param removable Logical flag specifying if the panel can be removed.
+#'
+#' @export
+#'
+#' @md
+flamingoIncrementalPanelUI <- function(id, ..., heading = NULL, footer = NULL, status = "default",
+                                       collapsible = FALSE, show = TRUE, removable = TRUE) {
+  ns <- NS(id)
+  flamingoPanel(
+    id = id,
+    ...,
+    heading = tagAppendChildren(
+      flamingoPanelHeading(heading),
+      actionButton(ns("add"), icon("plus"), style = "float: left; margin-right: 12px"),
+      if (removable) actionButton(ns("delete"), icon("times"), style = "float: right")
+    ),
+    footer = footer,
+    status = status,
+    collapsible = collapsible,
+    show = show
+  )
+}
+
+
 # Utility for constructing a named reactiveVal for the given IDs
 panelsState <- function(IDs) {
   reactiveVal(
     setNames(rep(FALSE, length(IDs)), IDs)
   )
 }
+
 
 #' callIncrementalPanelModules
 #'
