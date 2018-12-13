@@ -696,7 +696,8 @@ def do_generate_oasis_files(progoasisid):
     os.remove(OASIS_FILES_DIRECTORY + "/FMXRef_temp.csv")
 
     destination = open(itemdict, 'wb')
-    destination.write("item_id,coverage_id,location_id,location_desc,lob_id,lob_desc,county_id,county_desc,state_id,state_desc\n")
+    destination.write("item_id,coverage_id,location_id,location_desc,lob_id,lob_desc,county_id,"+\
+        "county_desc,state_id,state_desc,portfolionumber,locationgroup\n")
     shutil.copyfileobj(open(OASIS_FILES_DIRECTORY + "/ItemDict_temp.csv", 'rb'), destination)
     destination.close()
     os.remove(OASIS_FILES_DIRECTORY + "/ItemDict_temp.csv")
@@ -780,13 +781,15 @@ def do_generate_reinsurance_files(progoasisid):
     fm_dict_file = input_location + '/FMDict.csv'
     fm_dict = pd.read_csv(fm_dict_file)
     combined_dict = item_dict.merge(fm_dict, on=('item_id'))
-    xref_description = combined_dict[['layer_name','policy_name','location_desc']]
-    xref_description.columns = ['policy_number','account_number','location_number']
+    xref_description = combined_dict[['layer_name','policy_name','location_desc',
+        'portfolionumber_desc','locationgroup_desc']]
+    xref_description.columns = ['policy_number','account_number','location_number',
+        'portfolio_number','location_group']
     xref_description['xref_id'] = xref_description.index + 1
     xref_description['coverage_type_id'] = 1
     xref_description['peril_id'] = 1
-    xref_description['portfolio_number'] = ''
-    xref_description['location_group'] = ''
+    #xref_description['portfolio_number'] = ''
+    #xref_description['location_group'] = ''
     xref_description['cedant_name'] = ''
     xref_description['producer_name'] = ''
     xref_description['lob'] = ''
