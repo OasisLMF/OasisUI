@@ -1,0 +1,44 @@
+version: '2' 
+services:
+  shiny_proxy:
+    restart: always
+    container_name: shiny_proxy
+    image: coreoasis/shiny_proxy:0.393.0-beta
+    ports:
+     - ${UI_WEB_PORT}:8080
+    environment:
+     - FLAMINGO_ENVIRONMENT=${UI_DB_ENVIRONMENT}
+     - FLAMINGO_API_PORT=8000
+     - FLAMINGO_DB_IP=${UI_DB_IP}
+     - FLAMINGO_DB_PORT=${UI_DB_PORT}
+     - FLAMINGO_DB_NAME=${UI_DB_NAME}
+     - FLAMINGO_DB_USERNAME=${UI_DB_USERNAME}
+     - FLAMINGO_DB_PASSWORD=${UI_DB_PASSWORD}
+     - FLAMINGO_PORT_RANGE_START=20000
+     - FLAMINGO_DOCKER_IMAGE=coreoasis\/flamingo_shiny:${RELEASE_TAG}
+     - FLAMINGO_SHARE_FILEPATH_ON_HOST=${UI_FILESHARE}
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      shiny-net:
+
+  flamingo_server:
+    restart: always
+    container_name: flamingo_server
+    image: ${UI_IMAGE_SERVER}
+    volumes:
+      - ${UI_FILESHARE}:/var/www/oasis/Files
+    ports:
+      - 8000:80
+    environment:
+      - IS_WINDOWS_HOST=True
+      - FLAMINGO_ENVIRONMENT=${UI_DB_ENVIRONMENT}
+      - FLAMINGO_DB_IP=${UI_DB_IP}
+      - FLAMINGO_DB_PORT=${UI_DB_PORT}
+      - FLAMINGO_DB_NAME=${UI_DB_NAME}
+      - FLAMINGO_DB_USERNAME=${UI_DB_USERNAME}
+      - FLAMINGO_DB_PASSWORD=${UI_DB_PASSWORD}
+      - OASIS_LOG_LEVEL=DEBUG
+networks:
+  shiny-net:
+    external: true
