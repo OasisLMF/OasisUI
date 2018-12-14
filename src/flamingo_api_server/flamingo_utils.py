@@ -697,7 +697,8 @@ def do_generate_oasis_files(progoasisid):
 
     destination = open(itemdict, 'wb')
     destination.write("item_id,coverage_id,location_id,location_desc,lob_id,lob_desc,county_id,"+\
-        "county_desc,state_id,state_desc,portfolionumber,locationgroup\n")
+        "county_desc,state_id,state_desc,portfolionumber_id,portfolionumber_desc,"+\
+        "locationgroup_id,locationgroup_desc\n")
     shutil.copyfileobj(open(OASIS_FILES_DIRECTORY + "/ItemDict_temp.csv", 'rb'), destination)
     destination.close()
     os.remove(OASIS_FILES_DIRECTORY + "/ItemDict_temp.csv")
