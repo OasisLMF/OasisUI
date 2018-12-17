@@ -388,7 +388,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     # > read files to plot -----------------------------------------------------
     if (!is.null(filesToPlot)) {
       for (i in seq(nrow(filesToPlot))) { # i<- 1
-        currfolder <- getOption("flamingo.settins.api.share_filepath")
+        currfolder <- getOption("flamingo.settings.api.share_filepath")
         ana_folder <- paste0(anaID(), "_output/output")
         fileName <- file.path(currfolder, ana_folder, filesToPlot$files[i])
         #   oasisBasePath <- "/home/mirai/Desktop/Rprojects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"

@@ -159,18 +159,12 @@ panelDefineOutputsDetails <- function(id) {
                  selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "Long Term"),
                  checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
                  h5("Available Perils"),
-                 hidden(div(id = ns("perilwind"),
-                            checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = TRUE))),
-                 hidden(div(id = ns("perilsurge"),
-                            checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = TRUE))),
-                 hidden(div(id = ns("perilquake"),
-                            checkboxInput(ns("chkinputprquake"), label = "Peril: Quake", value = TRUE))),
-                 hidden(div(id = ns("perilflood"),
-                            checkboxInput(ns("chkinputprflood"), label = "Peril: Flood", value = TRUE))),
-                 hidden(div(id = ns("demandsurge"),
-                            checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = TRUE))),
-                 hidden(div(id = ns("leakagefactor"),
-                            sliderInput(ns("sliderleakagefac"), label = "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)))))
+                 hidden(checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = TRUE)),
+                 hidden(checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = TRUE)),
+                 hidden(checkboxInput(ns("chkinputprquake"), label = "Peril: Quake", value = TRUE)),
+                 hidden(checkboxInput(ns("chkinputprflood"), label = "Peril: Flood", value = TRUE)),
+                 hidden(checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = TRUE)),
+                 hidden(sliderInput(ns("sliderleakagefac"), label = "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5))))
     )
   )
 }
@@ -550,7 +544,7 @@ step3_configureOutput <- function(input, output, session,
   
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
-      index <- 1
+      index <- which(result$tbl_analysesData[,tbl_analysesData.AnaID] == result$anaID )
       logMessage("re-rendering analysis table")
       datatable(
         result$tbl_analysesData,
@@ -636,7 +630,6 @@ step3_configureOutput <- function(input, output, session,
     .defaultview()
     hide("panelAnalysisLogs")
     show("panelDefineOutputs")
-    .showPerils()
     logMessage("showing panelDefineOutputs")
     result$ana_flag <- "C"
   })
@@ -764,7 +757,6 @@ step3_configureOutput <- function(input, output, session,
     .defaultview()
     hide("panelAnalysisLogs")
     show("panelDefineOutputs")
-    .showPerils()
     logMessage("showing panelDefineOutputs")
     result$ana_flag <- "R"
     analysis_settings <- return_analyses_settings_file_list(result$anaID)
@@ -820,9 +812,9 @@ step3_configureOutput <- function(input, output, session,
   # Execute analysis
   onclick("abuttonexecuteanarun", {
     analysis_settingsList <- .gen_analysis_settings()
-
+    
     #write out file to be uploades
-    currfolder <- getOption("flamingo.settins.api.share_filepath")
+    currfolder <- getOption("flamingo.settings.api.share_filepath")
     dest <- file.path(currfolder, "analysis_settings.json")
     write_json(analysis_settingsList, dest, pretty = TRUE, auto_unbox = TRUE)
     
@@ -1013,7 +1005,7 @@ step3_configureOutput <- function(input, output, session,
       options = list(searchHighlight = TRUE)
     )
   }
-
+  
   .cancelAnaModal <- function(){
     ns <- session$ns
     modalDialog(label = "cancelAnaModal",
@@ -1047,6 +1039,12 @@ step3_configureOutput <- function(input, output, session,
                       selected = character(0))
   }
   
+  #utility function to swap names and values of a list
+  .SwapNamesValueInList <- function(List) {
+    L <- setNames(names(List), unlist(List) %>% as.vector() ) %>% as.list()
+    return(L)
+  }
+  
   # Clear other runtime params
   .clearotherparams <- function() {
     logMessage(".clearotherparams called")
@@ -1054,20 +1052,59 @@ step3_configureOutput <- function(input, output, session,
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
     modelID <- ifelse(modelID == "", -1,modelID)
-    tbl_modelsDetails <- return_models_id_resource_file_df(modelID)
+    tbl_modelsDetails <- return_models_id_resource_file_content(modelID)
     if (modelID != -1 && !is.null(tbl_modelsDetails)) {
-      eventSetChoices <- tbl_modelsDetails$content[grepl("EventSet", tbl_modelsDetails$resource)]
+      model_settings <- tbl_modelsDetails$model_settings
+      
+      names_settings <- list()
+      for (i in 1:length(model_settings)) {# i <- 1
+        names_settings[names(model_settings[[i]])] <- i
+      }
+      
+      event_set_id <- names_settings[names(names_settings) == "event_set"]$event_set
+      event_set_list <- model_settings[[event_set_id]]$event_set
+      event_set_default <- event_set_list$default
+      eventSetChoices <- .SwapNamesValueInList(event_set_list$values)
       updateSelectInput(session, "sinputeventset",
+                        selected = event_set_default,
                         choices = eventSetChoices)
-      occurrenceSetChoices <- tbl_modelsDetails$content[grepl("OccurrenceSet", tbl_modelsDetails$resource)]
+      
+      occurrence_set_id <- names_settings[names(names_settings) == "event_occurrence_id"]$event_occurrence_id
+      occurrence_set_list <- model_settings[[occurrence_set_id]]$event_occurrence_id
+      occurrence_set_default <- occurrence_set_list$default
+      occurrenceSetChoices <- .SwapNamesValueInList(occurrence_set_list$values)
       updateSelectInput(session, "sinputeventocc",
+                        selected = occurrence_set_default,
                         choices = occurrenceSetChoices)
+      
+      perils_list <- list("peril_wind" = "chkinputprwind",
+                          "peril_surge" = "chkinputprstsurge",
+                          "peril_quake" = "chkinputprquake",
+                          "peril_flood" = "chkinputprflood",
+                          "demand_surge" = "chkinputdsurge")
+      
+      model_perils <- names(names_settings)[grepl("peril", names(names_settings))]
+      
+      for (p in names(perils_list)) {
+        peril_id <- names_settings[names(names_settings) == p][[p]]
+        if (p %in% model_perils) {
+          show(perils_list[[p]])
+          updateCheckboxInput(session, perils_list[[p]], value = model_settings[[peril_id]][[p]]$default)
+        } else{
+          hide(perils_list[[p]])
+          updateCheckboxInput(session, perils_list[[p]], value = NULL)
+        }
+      }
+      
+      leackage_id <- names_settings[names(names_settings) == "leakage_factor"][["leakage_factor"]]
+      leackage_list <- model_settings[[leackage_id]]$leakage_factor
+      leackage_default <- leackage_list$default
+      leackage_max <- leackage_list$max
+      leackage_min <- leackage_list$min
+      show("sliderleakagefac")
+      updateSliderInput(session, "sliderleakagefac", value = leackage_default,
+                        min = leackage_min <- leackage_list$min, max = leackage_min <- leackage_list$max)
     }
-    updateCheckboxInput(session, "chkinputprwind", "Peril: Wind", value = TRUE)
-    updateCheckboxInput(session, "chkinputprstsurge", "Peril: Surge", value = TRUE)
-    updateCheckboxInput(session, "chkinputprquake", "Peril: Quake", value = TRUE)
-    updateCheckboxInput(session, "chkinputprflood", "Peril: Flood", value = TRUE)
-    updateCheckboxInput(session, "chkinputdsurge", "Demand Surge", value = TRUE)
   }
   
   # Clear checkboxgroups
@@ -1154,73 +1191,39 @@ step3_configureOutput <- function(input, output, session,
     .basicview()
   }
   
-  #Show available perils
-  # To-Do: retrieve perils from model. currently showing all
-  .showPerils <- function() {
-    logMessage(".showPerils called")
-    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
-    modelID <- ifelse(modelID == "", -1,modelID)
-    tbl_modelsDetails <- return_models_id_resource_file_df(modelID)
-    if (!is.null(tbl_modelsDetails)) {
-
-      leakIdx <- grepl("leakagefactor", tbl_modelsDetails$resource)
-      if (any(leakIdx) && as.logical(tbl_modelsDetails$content[leakIdx])) {
-        show("sliderleakagefac")
-      } else {
-        hide("sliderleakagefac")
-      }
-
-      perils <- list("perilwind" = "chkinputprwind",
-                     "perilsurge" = "chkinputprstsurge",
-                     "perilquake" = "chkinputprquake",
-                     "perilflood" = "chkinputprflood",
-                     "demandsurge" = "chkinputdsurge")
-      
-      for (p in names(perils)) {
-        periltype <- gsub("peril", "", p)
-        tbl_modelDetails_perils <- tbl_modelsDetails[grepl("peril", tolower(tbl_modelsDetails$resource)),]
-        perilIdx <- grepl(periltype, tolower(tbl_modelDetails_perils$content))
-        if (any(perilIdx)) {
-          show(perils[p])
-        } else{
-          hide(perils[p])
-        }
-      }
-    }
-  }
   
   #Generate Analysis settings file
   .gen_analysis_settings <- function(){
     
     logMessage(".gen_analysis_settings called")
-
+    
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
-    modelID <- ifelse(modelID == "", -1,modelID)
     modelData <- return_tbl_modelData(modelID)
     
     inputsettings <- list(
-      "analysis_tag" = as.integer(result$anaID),
-      "exposure_location" = "L:", #Depricated. ok hardcoded. will be removed soon
-      "gul_threshold" =  ifelse(is.null(input$tinputthreshold), 0 , as.integer(input$tinputthreshold)),
-      "model_version_id" = ifelse(is.null(modelData[[tbl_modelsData.ModelVersionId]]), "", modelData[[tbl_modelsData.ModelVersionId]]),
-      "module_supplier_id" = ifelse(is.null(modelData[[tbl_modelsData.ModelSupplierId]]), "", modelData[[tbl_modelsData.ModelSupplierId]]),
-      "number_of_samples" = ifelse(is.null(input$tinputnoofsample), 0, as.integer(input$tinputnoofsample)),
-      "prog_id" = ifelse(is.null(portfolioID()), -1, as.integer(portfolioID())),
-      "source_tag" = tolower( ifelse(is.null(modelData[[tbl_modelsData.ModelVersionId]]), "", modelData[[tbl_modelsData.ModelVersionId]])),
-      "gul_output" = ifelse(is.null(input$chkinputGUL), FALSE, input$chkinputGUL),
-      "il_output" = ifelse(is.null(input$chkinputIL), FALSE,input$chkinputIL),
-      "ri_output" = ifelse(is.null(input$chkinputRI), FALSE,input$chkinputRI),
-      "event_set" = toupper(ifelse(is.null(input$sinputeventset), "", strsplit(input$sinputeventset, "")[[1]][1])),
+      #analysisSettingsMapping
+      "analysis_tag" = as.integer(result$anaID), #potential new tag analysis_id
+      "exposure_location" = "L:", # hardcoded as depricated
+      "gul_threshold" = as.integer(input$tinputthreshold),
+      "model_version_id" = modelData[[tbl_modelsData.ModelNameId]], # potential new tag model_id
+      "module_supplier_id" = modelData[[tbl_modelsData.ModelSupplierId]], # potential new tag model_supplier_id
+      "number_of_samples" = as.integer(input$tinputnoofsample),
+      "prog_id" = as.integer(portfolioID()), # potential new tag `portfolio_id`
+      "source_tag" = getOption("flamingo.settings.oasis_environment"), # potential new tag environment_tag,
+      #modelSettingsMapping
+      "event_set" = input$sinputeventset,
       "peril_wind" = input$chkinputprwind,
       "demand_surge" = input$chkinputdsurge,
       "peril_quake" = input$chkinputprquake,
       "peril_flood" = input$chkinputprflood,
       "peril_surge" = input$chkinputprstsurge,
       "leakage_factor" = input$sliderleakagefac,
-      "use_random_number_file" = FALSE,  #Depricated. ok hardcoded. will be removed soon
-      "event_occurrence_file_id" =  input$sinputeventocc, # what here?
-      "summarycalc" = input$chkinputsummaryoption,
-      "return_period_file" = TRUE   #Depricated. ok hardcoded. will be removed soon
+      "event_occurrence_file_id" =  as.integer(input$sinputeventocc),
+      #outoutSettingsMappings
+      "gul_output" = input$chkinputGUL,
+      "il_output" = input$chkinputIL,
+      "ri_output" = input$chkinputRI,
+      "return_period_file" = TRUE  # currenlty hardcoded
     )
     
     outputsLossTypes <- list(
@@ -1230,12 +1233,11 @@ step3_configureOutput <- function(input, output, session,
     )
     
     #add summaries
-    if (input$chkinputsummaryoption){
+    if (input$chkinputsummaryoption) {
       for (l in names(outputsLossTypes)) {
         outputsLossTypes[[l]][["prog"]] <- unique(c(outputsLossTypes[[l]][["prog"]], ReportChoices))
       }
     }
-    
     analysis_settings <- construct_analysis_settings(inputsettings, outputsLossTypes)
     return(analysis_settings)
   }

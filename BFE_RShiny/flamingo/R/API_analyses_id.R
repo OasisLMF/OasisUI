@@ -19,7 +19,7 @@
 #' @export
 api_get_analyses_input_file <- function(id) {
   
-  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
   dest <- file.path(currfolder, paste0(id, "_inputs.tar"))
   extractFolder <- file.path(currfolder, paste0(id, "_inputs"))
   dir.create(extractFolder, showWarnings = FALSE)
@@ -74,7 +74,7 @@ api_get_analyses_input_file <- function(id) {
 #' @export
 
 return_analyses_input_file_df <- function(id) {
-  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_inputs"))
   if (!file.exists(extractFolder)) {
     api_get_analyses_input_file(id)
@@ -97,7 +97,7 @@ return_analyses_input_file_df <- function(id) {
 
 return_analyses_input_file_wicons_df <- function(id) {
   
-  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
   
   analyses_input_file_df <- return_analyses_input_file_df(id)
@@ -138,7 +138,7 @@ return_analyses_input_file_wicons_df <- function(id) {
 #' @export
 
 return_analyses_spec_input_file_df <- function(id, fileName) {
-  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
   filePath <- file.path(extractFolde, fileName)
   info <- file.info(filePath)
@@ -322,132 +322,159 @@ return_analyses_settings_file_list <- function(id){
 #' @export
 construct_analysis_settings <- function(inputsettings, outputsLossTypes){
   
-  .ifnullFALSE <- function(variable) {
-    ifelse(is.null(variable), FALSE, variable)
-  }
-  
-  .list_summary <- function(counter_id, oed_g, inputsettings, losstypeSettingsMapping){
-    list_summary <- data.frame("summarycalc" = inputsettings$summarycalc,
-                               "aalcalc" = .ifnullFALSE(losstypeSettingsMapping$aalcalc),
-                               "eltcalc" = .ifnullFALSE(losstypeSettingsMapping$eltcalc),
-                               "pltcalc" = .ifnullFALSE(losstypeSettingsMapping$pltcalc),
-                               "id" = counter_id,
-                               "oed_fields" = oed_g,
-                               "lec_output" = any(losstypeSettingsMapping),
-                               stringsAsFactors = FALSE
-    )
-  }
-  
-  .leccalc_outputs <- function(losstypeSettingsMapping) {
-    leccalcoutputs <- data.frame("full_uncertainty_aep" = .ifnullFALSE(losstypeSettingsMapping$full_uncertainty_aep),
-                                 "full_uncertainty_oep" = .ifnullFALSE(losstypeSettingsMapping$full_uncertainty_oep),
-                                 "wheatsheaf_aep" = .ifnullFALSE(losstypeSettingsMapping$wheatsheaf_aep),
-                                 "wheatsheaf_oep" = .ifnullFALSE(losstypeSettingsMapping$wheatsheaf_oep),
-                                 "wheatsheaf_mean_aep" = .ifnullFALSE(losstypeSettingsMapping$wheatsheaf_mean_aep),
-                                 "wheatsheaf_mean_oep" = .ifnullFALSE(losstypeSettingsMapping$wheatsheaf_mean_oep),
-                                 "sample_mean_aep" = .ifnullFALSE(losstypeSettingsMapping$sample_mean_aep),
-                                 "sample_mean_oep" = .ifnullFALSE(losstypeSettingsMapping$sample_mean_oep),
-                                 stringsAsFactors = FALSE
-    )
-  }
-  
   analysisSettingsMapping <- list(
-    "analysis_tag" = inputsettings$analysis_tag,
-    "exposure_location" = inputsettings$exposure_location,
-    "gul_threshold" = inputsettings$gul_threshold,
-    "model_version_id" = inputsettings$model_version_id,
-    "module_supplier_id" = inputsettings$module_supplier_id,
-    "number_of_samples" = inputsettings$number_of_samples,
-    "prog_id" = inputsettings$prog_id,
-    "source_tag" = inputsettings$source_tag
+    "analysis_tag" = list(
+      "path" = "analysis_settings",
+      "value" = inputsettings$analysis_tag
+    ),
+    "exposure_location" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$exposure_location
+    ),
+    "gul_threshold" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$gul_threshold
+    ),
+    "model_version_id"  = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$model_version_id
+    ),
+    "module_supplier_id" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$module_supplier_id
+    ),
+    "number_of_samples" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$number_of_samples
+    ),
+    "prog_id" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$prog_id
+    ),
+    "source_tag" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$source_tag
     )
-  
-  outoutSettingsMappings <- list(
-    "gul_output" = inputsettings$gul_output,
-    "il_output" = inputsettings$il_output,
-    "ri_output" = inputsettings$ri_output
   )
   
   modelSettingsMapping <- list(
-    "event_set" = inputsettings$event_set,
-    "peril_wind" = inputsettings$peril_wind,
-    "demand_surge" = inputsettings$demand_surge,
-    "peril_quake" = inputsettings$peril_quake,
-    "peril_flood" = inputsettings$peril_flood,
-    "peril_surge" = inputsettings$peril_surge,
-    "leakage_factor" = inputsettings$leakage_factor,
-    "use_random_number_file" = inputsettings$use_random_number_file,
-    "event_occurrence_file_id" = inputsettings$event_occurrence_file_id
+    "event_set" = list(
+      "path" = "model_settings",
+      "value" =  inputsettings$event_set
+    ),
+    "leakage_factor" = list(
+      "path" = "model_settings",
+      "value" =  inputsettings$leakage_factor
+    ),
+    "peril_wind" = list(
+      "path" = "model_settings",
+      "value" =  inputsettings$peril_wind
+    ),
+    "demand_surge" = list(
+      "path" = "model_settings",
+      "value" =  inputsettings$demand_surge
+    ),
+    "peril_quake" = list(
+      "path" = "model_settings",
+      "value" =  inputsettings$peril_quake
+    ),
+    "peril_flood" = list(
+      "path" = "model_settings",
+      "value" =  inputsettings$peril_flood
+    ),
+    "peril_surge" = list(
+      "path" = "model_settings",
+      "value" =  inputsettings$peril_surge
+    ),
+    "event_occurrence_file_id" = list(
+      "path" = "model_settings",
+      "value" =  inputsettings$event_occurrence_file_id
+    )
+  )
+  
+  outoutSettingsMappings <- list(
+    "gul_output" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$gul_output
+    ),
+    "il_output" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$il_output
+    ),
+    "ri_output" = list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings$ri_output
+    )
   )
   
   analysis_settings <- list(
-    "analysis_settings" = list(
-    )
+    "analysis_settings" = list()
   )
   
   analysis_settings$model_settings <- list()
   for (i in names(analysisSettingsMapping)) {
-    if (!is.null(analysisSettingsMapping[[i]])) {
-      analysis_settings$analysis_settings[i] <- analysisSettingsMapping[[i]]
+    if (!is.null(analysisSettingsMapping[[i]][["value"]])) {
+      analysis_settings$analysis_settings[i] <- analysisSettingsMapping[[i]][["value"]] 
     }
   }
   
   for (j in names(modelSettingsMapping)) {
-    if (!is.null(modelSettingsMapping[[j]])){
-      analysis_settings$model_settings[j] <- modelSettingsMapping[[j]]
+    if (!is.null(modelSettingsMapping[[j]][["value"]])) {
+      analysis_settings$model_settings[j] <- modelSettingsMapping[[j]][["value"]]
     }
   }
   
-  for (l in names(outoutSettingsMappings)) {
-    analysis_settings$analysis_settings[l] <- outoutSettingsMappings[[l]] 
-    if (!is.null(outoutSettingsMappings[[l]]) && outoutSettingsMappings[[l]]) {
-      losstype <- gsub( "_output", "", l)
-      losssummary <- paste0(losstype, "_summaries")
-      gran <- names(outputsLossTypes[[l]])
+  
+  for (l in names(outoutSettingsMappings)) { # l <- names(outoutSettingsMappings)[1]
+    losstype <- gsub( "_output", "", l)
+    losssummary <- paste0(losstype, "_summaries")
+    losstype_output <- outoutSettingsMappings[[l]][["value"]]
+    analysis_settings$analysis_settings[l] <- losstype_output
+    if (!is.null(losstype_output) && losstype_output) {
       counter_id <- 0
+      granularities <- names(outputsLossTypes[[l]])
       outputsLossType <- outputsLossTypes[[l]]
-      #define empty summary df
-      leccalc_outputs <-  data.frame("full_uncertainty_aep" = NULL,
-                                     "full_uncertainty_oep" = NULL,
-                                     "wheatsheaf_aep" = NULL,
-                                     "wheatsheaf_oep" = NULL,
-                                     "wheatsheaf_mean_aep" = NULL,
-                                     "wheatsheaf_mean_oep" = NULL,
-                                     "sample_mean_aep" = NULL,
-                                     "sample_mean_oep" = NULL,
-                                     stringsAsFactors = FALSE)
-      list_summary <- data.frame("summarycalc" = NULL,
-                                 "aalcalc" = NULL,
-                                 "eltcalc" = NULL,
-                                 "pltcalc" = NULL,
-                                 "id" = NULL,
-                                 "oed_fields" = NULL,
-                                 "lec_output" = NULL,
-                                 stringsAsFactors = FALSE
-      )
-      #loop over granularities
-      for (g in gran) {
+      list_summary <- list()
+      for (g in granularities) { #g <- granularities[1]
+        oed_g <- g # provide here oed field of granularity
         outputsLossTypeGran <- outputsLossType[[g]]
-        oed_g <- granToOed$oed[granToOed$outputlosstype == g] # provide here oed field of granularity
-        if (!is.null(outputsLossTypeGran)) {
-          counter_id <- counter_id + 1
-          losstypeSettingsMapping = list()
-          for (v in outputsLossTypeGran) {
-            losstypeSettingsMapping[varsdf$fields[which(varsdf$vars == v)]] = TRUE
-          }
-          leccalc_outputs <- rbind(leccalc_outputs, .leccalc_outputs(losstypeSettingsMapping))
-          list_summary <- rbind(list_summary, .list_summary(counter_id, oed_g, inputsettings, losstypeSettingsMapping))
+        counter_id <- counter_id + 1
+        losstypeSettingsMapping = list()
+        #construct list with all infor
+        for (v in outputsLossTypeGran) {
+          losstypeSettingsMapping[varsdf$fields[which(varsdf$vars == v)]] = TRUE
         }
+        list_summary_g <- list()
+        summary_g <- varsdf$fields[!varsdf$lec_output]
+        for (n in summary_g) {
+          if (!is.null(losstypeSettingsMapping[[n]]) && !is.null(losstypeSettingsMapping[[n]])) {
+            list_summary_g[n] <- losstypeSettingsMapping[[n]]
+          }
+        }
+        list_summary_g$id <- counter_id
+        list_summary_g$oed_fields <- oed_g
+        list_summary_g$lec_output <- any(losstypeSettingsMapping)
+        
+        list_leccalcoutputs_g <- list()
+        leccalcoutputs_g <- varsdf$fields[varsdf$lec_output]
+        for (m in leccalcoutputs_g) {
+          if (!is.null(losstypeSettingsMapping[[m]]) && !is.null(losstypeSettingsMapping[[m]])) {
+            list_leccalcoutputs_g[m] <- losstypeSettingsMapping[[m]]
+          }
+        }
+        
+        list_summary_g$leccalc$return_period_file <- inputsettings$return_period_file
+        if (length(list_leccalcoutputs_g) > 0) {
+          list_summary_g$leccalc$outputs <- list_leccalcoutputs_g  
+        }
+        
+        list_summary[[counter_id]] <-  list_summary_g
       }
-      #assemble summary element
-      leccal <- data.frame("return_period_file" = rep(inputsettings$return_period_file, counter_id),
-                           stringsAsFactors = FALSE)
-      leccal$outputs <- leccalc_outputs
-      list_summary$leccalc <- leccal
-      analysis_settings$analysis_settings[[losssummary]] <- list_summary
+      analysis_settings$analysis_settings[[losssummary]] <- list_summary 
     }
   }
-  return(analysis_settings)
+  
+  return(analysis_settings) 
 }
 
 
@@ -778,7 +805,7 @@ return_input_generation_traceback_file_df <- function(id){
 #' @export
 api_get_analyses_output_file <- function(id) {
   
-  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
   dest <- file.path(currfolder, paste0(id, "_outputs.tar"))
   extractFolder <- file.path(currfolder, paste0(id, "_output"))
   dir.create(extractFolder, showWarnings = FALSE)
@@ -832,7 +859,7 @@ api_get_analyses_output_file <- function(id) {
 #' @export
 
 return_analyses_output_file_df <- function(id) {
-  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_output/output"))
   if (!file.exists(extractFolder)) {
     api_get_analyses_output_file(id)
@@ -858,7 +885,7 @@ return_analyses_output_file_df <- function(id) {
 #' @export
 
 return_analyses_spec_output_file_df <- function(id, fileName) {
-  currfolder <- getOption("flamingo.settins.api.share_filepath")
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_output/output/"))
   filePath <- file.path(currfolder, paste0(id, "_output/output/", fileName))
   info <- file.info(filePath)
