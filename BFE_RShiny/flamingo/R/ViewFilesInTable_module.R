@@ -340,7 +340,7 @@ ViewFilesInTable <- function(input, output, session,
         filerows <- nrow(result$tbl_fileData)
       }
     } else {
-      currfolder <- getOption("flamingo.settins.api.share_filepath")
+      currfolder <- getOption("flamingo.settings.api.share_filepath")
       extractFolder <- file.path(currfolder, paste0(param(), folderpath))
       result$currfilepath <- file.path(extractFolder, result$currentFile)
       result$tbl_fileData <- fread(result$currfilepath )

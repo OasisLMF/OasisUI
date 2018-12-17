@@ -66,16 +66,6 @@ visualizationSBR <- function(input, output, session,
     result$preselPanel <- 3
   })
   
-  # Tab Summary ----------------------------------------------------------------
-  sub_modules$summary <- callModule(
-    summarytab,
-    id = "summarytab",
-    selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
-    portfolioID1 = reactive(sub_modules$defineID$selectPortfolioID()),
-    active = reactive({active() && input$tabsSBR == "tabsummary"}),
-    logMessage = logMessage)
-  
-  
   # Extract Output files for given anaID----------------------------------------
   observeEvent( sub_modules$defineID$selectAnaID(), {
     if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
@@ -90,6 +80,17 @@ visualizationSBR <- function(input, output, session,
       result$tbl_filesListDataana <- NULL
     }
   })
+  
+  # Tab Summary ----------------------------------------------------------------
+  sub_modules$summary <- callModule(
+    summarytab,
+    id = "summarytab",
+    selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
+    portfolioID1 = reactive(sub_modules$defineID$selectPortfolioID()),
+    tbl_filesListDataana1 <- reactive({result$tbl_filesListDataana}),
+    active = reactive({active() && input$tabsSBR == "tabsummary"}),
+    logMessage = logMessage)
+  
   
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(

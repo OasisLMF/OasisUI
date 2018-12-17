@@ -126,7 +126,6 @@ return_models_df <- function(supplier_id = ""){
 #' @export
 return_tbl_modelsData <- function(supplier_id = ""){
 
-  
   tbl_modelsData <- return_models_df(supplier_id) %>%
     as.data.frame()
   idx <- tbl_modelsData[[tbl_modelsData.ModelId]]
@@ -183,7 +182,5 @@ return_tbl_modelData <- function(id){
     as.data.frame()
     tbl_modelData[[tbl_modelsData.ModelCreated]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsData.ModelCreated]], format = "%d-%m-%YT%H:%M:%S"))
     tbl_modelData[[tbl_modelsData.ModelModified]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsData.ModelModified]], format = "%d-%m-%YT%H:%M:%S"))
-  tbl_modelData <- tbl_modelData %>%
-    arrange(desc(!! sym(tbl_modelsData.ModelId)))
   return(tbl_modelData)
 }

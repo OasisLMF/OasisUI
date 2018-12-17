@@ -67,7 +67,8 @@ APISettings <- APIgetenv(
 # options(flamingo.settings.api = api_init("localhost", "8000"))
 options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
 options(flamingo.settings.api.version = APISettings$version)
-options(flamingo.settins.api.share_filepath = APISettings$share_filepath)
+options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
+options(flamingo.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))
 
 loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
 tryCatch({
