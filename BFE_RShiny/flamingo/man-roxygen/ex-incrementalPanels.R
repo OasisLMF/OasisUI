@@ -51,7 +51,9 @@ if (interactive()) {
     all_panels <- callIncrementalPanelModules(
       panel_IDs, "start-panel", content_IDs,
       examplePanelUI,
-      headings = lapply(seq_len(n_panels), function(i) {flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))}),
+      headings = lapply(seq_len(n_panels), function(i) {
+        flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))
+      }),
       collapsible = TRUE, show = TRUE,
       ns = ns
     )

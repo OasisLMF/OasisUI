@@ -1,13 +1,16 @@
 Package: flamingo
-Version: 0.0.7
+Version: 0.1.0
 License: BSD-3-Clause + file LICENSE
-Date: 2017-11-07
-Title: Flamingo User Interface
-Description: This package provides an extensible implementation of an user interface
-  for modelling workflows: 'Flamingo'. The Flamingo interface is a web application
-  based on the popular Shiny framework.
-Author: Oasis LMF [aut, cre]
-Maintainer: Oasis LMF <support@oasislmf.org>
+Title: Oasis User Interface
+Description: This package provides an extensible implementation of a user
+  interface for modelling workflows. The interface is a web application based
+  on the popular Shiny framework.
+Authors@R: c(person("Oasis LMF", role = c("aut", "cre", "cph"),
+                    email = "support@oasislmf.org"),
+             person("Mirai Solutions GmbH", role = "ctr",
+                    email = "info@mirai-solutions.com"))
+LazyData: true
+NeedsCompilation: no
 Imports:
   utils,
   shiny,
@@ -30,8 +33,9 @@ Imports:
   tidyr
 Suggests:
   knitr,
-  testthat,
-  magrittr
+  testthat
 Encoding: UTF-8
+URL: https://oasislmf.github.io/, https://github.com/OasisLMF/OasisUI
+BugReports: https://github.com/OasisLMF/OasisUI/issues
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr

@@ -5,7 +5,7 @@
 #' @description Opens a new connection to the database, executes the given query
 #'   statement and then closes the connection again.
 #'
-#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
+#' @param dbSettings Setting object.
 #' @param statement Query statement to execute, e.g. as returned by
 #'   [buildDbQuery()].
 #' @param simplify If `TRUE`, a vector will be returned instead of a
