@@ -34,15 +34,15 @@ loginfo("testing logger", logger = "flamingo.module")
 logMessage <- function(msg) loginfo(msg, logger = "flamingo.module")
 
 ### flamingo database ----------------------------------------------------------
-dbSettings <- flamingoDB(
-  server = Sys.getenv("FLAMINGO_DB_IP"),
-  port = Sys.getenv("FLAMINGO_DB_PORT"),
-  database = Sys.getenv("FLAMINGO_DB_NAME"),
-  uid = Sys.getenv("FLAMINGO_DB_USERNAME"),
-  pwd = Sys.getenv("FLAMINGO_DB_PASSWORD")
-)
+# dbSettings <- flamingoDB(
+#   server = Sys.getenv("FLAMINGO_DB_IP"),
+#   port = Sys.getenv("FLAMINGO_DB_PORT"),
+#   database = Sys.getenv("FLAMINGO_DB_NAME"),
+#   uid = Sys.getenv("FLAMINGO_DB_USERNAME"),
+#   pwd = Sys.getenv("FLAMINGO_DB_PASSWORD")
+# )
 # timeout for DB connection (secs)
-dbSettings$timeout <- 10
+# dbSettings$timeout <- 10
 
 # tryCatch({
 #   conn <- do.call(DBI::dbConnect, dbSettings)
@@ -126,7 +126,7 @@ defaultSelectChoicesRI <- c(
   "FullUncAEP", "FullUncOEP"
 )
 
-varsdf <- data.frame(vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEPWheatsheaf', 'OEPWheatsheaf', 'MeanAEPWheatsheaf', 'MeanOEPWheatsheaf', 'SampleMeanAEP', 'SampleMeanOEP', 'AAL', 'PLT'), 
+varsdf <- data.frame(vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEPWheatsheaf', 'OEPWheatsheaf', 'MeanAEPWheatsheaf', 'MeanOEPWheatsheaf', 'SampleMeanAEP', 'SampleMeanOEP', 'AAL', 'PLT'),
                      fields = c('summarycalc', 'eltcalc', 'full_uncertainty_aep', 'full_uncertainty_oep', 'wheatsheaf_aep',  'wheatsheaf_oep', 'wheatsheaf_mean_aep', 'wheatsheaf_mean_oep', 'sample_mean_aep', 'sample_mean_oep',  'aalcalc', 'pltcalc'),
                      lec_output = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE),
                      stringsAsFactors = FALSE)

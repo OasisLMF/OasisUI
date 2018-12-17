@@ -193,7 +193,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
     # the user here is the logged in user, not the
     # currently selected user
 
-    result$permission <- flamingoDBCheckPermissions(dbSettings, user(), 905)
+    result$permission <- "R"
 
     if (length(result$permission) == 0) {
 

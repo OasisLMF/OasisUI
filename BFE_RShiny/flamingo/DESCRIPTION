@@ -15,7 +15,6 @@ Imports:
   htmlwidgets,
   httr,
   jsonlite,
-  odbc,
   DBI,
   shinyBS,
   shinyjs,
