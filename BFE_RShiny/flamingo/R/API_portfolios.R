@@ -328,7 +328,7 @@ return_tbl_portfoliosData <- function(name = ""){
       tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] , format = "%d-%m-%YT%H:%M:%S"))
       tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] , format = "%d-%m-%YT%H:%M:%S"))
     }
-    tbl_portfoliosData <- cbind(tbl_portfoliosData, data_frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", StatusProcessing, StatusCompleted)))
+    tbl_portfoliosData <- cbind(tbl_portfoliosData, data.frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", StatusProcessing, StatusCompleted)))
     
     tbl_portfoliosDetailsStatus <- tbl_portfoliosData  %>%
       select(-contains("file") ) %>% 
