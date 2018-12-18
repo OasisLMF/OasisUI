@@ -436,39 +436,41 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
       outputsLossType <- outputsLossTypes[[l]]
       list_summary <- list()
       for (g in granularities) { #g <- granularities[1]
-        oed_g <- g # provide here oed field of granularity
         outputsLossTypeGran <- outputsLossType[[g]]
-        counter_id <- counter_id + 1
-        losstypeSettingsMapping = list()
-        #construct list with all infor
-        for (v in outputsLossTypeGran) {
-          losstypeSettingsMapping[varsdf$fields[which(varsdf$vars == v)]] = TRUE
-        }
-        list_summary_g <- list()
-        summary_g <- varsdf$fields[!varsdf$lec_output]
-        for (n in summary_g) {
-          if (!is.null(losstypeSettingsMapping[[n]]) && !is.null(losstypeSettingsMapping[[n]])) {
-            list_summary_g[n] <- losstypeSettingsMapping[[n]]
+        if (!is.null(outputsLossTypeGran)){
+          oed_g <- g # provide here oed field of granularity
+          counter_id <- counter_id + 1
+          losstypeSettingsMapping = list()
+          #construct list with all infor
+          for (v in outputsLossTypeGran) {
+            losstypeSettingsMapping[varsdf$fields[which(varsdf$vars == v)]] = TRUE
           }
-        }
-        list_summary_g$id <- counter_id
-        list_summary_g$oed_fields <- oed_g
-        list_summary_g$lec_output <- any(losstypeSettingsMapping)
-        
-        list_leccalcoutputs_g <- list()
-        leccalcoutputs_g <- varsdf$fields[varsdf$lec_output]
-        for (m in leccalcoutputs_g) {
-          if (!is.null(losstypeSettingsMapping[[m]]) && !is.null(losstypeSettingsMapping[[m]])) {
-            list_leccalcoutputs_g[m] <- losstypeSettingsMapping[[m]]
+          list_summary_g <- list()
+          summary_g <- varsdf$fields[!varsdf$lec_output]
+          for (n in summary_g) {
+            if (!is.null(losstypeSettingsMapping[[n]]) && !is.null(losstypeSettingsMapping[[n]])) {
+              list_summary_g[n] <- losstypeSettingsMapping[[n]]
+            }
           }
+          list_summary_g$id <- counter_id
+          list_summary_g$oed_fields <- oed_g
+          list_summary_g$lec_output <- any(losstypeSettingsMapping)
+          
+          list_leccalcoutputs_g <- list()
+          leccalcoutputs_g <- varsdf$fields[varsdf$lec_output]
+          for (m in leccalcoutputs_g) {
+            if (!is.null(losstypeSettingsMapping[[m]]) && !is.null(losstypeSettingsMapping[[m]])) {
+              list_leccalcoutputs_g[m] <- losstypeSettingsMapping[[m]]
+            }
+          }
+          
+          list_summary_g$leccalc$return_period_file <- inputsettings$return_period_file
+          if (length(list_leccalcoutputs_g) > 0) {
+            list_summary_g$leccalc$outputs <- list_leccalcoutputs_g  
+          }
+          
+          list_summary[[counter_id]] <-  list_summary_g
         }
-        
-        list_summary_g$leccalc$return_period_file <- inputsettings$return_period_file
-        if (length(list_leccalcoutputs_g) > 0) {
-          list_summary_g$leccalc$outputs <- list_leccalcoutputs_g  
-        }
-        
-        list_summary[[counter_id]] <-  list_summary_g
       }
       analysis_settings$analysis_settings[[losssummary]] <- list_summary 
     }
@@ -1120,8 +1122,23 @@ api_post_analyses_run <- function(id) {
 #'
 #' @export
 return_analyses_run_df <- function(id){
+ 
+  .showname <- function(x){
+    if (length(x) > 1) {
+      y <- x$name
+    } else if (length(x) == 0) {
+      y <- "Not Available"
+    } else {
+      y <- x
+    }
+    return(y)
+  }
+  
   analyses_run <- api_post_analyses_run(id)
   analyses_runList <- content(analyses_run$result)
+  
+  analyses_runList <- lapply(analyses_runList,.showname)
+
   if (length(names(analyses_runList)) > 1) {
     analyses_run_df <- bind_rows(analyses_runList) %>%
       as.data.frame()

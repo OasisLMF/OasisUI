@@ -279,8 +279,23 @@ api_post_portfolios_create_analysis <- function(id, name, model) {
 #' 
 #' @export
 return_portfolios_df <- function(name = ""){
+  
+  .showname <- function(x){
+    if (length(x) > 1) {
+      y <- x$name
+    } else if (length(x) == 0) {
+      y <- "Not Available"
+    } else {
+      y <- x
+    }
+    return(y)
+  }
+  
   get_portfolios <- api_get_portfolios(name)
   portfoliosList <- content(get_portfolios$result)
+  
+  portfoliosList <- lapply(portfoliosList,function(x){lapply(x, .showname)})
+  
   portfolios_df <- bind_rows(portfoliosList) %>% #do.call("rbind", portfoliosList) %>% 
     as.data.frame()
   return(portfolios_df)
@@ -305,36 +320,26 @@ return_portfolios_df <- function(name = ""){
 #' @export
 return_tbl_portfoliosData <- function(name = ""){
   
-  #Help function to replace variable with icon
-  .replacewithIcon <- function(var){
-    var <- case_when(var %in% status_code_exist ~ StatusCompleted,
-                     var %in% status_code_notfound ~ StatusProcessing,
-                     var %notin% c(status_code_notfound, status_code_exist) ~ StatusFailed)
-    return(var)
-  }
-  
-  tbl_portfoliosData <- return_portfolios_df(name) %>%
-    select(-contains("file") ) %>% 
-    as.data.frame()
+  tbl_portfoliosData <- return_portfolios_df(name)
   if (nrow(tbl_portfoliosData) > 0) {
     idx <- tbl_portfoliosData[[tbl_portfoliosData.PortfolioID]]
     numpf <- length(idx)
-    status <- data.frame(status = rep(status_code_notfound, numpf))
     for (i in seq(numpf) ) {
-      id <- as.integer(idx[i])
-      get_portfolios_location_file <- api_get_portfolios_location_file(id)
-      status[i, "status"] <- toString(get_portfolios_location_file$result$status_code) %>% .replacewithIcon()
       tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] , format = "%d-%m-%YT%H:%M:%S"))
-      tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified], format = "%d-%m-%YT%H:%M:%S"))
+      tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] , format = "%d-%m-%YT%H:%M:%S"))
     }
-    tbl_portfoliosData <- cbind(tbl_portfoliosData, status) %>%
+    tbl_portfoliosData <- cbind(tbl_portfoliosData, data_frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", StatusProcessing, StatusCompleted)))
+    
+    tbl_portfoliosDetailsStatus <- tbl_portfoliosData  %>%
+      select(-contains("file") ) %>% 
+      arrange(desc(!! sym(tbl_portfoliosData.PortfolioID))) %>%
       as.data.frame()
-    tbl_portfoliosData <- tbl_portfoliosData %>%
-      arrange(desc(!! sym(tbl_portfoliosData.PortfolioID))) 
+
   } else {
-    tbl_portfoliosData <- NULL
+    tbl_portfoliosDetailsStatus <- NULL
   }
-  return(tbl_portfoliosData)
+  
+  return(tbl_portfoliosDetailsStatus)
 }
 
 #' Return Details Portfolio id Dataframe
@@ -352,8 +357,23 @@ return_tbl_portfoliosData <- function(name = ""){
 #' 
 #' @export
 return_portfolio_details_df <- function(id){
+  
+  .showname <- function(x){
+    if (length(x) > 1) {
+      y <- x$name
+    } else if (length(x) == 0) {
+      y <- "Not Available"
+    } else {
+      y <- x
+    }
+    return(y)
+  }
+  
   get_portfolio_details <- api_get_portfolios_id(id)
   portfolioDetailsList <- content(get_portfolio_details$result)
+  
+  portfolioDetailsList <- lapply(portfolioDetailsList, .showname)
+  
   portfolio_details_df <- bind_rows(portfolioDetailsList) %>% #do.call("rbind", portfoliosList) %>% 
     as.data.frame()
   return(portfolio_details_df)
@@ -370,43 +390,21 @@ return_portfolio_details_df <- function(id){
 #' @return dataframe of details of previously posted portfolio.
 #' 
 #' @importFrom dplyr select
-#' @importFrom dplyr case_when
 #' @importFrom dplyr contains
 #' @importFrom tidyr gather
 #' 
 #' @export
 return_tbl_portfolioDetails <- function(id){
   
-  #Help function to replace variable with icon
-  .replacewithIcon <- function(var){
-    var <- case_when(var %in% status_code_exist ~ StatusCompleted,
-                     var %in% status_code_notfound ~ StatusProcessing,
-                     var %notin% c(status_code_notfound, status_code_exist) ~ StatusFailed)
-    return(var)
-  }
-  
   tbl_portfolioDetails <- return_portfolio_details_df(id) %>%
     select(contains("file") ) %>% 
     as.data.frame()
-  #Replace files with Icons
-    #Location file
-    get_portfolios_location_file <- api_get_portfolios_location_file(id) 
-    tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioLoc]] <- toString(get_portfolios_location_file$result$status_code) %>%
-      .replacewithIcon()
-    #Account file
-    get_portfolios_accounts_file <- api_get_portfolios_accounts_file(id) 
-    tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioAcc]] <- toString(get_portfolios_accounts_file$result$status_code) %>%
-      .replacewithIcon()
-    #Reinsurance Info file
-    get_portfolios_reinsurance_info_file <- api_get_portfolios_reinsurance_info_file(id) 
-    tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioRIinfo]] <- toString(get_portfolios_reinsurance_info_file$result$status_code) %>%
-      .replacewithIcon()
-    #Reinsurance Source file
-    get_portfolios_reinsurance_source_file <- api_get_portfolios_reinsurance_source_file(id) 
-    tbl_portfolioDetails[[tbl_portfolioDetails.PortfolioRIsource]] <- toString(get_portfolios_reinsurance_source_file$result$status_code) %>%
-      .replacewithIcon()
+
   # reshape df
-  tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "status") %>%
+  tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "name")
+  # tbl_portfolioDetails <- tbl_portfolioDetails %>% mutate(status = ifelse( tbl_portfolioDetails$name == "Not Available", StatusProcessing, StatusCompleted)) %>%
+  tbl_portfolioDetails <-tbl_portfolioDetails  %>%
     as.data.frame()
+  
   return(tbl_portfolioDetails)
 }

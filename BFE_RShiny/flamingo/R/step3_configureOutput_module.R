@@ -812,7 +812,6 @@ step3_configureOutput <- function(input, output, session,
   # Execute analysis
   onclick("abuttonexecuteanarun", {
     analysis_settingsList <- .gen_analysis_settings()
-    
     #write out file to be uploades
     currfolder <- getOption("flamingo.settings.api.share_filepath")
     dest <- file.path(currfolder, "analysis_settings.json")
@@ -831,7 +830,7 @@ step3_configureOutput <- function(input, output, session,
     
     analyses_run <- return_analyses_run_df(result$anaID)
     
-    if (!is.null(analyses_run) && nrow(analyses_run) > 1) {
+    if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
       if (analyses_run[[tbl_analysesData.AnaStatus]] == "RUN_STARTED") {
         flamingoNotification(type = "message",
                              paste0("Analysis ", result$anaID ," is executing"))

@@ -63,7 +63,7 @@ panelCreateAnalysesTable <- function(id) {
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
              flamingoButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowanadetails, placement = "right")
-             )
+      )
     ),
     br(),
     fluidRow(
@@ -71,10 +71,10 @@ panelCreateAnalysesTable <- function(id) {
              flamingoButton(inputId = ns("abuttoncreateana"), label = "Create Analysis") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttoncreateana, placement = "right"),
              actionButton(ns("abuttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
-             ),
+      ),
       style = "margin-top: 10px;"
-      )
     )
+  )
 }
 
 #' panelAnalysisDetails
@@ -598,12 +598,12 @@ step2_chooseAnalysis <- function(input, output, session,
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
   })
-
+  
   onclick("buttonhidemodeldetails", {
     hide("panelModelDetails")
     logMessage("hiding panelModelDetails")
   })
-
+  
   output$dt_modelDetails <- renderDT(
     if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
       logMessage("re-rendering model details table")
@@ -620,13 +620,13 @@ step2_chooseAnalysis <- function(input, output, session,
     } else {
       .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$modelID ))
     })
-
+  
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
     modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ModelId]
     paste0('Resources of Model id ', modelId)
   })
-
+  
   #Hide panel if model id changes
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelModelDetails")
@@ -654,6 +654,7 @@ step2_chooseAnalysis <- function(input, output, session,
                            paste("Provide name for analysis creation."))
     }
     hide("panelModelTable")
+    hide("panelModelDetails")
   })
   
   # Show generated inputs ------------------------------------------------------
@@ -702,7 +703,8 @@ step2_chooseAnalysis <- function(input, output, session,
              result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] != StatusCompleted) {
           enable("abuttoncancelIG")
         }
-        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusReady) {
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusReady ||
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
           enable("abuttonpgotonextstep")
           enable("abuttonshowIG")
         }
