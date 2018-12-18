@@ -1,22 +1,20 @@
 # Location File ----------------------------------------------------------------
 #' Get portfolios location file
-#' 
+#'
 #' Gets the portfolios location_file contents
-#' 
+#'
 #' @rdname api_get_portfolios_location_file
-#' 
+#'
 #' @param id a unique integer value identifying this portfolio.
-#' 
-#' @return previously posted portfolios location files. 
-#' 
-#' @importFrom httr GET 
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' 
+#'
+#' @return previously posted portfolios location files.
+#'
+#' @importFrom httr GET
+#' @importFrom httr add_headers
+#'
 #' @export
 api_get_portfolios_location_file <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -25,42 +23,28 @@ api_get_portfolios_location_file <- function(id) {
     ),
     path = paste(get_version(), "portfolios", id, "location_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Post portfolios location file
-#' 
+#'
 #' Sets the portfolios location_file contents.
-#' 
+#'
 #' @rdname api_post_portfolios_location_file
-#' 
+#'
 #' @param id a unique integer value identifying this analysis.
 #' @param filepath_location path to the location file.
-#' 
-#' @return the posted portfolio location file. 
-#' 
-#' @importFrom httr POST 
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
+#'
+#' @return the posted portfolio location file.
+#'
+#' @importFrom httr POST
+#' @importFrom httr add_headers
 #' @importFrom httr upload_file
-#' 
+#'
 #' @export
 api_post_portfolios_location_file <- function(id, filepath_location) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -71,20 +55,8 @@ api_post_portfolios_location_file <- function(id, filepath_location) {
     encode = "multipart",
     path = paste(get_version(), "portfolios", id, "location_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Return location_file Dataframe
@@ -93,19 +65,16 @@ api_post_portfolios_location_file <- function(id, filepath_location) {
 #'
 #' @description Returns a dataframe of location_file
 #'
-#' @param id a unique integer value identifying the portfolio.
+#' @param id A unique integer value identifying the portfolio.
 #'
-#' @return dataframe of location_file
+#' @return Dataframe of location_file.
 #'
 #' @importFrom dplyr bind_rows
-#' @importFrom dplyr filter
-#' @importFrom dplyr sym
 #' @importFrom httr content
 #'
 #' @export
-return_location_file_df <- function(id){
-  get_location_file <- api_get_portfolios_location_file(id)
-  location_fileList <- content(get_location_file$result)
+return_location_file_df <- function(id) {
+  location_fileList <- content(api_get_portfolios_location_file(id)$result)
   if (is.null(names(location_fileList))) {
     location_file_df <- strsplit(location_fileList, split = "\n") %>%
       as.data.frame(stringsAsFactors = FALSE)
@@ -117,28 +86,24 @@ return_location_file_df <- function(id){
   return(location_file_df)
 }
 
-
 # Account File -----------------------------------------------------------------
 
 #' Get portfolios accounts file
-#' 
+#'
 #' Gets the portfolios accounts_file contents
-#' 
+#'
 #' @rdname api_get_portfolios_accounts_file
-#' 
+#'
 #' @param id a unique integer value identifying this portfolio.
-#' 
-#' @return the previously posted portfolio accounts file. 
-#' 
+#'
+#' @return the previously posted portfolio accounts file.
+#'
 #' @importFrom httr GET
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' @importFrom httr upload_file
-#' 
+#' @importFrom httr add_headers
+#'
 #' @export
 api_get_portfolios_accounts_file <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -147,41 +112,28 @@ api_get_portfolios_accounts_file <- function(id) {
     ),
     path = paste(get_version(), "portfolios", id, "accounts_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Post portfolios accounts file
-#' 
+#'
 #' Sets the portfolios accounts_file contents.
-#' 
+#'
 #' @rdname api_post_portfolios_accounts_file
-#' 
+#'
 #' @param id a unique integer value identifying this analysis.
 #' @param filepath_accounts path to accounts file.
-#' 
-#' @return the posted portfolio accounts file. 
-#' 
+#'
+#' @return the posted portfolio accounts file.
+#'
 #' @importFrom httr POST
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' 
+#' @importFrom httr add_headers
+#' @importFrom httr upload_file
+#'
 #' @export
 api_post_portfolios_accounts_file <- function(id, filepath_accounts) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -192,41 +144,26 @@ api_post_portfolios_accounts_file <- function(id, filepath_accounts) {
     encode = "multipart",
     path = paste(get_version(), "portfolios", id, "accounts_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Return accounts_file Dataframe
 #'
 #' @rdname return_accounts_file_df
 #'
-#' @description Returns a dataframe of accounts_file
+#' @description Returns a dataframe of accounts_file.
 #'
-#' @param id a unique integer value identifying the portfolio.
+#' @param id A unique integer value identifying the portfolio.
 #'
-#' @return dataframe of accounts_file
+#' @return Dataframe of accounts_file.
 #'
 #' @importFrom dplyr bind_rows
-#' @importFrom dplyr filter
-#' @importFrom dplyr sym
 #' @importFrom httr content
 #'
 #' @export
-return_accounts_file_df <- function(id){
-  get_accounts_file <- api_get_portfolios_accounts_file(id)
-  accounts_fileList <- content(get_accounts_file$result)
+return_accounts_file_df <- function(id) {
+  accounts_fileList <- content(api_get_portfolios_accounts_file(id)$result)
   if (is.null(names(accounts_fileList))) {
     accounts_file_df <- strsplit(accounts_fileList, split = "\n") %>%
       as.data.frame(stringsAsFactors = FALSE)
@@ -238,28 +175,24 @@ return_accounts_file_df <- function(id){
   return(accounts_file_df)
 }
 
-
 # Reinsurance Info File -------------------------------------------------------
 
 #' Get portfolios reinsurance info file
-#' 
+#'
 #' Gets the portfolios reinsurance_info_file contents
-#' 
+#'
 #' @rdname api_get_portfolios_reinsurance_info_file
-#' 
+#'
 #' @param id a unique integer value identifying this portfolio.
-#' 
-#' @return the previously posted portfolio reinsurance info file. 
-#' 
+#'
+#' @return the previously posted portfolio reinsurance info file.
+#'
 #' @importFrom httr GET
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' @importFrom httr upload_file
-#' 
+#' @importFrom httr add_headers
+#'
 #' @export
 api_get_portfolios_reinsurance_info_file <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -268,41 +201,28 @@ api_get_portfolios_reinsurance_info_file <- function(id) {
     ),
     path = paste(get_version(), "portfolios", id, "reinsurance_info_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Post portfolios reinsurance info file
-#' 
+#'
 #' Sets the portfolios reinsurance_info contents.
-#' 
+#'
 #' @rdname api_post_portfolios_reinsurance_info
-#' 
-#' @param id a unique integer value identifying this analysis.
-#' @param filepath_reinsurance_info path to reinsurance info file.
-#' 
-#' @return the posted portfolio reinsurance info file. 
-#' 
+#'
+#' @param id A unique integer value identifying this analysis.
+#' @param filepath_reinsurance_info Path to reinsurance info file.
+#'
+#' @return The posted portfolio reinsurance info file.
+#'
 #' @importFrom httr POST
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' 
+#' @importFrom httr add_headers
+#' @importFrom httr upload_file
+#'
 #' @export
 api_post_portfolios_reinsurance_info_file <- function(id, filepath_reinsurance_info) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -313,41 +233,26 @@ api_post_portfolios_reinsurance_info_file <- function(id, filepath_reinsurance_i
     encode = "multipart",
     path = paste(get_version(), "portfolios", id, "reinsurance_info_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
-#' Return reinsurance_info_file Dataframe
+#' Return reinsurance_info_file dataframe
 #'
 #' @rdname return_reinsurance_info_file_df
 #'
-#' @description Returns a dataframe of reinsurance_info_file
+#' @description Returns a dataframe of reinsurance_info_file.
 #'
-#' @param id a unique integer value identifying the portfolio.
+#' @param id A unique integer value identifying the portfolio.
 #'
-#' @return dataframe of reinsurance_info_file
+#' @return Dataframe of reinsurance_info_file.
 #'
 #' @importFrom dplyr bind_rows
-#' @importFrom dplyr filter
-#' @importFrom dplyr sym
 #' @importFrom httr content
 #'
 #' @export
-return_reinsurance_info_file_df <- function(id){
-  get_reinsurance_info_file <- api_get_portfolios_reinsurance_info_file(id)
-  reinsurance_info_fileList <- content(get_reinsurance_info_file$result)
+return_reinsurance_info_file_df <- function(id) {
+  reinsurance_info_fileList <- content(api_get_portfolios_reinsurance_info_file(id)$result)
   if (is.null(names(reinsurance_info_fileList))) {
     reinsurance_info_file_df <- strsplit(reinsurance_info_fileList, split = "\n") %>%
       as.data.frame(stringsAsFactors = FALSE)
@@ -362,24 +267,21 @@ return_reinsurance_info_file_df <- function(id){
 # Reinsurance Source File ------------------------------------------------------
 
 #' Get portfolios reinsurance source file
-#' 
+#'
 #' Gets the portfolios reinsurance_source_file contents
-#' 
+#'
 #' @rdname api_get_portfolios_reinsurance_source_file
-#' 
-#' @param id a unique integer value identifying this portfolio.
-#' 
-#' @return the previously posted portfolio reinsurance source file. 
-#' 
+#'
+#' @param id A unique integer value identifying this portfolio.
+#'
+#' @return The previously posted portfolio reinsurance source file.
+#'
 #' @importFrom httr GET
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' @importFrom httr upload_file
-#' 
+#' @importFrom httr add_headers
+#'
 #' @export
 api_get_portfolios_reinsurance_source_file <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -388,43 +290,28 @@ api_get_portfolios_reinsurance_source_file <- function(id) {
     ),
     path = paste(get_version(), "portfolios", id, "reinsurance_source_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
-
-
 #' Post portfolios reinsurance source file
-#' 
+#'
 #' Sets the portfolios reinsurance_source contents.
-#' 
+#'
 #' @rdname api_post_portfolios_reinsurance_source
-#' 
-#' @param id a unique integer value identifying this analysis.
-#' @param filepath_reinsurance_source path to reinsurance source file.
-#' 
-#' @return the posted portfolio reinsurance source file. 
-#' 
+#'
+#' @param id A unique integer value identifying this analysis.
+#' @param filepath_reinsurance_source Path to reinsurance source file.
+#'
+#' @return the posted portfolio reinsurance source file.
+#'
 #' @importFrom httr POST
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' 
+#' @importFrom httr add_headers
+#' @importFrom httr upload_file
+#'
 #' @export
 api_post_portfolios_reinsurance_source_file <- function(id, filepath_reinsurance_source) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -435,42 +322,26 @@ api_post_portfolios_reinsurance_source_file <- function(id, filepath_reinsurance
     encode = "multipart",
     path = paste(get_version(), "portfolios", id, "reinsurance_source_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
-
-#' Return reinsurance_source_file Dataframe
+#' Return reinsurance_source_file dataframe
 #'
 #' @rdname return_reinsurance_source_file_df
 #'
-#' @description Returns a dataframe of reinsurance_source_file
+#' @description Returns a dataframe of reinsurance_source_file.
 #'
-#' @param id a unique integer value identifying the portfolio.
+#' @param id A unique integer value identifying the portfolio.
 #'
-#' @return dataframe of reinsurance_source_file
+#' @return Dataframe of reinsurance_source_file.
 #'
 #' @importFrom dplyr bind_rows
-#' @importFrom dplyr filter
-#' @importFrom dplyr sym
 #' @importFrom httr content
 #'
 #' @export
-return_reinsurance_source_file_df <- function(id){
-  get_reinsurance_source_file <- api_get_portfolios_reinsurance_source_file(id)
-  reinsurance_source_fileList <- content(get_reinsurance_source_file$result)
+return_reinsurance_source_file_df <- function(id) {
+  reinsurance_source_fileList <- content(api_get_portfolios_reinsurance_source_file(id)$result)
   if (is.null(names(reinsurance_source_fileList))) {
     reinsurance_source_file_df <- strsplit(reinsurance_source_fileList, split = "\n") %>%
       as.data.frame(stringsAsFactors = FALSE)

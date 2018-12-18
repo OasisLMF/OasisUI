@@ -1,7 +1,3 @@
-# Flamingo Shiny
-#
-# (c) 2013-2017 Oasis LMF Ltd.
-# Software provided for early adopter evaluation only.
 ###############################################################################
 
 authUI <- function(WidthSide = 3, WidthMain = 9) {

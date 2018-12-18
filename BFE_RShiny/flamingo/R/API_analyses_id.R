@@ -18,12 +18,12 @@
 #'
 #' @export
 api_get_analyses_input_file <- function(id) {
-  
+
   currfolder <- getOption("flamingo.settings.api.share_filepath")
   dest <- file.path(currfolder, paste0(id, "_inputs.tar"))
   extractFolder <- file.path(currfolder, paste0(id, "_inputs"))
   dir.create(extractFolder, showWarnings = FALSE)
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -33,23 +33,12 @@ api_get_analyses_input_file <- function(id) {
     path = paste(get_version(), "analyses", id, "input_file", "", sep = "/"),
     write_disk(dest, overwrite = TRUE)
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
-  
+
+  api_handle_response(response)
+  # FIXME: where / why is response needed here?!
+
   untar(tarfile = dest, exdir = extractFolder)
-  
+
   #wait for untar to finish
   oldfileList <- NULL
   while (all.equal(oldfileList, list.files(extractFolder)) != TRUE) {
@@ -63,7 +52,7 @@ api_get_analyses_input_file <- function(id) {
 #'
 #' @rdname return_analyses_input_file_df
 #'
-#' @description Returns a dataframe of input files 
+#' @description Returns a dataframe of input files
 #'
 #' @param id a unique integer value identifying this analysis.
 #'
@@ -96,10 +85,10 @@ return_analyses_input_file_df <- function(id) {
 #' @export
 
 return_analyses_input_file_wicons_df <- function(id) {
-  
+
   currfolder <- getOption("flamingo.settings.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
-  
+
   analyses_input_file_df <- return_analyses_input_file_df(id)
   fnames <- analyses_input_file_df$files
   fnum <- length(fnames)
@@ -164,13 +153,10 @@ return_analyses_spec_input_file_df <- function(id, fileName) {
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
-#' @importFrom httr upload_file
 #'
 #' @export
 api_post_analyses_cancel <- function(id) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -181,20 +167,8 @@ api_post_analyses_cancel <- function(id) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "cancel", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 # Settings File ----------------------------------------------------------------
@@ -210,12 +184,10 @@ api_post_analyses_cancel <- function(id) {
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #'
 #' @export
 api_get_analyses_settings_file <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -224,20 +196,8 @@ api_get_analyses_settings_file <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "settings_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Post analysis settings file
@@ -253,13 +213,11 @@ api_get_analyses_settings_file <- function(id) {
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #' @importFrom httr upload_file
 #'
 #' @export
 api_post_analyses_settings_file <- function(id, filepath_settings) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -270,20 +228,8 @@ api_post_analyses_settings_file <- function(id, filepath_settings) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "settings_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Return ianalyses_settings_file List
@@ -321,7 +267,7 @@ return_analyses_settings_file_list <- function(id){
 #'
 #' @export
 construct_analysis_settings <- function(inputsettings, outputsLossTypes){
-  
+
   analysisSettingsMapping <- list(
     "analysis_tag" = list(
       "path" = "analysis_settings",
@@ -356,7 +302,7 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
       "value" =  inputsettings$source_tag
     )
   )
-  
+
   modelSettingsMapping <- list(
     "event_set" = list(
       "path" = "model_settings",
@@ -391,7 +337,7 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
       "value" =  inputsettings$event_occurrence_file_id
     )
   )
-  
+
   outoutSettingsMappings <- list(
     "gul_output" = list(
       "path" = "analysis_settings",
@@ -406,25 +352,25 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
       "value" =  inputsettings$ri_output
     )
   )
-  
+
   analysis_settings <- list(
     "analysis_settings" = list()
   )
-  
+
   analysis_settings$model_settings <- list()
   for (i in names(analysisSettingsMapping)) {
     if (!is.null(analysisSettingsMapping[[i]][["value"]])) {
-      analysis_settings$analysis_settings[i] <- analysisSettingsMapping[[i]][["value"]] 
+      analysis_settings$analysis_settings[i] <- analysisSettingsMapping[[i]][["value"]]
     }
   }
-  
+
   for (j in names(modelSettingsMapping)) {
     if (!is.null(modelSettingsMapping[[j]][["value"]])) {
       analysis_settings$model_settings[j] <- modelSettingsMapping[[j]][["value"]]
     }
   }
-  
-  
+
+
   for (l in names(outoutSettingsMappings)) { # l <- names(outoutSettingsMappings)[1]
     losstype <- gsub( "_output", "", l)
     losssummary <- paste0(losstype, "_summaries")
@@ -454,7 +400,7 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
         list_summary_g$id <- counter_id
         list_summary_g$oed_fields <- oed_g
         list_summary_g$lec_output <- any(losstypeSettingsMapping)
-        
+
         list_leccalcoutputs_g <- list()
         leccalcoutputs_g <- varsdf$fields[varsdf$lec_output]
         for (m in leccalcoutputs_g) {
@@ -462,19 +408,19 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
             list_leccalcoutputs_g[m] <- losstypeSettingsMapping[[m]]
           }
         }
-        
+
         list_summary_g$leccalc$return_period_file <- inputsettings$return_period_file
         if (length(list_leccalcoutputs_g) > 0) {
-          list_summary_g$leccalc$outputs <- list_leccalcoutputs_g  
+          list_summary_g$leccalc$outputs <- list_leccalcoutputs_g
         }
-        
+
         list_summary[[counter_id]] <-  list_summary_g
       }
-      analysis_settings$analysis_settings[[losssummary]] <- list_summary 
+      analysis_settings$analysis_settings[[losssummary]] <- list_summary
     }
   }
-  
-  return(analysis_settings) 
+
+  return(analysis_settings)
 }
 
 
@@ -492,12 +438,10 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes){
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #'
 #' @export
 api_get_analyses_input_errors_file <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -506,20 +450,8 @@ api_get_analyses_input_errors_file <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "input_errors_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Post analysis input_errors file
@@ -535,13 +467,11 @@ api_get_analyses_input_errors_file <- function(id) {
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #' @importFrom httr upload_file
 #'
 #' @export
 api_post_analyses_input_errors_file <- function(id, filepath_input_errors) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -552,20 +482,8 @@ api_post_analyses_input_errors_file <- function(id, filepath_input_errors) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "input_errors_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 # analysis input generation ----------------------------------------------------
@@ -582,13 +500,10 @@ api_post_analyses_input_errors_file <- function(id, filepath_input_errors) {
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
-#' @importFrom httr upload_file
 #'
 #' @export
 api_post_analyses_generate_inputs <- function(id) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -599,21 +514,8 @@ api_post_analyses_generate_inputs <- function(id) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "generate_inputs", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
-  
+
+  api_handle_response(response)
 }
 
 #' Cancel analysis input generation
@@ -628,13 +530,10 @@ api_post_analyses_generate_inputs <- function(id) {
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
-#' @importFrom httr upload_file
 #'
 #' @export
 api_post_analyses_cancel_generate_inputs <- function(id) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -645,22 +544,9 @@ api_post_analyses_cancel_generate_inputs <- function(id) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "cancel_generate_inputs", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
-}
 
+  api_handle_response(response)
+}
 
 # input generation traceback file ----------------------------------------------
 
@@ -676,12 +562,10 @@ api_post_analyses_cancel_generate_inputs <- function(id) {
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #'
 #' @export
 api_get_analyses_input_generation_traceback_file <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -690,20 +574,8 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "input_generation_traceback_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Post analysis input_generation_traceback file
@@ -719,13 +591,11 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #' @importFrom httr upload_file
 #'
 #' @export
 api_post_analyses_input_generation_traceback_file <- function(id, filepath_input_generation_traceback) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -736,20 +606,8 @@ api_post_analyses_input_generation_traceback_file <- function(id, filepath_input
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "input_generation_traceback_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Return input_generation_traceback_file Dataframe
@@ -804,12 +662,12 @@ return_input_generation_traceback_file_df <- function(id){
 #'
 #' @export
 api_get_analyses_output_file <- function(id) {
-  
+
   currfolder <- getOption("flamingo.settings.api.share_filepath")
   dest <- file.path(currfolder, paste0(id, "_outputs.tar"))
   extractFolder <- file.path(currfolder, paste0(id, "_output"))
   dir.create(extractFolder, showWarnings = FALSE)
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -819,36 +677,25 @@ api_get_analyses_output_file <- function(id) {
     path = paste(get_version(), "analyses", id, "output_file", "", sep = "/"),
     write_disk(dest, overwrite = TRUE)
   )
-  
+
   untar(tarfile = dest, exdir = extractFolder)
-  
-  #wait for untar to finish
+
+  # wait for untar to finish
   oldfileList <- NULL
   while (all.equal(oldfileList, list.files(extractFolder)) != TRUE) {
     oldfileList <- list.files(extractFolder)
     Sys.sleep(2)
   }
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  # FIXME: unclear how response relates to the above and what should be returned at all?!
+  api_handle_response(response)
 }
 
 #' Return analyses output files  Dataframe
 #'
 #' @rdname return_analyses_output_file_df
 #'
-#' @description Returns a dataframe of output files 
+#' @description Returns a dataframe of output files
 #'
 #' @param id a unique integer value identifying this analysis.
 #'
@@ -910,13 +757,11 @@ return_analyses_spec_output_file_df <- function(id, fileName) {
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #' @importFrom httr upload_file
 #'
 #' @export
 api_post_analyses_output_file <- function(id, filepath_output) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -927,20 +772,8 @@ api_post_analyses_output_file <- function(id, filepath_output) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "output_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 # run traceback file -----------------------------------------------------------
@@ -956,12 +789,10 @@ api_post_analyses_output_file <- function(id, filepath_output) {
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #'
 #' @export
 api_get_analyses_run_traceback_file <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -970,20 +801,8 @@ api_get_analyses_run_traceback_file <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "run_traceback_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Post analysis run_traceback file
@@ -999,13 +818,11 @@ api_get_analyses_run_traceback_file <- function(id) {
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #' @importFrom httr upload_file
 #'
 #' @export
 api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -1016,22 +833,9 @@ api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
     encode = "multipart",
     path = paste(get_version(), "analyses", id, "run_traceback_file", "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
-}
 
+  api_handle_response(response)
+}
 
 #' Return analyses_run_traceback_file Dataframe
 #'
@@ -1075,12 +879,10 @@ return_analyses_run_traceback_file_df <- function(id){
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #'
 #' @export
 api_post_analyses_run <- function(id) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -1089,20 +891,8 @@ api_post_analyses_run <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "run","", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Return analyses run Dataframe
@@ -1119,9 +909,8 @@ api_post_analyses_run <- function(id) {
 #' @importFrom httr content
 #'
 #' @export
-return_analyses_run_df <- function(id){
-  analyses_run <- api_post_analyses_run(id)
-  analyses_runList <- content(analyses_run$result)
+return_analyses_run_df <- function(id) {
+  analyses_runList <- content(api_post_analyses_run(id)$result)
   if (length(names(analyses_runList)) > 1) {
     analyses_run_df <- bind_rows(analyses_runList) %>%
       as.data.frame()

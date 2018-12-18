@@ -1,21 +1,6 @@
 ###############################################################################
-# Flamingo Shiny
-#
-# (c) 2013-2017 Oasis LMF Ltd.
-# Software provided for early adopter evaluation only.
-###############################################################################
-
 # note with shiny::runApp this statement isn't needed anymore
-#library(shiny, warn.conflicts = FALSE, quietly = TRUE)
-
-#library(httr)
-#suppressPackageStartupMessages(library(shinyjs, warn.conflicts = FALSE))
-#library(bsplus)
-#library(DT, warn.conflicts = FALSE)
-#library(DBI)
-#library(shinyWidgets)
-#library(dplyr, warn.conflicts = FALSE)
-#library(logging)
+# library(shiny, warn.conflicts = FALSE, quietly = TRUE)
 
 library(flamingo, warn.conflicts = FALSE)
 
@@ -33,41 +18,27 @@ loginfo("testing logger", logger = "flamingo.module")
 
 logMessage <- function(msg) loginfo(msg, logger = "flamingo.module")
 
-### flamingo database ----------------------------------------------------------
-# dbSettings <- flamingoDB(
-#   server = Sys.getenv("FLAMINGO_DB_IP"),
-#   port = Sys.getenv("FLAMINGO_DB_PORT"),
-#   database = Sys.getenv("FLAMINGO_DB_NAME"),
-#   uid = Sys.getenv("FLAMINGO_DB_USERNAME"),
-#   pwd = Sys.getenv("FLAMINGO_DB_PASSWORD")
-# )
-# timeout for DB connection (secs)
-# dbSettings$timeout <- 10
-
-# tryCatch({
-#   conn <- do.call(DBI::dbConnect, dbSettings)
-#   DBI::dbDisconnect(conn)
-#   loginfo("sucessfully connected to database", logger = "flamingo.module")
-# }, error = function(e) {
-#   logerror(paste("Could not connect to database:", e$message), logger = "flamingo.module")
-# })
+# timeout for connection (secs)
+# timeout <- 10
 
 # global parameter, number of milliseconds to wait before refreshing tables ----
 # (300000 == 5 mins)
 reloadMillis <- 300000
 
-# flamingo django API ----------------------------------------------------------
+### Django API -----------------------------------------------------------------
 APISettings <- APIgetenv(
-  server = Sys.getenv("API_IP"),
-  port = Sys.getenv("API_PORT"),
-  version = Sys.getenv("API_VERSION"),
-  share_filepath = Sys.getenv("API_SHARE_FILEPATH")
+  server = "API_IP",
+  port = "API_PORT",
+  version = "API_VERSION",
+  share_filepath = "API_SHARE_FILEPATH"
 )
 
 # options(flamingo.settings.api = api_init("localhost", "8000"))
 options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
+options(flamingo.settings.api.httptype = "application/json")
 options(flamingo.settings.api.version = APISettings$version)
 options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
+
 options(flamingo.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))
 
 loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
@@ -91,7 +62,7 @@ StatusFailed <- '<i class="fa fa-times-circle"></i>'
 StatusCompleted <- '<i class="fa fa-check-circle"></i>'
 StatusProcessing <- '<i class="fa fa-spinner"></i>'
 
-#Output options ----------------------------------------------------------------
+# Output options ----------------------------------------------------------------
 granularities <- c("LOB", "Location", "County","State", "Policy", "Portfolio")
 losstypes <- c("GUL", "IL", "RI")
 variables <- c("PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT")
@@ -181,7 +152,7 @@ plottypeslist <- list("loss per return period" = list("Variables" = c("LEC Full 
                                                   "xlabel" = c("Type"),
                                                   "ylabel" = c("Loss")
                             )#,
-                            # "Wheatsif violin plot" = list("Variables" = c("LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP"),
+                            # "Wheatsheaf violin plot" = list("Variables" = c("LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP"),
                             #                               "keycols" = c("loss"),
                             #                               "uncertaintycols" = c(),
                             #                               "referencecols" = c(),

@@ -1,7 +1,3 @@
-# Flamingo Shiny
-#
-# (c) 2013-2017 Oasis LMF Ltd.
-# Software provided for early adopter evaluation only.
 ###############################################################################
 
 # UI content that is rendered once the user has authenticated
@@ -9,7 +5,7 @@ source(file.path(".", "ui_auth.R"), local = TRUE)$value
 
 
 server <- function(input, output, session) {
-  
+
   #clean up folder upon login
   clean_downloadedData()
 
@@ -179,7 +175,7 @@ server <- function(input, output, session) {
   callModule(dynamicColumn, "main", reactive(result$WidthMain))
 
   observe(result$logout <- auth_modules$pageheader$logout())
-  
+
   # preselected panel
   observe({
     if (!is.null(auth_modules$visualizationSBR$preselPanel)) {

@@ -1,23 +1,21 @@
 # Models API Calls -------------------------------------------------------------
 
 #' Get models
-#' 
+#'
 #' Returns a list of model objects.
-#' 
+#'
 #' @rdname api_get_models
-#' 
+#'
 #' @param supplier_id the supplier ID for the model. Default is empty string.
-#' 
+#'
 #' @return previously posted models. . Default empty string returns all portfolios.
-#' 
+#'
 #' @importFrom httr GET
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' 
+#' @importFrom httr add_headers
+#'
 #' @export
 api_get_models <- function(supplier_id = "") {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -27,40 +25,26 @@ api_get_models <- function(supplier_id = "") {
     path = paste(get_version(), "models", "", sep = "/"),
     query = list(`supplier_id` = supplier_id)
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Get models id
-#' 
+#'
 #' Returns the specific model entry.
-#' 
+#'
 #' @rdname api_get_models_id
-#' 
+#'
 #' @param id a unique integer value identifying this analysis.
-#' 
-#' @return previously posted models id. 
-#' 
+#'
+#' @return previously posted models id.
+#'
 #' @importFrom httr GET
-#' @importFrom httr add_headers 
-#' @importFrom httr warn_for_status 
-#' @importFrom httr http_status
-#' 
+#' @importFrom httr add_headers
+#'
 #' @export
 api_get_models_id <- function(id) {
-  
+
   response <- GET(
     get_url(),
     config = add_headers(
@@ -69,60 +53,48 @@ api_get_models_id <- function(id) {
     ),
     path = paste(get_version(), "models", id, "", sep = "/")
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 # R functions calling Models API Calls -----------------------------------------
 
 #' Return Models Dataframe
-#' 
+#'
 #' @rdname return_models_df
-#' 
+#'
 #' @description Returns a dataframe of models
-#' 
+#'
 #' @param supplier_id the supplier ID for the model. Default is empty string.
-#' 
+#'
 #' @return dataframe of previously posted models. Default empty string returns all models.
-#' 
+#'
 #' @importFrom dplyr bind_rows
 #' @importFrom httr content
-#' 
+#'
 #' @export
 return_models_df <- function(supplier_id = ""){
   get_models <- api_get_models(supplier_id)
   modelsList <- content(get_models$result)
-  models_df <- bind_rows(modelsList) %>% 
+  models_df <- bind_rows(modelsList) %>%
     as.data.frame()
   return(models_df)
 }
 
 #' Return Models Data fot DT
-#' 
+#'
 #' @rdname return_tbl_modelsData
-#' 
+#'
 #' @description Returns a dataframe of models ready for being rendered as a data table
-#' 
+#'
 #' @param supplier_id the supplier ID for the model. Default is empty string.
-#' 
+#'
 #' @return dataframe of previously posted modelss. Default empty string returns all models.
-#' 
+#'
 #' @importFrom dplyr arrange
 #' @importFrom dplyr sym
 #' @importFrom dplyr desc
-#' 
+#'
 #' @export
 return_tbl_modelsData <- function(supplier_id = ""){
 
@@ -141,41 +113,41 @@ return_tbl_modelsData <- function(supplier_id = ""){
 
 
 #' Return Model Dataframe
-#' 
+#'
 #' @rdname return_model_df
-#' 
+#'
 #' @description Returns a dataframe of model
-#' 
+#'
 #' @param id the ID for the model.
-#' 
+#'
 #' @return dataframe of previously posted model.
-#' 
+#'
 #' @importFrom dplyr bind_rows
 #' @importFrom httr content
-#' 
+#'
 #' @export
 return_model_df <- function(id){
   get_model <- api_get_models_id(id)
   modelList <- content(get_model$result)
-  model_df <- bind_rows(modelList) %>% 
+  model_df <- bind_rows(modelList) %>%
     as.data.frame()
   return(model_df)
 }
 
 #' Return Model Data fot DT
-#' 
+#'
 #' @rdname return_tbl_modelData
-#' 
+#'
 #' @description Returns a dataframe of model ready for being rendered as a data table
-#' 
+#'
 #' @param id the ID for the model.
-#' 
+#'
 #' @return dataframe of previously posted model.
-#' 
+#'
 #' @importFrom dplyr arrange
 #' @importFrom dplyr sym
 #' @importFrom dplyr desc
-#' 
+#'
 #' @export
 return_tbl_modelData <- function(id){
   tbl_modelData <- return_model_df(id) %>%

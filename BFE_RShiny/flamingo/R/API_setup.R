@@ -1,30 +1,19 @@
-#' flamingoAPI
+#' Get API env vars
+#'
+#' Fetches values of environment variables and combines them conveniently in a
+#' list.
 #'
 #' @rdname APIgetenv
 #'
-#' @description Creates am api settings object which can then be used
-#' to create new connections to the Flamingo API
+#' @param ... Names of environment variables. If passed as named arguments, the
+#'   returned list will retain the same names.
 #'
-#' @param server API Host name.
-#' @param port API Host port.
-#' @param version API version.
-#' @param share_filepath path of shared location where to download files.
-#'
-#' @return A settings object (list).
+#' @return List of environment variables' values.
 #'
 #' @export
-APIgetenv <- function(server, port, version, share_filepath) {
-  
-  struct <- list(
-      server = server,
-      port = port,
-      version = version,
-      share_filepath = share_filepath)
-  
-  return(struct)
-  
+APIgetenv <- function(...) {
+  lapply(list(...), Sys.getenv)
 }
-
 
 #' API initialization
 #'
@@ -35,6 +24,8 @@ APIgetenv <- function(server, port, version, share_filepath) {
 #' @param host Host name.
 #' @param port Host port.
 #' @param scheme Communication scheme.
+#'
+#' @return List containing base API URL and parts.
 #'
 #' @export
 api_init <- function(host, port, scheme = c("http", "https")) {
@@ -49,6 +40,24 @@ api_init <- function(host, port, scheme = c("http", "https")) {
       url = paste0(scheme[1], "://", host, ":", port)
     ),
     class = c("apisettings")
+  )
+}
+
+logWarning <- warning
+
+#' @importFrom httr warn_for_status
+#' @importFrom httr http_status
+api_handle_response <- function(response) {
+  # re-route potential warning for logging
+  tryCatch(warn_for_status(response),
+           warning = function(w) logWarning(w$message))
+
+  structure(
+    list(
+      status = http_status(response)$category,
+      result = response
+    ),
+    class = c("apiresponse")
   )
 }
 
@@ -91,16 +100,16 @@ get_token <- function() {
   getOption("flamingo.settings.api.token")
 }
 
-#' Get access token
+#' Get refresh token
 #'
-#' Gets access token.
+#' Gets refresh token.
 #'
-#' @rdname get_access_token
+#' @rdname get_refresh_token
 #'
-#' @return Access token.
+#' @return Refresh token.
 #'
 #' @export
-get_access_token <- function() {
+get_refresh_token <- function() {
   getOption("flamingo.settings.api.refresh")
 }
 
@@ -119,67 +128,48 @@ get_http_type <- function() {
 
 #' Post refresh token
 #'
+#' Fetches a new access token from an existing refresh token.
+#'
 #' @rdname api_refresh_token
-#'
-#' @description Fetches a new refresh token from a username and password.
-#'
-#' @param user current user name
-#' @param pwd current user password
 #'
 #' @return List with API return status and response containing the new token.
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #'
 #' @export
-api_refresh_token <- function(user, pwd) {
+api_refresh_token <- function() {
 
   response <- POST(
     get_url(),
     config = add_headers(
-      Accept = get_http_type()
+      Accept = get_http_type(),
+      Authorization = sprintf("Bearer %s", get_refresh_token())
     ),
-    body = list(username = user, password = pwd),
     encode = "json",
     path = "refresh_token/"
   )
 
-  logWarning = warning
-
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+  api_handle_response(response)
 }
-
+#content(api_refresh_token()$result)$access_token
 #' Post access token
 #'
 #' Fetches a new access token from a username and password.
 #'
 #' @rdname api_access_token
 #'
-#' @return Response containing the new token.
-#' 
-#' @param user current user name
-#' @param pwd current user password
+#' @param user Username.
+#' @param pwd Password.
+#'
+#' @return List with API return status and response containing the new token.
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #'
 #' @export
 api_access_token <- function(user, pwd) {
-  
+
   response <- POST(
     get_url(),
     config = add_headers(
@@ -189,29 +179,17 @@ api_access_token <- function(user, pwd) {
     encode = "json",
     path = "access_token/"
   )
-  
-  logWarning = warning
-  
-  # re-route potential warning for logging
-  tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
-  
-  structure(
-    list(
-      status = http_status(response)$category,
-      result = response
-    ),
-    class = c("apiresponse")
-  )
+
+  api_handle_response(response)
 }
 
 #' Perform healthcheck
 #'
+#' Gets the current status of the api.
+#'
 #' @rdname api_get_healthcheck
 #'
-#' @description Gets the current status of the api.
-#'
-#' @return response containing status of API connection
+#' @return Response containing status of API connection.
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
