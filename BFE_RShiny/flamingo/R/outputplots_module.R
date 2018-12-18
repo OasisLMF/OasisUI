@@ -55,9 +55,10 @@ outputplots <- function(input, output, session,
   plotPanels <- callIncrementalPanelModules(
     panel_names, "flamingoIncrementalPanelOutput-0", content_IDs,
     panelOutputModuleUI,
-    headings = lapply(seq_len(n_panels), function(i) {flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))}),
-    collapsible = TRUE, show = TRUE,
-    ns = ns
+    headings = lapply(seq_len(n_panels), function(i) {
+      flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))
+    }),
+    collapsible = TRUE, show = TRUE, ns = ns
   )
   plotsubmodules <- lapply(seq_along(content_IDs), function(i) {
     callModule(panelOutputModule, content_IDs[i],
