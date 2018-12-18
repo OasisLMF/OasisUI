@@ -132,9 +132,9 @@ varsdf <- data.frame(vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEP
                      lec_output = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE),
                      stringsAsFactors = FALSE)
 
-granToOed <- data.frame(oed = c("summarycalc", "lob", "loc", "county","state", "policy", "prog"),
+granToOed <- data.frame(oed = c("summarycalc", "lob", "location", "county","state", "policy", "prog"),
                         gran = c("Full Sample", "LOB", "Location", "County","State", "Policy", "Portfolio"),
-                        outputlosstype = c("summarycalc", "lob", "loc", "county","state", "policy", "prog"),
+                        outputlosstype = c("summarycalc", "lob", "location", "county","state", "policy", "prog"),
                         stringsAsFactors = FALSE)
 
 modelResourcesdf <- data.frame(

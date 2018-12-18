@@ -317,6 +317,7 @@ summarytab <- function(input, output, session,
       for (v in 1:length(variables)) { #v <-1
         variable <- variables[v]
         fileName <- tbl_filesListDataana %>% 
+          filter(summary_level == "Portfolio") %>%
           filter(perspective == perspectives[p]) %>%
           filter(report == variable) %>%
           select(files)
@@ -338,10 +339,7 @@ summarytab <- function(input, output, session,
   }
   
   .getSummary <- function(selectAnaID, portfolioID) {
-    # if (!is.null(tbl_filesListDataana1())) {
-    #   browser()
-    # }
-    
+
     #analyses settings
     analysis_settings <- return_analyses_settings_file_list(selectAnaID)
     
