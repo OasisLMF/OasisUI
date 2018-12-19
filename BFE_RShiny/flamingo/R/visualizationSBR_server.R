@@ -87,7 +87,7 @@ visualizationSBR <- function(input, output, session,
     id = "summarytab",
     selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
     portfolioID1 = reactive(sub_modules$defineID$selectPortfolioID()),
-    tbl_filesListDataana1 <- reactive({result$tbl_filesListDataana}),
+    tbl_filesListDataana1 = reactive({result$tbl_filesListDataana}),
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)
   

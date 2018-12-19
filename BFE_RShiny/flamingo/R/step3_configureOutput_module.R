@@ -461,7 +461,9 @@ step3_configureOutput <- function(input, output, session,
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
-    result$anaID <- analysisID()
+    if (!is.null(analysisID())) {
+      result$anaID <- analysisID()
+    }
   })
   
   # Panels Visualization -------------------------------------------------------
@@ -724,6 +726,7 @@ step3_configureOutput <- function(input, output, session,
     #   .updateOutputConfig(analysis_settings)
     # }
     # Using analyses names to select the output configuration of a previously posted analyses
+    logMessage(paste0("input$sinoutputoptions changed to ",input$sinoutputoptions))
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
       anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
       anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
@@ -812,7 +815,6 @@ step3_configureOutput <- function(input, output, session,
   # Execute analysis
   onclick("abuttonexecuteanarun", {
     analysis_settingsList <- .gen_analysis_settings()
-    
     #write out file to be uploades
     currfolder <- getOption("flamingo.settings.api.share_filepath")
     dest <- file.path(currfolder, "analysis_settings.json")
@@ -831,7 +833,7 @@ step3_configureOutput <- function(input, output, session,
     
     analyses_run <- return_analyses_run_df(result$anaID)
     
-    if (!is.null(analyses_run) && nrow(analyses_run) > 1) {
+    if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
       if (analyses_run[[tbl_analysesData.AnaStatus]] == "RUN_STARTED") {
         flamingoNotification(type = "message",
                              paste0("Analysis ", result$anaID ," is executing"))
@@ -908,7 +910,7 @@ step3_configureOutput <- function(input, output, session,
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData)) {
+      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusFailed) {
           show("panelAnalysisLogs")
@@ -1111,7 +1113,7 @@ step3_configureOutput <- function(input, output, session,
   .clearchkboxgrp <- function(checkgrplist) {
     logMessage(".clearchkboxgrp called")
     for (i in checkgrplist) {
-      updateCheckboxGroupInput(session, inputId = i, selected = NULL)
+      updateCheckboxGroupInput(session, inputId = i, selected = "")
     }
   }
   
@@ -1122,7 +1124,7 @@ step3_configureOutput <- function(input, output, session,
       if (i == "chkgulprog") {
         defaultSelectChoices <- defaultSelectChoicesGUL
       } else {
-        defaultSelectChoices <- NULL
+        defaultSelectChoices <- ""
       }
       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
     }
@@ -1135,7 +1137,7 @@ step3_configureOutput <- function(input, output, session,
       if (i == "chkilprog" | i == "chkilpolicy") {
         defaultSelectChoices <- defaultSelectChoicesIL
       } else {
-        defaultSelectChoices <- NULL
+        defaultSelectChoices <- ""
       }
       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
     }
@@ -1143,12 +1145,11 @@ step3_configureOutput <- function(input, output, session,
   
   # Default output configuration options
   .defaultchkboxRIgrp <- function() {
-    logMessage(".defaultchkboxRIgrp called")
     for (i in checkrigrplist) {
       if (i == "chkriprog" | i == "chkripolicy") {
         defaultSelectChoices <- defaultSelectChoicesRI
       } else {
-        defaultSelectChoices <- NULL
+        defaultSelectChoices <- ""
       }
       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
     }
@@ -1246,13 +1247,13 @@ step3_configureOutput <- function(input, output, session,
   .updateOutputConfig <- function(analysis_settings){
     logMessage(".updateOutputConfig called")
     #clean checkboxes
+
     .clearchkboxgrp(checkgulgrplist)
     .clearchkboxgrp(checkilgrplist)
     .clearchkboxgrp(checkrigrplist)
-    
+
     #reduced list
     settings <- analysis_settings[["analysis_settings"]]
-    
     SettingsMapping <- list(
       "threshold"  = list(
         "inputId" = "tinputthreshold",
@@ -1260,12 +1261,12 @@ step3_configureOutput <- function(input, output, session,
         "SettingElement" = settings[["gul_threshold"]]
       )
     )
-    
+
     .updateWidget("threshold", SettingsMapping)
-    
-    gran <- c('prog', 'policy', 'state', 'county', 'loc', 'lob')
-    
-    for (L in tolower(losstypes)) {
+
+    gran <- granToOed$oed
+
+    for (L in tolower(losstypes)) { #L <- "GUL"
       l <- tolower(L)
       summary_settings <- settings[[paste0(l, "_summaries")]]
       sel_losstype <- settings[[paste0(l, "_output")]]
@@ -1278,8 +1279,8 @@ step3_configureOutput <- function(input, output, session,
           )
         )
         .updateWidget("chkinput", SummaryMapping)
-        
-        for (g in seq(length(summary_settings))) {
+
+        for (g in seq(length(summary_settings))) { #g <- 1
           curr_gran <- summary_settings[[g]]
           oed_gran <- granToOed$outputlosstype[granToOed$oed == curr_gran$oed_fields]
           chkgroup_name <- paste0("chk", l, oed_gran)
@@ -1298,7 +1299,7 @@ step3_configureOutput <- function(input, output, session,
                 )
               )
               .updateWidget("chkgroup", currchkGroupMapping)
-            } 
+            }
           }
         }
       }

@@ -62,6 +62,7 @@ summarytabUI <- function(id) {
 #' @param selectAnaID2 id of selected analysis
 #' @param portfolioID1 portfolio id associated with selected analysis
 #' @param portfolioID2 portfolio id associated with selected analysis
+#' @param tbl_filesListDataana1 dataframe of the output files
 #' @param compare logical indicating comparison
 #'
 #' @return list of tags
@@ -85,6 +86,7 @@ summarytab <- function(input, output, session,
                        selectAnaID2 = reactive(""),
                        portfolioID1 = reactive(""),
                        portfolioID2 = reactive(""),
+                       tbl_filesListDataana1 = NULL,
                        compare = FALSE,
                        active, logMessage = message) {
 
@@ -308,22 +310,27 @@ summarytab <- function(input, output, session,
   
 
   # Helper functions -----------------------------------------------------------
-  .getData <- function(id, filepattern, nonkeycols, variables) {
+  .returnData <- function(id, tbl_filesListDataana, filepattern, nonkeycols, variables) {
     perspectives <- c("gul", "il", "ri")
     DFList <- list()
-    for (p in 1:length(perspectives)) {
-      for (v in 1:length(variables)) {
-        if (variables[v] == "aal") {
-          fileName <- paste0(perspectives[p], "_S1_", filepattern, ".csv")
-        } else {
-          fileName <- paste0(perspectives[p], "_S1_", filepattern, "_", variables[v], ".csv")
-        }
-        output_file_df <- return_analyses_spec_output_file_df(id, fileName)
-        if (!is.null(output_file_df)) {
-          c <- length(DFList) + 1
-          DFList[[c]] <- output_file_df %>%
-            gather(key = variable, value = value, -nonkeycols) %>% 
-            mutate(variable = paste0(variable, ".", variables[v], ".",perspectives[p])) 
+    for (p in 1:length(perspectives)) { #p <- 1
+      for (v in 1:length(variables)) { #v <-1
+        variable <- variables[v]
+        fileName <- tbl_filesListDataana %>% 
+          filter(summary_level == "Portfolio") %>%
+          filter(perspective == perspectives[p]) %>%
+          filter(report == variable) %>%
+          select(files)
+        if (length(fileName$files) > 0) {
+          output_file_df <- return_analyses_spec_output_file_df(id, fileName$files %>% as.character())
+          if (!is.null(output_file_df)) {
+            c <- length(DFList) + 1
+            splitvar <- unlist(strsplit(variable, " "))
+            var <- splitvar[length(splitvar)]
+            DFList[[c]] <- output_file_df %>%
+              gather(key = variable, value = value, -nonkeycols) %>% 
+              mutate(variable = paste0(variable, ".",var, ".",perspectives[p])) 
+          }
         }
       }
     }
@@ -332,10 +339,12 @@ summarytab <- function(input, output, session,
   }
   
   .getSummary <- function(selectAnaID, portfolioID) {
+
     #analyses settings
     analysis_settings <- return_analyses_settings_file_list(selectAnaID)
+    
     #read aal files
-    AAL <- .getData(id = selectAnaID, filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("aal"))
+    AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
     if (!is.null(AAL)) {
       #infer params
       tiv <- AAL %>% 
@@ -360,8 +369,7 @@ summarytab <- function(input, output, session,
       plotAALtmp <- NULL
     }
     #read OEP & aEP files 
-    leccalc <- .getData(id = selectAnaID, filepattern = "leccalc_full_uncertainty", nonkeycols = c("summary_id", "return_period"),
-                        variables = c("aep", "oep"))
+    leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty", nonkeycols = c("summary_id", "return_period"),variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
         mutate(variable = paste0(variable, ".", return_period))

@@ -9,8 +9,8 @@ summarytabUI(id)
 
 summarytab(input, output, session, selectAnaID1 = reactive(""),
   selectAnaID2 = reactive(""), portfolioID1 = reactive(""),
-  portfolioID2 = reactive(""), compare = FALSE, active,
-  logMessage = message)
+  portfolioID2 = reactive(""), tbl_filesListDataana1 = NULL,
+  compare = FALSE, active, logMessage = message)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -24,6 +24,8 @@ summarytab(input, output, session, selectAnaID1 = reactive(""),
 \item{portfolioID1}{portfolio id associated with selected analysis}
 
 \item{portfolioID2}{portfolio id associated with selected analysis}
+
+\item{tbl_filesListDataana1}{dataframe of the output files}
 
 \item{compare}{logical indicating comparison}
 

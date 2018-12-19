@@ -135,8 +135,21 @@ api_post_analyses <- function(name, portfolio, model) {
 #'
 #' @export
 return_analyses_df <- function(name = ""){
+  .showname <- function(x){
+    if (length(x) > 1) {
+      y <- x$name
+    } else if (length(x) == 0) {
+      y <- "Not Available"
+    } else {
+      y <- x
+    }
+    return(y)
+  }
+  
   get_analyses <- api_get_analyses(name)
   analysesList <- content(get_analyses$result)
+  analysesList <- lapply(analysesList,function(x){lapply(x, .showname)})
+  
   analyses_df <- bind_rows(analysesList) %>%
     as.data.frame()
   return(analyses_df)
@@ -172,7 +185,6 @@ return_tbl_analysesData <- function(name = ""){
     if (!is.null(df)) {
       logMessage(paste0("replacing icons"))
       df <- df %>%
-        mutate(tatus = tolower(status)) %>%
         mutate(status = case_when(status %in% StatusGood ~ StatusCompleted,
                                   status %in% StatusBad ~ StatusFailed,
                                   status %in% StatusAvailable ~ StatusReady,
@@ -185,6 +197,7 @@ return_tbl_analysesData <- function(name = ""){
   tbl_analysesData <- return_analyses_df(name) %>%
     select(-contains("file") ) %>%
     as.data.frame()
+  
   if (nrow(tbl_analysesData) > 0) {
     idx <- tbl_analysesData[[tbl_analysesData.AnaID]]
     numpf <- length(idx)
@@ -221,8 +234,23 @@ return_tbl_analysesData <- function(name = ""){
 #'
 #' @export
 return_analyses_id_df <- function(id){
+  
+  .showname <- function(x){
+    if (length(x) > 1) {
+      y <- x$name
+    } else if (length(x) == 0) {
+      y <- "Not Available"
+    } else {
+      y <- x
+    }
+    return(y)
+  }
+  
   get_analyses_id <- api_get_analyses_id(id)
   analysesIdList <- content(get_analyses_id$result)
+
+  analysesIdList <- lapply(analysesIdList, .showname)
+  
   analyses_id_df <- bind_rows(analysesIdList) %>%
     as.data.frame()
   return(analyses_id_df)
