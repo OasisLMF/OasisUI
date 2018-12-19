@@ -7,7 +7,7 @@
 api_delete_portfolios_id(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this portfolio.}
+\item{id}{A unique integer value identifying this portfolio.}
 }
 \description{
 Delete portfolios by id

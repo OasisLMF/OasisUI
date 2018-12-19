@@ -7,10 +7,10 @@
 api_get_portfolios_id(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this portfolio}
+\item{id}{A unique integer value identifying this portfolio.}
 }
 \value{
-previously posted portfolios id.
+Previously posted portfolios id.
 }
 \description{
 Returns the specific portfolio entry.

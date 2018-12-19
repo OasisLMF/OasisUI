@@ -7,12 +7,12 @@
 api_access_token(user, pwd)
 }
 \arguments{
-\item{user}{current user name}
+\item{user}{Username.}
 
-\item{pwd}{current user password}
+\item{pwd}{Password.}
 }
 \value{
-Response containing the new token.
+List with API return status and response containing the new token.
 }
 \description{
 Fetches a new access token from a username and password.

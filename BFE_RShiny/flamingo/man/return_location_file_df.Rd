@@ -7,10 +7,10 @@
 return_location_file_df(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying the portfolio.}
+\item{id}{A unique integer value identifying the portfolio.}
 }
 \value{
-dataframe of location_file
+Dataframe of location_file.
 }
 \description{
 Returns a dataframe of location_file

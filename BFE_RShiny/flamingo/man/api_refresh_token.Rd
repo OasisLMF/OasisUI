@@ -4,16 +4,11 @@
 \alias{api_refresh_token}
 \title{Post refresh token}
 \usage{
-api_refresh_token(user, pwd)
-}
-\arguments{
-\item{user}{current user name}
-
-\item{pwd}{current user password}
+api_refresh_token()
 }
 \value{
 List with API return status and response containing the new token.
 }
 \description{
-Fetches a new refresh token from a username and password.
+Fetches a new access token from an existing refresh token.
 }

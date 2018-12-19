@@ -7,10 +7,10 @@
 api_post_portfolios(name)
 }
 \arguments{
-\item{name}{name of the portfolio.}
+\item{name}{Name of the portfolio.}
 }
 \value{
-the posted portfolio.
+The posted portfolio.
 }
 \description{
 Creates a portfolio based on the input data.

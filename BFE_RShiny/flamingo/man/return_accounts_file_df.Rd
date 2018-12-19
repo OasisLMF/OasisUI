@@ -7,11 +7,11 @@
 return_accounts_file_df(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying the portfolio.}
+\item{id}{A unique integer value identifying the portfolio.}
 }
 \value{
-dataframe of accounts_file
+Dataframe of accounts_file.
 }
 \description{
-Returns a dataframe of accounts_file
+Returns a dataframe of accounts_file.
 }

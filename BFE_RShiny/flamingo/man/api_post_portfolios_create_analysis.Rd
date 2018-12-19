@@ -7,14 +7,14 @@
 api_post_portfolios_create_analysis(id, name, model)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{name}{name of the portfolio.}
+\item{name}{Name of the portfolio.}
 
-\item{model}{id of model}
+\item{model}{Id of the model.}
 }
 \value{
-the posted portfolio analysis created.
+The posted portfolio analysis created.
 }
 \description{
 Creates an analysis object from the portfolio.

@@ -7,12 +7,12 @@
 api_put_portfolios_id(id, name)
 }
 \arguments{
-\item{id}{a unique integer value identifying this portfolio.}
+\item{id}{A unique integer value identifying this portfolio.}
 
-\item{name}{name of the portfolio.}
+\item{name}{Name of the portfolio.}
 }
 \value{
-the updated analysis.
+The updated analysis.
 }
 \description{
 Updates the specified analysis.

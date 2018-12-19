@@ -7,10 +7,10 @@
 api_get_portfolios_reinsurance_source_file(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this portfolio.}
+\item{id}{A unique integer value identifying this portfolio.}
 }
 \value{
-the previously posted portfolio reinsurance source file.
+The previously posted portfolio reinsurance source file.
 }
 \description{
 Gets the portfolios reinsurance_source_file contents

@@ -8,9 +8,9 @@ api_post_portfolios_reinsurance_source_file(id,
   filepath_reinsurance_source)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{filepath_reinsurance_source}{path to reinsurance source file.}
+\item{filepath_reinsurance_source}{Path to reinsurance source file.}
 }
 \value{
 the posted portfolio reinsurance source file.

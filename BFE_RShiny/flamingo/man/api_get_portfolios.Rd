@@ -7,10 +7,10 @@
 api_get_portfolios(name = "")
 }
 \arguments{
-\item{name}{name of the portfolio. Default empty string returns all portfolios.}
+\item{name}{Name of the portfolio. Default empty string returns all portfolios.}
 }
 \value{
-previously posted portfolios.
+Previously posted portfolios.
 }
 \description{
 Returns a list of portfolio objects.

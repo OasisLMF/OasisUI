@@ -7,7 +7,7 @@
 api_get_healthcheck()
 }
 \value{
-response containing status of API connection
+Response containing status of API connection.
 }
 \description{
 Gets the current status of the api.

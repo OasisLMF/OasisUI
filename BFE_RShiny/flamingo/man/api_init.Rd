@@ -13,6 +13,9 @@ api_init(host, port, scheme = c("http", "https"))
 
 \item{scheme}{Communication scheme.}
 }
+\value{
+List containing base API URL and parts.
+}
 \description{
 Builds API URL.
 }

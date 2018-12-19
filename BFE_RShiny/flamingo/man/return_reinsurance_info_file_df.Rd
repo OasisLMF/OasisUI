@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_portfolios_id.R
 \name{return_reinsurance_info_file_df}
 \alias{return_reinsurance_info_file_df}
-\title{Return reinsurance_info_file Dataframe}
+\title{Return reinsurance_info_file dataframe}
 \usage{
 return_reinsurance_info_file_df(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying the portfolio.}
+\item{id}{A unique integer value identifying the portfolio.}
 }
 \value{
-dataframe of reinsurance_info_file
+Dataframe of reinsurance_info_file.
 }
 \description{
-Returns a dataframe of reinsurance_info_file
+Returns a dataframe of reinsurance_info_file.
 }

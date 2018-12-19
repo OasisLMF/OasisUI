@@ -2,23 +2,18 @@
 % Please edit documentation in R/API_setup.R
 \name{APIgetenv}
 \alias{APIgetenv}
-\title{flamingoAPI}
+\title{Get API env vars}
 \usage{
-APIgetenv(server, port, version, share_filepath)
+APIgetenv(...)
 }
 \arguments{
-\item{server}{API Host name.}
-
-\item{port}{API Host port.}
-
-\item{version}{API version.}
-
-\item{share_filepath}{path of shared location where to download files.}
+\item{...}{Names of environment variables. If passed as named arguments, the
+returned list will retain the same names.}
 }
 \value{
-A settings object (list).
+List of environment variables' values.
 }
 \description{
-Creates am api settings object which can then be used
-to create new connections to the Flamingo API
+Fetches values of environment variables and combines them conveniently in a
+list.
 }

@@ -7,12 +7,12 @@
 api_post_portfolios_reinsurance_info_file(id, filepath_reinsurance_info)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{filepath_reinsurance_info}{path to reinsurance info file.}
+\item{filepath_reinsurance_info}{Path to reinsurance info file.}
 }
 \value{
-the posted portfolio reinsurance info file.
+The posted portfolio reinsurance info file.
 }
 \description{
 Sets the portfolios reinsurance_info contents.
