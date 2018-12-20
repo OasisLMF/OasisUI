@@ -120,41 +120,6 @@ api_post_analyses <- function(name, portfolio, model) {
 
 # R functions calling Analyses API Calls ---------------------------------------
 
-#' Return analyses Dataframe
-#'
-#' @rdname return_analyses_df
-#'
-#' @description Returns a dataframe of analyses
-#'
-#' @param name name of the analysis.
-#'
-#' @return dataframe of previously posted analyses Default empty string returns all analyses.
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_analyses_df <- function(name = ""){
-  .showname <- function(x){
-    if (length(x) > 1) {
-      y <- x$name
-    } else if (length(x) == 0) {
-      y <- "Not Available"
-    } else {
-      y <- x
-    }
-    return(y)
-  }
-  
-  get_analyses <- api_get_analyses(name)
-  analysesList <- content(get_analyses$result)
-  analysesList <- lapply(analysesList,function(x){lapply(x, .showname)})
-  
-  analyses_df <- bind_rows(analysesList) %>%
-    as.data.frame()
-  return(analyses_df)
-}
-
 #' Return analyses Data fot DT
 #'
 #' @rdname return_tbl_analysisData
@@ -185,76 +150,39 @@ return_tbl_analysesData <- function(name = ""){
     if (!is.null(df)) {
       logMessage(paste0("replacing icons"))
       df <- df %>%
-        mutate(status = case_when(status %in% StatusGood ~ StatusCompleted,
-                                  status %in% StatusBad ~ StatusFailed,
-                                  status %in% StatusAvailable ~ StatusReady,
-                                  status %notin% c(StatusBad, StatusGood, StatusAvailable) ~ StatusProcessing)) %>%
+        mutate(status = case_when(status %in% StatusGood ~ Status$Completed,
+                                  status %in% StatusBad ~ Status$Failed,
+                                  status %in% StatusAvailable ~ Status$Ready,
+                                  status %notin% c(StatusBad, StatusGood, StatusAvailable) ~ Status$Processing)) %>%
         as.data.frame()
     }
     df
   }
 
-  tbl_analysesData <- return_analyses_df(name) %>%
+  tbl_analysesData <- return_df(api_get_analyses, name) %>%
     select(-contains("file") ) %>%
     as.data.frame()
   
   if (nrow(tbl_analysesData) > 0) {
-    idx <- tbl_analysesData[[tbl_analysesData.AnaID]]
+    idx <- tbl_analysesData[[tbl_analysesDataNames$id]]
     numpf <- length(idx)
     for (i in seq(numpf) ) {
-      tbl_analysesData[i, tbl_analysesData.AnaCreated] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesData.AnaCreated] , format = "%d-%m-%YT%H:%M:%S"))
-      tbl_analysesData[i, tbl_analysesData.AnaModified] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesData.AnaModified], format = "%d-%m-%YT%H:%M:%S"))
+      tbl_analysesData[i, tbl_analysesDataNames$created] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesDataNames$created] , format = "%d-%m-%YT%H:%M:%S"))
+      tbl_analysesData[i, tbl_analysesDataNames$modified] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesDataNames$modified], format = "%d-%m-%YT%H:%M:%S"))
     }
     tbl_analysesData <- tbl_analysesData %>%
-      arrange(desc(!! sym(tbl_analysesData.AnaID))) %>%
+      arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
       .replaceWithIcons() %>%
-      select(c(!! sym(tbl_analysesData.AnaID), !! sym(tbl_analysesData.AnaName),
-               !! sym(tbl_analysesData.PortfolioID), !! sym(tbl_analysesData.ModelID),
-               !! sym(tbl_analysesData.AnaModified), !! sym (tbl_analysesData.AnaCreated),
-               !! sym(tbl_analysesData.AnaStatus)))
+      select(c(!! sym(tbl_analysesDataNames$id), !! sym(tbl_analysesDataNames$name),
+               !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
+               !! sym(tbl_analysesDataNames$modified), !! sym (tbl_analysesDataNames$created),
+               !! sym(tbl_analysesDataNames$status)))
   } else {
     tbl_analysesData <- NULL
   }
   return(tbl_analysesData)
 }
 
-
-#' Return analysis details Dataframe
-#'
-#' @rdname return_analyses_id_df
-#'
-#' @description Returns a dataframe of analysis details
-#'
-#' @param id a unique integer value identifying this analysis.
-#'
-#' @return dataframe of details of previously posted analysis
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_analyses_id_df <- function(id){
-  
-  .showname <- function(x){
-    if (length(x) > 1) {
-      y <- x$name
-    } else if (length(x) == 0) {
-      y <- "Not Available"
-    } else {
-      y <- x
-    }
-    return(y)
-  }
-  
-  get_analyses_id <- api_get_analyses_id(id)
-  analysesIdList <- content(get_analyses_id$result)
-
-  analysesIdList <- lapply(analysesIdList, .showname)
-  
-  analyses_id_df <- bind_rows(analysesIdList) %>%
-    as.data.frame()
-  return(analyses_id_df)
-}
 
 #' Return analysis Details fot DT
 #'
@@ -278,39 +206,43 @@ return_tbl_analysisdetails <- function(id){
 
   #Help function to replace variable with icon
   .replacewithIcon <- function(var){
-    var <- case_when(var %in% status_code_exist ~ StatusCompleted,
-                     var %in% status_code_notfound ~ StatusProcessing,
-                     var %notin% c(status_code_notfound, status_code_exist) ~ StatusFailed)
+    # Staus Code for files
+    status_code_exist <- 200
+    status_code_notfound <- 404
+    
+    var <- case_when(var %in% status_code_exist ~ Status$Completed,
+                     var %in% status_code_notfound ~ Status$Processing,
+                     var %notin% c(status_code_notfound, status_code_exist) ~ Status$Failed)
     return(var)
   }
 
-  tbl_analysisdetails <- return_analyses_id_df(id) %>%
+  tbl_analysisdetails <- return_df(api_get_analyses_id,id) %>%
     select(contains("file") ) %>%
     as.data.frame()
   #Replace files with Icons
     #Input File
     get_analyses_input_file <- api_get_analyses_input_file(id)
-    tbl_analysisdetails[[tbl_analysesData.AnaInputFile]] <- toString(get_analyses_input_file$result$status_code) %>%
+    tbl_analysisdetails[[tbl_analysesDataNames$input_file]] <- toString(get_analyses_input_file$result$status_code) %>%
       .replacewithIcon()
     #Setting File
     get_analyses_settings_file <- api_get_analyses_settings_file(id)
-    tbl_analysisdetails[[tbl_analysesData.AnaSettingFile]] <- toString(get_analyses_settings_file$result$status_code) %>%
+    tbl_analysisdetails[[tbl_analysesDataNames$settings_file]] <- toString(get_analyses_settings_file$result$status_code) %>%
       .replacewithIcon()
     #Input errors file
     get_analyses_input_errors_file <- api_get_analyses_input_errors_file(id)
-    tbl_analysisdetails[[tbl_analysesData.AnaInputErrFile]] <- toString(get_analyses_input_errors_file$result$status_code) %>%
+    tbl_analysisdetails[[tbl_analysesDataNames$input_errors_file]] <- toString(get_analyses_input_errors_file$result$status_code) %>%
       .replacewithIcon()
     #input generation traceback file
     get_analyses_input_generation_traceback_file <- api_get_analyses_input_generation_traceback_file(id)
-    tbl_analysisdetails[[tbl_analysesData.AnaInputGenTraceBackFile]] <- toString(get_analyses_input_generation_traceback_file$result$status_code) %>%
+    tbl_analysisdetails[[tbl_analysesDataNames$input_generation_traceback_file]] <- toString(get_analyses_input_generation_traceback_file$result$status_code) %>%
       .replacewithIcon()
     #output file
     get_analyses_input_file <- api_get_analyses_input_file(id)
-    tbl_analysisdetails[[tbl_analysesData.AnaOutputFile]] <- toString(get_analyses_input_file$result$status_code) %>%
+    tbl_analysisdetails[[tbl_analysesDataNames$output_file]] <- toString(get_analyses_input_file$result$status_code) %>%
       .replacewithIcon()
     #run traceback file
     get_analyses_run_traceback_file <- api_get_analyses_run_traceback_file(id)
-    tbl_analysisdetails[[tbl_analysesData.AnaRunTracebackFile]] <- toString(get_analyses_run_traceback_file$result$status_code) %>%
+    tbl_analysisdetails[[tbl_analysesDataNames$run_traceback_file]] <- toString(get_analyses_run_traceback_file$result$status_code) %>%
       .replacewithIcon()
   # reshape df
     tbl_analysisdetails <- gather(tbl_analysisdetails,  key = "files", value = "status") %>%

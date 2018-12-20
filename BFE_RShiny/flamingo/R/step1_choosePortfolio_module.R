@@ -293,7 +293,7 @@ step1_choosePortfolio <- function(input, output, session,
       enable("abuttondeletepf")
       enable("abuttonamendpf")
       enable("abuttonuploadsourcefiles")
-      if (result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status] == StatusCompleted) {
+      if (result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$status] == Status$Completed) {
         enable("abuttonpgotonextstep")
       }
     }
@@ -304,7 +304,7 @@ step1_choosePortfolio <- function(input, output, session,
     logMessage("re-rendering portfolio table")
     if (!is.null(result$tbl_portfoliosData)) {
       if (isolate(result$portfolioID) != "") {
-        rowToSelect <- match(isolate(result$portfolioID), result$tbl_portfoliosData[, tbl_portfoliosData.PortfolioID])
+        rowToSelect <- match(isolate(result$portfolioID), result$tbl_portfoliosData[, tbl_portfoliosDataNames$id])
       } else {
         rowToSelect <- 1
       }
@@ -337,8 +337,8 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Title Portfolio Details Panel
   output$paneltitle_pfDetails <- renderUI({
-    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
-    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName]
+    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
+    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
     paste0('Details of Portfolio id ', pfId, ' ', pfName)
   })
@@ -365,8 +365,8 @@ step1_choosePortfolio <- function(input, output, session,
     if (result$portfolio_flag == "C" || is.null(input$dt_Portfolios_rows_selected)) {
       "Create Portfolio"
     } else if (result$portfolio_flag == "A") {
-      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
-      pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName]
+      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
+      pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
       pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
       paste0('Amend Portfolio id ', pfId, ' ', pfName)
     }
@@ -428,7 +428,7 @@ step1_choosePortfolio <- function(input, output, session,
     } else if (result$portfolio_flag == "A") {
       idxSel <- input$dt_Portfolios_rows_selected
       pageSel <- ceiling(input$dt_Portfolios_rows_selected/pageLength)
-      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
+      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
       put_portfolios_id <- api_put_portfolios_id(id = pfId, name = input$tinputpfName)
       if (put_portfolios_id$status == "Success") {
         flamingoNotification(type = "message",
@@ -443,7 +443,7 @@ step1_choosePortfolio <- function(input, output, session,
     .reloadtbl_portfoliosData()
     logMessage(paste("updating dt_Portfolios select because portfolio table was reloaded"))
     if (result$portfolio_flag == "C") {
-      result$portfolioID <- result$tbl_portfoliosData[1, tbl_portfoliosData.PortfolioID]
+      result$portfolioID <- result$tbl_portfoliosData[1, tbl_portfoliosDataNames$id]
     }
     hide("panelDefinePortfolio")
   })
@@ -451,8 +451,8 @@ step1_choosePortfolio <- function(input, output, session,
   # Delete portfolio -----------------------------------------------------------
   # title for delete button
   output$pfdelmodal <- renderUI({
-    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
-    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName]
+    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
+    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     paste0('Delete portfolio id ', pfId, ' "', pfName,'"')
   })
 
@@ -483,8 +483,8 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelPortfolioDetails")
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
-    pfid <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
-    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName]
+    pfid <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
+    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     delete_portfolios_id <- api_delete_portfolios_id(pfid)
     if (delete_portfolios_id$status == "Success") {
       flamingoNotification(type = "message",
@@ -519,8 +519,8 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Link files to portfolio title
   output$paneltitle_linkFiles <- renderUI({
-    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
-    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName]
+    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
+    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
     if (result$portfolio_flag == "C") {
       paste0('Provide Inputs to portfolio id ', pfId, ' ', pfName)
@@ -538,7 +538,7 @@ step1_choosePortfolio <- function(input, output, session,
   # Upload Location/Account File
   .uploadSourceFile <- function(inFile, APIfunction, inputiconid){
     logMessage(paste0("Uploading file ", inFile$datapath))
-    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
+    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     if (!is.null(inFile$datapath)) {
       post_file <- APIfunction(pfId, inFile$datapath)
       if (post_file$status == "Success") {
@@ -578,7 +578,7 @@ step1_choosePortfolio <- function(input, output, session,
       logMessage(paste0("updating portfolioID choices because portfolio table was reloaded - contains ", nrow(result$tbl_portfoliosData), " rows"))
       if (result$portfolioID == "") {
         # initial selection last portfolio created
-        pfID <- result$tbl_portfoliosData[1, tbl_portfoliosData.PortfolioID]
+        pfID <- result$tbl_portfoliosData[1, tbl_portfoliosDataNames$id]
       } else {
         # keep current selection
         pfID <- result$portfolioID
@@ -593,7 +593,7 @@ step1_choosePortfolio <- function(input, output, session,
       pfID <- ""
 
       if (!is.null(input$dt_Portfolios_rows_selected)) {
-        pfID <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
+        pfID <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
       }
 
       if (result$portfolioID != pfID) {
@@ -602,7 +602,7 @@ step1_choosePortfolio <- function(input, output, session,
         logMessage(paste("updating dt_Portfolios select because portfolioID changed to", result$portfolioID))
         if (result$portfolioID != "") {
           if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0 && !bl_dirty ) {
-            rowToSelect <- match(result$portfolioID, result$tbl_portfoliosData[, tbl_portfoliosData.PortfolioID])
+            rowToSelect <- match(result$portfolioID, result$tbl_portfoliosData[, tbl_portfoliosDataNames$id])
             pageSel <- ceiling(rowToSelect/pageLength)
             #backward propagation
             if (is.null(input$dt_Portfolios_rows_selected)) {
@@ -645,10 +645,10 @@ step1_choosePortfolio <- function(input, output, session,
 
       if (length(input$dt_Portfolios_rows_selected) > 0) {
         # note that dt_Portfolios allows single row selection only
-        pfID <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
+        pfID <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
         # #If incomplete show panel to link files
-        currStatus <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.Status]
-        if (!is.na(currStatus) && currStatus == StatusProcessing) {
+        currStatus <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$status]
+        if (!is.na(currStatus) && currStatus == Status$Processing) {
           .clearUploadFiles()
           show("panelLinkFiles")
         }
@@ -696,7 +696,7 @@ step1_choosePortfolio <- function(input, output, session,
   .reloadtbl_portfolioDetails <- function() {
     logMessage(".reloadtbl_portfolioDetails called")
     if (length(input$dt_Portfolios_rows_selected) > 0) {
-      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioID]
+      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
       result$tbl_portfolioDetails  <- return_tbl_portfolioDetails(pfId)
       logMessage("portfolio details table refreshed")
     } else {
@@ -745,7 +745,7 @@ step1_choosePortfolio <- function(input, output, session,
   .updatePortfolioName <- function() {
     logMessage(".updatePortfolioName called")
     updateTextInput(session, "tinputpfName",
-                    value = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosData.PortfolioName])
+                    value = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name])
   }
 
   # Model Outout ---------------------------------------------------------------

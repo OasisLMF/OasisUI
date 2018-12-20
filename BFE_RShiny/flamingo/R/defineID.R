@@ -118,7 +118,7 @@ defineID <- function(input, output, session,
   observeEvent(input$chooseAnaID, {
     tbl_analysesData  <- return_tbl_analysesData()
     result$tbl_analysesData <- tbl_analysesData  %>%
-      filter(!! sym(tbl_analysesData.AnaStatus) == StatusCompleted)
+      filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
     showModal(AnaList)
   })
 
@@ -150,9 +150,9 @@ defineID <- function(input, output, session,
   #Find row of anaid preselected in landing page
   observeEvent({
     preselAnaId()},{
-      idx <- which(result$tbl_analysesData[,tbl_analysesData.AnaID] == preselAnaId())
-      status <- result$tbl_analysesData[idx,  tbl_analysesData.AnaStatus]
-      if (length(idx) > 0 && status == StatusCompleted){
+      idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == preselAnaId())
+      status <- result$tbl_analysesData[idx,  tbl_analysesDataNames$status]
+      if (length(idx) > 0 && status == Status$Completed){
         result$LProw <- idx
       }
     })
@@ -160,9 +160,9 @@ defineID <- function(input, output, session,
   #Find row of anaid preselected in model analysis server step 3
   observeEvent({
     anaID()},{
-      idx <- which(result$tbl_analysesData[, tbl_analysesData.AnaID] ==  anaID())
-      status <- result$tbl_analysesData[idx,  tbl_analysesData.AnaStatus]
-      if (length(idx) > 0 && status == StatusCompleted){
+      idx <- which(result$tbl_analysesData[, tbl_analysesDataNames$id] ==  anaID())
+      status <- result$tbl_analysesData[idx,  tbl_analysesDataNames$status]
+      if (length(idx) > 0 && status == Status$Completed){
         result$SArow <- idx
       }
     })
@@ -192,9 +192,9 @@ defineID <- function(input, output, session,
     currName <- ""
     currpfId <- ""
     if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
-      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaID]
-      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaName]
-      currpfId <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.PortfolioID]
+      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$id]
+      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$name]
+      currpfId <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$portfolio]
     }
     result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
@@ -232,8 +232,8 @@ defineID <- function(input, output, session,
     if (is.null(sub_modules$flamingo_analyses$rows_selected()) || is.na(sub_modules$flamingo_analyses$rows_selected())) {
       info <- ("missing")
     } else {
-      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaID]
-      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesData.AnaName]
+      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$id]
+      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$name]
       info <- paste0(currid, ' "' ,currName, '"  ')
     }
     info

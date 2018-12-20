@@ -49,8 +49,6 @@ pageheaderUI <- function(id) {
 #' @template params-logMessage
 #' @template params-active
 #' 
-#' @param reloadMillis Amount of time to wait between table updates;
-#' see \link{invalidateLater}.
 #' @param user reactive expression yielding user name
 #'
 #' @return For \code{pageheader()}, list of reactives:
@@ -61,8 +59,7 @@ pageheaderUI <- function(id) {
 #' @importFrom shinyWidgets toggleDropdownButton
 #'
 #' @export
-pageheader <- function(input, output, session, user,
-                       reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
+pageheader <- function(input, output, session, user, logMessage = message, active = reactive(TRUE)) {
   
   ns <- session$ns
   

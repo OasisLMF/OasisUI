@@ -45,9 +45,6 @@ landingPageUI <- function(id) {
 #' @template params-logMessage
 #' @template params-active
 #'
-#' @param reloadMillis Amount of time to wait between table updates;
-#' see \link{invalidateLater}.
-#'
 #' @return For \code{landingPage()}, list of reactives:
 #' \itemize{
 #' 		\item{\code{anaid}: }{id of selected analysis or -1 if nothing is selected}
@@ -61,10 +58,14 @@ landingPageUI <- function(id) {
 #' @importFrom data.table fwrite
 #'
 #' @export
-landingPage <- function(input, output, session,
-                        reloadMillis = 10000, logMessage = message, active = reactive(TRUE)) {
+landingPage <- function(input, output, session, logMessage = message, active = reactive(TRUE)) {
 
   # Reactive Values and parameters ---------------------------------------------
+  
+  # parameter, number of milliseconds to wait before refreshing tables
+  # (300000 == 5 mins)
+  reloadMillis <- 300000
+  
   navigation_state <- reactiveNavigation()
 
   result <- reactiveValues(
@@ -125,7 +126,7 @@ landingPage <- function(input, output, session,
 
   # Delete analysis ------------------------------------------------------------
   onclick("abuttondelana", {
-    analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesData.AnaID]
+    analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
     delete_analyses_id <- api_delete_analyses_id(analysisID)
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
@@ -141,7 +142,7 @@ landingPage <- function(input, output, session,
   observeEvent(input$dt_anaInbox_rows_selected, ignoreNULL = FALSE, {
     if (length(input$dt_anaInbox_rows_selected) > 0) {
       enable("abuttondelana")
-      if (result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
+      if (result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
         enable("abuttongotoana") 
       }
     } else {

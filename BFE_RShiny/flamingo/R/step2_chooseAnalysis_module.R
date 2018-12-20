@@ -362,7 +362,7 @@ step2_chooseAnalysis <- function(input, output, session,
   
   observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
     if (!is.null(input$dt_analyses_rows_selected)) {
-      result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+      result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     } else {
       result$analysisID <- ""
     }
@@ -387,7 +387,7 @@ step2_chooseAnalysis <- function(input, output, session,
     }
     anaid <- result$analysisID
     .reloadAnaData()
-    idxSel <- match(anaid, result$tbl_analysesData[, tbl_analysesData.AnaID])
+    idxSel <- match(anaid, result$tbl_analysesData[, tbl_analysesDataNames$id])
     pageSel <- ceiling(idxSel/pageLength)
     selectRows(dataTableProxy("dt_analyses"), idxSel)
     selectPage(dataTableProxy("dt_analyses"), pageSel)
@@ -399,8 +399,8 @@ step2_chooseAnalysis <- function(input, output, session,
   })
   
   output$cancelIGModaltitle <- renderUI({
-    AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
-    AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+    AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
     paste0('Cancel ', AnaId, ' ', AnaName)
   })
   
@@ -433,7 +433,7 @@ step2_chooseAnalysis <- function(input, output, session,
   observeEvent(input$abuttonConfirmDelIG, {
     removeModal()
     
-    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     delete_analyses_id <- api_post_analyses_cancel_generate_inputs(analysisID)
     
     if (delete_analyses_id$status == "Success") {
@@ -446,7 +446,7 @@ step2_chooseAnalysis <- function(input, output, session,
     
     anaid <- result$analysisID
     .reloadAnaData()
-    idxSel <- match(anaid, result$tbl_analysesData[, tbl_analysesData.AnaID])
+    idxSel <- match(anaid, result$tbl_analysesData[, tbl_analysesDataNames$id])
     pageSel <- ceiling(idxSel/pageLength)
     selectRows(dataTableProxy("dt_analyses"), idxSel)
     selectPage(dataTableProxy("dt_analyses"), pageSel)
@@ -489,7 +489,7 @@ step2_chooseAnalysis <- function(input, output, session,
   #  panelAnalysisDetails Table title
   output$paneltitle_panelAnalysisDetails <- renderUI({
     if (result$analysisID != "") {
-      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       paste0('Details of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
       paste0("Analysis Details")
@@ -533,7 +533,7 @@ step2_chooseAnalysis <- function(input, output, session,
   #  panelAnalysisLog Table title
   output$paneltitle_panelAnalysisLog <- renderUI({
     if (result$analysisID != "") {
-      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       paste0('Input generation Logs of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
       paste0("Input generation Logs")
@@ -623,7 +623,7 @@ step2_chooseAnalysis <- function(input, output, session,
   
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
-    modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsData.ModelId]
+    modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsDataNames$id]
     paste0('Resources of Model id ', modelId)
   })
   
@@ -636,7 +636,7 @@ step2_chooseAnalysis <- function(input, output, session,
   
   onclick("abuttonsubmit", {
     if (input$anaName != "") {
-      modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
+      modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
       post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID,
                                                                              name = input$anaName,
                                                                              model = modelID)
@@ -699,12 +699,12 @@ step2_chooseAnalysis <- function(input, output, session,
         enable("abuttonshowlog")
         enable("abuttondelana")
         enable("abuttonstartIG")
-        if ( result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] != StatusReady &&
-             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] != StatusCompleted) {
+        if ( result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready &&
+             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Completed) {
           enable("abuttoncancelIG")
         }
-        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusReady ||
-            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready ||
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
           enable("abuttonpgotonextstep")
           enable("abuttonshowIG")
         }
@@ -772,7 +772,7 @@ step2_chooseAnalysis <- function(input, output, session,
     if (result$portfolioID  != "") {
       tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesData.PortfolioID) == result$portfolioID)
+        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == result$portfolioID)
       }
       logMessage("analyses table refreshed")
     }  else {
@@ -833,7 +833,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadtbl_modelsDetails <- function() {
     logMessage(".reloadtbl_modelsDetails called")
     if (length(input$dt_models_rows_selected) > 0) {
-      modelId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsData.ModelId]
+      modelId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
       tbl_modelsDetails <- return_models_id_resource_file_df(modelId)
       if (!is.null(tbl_modelsDetails)) {
         result$tbl_modelsDetails <-  tbl_modelsDetails

@@ -7,8 +7,8 @@
 \usage{
 pageheaderUI(id)
 
-pageheader(input, output, session, user, reloadMillis = 10000,
-  logMessage = message, active = reactive(TRUE))
+pageheader(input, output, session, user, logMessage = message,
+  active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -16,9 +16,6 @@ pageheader(input, output, session, user, reloadMillis = 10000,
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{user}{reactive expression yielding user name}
-
-\item{reloadMillis}{Amount of time to wait between table updates;
-see \link{invalidateLater}.}
 
 \item{logMessage}{function that will be passed info messages.}
 

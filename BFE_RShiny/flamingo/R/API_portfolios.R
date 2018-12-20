@@ -176,43 +176,6 @@ api_post_portfolios_create_analysis <- function(id, name, model) {
 
 # R functions calling Portfolio API functions and manipulating the output ------
 
-#' Return Portfolios Dataframe
-#'
-#' @rdname return_portfolios_df
-#'
-#' @description Returns a dataframe of portfolios
-#'
-#' @param name name of the portfolio.
-#'
-#' @return dataframe of previously posted portfolios. Default empty string returns all portfolios.
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_portfolios_df <- function(name = ""){
-  
-  .showname <- function(x){
-    if (length(x) > 1) {
-      y <- x$name
-    } else if (length(x) == 0) {
-      y <- "Not Available"
-    } else {
-      y <- x
-    }
-    return(y)
-  }
-  
-  get_portfolios <- api_get_portfolios(name)
-  portfoliosList <- content(get_portfolios$result)
-  
-  portfoliosList <- lapply(portfoliosList,function(x){lapply(x, .showname)})
-  
-  portfolios_df <- bind_rows(portfoliosList) %>% #do.call("rbind", portfoliosList) %>% 
-    as.data.frame()
-  return(portfolios_df)
-}
-
 #' Return Portfolios Data fot DT
 #'
 #' @rdname return_tbl_portfoliosData
@@ -232,19 +195,19 @@ return_portfolios_df <- function(name = ""){
 #' @export
 return_tbl_portfoliosData <- function(name = ""){
   
-  tbl_portfoliosData <- return_portfolios_df(name)
+  tbl_portfoliosData <- return_df(api_get_portfolios, name)
   if (nrow(tbl_portfoliosData) > 0) {
-    idx <- tbl_portfoliosData[[tbl_portfoliosData.PortfolioID]]
+    idx <- tbl_portfoliosData[[tbl_portfoliosDataNames$id]]
     numpf <- length(idx)
     for (i in seq(numpf) ) {
-      tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioCreated] , format = "%d-%m-%YT%H:%M:%S"))
-      tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosData.PortfolioModified] , format = "%d-%m-%YT%H:%M:%S"))
+      tbl_portfoliosData[i, tbl_portfoliosDataNames$created] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosDataNames$created] , format = "%d-%m-%YT%H:%M:%S"))
+      tbl_portfoliosData[i, tbl_portfoliosDataNames$modified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosDataNames$modified] , format = "%d-%m-%YT%H:%M:%S"))
     }
-    tbl_portfoliosData <- cbind(tbl_portfoliosData, data.frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", StatusProcessing, StatusCompleted)))
+    tbl_portfoliosData <- cbind(tbl_portfoliosData, data.frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", Status$Processing, Status$Completed)))
     
     tbl_portfoliosDetailsStatus <- tbl_portfoliosData  %>%
       select(-contains("file") ) %>% 
-      arrange(desc(!! sym(tbl_portfoliosData.PortfolioID))) %>%
+      arrange(desc(!! sym(tbl_portfoliosDataNames$id))) %>%
       as.data.frame()
 
   } else {
@@ -252,43 +215,6 @@ return_tbl_portfoliosData <- function(name = ""){
   }
   
   return(tbl_portfoliosDetailsStatus)
-}
-
-#' Return Details Portfolio id Dataframe
-#'
-#' @rdname return_portfolio_details_df
-#'
-#' @description Returns a dataframe of portfolio's details
-#'
-#' @param id id of the portfolio.
-#'
-#' @return dataframe of details of previously posted portfolio
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_portfolio_details_df <- function(id){
-  
-  .showname <- function(x){
-    if (length(x) > 1) {
-      y <- x$name
-    } else if (length(x) == 0) {
-      y <- "Not Available"
-    } else {
-      y <- x
-    }
-    return(y)
-  }
-  
-  get_portfolio_details <- api_get_portfolios_id(id)
-  portfolioDetailsList <- content(get_portfolio_details$result)
-  
-  portfolioDetailsList <- lapply(portfolioDetailsList, .showname)
-  
-  portfolio_details_df <- bind_rows(portfolioDetailsList) %>% #do.call("rbind", portfoliosList) %>%
-    as.data.frame()
-  return(portfolio_details_df)
 }
 
 #' Return Portfolio Details fot DT
@@ -308,13 +234,13 @@ return_portfolio_details_df <- function(id){
 #' @export
 return_tbl_portfolioDetails <- function(id){
   
-  tbl_portfolioDetails <- return_portfolio_details_df(id) %>%
+  tbl_portfolioDetails <- return_df(api_get_portfolios_id, id) %>%
     select(contains("file") ) %>%
     as.data.frame()
 
   # reshape df
   tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "name")
-  # tbl_portfolioDetails <- tbl_portfolioDetails %>% mutate(status = ifelse( tbl_portfolioDetails$name == "Not Available", StatusProcessing, StatusCompleted)) %>%
+  # tbl_portfolioDetails <- tbl_portfolioDetails %>% mutate(status = ifelse( tbl_portfolioDetails$name == "Not Available", Status$Processing, Status$Completed)) %>%
   tbl_portfolioDetails <-tbl_portfolioDetails  %>%
     as.data.frame()
   

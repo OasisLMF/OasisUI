@@ -59,28 +59,6 @@ api_get_models_id <- function(id) {
 
 # R functions calling Models API Calls -----------------------------------------
 
-#' Return Models Dataframe
-#'
-#' @rdname return_models_df
-#'
-#' @description Returns a dataframe of models
-#'
-#' @param supplier_id the supplier ID for the model. Default is empty string.
-#'
-#' @return dataframe of previously posted models. Default empty string returns all models.
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_models_df <- function(supplier_id = ""){
-  get_models <- api_get_models(supplier_id)
-  modelsList <- content(get_models$result)
-  models_df <- bind_rows(modelsList) %>%
-    as.data.frame()
-  return(models_df)
-}
-
 #' Return Models Data fot DT
 #'
 #' @rdname return_tbl_modelsData
@@ -98,40 +76,17 @@ return_models_df <- function(supplier_id = ""){
 #' @export
 return_tbl_modelsData <- function(supplier_id = ""){
 
-  tbl_modelsData <- return_models_df(supplier_id) %>%
+  tbl_modelsData <- return_df(api_get_models,supplier_id) %>%
     as.data.frame()
-  idx <- tbl_modelsData[[tbl_modelsData.ModelId]]
+  idx <- tbl_modelsData[[tbl_modelsDataNames$id]]
   numpf <- length(idx)
   for (i in seq(numpf) ) {
-    tbl_modelsData[i, tbl_modelsData.ModelCreated] <- toString(as.POSIXct(tbl_modelsData[i, tbl_modelsData.ModelCreated] , format = "%d-%m-%YT%H:%M:%S"))
-    tbl_modelsData[i, tbl_modelsData.ModelModified] <- toString(as.POSIXct(tbl_modelsData[i, tbl_modelsData.ModelModified], format = "%d-%m-%YT%H:%M:%S"))
+    tbl_modelsData[i, tbl_modelsDataNames$created] <- toString(as.POSIXct(tbl_modelsData[i, tbl_modelsDataNames$created] , format = "%d-%m-%YT%H:%M:%S"))
+    tbl_modelsData[i, tbl_modelsDataNames$modified] <- toString(as.POSIXct(tbl_modelsData[i, tbl_modelsDataNames$modified], format = "%d-%m-%YT%H:%M:%S"))
   }
   tbl_modelsData <- tbl_modelsData %>%
-    arrange(desc(!! sym(tbl_modelsData.ModelId)))
+    arrange(desc(!! sym(tbl_modelsDataNames$id)))
   return(tbl_modelsData)
-}
-
-
-#' Return Model Dataframe
-#'
-#' @rdname return_model_df
-#'
-#' @description Returns a dataframe of model
-#'
-#' @param id the ID for the model.
-#'
-#' @return dataframe of previously posted model.
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_model_df <- function(id){
-  get_model <- api_get_models_id(id)
-  modelList <- content(get_model$result)
-  model_df <- bind_rows(modelList) %>%
-    as.data.frame()
-  return(model_df)
 }
 
 #' Return Model Data fot DT
@@ -150,9 +105,9 @@ return_model_df <- function(id){
 #'
 #' @export
 return_tbl_modelData <- function(id){
-  tbl_modelData <- return_model_df(id) %>%
+  tbl_modelData <- return_df(api_get_models_id, id) %>%
     as.data.frame()
-    tbl_modelData[[tbl_modelsData.ModelCreated]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsData.ModelCreated]], format = "%d-%m-%YT%H:%M:%S"))
-    tbl_modelData[[tbl_modelsData.ModelModified]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsData.ModelModified]], format = "%d-%m-%YT%H:%M:%S"))
+    tbl_modelData[[tbl_modelsDataNames$created]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsDataNames$created]], format = "%d-%m-%YT%H:%M:%S"))
+    tbl_modelData[[tbl_modelsDataNames$modified]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsDataNames$modified]], format = "%d-%m-%YT%H:%M:%S"))
   return(tbl_modelData)
 }

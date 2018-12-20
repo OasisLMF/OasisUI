@@ -212,6 +212,7 @@ panelDefOutputConfiguration <- function(id) {
 #' @export
 panel_configureAdvancedGUL <- function(id) {
   ns <- NS(id)
+  
   fluidRow(
     # Few outputs commented/disabled for the first release. To be enabled for later releases.
     column(4,
@@ -233,7 +234,7 @@ panel_configureAdvancedGUL <- function(id) {
              checkboxGroupInput(ns("chkgulprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
-                                selected = defaultSelectChoicesGUL),
+                                selected = varsdf$vars[varsdf$defaultChoice]),
              
              checkboxGroupInput(ns("chkgulstate"),
                                 label = h6("State", class = "flamingo-granularity"),
@@ -503,7 +504,7 @@ step3_configureOutput <- function(input, output, session,
           enable("abuttonshowlog")
           enable("abuttonconfigoutput")
           enable("abuttoncancelana")
-          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusCompleted) {
+          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
             enable("abuttondisplayoutput")
           }
         }
@@ -546,7 +547,7 @@ step3_configureOutput <- function(input, output, session,
   
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
-      index <- which(result$tbl_analysesData[,tbl_analysesData.AnaID] == result$anaID )
+      index <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == result$anaID )
       logMessage("re-rendering analysis table")
       datatable(
         result$tbl_analysesData,
@@ -578,8 +579,8 @@ step3_configureOutput <- function(input, output, session,
   })
   
   output$cancelAnaModaltitle <- renderUI({
-    AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
-    AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+    AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
     paste0('Cancel ', AnaId, ' ', AnaName)
   })
   
@@ -590,7 +591,7 @@ step3_configureOutput <- function(input, output, session,
   observeEvent(input$abuttonConfirmDelAna, {
     removeModal()
     
-    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     #should use /v1/analyses/{id}/cancel/
     delete_analyses_id <- api_post_analyses_cancel(analysisID)
     
@@ -598,7 +599,7 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "message",
                            paste0("Analysis id ", analysisID, " cancelled."))
       .reloadAnaData()
-      idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesData.AnaID])
+      idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesDataNames$id])
       pageSel <- ceiling(idxSel/pageLength)
       selectRows(dataTableProxy("dt_analyses"), idxSel)
       selectPage(dataTableProxy("dt_analyses"), pageSel)
@@ -618,8 +619,8 @@ step3_configureOutput <- function(input, output, session,
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
     if (result$ana_flag  == "R") {
-      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
-      analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+      analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
       paste0('Re-Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
     } else {
@@ -763,7 +764,7 @@ step3_configureOutput <- function(input, output, session,
     logMessage("showing panelDefineOutputs")
     result$ana_flag <- "R"
     analysis_settings <- return_analyses_settings_file_list(result$anaID)
-    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
     if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
       flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID))
     } else {
@@ -831,16 +832,16 @@ step3_configureOutput <- function(input, output, session,
                            paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analysis_settings_file$status))
     }
     
-    analyses_run <- return_analyses_run_df(result$anaID)
+    analyses_run <- return_df(api_post_analyses_run,result$anaID)
     
     if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
-      if (analyses_run[[tbl_analysesData.AnaStatus]] == "RUN_STARTED") {
+      if (analyses_run[[tbl_analysesDataNames$status]] == "RUN_STARTED") {
         flamingoNotification(type = "message",
                              paste0("Analysis ", result$anaID ," is executing"))
       }
     } 
-    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
-    idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesData.AnaID])
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesDataNames$id])
     pageSel <- ceiling(idxSel/pageLength)
     .reloadAnaData()
     hide("panelDefineOutputs")
@@ -885,8 +886,8 @@ step3_configureOutput <- function(input, output, session,
   
   # run logs title
   output$paneltitle_AnaLogs <- renderUI({
-    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
-    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaName]
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
     paste0('Run Logs for Analysis id ', analysisID, ' ', analysisName)
   })
@@ -911,8 +912,8 @@ step3_configureOutput <- function(input, output, session,
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
       if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
-        result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaID]
-        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.AnaStatus] == StatusFailed) {
+        result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
           show("panelAnalysisLogs")
           logMessage("showing analysis run log table")
         }
@@ -958,10 +959,10 @@ step3_configureOutput <- function(input, output, session,
     if (portfolioID()  != "") {
       tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesData.PortfolioID) == portfolioID())
+        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
         #Handling filter for 'In Progress'
         if (input$radioanaAllOrInProgress == "In_Progress") {
-          result$tbl_analysesData <- result$tbl_analysesData %>% filter(status == StatusProcessing)
+          result$tbl_analysesData <- result$tbl_analysesData %>% filter(status == Status$Processing)
         }
       }
       logMessage("analyses table refreshed")
@@ -1032,9 +1033,9 @@ step3_configureOutput <- function(input, output, session,
     #                   choices = gsub(".json", "", list.files("./analysis_settings")),
     #                   selected = character(0))
     tbl_analysesData  <- return_tbl_analysesData()
-    tbl_analysesData <- tbl_analysesData %>% filter(status != StatusProcessing & status != StatusReady)
-    namesList <- tbl_analysesData[,tbl_analysesData.AnaName]
-    idList <- tbl_analysesData[,tbl_analysesData.AnaID]
+    tbl_analysesData <- tbl_analysesData %>% filter(status != Status$Processing & status != Status$Ready)
+    namesList <- tbl_analysesData[,tbl_analysesDataNames$id]
+    idList <- tbl_analysesData[,tbl_analysesDataNames$id]
     choicesList <- paste(idList, namesList, sep = " / ")
     updateSelectInput(session, "sinoutputoptions",
                       choices = choicesList,
@@ -1052,7 +1053,7 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".clearotherparams called")
     .clearOutputOptions()
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
-    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelID <- ifelse(modelID == "", -1,modelID)
     tbl_modelsDetails <- return_models_id_resource_file_content(modelID)
     if (modelID != -1 && !is.null(tbl_modelsDetails)) {
@@ -1122,7 +1123,7 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".defaultchkboxGULgrp called")
     for (i in checkgulgrplist) {
       if (i == "chkgulprog") {
-        defaultSelectChoices <- defaultSelectChoicesGUL
+        defaultSelectChoices <- varsdf$vars[varsdf$defaultChoice]
       } else {
         defaultSelectChoices <- ""
       }
@@ -1135,7 +1136,7 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".defaultchkboxILgrp called")
     for (i in checkilgrplist) {
       if (i == "chkilprog" | i == "chkilpolicy") {
-        defaultSelectChoices <- defaultSelectChoicesIL
+        defaultSelectChoices <- varsdf$vars[varsdf$defaultChoice]
       } else {
         defaultSelectChoices <- ""
       }
@@ -1147,7 +1148,7 @@ step3_configureOutput <- function(input, output, session,
   .defaultchkboxRIgrp <- function() {
     for (i in checkrigrplist) {
       if (i == "chkriprog" | i == "chkripolicy") {
-        defaultSelectChoices <- defaultSelectChoicesRI
+        defaultSelectChoices <- varsdf$vars[varsdf$defaultChoice]
       } else {
         defaultSelectChoices <- ""
       }
@@ -1198,7 +1199,7 @@ step3_configureOutput <- function(input, output, session,
     
     logMessage(".gen_analysis_settings called")
     
-    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesData.ModelID]
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelData <- return_tbl_modelData(modelID)
     
     inputsettings <- list(
@@ -1206,8 +1207,8 @@ step3_configureOutput <- function(input, output, session,
       "analysis_tag" = as.integer(result$anaID), #potential new tag analysis_id
       "exposure_location" = "L:", # hardcoded as depricated
       "gul_threshold" = as.integer(input$tinputthreshold),
-      "model_version_id" = modelData[[tbl_modelsData.ModelNameId]], # potential new tag model_id
-      "module_supplier_id" = modelData[[tbl_modelsData.ModelSupplierId]], # potential new tag model_supplier_id
+      "model_version_id" = modelData[[tbl_modelsDataNames$model_id]], # potential new tag model_id
+      "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]], # potential new tag model_supplier_id
       "number_of_samples" = as.integer(input$tinputnoofsample),
       "prog_id" = as.integer(portfolioID()), # potential new tag `portfolio_id`
       "source_tag" = getOption("flamingo.settings.oasis_environment"), # potential new tag environment_tag,
@@ -1234,6 +1235,7 @@ step3_configureOutput <- function(input, output, session,
     )
     
     #add summaries
+    ReportChoices <- c('FullUncAEP', 'FullUncOEP', 'AAL')
     if (input$chkinputsummaryoption) {
       for (l in names(outputsLossTypes)) {
         outputsLossTypes[[l]][["prog"]] <- unique(c(outputsLossTypes[[l]][["prog"]], ReportChoices))
@@ -1264,9 +1266,7 @@ step3_configureOutput <- function(input, output, session,
 
     .updateWidget("threshold", SettingsMapping)
 
-    gran <- granToOed$oed
-
-    for (L in tolower(losstypes)) { #L <- "GUL"
+    for (L in tolower(output_options$losstypes)) { #L <- "GUL"
       l <- tolower(L)
       summary_settings <- settings[[paste0(l, "_summaries")]]
       sel_losstype <- settings[[paste0(l, "_output")]]

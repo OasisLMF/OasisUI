@@ -92,6 +92,7 @@ outputplots <- function(input, output, session,
 #' @export
 panelOutputModuleUI <- function(id){
   ns <- NS(id)
+  
   tagList(
     flamingoPanel(
       id = ns("flamingoPanelOutputModule"),
@@ -104,12 +105,12 @@ panelOutputModuleUI <- function(id){
       ),
       br(),
       column(4,
-             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = losstypes, inline = TRUE)),
+             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
       column(8,
-             checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Summary Level", choices = granularities, inline = TRUE)),
+             checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Summary Level", choices = output_options$granularities, inline = TRUE)),
       br(),
       column(12,
-             checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Report", choices = variables, inline = TRUE)),
+             checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Report", choices = output_options$variables, inline = TRUE)),
       br(),
       h4("Customize Plot"),
       column(4,
@@ -258,9 +259,9 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     result$Variables
   }, ignoreNULL = FALSE, {
     if (!is.null(inputplottype())) {
-      .reactiveUpdateSelectGroupInput(result$Losstypes, losstypes, "chkboxgrplosstypes", inputplottype())
-      .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
-      .reactiveUpdateSelectGroupInput(result$Granularities, granularities, "chkboxgrpgranularities", inputplottype())
+      .reactiveUpdateSelectGroupInput(result$Losstypes, output_options$losstypes, "chkboxgrplosstypes", inputplottype())
+      .reactiveUpdateSelectGroupInput(result$Variables, output_options$variables, "chkboxgrpvariables", inputplottype())
+      .reactiveUpdateSelectGroupInput(result$Granularities, output_options$granularities, "chkboxgrpgranularities", inputplottype())
     }
   })
 
@@ -276,8 +277,8 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     } else {
       Granularities <- result$Granularities
     }
-    .reactiveUpdateSelectGroupInput(Granularities, granularities, "chkboxgrpgranularities", inputplottype())
-    .reactiveUpdateSelectGroupInput(result$Variables, variables, "chkboxgrpvariables", inputplottype())
+    .reactiveUpdateSelectGroupInput(Granularities, output_options$granularities, "chkboxgrpgranularities", inputplottype())
+    .reactiveUpdateSelectGroupInput(result$Variables, output_options$variables, "chkboxgrpvariables", inputplottype())
   })
 
   # > button based on selection
@@ -472,7 +473,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
 
   # Helper function to enable and dosable checkboxes based on condition
   .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
-    logMessage(".reactiveUpdateSelectGroupInput called with parameters:")
+    logMessage(".reactiveUpdateSelectGroupInput called")
     # disable and untick variables that are not relevant
     if (inputid == "chkboxgrpvariables" && !is.null(plotType)) {
       relevantVariables <- plottypeslist[[plotType]][["Variables"]]

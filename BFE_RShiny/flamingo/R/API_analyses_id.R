@@ -88,7 +88,8 @@ return_analyses_input_file_wicons_df <- function(id) {
 
   currfolder <- getOption("flamingo.settings.api.share_filepath")
   extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
-
+  status_code_notfound <- 404
+  
   analyses_input_file_df <- return_analyses_input_file_df(id)
   fnames <- analyses_input_file_df$files
   fnum <- length(fnames)
@@ -98,11 +99,11 @@ return_analyses_input_file_wicons_df <- function(id) {
     filePath <- file.path(extractFolder, fname)
     info <- file.info(filePath)
     if (is.na(info$size)) {
-      status[i, "status"] <- StatusProcessing
+      status[i, "status"] <- Status$Processing
     } else if (info$size == 0) {
-      status[i, "status"] <- StatusFailed
+      status[i, "status"] <- StatusF$ailed
     } else {
-      status[i, "status"] <- StatusCompleted
+      status[i, "status"] <- Status$Completed
     }
   }
   analyses_input_file_df <- cbind(analyses_input_file_df, status) %>%
@@ -895,46 +896,4 @@ api_post_analyses_run <- function(id) {
   )
 
   api_handle_response(response)
-}
-
-#' Return analyses run Dataframe
-#'
-#' @rdname return_analyses_run_df
-#'
-#' @description Returns a dataframe of analyses after run started
-#'
-#' @param id a unique integer value identifying this analysis.
-#'
-#' @return dataframe of previously posted analysis states.
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_analyses_run_df <- function(id){
- 
-  .showname <- function(x){
-    if (length(x) > 1) {
-      y <- x$name
-    } else if (length(x) == 0) {
-      y <- "Not Available"
-    } else {
-      y <- x
-    }
-    return(y)
-  }
-  
-  analyses_run <- api_post_analyses_run(id)
-  analyses_runList <- content(analyses_run$result)
-  
-  analyses_runList <- lapply(analyses_runList,.showname)
-
-  if (length(names(analyses_runList)) > 1) {
-    analyses_run_df <- bind_rows(analyses_runList) %>%
-      as.data.frame()
-  } else {
-    analyses_run_df <- NULL
-  }
-
-  return(analyses_run_df)
 }

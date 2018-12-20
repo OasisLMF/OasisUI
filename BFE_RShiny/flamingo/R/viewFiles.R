@@ -160,7 +160,7 @@ ViewFilesModule <- function(input, output, session,
   fs <- reactive({
     files <- c()
     if (!is.null(input$dt_outputFL_rows_selected)) {
-      files <- file.path(result$filesListData[input$dt_outputFL_rows_selected, filesListData.path], result$filesListData[input$outputFLtable_rows_selected, filesListData.fileName])
+      files <- file.path(result$filesListData[input$dt_outputFL_rows_selected, filesListDataNames$location_unix], result$filesListData[input$outputFLtable_rows_selected, filesListDataNames$name])
     }
     files
   })
@@ -170,7 +170,7 @@ ViewFilesModule <- function(input, output, session,
   output$FLdownloadzip <- downloadHandler(
     filename = "files.zip",
     content = function(fname){
-      fs <- file.path(result$filesListData[, filesListData.path], result$filesListData[ filesListData.fileName])
+      fs <- file.path(result$filesListData[, filesListDataNames$location_unix], result$filesListData[ filesListDataNames$name])
       zip(zipfile = fname, files = fs)
       if (file.exists(paste0(fname, "./"))) {file.rename(paste0(fname, ".zip"), fname)}
     }
@@ -340,7 +340,7 @@ ViewFilesModule <- function(input, output, session,
       )
     })
     # get data to show in modal table
-    fileName <- file.path(result$filesListData[idx, filesListData.path], result$filesListData[idx, filesListData.fileName])
+    fileName <- file.path(result$filesListData[idx, filesListDataNames$location_unix], result$filesListData[idx, filesListDataNames$name])
     tryCatch({
       result$tbl_fileData <- read.csv(fileName, header = TRUE, sep = ",",
                                   quote = "\"", dec = ".", fill = TRUE, comment.char = "")
@@ -375,7 +375,7 @@ ViewFilesModule <- function(input, output, session,
 
   # Check permission row by row and show buttons
   .enableButton <- function(i) {
-    FVid <- result$filesListData[i, filesListData.fileID]
+    FVid <- result$filesListData[i, filesListDataNames$id]
     validButtons <- executeDbQuery(dbSettings,
                                    buildDbQuery("TellOperationsValidOnFileID", FVid))
     manageButtons <- c("FO_btn_show_raw_content" = "abuttonview",
@@ -399,8 +399,8 @@ ViewFilesModule <- function(input, output, session,
   }
 
   .getDetailsFile <- function(idx){
-    str1 <- paste("File Name: ", result$filesListData[idx, filesListData.fileName])
-    str2 <- paste("Resource Key ", result$filesListData[idx, filesListData.key])
+    str1 <- paste("File Name: ", result$filesListData[idx, filesListDataNames$name])
+    str2 <- paste("Resource Key ", result$filesListData[idx, filesListDataNames$resource_key])
     HTML(paste(str1, str2, sep = '<br/>'))
   }
 

@@ -328,12 +328,14 @@ ViewFilesInTable <- function(input, output, session,
     
     #Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column]
-    returnfunc <- paste0("return_", result$currentFile, "_df")
+    currNamespace <- ls("package:flamingo")
+    func_wpattern <- currNamespace[grepl(result$currentFile, currNamespace)]
+    returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
     filerows <- NULL
     filecolumns <- NULL
     if (exists(returnfunc)) {
       func <- get(returnfunc)
-      result$tbl_fileData <- func(param())
+      result$tbl_fileData <- return_file_df(func,param())
       if (!is.null(result$tbl_fileData )) {
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")

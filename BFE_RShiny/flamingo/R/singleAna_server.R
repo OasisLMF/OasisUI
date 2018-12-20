@@ -176,7 +176,7 @@ singleAna <- function(input, output, session,
       result$tbl_portfoliosData <- submodulesList$step1_choosePortfolio$tbl_portfoliosData()
     }
     if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0) {
-      result$pfChoices <- result$tbl_portfoliosData[, tbl_portfoliosData.PortfolioID]
+      result$pfChoices <- result$tbl_portfoliosData[, tbl_portfoliosDataNames$id]
     } else {
       result$pfChoices <- NULL
     }
@@ -188,14 +188,14 @@ singleAna <- function(input, output, session,
     result$tbl_portfoliosData
   }, ignoreInit = TRUE, {
     result$tbl_portfoliosData_rowselected <- match(result$portfolioID, result$pfChoices)
-    result$pfName <- result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.PortfolioName]
+    result$pfName <- result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$name]
     pfstatus <- ""
     if (!is.na(result$tbl_portfoliosData_rowselected) && !is.na(result$tbl_portfoliosData) && length(result$tbl_portfoliosData_rowselected) > 0) {
-      if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusCompleted) {
+      if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$status] == Status$Completed) {
         pfstatus <- "- Status: Completed"
-      } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusProcessing) {
+      } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$status] == Status$Processing) {
         pfstatus <- "- Status: in Progress"
-      } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosData.Status] == StatusFailed) {
+      } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$status] == Status$Failed) {
         pfstatus <- "- Status: Failed"
       }
       print 

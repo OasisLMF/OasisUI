@@ -378,7 +378,7 @@ summarytab <- function(input, output, session,
       plotleccalc <- NULL
     }
     #Location file
-    Location <- return_location_file_df(portfolioID)
+    Location <- return_file_df(api_get_portfolios_location_file, portfolioID)
     if (!is.null(Location)) {
       #infer params
       locnum <- length(unique(Location$LOCNUM))

@@ -1,24 +1,3 @@
-#' Flamingo Module Template
-#'
-#' @rdname flamingoModule
-#'
-#' @param input Shiny input object.
-#' @param output Shiny output object.
-#' @param session Shiny session object.
-#' @param active Reactive expression whether the module state should be updated.
-#' @param logMessage Function that will be passed info messages.
-#' @param logError Function that will be passed error messages.
-#'
-#' @export
-flamingoModule <- function(
-  input,
-  output,
-  session,
-  active,
-  logMessage,
-  logError) {}
-
-
 #' flamingoButton
 #'
 #' @rdname flamingoButton

@@ -68,7 +68,6 @@ server <- function(input, output, session) {
 
   auth_modules$landingPage <- callModule(
     landingPage, "landingPage",
-    reloadMillis = reloadMillis,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "LP")
   )
