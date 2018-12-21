@@ -115,7 +115,7 @@ return_file_df <- function(api_query, api_param = "") {
 #' @export
 convert_created_modified <- function(tbl_obj){
   nm <- deparse(substitute(tbl_obj))
-  idx <- tbl_obj[[ extractColName(nm, id)]]
+  idx <- tbl_obj[[ extractColName(nm, "id")]]
   numpf <- length(idx)
   for (i in seq(numpf) ) {
     tbl_obj[i, extractColName(nm, "created")] <- toString(as.POSIXct(tbl_obj[i, extractColName(nm, "created")] , format = "%d-%m-%YT%H:%M:%S"))
