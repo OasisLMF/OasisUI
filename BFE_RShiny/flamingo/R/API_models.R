@@ -75,15 +75,8 @@ api_get_models_id <- function(id) {
 #'
 #' @export
 return_tbl_modelsData <- function(supplier_id = ""){
-
-  tbl_modelsData <- return_df(api_get_models,supplier_id) %>%
-    as.data.frame()
-  idx <- tbl_modelsData[[tbl_modelsDataNames$id]]
-  numpf <- length(idx)
-  for (i in seq(numpf) ) {
-    tbl_modelsData[i, tbl_modelsDataNames$created] <- toString(as.POSIXct(tbl_modelsData[i, tbl_modelsDataNames$created] , format = "%d-%m-%YT%H:%M:%S"))
-    tbl_modelsData[i, tbl_modelsDataNames$modified] <- toString(as.POSIXct(tbl_modelsData[i, tbl_modelsDataNames$modified], format = "%d-%m-%YT%H:%M:%S"))
-  }
+  tbl_modelData <- return_df(api_get_models, supplier_id)
+  tbl_modelsData <- convert_created_modified(tbl_modelsData)
   tbl_modelsData <- tbl_modelsData %>%
     arrange(desc(!! sym(tbl_modelsDataNames$id)))
   return(tbl_modelsData)
@@ -105,9 +98,7 @@ return_tbl_modelsData <- function(supplier_id = ""){
 #'
 #' @export
 return_tbl_modelData <- function(id){
-  tbl_modelData <- return_df(api_get_models_id, id) %>%
-    as.data.frame()
-    tbl_modelData[[tbl_modelsDataNames$created]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsDataNames$created]], format = "%d-%m-%YT%H:%M:%S"))
-    tbl_modelData[[tbl_modelsDataNames$modified]] <- toString(as.POSIXct(tbl_modelData[[tbl_modelsDataNames$modified]], format = "%d-%m-%YT%H:%M:%S"))
+  tbl_modelData <- return_df(api_get_models_id, id)
+  tbl_modelData <- convert_created_modified(tbl_modelData)
   return(tbl_modelData)
 }

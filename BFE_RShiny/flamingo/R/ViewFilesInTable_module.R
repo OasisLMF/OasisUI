@@ -167,10 +167,10 @@ ViewFilesInTable <- function(input, output, session,
       for (f in 1:nrow(result$tbl_filesListData_wButtons)) {
         filename <- result$tbl_filesListData_wButtons[f, file_column]
         func <- get(paste0("return_", filename, "_df"))
-        return_df <- func(param())
-        if (nrow(return_df) > 0) {
+        response_df <- func(param())
+        if (nrow(response_df) > 0) {
           fpath <- file.path(".", paste0(filename, ".csv"))
-          fwrite(x = return_df, file = fpath, row.names = TRUE, quote = TRUE)
+          fwrite(x = response_df, file = fpath, row.names = TRUE, quote = TRUE)
           fs <- c(fs, fpath)
         }
       }

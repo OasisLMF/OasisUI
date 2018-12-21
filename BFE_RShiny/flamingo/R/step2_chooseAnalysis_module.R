@@ -801,7 +801,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
     if (!is.null(result$analysisID) && result$analysisID != "") {
-      result$tbl_analysislog <- return_input_generation_traceback_file_df(result$analysisID)
+      result$tbl_analysislog <- return_file_df(api_get_analyses_input_generation_traceback_file, result$analysisID)
     } else {
       result$tbl_analysislog <-  NULL
     }

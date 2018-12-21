@@ -163,13 +163,9 @@ return_tbl_analysesData <- function(name = ""){
     select(-contains("file") ) %>%
     as.data.frame()
   
+  tbl_analysesData <- convert_created_modified(tbl_analysesData) 
+  
   if (nrow(tbl_analysesData) > 0) {
-    idx <- tbl_analysesData[[tbl_analysesDataNames$id]]
-    numpf <- length(idx)
-    for (i in seq(numpf) ) {
-      tbl_analysesData[i, tbl_analysesDataNames$created] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesDataNames$created] , format = "%d-%m-%YT%H:%M:%S"))
-      tbl_analysesData[i, tbl_analysesDataNames$modified] <- toString(as.POSIXct(tbl_analysesData[i, tbl_analysesDataNames$modified], format = "%d-%m-%YT%H:%M:%S"))
-    }
     tbl_analysesData <- tbl_analysesData %>%
       arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
       .replaceWithIcons() %>%

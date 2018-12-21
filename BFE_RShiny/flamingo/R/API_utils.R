@@ -21,6 +21,26 @@ showname <- function(x){
 }
 
 
+#' Return response from API query
+#'
+#' @rdname return_response
+#'
+#' @description Returns a list of the API response
+#'
+#' @param api_query function representing the API query
+#' @param api_param parameter for the api_query
+#'
+#' @return list of the API response
+#'
+#' @importFrom httr content
+#'
+#' @export
+return_response <- function(api_query, api_param = ""){
+  
+  get_response <- api_query(api_param)
+  responseList <- content(get_response$result)
+}
+
 
 #' Return Dataframe from API response
 #'
@@ -34,22 +54,21 @@ showname <- function(x){
 #' @return dataframe of the API response
 #'
 #' @importFrom dplyr bind_rows
-#' @importFrom httr content
 #'
 #' @export
 return_df <- function(api_query, api_param = ""){
-  
-  get_response <- api_query(api_param)
-  responseList <- content(get_response$result)
+
+  responseList <- return_response(api_query, api_param)
   
   if (length(responseList[[1]]) > 1 ) {
     responseList <- lapply(responseList,function(x){lapply(x, showname)})
   } else {
     responseList <- lapply(responseList, showname)
   }
-
-  response_df <- bind_rows(responseList) %>% #do.call("rbind", portfoliosList) %>% 
+  
+  response_df <- bind_rows(responseList) %>% 
     as.data.frame()
+  
   return(response_df)
 }
 
@@ -80,4 +99,27 @@ return_file_df <- function(api_query, api_param = "") {
       as.data.frame()
   }
   return(file_df)
+}
+
+#' Convert created and modified columns 
+#'
+#' @rdname convert_created_modified
+#'
+#' @description replaces created and modified columns with different date format
+#'
+#' @param tbl_obj data.frame to convert.
+#'
+#' @return Dataframe with converted columns
+#'
+#'
+#' @export
+convert_created_modified <- function(tbl_obj){
+  nm <- deparse(substitute(tbl_obj))
+  idx <- tbl_obj[[ extractColName(nm, id)]]
+  numpf <- length(idx)
+  for (i in seq(numpf) ) {
+    tbl_obj[i, extractColName(nm, "created")] <- toString(as.POSIXct(tbl_obj[i, extractColName(nm, "created")] , format = "%d-%m-%YT%H:%M:%S"))
+    tbl_obj[i,  extractColName(nm, "modified")] <- toString(as.POSIXct(tbl_obj[i, extractColName(nm, "modified")], format = "%d-%m-%YT%H:%M:%S"))
+  }
+  return(tbl_obj)
 }

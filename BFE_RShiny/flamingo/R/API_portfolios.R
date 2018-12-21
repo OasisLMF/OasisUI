@@ -197,13 +197,10 @@ return_tbl_portfoliosData <- function(name = ""){
   
   tbl_portfoliosData <- return_df(api_get_portfolios, name)
   if (nrow(tbl_portfoliosData) > 0) {
-    idx <- tbl_portfoliosData[[tbl_portfoliosDataNames$id]]
-    numpf <- length(idx)
-    for (i in seq(numpf) ) {
-      tbl_portfoliosData[i, tbl_portfoliosDataNames$created] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosDataNames$created] , format = "%d-%m-%YT%H:%M:%S"))
-      tbl_portfoliosData[i, tbl_portfoliosDataNames$modified] <- toString(as.POSIXct(tbl_portfoliosData[i, tbl_portfoliosDataNames$modified] , format = "%d-%m-%YT%H:%M:%S"))
-    }
+    
     tbl_portfoliosData <- cbind(tbl_portfoliosData, data.frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", Status$Processing, Status$Completed)))
+    
+    tbl_portfoliosData <- convert_created_modified(tbl_portfoliosData)
     
     tbl_portfoliosDetailsStatus <- tbl_portfoliosData  %>%
       select(-contains("file") ) %>% 

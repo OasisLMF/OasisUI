@@ -47,31 +47,6 @@ api_get_analyses_input_file <- function(id) {
   }
 }
 
-
-#' Return analyses input files  Dataframe
-#'
-#' @rdname return_analyses_input_file_df
-#'
-#' @description Returns a dataframe of input files
-#'
-#' @param id a unique integer value identifying this analysis.
-#'
-#' @return dataframe of input files.
-#'
-#' @importFrom stats setNames
-#'
-#' @export
-
-return_analyses_input_file_df <- function(id) {
-  currfolder <- getOption("flamingo.settings.api.share_filepath")
-  extractFolder <- file.path(currfolder, paste0(id, "_inputs"))
-  if (!file.exists(extractFolder)) {
-    api_get_analyses_input_file(id)
-  }
-  analyses_input_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
-  return(analyses_input_file_df)
-}
-
 #' Return analyses input files  Dataframe with Icons
 #'
 #' @rdname return_analyses_input_file_wicons_df
@@ -90,7 +65,11 @@ return_analyses_input_file_wicons_df <- function(id) {
   extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
   status_code_notfound <- 404
   
-  analyses_input_file_df <- return_analyses_input_file_df(id)
+  if (!file.exists(extractFolder)) {
+    api_get_analyses_input_file(id)
+  }
+  analyses_input_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
+  
   fnames <- analyses_input_file_df$files
   fnum <- length(fnames)
   status <- data.frame(status = rep(status_code_notfound, fnum))
@@ -109,34 +88,6 @@ return_analyses_input_file_wicons_df <- function(id) {
   analyses_input_file_df <- cbind(analyses_input_file_df, status) %>%
     as.data.frame()
   return(analyses_input_file_df)
-}
-
-#' Return specific analyses input file as Dataframe
-#'
-#' @rdname return_analyses_spec_input_file_df
-#'
-#' @description Returns a dataframe of specific input file
-#'
-#' @param id a unique integer value identifying this analysis.
-#' @param fileName name of file to read
-#'
-#' @return dataframe of specific input file.
-#'
-#' @importFrom stats setNames
-#' @importFrom data.table fread
-#'
-#' @export
-
-return_analyses_spec_input_file_df <- function(id, fileName) {
-  currfolder <- getOption("flamingo.settings.api.share_filepath")
-  extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
-  filePath <- file.path(extractFolde, fileName)
-  info <- file.info(filePath)
-  analyses_spec_input_file_df <- NULL
-  if (!is.na(info$size) && info$size != 0 ) {
-    analyses_spec_input_file_df <- fread(filePath)
-  }
-  return(analyses_spec_input_file_df)
 }
 
 
@@ -613,37 +564,6 @@ api_post_analyses_input_generation_traceback_file <- function(id, filepath_input
   api_handle_response(response)
 }
 
-#' Return input_generation_traceback_file Dataframe
-#'
-#' @rdname return_input_generation_traceback_file_df
-#'
-#' @description Returns a dataframe of input_generation_traceback_file
-#'
-#' @param id a unique integer value identifying this analysis.
-#'
-#' @return dataframe of input_generation_traceback_file
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom dplyr filter
-#' @importFrom dplyr sym
-#' @importFrom httr content
-#'
-#' @export
-return_input_generation_traceback_file_df <- function(id){
-  get_input_generation_traceback_file <- api_get_analyses_input_generation_traceback_file(id)
-  input_generation_traceback_fileList <- content(get_input_generation_traceback_file$result)
-  if (is.null(names(input_generation_traceback_fileList))) {
-    input_generation_traceback_file_df <- strsplit(input_generation_traceback_fileList, split = "\n") %>%
-      as.data.frame(stringsAsFactors = FALSE)
-    colnames(input_generation_traceback_file_df) <- input_generation_traceback_file_df[1, ]
-    # input_generation_traceback_file_df <- input_generation_traceback_file_df %>% filter(!! sym(colnames(input_generation_traceback_file_df)) != colnames(input_generation_traceback_file_df) )
-  } else {
-    input_generation_traceback_file_df <- bind_rows(input_generation_traceback_fileList) %>%
-      as.data.frame()
-  }
-  return(input_generation_traceback_file_df)
-}
-
 # output file ------------------------------------------------------------------
 
 #' Get analysis output file
@@ -838,35 +758,6 @@ api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
   )
 
   api_handle_response(response)
-}
-
-#' Return analyses_run_traceback_file Dataframe
-#'
-#' @rdname return_analyses_run_traceback_file_df
-#'
-#' @description Returns a dataframe of analyses_run_traceback_file
-#'
-#' @param id a unique integer value identifying this analysis.
-#'
-#' @return dataframe of analyses_run_traceback_file
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_analyses_run_traceback_file_df <- function(id){
-  get_analyses_run_traceback_file <- api_get_analyses_run_traceback_file(id)
-  analyses_run_traceback_fileList <- content(get_analyses_run_traceback_file$result)
-  if (is.null(names(analyses_run_traceback_fileList))) {
-    analyses_run_traceback_file_df <- strsplit(analyses_run_traceback_fileList, split = "\n") %>%
-      as.data.frame(stringsAsFactors = FALSE)
-    colnames(analyses_run_traceback_file_df) <- analyses_run_traceback_file_df[1, ]
-    # analyses_run_traceback_file_df <- analyses_run_traceback_file_df %>% filter(!! sym(colnames(analyses_run_traceback_file_df)) != colnames(analyses_run_traceback_file_df) )
-  } else {
-    analyses_run_traceback_file_df <- bind_rows(analyses_run_traceback_fileList) %>%
-      as.data.frame()
-  }
-  return(analyses_run_traceback_file_df)
 }
 
 # Run --------------------------------------------------------------------------

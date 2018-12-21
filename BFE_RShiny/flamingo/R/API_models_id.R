@@ -30,26 +30,6 @@ api_get_models_id_resource_file <- function(id) {
 
 #' Return model resource file Dataframe
 #'
-#' @rdname return_models_resource_file_content
-#'
-#' @description Returns a dataframe of model resource file
-#'
-#' @param id a unique integer value identifying this model.
-#'
-#' @return dataframe of resource file of previously posted model
-#'
-#' @importFrom httr content
-#'
-#' @export
-return_models_id_resource_file_content <- function(id){
-  get_models_id_resource_file <- api_get_models_id_resource_file(id)
-  modelsIdResourceFileList <- content(get_models_id_resource_file$result)
-  return(modelsIdResourceFileList)
-}
-
-
-#' Return model resource file Dataframe
-#'
 #' @rdname return_models_resource_file_df
 #'
 #' @description Returns a dataframe of model resource file
@@ -62,7 +42,7 @@ return_models_id_resource_file_content <- function(id){
 #'
 #' @export
 return_models_id_resource_file_df <- function(id){
-  modelsIdResourceFileList <- return_models_id_resource_file_content(id)
+  modelsIdResourceFileList <- return_response(api_get_models_id_resource_file, id)
   models_id_resource_file_df <- unlist(modelsIdResourceFileList) %>%
     bind_rows() %>%
     as.data.frame(stringsAsFactors = FALSE)
