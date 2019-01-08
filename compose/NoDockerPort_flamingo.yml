@@ -3,7 +3,7 @@ services:
   shiny_proxy:
     restart: always
     container_name: shiny_proxy
-    image: coreoasis/shiny_proxy:0.393.0-beta
+    image: coreoasis/shiny_proxy_noport:latest
     ports:
      - ${UI_WEB_PORT}:8080
     environment:
