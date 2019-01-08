@@ -540,7 +540,11 @@ step1_choosePortfolio <- function(input, output, session,
     logMessage(paste0("Uploading file ", inFile$datapath))
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     if (!is.null(inFile$datapath)) {
-      post_file <- APIfunction(pfId, inFile$datapath)
+      tmp <- unlist(strsplit(inFile$datapath, split = "/"))
+      datapath <- paste(c(tmp[-length(tmp)], ""), collapse = "/")
+      newfile <- paste0(datapath, inFile$name)
+      file.rename(inFile$datapath, newfile)
+      post_file <- APIfunction(pfId, newfile)
       if (post_file$status == "Success") {
         flamingoNotification(type = "message",
                              paste("File uploaded successfully"))
