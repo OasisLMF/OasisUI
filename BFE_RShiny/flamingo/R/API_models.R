@@ -75,7 +75,7 @@ api_get_models_id <- function(id) {
 #'
 #' @export
 return_tbl_modelsData <- function(supplier_id = ""){
-  tbl_modelData <- return_df(api_get_models, supplier_id)
+  tbl_modelsData <- return_df(api_get_models, supplier_id)
   tbl_modelsData <- convert_created_modified(tbl_modelsData)
   tbl_modelsData <- tbl_modelsData %>%
     arrange(desc(!! sym(tbl_modelsDataNames$id)))
