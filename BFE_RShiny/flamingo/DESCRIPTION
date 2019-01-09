@@ -30,7 +30,8 @@ Imports:
   V8,
   data.table,
   ggplot2,
-  tidyr
+  tidyr,
+  readr
 Suggests:
   knitr,
   testthat
