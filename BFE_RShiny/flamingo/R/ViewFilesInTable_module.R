@@ -327,13 +327,13 @@ ViewFilesInTable <- function(input, output, session,
     session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_vbutton"))
     
     #Get dataframe
-    result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column]
+    result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
     currNamespace <- ls("package:flamingo")
     func_wpattern <- currNamespace[grepl(result$currentFile, currNamespace)]
     returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
     filerows <- NULL
     filecolumns <- NULL
-    if (exists(returnfunc)) {
+    if (length(returnfunc) != 0) {
       func <- get(returnfunc)
       result$tbl_fileData <- return_file_df(func,param())
       if (!is.null(result$tbl_fileData )) {
