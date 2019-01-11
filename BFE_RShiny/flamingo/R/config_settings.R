@@ -70,19 +70,3 @@ filesListDataNames <- list(
   location_unix <- "Location Unix",
   resource_key <- "Resource Key"
 )
-
-
-# Extract column name from list ------------------------------------------------
-
-#' extractColName
-#' 
-#' @description function to extract column name from named list including the column names
-#' 
-#' @param tbl_obj object for which to retrieve column name.
-#' @param col_type string of the column type to retrieve
-#' 
-#' @export
-extractColName <- function(tbl_obj, col_type) {
-  colname <- get(paste0(tbl_obj, "Names"))[[col_type]]
-  return(colname)
-}
