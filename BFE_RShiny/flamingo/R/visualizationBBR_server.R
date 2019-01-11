@@ -60,7 +60,7 @@ visualizationBBR <- function(input, output, session,
 
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotobatchconfig, {
-    updateNavigation(navigation_state, "PB")
+    updateNavigation(navigation_state, "BA")
     result$preselPanel <- 3
   })
 

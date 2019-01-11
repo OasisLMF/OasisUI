@@ -70,7 +70,7 @@ visualizationCBR <- function(input, output, session,
 
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
-    updateNavigation(navigation_state, "PS")
+    updateNavigation(navigation_state, "SA")
     result$preselPanel <- 3
   })
 
