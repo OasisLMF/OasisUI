@@ -144,6 +144,8 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       enable("abuttondelana")
       if (result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
         enable("abuttongotoana") 
+      } else {
+        disable("abuttongotoana")
       }
     } else {
       disable("abuttongotoana")
