@@ -76,9 +76,15 @@ api_get_models_id <- function(id) {
 #' @export
 return_tbl_modelsData <- function(supplier_id = ""){
   tbl_modelsData <- return_df(api_get_models, supplier_id)
-  tbl_modelsData <- convert_created_modified(tbl_modelsData)
-  tbl_modelsData <- tbl_modelsData %>%
-    arrange(desc(!! sym(tbl_modelsDataNames$id)))
+  
+  if (!is.null(tbl_modelsData) && nrow(tbl_modelsData) > 0 && is.null(tbl_modelsData$detail)) {
+    tbl_modelsData <- convert_created_modified(tbl_modelsData)
+    tbl_modelsData <- tbl_modelsData %>%
+      arrange(desc(!! sym(tbl_modelsDataNames$id)))
+  } else {
+    tbl_modelsData <- NULL
+  }
+
   return(tbl_modelsData)
 }
 
@@ -99,6 +105,12 @@ return_tbl_modelsData <- function(supplier_id = ""){
 #' @export
 return_tbl_modelData <- function(id){
   tbl_modelData <- return_df(api_get_models_id, id)
-  tbl_modelData <- convert_created_modified(tbl_modelData)
+  
+  if (!is.null(tbl_modelData) && nrow(tbl_modelData) > 0  && is.null(tbl_modelData$detail) ) {
+    tbl_modelData <- convert_created_modified(tbl_modelData)
+  } else {
+    tbl_modelData <- NULL
+  }
+  
   return(tbl_modelData)
 }

@@ -15,7 +15,7 @@
 #'
 #' @export
 api_get_analyses <- function(name = "") {
-
+  
   response <- GET(
     get_url(),
     config = add_headers(
@@ -25,7 +25,7 @@ api_get_analyses <- function(name = "") {
     path = paste(get_version(), "analyses", "", sep = "/"),
     query = list(name = name)
   )
-
+  
   api_handle_response(response)
 }
 
@@ -44,7 +44,7 @@ api_get_analyses <- function(name = "") {
 #'
 #' @export
 api_get_analyses_id <- function(id) {
-
+  
   response <- GET(
     get_url(),
     config = add_headers(
@@ -53,7 +53,7 @@ api_get_analyses_id <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "", sep = "/")
   )
-
+  
   api_handle_response(response)
 }
 
@@ -72,7 +72,7 @@ api_get_analyses_id <- function(id) {
 #'
 #' @export
 api_delete_analyses_id <- function(id) {
-
+  
   response <- DELETE(
     get_url(),
     config = add_headers(
@@ -81,7 +81,7 @@ api_delete_analyses_id <- function(id) {
     ),
     path = paste(get_version(), "analyses", id, "", sep = "/")
   )
-
+  
   api_handle_response(response)
 }
 
@@ -102,7 +102,7 @@ api_delete_analyses_id <- function(id) {
 #'
 #' @export
 api_post_analyses <- function(name, portfolio, model) {
-
+  
   response <- POST(
     get_url(),
     config = add_headers(
@@ -113,7 +113,7 @@ api_post_analyses <- function(name, portfolio, model) {
     encode = "json",
     path = paste(get_version(), "analyses", "", sep = "/")
   )
-
+  
   api_handle_response(response)
 }
 
@@ -139,13 +139,13 @@ api_post_analyses <- function(name, portfolio, model) {
 #'
 #' @export
 return_tbl_analysesData <- function(name = ""){
-
+  
   .replaceWithIcons <- function(df){
     #Status
     StatusGood <- c("RUN_COMPLETED")
     StatusBad <- c("INPUTS_GENERATION_ERROR", "RUN_ERROR", NA_character_)
     StatusAvailable <- c("READY")
-
+    
     #Replace Status in df
     if (!is.null(df)) {
       logMessage(paste0("replacing icons"))
@@ -158,14 +158,15 @@ return_tbl_analysesData <- function(name = ""){
     }
     df
   }
-
-  tbl_analysesData <- return_df(api_get_analyses, name) %>%
-    select(-contains("file") ) %>%
-    as.data.frame()
   
-  tbl_analysesData <- convert_created_modified(tbl_analysesData) 
+  tbl_analysesData <- return_df(api_get_analyses, name)
   
-  if (nrow(tbl_analysesData) > 0) {
+  if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0 && is.null(tbl_analysesData$detail)) {
+    tbl_analysesData <- tbl_analysesData %>%
+      select(-contains("file") ) %>%
+      as.data.frame()
+    
+    tbl_analysesData <- convert_created_modified(tbl_analysesData) 
     tbl_analysesData <- tbl_analysesData %>%
       arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
       .replaceWithIcons() %>%
@@ -173,9 +174,11 @@ return_tbl_analysesData <- function(name = ""){
                !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
                !! sym(tbl_analysesDataNames$modified), !! sym (tbl_analysesDataNames$created),
                !! sym(tbl_analysesDataNames$status)))
+    
   } else {
     tbl_analysesData <- NULL
   }
+  
   return(tbl_analysesData)
 }
 
@@ -199,7 +202,7 @@ return_tbl_analysesData <- function(name = ""){
 #'
 #' @export
 return_tbl_analysisdetails <- function(id){
-
+  
   #Help function to replace variable with icon
   .replacewithIcon <- function(var){
     # Staus Code for files
@@ -212,10 +215,13 @@ return_tbl_analysisdetails <- function(id){
     return(var)
   }
 
-  tbl_analysisdetails <- return_df(api_get_analyses_id,id) %>%
-    select(contains("file") ) %>%
-    as.data.frame()
-  #Replace files with Icons
+  tbl_analysisdetails <- return_df(api_get_analyses_id,id) 
+  
+  if (!is.null(tbl_analysisdetails) && nrow(tbl_analysisdetails) > 0 && is.null(tbl_analysisdetails$detail)) {
+    tbl_analysisdetails <-  tbl_analysisdetails %>%
+      select(contains("file") ) %>%
+      as.data.frame()
+    #Replace files with Icons
     #Input File
     get_analyses_input_file <- api_get_analyses_input_file(id)
     tbl_analysisdetails[[tbl_analysesDataNames$input_file]] <- toString(get_analyses_input_file$result$status_code) %>%
@@ -240,8 +246,13 @@ return_tbl_analysisdetails <- function(id){
     get_analyses_run_traceback_file <- api_get_analyses_run_traceback_file(id)
     tbl_analysisdetails[[tbl_analysesDataNames$run_traceback_file]] <- toString(get_analyses_run_traceback_file$result$status_code) %>%
       .replacewithIcon()
-  # reshape df
+    # reshape df
     tbl_analysisdetails <- gather(tbl_analysisdetails,  key = "files", value = "status") %>%
-    as.data.frame()
+      as.data.frame()
+    
+  } else {
+    tbl_analysisdetails <- NULL
+  }
+  
   return(tbl_analysisdetails)
 }

@@ -196,7 +196,8 @@ api_post_portfolios_create_analysis <- function(id, name, model) {
 return_tbl_portfoliosData <- function(name = ""){
   
   tbl_portfoliosData <- return_df(api_get_portfolios, name)
-  if (nrow(tbl_portfoliosData) > 0) {
+  
+  if (!is.null(tbl_portfoliosData) && nrow(tbl_portfoliosData) > 0 && is.null(tbl_portfoliosData$detail)) {
     
     tbl_portfoliosData <- cbind(tbl_portfoliosData, data.frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", Status$Processing, Status$Completed)))
     
@@ -231,15 +232,20 @@ return_tbl_portfoliosData <- function(name = ""){
 #' @export
 return_tbl_portfolioDetails <- function(id){
   
-  tbl_portfolioDetails <- return_df(api_get_portfolios_id, id) %>%
-    select(contains("file") ) %>%
-    as.data.frame()
-
-  # reshape df
-  tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "name")
-  # tbl_portfolioDetails <- tbl_portfolioDetails %>% mutate(status = ifelse( tbl_portfolioDetails$name == "Not Available", Status$Processing, Status$Completed)) %>%
-  tbl_portfolioDetails <-tbl_portfolioDetails  %>%
-    as.data.frame()
+  tbl_portfolioDetails <- return_df(api_get_portfolios_id, id)
+  
+  if (!is.null(tbl_portfolioDetails) && is.null(tbl_portfolioDetails$detail)) {
+    
+    tbl_portfolioDetails <- tbl_portfolioDetails %>%
+      select(contains("file") ) %>%
+      as.data.frame()
+    
+    # reshape df
+    tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "name")
+    # tbl_portfolioDetails <- tbl_portfolioDetails %>% mutate(status = ifelse( tbl_portfolioDetails$name == "Not Available", Status$Processing, Status$Completed)) %>%
+    tbl_portfolioDetails <- tbl_portfolioDetails  %>%
+      as.data.frame()
+  }
   
   return(tbl_portfolioDetails)
 }
