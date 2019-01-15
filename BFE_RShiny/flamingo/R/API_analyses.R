@@ -6,17 +6,17 @@
 #'
 #' @rdname api_get_analyses
 #'
-#' @param name the name of the analysis. Default empty string returns all analyses
+#' @param name The name of the analysis. Default empty string returns all analyses.
 #'
-#' @return previously posted analyses.
+#' @return Previously posted analyses.
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
 #'
 #' @export
 api_get_analyses <- function(name = "") {
-  
-  response <- GET(
+
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
@@ -24,8 +24,10 @@ api_get_analyses <- function(name = "") {
     ),
     path = paste(get_version(), "analyses", "", sep = "/"),
     query = list(name = name)
-  )
-  
+  ))
+
+  response <- api_fetch_response("GET", request_list)
+
   api_handle_response(response)
 }
 
@@ -35,25 +37,27 @@ api_get_analyses <- function(name = "") {
 #'
 #' @rdname api_get_analyses_id
 #'
-#' @param id a unique integer value identifying this analysis.
+#' @param id A unique integer value identifying this analysis.
 #'
-#' @return previously posted analyses id.
+#' @return Previously posted analyses id.
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
 #'
 #' @export
 api_get_analyses_id <- function(id) {
-  
-  response <- GET(
+
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
     path = paste(get_version(), "analyses", id, "", sep = "/")
-  )
-  
+  ))
+
+  response <- api_fetch_response("GET", request_list)
+
   api_handle_response(response)
 }
 
@@ -63,47 +67,49 @@ api_get_analyses_id <- function(id) {
 #'
 #' @rdname api_delete_analyses_id
 #'
-#' @param id a unique integer value identifying this analysis.
+#' @param id A unique integer value identifying this analysis.
 #'
-#' @return presponse to analysis deletion.
+#' @return Response to analysis deletion.
 #'
 #' @importFrom httr DELETE
 #' @importFrom httr add_headers
 #'
 #' @export
 api_delete_analyses_id <- function(id) {
-  
-  response <- DELETE(
+
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
     path = paste(get_version(), "analyses", id, "", sep = "/")
-  )
-  
+  ))
+
+  response <- api_fetch_response("DELETE", request_list)
+
   api_handle_response(response)
 }
 
 #' Post analyses
 #'
-#' Creates an analysis based on the input data
+#' Creates an analysis based on the input data.
 #'
 #' @rdname api_post_analyses
 #'
-#' @param name the name of the analysis.
-#' @param portfolio the id of the portfolio.
-#' @param model the id of the model.
+#' @param name The name of the analysis.
+#' @param portfolio The id of the portfolio.
+#' @param model The id of the model.
 #'
-#' @return the posted analysis.
+#' @return The posted analysis.
 #'
 #' @importFrom httr POST
 #' @importFrom httr add_headers
 #'
 #' @export
 api_post_analyses <- function(name, portfolio, model) {
-  
-  response <- POST(
+
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept =  get_http_type(),
@@ -112,23 +118,24 @@ api_post_analyses <- function(name, portfolio, model) {
     body = list(name = name, portfolio = portfolio, model = model),
     encode = "json",
     path = paste(get_version(), "analyses", "", sep = "/")
-  )
-  
+  ))
+
+  response <- api_fetch_response("POST", request_list)
+
   api_handle_response(response)
 }
 
-
 # R functions calling Analyses API Calls ---------------------------------------
 
-#' Return analyses Data fot DT
+#' Return analyses data for DT
 #'
 #' @rdname return_tbl_analysisData
 #'
-#' @description Returns a dataframe of analyses ready for being rendered as a data table
+#' @description Returns a dataframe of analyses ready for being rendered as a data table.
 #'
-#' @param name name of the analyses.
+#' @param name Name of the analyses.
 #'
-#' @return dataframe of previously posted analyses. Default empty string returns all analyses.
+#' @return Dataframe of previously posted analyses. Default empty string returns all analyses.
 #'
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
@@ -138,15 +145,14 @@ api_post_analyses <- function(name, portfolio, model) {
 #' @importFrom dplyr case_when
 #'
 #' @export
-return_tbl_analysesData <- function(name = ""){
-  
-  .replaceWithIcons <- function(df){
-    #Status
+return_tbl_analysesData <- function(name = "") {
+
+  .replaceWithIcons <- function(df) {
     StatusGood <- c("RUN_COMPLETED")
     StatusBad <- c("INPUTS_GENERATION_ERROR", "RUN_ERROR", NA_character_)
     StatusAvailable <- c("READY")
-    
-    #Replace Status in df
+
+    # replace status in df
     if (!is.null(df)) {
       logMessage(paste0("replacing icons"))
       df <- df %>%
@@ -158,15 +164,15 @@ return_tbl_analysesData <- function(name = ""){
     }
     df
   }
-  
+
   tbl_analysesData <- return_df(api_get_analyses, name)
-  
+
   if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0 && is.null(tbl_analysesData$detail)) {
     tbl_analysesData <- tbl_analysesData %>%
-      select(-contains("file") ) %>%
+      select(-contains("file")) %>%
       as.data.frame()
-    
-    tbl_analysesData <- convert_created_modified(tbl_analysesData) 
+
+    tbl_analysesData <- convert_created_modified(tbl_analysesData)
     tbl_analysesData <- tbl_analysesData %>%
       arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
       .replaceWithIcons() %>%
@@ -174,24 +180,22 @@ return_tbl_analysesData <- function(name = ""){
                !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
                !! sym(tbl_analysesDataNames$modified), !! sym (tbl_analysesDataNames$created),
                !! sym(tbl_analysesDataNames$status)))
-    
   } else {
     tbl_analysesData <- NULL
   }
-  
-  return(tbl_analysesData)
+
+  tbl_analysesData
 }
 
-
-#' Return analysis Details fot DT
+#' Return analysis details for DT
 #'
 #' @rdname return_tbl_analysisdetails
 #'
-#' @description Returns a dataframe of analysis details ready for being rendered as a data table
+#' @description Returns a dataframe of analysis details ready for being rendered as a data table.
 #'
-#' @param id a unique integer value identifying this analysis.
+#' @param id A unique integer value identifying this analysis.
 #'
-#' @return dataframe of details of previously posted analysis
+#' @return Dataframe of details of previously posted analysis.
 #'
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
@@ -201,58 +205,57 @@ return_tbl_analysesData <- function(name = ""){
 #' @importFrom dplyr case_when
 #'
 #' @export
-return_tbl_analysisdetails <- function(id){
-  
-  #Help function to replace variable with icon
-  .replacewithIcon <- function(var){
-    # Staus Code for files
+return_tbl_analysisdetails <- function(id) {
+
+  # helper function to replace variable with icon
+  .replacewithIcon <- function(var) {
+    # status code for files
     status_code_exist <- 200
     status_code_notfound <- 404
-    
+
     var <- case_when(var %in% status_code_exist ~ Status$Completed,
                      var %in% status_code_notfound ~ Status$Processing,
                      var %notin% c(status_code_notfound, status_code_exist) ~ Status$Failed)
     return(var)
   }
 
-  tbl_analysisdetails <- return_df(api_get_analyses_id,id) 
-  
+  tbl_analysisdetails <- return_df(api_get_analyses_id, id)
+
   if (!is.null(tbl_analysisdetails) && nrow(tbl_analysisdetails) > 0 && is.null(tbl_analysisdetails$detail)) {
     tbl_analysisdetails <-  tbl_analysisdetails %>%
       select(contains("file") ) %>%
       as.data.frame()
-    #Replace files with Icons
-    #Input File
+    # replace files with Icons
+    # input file
     get_analyses_input_file <- api_get_analyses_input_file(id)
     tbl_analysisdetails[[tbl_analysesDataNames$input_file]] <- toString(get_analyses_input_file$result$status_code) %>%
       .replacewithIcon()
-    #Setting File
+    # settings file
     get_analyses_settings_file <- api_get_analyses_settings_file(id)
     tbl_analysisdetails[[tbl_analysesDataNames$settings_file]] <- toString(get_analyses_settings_file$result$status_code) %>%
       .replacewithIcon()
-    #Input errors file
+    # input errors file
     get_analyses_input_errors_file <- api_get_analyses_input_errors_file(id)
     tbl_analysisdetails[[tbl_analysesDataNames$input_errors_file]] <- toString(get_analyses_input_errors_file$result$status_code) %>%
       .replacewithIcon()
-    #input generation traceback file
+    # input generation traceback file
     get_analyses_input_generation_traceback_file <- api_get_analyses_input_generation_traceback_file(id)
     tbl_analysisdetails[[tbl_analysesDataNames$input_generation_traceback_file]] <- toString(get_analyses_input_generation_traceback_file$result$status_code) %>%
       .replacewithIcon()
-    #output file
+    # output file
     get_analyses_input_file <- api_get_analyses_input_file(id)
     tbl_analysisdetails[[tbl_analysesDataNames$output_file]] <- toString(get_analyses_input_file$result$status_code) %>%
       .replacewithIcon()
-    #run traceback file
+    # run traceback file
     get_analyses_run_traceback_file <- api_get_analyses_run_traceback_file(id)
     tbl_analysisdetails[[tbl_analysesDataNames$run_traceback_file]] <- toString(get_analyses_run_traceback_file$result$status_code) %>%
       .replacewithIcon()
     # reshape df
     tbl_analysisdetails <- gather(tbl_analysisdetails,  key = "files", value = "status") %>%
       as.data.frame()
-    
   } else {
     tbl_analysisdetails <- NULL
   }
-  
-  return(tbl_analysisdetails)
+
+  tbl_analysisdetails
 }
