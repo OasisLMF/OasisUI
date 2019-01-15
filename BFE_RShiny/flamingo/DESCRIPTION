@@ -1,6 +1,6 @@
 Package: flamingo
 Version: 0.1.0
-License: BSD-3-Clause + file LICENSE
+License: BSD_3_clause + file LICENSE
 Title: Oasis User Interface
 Description: This package provides an extensible implementation of a user
   interface for modelling workflows. The interface is a web application based
