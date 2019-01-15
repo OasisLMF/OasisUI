@@ -2,18 +2,18 @@
 % Please edit documentation in R/API_utils.R
 \name{return_df}
 \alias{return_df}
-\title{Return Dataframe from API response}
+\title{Return dataframe from API response}
 \usage{
 return_df(api_query, api_param = "")
 }
 \arguments{
-\item{api_query}{function representing the API query}
+\item{api_query}{Function representing the API query.}
 
-\item{api_param}{parameter for the api_query}
+\item{api_param}{Parameter for the api_query.}
 }
 \value{
-dataframe of the API response
+Dataframe of the API response.
 }
 \description{
-Returns a dataframe of the API response
+Returns a dataframe of the API response.
 }

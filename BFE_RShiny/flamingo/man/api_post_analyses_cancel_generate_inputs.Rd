@@ -7,11 +7,11 @@
 api_post_analyses_cancel_generate_inputs(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-the cancelled analysis input generation.
+The cancelled analysis input generation.
 }
 \description{
-Cancel the inputs generated in the analysis.
+Cancel the input generation process for the analysis.
 }

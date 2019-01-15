@@ -7,11 +7,11 @@
 api_get_analyses_run_traceback_file(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-previously posted analysis run_traceback file.
+Previously produced analysis run_traceback file.
 }
 \description{
-Gets the analysis run_traceback_file contents
+Gets the analysis run_traceback_file contents.
 }

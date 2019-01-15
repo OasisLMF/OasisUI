@@ -7,11 +7,11 @@
 api_get_portfolios_accounts_file(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this portfolio.}
+\item{id}{A unique integer value identifying this portfolio.}
 }
 \value{
-the previously posted portfolio accounts file.
+The previously posted portfolio accounts file.
 }
 \description{
-Gets the portfolios accounts_file contents
+Gets the portfolios accounts_file contents.
 }

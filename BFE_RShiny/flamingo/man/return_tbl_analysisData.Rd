@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_analyses.R
 \name{return_tbl_analysesData}
 \alias{return_tbl_analysesData}
-\title{Return analyses Data fot DT}
+\title{Return analyses data for DT}
 \usage{
 return_tbl_analysesData(name = "")
 }
 \arguments{
-\item{name}{name of the analyses.}
+\item{name}{Name of the analyses.}
 }
 \value{
-dataframe of previously posted analyses. Default empty string returns all analyses.
+Dataframe of previously posted analyses. Default empty string returns all analyses.
 }
 \description{
-Returns a dataframe of analyses ready for being rendered as a data table
+Returns a dataframe of analyses ready for being rendered as a data table.
 }

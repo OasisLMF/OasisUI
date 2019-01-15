@@ -7,10 +7,10 @@
 api_get_models_id(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying a model.}
 }
 \value{
-previously posted models id.
+Previously posted models id.
 }
 \description{
 Returns the specific model entry.

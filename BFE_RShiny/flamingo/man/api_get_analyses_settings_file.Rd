@@ -7,11 +7,11 @@
 api_get_analyses_settings_file(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-previously posted analysis settings file.
+Previously posted analysis settings file.
 }
 \description{
-Gets the analysis settings_file contents
+Gets the analysis settings_file contents.
 }

@@ -7,10 +7,10 @@
 api_get_analyses_id(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-previously posted analyses id.
+Previously posted analyses id.
 }
 \description{
 Returns the specific analysis entry.

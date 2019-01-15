@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_analyses_id.R
 \name{return_analyses_settings_file_list}
 \alias{return_analyses_settings_file_list}
-\title{Return ianalyses_settings_file List}
+\title{Return analyses_settings_file list}
 \usage{
 return_analyses_settings_file_list(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-list of analyses_settings_file
+List of analyses_settings_file.
 }
 \description{
-Returns a list of analyses_settings
+Returns a list of analyses_settings.
 }

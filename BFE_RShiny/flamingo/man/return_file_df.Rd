@@ -7,13 +7,13 @@
 return_file_df(api_query, api_param = "")
 }
 \arguments{
-\item{api_query}{function representing the API query}
+\item{api_query}{Function representing the API query.}
 
-\item{api_param}{parameter for the api_query}
+\item{api_param}{Parameter for the api_query.}
 }
 \value{
-Dataframe of a file downloaded from API
+Dataframe of a file downloaded from the API.
 }
 \description{
-Returns a dataframe of a file downloaded from API
+Returns a dataframe of a file downloaded from the API.
 }

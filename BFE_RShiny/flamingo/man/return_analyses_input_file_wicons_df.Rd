@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_analyses_id.R
 \name{return_analyses_input_file_wicons_df}
 \alias{return_analyses_input_file_wicons_df}
-\title{Return analyses input files  Dataframe with Icons}
+\title{Return analyses input files dataframe with icons}
 \usage{
 return_analyses_input_file_wicons_df(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-dataframe of input files with Icons.
+Dataframe of input files with icons.
 }
 \description{
-Returns a dataframe of input files with Icons
+Returns a dataframe of input files with icons.
 }

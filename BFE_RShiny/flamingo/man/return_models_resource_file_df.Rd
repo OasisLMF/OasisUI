@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_models_id.R
 \name{return_models_id_resource_file_df}
 \alias{return_models_id_resource_file_df}
-\title{Return model resource file Dataframe}
+\title{Return model resource file dataframe}
 \usage{
 return_models_id_resource_file_df(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this model.}
+\item{id}{A unique integer value identifying this model.}
 }
 \value{
-dataframe of resource file of previously posted model
+Dataframe of resource file of previously posted model.
 }
 \description{
-Returns a dataframe of model resource file
+Returns a dataframe of a model resource file.
 }

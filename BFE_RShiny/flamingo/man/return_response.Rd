@@ -7,13 +7,13 @@
 return_response(api_query, api_param = "")
 }
 \arguments{
-\item{api_query}{function representing the API query}
+\item{api_query}{Function representing the API query.}
 
-\item{api_param}{parameter for the api_query}
+\item{api_param}{Parameter for the api_query.}
 }
 \value{
-list of the API response
+List of the API response.
 }
 \description{
-Returns a list of the API response
+Returns a list of the API response.
 }

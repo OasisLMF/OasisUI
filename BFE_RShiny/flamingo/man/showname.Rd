@@ -2,16 +2,18 @@
 % Please edit documentation in R/API_utils.R
 \name{showname}
 \alias{showname}
-\title{return element based on length of input}
+\title{Return element based on length of input}
 \usage{
 showname(x)
 }
 \arguments{
-\item{x}{list, NULL or string}
+\item{x}{List, NULL or string.}
 }
 \value{
-string
+String.
 }
 \description{
-Returns the element name of the input x if x has legth > 1, the elemnt x itself if it has length = 1, and "Not available" if if x has legth = 0
+Returns the element name of the input x if x has length > 1, the
+  element x itself if it has length = 1, and "Not available" if x has length
+  = 0.
 }

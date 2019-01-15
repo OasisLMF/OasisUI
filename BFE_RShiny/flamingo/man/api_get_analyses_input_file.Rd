@@ -7,11 +7,11 @@
 api_get_analyses_input_file(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-previously posted analysis input file.
+Previously posted analysis input file.
 }
 \description{
-Gets the analysis input_file contents
+Gets the analysis input_file contents.
 }

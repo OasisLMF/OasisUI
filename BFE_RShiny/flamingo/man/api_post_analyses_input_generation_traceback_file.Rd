@@ -8,12 +8,12 @@ api_post_analyses_input_generation_traceback_file(id,
   filepath_input_generation_traceback)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{filepath_input_generation_traceback}{path to the input_generation_traceback file.}
+\item{filepath_input_generation_traceback}{Path to the input_generation_traceback file.}
 }
 \value{
-the posted analysis input_generation_traceback file.
+The posted analysis input_generation_traceback file.
 }
 \description{
 Sets the analysis input_generation_traceback_file contents.

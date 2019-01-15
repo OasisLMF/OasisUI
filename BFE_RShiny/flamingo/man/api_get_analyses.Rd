@@ -7,10 +7,10 @@
 api_get_analyses(name = "")
 }
 \arguments{
-\item{name}{the name of the analysis. Default empty string returns all analyses}
+\item{name}{The name of the analysis. Default empty string returns all analyses.}
 }
 \value{
-previously posted analyses.
+Previously posted analyses.
 }
 \description{
 Returns a list of analysis objects.

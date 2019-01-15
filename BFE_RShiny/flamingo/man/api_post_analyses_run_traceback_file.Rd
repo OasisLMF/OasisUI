@@ -7,12 +7,12 @@
 api_post_analyses_run_traceback_file(id, filepath_run_traceback)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{filepath_run_traceback}{path to the run_traceback file.}
+\item{filepath_run_traceback}{Path to the run_traceback file.}
 }
 \value{
-the posted analysis run_traceback file.
+The posted analysis run_traceback file.
 }
 \description{
 Sets the analysis run_traceback_file contents.

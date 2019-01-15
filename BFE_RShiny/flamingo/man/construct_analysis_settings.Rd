@@ -7,16 +7,13 @@
 construct_analysis_settings(inputsettings, outputsLossTypes)
 }
 \arguments{
-\item{inputsettings}{list of input settings}
+\item{inputsettings}{List of input settings.}
 
-\item{outputsLossTypes}{list of output configuration}
+\item{outputsLossTypes}{List of output configuration.}
 }
 \value{
-list of analysis settings.
+List of analysis settings.
 }
 \description{
-Constructs a list of analysis settings
-}
-\details{
-Construct analysis settings
+Constructs a list of analysis settings.
 }

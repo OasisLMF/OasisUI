@@ -7,11 +7,11 @@
 api_post_analyses_run(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-analysis status..
+Analysis status.
 }
 \description{
-Returns the analysis status
+Returns the analysis status.
 }

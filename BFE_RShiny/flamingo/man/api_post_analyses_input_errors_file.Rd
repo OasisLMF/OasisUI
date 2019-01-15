@@ -7,12 +7,12 @@
 api_post_analyses_input_errors_file(id, filepath_input_errors)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{filepath_input_errors}{path to the input_errors file.}
+\item{filepath_input_errors}{Path to the input_errors file.}
 }
 \value{
-the posted analysis input_errors file.
+The posted analysis input_errors file.
 }
 \description{
 Sets the analysis input_errors_file contents.

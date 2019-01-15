@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_analyses.R
 \name{return_tbl_analysisdetails}
 \alias{return_tbl_analysisdetails}
-\title{Return analysis Details fot DT}
+\title{Return analysis details for DT}
 \usage{
 return_tbl_analysisdetails(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-dataframe of details of previously posted analysis
+Dataframe of details of previously posted analysis.
 }
 \description{
-Returns a dataframe of analysis details ready for being rendered as a data table
+Returns a dataframe of analysis details ready for being rendered as a data table.
 }

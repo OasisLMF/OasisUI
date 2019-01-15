@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_models.R
 \name{return_tbl_modelData}
 \alias{return_tbl_modelData}
-\title{Return Model Data fot DT}
+\title{Return model data for DT}
 \usage{
 return_tbl_modelData(id)
 }
 \arguments{
-\item{id}{the ID for the model.}
+\item{id}{The ID for the model.}
 }
 \value{
-dataframe of previously posted model.
+Dataframe of previously posted model.
 }
 \description{
-Returns a dataframe of model ready for being rendered as a data table
+Returns a dataframe of model ready for being rendered as a data table.
 }

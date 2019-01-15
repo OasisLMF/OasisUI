@@ -7,11 +7,11 @@
 api_get_models_id_resource_file(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this model.}
+\item{id}{A unique integer value identifying this model.}
 }
 \value{
-previously posted model resource file.
+Previously posted model resource file.
 }
 \description{
-Gets the model resource_file contents
+Gets the model resource_file contents.
 }

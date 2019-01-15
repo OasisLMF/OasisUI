@@ -7,15 +7,15 @@
 api_post_analyses(name, portfolio, model)
 }
 \arguments{
-\item{name}{the name of the analysis.}
+\item{name}{The name of the analysis.}
 
-\item{portfolio}{the id of the portfolio.}
+\item{portfolio}{The id of the portfolio.}
 
-\item{model}{the id of the model.}
+\item{model}{The id of the model.}
 }
 \value{
-the posted analysis.
+The posted analysis.
 }
 \description{
-Creates an analysis based on the input data
+Creates an analysis based on the input data.
 }

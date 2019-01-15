@@ -2,18 +2,18 @@
 % Please edit documentation in R/API_analyses_id.R
 \name{return_analyses_spec_output_file_df}
 \alias{return_analyses_spec_output_file_df}
-\title{Return specific analyses output file as Dataframe}
+\title{Return specific analyses output file as dataframe}
 \usage{
 return_analyses_spec_output_file_df(id, fileName)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{fileName}{name of file to read}
+\item{fileName}{Name of file to read.}
 }
 \value{
-dataframe of specific output file.
+Dataframe of specific output file.
 }
 \description{
-Returns a dataframe of specific output file
+Returns a dataframe of a specific output file.
 }

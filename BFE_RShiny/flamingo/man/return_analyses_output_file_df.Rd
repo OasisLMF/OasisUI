@@ -7,11 +7,11 @@
 return_analyses_output_file_df(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-dataframe of output files.
+Dataframe of output files.
 }
 \description{
-Returns a dataframe of output files
+Returns a dataframe of output files.
 }

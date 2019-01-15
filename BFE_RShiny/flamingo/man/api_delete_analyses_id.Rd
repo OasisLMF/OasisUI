@@ -7,10 +7,10 @@
 api_delete_analyses_id(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-presponse to analysis deletion.
+Response to analysis deletion.
 }
 \description{
 Removes an analysis.

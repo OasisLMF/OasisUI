@@ -7,12 +7,12 @@
 api_post_analyses_output_file(id, filepath_output)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{filepath_output}{path to the output file.}
+\item{filepath_output}{Path to the output file.}
 }
 \value{
-the posted analysis output file.
+The posted analysis output file.
 }
 \description{
 Sets the analysis output_file contents.

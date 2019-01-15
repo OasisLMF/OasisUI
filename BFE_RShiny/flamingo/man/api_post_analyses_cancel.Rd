@@ -7,10 +7,10 @@
 api_post_analyses_cancel(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-the cancelled analysis.
+The cancelled analysis.
 }
 \description{
 Cancel the selected analysis.

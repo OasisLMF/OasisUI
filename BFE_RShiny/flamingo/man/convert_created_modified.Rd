@@ -7,11 +7,11 @@
 convert_created_modified(tbl_obj)
 }
 \arguments{
-\item{tbl_obj}{data.frame to convert.}
+\item{tbl_obj}{Dataframe to convert.}
 }
 \value{
-Dataframe with converted columns
+Dataframe with converted columns.
 }
 \description{
-replaces created and modified columns with different date format
+Replaces created and modified columns with different date format.
 }

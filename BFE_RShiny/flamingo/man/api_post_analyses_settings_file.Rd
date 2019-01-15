@@ -7,12 +7,12 @@
 api_post_analyses_settings_file(id, filepath_settings)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{filepath_settings}{path to the settings file.}
+\item{filepath_settings}{Path to the settings file.}
 }
 \value{
-the posted analysis settings file.
+The posted analysis settings file.
 }
 \description{
 Sets the analysis settings_file contents.

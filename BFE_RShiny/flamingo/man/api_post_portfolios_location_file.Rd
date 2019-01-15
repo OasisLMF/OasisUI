@@ -7,12 +7,12 @@
 api_post_portfolios_location_file(id, filepath_location)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 
-\item{filepath_location}{path to the location file.}
+\item{filepath_location}{Path to the location file.}
 }
 \value{
-the posted portfolio location file.
+The posted portfolio location file.
 }
 \description{
 Sets the portfolios location_file contents.

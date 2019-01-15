@@ -13,5 +13,5 @@ api_get_portfolios_reinsurance_source_file(id)
 The previously posted portfolio reinsurance source file.
 }
 \description{
-Gets the portfolios reinsurance_source_file contents
+Gets the portfolios reinsurance_source_file contents.
 }

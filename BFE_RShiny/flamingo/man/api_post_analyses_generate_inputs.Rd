@@ -7,10 +7,10 @@
 api_post_analyses_generate_inputs(id)
 }
 \arguments{
-\item{id}{a unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this analysis.}
 }
 \value{
-the posted analysis input generation.
+The posted analysis input generation.
 }
 \description{
 Sets the analysis generate_inputs contents.

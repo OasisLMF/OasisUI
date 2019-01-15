@@ -7,10 +7,10 @@
 api_get_models(supplier_id = "")
 }
 \arguments{
-\item{supplier_id}{the supplier ID for the model. Default is empty string.}
+\item{supplier_id}{The supplier ID for the model. Default is empty string.}
 }
 \value{
-previously posted models. . Default empty string returns all portfolios.
+Previously posted models. Default empty string returns all models.
 }
 \description{
 Returns a list of model objects.
