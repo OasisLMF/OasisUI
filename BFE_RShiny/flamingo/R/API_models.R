@@ -1,14 +1,13 @@
 # Models API Calls -------------------------------------------------------------
-
 #' Get models
 #'
 #' Returns a list of model objects.
 #'
 #' @rdname api_get_models
 #'
-#' @param supplier_id the supplier ID for the model. Default is empty string.
+#' @param supplier_id The supplier ID for the model. Default is empty string.
 #'
-#' @return previously posted models. . Default empty string returns all portfolios.
+#' @return Previously posted models. Default empty string returns all models.
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
@@ -16,7 +15,7 @@
 #' @export
 api_get_models <- function(supplier_id = "") {
 
-  response <- GET(
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
@@ -24,7 +23,9 @@ api_get_models <- function(supplier_id = "") {
     ),
     path = paste(get_version(), "models", "", sep = "/"),
     query = list(`supplier_id` = supplier_id)
-  )
+  ))
+
+  response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
 }
@@ -35,9 +36,9 @@ api_get_models <- function(supplier_id = "") {
 #'
 #' @rdname api_get_models_id
 #'
-#' @param id a unique integer value identifying this analysis.
+#' @param id A unique integer value identifying a model.
 #'
-#' @return previously posted models id.
+#' @return Previously posted models id.
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
@@ -45,38 +46,39 @@ api_get_models <- function(supplier_id = "") {
 #' @export
 api_get_models_id <- function(id) {
 
-  response <- GET(
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
     path = paste(get_version(), "models", id, "", sep = "/")
-  )
+  ))
+
+  response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
 }
 
 # R functions calling Models API Calls -----------------------------------------
-
-#' Return Models Data fot DT
+#' Return models data for DT
 #'
 #' @rdname return_tbl_modelsData
 #'
-#' @description Returns a dataframe of models ready for being rendered as a data table
+#' @description Returns a dataframe of models ready for being rendered as a data table.
 #'
-#' @param supplier_id the supplier ID for the model. Default is empty string.
+#' @param supplier_id The supplier ID for the model. Default is empty string.
 #'
-#' @return dataframe of previously posted modelss. Default empty string returns all models.
+#' @return Dataframe of previously posted models. Default empty string returns all models.
 #'
 #' @importFrom dplyr arrange
 #' @importFrom dplyr sym
 #' @importFrom dplyr desc
 #'
 #' @export
-return_tbl_modelsData <- function(supplier_id = ""){
+return_tbl_modelsData <- function(supplier_id = "") {
   tbl_modelsData <- return_df(api_get_models, supplier_id)
-  
+
   if (!is.null(tbl_modelsData) && nrow(tbl_modelsData) > 0 && is.null(tbl_modelsData$detail)) {
     tbl_modelsData <- convert_created_modified(tbl_modelsData)
     tbl_modelsData <- tbl_modelsData %>%
@@ -85,32 +87,32 @@ return_tbl_modelsData <- function(supplier_id = ""){
     tbl_modelsData <- NULL
   }
 
-  return(tbl_modelsData)
+  tbl_modelsData
 }
 
-#' Return Model Data fot DT
+#' Return model data for DT
 #'
 #' @rdname return_tbl_modelData
 #'
-#' @description Returns a dataframe of model ready for being rendered as a data table
+#' @description Returns a dataframe of model ready for being rendered as a data table.
 #'
-#' @param id the ID for the model.
+#' @param id The ID for the model.
 #'
-#' @return dataframe of previously posted model.
+#' @return Dataframe of previously posted model.
 #'
 #' @importFrom dplyr arrange
 #' @importFrom dplyr sym
 #' @importFrom dplyr desc
 #'
 #' @export
-return_tbl_modelData <- function(id){
+return_tbl_modelData <- function(id) {
   tbl_modelData <- return_df(api_get_models_id, id)
-  
-  if (!is.null(tbl_modelData) && nrow(tbl_modelData) > 0  && is.null(tbl_modelData$detail) ) {
+
+  if (!is.null(tbl_modelData) && nrow(tbl_modelData) > 0  && is.null(tbl_modelData$detail)) {
     tbl_modelData <- convert_created_modified(tbl_modelData)
   } else {
     tbl_modelData <- NULL
   }
-  
-  return(tbl_modelData)
+
+  tbl_modelData
 }
