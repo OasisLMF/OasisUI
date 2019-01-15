@@ -12,3 +12,12 @@ List with API return status and response containing the new token.
 \description{
 Fetches a new access token from an existing refresh token.
 }
+\details{
+Passing the \code{refresh_token} through the authorization header does
+not seem to be standard oauth2 as described in
+\url{https://tools.ietf.org/html/rfc6749}. This also makes it impossible to use
+\code{httr}'s built-in oauth2 mechanisms, which would provide automatic token
+refreshing within \code{\link[httr:POST]{httr::POST()}}, \code{\link[httr:GET]{httr::GET()}}, etc. Instead we have to
+check outside \code{\link[httr:POST]{httr::POST()}} / \code{\link[httr:GET]{httr::GET()}} and if necessary, refresh and
+redo the request. See also the unexported \code{api_fetch_response()}.
+}
