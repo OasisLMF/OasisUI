@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_portfolios.R
 \name{return_tbl_portfolioDetails}
 \alias{return_tbl_portfolioDetails}
-\title{Return Portfolio Details fot DT}
+\title{Return portfolio details for DT}
 \usage{
 return_tbl_portfolioDetails(id)
 }
 \arguments{
-\item{id}{id of the portfolio.}
+\item{id}{Id of the portfolio.}
 }
 \value{
-dataframe of details of previously posted portfolio.
+Dataframe of details of previously posted portfolio.
 }
 \description{
-Returns a dataframe of portfolio's details ready for being rendered as a data table
+Returns a dataframe of portfolio's details ready for being rendered as a data table.
 }

@@ -2,16 +2,16 @@
 % Please edit documentation in R/API_portfolios.R
 \name{return_tbl_portfoliosData}
 \alias{return_tbl_portfoliosData}
-\title{Return Portfolios Data fot DT}
+\title{Return portfolios data for DT}
 \usage{
 return_tbl_portfoliosData(name = "")
 }
 \arguments{
-\item{name}{name of the portfolio.}
+\item{name}{Name of the portfolio.}
 }
 \value{
-dataframe of previously posted portfolios. Default empty string returns all portfolios.
+Dataframe of previously posted portfolios. Default empty string returns all portfolios.
 }
 \description{
-Returns a dataframe of portfolios ready for being rendered as a data table
+Returns a dataframe of portfolios ready for being rendered as a data table.
 }

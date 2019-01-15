@@ -16,7 +16,7 @@
 #' @export
 api_get_portfolios <- function(name = "") {
 
-  response <- GET(
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
@@ -24,7 +24,9 @@ api_get_portfolios <- function(name = "") {
     ),
     path = paste(get_version(), "portfolios", "", sep = "/"),
     query = list(name = name)
-  )
+  ))
+
+  response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
 }
@@ -45,16 +47,18 @@ api_get_portfolios <- function(name = "") {
 #' @export
 api_post_portfolios <- function(name) {
 
-  response <- POST(
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())#,
+      Authorization = sprintf("Bearer %s", get_token())
     ),
     body = list(name = name),
     encode = "json",
     path = paste(get_version(), "portfolios", "", sep = "/")
-  )
+  ))
+
+  response <- api_fetch_response("POST", request_list)
 
   api_handle_response(response)
 }
@@ -76,7 +80,7 @@ api_post_portfolios <- function(name) {
 #' @export
 api_put_portfolios_id <- function(id, name) {
 
-  response <- PUT(
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
@@ -85,7 +89,9 @@ api_put_portfolios_id <- function(id, name) {
     body = list(name = name),
     encode = "json",
     path = paste(get_version(), "portfolios", id, "", sep = "/")
-  )
+  ))
+
+  response <- api_fetch_response("PUT", request_list)
 
   api_handle_response(response)
 }
@@ -106,14 +112,16 @@ api_put_portfolios_id <- function(id, name) {
 #' @export
 api_get_portfolios_id <- function(id) {
 
-  response <- GET(
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
     path = paste(get_version(), "portfolios", id, "", sep = "/")
-  )
+  ))
+
+  response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
 }
@@ -130,14 +138,16 @@ api_get_portfolios_id <- function(id) {
 #' @export
 api_delete_portfolios_id <- function(id) {
 
-  response <- DELETE(
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
     path = paste(get_version(), "portfolios", id, "", sep = "/")
-  )
+  ))
+
+  response <- api_fetch_response("DELETE", request_list)
 
   api_handle_response(response)
 }
@@ -160,7 +170,7 @@ api_delete_portfolios_id <- function(id) {
 #' @export
 api_post_portfolios_create_analysis <- function(id, name, model) {
 
-  response <- POST(
+  request_list <- expression(list(
     get_url(),
     config = add_headers(
       Accept = get_http_type(),
@@ -169,22 +179,24 @@ api_post_portfolios_create_analysis <- function(id, name, model) {
     body = list(name = name, model = model),
     encode = "json",
     path = paste(get_version(), "portfolios", id, "create_analysis", "", sep = "/")
-  )
+  ))
+
+  response <- api_fetch_response("POST", request_list)
 
   api_handle_response(response)
 }
 
 # R functions calling Portfolio API functions and manipulating the output ------
 
-#' Return Portfolios Data fot DT
+#' Return portfolios data for DT
 #'
 #' @rdname return_tbl_portfoliosData
 #'
-#' @description Returns a dataframe of portfolios ready for being rendered as a data table
+#' @description Returns a dataframe of portfolios ready for being rendered as a data table.
 #'
-#' @param name name of the portfolio.
+#' @param name Name of the portfolio.
 #'
-#' @return dataframe of previously posted portfolios. Default empty string returns all portfolios.
+#' @return Dataframe of previously posted portfolios. Default empty string returns all portfolios.
 #'
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
@@ -193,59 +205,53 @@ api_post_portfolios_create_analysis <- function(id, name, model) {
 #' @importFrom dplyr desc
 #'
 #' @export
-return_tbl_portfoliosData <- function(name = ""){
-  
+return_tbl_portfoliosData <- function(name = "") {
+
   tbl_portfoliosData <- return_df(api_get_portfolios, name)
-  
+
   if (!is.null(tbl_portfoliosData) && nrow(tbl_portfoliosData) > 0 && is.null(tbl_portfoliosData$detail)) {
-    
     tbl_portfoliosData <- cbind(tbl_portfoliosData, data.frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", Status$Processing, Status$Completed)))
-    
+
     tbl_portfoliosData <- convert_created_modified(tbl_portfoliosData)
-    
+
     tbl_portfoliosDetailsStatus <- tbl_portfoliosData  %>%
-      select(-contains("file") ) %>% 
+      select(-contains("file") ) %>%
       arrange(desc(!! sym(tbl_portfoliosDataNames$id))) %>%
       as.data.frame()
-
   } else {
     tbl_portfoliosDetailsStatus <- NULL
   }
-  
-  return(tbl_portfoliosDetailsStatus)
+
+  tbl_portfoliosDetailsStatus
 }
 
-#' Return Portfolio Details fot DT
+#' Return portfolio details for DT
 #'
 #' @rdname return_tbl_portfolioDetails
 #'
-#' @description Returns a dataframe of portfolio's details ready for being rendered as a data table
+#' @description Returns a dataframe of portfolio's details ready for being rendered as a data table.
 #'
-#' @param id id of the portfolio.
+#' @param id Id of the portfolio.
 #'
-#' @return dataframe of details of previously posted portfolio.
+#' @return Dataframe of details of previously posted portfolio.
 #'
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
 #' @importFrom tidyr gather
 #'
 #' @export
-return_tbl_portfolioDetails <- function(id){
-  
+return_tbl_portfolioDetails <- function(id) {
+
   tbl_portfolioDetails <- return_df(api_get_portfolios_id, id)
-  
+
   if (!is.null(tbl_portfolioDetails) && is.null(tbl_portfolioDetails$detail)) {
-    
     tbl_portfolioDetails <- tbl_portfolioDetails %>%
-      select(contains("file") ) %>%
+      select(contains("file")) %>%
       as.data.frame()
-    
     # reshape df
-    tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "name")
-    # tbl_portfolioDetails <- tbl_portfolioDetails %>% mutate(status = ifelse( tbl_portfolioDetails$name == "Not Available", Status$Processing, Status$Completed)) %>%
-    tbl_portfolioDetails <- tbl_portfolioDetails  %>%
+    tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "name") %>%
       as.data.frame()
   }
-  
-  return(tbl_portfolioDetails)
+
+  tbl_portfolioDetails
 }
