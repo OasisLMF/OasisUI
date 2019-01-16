@@ -12,26 +12,25 @@ Authors@R: c(person("Oasis LMF", role = c("aut", "cre", "cph"),
 LazyData: true
 NeedsCompilation: no
 Imports:
-  utils,
-  shiny,
+  bsplus,
+  DBI,
+  DT,
+  data.table,
+  dplyr,
+  ggplot2,
   htmltools,
   htmlwidgets,
   httr,
   jsonlite,
-  DBI,
-  shinyBS,
-  shinyjs,
-  shinyWidgets,
-  bsplus,
-  DT,
   leaflet,
   plotly,
-  dplyr,
-  V8,
-  data.table,
-  ggplot2,
+  readr,
+  shiny,
+  shinyjs,
+  shinyWidgets,
   tidyr,
-  readr
+  utils,
+  V8
 Suggests:
   knitr,
   testthat

@@ -12,7 +12,7 @@
 #'   initially shown as not collapsed.
 #'
 #' @details Adapted from [shinyWidgets::panel()] including IDs and collapsible
-#' (inspired by [shinyBS::bsCollapsePanel()]).
+#' (inspired by `bsCollapsePanel` from the `shinyBS` package).
 #'
 #' @return The UI definition of the panel.
 #'

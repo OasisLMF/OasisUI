@@ -31,7 +31,7 @@ Flamingo UI panel with collapsing capabilities.
 }
 \details{
 Adapted from \code{\link[shinyWidgets:panel]{shinyWidgets::panel()}} including IDs and collapsible
-(inspired by \code{\link[shinyBS:bsCollapsePanel]{shinyBS::bsCollapsePanel()}}).
+(inspired by \code{bsCollapsePanel} from the \code{shinyBS} package).
 }
 \examples{
 if (interactive()) {
