@@ -138,6 +138,7 @@ api_post_analyses <- function(name, portfolio, model) {
 #' @return Dataframe of previously posted analyses. Default empty string returns all analyses.
 #'
 #' @importFrom dplyr select
+#' @importFrom dplyr mutate
 #' @importFrom dplyr contains
 #' @importFrom dplyr arrange
 #' @importFrom dplyr sym
@@ -178,7 +179,7 @@ return_tbl_analysesData <- function(name = "") {
       .replaceWithIcons() %>%
       select(c(!! sym(tbl_analysesDataNames$id), !! sym(tbl_analysesDataNames$name),
                !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
-               !! sym(tbl_analysesDataNames$modified), !! sym (tbl_analysesDataNames$created),
+               !! sym(tbl_analysesDataNames$modified), !! sym(tbl_analysesDataNames$created),
                !! sym(tbl_analysesDataNames$status)))
   } else {
     tbl_analysesData <- NULL
@@ -199,10 +200,8 @@ return_tbl_analysesData <- function(name = "") {
 #'
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
-#' @importFrom dplyr arrange
-#' @importFrom dplyr sym
-#' @importFrom dplyr desc
 #' @importFrom dplyr case_when
+#' @importFrom tidyr gather
 #'
 #' @export
 return_tbl_analysisdetails <- function(id) {
