@@ -501,10 +501,12 @@ step3_configureOutput <- function(input, output, session,
       if (portfolioID() != "") {
         if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
           enable("abuttonshowlog")
-          enable("abuttonconfigoutput")
           enable("abuttoncancelana")
+          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
+            enable("abuttonconfigoutput")
+          }
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Ready, Status$Failed)) {
-            enable("abuttonrerunana") 
+            enable("abuttonrerunana")
           }
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
             enable("abuttondisplayoutput")
@@ -836,7 +838,6 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "error",
                            paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analysis_settings_file$status))
     }
-    
     analyses_run <- return_df(api_post_analyses_run,result$anaID)
     
     if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
