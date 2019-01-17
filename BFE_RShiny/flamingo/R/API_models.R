@@ -100,10 +100,6 @@ return_tbl_modelsData <- function(supplier_id = "") {
 #'
 #' @return Dataframe of previously posted model.
 #'
-#' @importFrom dplyr arrange
-#' @importFrom dplyr sym
-#' @importFrom dplyr desc
-#'
 #' @export
 return_tbl_modelData <- function(id) {
   tbl_modelData <- return_df(api_get_models_id, id)
