@@ -13,5 +13,5 @@ api_get_analyses_input_file(id)
 Previously posted analysis input file.
 }
 \description{
-Gets the analysis input_file contents.
+Downloads the analysis input files.
 }
