@@ -32,7 +32,7 @@ api_get_analyses_input_file <- function(id) {
     write_disk(dest, overwrite = TRUE)
   ))
 
-  api_fetch_response("GET", request_list)
+  response <- api_fetch_response("GET", request_list)
 
   untar(tarfile = dest, exdir = extractFolder)
 
@@ -43,7 +43,8 @@ api_get_analyses_input_file <- function(id) {
     Sys.sleep(2)
   }
   
-  invisible()
+  #response needed in step2 to place icon
+  api_handle_response(response)
 }
 
 #' Return analyses input files dataframe with icons
@@ -65,8 +66,10 @@ return_analyses_input_file_wicons_df <- function(id) {
   if (!file.exists(extractFolder)) {
     api_get_analyses_input_file(id)
   }
-  analyses_input_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
 
+  analyses_input_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
+  
+  if (nrow(analyses_input_file_df) > 0) {
   fnames <- analyses_input_file_df$files
   fnum <- length(fnames)
   status <- data.frame(status = rep(status_code_notfound, fnum))
@@ -74,6 +77,7 @@ return_analyses_input_file_wicons_df <- function(id) {
     fname <- as.character(fnames[i])
     filePath <- set_extractFilePath(extractFolder, fname)
     info <- file.info(filePath)
+    
     if (is.na(info$size)) {
       status[i, "status"] <- Status$Processing
     } else if (info$size == 0) {
@@ -84,6 +88,9 @@ return_analyses_input_file_wicons_df <- function(id) {
   }
   analyses_input_file_df <- cbind(analyses_input_file_df, status) %>%
     as.data.frame()
+  } else {
+    analyses_input_file_df <- NULL
+  }
   analyses_input_file_df
 }
 
@@ -404,7 +411,6 @@ api_get_analyses_input_errors_file <- function(id) {
 
   api_handle_response(response)
   
-  invisible()
 }
 
 # Analysis input generation ----------------------------------------------------
@@ -541,7 +547,7 @@ api_get_analyses_output_file <- function(id) {
     write_disk(dest, overwrite = TRUE)
   ))
 
- api_fetch_response("GET", request_list)
+  response <- api_fetch_response("GET", request_list)
 
   untar(tarfile = dest, exdir = extractFolder)
 
@@ -552,7 +558,8 @@ api_get_analyses_output_file <- function(id) {
     Sys.sleep(2)
   }
 
-invisible()
+  #response needed in step2 to place icon
+  api_handle_response(response)
 
 }
 
