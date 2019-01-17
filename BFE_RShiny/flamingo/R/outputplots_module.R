@@ -390,31 +390,34 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     # > read files to plot -----------------------------------------------------
     if (!is.null(filesToPlot)) {
       for (i in seq(nrow(filesToPlot))) { # i<- 1
-        currfolder <- getOption("flamingo.settings.api.share_filepath")
-        ana_folder <- paste0(anaID(), "_output/output")
-        fileName <- file.path(currfolder, ana_folder, filesToPlot$files[i])
+        extractFolder <- set_extractFolder(id = anaID(), label = "_outputs/output")
+        fileName <- set_extractFilePath(extractFolder, filesToPlot$files[i])
         #   oasisBasePath <- "/home/mirai/Desktop/Rprojects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
         #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
         #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
         currfileData <- .readFile(fileName)
-        #Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
-        nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
-        gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) & !(names(currfileData) %in% extracols) & !(names(currfileData) %in% x)]
-        if (any(which(plotstrc > 1))) {
-          extension <- filesToPlot[i, suffix[which(plotstrc > 1)]] # losstype or Variable
+        if (nrow(currfileData) > 0) {
+          #Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
+          nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
+          gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) & !(names(currfileData) %in% extracols) & !(names(currfileData) %in% x)]
+          if (any(which(plotstrc > 1))) {
+            extension <- filesToPlot[i, suffix[which(plotstrc > 1)]] # losstype or Variable
+          } else {
+            extension <- filesToPlot[i, suffix[3]] # granularity
+          }
+          for (k in keycols) {
+            newnamekey <- paste0(k, ".", extension)
+            names(currfileData)[names(currfileData) == k] <- newnamekey
+          }
+          #Join data
+          if (is.null(fileData)) {
+            fileData <- currfileData
+          } else {
+            fileData <- left_join(fileData, currfileData, by = nonkey )
+          }
         } else {
-          extension <- filesToPlot[i, suffix[3]] # granularity
-        }
-        for (k in keycols) {
-          newnamekey <- paste0(k, ".", extension)
-          names(currfileData)[names(currfileData) == k] <- newnamekey
-        }
-        #Join data
-        if (is.null(fileData)) {
-          fileData <- currfileData
-        } else {
-          fileData <- left_join(fileData, currfileData, by = nonkey )
-        }
+        fileData <- NULL
+      }
       }
     }
 

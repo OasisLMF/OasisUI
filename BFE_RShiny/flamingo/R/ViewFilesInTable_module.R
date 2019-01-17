@@ -77,7 +77,7 @@ ViewFilesInTable <- function(input, output, session,
                              tbl_filesListData, 
                              param = NULL,
                              file_column = "files",
-                             folderpath = "_output/output/",
+                             folderpath = "_outputs/output",
                              includechkbox = FALSE) {
   
   ns <- session$ns
@@ -342,9 +342,8 @@ ViewFilesInTable <- function(input, output, session,
         filerows <- nrow(result$tbl_fileData)
       }
     } else {
-      currfolder <- getOption("flamingo.settings.api.share_filepath")
-      extractFolder <- file.path(currfolder, paste0(param(), folderpath))
-      result$currfilepath <- file.path(extractFolder, result$currentFile)
+      extractFolder <- set_extractFolder(id = param(), label = folderpath)
+      result$currfilepath <- set_extractFilePath(extractFolder, result$currentFile)
       result$tbl_fileData <- fread(result$currfilepath )
       if (!is.null(result$tbl_fileData )) {
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData)) 

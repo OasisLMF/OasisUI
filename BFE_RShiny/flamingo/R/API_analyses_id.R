@@ -1,9 +1,9 @@
 # Input File -------------------------------------------------------------------
 #' Get analysis input file
-#'
-#' Gets the analysis input_file contents.
-#'
+#' 
 #' @rdname api_get_analyses_input_file
+#' 
+#' @description Downloads the analysis input files.
 #'
 #' @param id A unique integer value identifying this analysis.
 #'
@@ -11,8 +11,6 @@
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #' @importFrom httr write_disk
 #' @importFrom utils untar
 #'
@@ -21,7 +19,7 @@ api_get_analyses_input_file <- function(id) {
 
   currfolder <- getOption("flamingo.settings.api.share_filepath")
   dest <- file.path(currfolder, paste0(id, "_inputs.tar"))
-  extractFolder <- file.path(currfolder, paste0(id, "_inputs"))
+  extractFolder <- set_extractFolder(id, label = "_inputs/")
   dir.create(extractFolder, showWarnings = FALSE)
 
   request_list <- expression(list(
@@ -34,10 +32,7 @@ api_get_analyses_input_file <- function(id) {
     write_disk(dest, overwrite = TRUE)
   ))
 
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-  # FIXME: where / why is response needed here?!
+  api_fetch_response("GET", request_list)
 
   untar(tarfile = dest, exdir = extractFolder)
 
@@ -47,6 +42,8 @@ api_get_analyses_input_file <- function(id) {
     oldfileList <- list.files(extractFolder)
     Sys.sleep(2)
   }
+  
+  invisible()
 }
 
 #' Return analyses input files dataframe with icons
@@ -62,8 +59,7 @@ api_get_analyses_input_file <- function(id) {
 #' @export
 return_analyses_input_file_wicons_df <- function(id) {
 
-  currfolder <- getOption("flamingo.settings.api.share_filepath")
-  extractFolder <- file.path(currfolder, paste0(id, "_inputs/"))
+  extractFolder <- set_extractFolder(id, label = "_inputs/")
   status_code_notfound <- 404
 
   if (!file.exists(extractFolder)) {
@@ -76,12 +72,12 @@ return_analyses_input_file_wicons_df <- function(id) {
   status <- data.frame(status = rep(status_code_notfound, fnum))
   for (i in seq(fnum) ) {
     fname <- as.character(fnames[i])
-    filePath <- file.path(extractFolder, fname)
+    filePath <- set_extractFilePath(extractFolder, fname)
     info <- file.info(filePath)
     if (is.na(info$size)) {
       status[i, "status"] <- Status$Processing
     } else if (info$size == 0) {
-      status[i, "status"] <- StatusF$ailed
+      status[i, "status"] <- Status$Failed
     } else {
       status[i, "status"] <- Status$Completed
     }
@@ -335,7 +331,7 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
       list_summary <- list()
       for (g in granularities) {
         outputsLossTypeGran <- outputsLossType[[g]]
-        if (!is.null(outputsLossTypeGran)){
+        if (!is.null(outputsLossTypeGran)) {
           oed_g <- g # provide here oed field of granularity
           counter_id <- counter_id + 1
           losstypeSettingsMapping = list()
@@ -407,40 +403,8 @@ api_get_analyses_input_errors_file <- function(id) {
   response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
-}
-
-#' Post analysis input_errors file
-#'
-#' Sets the analysis input_errors_file contents.
-#'
-#' @rdname api_post_analyses_input_errors_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#' @param filepath_input_errors Path to the input_errors file.
-#'
-#' @return The posted analysis input_errors file.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#' @importFrom httr upload_file
-#'
-#' @export
-api_post_analyses_input_errors_file <- function(id, filepath_input_errors) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(file = upload_file(filepath_input_errors)),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "input_errors_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
+  
+  invisible()
 }
 
 # Analysis input generation ----------------------------------------------------
@@ -539,6 +503,7 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
   response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
+  
 }
 
 # Output file ------------------------------------------------------------------
@@ -555,8 +520,6 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
 #'
 #' @importFrom httr GET
 #' @importFrom httr add_headers
-#' @importFrom httr warn_for_status
-#' @importFrom httr http_status
 #' @importFrom httr write_disk
 #' @importFrom utils untar
 #'
@@ -565,7 +528,7 @@ api_get_analyses_output_file <- function(id) {
 
   currfolder <- getOption("flamingo.settings.api.share_filepath")
   dest <- file.path(currfolder, paste0(id, "_outputs.tar"))
-  extractFolder <- file.path(currfolder, paste0(id, "_output"))
+  extractFolder <- set_extractFolder(id, label = "_outputs")
   dir.create(extractFolder, showWarnings = FALSE)
 
   request_list <- expression(list(
@@ -578,7 +541,7 @@ api_get_analyses_output_file <- function(id) {
     write_disk(dest, overwrite = TRUE)
   ))
 
-  response <- api_fetch_response("GET", request_list)
+ api_fetch_response("GET", request_list)
 
   untar(tarfile = dest, exdir = extractFolder)
 
@@ -589,8 +552,41 @@ api_get_analyses_output_file <- function(id) {
     Sys.sleep(2)
   }
 
-  # FIXME: unclear how response relates to the above and what should be returned at all?!
-  api_handle_response(response)
+invisible()
+
+}
+
+#' Define Extract Folder Path
+#' 
+#' @rdname set_extractFolder
+#' 
+#' @description constructs the path to the folder where to extract files
+#' 
+#' @return extractFolder
+#' 
+#' @param id A unique integer value identifying this analysis.
+#' @param label either input or output
+#' 
+#' @export
+set_extractFolder <- function(id, label) {
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
+  extractFolder <- file.path(currfolder, paste0(id, label))
+}
+
+#' Define File to extract Path
+#' 
+#' @rdname set_extractFilePath
+#' 
+#' @description constructs the path to the file to extract
+#' 
+#' @return filePath
+#' 
+#' @param extractFolder path to the folder where the file is placed
+#' @param fileName name of the file
+#' 
+#' @export
+set_extractFilePath <- function(extractFolder, fileName) {
+  filePath <- file.path(extractFolder, fileName)
 }
 
 #' Return analyses output files  Dataframe
@@ -607,11 +603,9 @@ api_get_analyses_output_file <- function(id) {
 #'
 #' @export
 return_analyses_output_file_df <- function(id) {
-  currfolder <- getOption("flamingo.settings.api.share_filepath")
-  # FIXME: the extractFolder path definition should not be in multiple places
-  extractFolder <- file.path(currfolder, paste0(id, "_output/output"))
+
+  extractFolder <- set_extractFolder(id, label = "_outputs/output")
   if (!file.exists(extractFolder)) {
-    # FIXME: this call looks wrong since the function returns something
     api_get_analyses_output_file(id)
   }
   list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
@@ -628,54 +622,18 @@ return_analyses_output_file_df <- function(id) {
 #'
 #' @return Dataframe of specific output file.
 #'
-#' @importFrom stats setNames
 #' @importFrom data.table fread
 #'
 #' @export
 return_analyses_spec_output_file_df <- function(id, fileName) {
-  currfolder <- getOption("flamingo.settings.api.share_filepath")
-  extractFolder <- file.path(currfolder, paste0(id, "_output/output/"))
-  filePath <- file.path(currfolder, paste0(id, "_output/output/", fileName))
+  extractFolder <- set_extractFolder(id, label = "_outputs/output/")
+  filePath <- set_extractFilePath(extractFolder, fileName)
   info <- file.info(filePath)
   analyses_spec_output_file_df <- NULL
   if (!is.na(info$size) && info$size != 0 ) {
     analyses_spec_output_file_df <- fread(filePath)
   }
   analyses_spec_output_file_df
-}
-
-#' Post analysis output file
-#'
-#' Sets the analysis output_file contents.
-#'
-#' @rdname api_post_analyses_output_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#' @param filepath_output Path to the output file.
-#'
-#' @return The posted analysis output file.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#' @importFrom httr upload_file
-#'
-#' @export
-api_post_analyses_output_file <- function(id, filepath_output) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(file = upload_file(filepath_output)),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "output_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
 }
 
 # Run traceback file -----------------------------------------------------------
@@ -707,6 +665,7 @@ api_get_analyses_run_traceback_file <- function(id) {
   response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
+
 }
 
 # Run --------------------------------------------------------------------------
