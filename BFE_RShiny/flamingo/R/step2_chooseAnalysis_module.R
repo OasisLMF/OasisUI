@@ -360,7 +360,9 @@ step2_chooseAnalysis <- function(input, output, session,
   
   # Analysis ID ----------------------------------------------------------------
   
-  observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
+  observeEvent({
+    input$dt_analyses_rows_selected
+    result$portfolioID}, ignoreNULL = FALSE, {
     if (!is.null(input$dt_analyses_rows_selected)) {
       result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     } else {
@@ -665,6 +667,16 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
     show("panelAnalysisGenInputs")
     .reloadAnaIG()
+  })
+  
+  # Create Generated input Table  Title
+  output$paneltitle_panelAnalysisIG <- renderUI({
+    if (result$analysisID != "") {
+      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+      paste0('Generated inputs associated with analysis id ', toString(result$analysisID), ' ', anaName)
+    } else {
+      paste0("Generated inputs")
+    }
   })
   
   sub_modules$ViewIGFiles <- callModule(
