@@ -541,40 +541,6 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
   api_handle_response(response)
 }
 
-#' Post analysis input_generation_traceback file
-#'
-#' Sets the analysis input_generation_traceback_file contents.
-#'
-#' @rdname api_post_analyses_input_generation_traceback_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#' @param filepath_input_generation_traceback Path to the input_generation_traceback file.
-#'
-#' @return The posted analysis input_generation_traceback file.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#' @importFrom httr upload_file
-#'
-#' @export
-api_post_analyses_input_generation_traceback_file <- function(id, filepath_input_generation_traceback) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(file = upload_file(filepath_input_generation_traceback)),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "input_generation_traceback_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
-}
-
 # Output file ------------------------------------------------------------------
 
 #' Get analysis output file
@@ -739,40 +705,6 @@ api_get_analyses_run_traceback_file <- function(id) {
   ))
 
   response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-}
-
-#' Post analysis run_traceback file
-#'
-#' Sets the analysis run_traceback_file contents.
-#'
-#' @rdname api_post_analyses_run_traceback_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#' @param filepath_run_traceback Path to the run_traceback file.
-#'
-#' @return The posted analysis run_traceback file.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#' @importFrom httr upload_file
-#'
-#' @export
-api_post_analyses_run_traceback_file <- function(id, filepath_run_traceback) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(file = upload_file(filepath_run_traceback)),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "run_traceback_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
 
   api_handle_response(response)
 }
