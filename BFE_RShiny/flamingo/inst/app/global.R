@@ -12,8 +12,30 @@ source(file.path(".", "helper_text.R"), local = TRUE)
 
 #addHandler(writeToConsole, logger = "flamingo")
 
+#' loginfo
+#'
+#' @rdname loginfo
+#'
+#' @param ... Extra arguments.
+#' @param logger flamingo.module.
+#'
+#' @return Log in info.
+#'
+#' @export
 loginfo <- function(..., logger) {message(...)}
+
+#' logerror
+#'
+#' @rdname logerror
+#'
+#' @param ... Extra arguments.
+#' @param logger flamingo.module.
+#'
+#' @return Warning message.
+#'
+#' @export
 logerror <- function(..., logger) {warning(...)}
+
 loginfo("testing logger", logger = "flamingo.module")
 
 logMessage <- function(msg) loginfo(msg, logger = "flamingo.module")

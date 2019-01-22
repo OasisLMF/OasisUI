@@ -3,6 +3,14 @@
 # UI content that is rendered once the user has authenticated
 source(file.path(".", "ui_auth.R"), local = TRUE)$value
 
+#' server
+#'
+#' @rdname server
+#'
+#' @template params-module
+#'
+#' @return Server.
+#' @export
 
 server <- function(input, output, session) {
 

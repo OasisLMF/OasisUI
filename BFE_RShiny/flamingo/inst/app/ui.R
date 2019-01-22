@@ -1,5 +1,15 @@
 ###############################################################################
 
+#' ui
+#'
+#' @rdname ui
+#'
+#' @param request ui before authentification.
+#'
+#' @return ui before authentification.
+#'
+#' @export
+
 ui <- function(request) {
 
   fluidPage(
