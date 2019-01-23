@@ -56,18 +56,17 @@ defineSingleAna <- list(
   abuttonpfsubmit = "Submit new portfolio.",
   abuttondeletepf = "Delete selected portfolio.",
   abuttonmodeldetails = "Show details for selected portfolio.",
-  abuttonrerunana = "Perform rerun on completed analysis.",
   abuttonsaveoutput = "Save selected output configuration.",
   abuttonexecuteanarun = "Execute run on selected output configuration.",
   abuttonshowlog = "Show log on selected analysis.",
   abuttondisplayoutput = "Display output for selected analysis.",
-  abuttonconfigoutput = "Associate an output configuration to ready analysis.",
   abuttoncancelana = "Cancel selected analysis.",
   abuttonConfirmDel = "Confirm deleting analysis.",
   abuttoncancelIG = "Stop input generation on selected analysis.",
   abuttonstartIG = "Start input generation.",
   abuttonshowIG = "Visualize the generated inputs for selected analysis.",
-  abuttonConfirmDelIG = "Confirm cancelling input generation."
+  abuttonConfirmDelIG = "Confirm cancelling input generation.",
+  abuttonrunboth = "Run Output Configuration"
 )
 
 ### Panel Browse ----
