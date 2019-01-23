@@ -4,52 +4,38 @@
 \name{visualizationCBR}
 \alias{visualizationCBR}
 \alias{visualizationCBRUI}
-\title{Compare Runs Definition Module Server ---------------------------------------
+\title{Compare Analyses Definition Module Server ---------------------------------------
 visualizationCBR}
 \usage{
-visualizationCBR(input, output, session, dbSettings, apiSettings, userId,
-  active = reactive(TRUE), preselRunId = reactive(-1),
-  processRunId = reactive(-1), logMessage = message)
+visualizationCBR(input, output, session, active = reactive(TRUE),
+  preselAnaId = reactive(-1), anaID = reactive(-1),
+  logMessage = message)
 
 visualizationCBRUI(id)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
+\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingPage}.}
 
-\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+\item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{runIdList}{List of runs and their status.}
-
-\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-preselPanel panel to show in the process session.
+preselPanel panel to show in the model session.
 
 List of tags.
 }
 \description{
-Server logic for comparing runs run page.
+Server logic for comparing runs analyses page.
 
 UI/View for comparing runs run page.
 }

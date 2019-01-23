@@ -7,31 +7,21 @@
 \usage{
 panelOutputModuleUI(id)
 
-panelOutputModule(input, output, session, logMessage = message,
+panelOutputModule(input, output, session, logMessage = message, anaID,
   filesListData = reactive(NULL), active)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{logMessage}{function that will be passed info messages.}
 
-\item{filesListData}{table of output files for a given runID}
+\item{anaID}{is selectAnaID}
+
+\item{filesListData}{table of output files for a given anaID}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{id}{Namespace ID for the module.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
 }
 \value{
 reactive value of the title

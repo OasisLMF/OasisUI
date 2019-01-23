@@ -8,65 +8,73 @@ file_Viewer <- list(
 )
 
 landing_page <- list(
-  abuttonrun = "Define process to run",
-  abuttonbrowse = "Choose browse option",
-  abuttondefineaccount = "Create/amend/delete account",
-  abuttondefineprogramme = "Create/amend/delete Programme; Associate Model; Run Process",
-  abuttondefineprogrammesingle = "Define single Process Run",
-  abuttondefineprogrammebatch = "Define batch Process Run",
-  abuttonbrowseSBR = "Visualize outputs from single run",
-  abuttonbrowseBBR = "Visualize results across runs or from batch runs",
-  abuttonbrowseCBR = "Compare runs",
-  abuttongotorun = "Go to run details",
-  PRIdownloadexcel = "Download files table",
-  abuttonfilemngt = "Access input/output files",
-  abuttonsysconf = "System configuration",
-  accountDD = "User info",
+  abuttonanalysis = "Define analysis to run.",
+  abuttonbrowse = "Choose browse option.",
+  abuttondefineaccount = "Create/amend/delete account.",
+  abuttondefineanasingle = "Define single analysis.",
+  abuttondefineanabatch = "Define batch analysis.",
+  abuttonbrowseSBR = "Visualize outputs from single analysis.",
+  abuttonbrowseBBR = "Visualize results across analyses or from batch runs.",
+  abuttonbrowseCBR = "Compare runs.",
+  abuttongotoana = "Go to analysis details.",
+  abuttondelana = "Please select a Analysis to delete.",
+  downloadexcel_ana = "Download Analyses table.",
+  abuttonfilemngt = "Access input/output files.",
+  abuttonsysconf = "System configuration.",
+  accountDD = "User info.",
   abuttonuserupdate = "Please select a user to update.",
-  abuttonuserdelete = "Please select a user to delete",
-  abuttonusersecurity = "Please select a user to add security group",
-  abuttonuseroasis = "Please select a user to add license"
+  abuttonuserdelete = "Please select a user to delete.",
+  abuttonusersecurity = "Please select a user to add security group.",
+  abuttonuseroasis = "Please select a user to add license."
 )
 
   define_account <- list(
-    buttonamendac = "Please select an account to amend",
-    buttondeleteac = "Please select an account to delete"
+    abuttonamendac = "Please select an account to amend.",
+    abuttondeleteac = "Please select an account to delete."
   )
 
   define_company <- list(
     abuttoncompupdate = "Please select a company to update.",
-    abuttoncompdel = "Please select a company to delete"
+    abuttoncompdel = "Please select a company to delete."
   )
 
   sys_conf <- list(
-    btnAmend = "Please select a Model Resource to amend.",
-    btnDelete = "Please select a Model Resource to delete.",
-    btnConfirmDel = "Please select a Model Resource to delete.",
-    btnSubmitCrtAm = "Submit Programme"
+    abuttonamend = "Please select a Model Resource to amend.",
+    abuttondelete = "Please select a Model Resource to delete.",
+    abuttonConfirmDel = "Please select a Model Resource to delete.",
+    abuttonSubmitCrtAm = "Submit Programme."
   )
 
-programme_Definition_Single <- list(
-  sinputTransformname = "Transformation Description to be added here",
-  sinputProgModTransform = "Transformation Description to be added here",
-  selectprogrammeID = "Select a programme ID to which associate a model",
-  selectprogOasisID = "Select the Oasis Programme to Run",
-  buttonprogdetails = "Please select a Programme to show details",
-  buttonamendpr = "Please select a Programme to Amend",
-  abuttonProgSubmit = "Please fill all fields",
-  buttondeletepr = "Please select a Programme to Delete",
-  buttonmodeldetails = "Please select a Programme Model to show details",
-  abuttoncrprogoasis = "Please select both fields",
-  abuttonrerunpr = "Please select a completed Programme Model to perform rerun",
-  abuttonsaveoutput = "Please select Output Configuration",
-  abuttonexecuteprrun = "Please select Output Configuration",
-  abuttonshowlog = "Please select a Process Run to show log",
-  abuttondisplayoutput = "Please select a Process Run to display output"
+defineSingleAna <- list(
+  abuttoncreateana = "Please select a completed Portfolio to create ana analysis.",
+  abuttonshowanadetails = "Please select a Analysis to show details.",
+  abuttonuploadsourcefiles = "Upload Source Files to portfolio.",
+  portfolioID = "Select a portfolio ID to which associate a model.",
+  modelID = "Select the Model to associate with the Portfolio.",
+  abuttonpfdetails = "Please select a Portfolio to show details.",
+  abuttonamendpf = "Please select a Portfolio to Amend.",
+  abuttonpfsubmit = "Please fill all fields.",
+  abuttondeletepf = "Please select a Portfolio to Delete.",
+  abuttonmodeldetails = "Please select a Portfolio Model to show details",
+  abuttonrerunana = "Please select a completed Analysis to perform rerun.",
+  abuttonsaveoutput = "Please select Output Configuration.",
+  abuttonexecuteanarun = "Please select Output Configuration.",
+  abuttonshowlog = "Please select a Analysis to show log.",
+  abuttondisplayoutput = "Please select an Analysis to display output.",
+  abuttonconfigoutput = "Please select a ready analysis Analysis to which associate an output configuration.",
+  abuttoncancelana = "Please select an Analysis to delete.",
+  abuttonConfirmDel = "Please confirm to delete analysis.",
+  abuttoncancelIG = "Please select an Analysis to stop input generation.",
+  abuttonstartIG = "Start input generation.",
+  abuttonshowIG = "Please select an analysis to visualize the generated input",
+  abuttonConfirmDelIG = "Pleas confirm to cancel input generation."
 )
 
 ### Panel Browse ----
 
-browse_programmes <- list(
-  selectRunID = "Select RunID",
-  selectBatchRunID = "Select Batch RunID",
-  abuttonplusplot = "Add a new plot"
+dashboard <- list(
+  selectAnaID = "Select AnaID.",
+  selectBatchAnaID = "Select Batch AnaID.",
+  abuttonplusplot = "Add a new plot.",
+  abuttonselectAna = "Please select an analysis."
   )

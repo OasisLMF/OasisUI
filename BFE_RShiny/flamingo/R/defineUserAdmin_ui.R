@@ -5,8 +5,6 @@
 #' @description UI/View for accessing the Company User List for Flamingo
 #' in association with OASIS LMF.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom DT DTOutput
@@ -52,7 +50,7 @@ userAdminDefinitionUI <- function(id) {
              hidden(
                div(id = ns("usgroups"), class = "flamingo-page-division",
                    h4("User Security Groups", class = "flamingo-table-title"),
-                   DTOutput(ns("tableusersecuritygroups")),
+                   DTOutput(ns("dt_usersecuritygroups")),
                    downloadButton(ns("CUAUUSGdownloadexcel"),
                                   label="Export to csv")
                )#End of div usgroups
@@ -65,7 +63,7 @@ userAdminDefinitionUI <- function(id) {
              hidden(
                div(id = ns("ulicenses"), class = "flamingo-page-division",
                    h4("User Licenses", class = "flamingo-table-title"),
-                   DTOutput(ns("tableuserlicenses")),
+                   DTOutput(ns("dt_userlicenses")),
                    downloadButton(ns("CUAULdownloadexcel"),
                                   label="Export to csv")
                )#End of div ulicenses

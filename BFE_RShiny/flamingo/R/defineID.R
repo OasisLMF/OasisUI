@@ -2,32 +2,28 @@
 # UI ---------------------------------------------------------------------------
 
 #' defineIDUI
-#' 
+#'
 #' @rdname defineID
-#' 
-#' @description UI/View for defining one run ID
-#' 
-#' @template params-module-ui
-#' 
+#'
+#' @description UI/View for defining one analysis ID
+#'
 #' @param w width of the coulmn.
-#' 
-#' @param batch flag indicating if it is a batch or a simple run.
-#' 
+#'
 #' @return List of tags.
-#' 
+#'
 #' @importFrom bsplus bs_embed_tooltip
-#' 
+#'
 #' @export
 defineIDUI <- function(id, w, batch = FALSE){
   ns <- NS(id)
-  
-  labelrun <- "Run ID"
+
+  labelana <- "Ana ID"
   if (batch) {
-    labelrun <- "Batch ID"
+    labelana <- "Batch ID"
   }
-  
+
   column(w,
-         actionButton(ns(paste0("chooseRunID")), label = NULL, icon = icon("list-alt"), 
+         actionButton(ns(paste0("chooseAnaID")), label = NULL, icon = icon("list-alt"),
                       style = " color: rgb(71, 73, 73);
                                background-color: white;
                                padding: 0px;
@@ -35,195 +31,221 @@ defineIDUI <- function(id, w, batch = FALSE){
                                background-image: none;
                                border: none;
                                 ") %>%
-           bs_embed_tooltip(title = browse_programmes$selectRunID, placement = "right"),
-         div(textOutput(ns("selectRunInfo1"), inline = TRUE), 
-               style = "font-weight:bold; font-color: #2d2d2d; 
+           bs_embed_tooltip(title = dashboard$selectAnaID, placement = "right"),
+         div(textOutput(ns("selectAnaInfo1"), inline = TRUE),
+               style = "font-weight:bold; font-color: #2d2d2d;
                         display:inline;
                         padding:10px; margin: 5px; "),
-         div(textOutput(ns("selectRunInfo2"), inline = TRUE),
+         div(textOutput(ns("selectAnaInfo2"), inline = TRUE),
              style = "display:inline;"
                       # font-weight:bold; font-color: #2d2d2d;
                       # padding:10px; margin: 5px; border-style: solid;"
              ),
          style = "display:inline;")
-  
+
 }
 
 # Server -----------------------------------------------------------------------
 
 #' defineID
-#' 
+#'
 #' @rdname defineID
-#' 
-#' @description Server logic for defining one run ID.
-#' 
+#'
+#' @description Server logic for defining one analysis ID.
+#'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#'
+#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
+#' @param anaID reactive string expression for reselected run id from \link{step3_configureOutput}.
+#'
+#' @param batch Flag indicating if it is a batch or a simple analysis.
+#'
+#' @return selectAnaID reactive for anaID selected.
 #' 
-#' @param preselRunId reactive string expression for reselected run id from \link{landingpage}.
-#' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
-#' 
-#' @param batch Flag indicating if it is a batch or a simple run.
-#' 
-#' @return selectRunID reactive for runID selected.
-#' 
+#' @importFrom dplyr sym
+#' @importFrom dplyr filter
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
+#'
 #' @export
-defineID <- function(input, output, session, 
-                     dbSettings, userId, 
-                     preselRunId = reactive(-1),
-                     processRunId = reactive(-1),
+defineID <- function(input, output, session,
+                     preselAnaId = reactive(-1),
+                     anaID = reactive(-1),
                      batch = FALSE,
                      logMessage = message) {
-  
+
   ns <- session$ns
-  
+
   # Reactive Values and parameters ---------------------------------------------
   result <- reactiveValues(
-    inbox = NULL,
-    selectRunID = "",
-    selectRunName = "",
+    tbl_analysesData = NULL,
+    selectAnaID = "",
+    selectAnaName = "",
+    selectportfolioID = "",
     LProw = NULL,
-    PRrow = NULL,
+    SArow = NULL,
     preselRow = NULL
   )
-  
+
   # list of sub-modules
   sub_modules <- list()
-  
+
   #label
-  labelrun <- "Run"
+  labelana <- "Ana"
   if (batch) {
-    labelrun <- "Batch"
+    labelana <- "Batch"
   }
-  
-  # Modal for RunID selection --------------------------------------------------
-  
+
+  # Modal for AnaID selection --------------------------------------------------
+
   # > Modal Panel
-  RunsList <- modalDialog(
+  AnaList <- modalDialog(
     easyClose = TRUE,
     size = "l",
-    flamingoTableUI(ns("tableInboxpanel")),
+    flamingoTableUI(ns("flamingo_analyses")),
     footer = tagList(
-      flamingoButton(ns("abuttonselectRun"),
-                     label = "Select Run", align = "left"),
-      actionButton(ns("abuttonccancel"),
+      flamingoButton(ns("abuttonselectAna"),
+                     label = "Select Analysis", align = "left") %>%
+        bs_embed_tooltip(title = dashboard$abuttonselectAna, placement = "right"),
+      actionButton(ns("abuttoncancel"),
                    label = "Cancel", align = "right")
     )
   )
-  
+
   # > open modal
-  observeEvent(input$chooseRunID, {
-    data <- getInboxData(dbSettings, userId())
-    result$inbox <- data  %>%
-      replaceWithIcons() %>% 
-      filter(Status == StatusCompleted)
-    showModal(RunsList)
+  observeEvent(input$chooseAnaID, {
+    tbl_analysesData  <- return_tbl_analysesData()
+    result$tbl_analysesData <- tbl_analysesData  %>%
+      filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
+    showModal(AnaList)
   })
-  
-  
+
+
   # > modal content
-  sub_modules$tableInboxpanel <- callModule(
+  sub_modules$flamingo_analyses <- callModule(
     flamingoTable,
-    id = "tableInboxpanel",
-    data = reactive(result$inbox),
+    id = "flamingo_analyses",
+    data = reactive(result$tbl_analysesData),
     selection = "single",
     escape = FALSE,
     scrollX = TRUE,
     filter = FALSE,
     rownames = FALSE,
-    colnames =  c("Row Number" = 1),
+    colnames =  c("row number" = 1),
     preselRow = reactive({result$preselRow}),
     maxrowsperpage = 10,
     logMessage = logMessage)
-  
-  # > row to select
-  
-  #Find row of runId preselected in landing page
-  observeEvent({
-    preselRunId()},{
-      idx <- which(result$inbox[, inbox.RunID] == preselRunId())
-      status <- result$inbox[idx,  inbox.Status]
-      
-      if (length(idx) > 0 && status == StatusCompleted){
-        result$LProw <- idx 
-      }
-    })
-  
-  #Find row of runId preselected in process run server step 3
-  observeEvent({
-    processRunId()},{
-      idx <- which(result$inbox[, inbox.RunID] ==  processRunId())
-      status <- result$inbox[idx,  inbox.Status]
-      
-      if (length(idx) > 0 && status == StatusCompleted){
-        result$PRrow <- idx 
-      }
-    })
-  
-  observeEvent({
-    result$LProw
-    result$PRrow
-  },ignoreNULL = FALSE, {
-    if (!is.null(result$LProw)) {
-      result$preselRow <- result$LProw
-    } else if (!is.null(result$PRrow)) {
-      result$preselRow <- result$PRrow
+
+  # > enable disable button
+  observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
+    if (is.null(sub_modules$flamingo_analyses$rows_selected())) {
+      disable("abuttonselectAna") 
     } else {
-      result$preselRow <- 1
+      enable("abuttonselectAna")
     }
   })
 
-  
-  # > select run ID
-  observeEvent(sub_modules$tableInboxpanel$rows_selected(), ignoreNULL = FALSE, {
+  #Find row of anaid preselected in landing page
+  observeEvent({
+    preselAnaId()},{
+      idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == preselAnaId())
+      status <- result$tbl_analysesData[idx,  tbl_analysesDataNames$status]
+      if (length(idx) > 0 && status == Status$Completed){
+        result$LProw <- idx
+      }
+    })
+
+  #Find row of anaid preselected in model analysis server step 3
+  observeEvent({
+    anaID()},{
+      idx <- which(result$tbl_analysesData[, tbl_analysesDataNames$id] ==  anaID())
+      status <- result$tbl_analysesData[idx,  tbl_analysesDataNames$status]
+      if (length(idx) > 0 && status == Status$Completed){
+        result$SArow <- idx
+      }
+    })
+
+  #Assign preselected row
+  observeEvent({
+    result$LProw
+    result$SArow
+  }, ignoreNULL = FALSE, {
+    if (length(nrow(result$tbl_analysesData)) > 0 ) {
+      if (!is.null(result$LProw)) {
+        result$preselRow <- result$LProw
+      } else if (!is.null(result$SArow)) {
+        result$preselRow <- result$SArow
+      } else {
+        result$preselRow <- 1
+      }
+    } else {
+      result$preselRow <- NULL
+    }
+  })
+
+
+  # > select analysis ID
+  observeEvent(input$abuttonselectAna, {
     currid <- ""
     currName <- ""
-    if (!is.null(sub_modules$tableInboxpanel$rows_selected())) {
-      currid <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.RunID]
-      currName <- result$inbox[sub_modules$tableInboxpanel$rows_selected(),inbox.RunName]
+    currpfId <- ""
+    if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
+      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$id]
+      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$name]
+      currpfId <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$portfolio]
     }
-    result$selectRunID <- ifelse(is.null(currid) | is.na(currid), "", currid)
-    result$selectRunName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
-  })
-  
-  # > close modal
-  observeEvent(input$abuttonccancel, {
+    result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
+    result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
+    result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
+    logMessage("Extract output files")
+    api_get_analyses_output_file(result$selectAnaID)
     removeModal()
   })
   
-  observeEvent(input$abuttonselectRun, {
-    if (!is.null(sub_modules$tableInboxpanel$rows_selected())) {
-      result$preselRow <- sub_modules$tableInboxpanel$rows_selected()
-    }
-    removeModal()
-  })
-  
-  output$selectRunInfo1 <- renderText({
-    if (result$selectRunID == "") {
-      info <- paste0("Select ", labelrun, ":   ")
+  # > Enable/disable select button
+  observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
+    if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
+      enable("abuttonselectAna")
     } else {
-      info <- paste0('Selected ', labelrun, ': ')
+      disable("abuttonselectAna")
+    }
+  })
+
+  # > close modal
+  observeEvent(input$abuttoncancel, {
+    removeModal()
+  })
+
+  # > ifo selected analysis
+  output$selectAnaInfo1 <- renderText({
+    if (is.null(sub_modules$flamingo_analyses$rows_selected()) || is.na(sub_modules$flamingo_analyses$rows_selected())) {
+      info <- paste0("Select ", labelana, ":   ")
+    } else {
+      info <- paste0('Selected ', labelana, ': ')
     }
     info
   })
-  
-  output$selectRunInfo2 <- renderText({
-    if (result$selectRunID == "") {
-      info <- " "
+
+  output$selectAnaInfo2 <- renderText({
+    if (is.null(sub_modules$flamingo_analyses$rows_selected()) || is.na(sub_modules$flamingo_analyses$rows_selected())) {
+      info <- ("missing")
     } else {
-      info <- paste0(result$selectRunID, ' "' ,result$selectRunName, '"  ')
+      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$id]
+      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$name]
+      info <- paste0(currid, ' "' ,currName, '"  ')
     }
     info
   })
   
   # Module Outout --------------------------------------------------------------
-  selectRunID <- reactive({ifelse(is.null(result$selectRunID) | is.na(result$selectRunID), "", result$selectRunID)})
   
   moduleOutput <- c(
     list(
-      selectRunID = reactive(selectRunID())
+      selectAnaID = reactive({result$selectAnaID}),
+      selectPortfolioID = reactive({result$selectportfolioID})
     )
   )
-  
+
 }

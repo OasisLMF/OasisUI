@@ -241,7 +241,7 @@ div.flamingo-page-division {
   border-color: #8b2129;
 }
 
-#pagestructure-abuttonrun.btn-dropdown {
+#pagestructure-abuttonanalysis.btn-dropdown {
   background-image: -webkit-linear-gradient(#d41f29, #8b2129 50%, #8b2129);
   background-image: -o-linear-gradient(#d41f29, #8b2129 50%, #8b2129);
   background-image: -webkit-gradient(linear, left top, left bottom, from(#d41f29), color-stop(50%, #8b2129), to(#8b2129));
@@ -253,7 +253,7 @@ div.flamingo-page-division {
   border: 1px solid #8b2129;
 }
 
-#pagestructure-abuttonrun.btn-dropdown:hover {
+#pagestructure-abuttonanalysis.btn-dropdown:hover {
   background-image: -webkit-linear-gradient(#87474c, #8b2129 50%, #8b2129);
   background-image: -o-linear-gradient(#87474c, #8b2129 50%, #8b2129);
   background-image: -webkit-gradient(linear, left top, left bottom, from(#87474c), color-stop(50%, #8b2129), to(#8b2129));
@@ -288,7 +288,7 @@ div.flamingo-page-division {
   border: 1px solid #2e4b69;
 }
 
-#programmeDefinitionSingle-workflowsteps-radiobuttons button {
+#singleAna-workflowsteps-radiobuttons button {
   background-image: none;
   border-radius: 9999px; /* circular border */
   color: #000000bf;
@@ -296,19 +296,19 @@ div.flamingo-page-division {
   text-shadow: none;
 }
 
-#programmeDefinitionSingle-workflowsteps-radiobuttons button.previousStepButton {
+#singleAna-workflowsteps-radiobuttons button.previousStepButton {
   background-color: #eacbcb;
   color: #3d3f3f;
 }
 
-#programmeDefinitionSingle-workflowsteps-radiobuttons button.activeStepButton {
+#singleAna-workflowsteps-radiobuttons button.activeStepButton {
   background-color: #bb252c;
   background-image: linear-gradient(#d41f29, #8b2129 50%, #8b2129);
   color: #ffffff;
   font-weight: bold;
 }
 
-#programmeDefinitionSingle-workflowsteps-radiobuttons button.nextStepButton {
+#singleAna-workflowsteps-radiobuttons button.nextStepButton {
   background-color: #ffffff;
   color: #8b2129;
 }
@@ -337,6 +337,7 @@ input[type="checkbox"] + span:before {
   width: 16px;
   text-align: center;
   margin-right: 6px;
+  margin-bottom: 5px;
   border: 1px solid black;
   border-radius: 2px;
   background-color: white;

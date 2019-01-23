@@ -6,49 +6,37 @@
 \alias{visualizationSBRUI}
 \title{visualizationSBR}
 \usage{
-visualizationSBR(input, output, session, dbSettings, apiSettings, userId,
-  preselRunId = reactive(-1), processRunId = reactive(-1),
+visualizationSBR(input, output, session, anaIdList = reactive(c(-1)),
+  preselAnaId = reactive(-1), anaID = reactive(-1),
   active = reactive(TRUE), logMessage = message)
 
 visualizationSBRUI(id)
 }
 \arguments{
-\item{input}{Shiny input object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{Shiny output object.}
+\item{anaIdList}{List of analyses and their status.}
 
-\item{session}{Shiny session object.}
+\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingPage}.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
-
-\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
-
-\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+\item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{runIdList}{List of runs and their status.}
-
-\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-preselPanel panel to show in the process session
+preselPanel panel to show in the model session
 
 List of tags.
 }
 \description{
-Server logic for viewing results of a single run.
+Server logic for viewing results of a single analysis.
 
 UI/View for viewing results of a single run.
 }

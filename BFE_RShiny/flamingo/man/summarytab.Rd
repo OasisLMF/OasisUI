@@ -7,30 +7,31 @@
 \usage{
 summarytabUI(id)
 
-summarytab(input, output, session, dbSettings, apiSettings, userId,
-  selectRunID1 = reactive(""), selectRunID2 = reactive(""),
+summarytab(input, output, session, selectAnaID1 = reactive(""),
+  selectAnaID2 = reactive(""), portfolioID1 = reactive(""),
+  portfolioID2 = reactive(""), tbl_filesListDataana1 = NULL,
   compare = FALSE, active, logMessage = message)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
-\item{input}{Shiny input object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{Shiny output object.}
+\item{selectAnaID1}{id of selected analysis}
 
-\item{session}{Shiny session object.}
+\item{selectAnaID2}{id of selected analysis}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{portfolioID1}{portfolio id associated with selected analysis}
 
-\item{apiSettings}{as returned from \link{flamingoServer}}
+\item{portfolioID2}{portfolio id associated with selected analysis}
 
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+\item{tbl_filesListDataana1}{dataframe of the output files}
+
+\item{compare}{logical indicating comparison}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 list of tags
@@ -38,10 +39,10 @@ list of tags
 list of tags
 }
 \description{
-UI/View of summary elements of a run.
+UI/View of summary elements of an analysis.
 
-Server logic of summary elements of a run.
+Server logic of summary elements of an analysis.
 }
 \details{
-Run Summary Server
+Analysis Summary Server
 }

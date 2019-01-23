@@ -6,9 +6,11 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
-#' 
-#' @param preselRunId Reactive string expression for reselected run id from landingpage.
+#' @template params-logMessage
+#' @template params-active
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
+#'
+#' @param preselAnaId Reactive string expression for reselected analysis id from landingpage.
 #'
 #' @importFrom dplyr select
 #'
@@ -18,8 +20,7 @@ fileViewer <- function(
   output,
   session,
   dbSettings,
-  userId,
-  preselRunId = reactive(-1),
+  preselAnaId = reactive(-1),
   active, #= reactive(TRUE),
   logMessage = message) {
 
@@ -49,13 +50,13 @@ fileViewer <- function(
     result$FLdata <- FLdata %>% select(-c(Source))
   })
 
-  # Pre-select the correct runId
+  # Pre-select the correct anaid
   initialSelection <- reactive({
-    if (preselRunId() == -1) {
+    if (preselAnaId() == -1) {
       index <- 1
       initialSelection <- NULL
     } else {
-      index <- match(c(paste0("Process:", preselRunId())), result$FLdata[[7]])
+      index <- match(c(paste0("Model:", preselAnaId())), result$FLdata[[7]])
       initialSelection <- rownames(result$FLdata)[c(as.integer(index))]
     }
     return(initialSelection)

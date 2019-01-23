@@ -6,24 +6,22 @@
 #'
 #' @description UI/View for comparing runs run page.
 #'
-#' @template params-module-ui
-#' 
 #' @return List of tags.
-#' 
+#'
 #' @importFrom shinyWidgets panel
 #'
 #' @export
 visualizationCBRUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   #parameters
   w <- 4
   labelconfig <- "Go to Configure Output"
-  
+
   tagList(
-    
-    #defineCompareRunIDs
+
+    #defineCompareAnaIDs
     panel(
       status = "primary",
       fluidRow(
@@ -33,29 +31,29 @@ visualizationCBRUI <- function(id) {
                align = "right",
                actionButton(inputId = ns("abuttongotoconfig"), label = labelconfig)))
     ),
-    
+
     tabsetPanel(
       id = ns("tabsCBR"),
-      
+
       tabPanel(
         title = "Summary",
         summarytabUI(ns("summarytab")),
         value = ns("tabsummary")
       ),
-      
+
       tabPanel(
         title = "Plots",
         outputplotsUI(ns("outputplots")),
         value = ns("tabplots")
       ),
-      
+
       tabPanel(
         title = "Files",
         outputfilesUI(ns("outputfiles")),
         value = ns("taboutputfiles")
       )
-      
+
     )
   )
-  
+
 }

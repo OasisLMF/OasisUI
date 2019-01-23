@@ -8,7 +8,7 @@ executeDbQuery(dbSettings, statement, simplify = FALSE,
   verbose = FALSE, logMessage = message, logError = logMessage, ...)
 }
 \arguments{
-\item{dbSettings}{Setting object as returned by e.g. \code{\link[=flamingoDB]{flamingoDB()}}.}
+\item{dbSettings}{Setting object.}
 
 \item{statement}{Query statement to execute, e.g. as returned by
 \code{\link[=buildDbQuery]{buildDbQuery()}}.}

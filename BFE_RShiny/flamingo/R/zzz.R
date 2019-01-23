@@ -1,5 +1,4 @@
-#' @import shiny
 .onLoad <- function(libname, pkgname) {
-  # https://github.com/ebailey78/shinyBS/issues/100
-  shiny::addResourcePath("sbs", system.file("www", package = "shinyBS"))
+  # nothing needed at the moment
+  invisible()
 }

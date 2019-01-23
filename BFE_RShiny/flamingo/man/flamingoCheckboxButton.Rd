@@ -8,6 +8,14 @@ flamingoCheckboxButton(inputId, label, icon = NULL, width = NULL,
   class = c("btn"), ...)
 }
 \arguments{
+\item{inputId}{widget id}
+
+\item{label}{widget label}
+
+\item{icon}{widget icon}
+
+\item{width}{widget width}
+
 \item{class}{HTML class attribute.}
 
 \item{...}{Arguments to \code{\link[shiny:actionButton]{shiny::actionButton()}}.}

@@ -7,31 +7,21 @@
 \usage{
 ViewFilesModuleUI(id, includechkbox = FALSE)
 
-ViewFilesModule(input, output, session, logMessage = message,
+ViewFilesModule(input, output, session, dbSettings, logMessage = message,
   filesListData, includechkbox = FALSE)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
-\item{input}{Shiny input object.}
+\item{includechkbox}{logical indicating the presence of checkboxes. Default FALSE.}
 
-\item{output}{Shiny output object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{session}{Shiny session object.}
+\item{dbSettings}{Setting object as returned by e.g. [flamingoDB()].}
 
 \item{logMessage}{function that will be passed info messages.}
 
-\item{filesListData}{Table of output files for a given runID.}
-
-\item{id}{Namespace ID for the module.}
-
-\item{active}{reactive expression whether the module state should be updated.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+\item{filesListData}{Table of output files for a given anaID.}
 }
 \value{
 List of tags.

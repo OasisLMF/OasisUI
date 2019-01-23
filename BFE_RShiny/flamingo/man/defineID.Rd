@@ -7,40 +7,23 @@
 \usage{
 defineIDUI(id, w, batch = FALSE)
 
-defineID(input, output, session, dbSettings, userId,
-  preselRunId = reactive(-1), processRunId = reactive(-1),
-  batch = FALSE, logMessage = message)
+defineID(input, output, session, preselAnaId = reactive(-1),
+  anaID = reactive(-1), batch = FALSE, logMessage = message)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{w}{width of the coulmn.}
 
-\item{batch}{flag indicating if it is a batch or a simple run.}
+\item{batch}{Flag indicating if it is a batch or a simple analysis.}
 
-\item{input}{Shiny input object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{Shiny output object.}
+\item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingPage}.}
 
-\item{session}{Shiny session object.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
-
-\item{preselRunId}{reactive string expression for reselected run id from \link{landingpage}.}
-
-\item{processRunId}{reactive string expression for reselected run id from \link{defineProgramme}.}
+\item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{logMessage}{function that will be passed info messages.}
-
-\item{id}{Namespace ID for the module.}
-
-\item{active}{reactive expression whether the module state should be updated.}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{batch}{Flag indicating if it is a batch or a simple run.}
 }
 \value{
 List of tags.
@@ -48,10 +31,10 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-selectRunID reactive for runID selected.
+selectAnaID reactive for anaID selected.
 }
 \description{
-UI/View for defining one run ID
+UI/View for defining one analysis ID
 
-Server logic for defining one run ID.
+Server logic for defining one analysis ID.
 }

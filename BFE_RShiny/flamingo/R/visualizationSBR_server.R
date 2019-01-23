@@ -4,31 +4,30 @@
 #'
 #' @rdname visualizationSBR
 #'
-#' @description Server logic for viewing results of a single run.
+#' @description Server logic for viewing results of a single analysis.
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
 #'
-#' @param runIdList List of runs and their status.
-#' @param preselRunId reactive string expression for reselected run id from \link{landingpage}.
-#' @param processRunId reactive string expression for reselected run id from \link{defineProgramme}.
+#' @param anaIdList List of analyses and their status.
+#' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
+#' @param anaID  reactive string expression for reselected run id from \link{step3_configureOutput}.
 #'
-#' @return preselPanel panel to show in the process session
+#' @return preselPanel panel to show in the model session
 #'
 #' @importFrom dplyr select
 #'
 #' @export
-visualizationSBR <- function(input, output, session, dbSettings,
-                             apiSettings, userId,
-                             preselRunId = reactive(-1),
-                             processRunId = reactive(-1),
+visualizationSBR <- function(input, output, session,
+                             anaIdList = reactive(c(-1)),
+                             preselAnaId = reactive(-1),
+                             anaID  = reactive(-1),
                              active = reactive(TRUE), logMessage = message) {
   
   ns <- session$ns
-  
-  # Reactive Values and parameters ---------------------------------------------
-  
+  # Reactive Values and parameters ------------------------------------------
   navigation_state <- reactiveNavigation()
   
   # list of sub-modules
@@ -37,8 +36,10 @@ visualizationSBR <- function(input, output, session, dbSettings,
   result <- reactiveValues(
     #Panel to select
     preselPanel = 1,
-    # output files table
-    filesListData = NULL
+    # df analysis output files
+    tbl_filesListDataana = NULL,
+    # df portfolio input files
+    tbl_filesListDatapf = NULL
   )
   
   #number of plot output panels
@@ -50,63 +51,55 @@ visualizationSBR <- function(input, output, session, dbSettings,
       result$preselPanel <- 1
     }
   })
- 
-  # Selected runID -------------------------------------------------------------
+  
+  # Selected anaID -------------------------------------------------------------
   sub_modules$defineID <- callModule(
     defineID,
     id = "defineID",
-    dbSettings = dbSettings,
-    userId = reactive(userId()),
-    preselRunId = preselRunId,
-    processRunId =  processRunId,
+    preselAnaId = preselAnaId,
+    anaID =  anaID,
     logMessage = logMessage)
   
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
-    updateNavigation(navigation_state, "PS")
+    updateNavigation(navigation_state, "SA")
     result$preselPanel <- 3
+  })
+  
+  # Extract Output files for given anaID----------------------------------------
+  observeEvent( sub_modules$defineID$selectAnaID(), {
+    if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
+      tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
+      analysis_settings <- return_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
+      result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
+                                    do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
+                                                                     .addDescription, analysis_settings)))
+      result$tbl_filesListDatapf <- return_tbl_portfolioDetails(sub_modules$defineID$selectPortfolioID())
+    } else {
+      result$tbl_filesListDatapf <- NULL
+      result$tbl_filesListDataana <- NULL
+    }
   })
   
   # Tab Summary ----------------------------------------------------------------
   sub_modules$summary <- callModule(
     summarytab,
     id = "summarytab",
-    selectRunID1 = reactive(sub_modules$defineID$selectRunID()),
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
-    userId = userId,
+    selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
+    portfolioID1 = reactive(sub_modules$defineID$selectPortfolioID()),
+    tbl_filesListDataana1 = reactive({result$tbl_filesListDataana}),
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)
   
-  
-  # Extract Output files for given runID----------------------------------------
-  observeEvent( sub_modules$defineID$selectRunID(), {
-    if (!is.na(sub_modules$defineID$selectRunID()) && sub_modules$defineID$selectRunID() != "") {
-          result$filesListData <- getFileList(dbSettings, sub_modules$defineID$selectRunID())
-          result$filesListData <- cbind(result$filesListData, 
-                                        do.call(rbind.data.frame, lapply(result$filesListData$Description, 
-                                                                         .splitDescription)))
-        } else {
-          result$filesListData <- NULL
-        }
-    })
-  
-  filesListDatatoview <- reactive({
-    if (!is.null(result$filesListData)) {
-      result$filesListData %>% select(-c("Variable", "Granularity", "Losstype"))
-    } else {
-      result$filesListData
-    }
-  })
   
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
     outputfiles,
     id = "outputfiles",
-    filesListDatatoview =  filesListDatatoview,
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
-    userId = userId,
+    tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
+    tbl_filesListDatapf = reactive(result$tbl_filesListDatapf),
+    anaId = sub_modules$defineID$selectAnaID,
+    portfolioId = sub_modules$defineID$selectPortfolioID, 
     active = reactive({active() && input$tabsSBR == "taboutputfiles"}),
     logMessage = logMessage)
   
@@ -115,23 +108,26 @@ visualizationSBR <- function(input, output, session, dbSettings,
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
-    selectRunID = reactive(sub_modules$defineID$selectRunID()),
-    filesListData =   reactive({result$filesListData}),
+    selectAnaID = reactive(sub_modules$defineID$selectAnaID()),
+    filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    dbSettings = dbSettings,
-    apiSettings = apiSettings,
-    userId = userId,
     active = reactive({active() && input$tabsSBR == "tabplots"}),
     logMessage = logMessage)
   
   
   # Helper functions -----------------------------------------------------------
-  #function to split the description field of result$filesListData
-  .splitDescription <- function(x){
-    y <- unlist(strsplit(x,split = " "))
-    z <- data.frame("Granularity" = y[2], "Losstype" = y[4], "Variable" = paste(y[5:length(y)], collapse = " "), stringsAsFactors = FALSE)
-    return(z)}
-  
+
+  #Add descritption fields to output files
+  .addDescription <- function(x, analysis_settings){
+    x <- as.character(x)
+    x <- strsplit(x, split = "[.]")[[1]][1]
+    y <- unlist(strsplit(x, split = "_"))
+    report <-  paste(y[3:(length(y))], collapse = "_")
+    g_idx <- as.integer(gsub("S", "", y[2]))
+    g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
+    g <- granToOed[granToOed$oed == g_oed, "gran"]
+    z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = reportToVar(varsdf)[[ report ]], stringsAsFactors = FALSE)
+  }
   
   # Module Outout --------------------------------------------------------------
   

@@ -4,9 +4,12 @@
 \name{FLAMINGO_GUEST_ID}
 \alias{FLAMINGO_GUEST_ID}
 \title{FLAMINGO_GUEST_ID}
-\format{An object of class \code{numeric} of length 1.}
+\format{An object of class \code{character} of length 1.}
 \usage{
 FLAMINGO_GUEST_ID
+}
+\value{
+Set value.
 }
 \description{
 Id to use for an unidentified user.

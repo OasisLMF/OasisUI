@@ -11,25 +11,15 @@ modelSupplierPage(input, output, session, dbSettings,
 modelSupplierPageUI(id)
 }
 \arguments{
-\item{input}{Shiny input object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{dbSettings}{Setting object as returned by e.g. [flamingoDB()].}
 
 \item{logMessage}{function that will be passed info messages.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
-
-\item{id}{module id}
 }
 \value{
 The returned list also includes reactive navigation state

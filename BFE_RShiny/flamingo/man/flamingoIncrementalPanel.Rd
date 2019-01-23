@@ -2,42 +2,127 @@
 % Please edit documentation in R/flamingoIncrementalPanel.R
 \name{flamingoIncrementalPanel}
 \alias{flamingoIncrementalPanel}
+\alias{flamingoIncrementalPanelUI}
 \title{flamingoIncrementalPanel}
 \usage{
 flamingoIncrementalPanel(input, output, session, panels_state,
   new_content_IDs, new_content_fun, ..., new_headings = NULL,
   collapsible = FALSE, show = TRUE)
+
+flamingoIncrementalPanelUI(id, ..., heading = NULL, footer = NULL,
+  status = "default", collapsible = FALSE, show = TRUE,
+  removable = TRUE)
 }
 \arguments{
-\item{input}{Shiny input object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{Shiny output object.}
+\item{panels_state}{State (taken/available) of panels placeholder, a reactive
+named logical vector where the names are the panel IDs. The state is
+updated upon addiotion / removal of panels.}
 
-\item{session}{Shiny session object.}
+\item{new_content_IDs}{Character vector of IDs to be used for the content of
+each panel upon its creation.}
 
-\item{panels_state}{State of panel.}
+\item{new_content_fun}{Function used to populate any new panel.}
 
-\item{new_content_IDs}{ID with new content.}
+\item{...}{For the module server function, additional aruments passed to
+\code{new_content_fun}. For the module UI function, the elements to include
+inside the panel.}
 
-\item{new_content_fun}{Function with new content.}
+\item{new_headings}{Heading content to be used for each panel upon its
+creation, as a character vector or list.}
 
-\item{new_headings}{New heading.}
+\item{collapsible}{Logical flag specifying if the panel is collapsible.}
+
+\item{show}{Logical flag specifying if a collapsible panel should be
+initially shown as not collapsed.}
 
 \item{id}{Namespace ID for the module.}
 
-\item{active}{reactive expression whether the module state should be updated.}
+\item{heading}{Title for the panel.}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{footer}{Footer for the panel.}
 
-\item{apiSettings}{as returned from \link{flamingoServer}}
+\item{status}{Bootstrap status for contextual alternative.}
 
-\item{logMessage}{function that will be passed info messages.}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
-}
-\value{
-smth.
+\item{removable}{Logical flag specifying if the panel can be removed.}
 }
 \description{
-flamingoIncrementalPanel
+Incremental flamingo panel module, including a button to add
+a new panel above.
+}
+\examples{
+if (interactive()) {
+  library(shiny)
+  n_panels <- 10L
+  # Example module
+  examplePanelUI <- function(id) {
+    ns <- NS(id)
+    verticalLayout(
+      textInput(ns("txt_in"), label = paste("type something", id)),
+      textOutput(ns("txt_out")),
+      actionButton(ns("upd"), "Update")
+    )
+  }
+  examplePanel <- function(input, output, session, reset = reactive(FALSE)) {
+    txt <- reactiveVal(NULL)
+    observe({
+      reset()
+      txt(NULL)
+    })
+    observeEvent(input$upd, txt(input$txt_in))
+    output$txt_out <- renderText(txt())
+    reactive(txt())
+  }
+  ui <- fluidPage(
+    tags$style(HTML('
+                    .collapsebtn:after {
+                    font-family: "FontAwesome"; font-weight: 900; content: "\\\\f068";
+                    float: right;
+                    }
+                    .collapsebtn.collapsed:after {
+                    content: "\\\\f065";
+                    }
+                    ')),
+    titlePanel("Dynamic panels"),
+    verticalLayout(
+      actionButton("delete_all", "Remove all panels"),
+      flamingoIncrementalPanelUI(
+        "start-panel", heading = "Add a new panel",
+        collapsible = FALSE, show = FALSE, removable = FALSE
+      )
+    )
+  )
+  server <- function(input, output, session) {
+    # NOTE that, since we are using server logic to create UI elements, the IDs
+    # used for the UI components must include session$ns (relevant for module
+    # server functions)
+    ns <- session$ns
+    panel_IDs <- paste0("extpanel-", c(seq_len(n_panels)))
+    # content IDs used for the content module server and UI
+    # content modules
+    content_IDs <- paste0("content-", seq_len(n_panels))
+    all_panels <- callIncrementalPanelModules(
+      panel_IDs, "start-panel", content_IDs,
+      examplePanelUI,
+      headings = lapply(seq_len(n_panels), function(i) {
+        flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))
+      }),
+      collapsible = TRUE, show = TRUE,
+      ns = ns
+    )
+    panel_modules <- lapply(seq_along(content_IDs), function(i) {
+      callModule(examplePanel, content_IDs[i], reactive(all_panels$state()[[i]]))
+    })
+    lapply(seq_along(panel_modules), function(i) {
+      output[[paste0("paneltitle", i)]] <- renderFlamingoPanelHeading(panel_modules[[i]]())
+    })
+    observeEvent(input$delete_all, {
+      all_panels$remove_all()
+    })
+  }
+
+  shinyApp(ui = ui, server = server)
+
+}
 }

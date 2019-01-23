@@ -7,6 +7,8 @@
 runFlamingo(port = 3838, ...)
 }
 \arguments{
+\item{port}{port to pass to \code{\link[shiny]{runApp}}.}
+
 \item{...}{Additional arguments to \code{\link[shiny]{runApp}}.}
 }
 \value{

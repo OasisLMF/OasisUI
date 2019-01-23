@@ -7,37 +7,33 @@
 \usage{
 outputfilesUI(id)
 
-outputfiles(input, output, session, dbSettings, apiSettings, userId,
-  filesListDatatoview, active, logMessage = message)
+outputfiles(input, output, session,
+  tbl_filesListDataana = reactive(NULL),
+  tbl_filesListDatapf = reactive(NULL), anaId = reactive(""),
+  portfolioId = reactive(""), active, logMessage = message)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
-\item{input}{Shiny input object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{Shiny output object.}
+\item{tbl_filesListDataana}{tbl of output files to view}
 
-\item{session}{Shiny session object.}
+\item{tbl_filesListDatapf}{dataframe of input files to view}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{anaId}{id of analysis}
 
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
-
-\item{filesListDatatoview}{dataframe of files to view}
+\item{portfolioId}{id of portfolio associated to the analysis}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.
 }
 \description{
-UI/View for output files of a run.
+UI/View for output files of an analysis.
 
-Server logic for output files of a run.
+Server logic for output files of an analysis.
 }

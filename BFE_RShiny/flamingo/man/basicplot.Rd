@@ -6,6 +6,15 @@
 \usage{
 basicplot(xlabel, ylabel, titleToUse, data)
 }
+\arguments{
+\item{xlabel}{label x axis}
+
+\item{ylabel}{label y axis}
+
+\item{titleToUse}{plot title}
+
+\item{data}{dataset to plot}
+}
 \description{
 basic plot
 }

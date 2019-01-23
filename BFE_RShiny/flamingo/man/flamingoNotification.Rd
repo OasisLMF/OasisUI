@@ -8,6 +8,8 @@ flamingoNotification(ui, type = c("default", "message", "warning",
   "error"), ...)
 }
 \arguments{
+\item{ui}{Content of message.}
+
 \item{type}{see \code{\link[shiny:showNotification]{shiny::showNotification()}}.}
 
 \item{...}{other arguments to \code{\link[shiny:showNotification]{shiny::showNotification()}}.}

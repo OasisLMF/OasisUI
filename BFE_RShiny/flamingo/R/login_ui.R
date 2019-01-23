@@ -4,8 +4,6 @@
 #'
 #' @description UI/View to login an user.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @export
@@ -17,14 +15,14 @@ loginDialogUI <- function(id) {
 
     tags$div(align = "center", class = "login-dialog",
              img(src = "img/Flamingo.jpg" ),
-             tags$input(id = ns("userid"), type = "text",
+             tags$input(id = ns("user"), type = "text",
                         placeholder = "username", size = 15),
              tags$input(id = ns("password"), type = "password",
                         placeholder = "password", size = 15,
                         onkeydown = sprintf(
                           "if (event.keyCode == 13) document.getElementById('%s').click()",
                           ns("loginbutton"))),
-             flamingoButton(ns("loginbutton"), "Login", class = "btn btn-success")
+             flamingoButton(ns("abuttonloginbutton"), "Login", class = "btn btn-success")
     )
   )
 }

@@ -7,7 +7,9 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-active
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
+#' @param user current user name
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -16,9 +18,10 @@
 #' @importFrom shinyjs onclick
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
+#' @importFrom utils write.csv
 #'
 #' @export
-userAdminDefinition <- function(input, output, session, dbSettings, userId,
+userAdminDefinition <- function(input, output, session, dbSettings, user,
                                 active = reactive(TRUE)) {
 
   # Reactive Values and parameters ---------------------------------------------
@@ -28,32 +31,32 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
     permission = NULL,
 
-    CULData = NULL,
-    CULDataCounter = 0,
+    tbl_CULData = NULL,
+    tbl_CULDataCounter = 0,
 
-    CUAULData = NULL,
-    CUAULDataCounter = 0,
+    tbl_CUAULData = NULL,
+    tbl_CUAULDataCounter = 0,
 
-    USGData = NULL,
-    USGDataCounter = 0,
+    tbl_USGData = NULL,
+    tbl_USGDataCounter = 0,
 
     useradminflg = "", # one of c("", "C", "U")
 
     selUserId = -1 # reset to -1 when no user is selected
   )
 
-  .reloadCULData <- function() {
-    result$CULDataCounter <- result$CULDataCounter + 1
+  .reloadtbl_CULData <- function() {
+    result$tbl_CULDataCounter <- result$tbl_CULDataCounter + 1
     invisible()
   }
 
-  .reloadCUAULData <- function() {
-    result$CUAULDataCounter <- result$CUAULDataCounter + 1
+  .reloadtbl_CUAULData <- function() {
+    result$tbl_CUAULDataCounter <- result$tbl_CUAULDataCounter + 1
     invisible()
   }
 
-  .reloadUSGData <- function() {
-    result$USGDataCounter <- result$USGDataCounter + 1
+  .reloadtbl_USGData <- function() {
+    result$tbl_USGDataCounter <- result$tbl_USGDataCounter + 1
     invisible()
   }
 
@@ -76,8 +79,8 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   .clearOasisUserSelection <- function() {
     oasisUsers <- getOasisUsers(dbSettings)
     updateSelectInput(session, "sinputOasisID",
-                      choices = createSelectOptions(oasisUsers, "Select Oasis User ID"),
-                      selected = c("Select Oasis User ID" = 0))
+                      choices = createSelectOptions(oasisUsers, "Select Oasis User"),
+                      selected = c("Select Oasis User" = 0))
   }
 
   # When Activated (e.g. tab is openened) --------------------------------------
@@ -93,22 +96,22 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # queries the database every time to update its dataset
   observe(if (active()) {
 
-    force(result$CULDataCounter)
+    force(result$tbl_CULDataCounter)
 
     stmt <- buildDbQuery("getUsersForCompany")
-    result$CULData <- executeDbQuery(dbSettings, stmt)
+    result$tbl_CULData <- executeDbQuery(dbSettings, stmt)
 
   })
 
   # draw company user list table with custom format options
-  output$tablecompanyuserlist <- renderDT({
+  output$dt_companyuserlist <- renderDT({
     datatable(
-      result$CULData,
+      result$tbl_CULData,
       class = "flamingo-table display",
       rownames = TRUE,
       filter = "none",
       selection = "single",
-      colnames = c('Row Number' = 1),
+      colnames = c('row number' = 1),
       options = list(
         searchHighlight = TRUE,
         columnDefs = list(list(visible = FALSE, targets = 0))
@@ -122,22 +125,22 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # queries the database every time to update its dataset
   observe(if (active()) {
 
-    force(result$USGDataCounter)
+    force(result$tbl_USGDataCounter)
 
     stmt <- buildDbQuery("getSecurityGroupsForUser", result$selUserId)
-    result$USGData <- executeDbQuery(dbSettings, stmt)
+    result$tbl_USGData <- executeDbQuery(dbSettings, stmt)
 
   })
 
   # draw User Securtiy Group table with custom format options
-  output$tableusersecuritygroups <- renderDT({
-    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
+  output$dt_usersecuritygroups <- renderDT({
+    if (length(input$dt_companyuserlist_rows_selected) > 0) {
       datatable(
-        result$USGData,
+        result$tbl_USGData,
         class = "flamingo-table display",
         rownames = TRUE,
         selection = "none",
-        colnames = c('Row Number' = 1),
+        colnames = c('row number' = 1),
         filter = 'bottom',
         options = list(
           searchHighlight = TRUE,
@@ -156,19 +159,19 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # queries the database every time to update dataset
   observe(if (active()) {
 
-    force(result$CUAULDataCounter)
+    force(result$tbl_CUAULDataCounter)
     stmt <- buildDbQuery("getUserLicenses", result$selUserId)
-    result$CUAULData <- executeDbQuery(dbSettings, stmt)
+    result$tbl_CUAULData <- executeDbQuery(dbSettings, stmt)
   })
 
   # draw User License table with custom format options
-  output$tableuserlicenses <- renderDT({
-    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
+  output$dt_userlicenses <- renderDT({
+    if (length(input$dt_companyuserlist_rows_selected) > 0) {
       datatable(
-        result$CUAULData,
+        result$tbl_CUAULData,
         rownames = TRUE,
         selection = "none",
-        colnames = c('Row Number' = 1),
+        colnames = c('row number' = 1),
         filter = 'bottom',
         options = list(
           searchHighlight = TRUE,
@@ -185,12 +188,12 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
 
   # Permission Checking --------------------------------------------------------
 
-  observeEvent({active(); userId()}, if (active()) {
+  observeEvent({active(); user()}, if (active()) {
 
-    # the user Id here is the user id of the logged in user, not of the
+    # the user here is the logged in user, not the
     # currently selected user
 
-    result$permission <- flamingoDBCheckPermissions(dbSettings, userId(), 905)
+    result$permission <- "R"
 
     if (length(result$permission) == 0) {
 
@@ -213,11 +216,11 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # - updates information fields in Modal Dialog
   .getCompUserDetails <- function() {
 
-    result$selUserId <- result$CULData[input$tablecompanyuserlist_rows_selected, 3]
+    result$selUserId <- result$tbl_CULData[input$dt_companyuserlist_rows_selected, 3]
     updateTextInput(session, "tinputUserName",
-                    value = result$CULData[input$tablecompanyuserlist_rows_selected, 4])
+                    value = result$tbl_CULData[input$dt_companyuserlist_rows_selected, 4])
     updateSelectInput(session, "sinputCompany",
-                      selected = result$CULData[(input$tablecompanyuserlist_rows_selected), 1])
+                      selected = result$tbl_CULData[(input$dt_companyuserlist_rows_selected), 1])
     deptData <- getDeptData(dbSettings, result$selUserId)
     updateTextInput(session, "tinputDepartment", value = deptData[[3]])
     updateTextInput(session, "tinputLogin", value = deptData[[1]])
@@ -228,12 +231,12 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # updates the details oevery time a row is clicked
   # uses the list of rows selected to attain row index
   # row index is used to access data in table and render it
-  observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, {
-    if (length(input$tablecompanyuserlist_rows_selected) > 0) {
+  observeEvent(input$dt_companyuserlist_rows_selected, ignoreNULL = FALSE, {
+    if (length(input$dt_companyuserlist_rows_selected) > 0) {
       .getCompUserDetails()
-      .reloadUSGData()
+      .reloadtbl_USGData()
       show("ulicenses")
-      .reloadCUAULData()
+      .reloadtbl_CUAULData()
       show("usgroups")
     } else {
       hide("usgroups")
@@ -279,12 +282,12 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   onclick("abuttonusercancel",{
     removeModal()
     result$selUserId <- -1
-    .reloadCULData()
+    .reloadtbl_CULData()
   })
 
   # Enable and disable buttons
-  observeEvent(input$tablecompanyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      if (length(input$tablecompanyuserlist_rows_selected) > 0 && result$permission[1] == "CRUD") {
+  observeEvent(input$dt_companyuserlist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      if (length(input$dt_companyuserlist_rows_selected) > 0 && result$permission[1] == "CRUD") {
         enable("abuttonuserupdate")
         enable("abuttonuserdelete")
         enable("abuttonusersecurity")
@@ -321,7 +324,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
                          paste("Failed to create new user - ", input$tinputUserName))
       } else {
         flamingoNotification(type = "message",
-                         paste("User ", input$tinputUserName, " created. User id: ", res))
+                         paste("User ", input$tinputUserName, " created. User: ", res))
       }
 
     } else if (result$useradminflg == "U") {
@@ -341,16 +344,16 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     }
     result$useradminflg <- ""
     removeModal()
-    .reloadCULData()
+    .reloadtbl_CULData()
   })
 
   # title for delete button
   output$userdelmodal <- renderUI({
-    companyId <- result$CULData[(input$tablecompanyuserlist_rows_selected), 1]
-    companyName <- result$CULData[(input$tablecompanyuserlist_rows_selected), 2]
-    userId <- result$CULData[(input$tablecompanyuserlist_rows_selected), 3]
-    userName <- result$CULData[(input$tablecompanyuserlist_rows_selected), 4]
-    paste0('Delete User id ', userId, ' "', userName,'" for Company id ', companyId, ' "', companyName, '"')
+    companyId <- result$tbl_CULData[(input$dt_companyuserlist_rows_selected), 1]
+    companyName <- result$tbl_CULData[(input$dt_companyuserlist_rows_selected), 2]
+    CULId <- result$tbl_CULData[(input$dt_companyuserlist_rows_selected), 3]
+    CULName <- result$tbl_CULData[(input$dt_companyuserlist_rows_selected), 4]
+    paste0('Delete User ', CULId, ' "', CULName,'" for Company id ', companyId, ' "', companyName, '"')
   })
 
   # Modal dialog of delete button
@@ -378,27 +381,27 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   # onclick of cancel delete button
   onclick("abuttonucanceldel", {
     removeModal()
-    .reloadCULData()
+    .reloadtbl_CULData()
   })
 
   # onclick of confirm delete button
   onclick("abuttonuconfirmdel",{
 
     stmt <- buildDbQuery("deleteUser",
-                         as.character(result$CULData[input$tablecompanyuserlist_rows_selected, 3]))
+                         as.character(result$tbl_CULData[input$dt_companyuserlist_rows_selected, 3]))
     res <- executeDbQuery(dbSettings, stmt)
 
     if (is.null(res)) {
       flamingoNotification(type = "error", sprintf("Failed to delete user - ",
-                                               result$CULData[input$tablecompanyuserlist_rows_selected, 4]))
+                                               result$tbl_CULData[input$dt_companyuserlist_rows_selected, 4]))
     } else {
       flamingoNotification(type = "message", sprintf("User - %s deleted.",
-                                                 result$CULData[input$tablecompanyuserlist_rows_selected, 4]))
+                                                 result$tbl_CULData[input$dt_companyuserlist_rows_selected, 4]))
     }
 
     removeModal()
     result$selUserId <- -1
-    .reloadCULData()
+    .reloadtbl_CULData()
   })
 
 
@@ -434,7 +437,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("addSecurityGroup",
                          as.character(result$selUserId), as.character(input$sinputSecurity))
     executeDbQuery(dbSettings, stmt)
-    .reloadUSGData()
+    .reloadtbl_USGData()
     removeModal()
   })
 
@@ -443,20 +446,20 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("removeSecurityGroup",
                          as.character(result$selUserId), as.character(input$sinputSecurity))
     executeDbQuery(dbSettings, stmt)
-    .reloadUSGData()
+    .reloadtbl_USGData()
     removeModal()
   })
 
 
 
-  # Oasis User Id (License) Add/Delete -----------------------------------------
+  # Oasis User (License) Add/Delete --------------------------------------------
 
   # modal dialog of add/remove license button
   .userlicensemodal <- function() {
     ns <- session$ns
     modalDialog(label = "userlicensemodal",
                 title = "Add/Remove User Licenses",
-                selectInput(ns("sinputOasisID"), "Select Oasis User ID",
+                selectInput(ns("sinputOasisID"), "Select Oasis User",
                             choices = c("")),
                 footer = tagList(
                   flamingoButton(ns("abuttonaddoasisid"),
@@ -480,7 +483,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("addUserLicense",
                          as.character(result$selUserId), as.character(input$sinputOasisID))
     executeDbQuery(dbSettings, query)
-    .reloadCUAULData()
+    .reloadtbl_CUAULData()
     removeModal()
   })
 
@@ -489,7 +492,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
     stmt <- buildDbQuery("removeUserLicense",
                          as.character(result$selUserId), as.character(input$sinputOasisID))
     executeDbQuery(dbSettings, query)
-    .reloadCUAULData()
+    .reloadtbl_CUAULData()
     removeModal()
   })
 
@@ -499,21 +502,21 @@ userAdminDefinition <- function(input, output, session, dbSettings, userId,
   output$CUACULdownloadexcel <- downloadHandler(
     filename = "companyuserlist.csv",
     content = function(file) {
-      write.csv(result$CULData, file)
+      write.csv(result$tbl_CULData, file)
     }
   )
   # User Security Groups
   output$CUAUUSGdownloadexcel <- downloadHandler(
     filename = "usersecuritygroups.csv",
     content = function(file) {
-      write.csv(result$USGdata, file)
+      write.csv(result$tbl_USGData, file)
     }
   )
   # User Licenses
   output$CUAULdownloadexcel <- downloadHandler(
     filename = "userlicenses.csv",
     content = function(file) {
-      write.csv(result$CUAULData, file)
+      write.csv(result$tbl_CUAULData, file)
     }
   )
 

@@ -1,20 +1,28 @@
-#' flamingoPanel
+#' Flamingo UI Panel
 #'
-#' @rdname flamingoPanel
+#' Flamingo UI panel with collapsing capabilities.
 #'
-#' @description Adapted from shinyWidgets::panel() including IDs and collapsible
-#' (inspired by shinyBS::bsCollapsePanel()).
+#' @param id String ID of the panel.
+#' @param ... UI elements to include inside the panel.
+#' @param heading Title for the panel.
+#' @param footer Footer for the panel.
+#' @param status Bootstrap status for contextual alternative.
+#' @param collapsible Logical flag specifying if the panel is collapsible.
+#' @param show Logical flag specifying if a collapsible panel should be
+#'   initially shown as not collapsed.
 #'
-#' @template params-module-ui
-#' @param ... Additional parameters.
-#' @param heading NULL by default.
-#' @param footer NULL by default.
-#' @param status default.
-#' @param show TRUE.
-#' @param collapsible FALSE.
+#' @details Adapted from [shinyWidgets::panel()] including IDs and collapsible
+#' (inspired by `bsCollapsePanel` from the `shinyBS` package).
+#'
+#' @return The UI definition of the panel.
+#'
+#' @example man-roxygen/ex-flamingoPanel.R
 #'
 #' @export
-flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "default", collapsible = FALSE, show = TRUE) {
+#'
+#' @md
+flamingoPanel <- function(id, ..., heading = NULL, footer = NULL,
+                          status = "default", collapsible = FALSE, show = TRUE) {
 
   with_id <- function(x) paste(id, x, sep = "-")
   status <- match.arg(
@@ -52,120 +60,29 @@ flamingoPanel <- function(id, ..., heading = NULL, footer = NULL, status = "defa
   )
 }
 
-if (FALSE) {
-  # to become man-roxygen/ex-flamingoPanel.R
-  if (interactive()) {
-    library(shiny)
-    ui <- fluidPage(
-      # replace eventually with flamingo-tweaks.css via system.file()
-      tags$style(HTML('
-      .collapsebtn:after {
-      font-family: "FontAwesome"; font-weight: 900; content: "\\f068";
-      float: right;
-      }
-      .collapsebtn.collapsed:after {
-      content: "\\f065";
-      }
-      '
-      )),
-      titlePanel("`flamingoPanel` examples"),
-      flamingoPanel(
-        "apanel",
-        "...Yeah yeah yeah",
-        heading = h4("She loves you...")
-      ),
-      flamingoPanel(
-        "bpanel",
-        "...Yeah yeah yeah",
-        heading = h4("She loves you..."),
-        collapsible = TRUE
-      ),
-      flamingoPanel(
-        "cpanel",
-        "...Yeah yeah yeah",
-        heading = tagList(
-          "She loves you...",
-          actionButton("aa", icon("times"), style = "float: right")
-        ),
-        footer = fluidRow(column(
-          12,
-          actionButton("aa", "+", style = "float: left")
-        )),
-        collapsible = TRUE,
-        show = FALSE
-      ),
-      flamingoPanel(
-        "dpanel",
-        footer = fluidRow(column(
-          12,
-          actionButton("aa", "+", style = "float: left")
-        )),
-        show = FALSE
-      ),
 
-      NULL
-    )
-    server <- function(input, output) {}
-    shinyApp(ui, server)
-  }
-}
-
-#' collapseButton
+#' Collapse Button
 #'
-#' @rdname collapseButton
+#' Collapse button associated to a collapsible UI element.
 #'
-#' @template params-module-ui
-#' 
-#' @param id_collapse id of button that triggers collapsing.
-#' @param width widget widt
-#' @param collapsed FALSE.
-#' 
-#' @return List of tags.
+#' @param id ID of the button
+#' @param id_collapse ID of the collapsible UI element.
+#' @inheritParams shiny::actionButton
+#' @param collapsed Initial state of the button.
+#'
+#' @example man-roxygen/ex-collapseButton.R
+#'
+#' @export
+#'
+#' @md
 collapseButton <- function(id, id_collapse, ..., width = NULL, collapsed = FALSE) {
   actionButton(id, NULL, NULL, ..., width = width) %>%
     bsplus::bs_attach_collapse(id_collapse)  %>%
     tagAppendAttributes(class = paste("collapsebtn", if (collapsed) "collapsed"))
 }
-if (FALSE) {
-  # to become man-roxygen/ex-collapseButton.R
-  collapseButton(id = "abutton", id_collapse = "acollapse")
-  collapseButton(id = "abutton", id_collapse = "acollapse", collapsed = TRUE)
 
-  if (interactive()) {
-    library(shiny)
-    ui <- fluidPage(
-      # replace eventually with flamingo-tweaks.css via system.file()
-      tags$style(HTML('
-      .collapsebtn:after {
-      content:"-";
-      float: right;
-      }
-      .collapsebtn.collapsed:after {
-      content: "+";
-      }
-      '
-      )),
-      titlePanel("`collapseButton` example"),
-      verticalLayout(
-        bsplus::bs_collapse(id = "yeah", "...Yeah yeah yeah", show = FALSE),
-        div(collapseButton(
-          id = "shelovesyou", id_collapse = "yeah", collapsed = TRUE,
-          "She loves you..."
-        ))
-      )
-    )
-    server <- function(input, output) {}
-    shinyApp(ui, server)
-  }
-}
 
-#' flamingoPanelHeading
-#'
-#' @rdname flamingoPanelHeading
-#'
-#' @param heading title of the panel
-#'
-#' @return heading
+# Utility for handling panel heading as character or pre-difined tags.
 flamingoPanelHeading <- function(heading) {
   if (is.character(heading)) {
     # TODO: fine-tune font size
@@ -175,28 +92,31 @@ flamingoPanelHeading <- function(heading) {
   }
 }
 
-#' flamingoPanelHeadingOutput
+#' Panel Heading UI Output
 #'
-#' @rdname flamingoPanelHeadingOutput
+#' Panel heading UI placeholder to be rendered dynamically via
+#' [renderFlamingoPanelHeading()].
 #'
-#' @param outputId Output Id.
-#' @param inline boolean for inline css tag
-#' @param ... Additional parameters.
+#' @param outputId ID of the dynamical panel heading.
+#' @inheritParams shiny::uiOutput
 #'
-#' @return smth.
+#' @seealso [flamingoPanelHeadingOutput()]
+#'
+#' @md
 flamingoPanelHeadingOutput <- function(outputId, ...) {
   div(uiOutput(outputId, inline = TRUE, ...))
 }
 
-#' renderflamingoPanelHeading
+#' Remder Heading UI
 #'
-#' @rdname renderflamingoPanelHeading
+#' Render reactive panel heading content dynamically based on server logic.
 #'
-#' @param expr Expression.
-#' @param env Environment.
-#' @param ... Additional parameters.
+#' @inheritParams shiny::renderUI
+#' @param ... Further arguments passed to [shiny::renderUI()].
 #'
-#' @return Flamingo heading.
-renderflamingoPanelHeading <- function(expr, env = parent.frame(), ...) {
+#' @seealso [flamingoPanelHeadingOutput()]
+#'
+#' @md
+renderFlamingoPanelHeading <- function(expr, env = parent.frame(), ...) {
   renderUI(call("flamingoPanelHeading", substitute(expr)), quoted = TRUE, env = env, ...)
 }

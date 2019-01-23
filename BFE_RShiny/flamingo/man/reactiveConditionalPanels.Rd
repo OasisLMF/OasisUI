@@ -10,58 +10,36 @@ reactiveConditionalPanels(input, output, session, visible)
 reactiveConditionalPanelsUI(id, panels)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{visible}{Reactive string expression determining the visibility of
 panels.}
 
 \item{id}{Namespace ID for the module.}
 
-\item{panels}{Named list of UI content for a set of panels. Only the panel
+\item{panels}{Named list of UI content for a set of panels. Only the panels
 whose name matches the \code{visible} reactive input to the module server
-function is shown.}
-
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
-
-\item{id}{Namespace ID for the module.}
-
-\item{active}{reactive expression whether the module state should be updated.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{logMessage}{function that will be passed info messages.}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
-
-\item{id}{module id}
+function are shown. Panels with the same name are supported and shown
+together.}
 }
 \value{
-smth.
+SERVER => TO BE REVIEWED AND HAMRONIZED, CONSIDER A SECTION Module
+Outputs INSTEAD
 
-Panels.
+UI => TO BE REVIEWED AND HAMRONIZED
 }
 \description{
-Shiny module handling the visibility of a set of panels depending on a
-reactive input.
+Shiny module handling the visibility of a set of panels
+depending on a reactive input.
 }
 \details{
-In comparison to \code{\link[shiny:conditionalPanel]{shiny::conditionalPanel()}}, the
-\emph{reactiveConditionalPanels} module provides a convenient abstraction from the
-JavaScript condition details and only relies on the reactive input
-\code{visible} to determine which panels are visible.
+In comparison to \code{\link[shiny:conditionalPanel]{shiny::conditionalPanel()}}, the \emph{reactiveConditionalPanels}
+module provides a convenient abstraction from the JavaScript condition
+details and only relies on the reactive input \code{visible}, to
+determine which panels are visible.
 }
 \note{
-The module relies on the package \pkg{shinyjs}, which means
+The module relies on the \pkg{shinyjs} package, which means
 \code{\link[shinyjs:useShinyjs]{shinyjs::useShinyjs()}} must be included in the app \code{ui} definition.
 }
 \examples{

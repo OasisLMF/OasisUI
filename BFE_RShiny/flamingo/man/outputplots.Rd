@@ -7,30 +7,23 @@
 \usage{
 outputplotsUI(id)
 
-outputplots(input, output, session, dbSettings, apiSettings, userId,
-  selectRunID, n_panels, filesListData = reactive(NULL), active,
-  logMessage = message)
+outputplots(input, output, session, selectAnaID, n_panels,
+  filesListData = reactive(NULL), active, logMessage = message)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
-\item{input}{Shiny input object.}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{Shiny output object.}
+\item{selectAnaID}{id of selected analysis}
 
-\item{session}{Shiny session object.}
+\item{n_panels}{number of panels}
 
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{apiSettings}{as returned from \link{flamingoServer}}
-
-\item{userId}{user id as returned by \code{\link[=flamingoDBLogin]{flamingoDBLogin()}}}
+\item{filesListData}{Table of output files for a given analysis id}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

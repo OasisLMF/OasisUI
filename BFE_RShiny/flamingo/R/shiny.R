@@ -1,42 +1,3 @@
-
-#' flamingoModuleUI
-#'
-#' @rdname flamingoModuleUI
-#'
-#' @description Flamingo Module Template UI.
-#'
-#' @inheritParams accountDefinitionUI
-#'
-#' @return No value.
-flamingoModuleUI <- function(id) {}
-
-
-#' Flamingo Module Template
-#'
-#' @rdname flamingoModule
-#'
-#' @inheritParams loadProgrammeModel
-#' @inheritParams flamingoDBLogin
-#' @inheritParams executeDbQuery
-#' @param input Shiny input object.
-#' @param output Shiny output object.
-#' @param session Shiny session object.
-#' @param active Reactive expression whether the module state should be updated.
-#' @param logMessage Function that will be passed info messages.
-#' @param logError Function that will be passed error messages.
-#'
-#' @export
-flamingoModule <- function(
-  input,
-  output,
-  session,
-  active,
-  dbSettings,
-  apiSettings,
-  logMessage,
-  logError) {}
-
-
 #' flamingoButton
 #'
 #' @rdname flamingoButton
@@ -44,6 +5,10 @@ flamingoModule <- function(
 #' @description Modified version of the default [shiny::actionButton()].
 #'
 #' @param class HTML class attribute.
+#' @param inputId widget id
+#' @param label widget label 
+#' @param icon widget icon
+#' @param width widget width
 #' @param ... Arguments to [shiny::actionButton()].
 #'
 #' @return Acces to Oasis UI.
@@ -72,7 +37,11 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
 #'
 #' @description Modified version of the default [shiny::actionButton()].
 #'
-#' @inheritParams flamingoButton
+#' @param inputId widget id
+#' @param label widget label 
+#' @param icon widget icon
+#' @param width widget width
+#' @param class HTML class attribute.
 #' @param ... Arguments to [shiny::actionButton()].
 #'
 #' @return List of tags.
@@ -102,7 +71,7 @@ flamingoCheckboxButton <- function(inputId, label, icon = NULL, width = NULL, cl
 #'
 #' @description Modified version of the default [shiny::showNotification()].
 #'
-#' @inheritParams companyDefinition
+#' @param ui Content of message.
 #' @param type see [shiny::showNotification()].
 #' @param ... other arguments to [shiny::showNotification()].
 #'
@@ -138,7 +107,7 @@ flamingoNotification <- function(ui, type = c("default", "message", "warning", "
 #' @description Converts a table into a named list of choices for use in
 #' \link{selectInput}.
 #'
-#' @inheritParams replaceWithIcons
+#' @param df \code{data.frame}.
 #' @param label Label for extra option to add at the top. If \code{NA} (default)
 #' no extra option will be added to the top.
 #' @param value value for extra option to add at the top.

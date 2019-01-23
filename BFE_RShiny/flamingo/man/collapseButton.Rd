@@ -2,22 +2,59 @@
 % Please edit documentation in R/flamingoPanel.R
 \name{collapseButton}
 \alias{collapseButton}
-\title{collapseButton}
+\title{Collapse Button}
 \usage{
 collapseButton(id, id_collapse, ..., width = NULL, collapsed = FALSE)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{ID of the button}
 
-\item{id_collapse}{id of button that triggers collapsing.}
+\item{id_collapse}{ID of the collapsible UI element.}
 
-\item{width}{widget widt}
+\item{...}{Named attributes to be applied to the button or link.}
 
-\item{collapsed}{FALSE.}
-}
-\value{
-List of tags.
+\item{width}{The width of the input, e.g. \code{'400px'}, or \code{'100\%'};
+see \code{\link{validateCssUnit}}.}
+
+\item{collapsed}{Initial state of the button.}
 }
 \description{
-collapseButton
+Collapse button associated to a collapsible UI element.
+}
+\examples{
+
+# to become man-roxygen/ex-collapseButton.R
+collapseButton(id = "abutton", id_collapse = "acollapse")
+collapseButton(id = "abutton", id_collapse = "acollapse", collapsed = TRUE)
+
+if (interactive()) {
+  library(shiny)
+  ui <- fluidPage(
+    tags$style(HTML('
+      .collapsebtn:after {
+      content:"-";
+      float: right;
+      }
+      .collapsebtn.collapsed:after {
+      content: "+";
+      }
+      '
+    )),
+    titlePanel("`collapseButton` example"),
+    verticalLayout(
+      div(collapseButton(
+        id = "shelovesyou", id_collapse = "yeah", collapsed = TRUE,
+        "She loves you..."
+      )),
+      bsplus::bs_collapse(id = "yeah", "...Yeah yeah yeah", show = FALSE),
+      div(collapseButton(
+        id = "shelovesme", id_collapse = "no", collapsed = FALSE,
+        "She loves me..."
+      )),
+      bsplus::bs_collapse(id = "no", "...No no no", show = TRUE)
+    )
+  )
+  server <- function(input, output) {}
+  shinyApp(ui, server)
+}
 }

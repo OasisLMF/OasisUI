@@ -6,7 +6,9 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-flamingo-module
+#' @template params-logMessage
+#' @template params-active
+#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
 #'
 #' @return Empty list.
 #
@@ -17,24 +19,24 @@
 #' @importFrom shinyjs onclick
 #'
 #' @export
-companyDefinition <- function(input, output, session, dbSettings, userId,
+companyDefinition <- function(input, output, session, dbSettings,
                               active = reactive(TRUE), logMessage = message) {
 
   ns <- session$ns
 
   result <- reactiveValues(
     # company table data
-    compData = 0,
+    tbl_compData = 0,
 
     # counter to increase to trigger refresh after CRUD
-    compDataCounter = 0,
+    tbl_compDataCounter = 0,
 
     # stores current edit mode
     compFlag = c("", "U", "C")[1]
   )
 
-  .reloadCompData <- function() {
-    result$compDataCounter <- result$compDataCounter + 1
+  .reloadtbl_compData <- function() {
+    result$tbl_compDataCounter <- result$tbl_compDataCounter + 1
     invisible()
   }
 
@@ -43,22 +45,22 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
 
   # update company table when:
   # - module activated (e.g. when switching to tab)
-  # - .reloadCompData() called
+  # - .reloadtbl_compData() called
   observe(if (active()) {
-    force(result$compDataCounter)
-    result$compData <- getCompanyList(dbSettings)
+    force(result$tbl_compDataCounter)
+    result$tbl_compData <- getCompanyList(dbSettings)
   })
 
   # draw company table with custom format options, queries the database every
   # time to update its dataset
-  output$tablecompanylist <- renderDT({
+  output$dt_companylist <- renderDT({
     datatable(
-      result$compData,
+      result$tbl_compData,
       class = "flamingo-table display",
       rownames = TRUE,
       filter = "none",
       selection = "single",
-      colnames = c('Row Number' = 1),
+      colnames = c('row number' = 1),
       options = list(
         searchHighlight = TRUE,
         columnDefs = list(list(visible = FALSE, targets = 0)),
@@ -91,7 +93,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   # onclick of cancel button in pop-up
   onclick("abuttonccancel", {
     removeModal()
-    .reloadCompData()
+    .reloadtbl_compData()
   })
 
   # onclick of create button in main panel
@@ -101,8 +103,8 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
   })
 
   # Enable and disable buttons
-  observeEvent(input$tablecompanylist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      if (length(input$tablecompanylist_rows_selected) > 0) {
+  observeEvent(input$dt_companylist_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+      if (length(input$dt_companylist_rows_selected) > 0) {
         enable("abuttoncompupdate")
         enable("abuttoncompdel")
       } else {
@@ -116,19 +118,19 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
       showModal(.compcrtupmodal())
       result$compFlag <- "U"
       updateTextInput(session, "tinputCompName",
-                      value = result$compData[input$tablecompanylist_rows_selected, 2])
+                      value = result$tbl_compData[input$dt_companylist_rows_selected, 2])
       updateTextInput(session, "tinputCompDom",
-                      value = result$compData[input$tablecompanylist_rows_selected, 3])
+                      value = result$tbl_compData[input$dt_companylist_rows_selected, 3])
       updateTextInput(session, "tinputCompLegName",
-                      value = result$compData[input$tablecompanylist_rows_selected, 4])
+                      value = result$tbl_compData[input$dt_companylist_rows_selected, 4])
       updateTextInput(session, "tinputCompRegNo",
-                      value = result$compData[input$tablecompanylist_rows_selected, 5])
+                      value = result$tbl_compData[input$dt_companylist_rows_selected, 5])
   })
 
   # title for delete button
   output$compdelmodal <- renderUI({
-    companyId <- result$compData[input$tablecompanylist_rows_selected, 1]
-    companyName <- result$compData[input$tablecompanylist_rows_selected, 2]
+    companyId <- result$tbl_compData[input$dt_companylist_rows_selected, 1]
+    companyName <- result$tbl_compData[input$dt_companylist_rows_selected, 2]
     paste0('Delete Company id ', companyId, ' "', companyName, '"')
   })
 
@@ -184,7 +186,7 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
       if (result$compFlag == "U") {
 
         stmt <- buildDbQuery("updateCompany",
-                             result$compData[input$tablecompanylist_rows_selected, 1],
+                             result$tbl_compData[input$dt_companylist_rows_selected, 1],
                              input$tinputCompName,
                              input$tinputCompDom,
                              input$tinputCompLegName,
@@ -195,16 +197,16 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
         if (is.null(res)) {
           flamingoNotification(type = "error",
                            sprintf("Failed to update company - %s",
-                                   result$compData[input$tablecompanylist_rows_selected, 2]))
+                                   result$tbl_compData[input$dt_companylist_rows_selected, 2]))
         } else {
           flamingoNotification(type = "message",
                            sprintf("Company - %s updated.",
-                                   result$compData[input$tablecompanylist_rows_selected, 2]))
+                                   result$tbl_compData[input$dt_companylist_rows_selected, 2]))
         }
       }}
     result$compFlag <- ""
     removeModal()
-    .reloadCompData()
+    .reloadtbl_compData()
   })
 
   # confirm delete
@@ -212,19 +214,19 @@ companyDefinition <- function(input, output, session, dbSettings, userId,
     removeModal()
 
       stmt <- buildDbQuery("deleteCompany",
-                           result$compData[input$tablecompanylist_rows_selected, 1])
+                           result$tbl_compData[input$dt_companylist_rows_selected, 1])
       res <- executeDbQuery(dbSettings, stmt)
 
       if (is.null(res)) {
         flamingoNotification(type = "error",
                          paste("Failed to delete company - ",
-                               result$compData[input$tablecompanylist_rows_selected, 2]))
+                               result$tbl_compData[input$dt_companylist_rows_selected, 2]))
       } else {
         flamingoNotification(type = "message",
                          sprintf("Company - %s deleted.",
-                                 result$compData[input$tablecompanylist_rows_selected, 2]))
+                                 result$tbl_compData[input$dt_companylist_rows_selected, 2]))
       }
-      .reloadCompData()
+      .reloadtbl_compData()
   })
 
 

@@ -5,19 +5,13 @@
 \alias{loginDialogUI}
 \title{loginDialog}
 \usage{
-loginDialog(input, output, session, dbSettings, logout,
-  logMessage = message, logError = logMessage)
+loginDialog(input, output, session, logout, logMessage = message,
+  logError = logMessage)
 
 loginDialogUI(id)
 }
 \arguments{
-\item{input}{Shiny input object.}
-
-\item{output}{Shiny output object.}
-
-\item{session}{Shiny session object.}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{logout}{Reactive yielding logout signal.}
 
@@ -26,13 +20,11 @@ loginDialogUI(id)
 \item{logError}{function that will be passed error messages.}
 
 \item{id}{Namespace ID for the module.}
-
-\item{id}{module id}
 }
 \value{
 List of reactive expressions:
 \itemize{
-		\item{\code{userId}: }{yielding an user id if login has been completed
+		\item{\code{user}: }{yielding an user id if login has been completed
 					successfully and \link{FLAMINGO_GUEST_ID} otherwise}
 		\item{\code{logout}: }{reactive yielding logout button signal}
 }.

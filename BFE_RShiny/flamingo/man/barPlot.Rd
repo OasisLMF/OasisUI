@@ -4,7 +4,18 @@
 \alias{barPlot}
 \title{barPlot}
 \usage{
-barPlot(xlabel, ylabel, titleToUse, data, xtickslabels = NULL)
+barPlot(xlabel, ylabel, titleToUse, data, multipleplots)
+}
+\arguments{
+\item{xlabel}{label X axis}
+
+\item{ylabel}{label y axis}
+
+\item{titleToUse}{title}
+
+\item{data}{dataframe to plot}
+
+\item{multipleplots}{flag about facets}
 }
 \description{
 bar plot
