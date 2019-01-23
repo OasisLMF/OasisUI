@@ -16,12 +16,12 @@
 #' @export
 defineIDUI <- function(id, w, batch = FALSE){
   ns <- NS(id)
-
+  
   labelana <- "Ana ID"
   if (batch) {
     labelana <- "Batch ID"
   }
-
+  
   column(w,
          actionButton(ns(paste0("chooseAnaID")), label = NULL, icon = icon("list-alt"),
                       style = " color: rgb(71, 73, 73);
@@ -33,16 +33,16 @@ defineIDUI <- function(id, w, batch = FALSE){
                                 ") %>%
            bs_embed_tooltip(title = dashboard$selectAnaID, placement = "right"),
          div(textOutput(ns("selectAnaInfo1"), inline = TRUE),
-               style = "font-weight:bold; font-color: #2d2d2d;
+             style = "font-weight:bold; font-color: #2d2d2d;
                         display:inline;
                         padding:10px; margin: 5px; "),
          div(textOutput(ns("selectAnaInfo2"), inline = TRUE),
              style = "display:inline;"
-                      # font-weight:bold; font-color: #2d2d2d;
-                      # padding:10px; margin: 5px; border-style: solid;"
-             ),
+             # font-weight:bold; font-color: #2d2d2d;
+             # padding:10px; margin: 5px; border-style: solid;"
+         ),
          style = "display:inline;")
-
+  
 }
 
 # Server -----------------------------------------------------------------------
@@ -75,31 +75,29 @@ defineID <- function(input, output, session,
                      anaID = reactive(-1),
                      batch = FALSE,
                      logMessage = message) {
-
+  
   ns <- session$ns
-
+  
   # Reactive Values and parameters ---------------------------------------------
   result <- reactiveValues(
     tbl_analysesData = NULL,
     selectAnaID = "",
     selectAnaName = "",
     selectportfolioID = "",
-    LProw = NULL,
-    SArow = NULL,
     preselRow = NULL
   )
-
+  
   # list of sub-modules
   sub_modules <- list()
-
+  
   #label
-  labelana <- "Ana"
+  labelana <- "Analysis"
   if (batch) {
-    labelana <- "Batch"
+    labelana <- "Batch Analysis"
   }
-
+  
   # Modal for AnaID selection --------------------------------------------------
-
+  
   # > Modal Panel
   AnaList <- modalDialog(
     easyClose = TRUE,
@@ -113,16 +111,24 @@ defineID <- function(input, output, session,
                    label = "Cancel", align = "right")
     )
   )
-
+  
+  # > update lsit of analyses
+  observeEvent({
+    input$chooseAnaID
+    preselAnaId()
+    anaID()}, {
+      tbl_analysesData  <- return_tbl_analysesData() 
+      result$tbl_analysesData <- tbl_analysesData  %>%
+        filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
+    })
+  
   # > open modal
-  observeEvent(input$chooseAnaID, {
-    tbl_analysesData  <- return_tbl_analysesData()
-    result$tbl_analysesData <- tbl_analysesData  %>%
-      filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
-    showModal(AnaList)
-  })
-
-
+  observeEvent(
+    input$chooseAnaID, {
+      showModal(AnaList)
+    })
+  
+  
   # > modal content
   sub_modules$flamingo_analyses <- callModule(
     flamingoTable,
@@ -137,7 +143,7 @@ defineID <- function(input, output, session,
     preselRow = reactive({result$preselRow}),
     maxrowsperpage = 10,
     logMessage = logMessage)
-
+  
   # > enable disable button
   observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
     if (is.null(sub_modules$flamingo_analyses$rows_selected())) {
@@ -146,61 +152,34 @@ defineID <- function(input, output, session,
       enable("abuttonselectAna")
     }
   })
-
+  
   #Find row of anaid preselected in landing page
   observeEvent({
     preselAnaId()},{
       idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == preselAnaId())
-      status <- result$tbl_analysesData[idx,  tbl_analysesDataNames$status]
-      if (length(idx) > 0 && status == Status$Completed){
-        result$LProw <- idx
+      if (length(idx) > 0 && !isTRUE(all.equal(result$preselRow, idx)) && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
+        result$preselRow <- idx
       }
     })
-
+  
   #Find row of anaid preselected in model analysis server step 3
   observeEvent({
     anaID()},{
-      idx <- which(result$tbl_analysesData[, tbl_analysesDataNames$id] ==  anaID())
-      status <- result$tbl_analysesData[idx,  tbl_analysesDataNames$status]
-      if (length(idx) > 0 && status == Status$Completed){
-        result$SArow <- idx
+      idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == anaID())
+      if (length(idx) > 0 && !isTRUE(all.equal(result$preselRow, idx)) && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
+        result$preselRow <- idx
       }
     })
-
-  #Assign preselected row
-  observeEvent({
-    result$LProw
-    result$SArow
-  }, ignoreNULL = FALSE, {
-    if (length(nrow(result$tbl_analysesData)) > 0 ) {
-      if (!is.null(result$LProw)) {
-        result$preselRow <- result$LProw
-      } else if (!is.null(result$SArow)) {
-        result$preselRow <- result$SArow
-      } else {
-        result$preselRow <- 1
-      }
-    } else {
-      result$preselRow <- NULL
-    }
-  })
-
-
+  
+  
   # > select analysis ID
+  observeEvent(result$preselRow, {
+    .downloadOutput(idx = result$preselRow)
+  })
+  
+  
   observeEvent(input$abuttonselectAna, {
-    currid <- ""
-    currName <- ""
-    currpfId <- ""
-    if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
-      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$id]
-      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$name]
-      currpfId <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$portfolio]
-    }
-    result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
-    result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
-    result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
-    logMessage("Extract output files")
-    api_get_analyses_output_file(result$selectAnaID)
+    .downloadOutput(idx = sub_modules$flamingo_analyses$rows_selected())
     removeModal()
   })
   
@@ -212,32 +191,42 @@ defineID <- function(input, output, session,
       disable("abuttonselectAna")
     }
   })
-
+  
   # > close modal
   observeEvent(input$abuttoncancel, {
     removeModal()
   })
-
+  
   # > ifo selected analysis
   output$selectAnaInfo1 <- renderText({
-    if (is.null(sub_modules$flamingo_analyses$rows_selected()) || is.na(sub_modules$flamingo_analyses$rows_selected())) {
-      info <- paste0("Select ", labelana, ":   ")
-    } else {
-      info <- paste0('Selected ', labelana, ': ')
-    }
-    info
+    paste0("Selected ", labelana, ":   ")
   })
-
+  
   output$selectAnaInfo2 <- renderText({
-    if (is.null(sub_modules$flamingo_analyses$rows_selected()) || is.na(sub_modules$flamingo_analyses$rows_selected())) {
-      info <- ("missing")
+    if (result$selectAnaID == "") {
+      info <- '" - "'
     } else {
-      currid <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$id]
-      currName <- result$tbl_analysesData[sub_modules$flamingo_analyses$rows_selected(),tbl_analysesDataNames$name]
-      info <- paste0(currid, ' "' ,currName, '"  ')
+      info <- paste0(result$selectAnaID, ' "' ,result$selectAnaName, '"  ') 
     }
     info
   })
+  
+  # Help functions -------------------------------------------------------------
+  .downloadOutput <- function(idx) {
+    currid <- ""
+    currName <- ""
+    currpfId <- ""
+    if (!is.null(idx)) {
+      currid <- result$tbl_analysesData[idx,tbl_analysesDataNames$id]
+      currName <- result$tbl_analysesData[idx,tbl_analysesDataNames$name]
+      currpfId <- result$tbl_analysesData[idx,tbl_analysesDataNames$portfolio]
+    }
+    result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
+    result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
+    result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
+    logMessage("Extract output files")
+    api_get_analyses_output_file(result$selectAnaID)
+  }
   
   # Module Outout --------------------------------------------------------------
   
@@ -247,5 +236,5 @@ defineID <- function(input, output, session,
       selectPortfolioID = reactive({result$selectportfolioID})
     )
   )
-
+  
 }

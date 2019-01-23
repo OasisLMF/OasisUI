@@ -13,7 +13,7 @@
 #' @export
 landingPageUI <- function(id) {
   ns <- NS(id)
-
+  
   tagList(
     flamingoPanel(
       collapsible = FALSE,
@@ -45,11 +45,7 @@ landingPageUI <- function(id) {
 #' @template params-logMessage
 #' @template params-active
 #'
-#' @return For \code{landingPage()}, list of reactives:
-#' \itemize{
-#' 		\item{\code{anaid}: }{id of selected analysis or -1 if nothing is selected}
-#' 		\item{\code{modelid}: }{id of selected model or -1 if nothing is selected}
-#' }
+#' @return anaID id of selected analysis 
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -59,7 +55,7 @@ landingPageUI <- function(id) {
 #'
 #' @export
 landingPage <- function(input, output, session, logMessage = message, active = reactive(TRUE)) {
-
+  
   # Reactive Values and parameters ---------------------------------------------
   
   # parameter, number of milliseconds to wait before refreshing tables
@@ -67,15 +63,18 @@ landingPage <- function(input, output, session, logMessage = message, active = r
   reloadMillis <- 300000
   
   navigation_state <- reactiveNavigation()
-
+  
   result <- reactiveValues(
-    tbl_anaInbox = NULL
+    tbl_anaInbox = NULL,
+    anaID = -1
   )
 
   # navigation -----------------------------------------------------------------
-  observeEvent(input$abuttongotoana,
-               updateNavigation(navigation_state, "SBR"))
-
+  observeEvent(input$abuttongotoana,{
+    updateNavigation(navigation_state, "SBR")
+    result$anaID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
+  })
+  
   # Inbox table ----------------------------------------------------------------
   
   # Reload Process Runs table
@@ -87,16 +86,19 @@ landingPage <- function(input, output, session, logMessage = message, active = r
   }
   
   observe(if (active()) {
+    # Reset Param
+    result$anaID <- -1
+    
     # invalidate if the refresh button updates
     force(input$abuttonrefreshanaInbox)
-
+    
     # reload automatically every so often
     invalidateLater(reloadMillis)
     
     #refesh table
     .reloadAnaData()
   })
-
+  
   output$dt_anaInbox <- renderDT(if (!is.null(result$tbl_anaInbox)) {
     datatable(
       result$tbl_anaInbox,
@@ -116,14 +118,14 @@ landingPage <- function(input, output, session, logMessage = message, active = r
     .nothingToShowTable(contentMessage = "No analyses available")
   }
   )
-
+  
   output$downloadexcel_ana <- downloadHandler(
     filename = "analyses_inbox.csv",
     content = function(file) {
       fwrite(result$tbl_anaInbox, file, row.names = TRUE, quote = TRUE)
     }
   )
-
+  
   # Delete analysis ------------------------------------------------------------
   onclick("abuttondelana", {
     analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
@@ -152,16 +154,12 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       disable("abuttondelana")
     }
   })
-
+  
   # Module Output --------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      anaid = reactive(if (length(i <- input$dt_anaInbox_rows_selected) == 1) {
-        result$tbl_anaInbox[i, 2]} else -1),
-      # this is needed in processAna, probably shouldn't
-      modelid = reactive(if (length(i <- input$dt_anaInbox_rows_selected) == 1) {
-        result$tbl_anaInbox[i, 1]} else -1)
+      anaID = reactive({result$anaID})
     )
   )
   
@@ -179,6 +177,6 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       options = list(searchHighlight = TRUE)
     )
   }
-
+  
   moduleOutput
 }
