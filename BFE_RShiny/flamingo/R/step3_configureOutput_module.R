@@ -56,8 +56,8 @@ panelAnalysisTable <- function(id) {
                               bs_embed_tooltip(title = defineSingleAna$abuttoncancelana, placement = "right"),
                             flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
-                            flamingoButton(inputId = ns("abuttonrunboth"), label = "New Output Configuration") %>%
-                              bs_embed_tooltip(title = defineSingleAna$abuttonrunboth, placement = "right"),
+                            flamingoButton(inputId = ns("abuttonrunconfig"), label = "New Output Configuration") %>%
+                              bs_embed_tooltip(title = defineSingleAna$abuttonrunconfig, placement = "right"),
                             div(
                               actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Dashboard") %>%
                                 bs_embed_tooltip(title = defineSingleAna$abuttondisplayoutput, placement = "right"),
@@ -497,24 +497,24 @@ step3_configureOutput <- function(input, output, session,
     input$dt_analyses_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttondisplayoutput")
       disable("abuttonshowlog")
-      disable("abuttonrunboth")
+      disable("abuttonrunconfig")
       disable("abuttoncancelana")
-      disable("abuttonrunboth")
       if (portfolioID() != "") {
-        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
+        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
           enable("abuttonshowlog")
           enable("abuttoncancelana")
+          
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
             enable("abuttondisplayoutput")
           }
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
-            enable("abuttonrunboth")
-            updateActionButton(session, inputId = "abuttonrunboth", label = "New Output Configuration")
+            enable("abuttonrunconfig")
+            updateActionButton(session, inputId = "abuttonrunconfig", label = "Output Configuration")
           } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Failed)) {
-            enable("abuttonrunboth")
-            updateActionButton(session, inputId ="abuttonrunboth", label = "Rerun")
+            enable("abuttonrunconfig")
+            updateActionButton(session, inputId = "abuttonrunconfig", label = "Rerun")
           } else {
-            updateActionButton(session, inputId ="abuttonrunboth", label = "New Output Configuration")
+            updateActionButton(session, inputId = "abuttonrunconfig", label = "Output Configuration")
           }
         }
       }
@@ -630,18 +630,18 @@ step3_configureOutput <- function(input, output, session,
 
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+    analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
     if (result$ana_flag  == "R") {
-      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-      analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
-      paste0('Re-Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
+      paste0('Re-define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
     } else {
-      "New Output Configuration"
+      paste0('Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
     }
   })
 
   #Show Output Configuration Panel and Re-run
-  onclick("abuttonrunboth", {
+  onclick("abuttonrunconfig", {
         if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
               .defaultview()
@@ -925,7 +925,7 @@ step3_configureOutput <- function(input, output, session,
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
+      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
         logMessage(paste0("analysisId changed to", result$anaID))
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
@@ -962,7 +962,7 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".defaultstep3 called")
     show("panelAnalysisTable")
     disable("chkgulpolicy")
-    disable("abuttonrunboth")
+    disable("abuttonrunconfig")
     disable("abuttondisplayoutput")
     disable("abuttonshowlog")
     disable("abuttoncancelana")
@@ -1263,8 +1263,8 @@ step3_configureOutput <- function(input, output, session,
   #update analyses settings
   .updateOutputConfig <- function(analysis_settings){
     logMessage(".updateOutputConfig called")
-    #clean checkboxes
 
+    #clean checkboxes
     .clearchkboxgrp(checkgulgrplist)
     .clearchkboxgrp(checkilgrplist)
     .clearchkboxgrp(checkrigrplist)
