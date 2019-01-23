@@ -86,7 +86,7 @@ summarytab <- function(input, output, session,
                        selectAnaID2 = reactive(""),
                        portfolioID1 = reactive(""),
                        portfolioID2 = reactive(""),
-                       tbl_filesListDataana1 = NULL,
+                       tbl_filesListDataana1 = reactive(NULL),
                        compare = FALSE,
                        active, logMessage = message) {
 
@@ -105,6 +105,7 @@ summarytab <- function(input, output, session,
   observeEvent({
     selectAnaID1()
     selectAnaID2()
+    tbl_filesListDataana1()
     active()}, {
       
       # Initialize variables
@@ -112,10 +113,10 @@ summarytab <- function(input, output, session,
       SummaryData2 <- NULL
       SummaryData <- NULL
       
-      if (selectAnaID1() != "" && portfolioID1() != "") {
+      if (selectAnaID1() != "" && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
         SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
       }
-      if (selectAnaID2() != "" && portfolioID2() != "") {
+      if (selectAnaID2() != "" && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
         SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
       }
 

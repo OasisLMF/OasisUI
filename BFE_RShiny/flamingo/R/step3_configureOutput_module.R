@@ -406,7 +406,7 @@ panel_configureAdvancedRI <- function(id) {
 #' @param portfolioID selected portfolio ID.
 #' @param analysisID selected analysis ID
 #'
-#' @return anaID id of selected run.
+#' @return dashboardAnaID id of selected run.
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -455,12 +455,15 @@ step3_configureOutput <- function(input, output, session,
     ana_flag = "C",
     # Id of the Analysis
     anaID = -1,
+    # anaId for Dashboard
+    dashboardAnaID = -1,
     # analysis_ setting
     analysis_settings = NULL
   )
   
   # Reset Param
   observe(if (active()) {
+    result$dashboardAnaID <- -1
     result$navigationstate <- NULL
     if (!is.null(analysisID())) {
       result$anaID <- analysisID()
@@ -934,6 +937,7 @@ step3_configureOutput <- function(input, output, session,
   # Go to browse section
   onclick("abuttondisplayoutput", {
     result$navigationstate <- "SBR"
+    result$dashboardAnaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
   })
   
   
@@ -1327,7 +1331,7 @@ step3_configureOutput <- function(input, output, session,
   moduleOutput <- c(
     list(
       navigationstate = reactive(result$navigationstate),
-      anaID = reactive({result$anaID})
+      dashboardAnaID = reactive({result$dashboardAnaID})
     )
   )
   

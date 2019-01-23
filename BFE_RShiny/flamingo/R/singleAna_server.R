@@ -9,8 +9,6 @@
 #' @template params-logMessage
 #' @template params-active
 #' 
-#' @param preselRunId selected run id as returned from \link{landingPage}
-#' @param preselProcId selected progOasis id as returned from \link{landingPage}
 #' @param preselPanel selectedstep to visualize as returned from either
 #'  \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}
 #'
@@ -22,8 +20,6 @@
 #' @export
 singleAna <- function(input, output, session,
                      active = reactive(TRUE), logMessage = message,
-                     preselRunId = reactive(-1),
-                     preselProcId = reactive(-1),
                      preselPanel = reactive(1)) {
 
   ns <- session$ns
@@ -132,8 +128,8 @@ singleAna <- function(input, output, session,
   })
 
   # > RunId --------------------------------------------------------------------
-  observeEvent(submodulesList$step3_configureOutput$anaID(), ignoreInit = TRUE, {
-    result$anaID <- submodulesList$step3_configureOutput$anaID()
+  observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), ignoreInit = TRUE, {
+    result$anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
   })
 
   # > portfolioID --------------------------------------------------------------

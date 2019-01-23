@@ -25,11 +25,7 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-For \code{landingPage()}, list of reactives:
-\itemize{
-		\item{\code{anaid}: }{id of selected analysis or -1 if nothing is selected}
-		\item{\code{modelid}: }{id of selected model or -1 if nothing is selected}
-}
+anaID id of selected analysis
 }
 \description{
 landingPage

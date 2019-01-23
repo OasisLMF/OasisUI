@@ -32,7 +32,7 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-anaID id of selected run.
+dashboardAnaID id of selected run.
 }
 \description{
 UI/View for the step3_configureOutput.

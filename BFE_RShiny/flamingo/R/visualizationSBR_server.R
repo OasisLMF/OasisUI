@@ -11,7 +11,6 @@
 #' @template params-logMessage
 #' @template params-active
 #'
-#' @param anaIdList List of analyses and their status.
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
 #' @param anaID  reactive string expression for reselected run id from \link{step3_configureOutput}.
 #'
@@ -21,7 +20,6 @@
 #'
 #' @export
 visualizationSBR <- function(input, output, session,
-                             anaIdList = reactive(c(-1)),
                              preselAnaId = reactive(-1),
                              anaID  = reactive(-1),
                              active = reactive(TRUE), logMessage = message) {
