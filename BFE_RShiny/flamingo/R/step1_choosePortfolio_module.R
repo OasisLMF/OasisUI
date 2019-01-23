@@ -242,7 +242,7 @@ step1_choosePortfolio <- function(input, output, session,
 
   #values to stop ping pong effect
   stop_selPfID <- check_selPfID <- 0
-  
+
   # list of sub-modules
   sub_modules <- list()
 
@@ -275,7 +275,7 @@ step1_choosePortfolio <- function(input, output, session,
       .reloadtbl_portfoliosData()
     }
   })
-  
+
   # Enable/ Disable buttons ----------------------------------------------------
   # Enable and disable buttons
   observeEvent({
@@ -401,10 +401,9 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   # to enable and disable submit button for create portfolio
-  observeEvent({
-    input$tinputpfName
-  }, ignoreInit = TRUE, {
-    if (input$tinputpfName == "") {
+  observeEvent(input$tinputpfName, {
+    if (is.null(input$tinputpfName) || input$tinputpfName == "") {
+      disable("abuttonpfsubmit")
     } else {
       enable("abuttonpfsubmit")
     }

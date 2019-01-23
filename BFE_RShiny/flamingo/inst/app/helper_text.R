@@ -3,7 +3,7 @@
 # Naming convention: buttonname
 
 file_Viewer <- list(
-  FLdownloadzip = "Download all checked files"
+  FLdownloadzip = "Download all selected files."
   #FVFLdownloadexcel = "Download files table"
 )
 
@@ -17,64 +17,64 @@ landing_page <- list(
   abuttonbrowseBBR = "Visualize results across analyses or from batch runs.",
   abuttonbrowseCBR = "Compare runs.",
   abuttongotoana = "Go to analysis details.",
-  abuttondelana = "Please select a Analysis to delete.",
-  downloadexcel_ana = "Download Analyses table.",
+  abuttondelana = "Delete selected analysis.",
+  downloadexcel_ana = "Download analyses table.",
   abuttonfilemngt = "Access input/output files.",
   abuttonsysconf = "System configuration.",
   accountDD = "User info.",
-  abuttonuserupdate = "Please select a user to update.",
-  abuttonuserdelete = "Please select a user to delete.",
-  abuttonusersecurity = "Please select a user to add security group.",
-  abuttonuseroasis = "Please select a user to add license."
+  abuttonuserupdate = "Update selected user.",
+  abuttonuserdelete = "Delete selected user.",
+  abuttonusersecurity = "Add security group to selected user.",
+  abuttonuseroasis = "Add license to selected user."
 )
 
   define_account <- list(
-    abuttonamendac = "Please select an account to amend.",
-    abuttondeleteac = "Please select an account to delete."
+    abuttonamendac = "Amend selected account.",
+    abuttondeleteac = "Delete selected account."
   )
 
   define_company <- list(
-    abuttoncompupdate = "Please select a company to update.",
-    abuttoncompdel = "Please select a company to delete."
+    abuttoncompupdate = "Update selected company.",
+    abuttoncompdel = "Delete selected company."
   )
 
   sys_conf <- list(
-    abuttonamend = "Please select a Model Resource to amend.",
-    abuttondelete = "Please select a Model Resource to delete.",
-    abuttonConfirmDel = "Please select a Model Resource to delete.",
+    abuttonamend = "Amend selected model resource.",
+    abuttondelete = "Delete selected model resource.",
+    abuttonConfirmDel = "Delete selected model resource.",
     abuttonSubmitCrtAm = "Submit Programme."
   )
 
 defineSingleAna <- list(
-  abuttoncreateana = "Please select a completed Portfolio to create ana analysis.",
-  abuttonshowanadetails = "Please select a Analysis to show details.",
-  abuttonuploadsourcefiles = "Upload Source Files to portfolio.",
+  abuttoncreateana = "Create a new analysis.",
+  abuttonshowanadetails = "Show details for selected analysis.",
+  abuttonuploadsourcefiles = "Upload source files to selected portfolio.",
   portfolioID = "Select a portfolio ID to which associate a model.",
-  modelID = "Select the Model to associate with the Portfolio.",
-  abuttonpfdetails = "Please select a Portfolio to show details.",
-  abuttonamendpf = "Please select a Portfolio to Amend.",
-  abuttonpfsubmit = "Please fill all fields.",
-  abuttondeletepf = "Please select a Portfolio to Delete.",
-  abuttonmodeldetails = "Please select a Portfolio Model to show details",
-  abuttonrerunana = "Please select a completed Analysis to perform rerun.",
-  abuttonsaveoutput = "Please select Output Configuration.",
-  abuttonexecuteanarun = "Please select Output Configuration.",
-  abuttonshowlog = "Please select a Analysis to show log.",
-  abuttondisplayoutput = "Please select an Analysis to display output.",
-  abuttonconfigoutput = "Please select a ready analysis Analysis to which associate an output configuration.",
-  abuttoncancelana = "Please select an Analysis to delete.",
-  abuttonConfirmDel = "Please confirm to delete analysis.",
-  abuttoncancelIG = "Please select an Analysis to stop input generation.",
+  modelID = "Select the model to associate with the portfolio.",
+  abuttonpfdetails = "Show details for selected portfolio.",
+  abuttonamendpf = "Amend selected portfolio.",
+  abuttonpfsubmit = "Submit new portfolio.",
+  abuttondeletepf = "Delete selected portfolio.",
+  abuttonmodeldetails = "Show details for selected portfolio.",
+  abuttonrerunana = "Perform rerun on completed analysis.",
+  abuttonsaveoutput = "Save selected output configuration.",
+  abuttonexecuteanarun = "Execute run on selected output configuration.",
+  abuttonshowlog = "Show log on selected analysis.",
+  abuttondisplayoutput = "Display output for selected analysis.",
+  abuttonconfigoutput = "Associate an output configuration to ready analysis.",
+  abuttoncancelana = "Cancel selected analysis.",
+  abuttonConfirmDel = "Confirm deleting analysis.",
+  abuttoncancelIG = "Stop input generation on selected analysis.",
   abuttonstartIG = "Start input generation.",
-  abuttonshowIG = "Please select an analysis to visualize the generated input",
-  abuttonConfirmDelIG = "Pleas confirm to cancel input generation."
+  abuttonshowIG = "Visualize the generated inputs for selected analysis.",
+  abuttonConfirmDelIG = "Confirm cancelling input generation."
 )
 
 ### Panel Browse ----
 
 dashboard <- list(
-  selectAnaID = "Select AnaID.",
-  selectBatchAnaID = "Select Batch AnaID.",
+  selectAnaID = "Select analysis ID.",
+  selectBatchAnaID = "Select Batch analysis ID.",
   abuttonplusplot = "Add a new plot.",
-  abuttonselectAna = "Please select an analysis."
+  abuttonselectAna = "Select analysis."
   )
