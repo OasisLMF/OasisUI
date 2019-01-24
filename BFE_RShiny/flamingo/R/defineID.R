@@ -120,7 +120,7 @@ defineID <- function(input, output, session,
       tbl_analysesData  <- return_tbl_analysesData() 
       result$tbl_analysesData <- tbl_analysesData  %>%
         filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
-    })
+    }, ignoreInit = TRUE)
   
   # > open modal
   observeEvent(
