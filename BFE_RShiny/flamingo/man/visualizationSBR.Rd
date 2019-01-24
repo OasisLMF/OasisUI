@@ -31,6 +31,10 @@ constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
 preselPanel panel to show in the model session
 
+selectAnaID id of selected analysis
+
+selectPortfolioID portfolio id of selected analysis
+
 List of tags.
 }
 \description{

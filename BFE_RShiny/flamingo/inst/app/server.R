@@ -90,6 +90,8 @@ server <- function(input, output, session) {
     singleAna,
     id = "singleAna",
     preselPanel = reactive(result$preselPanel),
+    selectAnaID = auth_modules$visualizationSBR$selectAnaID,
+    selectPortfolioID = auth_modules$visualizationSBR$selectPortfolioID,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "SA")
   )

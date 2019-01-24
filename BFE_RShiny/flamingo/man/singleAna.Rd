@@ -6,7 +6,8 @@
 \title{singleAna}
 \usage{
 singleAna(input, output, session, active = reactive(TRUE),
-  logMessage = message, preselPanel = reactive(1))
+  logMessage = message, selectAnaID = reactive(""),
+  selectPortfolioID = reactive(""), preselPanel = reactive(1))
 
 singleAnaUI(id)
 }
@@ -16,6 +17,10 @@ singleAnaUI(id)
 \item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
+
+\item{selectAnaID}{id of selected analysis as returned from \link{visualizationSBR}}
+
+\item{selectPortfolioID}{portfolio id of selected analysis as returned from \link{visualizationSBR}}
 
 \item{preselPanel}{selectedstep to visualize as returned from either
 \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}}

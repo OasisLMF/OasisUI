@@ -11,6 +11,8 @@
 #' 
 #' @param preselPanel selectedstep to visualize as returned from either
 #'  \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}
+#' @param selectAnaID id of selected analysis as returned from \link{visualizationSBR}
+#' @param selectPortfolioID portfolio id of selected analysis as returned from \link{visualizationSBR}
 #'
 #' @return anaID  selected analysis ID
 #'
@@ -20,6 +22,8 @@
 #' @export
 singleAna <- function(input, output, session,
                      active = reactive(TRUE), logMessage = message,
+                     selectAnaID = reactive(""),
+                     selectPortfolioID = reactive(""),
                      preselPanel = reactive(1)) {
 
   ns <- session$ns
@@ -33,8 +37,10 @@ singleAna <- function(input, output, session,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
-    # Id of the analysis
-    anaID = -1,
+    # Id of the analysis to use in dashboard
+    dashboardanaID = -1,
+    # Id of analysis
+    anaID = "",
     # Id of the portfolio
     portfolioID = "",
     # Portfolio table
@@ -107,8 +113,8 @@ singleAna <- function(input, output, session,
     active = reactive({active() && workflowSteps$step() == 3}),
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
-    portfolioID =  reactive(input$portfolioID),
-    analysisID = reactive(submodulesList$step2_chooseAnalysis$analysisID())
+    portfolioID =  reactive({input$portfolioID}),
+    analysisID = reactive({result$anaID})
   )
 
   # Sub-Modules output ---------------------------------------------------------
@@ -129,15 +135,47 @@ singleAna <- function(input, output, session,
 
   # > RunId --------------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), ignoreInit = TRUE, {
-    result$anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
+    anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
+    #Avoid updating input if not necessary
+    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
+      logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", anaID ))
+      result$dashboardanaID <- anaID
+    }
+  })
+
+  observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), ignoreInit = TRUE, {
+    anaID <- submodulesList$step2_chooseAnalysis$analysisID()
+    #Avoid updating input if not necessary
+    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
+      logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$dashboardAnaID() changed to: ", anaID ))
+      result$anaID <- anaID
+    }
+  })
+
+  observeEvent(selectAnaID(), ignoreInit = TRUE, {
+    anaID <- selectAnaID()
+    #Avoid updating input if not necessary
+    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
+      logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", anaID ))
+      result$anaID <- anaID
+    }
   })
 
   # > portfolioID --------------------------------------------------------------
   observeEvent(submodulesList$step1_choosePortfolio$portfolioID(), ignoreInit = TRUE, {
     portfolioID <- submodulesList$step1_choosePortfolio$portfolioID()
     #Avoid updating input if not necessary
-    if (!is.na(portfolioID) &&  result$portfolioID != portfolioID) {
+    if (!is.na(portfolioID) && result$portfolioID != portfolioID) {
       logMessage(paste0("updating result$portfolioID because submodulesList$step1_choosePortfolio$portfolioID() changed to: ", portfolioID ))
+      result$portfolioID <- portfolioID
+    }
+  })
+  
+  observeEvent(selectPortfolioID(),  ignoreInit = TRUE, {
+    portfolioID <- selectPortfolioID()
+    #Avoid updating input if not necessary
+    if (!is.na(portfolioID) && portfolioID != "" && result$portfolioID != portfolioID) {
+      logMessage(paste0("updating result$portfolioID becauseselectPortfolioID() changed to: ", portfolioID ))
       result$portfolioID <- portfolioID
     }
   })
@@ -147,6 +185,14 @@ singleAna <- function(input, output, session,
     if (input$portfolioID != result$portfolioID) {
       logMessage(paste0("updating result$portfolioID because input$portfolioID changed to: ", input$portfolioID ))
       result$portfolioID <- input$portfolioID
+    }
+  })
+  
+  observeEvent(result$portfolioID, ignoreInit = TRUE,{
+    #Avoid updating input if not necessary
+    if (input$portfolioID != result$portfolioID) {
+      logMessage(paste0("updating input$portfolioID because result$portfolioID changed to: ", result$portfolioID ))
+      updateSelectizeInput(session, inputId = "portfolioID", selected = result$portfolioID, choices = result$pfChoices)
     }
   })
 
@@ -203,7 +249,7 @@ singleAna <- function(input, output, session,
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      anaID  = reactive(result$anaID)
+      anaID  = reactive(result$dashboardanaID)
     )
   )
 

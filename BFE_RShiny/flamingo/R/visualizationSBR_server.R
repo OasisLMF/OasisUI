@@ -15,6 +15,8 @@
 #' @param anaID  reactive string expression for reselected run id from \link{step3_configureOutput}.
 #'
 #' @return preselPanel panel to show in the model session
+#' @return selectAnaID id of selected analysis
+#' @return selectPortfolioID portfolio id of selected analysis
 #'
 #' @importFrom dplyr select
 #'
@@ -34,6 +36,10 @@ visualizationSBR <- function(input, output, session,
   result <- reactiveValues(
     #Panel to select
     preselPanel = 1,
+    #id of selected analysis
+    selectAnaID = "",
+    #portfolio id of selected analysis
+    selectPortfolioID = "",
     # df analysis output files
     tbl_filesListDataana = NULL,
     # df portfolio input files
@@ -62,6 +68,8 @@ visualizationSBR <- function(input, output, session,
   observeEvent(input$abuttongotoconfig, {
     updateNavigation(navigation_state, "SA")
     result$preselPanel <- 3
+    result$selectAnaID <- sub_modules$defineID$selectAnaID()
+    result$selectPortfolioID <- sub_modules$defineID$selectPortfolioID()
   })
   
   # Extract Output files for given anaID----------------------------------------
@@ -132,7 +140,9 @@ visualizationSBR <- function(input, output, session,
   moduleOutput <- c(
     outputNavigation(navigation_state),
     list(
-      preselPanel = reactive({result$preselPanel})
+      preselPanel = reactive({result$preselPanel}),
+      selectAnaID = reactive({result$selectAnaID}),
+      selectPortfolioID = reactive({result$selectPortfolioID})
     )
   )
   
