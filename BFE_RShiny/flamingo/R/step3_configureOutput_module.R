@@ -499,6 +499,7 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttonshowlog")
       disable("abuttonrunconfig")
       disable("abuttoncancelana")
+      
       if (portfolioID() != "") {
         if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
           enable("abuttonshowlog")
@@ -962,10 +963,6 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".defaultstep3 called")
     show("panelAnalysisTable")
     disable("chkgulpolicy")
-    disable("abuttonrunconfig")
-    disable("abuttondisplayoutput")
-    disable("abuttonshowlog")
-    disable("abuttoncancelana")
   }
 
   # Reload Analyses table

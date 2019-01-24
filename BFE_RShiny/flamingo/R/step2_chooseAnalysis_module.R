@@ -181,9 +181,9 @@ panelModelTable <- function(id) {
       actionButton(inputId = ns("buttonhidemodel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_models")),
-    textInput(inputId = ns("anaName"), label = "Analysis Name"),
-    flamingoButton(ns("abuttonmodeldetails"), "Show Details", align = "centre") %>%
+    flamingoButton(ns("abuttonmodeldetails"), "Show Model Details", style = "float:right") %>%
       bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right"),
+    textInput(inputId = ns("anaName"), label = "Analysis Name"),
     flamingoButton(ns("abuttonsubmit"), "Submit", style = "float:right")
   )
 }
@@ -690,11 +690,23 @@ step2_chooseAnalysis <- function(input, output, session,
     includechkbox = TRUE)
   
   # Enable and disable buttons -------------------------------------------------
+
+  #Make submit button dependent of analysis name
+  observeEvent(input$anaName, ignoreNULL = TRUE, ignoreInit = TRUE, {
+    if (input$anaName == "" | is.null(input$anaName)) {
+      disable("abuttonsubmit")
+    } else {
+      enable("abuttonsubmit")
+    }
+  })
+  
+  #note initialization causes the buttons to be enabled on app lounch if tables are empty
   observeEvent({
     result$tbl_analysesData
     input$dt_analyses_rows_selected
     result$tbl_modelsData
-    input$dt_models_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    input$dt_models_rows_selected
+    currstep()}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonshowlog")
       disable("abuttonshowanadetails")
       disable("abuttondelana")
@@ -706,7 +718,7 @@ step2_chooseAnalysis <- function(input, output, session,
       if (length(input$dt_models_rows_selected) > 0) {
         enable("abuttonmodeldetails")
       }
-      if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
+      if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         enable("abuttonshowanadetails")
         enable("abuttonshowlog")
         enable("abuttondelana")
