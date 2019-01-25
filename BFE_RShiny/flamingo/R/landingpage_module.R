@@ -68,7 +68,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
     tbl_anaInbox = NULL,
     anaID = -1
   )
-
+  
   # navigation -----------------------------------------------------------------
   observeEvent(input$abuttongotoana,{
     updateNavigation(navigation_state, "SBR")
@@ -128,6 +128,34 @@ landingPage <- function(input, output, session, logMessage = message, active = r
   
   # Delete analysis ------------------------------------------------------------
   onclick("abuttondelana", {
+    showModal(.deleteAna())
+  })
+  
+  output$deleteAnatitle <- renderUI({
+    analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
+    AnaName <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$name]
+    paste0('Delete analysis ', analysisID, ' ', AnaName)
+  })
+  
+  .deleteAna <- function(){
+    ns <- session$ns
+    modalDialog(label = "deleteAnaModal",
+                title = uiOutput(ns("deleteAnatitle"), inline = TRUE),
+                paste0("Are you sure you want to delete this analysis?"),
+                footer = tagList(
+                  flamingoButton(ns("abuttonConfirmDelAna"),
+                                 label = "Confirm", align = "center") %>%
+                    bs_embed_tooltip(title = landing_page$abuttonConfirmDelAna, placement = "right"),
+                  actionButton(ns("btnCancelDelAna"),
+                               label = "Go back", align = "right")
+                ),
+                size = "m",
+                easyClose = TRUE
+    )
+  }
+  
+  observeEvent(input$abuttonConfirmDelAna, {
+    removeModal()
     analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
     delete_analyses_id <- api_delete_analyses_id(analysisID)
     if (delete_analyses_id$status == "Success") {

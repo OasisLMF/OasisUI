@@ -18,6 +18,7 @@ landing_page <- list(
   abuttonbrowseCBR = "Compare runs",
   abuttongotoana = "Visualize outputs of selected analysis",
   abuttondelana = "Delete selected analysis",
+  abuttonConfirmDelAna = "Confirm deleting analysis",
   downloadexcel_ana = "Download analyses table",
   abuttonfilemngt = "Access input/output files",
   abuttonsysconf = "System configuration",
