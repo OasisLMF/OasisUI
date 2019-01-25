@@ -17,7 +17,7 @@ outputplotsUI <- function(id) {
 
   flamingoIncrementalPanelUI(
     id = ns("flamingoIncrementalPanelOutput-0"),
-    heading = "New Plot",
+    heading = "New plot",
     collapsible = FALSE, show = FALSE, removable = FALSE)
 
 }
@@ -97,7 +97,7 @@ panelOutputModuleUI <- function(id){
     flamingoPanel(
       id = ns("flamingoPanelOutputModule"),
       collapsible = TRUE,
-      heading = "Custom Plot",
+      heading = "Custom plot",
       h4("Data to plot"),
       column(12,
              div( class = "InlineSelectInput",
@@ -112,7 +112,7 @@ panelOutputModuleUI <- function(id){
       column(12,
              checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Report", choices = output_options$variables, inline = TRUE)),
       br(),
-      h4("Customize Plot"),
+      h4("Customize plot"),
       column(4,
              div(class = "InlineTextInput",
                  textInput(ns("textinputtitle"), "Title", ""))),

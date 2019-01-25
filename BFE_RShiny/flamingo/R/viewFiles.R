@@ -258,7 +258,7 @@ ViewFilesModule <- function(input, output, session,
         id = ns("flamingoPaneltableFVExposureSelected"),
         collapsible = FALSE,
         heading =  tagAppendChildren(
-          h4("File Content"),
+          h4("File content"),
           #uiOutput(ns("paneltitledt_FVExposureSelected"), inline = TRUE),
           actionButton(inputId = ns("buttonhidedt_FVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
         DTOutput(ns("dt_FVExposureSelected")))),
@@ -266,7 +266,7 @@ ViewFilesModule <- function(input, output, session,
         id = ns("flamingoPanelmapFVExposureSelected"),
         collapsible = FALSE,
         heading = tagAppendChildren(
-          h4("Map "),
+          h4("Map"),
           #uiOutput(ns("paneltitlemapFVExposureSelected"), inline = TRUE),
           actionButton(inputId = ns("buttonhidemapFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
         leafletOutput(ns("plainmap"))))

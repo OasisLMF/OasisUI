@@ -53,7 +53,7 @@ panelPortfolioTable <- function(id) {
     show = TRUE,
     ns("panel_portfolios"),
     heading = tagAppendChildren(
-      h4("Portfolios Table"),
+      h4("Portfolios table"),
       actionButton(inputId = ns("abuttonprgtblrfsh"), label = "Refresh", style = "float: right;")
     ),
     DTOutput(ns("dt_Portfolios")),
@@ -87,7 +87,7 @@ panelPortfolioDetails <- function(id) {
     collapsible = FALSE,
     ns("panel_portfolio_details"),
     heading = tagAppendChildren(
-      h4("Source Files for Portfolio"),
+      h4("Source files for portfolio"),
       uiOutput(ns("paneltitle_pfDetails"), inline = TRUE),
       actionButton(inputId = ns("abuttondefpfrfsh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
@@ -364,7 +364,7 @@ step1_choosePortfolio <- function(input, output, session,
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
-    paste0('Details of Portfolio id ', pfId, ' ', pfName)
+    paste0('details of portfolio id ', pfId, ' ', pfName)
   })
   
   
@@ -387,12 +387,12 @@ step1_choosePortfolio <- function(input, output, session,
   # Create/Amend portfolio title
   output$paneltitle_defPortfolio <- renderUI({
     if (result$portfolio_flag == "C" || is.null(input$dt_Portfolios_rows_selected)) {
-      "Create Portfolio"
+      "Create portfolio"
     } else if (result$portfolio_flag == "A") {
       pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
       pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
       pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
-      paste0('Amend Portfolio id ', pfId, ' ', pfName)
+      paste0('Amend portfolio id ', pfId, ' ', pfName)
     }
   })
   

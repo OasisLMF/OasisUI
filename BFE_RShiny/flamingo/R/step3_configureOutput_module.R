@@ -143,13 +143,13 @@ panelDefineOutputsDetails <- function(id) {
     flamingoPanel(
       collapsible = FALSE,
       ns("panel_ConfigDetails"),
-      heading = h4("Configuration Details"),
+      heading = h4("Configuration details"),
       selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = "")
     ),
     flamingoPanel(
       collapsible = FALSE,
       ns("panel_defAnaOutputDetails"),
-      heading = h4("Model Parameters"),
+      heading = h4("Model parameters"),
       div(id = ns("noofsample"), style = "width:100%; margin: 0 auto;", textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10")),
       hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
@@ -184,7 +184,7 @@ panelDefOutputConfiguration <- function(id) {
   flamingoPanel(
     collapsible = FALSE,
     ns("panel_outconfig"),
-    heading = h4("Output Configuration"),
+    heading = h4("Output configuration"),
     checkboxInput(ns("chkinputGUL"), label = "Ground Up Loss", value = TRUE),
     hidden(div(id = ns("panel_configureAdvancedGUL"), panel_configureAdvancedGUL(id))),
     checkboxInput(ns("chkinputIL"), label = "Insured Loss", value = FALSE),
@@ -635,9 +635,9 @@ step3_configureOutput <- function(input, output, session,
     analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
     if (result$ana_flag  == "R") {
-      paste0('Re-define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
+      paste0('Re-define output configuration for analysis id ', analysisID, ' ', analysisName)
     } else {
-      paste0('Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
+      paste0('Define output configuration for analysis id ', analysisID, ' ', analysisName)
     }
   })
 
@@ -904,7 +904,7 @@ step3_configureOutput <- function(input, output, session,
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
-    paste0('Run Logs for Analysis id ', analysisID, ' ', analysisName)
+    paste0('Run logs for analysis id ', analysisID, ' ', analysisName)
   })
 
   # Refresh Buttons ------------------------------------------------------------

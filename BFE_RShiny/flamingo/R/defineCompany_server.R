@@ -131,7 +131,7 @@ companyDefinition <- function(input, output, session, dbSettings,
   output$compdelmodal <- renderUI({
     companyId <- result$tbl_compData[input$dt_companylist_rows_selected, 1]
     companyName <- result$tbl_compData[input$dt_companylist_rows_selected, 2]
-    paste0('Delete Company id ', companyId, ' "', companyName, '"')
+    paste0('Delete company id ', companyId, ' "', companyName, '"')
   })
 
   # modalDialog of delete button in main panel

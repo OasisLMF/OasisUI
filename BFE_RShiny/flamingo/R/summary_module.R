@@ -20,7 +20,7 @@ summarytabUI <- function(id) {
     id = ns("flamingoPanelSummaryTable"),
     collapsible = FALSE,
     heading =  tagAppendChildren(
-      h4("Summary Table")
+      h4("Summary table")
     ),
 
     fluidRow(

@@ -259,7 +259,7 @@ ViewFilesInTable <- function(input, output, session,
         id = ns("flamingoPanelFVExposureSelected"),
         collapsible = FALSE,
         heading =  tagAppendChildren(
-          h4("File Content"),
+          h4("File content"),
           actionButton(inputId = ns("abuttonhidedFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
         DTOutput(ns("dt_FVExposureSelected")))),
 

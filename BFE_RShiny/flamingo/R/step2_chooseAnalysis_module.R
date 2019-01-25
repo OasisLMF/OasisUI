@@ -123,7 +123,6 @@ panelAnalysisLog <- function(id) {
     ns("panel_analysislog"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitle_panelAnalysisLog"), inline = TRUE),
       actionButton(inputId = ns("abuttonanalogrefresh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
@@ -494,7 +493,7 @@ step2_chooseAnalysis <- function(input, output, session,
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       paste0('Details of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
-      paste0("Analysis Details")
+      paste0("Analysis details")
     }
   })
   
@@ -584,7 +583,7 @@ step2_chooseAnalysis <- function(input, output, session,
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
       paste0('Pick a model to associate with portfolio id ', toString(result$portfolioID), ' ', pfName)
     } else {
-      paste0("List of Models")
+      paste0("List of models")
     }
   })
   
@@ -626,7 +625,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
     modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsDataNames$id]
-    paste0('Resources of Model id ', modelId)
+    paste0('Resources of model id ', modelId)
   })
   
   #Hide panel if model id changes
@@ -673,7 +672,7 @@ step2_chooseAnalysis <- function(input, output, session,
   output$paneltitle_panelAnalysisIG <- renderUI({
     if (result$analysisID != "") {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      paste0('Generated inputs associated with analysis id ', toString(result$analysisID), ' ', anaName)
+      paste0('Generated inputs for analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
       paste0("Generated inputs")
     }
