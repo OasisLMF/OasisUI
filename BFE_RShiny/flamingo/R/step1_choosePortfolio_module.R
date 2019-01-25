@@ -584,15 +584,15 @@ step1_choosePortfolio <- function(input, output, session,
       post_file <- APIfunction(pfId, newfile)
       if (post_file$status == "Success") {
         flamingoNotification(type = "message",
-                             paste("File uploaded successfully"))
+                             paste("File linked successfully"))
       } else {
         flamingoNotification(type = "error",
-                             paste("File upload failed."))
+                             paste("File link failed."))
       }
       .reloadtbl_portfoliosData()
     } else {
       flamingoNotification(type = "warning",
-                           paste("Select file to upload"))
+                           paste("Select file to link"))
     }
   }
   
