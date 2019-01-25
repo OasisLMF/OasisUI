@@ -133,7 +133,7 @@ singleAna <- function(input, output, session,
     workflowSteps$update(analysisWorkflowSteps[[3]])
   })
 
-  # > RunId --------------------------------------------------------------------
+  # > AnaId --------------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), ignoreInit = TRUE, {
     anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
     #Avoid updating input if not necessary
