@@ -1,8 +1,8 @@
 -- (c) 2013-2016 Oasis LMF Ltd.  Software provided for early adopter evaluation only.
 --Flamingo Database Generation Script
 --Author: Ben Hayes
---Date: 2018-10-10
---Version: 0.395.0
+--Date: 2018-12-10
+--Version: 0.397.0
 
 
 -------------------------------------------------------------------------------
@@ -425,7 +425,7 @@ CREATE TABLE [dbo].[OasisITEMS]
 	(
 	[item_id] [int] NOT NULL,
 	[coverage_id] [int] NOT NULL,
-	[areaperil_id] [int] NOT NULL,
+	[areaperil_id] [bigint] NOT NULL,
 	[vulnerability_id] [int] NOT NULL,
 	[group_id] [int] NOT NULL
 	)
@@ -440,7 +440,11 @@ CREATE TABLE [dbo].[OasisITEMDICT]
 	[county_id] [int] NULL,
 	[county_desc] [nvarchar](255) NULL,
 	[state_id] [int] NULL,
-	[state_desc] [nvarchar](255) NULL
+	[state_desc] [nvarchar](255) NULL,
+	[portfolio_id] [int] NULL,
+	[portfolio_desc] [nvarchar](255) NULL,
+	[locationgroup_id] [int] NULL,
+	[locationgroup_desc] [nvarchar](255) NULL
 	)
 CREATE TABLE [dbo].[OasisCOVERAGES]
 	(
@@ -2010,7 +2014,7 @@ end
 Select @NewLocationID AS LocationID
 
 GO
-/****** Object:  StoredProcedure [dbo].[generateOasisFiles2]    Script Date: 10/9/2018 10:21:12 AM ******/
+/****** Object:  StoredProcedure [dbo].[generateOasisFiles2]    Script Date: 12/13/2018 10:17:42 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2048,10 +2052,12 @@ Declare @LineOfBusinessId  int = 61
 Declare @AccountNumber int = 6
 Declare @SubLimitRef int = 54
 Declare @ModelGroupField int = 300
-Declare @SQL nvarchar(2500)
+Declare @SQL nvarchar(max)
 Declare @ProfileElementID int
 Declare @Level int
 Declare @MaxLevel int
+Declare @PortfolioNumberId int = 62
+Declare @LocationGroup int = 63
 
 insert into LogDatabaseUsage values ('generateOasisFiles2','started',getdate(),null)
 
@@ -2060,16 +2066,16 @@ update progoasis set [status] = 'Generating Oasis Files' where progoasisid = @Pr
 --Item Staging File
 Create Table #Item (ItemId int identity(1,1) primary key, InterestGroupId int, InterestRiskID int, InterestSubRiskID int, InterestExposureID int,
 					GroupId int NULL, LocId int NULL, PerilId nvarchar(255) NULL, CoverageTypeId nvarchar(255) NULL, TIV float NULL, 
-					AreaPerilId int NULL, VulnerabilityId int NULL, PolicyID int NULL, AltItemID int NULL, CoverageId int NULL, StateCode nvarchar(255) NULL,
+					AreaPerilId bigint NULL, VulnerabilityId int NULL, PolicyID int NULL, AltItemID int NULL, CoverageId int NULL, StateCode nvarchar(255) NULL,
 					CountyCode nvarchar(255) NULL, PostCode nvarchar(255) NULL, SourceLocNumber nvarchar(255) NULL, OccScheme nvarchar(255) NULL, 
 					OccCode nvarchar(255) NULL, LineOfBusiness nvarchar(255) NULL, AccountNumber nvarchar(255) NULL, SubLimitRef nvarchar(255) NULL, ElementDimensionID int NULL, ProgID int NULL,
-					IsValid bit null)
+					IsValid bit null, PortfolioNumber nvarchar(255) null, LocationGroup nvarchar(255) null)
 CREATE INDEX Idx_Item_InterestRiskID	 ON #Item (InterestRiskID)
 CREATE INDEX Idx_Item_InterestSubRiskID  ON #Item (InterestSubRiskID)
 CREATE INDEX Idx_Item_InterestExposureID ON #Item (InterestExposureID)
 Insert Into	#Item (InterestGroupId, InterestRiskID, InterestSubRiskID, InterestExposureID,GroupId, LocId, PerilId, CoverageTypeId, TIV, 
 					AreaPerilId, VulnerabilityId, PolicyID, AltItemID, CoverageId, StateCode, CountyCode, PostCode, SourceLocNumber, 
-					OccScheme, OccCode, LineOfBusiness, AccountNumber,SubLimitRef,ElementDimensionID,ProgID,IsValid)
+					OccScheme, OccCode, LineOfBusiness, AccountNumber,SubLimitRef,ElementDimensionID,ProgID,IsValid,PortfolioNumber,LocationGroup)
 Select	IG.InterestGroupId,
 		IR.InterestRiskID,
 		ISR.InterestSubRiskID,
@@ -2095,7 +2101,9 @@ Select	IG.InterestGroupId,
 		cast(NULL as nvarchar(255)) AS SubLimitRef,
 		PVD.ElementDimensionID,
 		@ProgId AS ProgID,
-		1 AS IsValid
+		1 AS IsValid,
+		cast(NULL as nvarchar(255)) AS PortfolioNumber,
+		cast(NULL as nvarchar(255)) AS LocationGroup
 From	InterestGroup AS IG
 Join	InterestRisk AS IR on IG.InterestGroupID = IR.InterestGroupID
 Join	InterestSubRisk AS ISR on IR.InterestRiskID = ISR.InterestRiskID
@@ -2229,6 +2237,38 @@ if @ProfileElementID is not null
 else
 	begin
 		Update #Item Set LineOfBusiness = 'XXX'
+	end
+
+--Portfolio Number
+Set @ProfileElementID = (Select ProfileElementID From ProfileElement Where ProfileID = @CanLocProfileID and FieldID = @PortfolioNumberId)
+if @ProfileElementID is not null
+	begin
+		Select	@SQL = 'Update #Item Set PortfolioNumber = FieldValue From	' + TableName + ' Where ProfileElementId = ' + convert(nvarchar,@ProfileElementID) + ' And #Item.' + Replace(TableName,'Values','ID') + ' = ' + TableName + '.' + Replace(TableName,'Values','ID') 
+		From	ProfileElement AS PE
+		Join	[Table] AS T on PE.TableID = T.TableID
+		Where	ProfileID = @CanLocProfileID 
+		And		PE.FieldID = @LocFieldID
+		exec sp_ExecuteSQL @SQL
+	end
+else
+	begin
+		Update #Item Set PortfolioNumber = ''
+	end
+
+--LocationGroup
+Set @ProfileElementID = (Select ProfileElementID From ProfileElement Where ProfileID = @CanLocProfileID and FieldID = @LocationGroup)
+if @ProfileElementID is not null
+	begin
+		Select	@SQL = 'Update #Item Set LocationGroup = FieldValue From	' + TableName + ' Where ProfileElementId = ' + convert(nvarchar,@ProfileElementID) + ' And #Item.' + Replace(TableName,'Values','ID') + ' = ' + TableName + '.' + Replace(TableName,'Values','ID') 
+		From	ProfileElement AS PE
+		Join	[Table] AS T on PE.TableID = T.TableID
+		Where	ProfileID = @CanLocProfileID 
+		And		PE.FieldID = @LocFieldID
+		exec sp_ExecuteSQL @SQL
+	end
+else
+	begin
+		Update #Item Set LocationGroup = ''
 	end
 
 --Oasis Keys
@@ -2455,7 +2495,11 @@ Select	Distinct AltItemID AS item_id,
 		dense_rank() over (order by CountyCode) AS county_id,
 		CountyCode as county_desc,
 		dense_rank() over (order by StateCode) AS state_id,
-		StateCode AS state_desc
+		StateCode AS state_desc,
+		dense_rank() over (order by PortfolioNumber) AS portfolionumber_id,
+		PortfolioNumber AS portfolionumber_desc,
+		dense_rank() over (order by LocationGroup) AS locationgroup_id,
+		LocationGroup AS locationgroup_desc
 From	#Item
 
 
@@ -3133,7 +3177,7 @@ declare @fmxreflocartionid int = (select locationid from [file] where fileid = @
 declare @fmxreffilename nvarchar(255) = (select [FileName] From [File] where fileid = @fmxreffileid)
 declare @fmxreflocationname nvarchar(255) = (select LocationName From Location where LocationID = @fmxreflocartionid)
 
-declare @sql nvarchar(2500)
+declare @sql nvarchar(max)
 declare @int int
 declare @perspectiveid int
 declare @summarysetid int
@@ -3216,7 +3260,7 @@ begin
 
 	if @SummaryLevelName = 'Policy_Id'
 		begin
-			set @sql = 'select distinct output_id, agg_id as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
+			set @sql = 'select distinct output_id, dense_rank() over (order by agg_id, layer_id) as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
 						join TempFMDict on TempItemDict.item_id = TempFMDict.agg_id'
 		end
 	else
@@ -3254,7 +3298,7 @@ begin
 
 	if @SummaryLevelName = 'Policy_Id'
 		begin
-			set @sql = 'select distinct output_id, agg_id as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
+			set @sql = 'select distinct output_id, dense_rank() over (order by agg_id, layer_id) as summary_id, '+ convert(nvarchar,@summarysetid) +' as summaryset_id from TempItemDict 
 						join TempFMDict on TempItemDict.item_id = TempFMDict.agg_id'
 		end
 	else
@@ -3606,7 +3650,7 @@ Declare @LocationId int			= 102 --Output Files for API
 Declare @locationname nvarchar(255) 
 								= (select locationname from location where locationid = @locationid)
 Declare @ModelId int			= (Select ModelId from ProgOasis Where ProgOasisId = @ProgOasisId)
-Declare @SQL nvarchar(2500)
+Declare @SQL nvarchar(max)
 
 --generate legacy resource record
 Insert Into  [Resource] (ResourceID,ResourceTable,ResourceKey,ResourceQualifier,ResourceTypeID)
@@ -3843,7 +3887,7 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 
 Declare	@File nvarchar(255)
 Declare	@Folder nvarchar(255)
-Declare @SQL nvarchar(2500)
+Declare @SQL nvarchar(max)
 
 Select	@File = [FileName] from [File] where FileId = @FileID
 Select	@Folder = LocationName From Location Where LocationId = (Select LocationId from [File] where FileId = @FileID)
@@ -4493,7 +4537,7 @@ create table #Summary
 declare @FileID int
 declare @FileName nvarchar(255)
 declare @LocationName nvarchar(255)
-declare @SQL nvarchar(2500)
+declare @SQL nvarchar(max)
 declare @progoasisid int = (Select progoasisid from processrun where processrunid = @ProcessRunID)
 
 
@@ -4703,7 +4747,7 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 
 declare @FileName nvarchar(255)
 declare @LocationName nvarchar(255)
-declare @SQL nvarchar(2500)
+declare @SQL nvarchar(max)
 
 Create Table #Files (FileID int null, [FileName] nvarchar(255) null, FileDesc nvarchar(255) null, LocationName nvarchar(255) null)
 
@@ -4844,7 +4888,7 @@ exec updateLogDatabaseUsage @ProcedureName,@ParameterList,@LogTimestamp
 
 declare @FileName nvarchar(255)
 declare @LocationName nvarchar(255)
-declare @SQL nvarchar(2500)
+declare @SQL nvarchar(max)
 
 Create Table #Files (FileID int, [FileName] nvarchar(255), FileDesc nvarchar(255), LocationName nvarchar(255))
 
@@ -7600,6 +7644,8 @@ INSERT [dbo].[Field] ([FieldID], [FieldName], [FormatID], [FieldlLength], [Field
 INSERT [dbo].[Field] ([FieldID], [FieldName], [FormatID], [FieldlLength], [FieldRule], [IsOasisField]) VALUES (59, N'City',3,NULL,NULL,0)						     
 INSERT [dbo].[Field] ([FieldID], [FieldName], [FormatID], [FieldlLength], [FieldRule], [IsOasisField]) VALUES (60, N'CityCode',3,NULL,NULL,0)	
 INSERT [dbo].[Field] ([FieldID], [FieldName], [FormatID], [FieldlLength], [FieldRule], [IsOasisField]) VALUES (61, N'LineOfBusiness',3,NULL,NULL,0)	
+INSERT [dbo].[Field] ([FieldID], [FieldName], [FormatID], [FieldlLength], [FieldRule], [IsOasisField]) VALUES (62, N'PortfolioNumber',3,NULL,NULL,0)		
+INSERT [dbo].[Field] ([FieldID], [FieldName], [FormatID], [FieldlLength], [FieldRule], [IsOasisField]) VALUES (63, N'LocationGroup',3,NULL,NULL,0)	
 INSERT [dbo].[ProfileType] ([ProfileTypeID], [ProfileTypeName]) VALUES (0, N'Dummy')
 INSERT [dbo].[ProfileType] ([ProfileTypeID], [ProfileTypeName]) VALUES (1, N'Canonical Location File')
 INSERT [dbo].[ProfileType] ([ProfileTypeID], [ProfileTypeName]) VALUES (2, N'Canonical Account File')

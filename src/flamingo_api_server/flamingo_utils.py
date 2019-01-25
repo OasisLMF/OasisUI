@@ -283,6 +283,7 @@ def do_run_prog_oasis(processrunid):
         df_itemdict = pd.read_csv(itemdict)
         df_fmdict = pd.read_csv(fmdict)
         df_fmdict["policy_layer"] = df_fmdict["policy_name"].map(str) + '--' + df_fmdict["layer_name"].map(str)
+        df_fmdict["summary_id"] = (df_fmdict["agg_id"] * 1000 + df_fmdict["layer_id"]).rank(method="dense").astype(int)
 
         for index, row in df_output_file_details.iterrows():
             output = upload_directory + '/output/' + row['FileName']
@@ -296,10 +297,10 @@ def do_run_prog_oasis(processrunid):
             if SummaryLevelName != "Portfolio":
                 if SummaryLevelName == "Policy":
                     # join fmdict to file
-                    df_summarydict = df_fmdict[['agg_id','policy_layer']]
+                    df_summarydict = df_fmdict[['summary_id','policy_layer']]
                     logging.getLogger().debug("df_summarydict: {}".format(df_summarydict))
                     df_summarydict_distinct = df_summarydict.drop_duplicates()
-                    df_output_temp = df_output.join(df_summarydict_distinct.set_index('agg_id'), on='summary_id')
+                    df_output_temp = df_output.join(df_summarydict_distinct.set_index('summary_id'), on='summary_id')
                 else:
                     # join itemdict to file
                     df_summarydict = df_itemdict[[SummaryLevelId,SummaryLevelDesc]]
@@ -695,7 +696,9 @@ def do_generate_oasis_files(progoasisid):
     os.remove(OASIS_FILES_DIRECTORY + "/FMXRef_temp.csv")
 
     destination = open(itemdict, 'wb')
-    destination.write("item_id,coverage_id,location_id,location_desc,lob_id,lob_desc,county_id,county_desc,state_id,state_desc\n")
+    destination.write("item_id,coverage_id,location_id,location_desc,lob_id,lob_desc,county_id,"+\
+        "county_desc,state_id,state_desc,portfolionumber_id,portfolionumber_desc,"+\
+        "locationgroup_id,locationgroup_desc\n")
     shutil.copyfileobj(open(OASIS_FILES_DIRECTORY + "/ItemDict_temp.csv", 'rb'), destination)
     destination.close()
     os.remove(OASIS_FILES_DIRECTORY + "/ItemDict_temp.csv")
@@ -779,13 +782,25 @@ def do_generate_reinsurance_files(progoasisid):
     fm_dict_file = input_location + '/FMDict.csv'
     fm_dict = pd.read_csv(fm_dict_file)
     combined_dict = item_dict.merge(fm_dict, on=('item_id'))
-    xref_description = combined_dict[['layer_name','policy_name','location_desc']]
-    xref_description.columns = ['policy_number','account_number','location_number']
+    xref_description = combined_dict[['layer_name','policy_name','location_desc',
+        'portfolionumber_desc','locationgroup_desc']]
+    xref_description.columns = ['policy_number','account_number','location_number',
+        'portfolio_number','location_group']
     xref_description['xref_id'] = xref_description.index + 1
     xref_description['coverage_type_id'] = 1
     xref_description['peril_id'] = 1
+    #xref_description['portfolio_number'] = ''
+    #xref_description['location_group'] = ''
+    xref_description['cedant_name'] = ''
+    xref_description['producer_name'] = ''
+    xref_description['lob'] = ''
+    xref_description['country_code'] = ''
+    xref_description['reins_tag'] = ''
     xref_description['tiv'] = 1
-    xref_description = xref_description[['xref_id','policy_number','account_number','location_number','coverage_type_id','peril_id','tiv']]
+
+    xref_description = xref_description[['portfolio_number','xref_id','policy_number','account_number',
+        'location_number','location_group','cedant_name','producer_name','lob','country_code','reins_tag',
+        'coverage_type_id','peril_id','tiv']]
     xref_description_file = input_location + '/xref_descriptions.csv'
     xref_description.to_csv(xref_description_file, index=False)
 

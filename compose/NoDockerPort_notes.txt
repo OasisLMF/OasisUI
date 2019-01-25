@@ -1,0 +1,6 @@
+https://github.com/openanalytics/shinyproxy/pull/33
+https://github.com/openanalytics/shinyproxy-config-examples/tree/master/02-containerized-docker-engine
+
+#Might need to add creation of docker network to bash scripts 
+sudo docker network create shiny-net
+
