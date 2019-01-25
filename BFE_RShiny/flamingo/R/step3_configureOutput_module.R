@@ -939,6 +939,7 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttondisplayoutput", {
     result$navigationstate <- "SBR"
     result$dashboardAnaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    logMessage(paste0("selected analysis ID is ", result$dashboardAnaID))
   })
   
   
