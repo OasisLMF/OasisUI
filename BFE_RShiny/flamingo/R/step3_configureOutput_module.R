@@ -13,9 +13,9 @@
 #'
 #' @export
 step3_configureOutputUI <- function(id) {
-
+  
   ns <- NS(id)
-
+  
   tagList(
     hidden(div(id = ns("panelAnalysisTable"), panelAnalysisTable(id))),
     hidden(div(id = ns("panelDefineOutputs"), panelDefineOutputs(id))),
@@ -210,7 +210,7 @@ panelDefOutputConfiguration <- function(id) {
 #' @export
 panel_configureAdvancedGUL <- function(id) {
   ns <- NS(id)
-
+  
   fluidRow(
     # Few outputs commented/disabled for the first release. To be enabled for later releases.
     column(4,
@@ -227,33 +227,33 @@ panel_configureAdvancedGUL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-
+    
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkgulprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = varsdf$vars[varsdf$defaultChoice]),
-
+             
              checkboxGroupInput(ns("chkgulstate"),
                                 label = h6("State", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkgulcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
                                 choices =LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkgulloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkgullob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkgulpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
@@ -288,33 +288,33 @@ panel_configureAdvancedIL <- function(id) {
            # h5("Sample Mean OEP", class = "flamingo-measure"),
            h5("AAL", class = "flamingo-measure"),
            tags$div(class = "h5-align", h5("PLT", class = "flamingo-measure"))),
-
+    
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkilprog"),
                                 label = h6("Prog", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilstate"),
                                 label = h6("State", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilcounty"),
                                 label = h6("County", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilloc"),
                                 label = h6("Location", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkillob"),
                                 label = h6("LOB", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkilpolicy"),
                                 label = h6("Policy", class = "flamingo-granularity"),
                                 choices = LosstypesChoices,
@@ -349,33 +349,33 @@ panel_configureAdvancedRI <- function(id) {
            # h5("Sample Mean OEP", style="font-size: 16.5px;"),
            h5("AAL", style="font-size: 16.5px;"),
            tags$div(class = "h5-align",h5("PLT", style="font-size: 16.5px;"))),
-
+    
     tags$div(class = "multicol",
              checkboxGroupInput(ns("chkriprog"),
                                 label = h5("Prog", style = "font-size: 15.0px;"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkristate"),
                                 label = h5("State", style = "font-size: 15.0px;"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkricounty"),
                                 label = h5("County", style = "font-size: 15.0px;"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkriloc"),
                                 label = h5("Location", style = "font-size: 15.0px;"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkrilob"),
                                 label = h5("LOB", style = "font-size: 15.0px;"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
-
+             
              checkboxGroupInput(ns("chkripolicy"),
                                 label = h5("Policy", style = "font-size: 15.0px;"),
                                 choices = LosstypesChoices,
@@ -429,19 +429,19 @@ step3_configureOutput <- function(input, output, session,
                                   portfolioID = reactive(""),
                                   analysisID = reactive("")
 ) {
-
+  
   ns <- session$ns
-
+  
   # Reactive Values and parameters ---------------------------------------------
-
+  
   #number of Rows per Page in a dataable
   pageLength <- 5
-
+  
   # Default checkgroup for  GUL, IL and RI
   checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
   checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
   checkrigrplist <- c("chkriprog", "chkristate", "chkricounty", "chkriloc", "chkrilob", "chkripolicy")
-
+  
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # reactve value for navigation
@@ -459,7 +459,7 @@ step3_configureOutput <- function(input, output, session,
     # analysis_ setting
     analysis_settings = NULL
   )
-
+  
   # Reset Param
   observe(if (active()) {
     result$dashboardAnaID <- -1
@@ -468,7 +468,7 @@ step3_configureOutput <- function(input, output, session,
       result$anaID <- analysisID()
     }
   })
-
+  
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
@@ -477,7 +477,7 @@ step3_configureOutput <- function(input, output, session,
       .reloadAnaData()
     }
   })
-
+  
   # If portfolioID changes, reload analysis table and set view back to default
   observeEvent(portfolioID(), ignoreInit = TRUE, {
     if (active()) {
@@ -486,9 +486,9 @@ step3_configureOutput <- function(input, output, session,
       .reloadAnaData()
     }
   })
-
+  
   # Enable and disable buttons -------------------------------------------------
-
+  
   #Enabling based on analysis
   observeEvent({
     result$tbl_analysesData
@@ -503,8 +503,9 @@ step3_configureOutput <- function(input, output, session,
       if (portfolioID() != "") {
         if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
           enable("abuttonshowlog")
-          enable("abuttoncancelana")
-          
+          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready) {
+            enable("abuttoncancelana")
+          }
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
             enable("abuttondisplayoutput")
           }
@@ -521,7 +522,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   )
-
+  
   # reactive expression yielding the output options as a list
   outputOptionsList <- reactive({paste(collapse = ",", c(
     input$chkinputGUL, input$chkgulprog, input$chkgulpolicy,
@@ -534,7 +535,7 @@ step3_configureOutput <- function(input, output, session,
     input$chkristate, input$chkricounty, input$chkriloc,
     input$chkrilob
   ))})
-
+  
   # Enable and disable buttons based on output confifig
   observeEvent(outputOptionsList(), ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (outputOptionsList() != "") {
@@ -545,7 +546,7 @@ step3_configureOutput <- function(input, output, session,
       disable("abuttonexecuteanarun")
     }
   })
-
+  
   # Analyses  Table ------------------------------------------------------------
   # reload if radio buttons for 'All' vs 'In_Progress' change
   observeEvent(input$radioanaAllOrInProgress, ignoreInit = TRUE, {
@@ -554,7 +555,7 @@ step3_configureOutput <- function(input, output, session,
       .reloadAnaData()
     }
   })
-
+  
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == result$anaID )
@@ -576,7 +577,7 @@ step3_configureOutput <- function(input, output, session,
     } else {
       .nothingToShowTable(contentMessage = paste0("no analysis available"))
     })
-
+  
   # Analyses Table Title
   output$paneltitle_AnalysisTable <- renderUI({
     if (portfolioID() != "") {
@@ -585,29 +586,29 @@ step3_configureOutput <- function(input, output, session,
       paste0("Analyses")
     }
   })
-
+  
   # Delete analysis button -----------------------------------------------------
   onclick("abuttoncancelana", {
     showModal(.cancelAnaModal())
   })
-
+  
   output$cancelAnaModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
     paste0('Cancel ', AnaId, ' ', AnaName)
   })
-
+  
   observeEvent(input$btnCancelAnaDel, {
     removeModal()
   })
-
+  
   observeEvent(input$abuttonConfirmDelAna, {
     removeModal()
-
+    
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     #should use /v1/analyses/{id}/cancel/
     delete_analyses_id <- api_post_analyses_cancel(analysisID)
-
+    
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis id ", analysisID, " cancelled."))
@@ -620,15 +621,15 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "error",
                            paste0("Error in cancelling analysis ", result$anaID, ". Analysis is not running."))
     }
-
+    
   })
-
+  
   # Configure Output -----------------------------------------------------------
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
     hide("panelDefineOutputs")
   })
-
+  
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
@@ -640,42 +641,42 @@ step3_configureOutput <- function(input, output, session,
       paste0('Define output configuration for analysis id ', analysisID, ' ', analysisName)
     }
   })
-
+  
   #Show Output Configuration Panel and Re-run
   onclick("abuttonrunconfig", {
-        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
-          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
-              .defaultview()
-              hide("panelAnalysisLogs")
-              show("panelDefineOutputs")
-              logMessage("showing panelDefineOutputs")
-              result$ana_flag <- "C"
-
-          } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Failed)) {
-              .defaultview()
-              hide("panelAnalysisLogs")
-              show("panelDefineOutputs")
-              logMessage("showing panelDefineOutputs")
-              result$ana_flag <- "R"
-              analysis_settings <- return_analyses_settings_file_list(result$anaID)
-              analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-              if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
-                flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID))
-              } else {
-                logMessage(paste0("appling the output configuration of analysis ",analysisName," id ", result$anaID))
-                #Set inputs
-                .updateOutputConfig(analysis_settings)
-              }
-          }
+    if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
+      if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
+        .defaultview()
+        hide("panelAnalysisLogs")
+        show("panelDefineOutputs")
+        logMessage("showing panelDefineOutputs")
+        result$ana_flag <- "C"
+        
+      } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Failed)) {
+        .defaultview()
+        hide("panelAnalysisLogs")
+        show("panelDefineOutputs")
+        logMessage("showing panelDefineOutputs")
+        result$ana_flag <- "R"
+        analysis_settings <- return_analyses_settings_file_list(result$anaID)
+        analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+        if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
+          flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID))
+        } else {
+          logMessage(paste0("appling the output configuration of analysis ",analysisName," id ", result$anaID))
+          #Set inputs
+          .updateOutputConfig(analysis_settings)
         }
-    })
-
+      }
+    }
+  })
+  
   # Hide Output Configuration panel
   onclick("abuttonehidepanelconfigureoutput", {
     hide("panelDefineOutputs")
     result$ana_flag <- "C"
   })
-
+  
   # simplified view selection
   observe({
     gullistlength <- lapply(checkgulgrplist, function(i){
@@ -698,8 +699,8 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxInput(session, "chkinputRI", value = TRUE)
     }
   })
-
-
+  
+  
   # Select/deselect GUL
   observeEvent(input$chkinputGUL, ignoreInit = TRUE,  {
     if (active()) {
@@ -716,7 +717,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # Select/deselect IL
   # Note: the ignoreInit = TRUE does not prevent the trigger once logged in
   observeEvent(input$chkinputIL, ignoreInit = TRUE, {
@@ -733,7 +734,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # Select/deselect RI
   observeEvent(input$chkinputRI, ignoreInit = TRUE, {
     if (active()) {
@@ -749,16 +750,10 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # Update button in sidebar panel to update checkboxes for pre-populated values
   #To-Do update output configuration based on analysis setting
   observeEvent(input$sinoutputoptions, {
-    # if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
-    #   #read the right analysis settings file
-    #   analysis_settings <- read_json(paste0("./analysis_settings/",input$sinoutputoptions,".json"),  simplifyVector = TRUE)
-    #   #Set inputs
-    #   .updateOutputConfig(analysis_settings)
-    # }
     # Using analyses names to select the output configuration of a previously posted analyses
     logMessage(paste0("input$sinoutputoptions changed to ",input$sinoutputoptions))
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
@@ -774,22 +769,22 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # Clear the checkbox groups and preset dropdown - Set back to default
   onclick("abuttonclroutopt", {
     .defaultview()
   })
-
+  
   # show advanced view
   onclick("abuttonadvanced", {
     .advancedview()
   })
-
+  
   # show basic view
   onclick("abuttonbasic", {
     .basicview()
   })
-
+  
   # # Save output configuration --------------------------------------------------
   #
   # # Save output for later use as presets
@@ -826,9 +821,9 @@ step3_configureOutput <- function(input, output, session,
   #     .clearOutputOptions()
   #   }
   # })
-
+  
   # Run Analyses ---------------------------------------------------------------
-
+  
   # Execute analysis
   onclick("abuttonexecuteanarun", {
     analysis_settingsList <- .gen_analysis_settings()
@@ -836,10 +831,10 @@ step3_configureOutput <- function(input, output, session,
     currfolder <- getOption("flamingo.settings.api.share_filepath")
     dest <- file.path(currfolder, "analysis_settings.json")
     write_json(analysis_settingsList, dest, pretty = TRUE, auto_unbox = TRUE)
-
+    
     #post analysis settings
     post_analysis_settings_file <- api_post_analyses_settings_file(result$anaID, dest)
-
+    
     if (post_analysis_settings_file$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis  settings posted to ", result$anaID ,"."))
@@ -848,7 +843,7 @@ step3_configureOutput <- function(input, output, session,
                            paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analysis_settings_file$status))
     }
     analyses_run <- return_df(api_post_analyses_run,result$anaID)
-
+    
     if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
       if (analyses_run[[tbl_analysesDataNames$status]] == "RUN_STARTED") {
         flamingoNotification(type = "message",
@@ -863,9 +858,9 @@ step3_configureOutput <- function(input, output, session,
     .defaultview()
     selectRows(dataTableProxy("dt_analyses"), idxSel)
     selectPage(dataTableProxy("dt_analyses"), pageSel)
-
+    
   })
-
+  
   # Logs -----------------------------------------------------------------------
   onclick("abuttonshowlog", {
     hide("panelDefineOutputs")
@@ -873,11 +868,11 @@ step3_configureOutput <- function(input, output, session,
     logMessage("showing analysis run log table")
     .reloadAnaRunLog()
   })
-
+  
   onclick("abuttonhidelog", {
     hide("panelAnalysisLogs")
   })
-
+  
   ### Log Table
   output$dt_analysesrunlog <- renderDT({
     if (length(input$dt_analyses_rows_selected) > 0) {
@@ -898,7 +893,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # run logs title
   output$paneltitle_AnaLogs <- renderUI({
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
@@ -906,16 +901,16 @@ step3_configureOutput <- function(input, output, session,
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
     paste0('Run logs for analysis id ', analysisID, ' ', analysisName)
   })
-
+  
   # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonanarefresh", {
     .reloadAnaData()
   } )
-
+  
   onclick("abuttonanarefreshlogs", {
     .reloadAnaRunLog()
   })
-
+  
   # Updates dependent on changed: dt_analyses_rows_selected --------------------
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent({
@@ -938,17 +933,17 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   })
-
+  
   # Navigation -----------------------------------------------------------------
   # Go to browse section
   onclick("abuttondisplayoutput", {
     result$navigationstate <- "SBR"
     result$dashboardAnaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
   })
-
-
+  
+  
   # Help Functions -------------------------------------------------------------
-
+  
   # hide all panels
   .hideDivs <- function() {
     logMessage(".hideDivs called")
@@ -957,14 +952,14 @@ step3_configureOutput <- function(input, output, session,
     hide("panelDefineOutputs")
     hide("panelAnalysisLogs")
   }
-
+  
   #show default view for Section "Configure Output & Run" = "3"
   .defaultstep3 <- function(){
     logMessage(".defaultstep3 called")
     show("panelAnalysisTable")
     disable("chkgulpolicy")
   }
-
+  
   # Reload Analyses table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
@@ -983,7 +978,7 @@ step3_configureOutput <- function(input, output, session,
     }
     invisible()
   }
-
+  
   # Reload Analysis Run Log table
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
@@ -993,7 +988,7 @@ step3_configureOutput <- function(input, output, session,
       result$tbl_analysisrunlog <-  NULL
     }
   }
-
+  
   # table settings for pr tab: returns option list for datatable
   .getPRTableOptions <- function() {
     options <- list(
@@ -1006,7 +1001,7 @@ step3_configureOutput <- function(input, output, session,
       columnDefs = list(list(visible = FALSE, targets = 0)))
     return(options)
   }
-
+  
   #empty table
   .nothingToShowTable <- function(contentMessage){
     datatable(
@@ -1020,7 +1015,7 @@ step3_configureOutput <- function(input, output, session,
       options = list(searchHighlight = TRUE)
     )
   }
-
+  
   .cancelAnaModal <- function(){
     ns <- session$ns
     modalDialog(label = "cancelAnaModal",
@@ -1037,29 +1032,26 @@ step3_configureOutput <- function(input, output, session,
                 easyClose = TRUE
     )
   }
-
+  
   # Clear Custom Configuration option
   .clearOutputOptions <- function() {
     logMessage(".clearOutputOptions called")
-    # updateSelectInput(session, "sinoutputoptions",
-    #                   choices = gsub(".json", "", list.files("./analysis_settings")),
-    #                   selected = character(0))
     tbl_analysesData  <- return_tbl_analysesData()
     tbl_analysesData <- tbl_analysesData %>% filter(status != Status$Processing & status != Status$Ready)
-    namesList <- tbl_analysesData[,tbl_analysesDataNames$id]
+    namesList <- tbl_analysesData[,tbl_analysesDataNames$name]
     idList <- tbl_analysesData[,tbl_analysesDataNames$id]
     choicesList <- paste(idList, namesList, sep = " / ")
     updateSelectInput(session, "sinoutputoptions",
                       choices = choicesList,
                       selected = character(0))
   }
-
+  
   #utility function to swap names and values of a list
   .SwapNamesValueInList <- function(List) {
     L <- setNames(names(List), unlist(List) %>% as.vector() ) %>% as.list()
     return(L)
   }
-
+  
   # Clear other runtime params
   .clearotherparams <- function() {
     logMessage(".clearotherparams called")
@@ -1070,12 +1062,12 @@ step3_configureOutput <- function(input, output, session,
     tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
     if (modelID != -1 && !is.null(tbl_modelsDetails)) {
       model_settings <- tbl_modelsDetails$model_settings
-
+      
       names_settings <- list()
       for (i in 1:length(model_settings)) {# i <- 1
         names_settings[names(model_settings[[i]])] <- i
       }
-
+      
       event_set_id <- names_settings[names(names_settings) == "event_set"]$event_set
       event_set_list <- model_settings[[event_set_id]]$event_set
       event_set_default <- event_set_list$default
@@ -1083,7 +1075,7 @@ step3_configureOutput <- function(input, output, session,
       updateSelectInput(session, "sinputeventset",
                         selected = event_set_default,
                         choices = eventSetChoices)
-
+      
       occurrence_set_id <- names_settings[names(names_settings) == "event_occurrence_id"]$event_occurrence_id
       occurrence_set_list <- model_settings[[occurrence_set_id]]$event_occurrence_id
       occurrence_set_default <- occurrence_set_list$default
@@ -1091,15 +1083,15 @@ step3_configureOutput <- function(input, output, session,
       updateSelectInput(session, "sinputeventocc",
                         selected = occurrence_set_default,
                         choices = occurrenceSetChoices)
-
+      
       perils_list <- list("peril_wind" = "chkinputprwind",
                           "peril_surge" = "chkinputprstsurge",
                           "peril_quake" = "chkinputprquake",
                           "peril_flood" = "chkinputprflood",
                           "demand_surge" = "chkinputdsurge")
-
+      
       model_perils <- names(names_settings)[grepl("peril", names(names_settings))]
-
+      
       for (p in names(perils_list)) {
         peril_id <- names_settings[names(names_settings) == p][[p]]
         if (p %in% model_perils) {
@@ -1110,7 +1102,7 @@ step3_configureOutput <- function(input, output, session,
           updateCheckboxInput(session, perils_list[[p]], value = NULL)
         }
       }
-
+      
       leackage_id <- names_settings[names(names_settings) == "leakage_factor"][["leakage_factor"]]
       leackage_list <- model_settings[[leackage_id]]$leakage_factor
       leackage_default <- leackage_list$default
@@ -1121,7 +1113,7 @@ step3_configureOutput <- function(input, output, session,
                         min = leackage_min <- leackage_list$min, max = leackage_min <- leackage_list$max)
     }
   }
-
+  
   # Clear checkboxgroups
   .clearchkboxgrp <- function(checkgrplist) {
     logMessage(".clearchkboxgrp called")
@@ -1129,7 +1121,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxGroupInput(session, inputId = i, selected = "")
     }
   }
-
+  
   # Default GUL output configuration options
   .defaultchkboxGULgrp <- function() {
     logMessage(".defaultchkboxGULgrp called")
@@ -1142,7 +1134,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
     }
   }
-
+  
   # Default output configuration options
   .defaultchkboxILgrp <- function() {
     logMessage(".defaultchkboxILgrp called")
@@ -1155,7 +1147,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
     }
   }
-
+  
   # Default output configuration options
   .defaultchkboxRIgrp <- function() {
     for (i in checkrigrplist) {
@@ -1167,7 +1159,7 @@ step3_configureOutput <- function(input, output, session,
       updateCheckboxGroupInput(session, inputId = i, selected = defaultSelectChoices)
     }
   }
-
+  
   # Output view
   .advancedview <- function() {
     logMessage(".advancedview called")
@@ -1180,7 +1172,7 @@ step3_configureOutput <- function(input, output, session,
     # show("abuttonsaveoutput")
     show("abuttonclroutopt")
   }
-
+  
   .basicview <- function() {
     logMessage(".basicview called")
     hide("panel_configureAdvancedGUL")
@@ -1192,7 +1184,7 @@ step3_configureOutput <- function(input, output, session,
     # hide("abuttonsaveoutput")
     hide("abuttonclroutopt")
   }
-
+  
   .defaultview <- function() {
     logMessage(".defaultview called")
     updateCheckboxInput(session, "chkinputGUL", value = TRUE)
@@ -1204,16 +1196,16 @@ step3_configureOutput <- function(input, output, session,
     .clearotherparams()
     .basicview()
   }
-
-
+  
+  
   #Generate Analysis settings file
   .gen_analysis_settings <- function(){
-
+    
     logMessage(".gen_analysis_settings called")
-
+    
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelData <- return_tbl_modelData(modelID)
-
+    
     inputsettings <- list(
       #analysisSettingsMapping
       "analysis_tag" = as.integer(result$anaID), #potential new tag analysis_id
@@ -1239,13 +1231,13 @@ step3_configureOutput <- function(input, output, session,
       "ri_output" = input$chkinputRI,
       "return_period_file" = TRUE  # currenlty hardcoded
     )
-
+    
     outputsLossTypes <- list(
       "gul_output" = list("prog" = input$chkgulprog, "policy" = input$chkgulpolicy, "state" = input$chkgulstate, "county" = input$chkgulcounty, "location" = input$chkgulloc, "lob" = input$chkgullob),
       "il_output" =  list("prog" = input$chkilprog, "policy" = input$chkilpolicy, "state" = input$chkilstate, "county" = input$chkilcounty, "location" =  input$chkilloc, "lob" = input$chkillob),
       "ri_output"  = list("prog" = input$chkriprog, "policy" = input$chkripolicy, "state" = input$chkristate, "county" = input$chkricounty, "location" =  input$chkriloc, "lob" = input$chkrilob)
     )
-
+    
     #add summaries
     ReportChoices <- c('FullUncAEP', 'FullUncOEP', 'AAL')
     if (input$chkinputsummaryoption) {
@@ -1256,16 +1248,16 @@ step3_configureOutput <- function(input, output, session,
     analysis_settings <- construct_analysis_settings(inputsettings, outputsLossTypes)
     return(analysis_settings)
   }
-
+  
   #update analyses settings
   .updateOutputConfig <- function(analysis_settings){
     logMessage(".updateOutputConfig called")
-
+    
     #clean checkboxes
     .clearchkboxgrp(checkgulgrplist)
     .clearchkboxgrp(checkilgrplist)
     .clearchkboxgrp(checkrigrplist)
-
+    
     #reduced list
     settings <- analysis_settings[["analysis_settings"]]
     SettingsMapping <- list(
@@ -1275,9 +1267,9 @@ step3_configureOutput <- function(input, output, session,
         "SettingElement" = settings[["gul_threshold"]]
       )
     )
-
+    
     .updateWidget("threshold", SettingsMapping)
-
+    
     for (L in tolower(output_options$losstypes)) { #L <- "GUL"
       l <- tolower(L)
       summary_settings <- settings[[paste0(l, "_summaries")]]
@@ -1291,7 +1283,7 @@ step3_configureOutput <- function(input, output, session,
           )
         )
         .updateWidget("chkinput", SummaryMapping)
-
+        
         for (g in seq(length(summary_settings))) { #g <- 1
           curr_gran <- summary_settings[[g]]
           oed_gran <- granToOed$outputlosstype[granToOed$oed == curr_gran$oed_fields]
@@ -1317,7 +1309,7 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   }
-
+  
   .updateWidget <- function(inp, MappingList) {
     logMessage(".updateWidget called")
     curr_setting <- MappingList[[inp]]
@@ -1327,7 +1319,7 @@ step3_configureOutput <- function(input, output, session,
       get(curr_setting$UpdateWidget)(session = session, inputId = curr_setting$inputId, value = curr_setting$SettingElement)
     }
   }
-
+  
   # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     list(
@@ -1335,7 +1327,7 @@ step3_configureOutput <- function(input, output, session,
       dashboardAnaID = reactive({result$dashboardAnaID})
     )
   )
-
+  
   moduleOutput
-
+  
 }
