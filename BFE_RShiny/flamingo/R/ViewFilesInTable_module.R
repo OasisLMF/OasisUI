@@ -253,7 +253,7 @@ ViewFilesInTable <- function(input, output, session,
         flamingoButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(flamingoButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
         downloadButton(ns("FVEdownloadexcel"), label = "Export to csv"),
-        style = "inline:true"),
+        style = "display: inline"),
 
       hidden(flamingoPanel(
         id = ns("flamingoPanelFVExposureSelected"),
