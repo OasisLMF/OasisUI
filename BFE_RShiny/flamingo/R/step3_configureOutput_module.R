@@ -595,7 +595,7 @@ step3_configureOutput <- function(input, output, session,
   output$cancelAnaModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-    paste0('Cancel ', AnaId, ' ', AnaName)
+    paste0('Cancel analysis ', AnaId, ' ', AnaName)
   })
   
   observeEvent(input$btnCancelAnaDel, {

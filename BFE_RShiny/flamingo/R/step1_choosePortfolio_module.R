@@ -473,7 +473,7 @@ step1_choosePortfolio <- function(input, output, session,
   
   # Delete portfolio -----------------------------------------------------------
   # title for delete button
-  output$pfdelmodal <- renderUI({
+  output$pfdelmodaltitle <- renderUI({
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     paste0('Delete portfolio id ', pfId, ' "', pfName,'"')
@@ -483,7 +483,7 @@ step1_choosePortfolio <- function(input, output, session,
   .pfdelmodal <- function() {
     ns <- session$ns
     modalDialog(label = "pfdelmodal",
-                title = uiOutput(ns("pfdelmodal"), inline = TRUE),
+                title = uiOutput(ns("pfdelmodaltitle"), inline = TRUE),
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonuconfirmdel"),

@@ -348,7 +348,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   })
 
   # title for delete button
-  output$userdelmodal <- renderUI({
+  output$userdelmodaltitle <- renderUI({
     companyId <- result$tbl_CULData[(input$dt_companyuserlist_rows_selected), 1]
     companyName <- result$tbl_CULData[(input$dt_companyuserlist_rows_selected), 2]
     CULId <- result$tbl_CULData[(input$dt_companyuserlist_rows_selected), 3]
@@ -360,7 +360,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
   .userdelmodal <- function() {
     ns <- session$ns
     modalDialog(label = "userdelmodal",
-                title = uiOutput(ns("userdelmodal"), inline = TRUE),
+                title = uiOutput(ns("userdelmodaltitle"), inline = TRUE),
                 paste0("Are you sure you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonuconfirmdel"),

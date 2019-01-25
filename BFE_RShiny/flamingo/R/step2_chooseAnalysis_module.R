@@ -123,6 +123,7 @@ panelAnalysisLog <- function(id) {
     ns("panel_analysislog"),
     heading = tagAppendChildren(
       h4(""),
+      uiOutput(ns("paneltitle_AnalysisLog"), inline = TRUE),
       actionButton(inputId = ns("abuttonanalogrefresh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
@@ -410,13 +411,13 @@ step2_chooseAnalysis <- function(input, output, session,
   output$cancelIGModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-    paste0('Cancel ', AnaId, ' ', AnaName)
+    paste0('Cancel input generation for', AnaId, ' ', AnaName)
   })
   
   .cancelIGModal <- function(){
     ns <- session$ns
-    modalDialog(label = "cancelIGModaltitle",
-                title = uiOutput(ns("cancelIGModal"), inline = TRUE),
+    modalDialog(label = "cancelIGModal",
+                title = uiOutput(ns("cancelIGModaltitle"), inline = TRUE),
                 paste0("Are you sure you want to cancel this input generation?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonConfirmDelIG"),
@@ -519,6 +520,12 @@ step2_chooseAnalysis <- function(input, output, session,
   
   onclick("buttonhideanalog", {
     hide("panelAnalysisLog")
+  })
+  
+  output$paneltitle_AnalysisLog <- renderUI({
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+    paste0('Logs for analysis ', analysisID, ' ', AnaName)
   })
   
   output$dt_analysislog <- renderDT(
