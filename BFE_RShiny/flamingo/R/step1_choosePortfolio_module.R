@@ -155,20 +155,17 @@ panelLinkFiles <- function(id) {
     ),
     
     fluidRow(
-      column(12, h4("Link input files to portfolio"))),
-    
-    fluidRow(
       # Source Location File
       column(3,
              fileInput(inputId = ns("SLFile"), label = 'Location file:', accept = c('csv', 'comma-separated-values', '.csv'))),
       column(2,
-             flamingoButton(inputId = ns("abuttonSLFileUpload"), label = "Upload File", align = "left", enable = FALSE, style = "margin-top: 25px;display-inline: true;")),
+             flamingoButton(inputId = ns("abuttonSLFileUpload"), label = "Link File", align = "left", enable = FALSE, style = "margin-top: 25px;display-inline: true;")),
       # Source Account File
       column(3,
              fileInput(inputId = ns("SAFile"), label = 'Account file:',
                        accept = c('csv', 'comma-separated-values', '.csv'))),
       column(2,
-             flamingoButton(inputId = ns("abuttonSAFileUpload"), label = "Upload File", align = "left",
+             flamingoButton(inputId = ns("abuttonSAFileUpload"), label = "Link File", align = "left",
                             style = "margin-top: 25px;display-inline: true;"))),
     
     fluidRow(
@@ -177,14 +174,14 @@ panelLinkFiles <- function(id) {
              fileInput(inputId = ns("SRFile"), label = 'RI info file:',
                        accept = c('csv', 'comma-separated-values', '.csv'))),
       column(2,
-             flamingoButton(inputId = ns("abuttonSRFileUpload"), label = "Upload File", align = "left",
+             flamingoButton(inputId = ns("abuttonSRFileUpload"), label = "Link File", align = "left",
                             style = "margin-top: 25px;display-inline: true;")),
       # Source Reinsurance Scope File
       column(3,
-             fileInput(inputId = ns("SRSFile"), label = 'RI scope:',
+             fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
                        accept = c('csv', 'comma-separated-values', '.csv'))),
       column(2,
-             flamingoButton(inputId = ns("abuttonSRSFileUpload"), label = "Upload File", align = "left",
+             flamingoButton(inputId = ns("abuttonSRSFileUpload"), label = "Link File", align = "left",
                             style = "margin-top: 25px;display-inline: true;"))),
     fluidRow(
       column(12,
@@ -252,10 +249,14 @@ step1_choosePortfolio <- function(input, output, session,
     portfolioID = "",
     # reactive value for the portfolio table
     tbl_portfoliosData = NULL,
-    # SL file to view
-    viewSLfile = NULL,
-    # SA file to view
-    viewSAfile = NULL,
+    # SL file to load
+    SLfile = NULL,
+    # SA file to load
+    SAfile = NULL,
+    # SR file to load
+    SRfile = NULL,
+    # SA file to load
+    SRSfile = NULL,
     # reactive value for details of portfolio table
     tbl_portfolioDetails = NULL,
     # flag to know if the user is creating or amending a portfolio
@@ -277,6 +278,28 @@ step1_choosePortfolio <- function(input, output, session,
   })
   
   # Enable/ Disable buttons ----------------------------------------------------
+  
+  # Enable and disable link files buttons
+  #Location file
+  observeEvent(result$SLFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    .enablingLinkButton(inFileId = "SLFile", abuttonId = "abuttonSLFileUpload")
+  })
+  
+  #Account file
+  observeEvent(result$SAFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    .enablingLinkButton(inFileId = "SAFile", abuttonId = "abuttonSAFileUpload")
+  })
+  
+  #RI file
+  observeEvent(result$SRFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    .enablingLinkButton(inFileId = "SRFile", abuttonId = "abuttonSRFileUpload")
+  })
+  
+  #Reinsurance Scope file
+  observeEvent(result$SRSFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    .enablingLinkButton(inFileId = "SRSFile", abuttonId = "abuttonSRSFileUpload")
+  })
+ 
   
   # Enable and disable buttons
   observeEvent({
@@ -513,8 +536,12 @@ step1_choosePortfolio <- function(input, output, session,
   })
   
   #Clear panel
-  observeEvent(input$abuttonpfclear, {
+  observeEvent(input$abuttonpfclear, ignoreInit = TRUE, {
     .clearUploadFiles()
+    result$SLFile <- NULL
+    result$SAFile <- NULL
+    result$SRFile <- NULL
+    result$SRSFile <- NULL
   })
   
   # Link files to portfolio title
@@ -523,9 +550,9 @@ step1_choosePortfolio <- function(input, output, session,
     pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
     if (result$portfolio_flag == "C") {
-      paste0('Provide Inputs to portfolio id ', pfId, ' ', pfName)
+      paste0('Link input files to portfolio id ', pfId, ' ', pfName)
     } else {
-      paste0('Amend Inputs to portfolio id ', pfId, ' ', pfName)
+      paste0('Amend input files to portfolio id ', pfId, ' ', pfName)
     }
     
   })
@@ -535,8 +562,18 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelLinkFiles")
   })
   
+  # disable link files action button if input file widget is empty
+  .enablingLinkButton <- function(inFileId, abuttonId) {
+    inFile <- result[[inFileId]]
+    if (is.null(inFile) || inFile == "") {
+      disable(abuttonId)
+    } else {
+      enable(abuttonId)
+    }
+  }
+  
   # Upload Location/Account File
-  .uploadSourceFile <- function(inFile, APIfunction, inputiconid){
+  .uploadSourceFile <- function(inFile, APIfunction){
     logMessage(paste0("Uploading file ", inFile$datapath))
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     if (!is.null(inFile$datapath)) {
@@ -559,20 +596,36 @@ step1_choosePortfolio <- function(input, output, session,
     }
   }
   
+  observeEvent(input$SLFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    result$SLFile <- input$SLFile
+  })
+  
   onclick("abuttonSLFileUpload", {
-    .uploadSourceFile(inFile = input$SLFile, api_post_portfolios_location_file)
+    .uploadSourceFile(inFile = result$SLFile, api_post_portfolios_location_file)
+  })
+  
+  observeEvent(input$SAFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    result$SAFile <- input$SAFile
   })
   
   onclick("abuttonSAFileUpload", {
-    .uploadSourceFile(inFile = input$SAFile, api_post_portfolios_accounts_file)
+    .uploadSourceFile(inFile = result$SAFile, api_post_portfolios_accounts_file)
+  })
+  
+  observeEvent(input$SRFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    result$SRFile <- input$SRFile
   })
   
   onclick("abuttonSRFileUpload", {
-    .uploadSourceFile(inFile = input$SRFile, api_post_portfolios_reinsurance_info_file)
+    .uploadSourceFile(inFile = result$SRFile, api_post_portfolios_reinsurance_info_file)
+  })
+  
+  observeEvent(input$SRSFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    result$SRSFile <- input$SRSFile
   })
   
   onclick("abuttonSRSFileUpload", {
-    .uploadSourceFile(inFile = input$SRSFile, api_post_portfolios_reinsurance_source_file)
+    .uploadSourceFile(inFile = result$SRSFile, api_post_portfolios_reinsurance_source_file)
   })
   
   # Define portfolioID ---------------------------------------------------------
