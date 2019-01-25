@@ -967,11 +967,12 @@ step3_configureOutput <- function(input, output, session,
     if (portfolioID()  != "") {
       tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
+        tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
         #Handling filter for 'In Progress'
-        if (input$radioanaAllOrInProgress == "In_Progress") {
-          result$tbl_analysesData <- result$tbl_analysesData %>% filter(status == Status$Processing)
+        if (input$radioanaAllOrInProgress == "In Progress") {
+          tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$status) == Status$Processing)
         }
+        result$tbl_analysesData <- tbl_analysesData
       }
       logMessage("analyses table refreshed")
     }  else {
