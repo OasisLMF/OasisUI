@@ -123,7 +123,7 @@ panelAnalysisLog <- function(id) {
     ns("panel_analysislog"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitle_panelAnalysisLog"), inline = TRUE),
+      uiOutput(ns("paneltitle_AnalysisLog"), inline = TRUE),
       actionButton(inputId = ns("abuttonanalogrefresh"), label = "Refresh", style = "float: right;"),
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
@@ -181,10 +181,18 @@ panelModelTable <- function(id) {
       actionButton(inputId = ns("buttonhidemodel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_models")),
-    textInput(inputId = ns("anaName"), label = "Analysis Name"),
-    flamingoButton(ns("abuttonmodeldetails"), "Show Details", align = "centre") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right"),
-    flamingoButton(ns("abuttonsubmit"), "Submit", style = "float:right")
+    fluidRow(
+      column(4,
+             flamingoButton(ns("abuttonmodeldetails"), "Show Model Details", style = "float:left") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right")),
+      column(6,
+             br(),
+             div(textInput(inputId = ns("anaName"), label = "Analysis Name"), style = "float:right;")),
+      column(2,
+             br(),
+             flamingoButton(ns("abuttonsubmit"), "Submit", style = "float:right; margin-top:25px;")
+      )
+    )
   )
 }
 
@@ -363,12 +371,12 @@ step2_chooseAnalysis <- function(input, output, session,
   observeEvent({
     input$dt_analyses_rows_selected
     result$portfolioID}, ignoreNULL = FALSE, {
-    if (!is.null(input$dt_analyses_rows_selected)) {
-      result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-    } else {
-      result$analysisID <- ""
-    }
-  })
+      if (!is.null(input$dt_analyses_rows_selected)) {
+        result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+      } else {
+        result$analysisID <- ""
+      }
+    })
   
   
   # Generate input -------------------------------------------------------------
@@ -403,13 +411,13 @@ step2_chooseAnalysis <- function(input, output, session,
   output$cancelIGModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-    paste0('Cancel ', AnaId, ' ', AnaName)
+    paste0('Cancel input generation for', AnaId, ' ', AnaName)
   })
   
   .cancelIGModal <- function(){
     ns <- session$ns
-    modalDialog(label = "cancelIGModaltitle",
-                title = uiOutput(ns("cancelIGModal"), inline = TRUE),
+    modalDialog(label = "cancelIGModal",
+                title = uiOutput(ns("cancelIGModaltitle"), inline = TRUE),
                 paste0("Are you sure you want to cancel this input generation?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonConfirmDelIG"),
@@ -494,7 +502,7 @@ step2_chooseAnalysis <- function(input, output, session,
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       paste0('Details of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
-      paste0("Analysis Details")
+      paste0("Analysis details")
     }
   })
   
@@ -512,6 +520,12 @@ step2_chooseAnalysis <- function(input, output, session,
   
   onclick("buttonhideanalog", {
     hide("panelAnalysisLog")
+  })
+  
+  output$paneltitle_AnalysisLog <- renderUI({
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+    paste0('Logs for analysis ', analysisID, ' ', AnaName)
   })
   
   output$dt_analysislog <- renderDT(
@@ -582,9 +596,9 @@ step2_chooseAnalysis <- function(input, output, session,
   output$paneltitle_ModelTable <- renderUI({
     if (result$portfolioID != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
-      paste0('Pick a model to associate with portfolio id ', toString(result$portfolioID), ' ', pfName)
+      paste0('Pick a model and choose an analysis name')
     } else {
-      paste0("List of Models")
+      paste0("List of models")
     }
   })
   
@@ -626,7 +640,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
     modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsDataNames$id]
-    paste0('Resources of Model id ', modelId)
+    paste0('Resources of model id ', modelId)
   })
   
   #Hide panel if model id changes
@@ -673,7 +687,7 @@ step2_chooseAnalysis <- function(input, output, session,
   output$paneltitle_panelAnalysisIG <- renderUI({
     if (result$analysisID != "") {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      paste0('Generated inputs associated with analysis id ', toString(result$analysisID), ' ', anaName)
+      paste0('Generated inputs for analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
       paste0("Generated inputs")
     }
@@ -690,11 +704,25 @@ step2_chooseAnalysis <- function(input, output, session,
     includechkbox = TRUE)
   
   # Enable and disable buttons -------------------------------------------------
+  
+  #Make submit button dependent of analysis name
+  observeEvent({
+    input$dt_models_rows_selected
+    input$anaName}, ignoreNULL = TRUE, ignoreInit = TRUE, {
+      if (length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
+        enable("abuttonsubmit")
+      } else {
+        disable("abuttonsubmit")
+      }
+    })
+  
+  #note initialization causes the buttons to be enabled on app lounch if tables are empty
   observeEvent({
     result$tbl_analysesData
     input$dt_analyses_rows_selected
     result$tbl_modelsData
-    input$dt_models_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    input$dt_models_rows_selected
+    currstep()}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonshowlog")
       disable("abuttonshowanadetails")
       disable("abuttondelana")
@@ -703,10 +731,11 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttonshowIG")
       disable("abuttonmodeldetails")
       disable("abuttonpgotonextstep")
+      disable("abuttonsubmit")
       if (length(input$dt_models_rows_selected) > 0) {
         enable("abuttonmodeldetails")
       }
-      if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
+      if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         enable("abuttonshowanadetails")
         enable("abuttonshowlog")
         enable("abuttondelana")

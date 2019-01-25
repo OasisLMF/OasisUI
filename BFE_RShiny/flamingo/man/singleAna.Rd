@@ -6,8 +6,8 @@
 \title{singleAna}
 \usage{
 singleAna(input, output, session, active = reactive(TRUE),
-  logMessage = message, preselRunId = reactive(-1),
-  preselProcId = reactive(-1), preselPanel = reactive(1))
+  logMessage = message, selectAnaID = reactive(""),
+  selectPortfolioID = reactive(""), preselPanel = reactive(1))
 
 singleAnaUI(id)
 }
@@ -18,9 +18,9 @@ singleAnaUI(id)
 
 \item{logMessage}{function that will be passed info messages.}
 
-\item{preselRunId}{selected run id as returned from \link{landingPage}}
+\item{selectAnaID}{id of selected analysis as returned from \link{visualizationSBR}}
 
-\item{preselProcId}{selected progOasis id as returned from \link{landingPage}}
+\item{selectPortfolioID}{portfolio id of selected analysis as returned from \link{visualizationSBR}}
 
 \item{preselPanel}{selectedstep to visualize as returned from either
 \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}}

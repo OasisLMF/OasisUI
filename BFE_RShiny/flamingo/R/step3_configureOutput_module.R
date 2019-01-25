@@ -52,14 +52,12 @@ panelAnalysisTable <- function(id) {
         DTOutput(ns("dt_analyses")),
         fluidRow(column(12,
                         div(id = ns("divAnalysisButtons"),
-                            flamingoButton(inputId = ns("abuttonconfigoutput"), label = "New Output Configuration") %>%
-                              bs_embed_tooltip(title = defineSingleAna$abuttonconfigoutput, placement = "right"),
                             flamingoButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttoncancelana, placement = "right"),
-                            flamingoButton(inputId = ns("abuttonrerunana"), label = "Rerun") %>%
-                              bs_embed_tooltip(title = defineSingleAna$abuttonrerunana, placement = "right"),
                             flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
+                            flamingoButton(inputId = ns("abuttonrunconfig"), label = "New Output Configuration") %>%
+                              bs_embed_tooltip(title = defineSingleAna$abuttonrunconfig, placement = "right"),
                             div(
                               actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Dashboard") %>%
                                 bs_embed_tooltip(title = defineSingleAna$abuttondisplayoutput, placement = "right"),
@@ -145,13 +143,13 @@ panelDefineOutputsDetails <- function(id) {
     flamingoPanel(
       collapsible = FALSE,
       ns("panel_ConfigDetails"),
-      heading = h4("Configuration Details"),
+      heading = h4("Configuration details"),
       selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = "")
     ),
     flamingoPanel(
       collapsible = FALSE,
       ns("panel_defAnaOutputDetails"),
-      heading = h4("Model Parameters"),
+      heading = h4("Model parameters"),
       div(id = ns("noofsample"), style = "width:100%; margin: 0 auto;", textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10")),
       hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
@@ -186,7 +184,7 @@ panelDefOutputConfiguration <- function(id) {
   flamingoPanel(
     collapsible = FALSE,
     ns("panel_outconfig"),
-    heading = h4("Output Configuration"),
+    heading = h4("Output configuration"),
     checkboxInput(ns("chkinputGUL"), label = "Ground Up Loss", value = TRUE),
     hidden(div(id = ns("panel_configureAdvancedGUL"), panel_configureAdvancedGUL(id))),
     checkboxInput(ns("chkinputIL"), label = "Insured Loss", value = FALSE),
@@ -406,7 +404,7 @@ panel_configureAdvancedRI <- function(id) {
 #' @param portfolioID selected portfolio ID.
 #' @param analysisID selected analysis ID
 #'
-#' @return anaID id of selected run.
+#' @return dashboardAnaID id of selected run.
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -418,6 +416,7 @@ panel_configureAdvancedRI <- function(id) {
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
+#' @importFrom bsplus bs_embed_tooltip
 #' @importFrom dplyr filter
 #' @importFrom jsonlite write_json
 #' @importFrom jsonlite read_json
@@ -455,12 +454,15 @@ step3_configureOutput <- function(input, output, session,
     ana_flag = "C",
     # Id of the Analysis
     anaID = -1,
+    # anaId for Dashboard
+    dashboardAnaID = -1,
     # analysis_ setting
     analysis_settings = NULL
   )
   
   # Reset Param
   observe(if (active()) {
+    result$dashboardAnaID <- -1
     result$navigationstate <- NULL
     if (!is.null(analysisID())) {
       result$anaID <- analysisID()
@@ -493,23 +495,28 @@ step3_configureOutput <- function(input, output, session,
     portfolioID()
     currstep()
     input$dt_analyses_rows_selected}, ignoreNULL = FALSE, ignoreInit = TRUE, {
-      disable("abuttonrerunana")
       disable("abuttondisplayoutput")
       disable("abuttonshowlog")
-      disable("abuttonconfigoutput")
+      disable("abuttonrunconfig")
       disable("abuttoncancelana")
+      
       if (portfolioID() != "") {
-        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
+        if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
           enable("abuttonshowlog")
-          enable("abuttoncancelana")
-          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
-            enable("abuttonconfigoutput")
-          }
-          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Ready, Status$Failed)) {
-            enable("abuttonrerunana")
+          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready) {
+            enable("abuttoncancelana")
           }
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
             enable("abuttondisplayoutput")
+          }
+          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
+            enable("abuttonrunconfig")
+            updateActionButton(session, inputId = "abuttonrunconfig", label = "Output Configuration")
+          } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Failed)) {
+            enable("abuttonrunconfig")
+            updateActionButton(session, inputId = "abuttonrunconfig", label = "Rerun")
+          } else {
+            updateActionButton(session, inputId = "abuttonrunconfig", label = "Output Configuration")
           }
         }
       }
@@ -588,7 +595,7 @@ step3_configureOutput <- function(input, output, session,
   output$cancelAnaModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-    paste0('Cancel ', AnaId, ' ', AnaName)
+    paste0('Cancel analysis ', AnaId, ' ', AnaName)
   })
   
   observeEvent(input$btnCancelAnaDel, {
@@ -625,23 +632,43 @@ step3_configureOutput <- function(input, output, session,
   
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
+    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+    analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
     if (result$ana_flag  == "R") {
-      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-      analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
-      paste0('Re-Define Output Configuration for Analysis id ', analysisID, ' ', analysisName)
+      paste0('Re-define output configuration for analysis id ', analysisID, ' ', analysisName)
     } else {
-      "New Output Configuration"
+      paste0('Define output configuration for analysis id ', analysisID, ' ', analysisName)
     }
   })
   
-  #Show Output Configuration Panel
-  onclick("abuttonconfigoutput", {
-    .defaultview()
-    hide("panelAnalysisLogs")
-    show("panelDefineOutputs")
-    logMessage("showing panelDefineOutputs")
-    result$ana_flag <- "C"
+  #Show Output Configuration Panel and Re-run
+  onclick("abuttonrunconfig", {
+    if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
+      if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
+        .defaultview()
+        hide("panelAnalysisLogs")
+        show("panelDefineOutputs")
+        logMessage("showing panelDefineOutputs")
+        result$ana_flag <- "C"
+        
+      } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Failed)) {
+        .defaultview()
+        hide("panelAnalysisLogs")
+        show("panelDefineOutputs")
+        logMessage("showing panelDefineOutputs")
+        result$ana_flag <- "R"
+        analysis_settings <- return_analyses_settings_file_list(result$anaID)
+        analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+        if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
+          flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID))
+        } else {
+          logMessage(paste0("appling the output configuration of analysis ",analysisName," id ", result$anaID))
+          #Set inputs
+          .updateOutputConfig(analysis_settings)
+        }
+      }
+    }
   })
   
   # Hide Output Configuration panel
@@ -727,12 +754,6 @@ step3_configureOutput <- function(input, output, session,
   # Update button in sidebar panel to update checkboxes for pre-populated values
   #To-Do update output configuration based on analysis setting
   observeEvent(input$sinoutputoptions, {
-    # if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
-    #   #read the right analysis settings file
-    #   analysis_settings <- read_json(paste0("./analysis_settings/",input$sinoutputoptions,".json"),  simplifyVector = TRUE)
-    #   #Set inputs
-    #   .updateOutputConfig(analysis_settings)
-    # }
     # Using analyses names to select the output configuration of a previously posted analyses
     logMessage(paste0("input$sinoutputoptions changed to ",input$sinoutputoptions))
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
@@ -744,7 +765,7 @@ step3_configureOutput <- function(input, output, session,
       } else {
         logMessage(paste0("appling the output configuration of analysis ", anaName," id ", anaID))
         #Set inputs
-        .updateOutputConfig(analysis_settings) 
+        .updateOutputConfig(analysis_settings)
       }
     }
   })
@@ -764,25 +785,8 @@ step3_configureOutput <- function(input, output, session,
     .basicview()
   })
   
-  onclick("abuttonrerunana", {
-    .defaultview()
-    hide("panelAnalysisLogs")
-    show("panelDefineOutputs")
-    logMessage("showing panelDefineOutputs")
-    result$ana_flag <- "R"
-    analysis_settings <- return_analyses_settings_file_list(result$anaID)
-    analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-    if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
-      flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID))
-    } else {
-      logMessage(paste0("appling the output configuration of analysis ",analysisName," id ", result$anaID))
-      #Set inputs
-      .updateOutputConfig(analysis_settings) 
-    }
-  })
-  
   # # Save output configuration --------------------------------------------------
-  # 
+  #
   # # Save output for later use as presets
   # .modalsaveoutput <- function() {
   #   ns <- session$ns
@@ -797,11 +801,11 @@ step3_configureOutput <- function(input, output, session,
   #               easyClose = TRUE
   #   )
   # }
-  # 
+  #
   # onclick("abuttonsaveoutput", {
   #   showModal(.modalsaveoutput())
   # })
-  # 
+  #
   # # Submit output configuration (to be saved)
   # onclick("abuttonsubmitoutput", {
   #   if (input$tinputoutputname == "") {
@@ -845,7 +849,7 @@ step3_configureOutput <- function(input, output, session,
         flamingoNotification(type = "message",
                              paste0("Analysis ", result$anaID ," is executing"))
       }
-    } 
+    }
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesDataNames$id])
     pageSel <- ceiling(idxSel/pageLength)
@@ -895,7 +899,7 @@ step3_configureOutput <- function(input, output, session,
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
     analysisName <- ifelse(analysisName == " ", "", paste0('"', analysisName, '"'))
-    paste0('Run Logs for Analysis id ', analysisID, ' ', analysisName)
+    paste0('Run logs for analysis id ', analysisID, ' ', analysisName)
   })
   
   # Refresh Buttons ------------------------------------------------------------
@@ -917,7 +921,7 @@ step3_configureOutput <- function(input, output, session,
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
+      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
         logMessage(paste0("analysisId changed to", result$anaID))
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
@@ -934,6 +938,8 @@ step3_configureOutput <- function(input, output, session,
   # Go to browse section
   onclick("abuttondisplayoutput", {
     result$navigationstate <- "SBR"
+    result$dashboardAnaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+    logMessage(paste0("selected analysis ID is ", result$dashboardAnaID))
   })
   
   
@@ -953,11 +959,6 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".defaultstep3 called")
     show("panelAnalysisTable")
     disable("chkgulpolicy")
-    disable("abuttonrerunana")
-    disable("abuttondisplayoutput")
-    disable("abuttonshowlog")
-    disable("abuttonconfigoutput")
-    disable("abuttoncancelana")
   }
   
   # Reload Analyses table
@@ -966,11 +967,12 @@ step3_configureOutput <- function(input, output, session,
     if (portfolioID()  != "") {
       tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
+        tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
         #Handling filter for 'In Progress'
-        if (input$radioanaAllOrInProgress == "In_Progress") {
-          result$tbl_analysesData <- result$tbl_analysesData %>% filter(status == Status$Processing)
+        if (input$radioanaAllOrInProgress == "In Progress") {
+          tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$status) == Status$Processing)
         }
+        result$tbl_analysesData <- tbl_analysesData
       }
       logMessage("analyses table refreshed")
     }  else {
@@ -1036,12 +1038,9 @@ step3_configureOutput <- function(input, output, session,
   # Clear Custom Configuration option
   .clearOutputOptions <- function() {
     logMessage(".clearOutputOptions called")
-    # updateSelectInput(session, "sinoutputoptions",
-    #                   choices = gsub(".json", "", list.files("./analysis_settings")),
-    #                   selected = character(0))
     tbl_analysesData  <- return_tbl_analysesData()
     tbl_analysesData <- tbl_analysesData %>% filter(status != Status$Processing & status != Status$Ready)
-    namesList <- tbl_analysesData[,tbl_analysesDataNames$id]
+    namesList <- tbl_analysesData[,tbl_analysesDataNames$name]
     idList <- tbl_analysesData[,tbl_analysesDataNames$id]
     choicesList <- paste(idList, namesList, sep = " / ")
     updateSelectInput(session, "sinoutputoptions",
@@ -1255,12 +1254,12 @@ step3_configureOutput <- function(input, output, session,
   #update analyses settings
   .updateOutputConfig <- function(analysis_settings){
     logMessage(".updateOutputConfig called")
+    
     #clean checkboxes
-
     .clearchkboxgrp(checkgulgrplist)
     .clearchkboxgrp(checkilgrplist)
     .clearchkboxgrp(checkrigrplist)
-
+    
     #reduced list
     settings <- analysis_settings[["analysis_settings"]]
     SettingsMapping <- list(
@@ -1270,9 +1269,9 @@ step3_configureOutput <- function(input, output, session,
         "SettingElement" = settings[["gul_threshold"]]
       )
     )
-
+    
     .updateWidget("threshold", SettingsMapping)
-
+    
     for (L in tolower(output_options$losstypes)) { #L <- "GUL"
       l <- tolower(L)
       summary_settings <- settings[[paste0(l, "_summaries")]]
@@ -1286,7 +1285,7 @@ step3_configureOutput <- function(input, output, session,
           )
         )
         .updateWidget("chkinput", SummaryMapping)
-
+        
         for (g in seq(length(summary_settings))) { #g <- 1
           curr_gran <- summary_settings[[g]]
           oed_gran <- granToOed$outputlosstype[granToOed$oed == curr_gran$oed_fields]
@@ -1327,7 +1326,7 @@ step3_configureOutput <- function(input, output, session,
   moduleOutput <- c(
     list(
       navigationstate = reactive(result$navigationstate),
-      anaID = reactive({result$anaID})
+      dashboardAnaID = reactive({result$dashboardAnaID})
     )
   )
   

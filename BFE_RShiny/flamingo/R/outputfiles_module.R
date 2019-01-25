@@ -19,7 +19,7 @@ outputfilesUI <- function(id) {
       id = ns("flamingoPanelViewOutputFiles"),
       collapsible = TRUE,
       show = TRUE,
-      heading = "Output Files Table",
+      heading = "Output files table",
       ViewFilesInTableUI(id  = ns("ViewOutputFiles"), includechkbox = TRUE)
     ),
 
@@ -27,7 +27,7 @@ outputfilesUI <- function(id) {
       id = ns("flamingoPanelViewInputFiles"),
       collapsible = TRUE,
       show = FALSE,
-      heading = "Input Files Table",
+      heading = "Input files table",
       ViewFilesInTableUI(id  = ns("ViewInputFiles"), includechkbox = TRUE)
     )
 

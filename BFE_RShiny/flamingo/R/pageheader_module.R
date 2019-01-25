@@ -33,7 +33,8 @@ pageheaderUI <- function(id) {
                        #   bs_embed_tooltip(title = landing_page$abuttonsysconf, placement = "left"),
                        
                        flamingoButton(ns("abuttonlogout"),
-                                      label = "Logout", align = "center", width = "100%")
+                                      label = "Logout", align = "center", width = "100%")  %>%
+                         bs_embed_tooltip(title = landing_page$abuttonlogout, placement = "right")
         ) %>%
           bs_embed_tooltip(title = landing_page$accountDD, placement = "right")
     )
