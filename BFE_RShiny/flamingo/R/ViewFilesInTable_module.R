@@ -163,15 +163,28 @@ ViewFilesInTable <- function(input, output, session,
   output$FLdownloadzip <- downloadHandler(
     filename = "files.zip",
     content = function(fname){
+      
       #path of files to download in Zip bundle
       fs <- c()
       for (f in 1:nrow(result$tbl_filesListData_wButtons)) {
         filename <- result$tbl_filesListData_wButtons[f, file_column]
-        func <- get(paste0("return_", filename, "_df"))
-        response_df <- func(param())
-        if (nrow(response_df) > 0) {
+        
+        #Get dataframe
+        currNamespace <- ls("package:flamingo")
+        func_wpattern <- currNamespace[grepl(filename, currNamespace)]
+        returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
+        if (length(returnfunc) != 0) {
+          func <- get(returnfunc)
+          fileData <- return_file_df(func,param())
+        } else {
+          extractFolder <- set_extractFolder(id = param(), label = folderpath)
+          currfilepath <- set_extractFilePath(extractFolder, filename)
+          fileData <- fread(currfilepath )
+        }
+        
+        if (nrow(fileData) > 0) {
           fpath <- file.path(".", paste0(filename, ".csv"))
-          fwrite(x = response_df, file = fpath, row.names = TRUE, quote = TRUE)
+          fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
           fs <- c(fs, fpath)
         }
       }
