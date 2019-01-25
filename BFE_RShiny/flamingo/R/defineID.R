@@ -116,11 +116,13 @@ defineID <- function(input, output, session,
   observeEvent({
     input$chooseAnaID
     preselAnaId()
-    anaID()}, {
+    anaID()}, ignoreInit = TRUE, {
       tbl_analysesData  <- return_tbl_analysesData() 
-      result$tbl_analysesData <- tbl_analysesData  %>%
-        filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
-    }, ignoreInit = TRUE)
+      if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
+        result$tbl_analysesData <- tbl_analysesData  %>%
+          filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
+      }
+    })
   
   # > open modal
   observeEvent(
