@@ -53,6 +53,8 @@ visualizationSBR <- function(input, output, session,
   observeEvent(active(), {
     if (active()) {
       result$preselPanel <- 1
+      result$selectAnaID <- ""
+      result$selectPortfolioID = ""
     }
   })
   
@@ -62,14 +64,16 @@ visualizationSBR <- function(input, output, session,
     id = "defineID",
     preselAnaId = preselAnaId,
     anaID =  anaID,
+    active = active,
     logMessage = logMessage)
   
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
-    updateNavigation(navigation_state, "SA")
     result$preselPanel <- 3
     result$selectAnaID <- sub_modules$defineID$selectAnaID()
     result$selectPortfolioID <- sub_modules$defineID$selectPortfolioID()
+    logMessage(paste0("Selected analysis id is ", result$selectAnaID, ". Selected portfolio id is ", result$selectPortfolioID))
+    updateNavigation(navigation_state, "SA")
   })
   
   # Extract Output files for given anaID----------------------------------------

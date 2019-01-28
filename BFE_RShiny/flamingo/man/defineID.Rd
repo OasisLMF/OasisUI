@@ -8,7 +8,8 @@
 defineIDUI(id, w, batch = FALSE)
 
 defineID(input, output, session, preselAnaId = reactive(-1),
-  anaID = reactive(-1), batch = FALSE, logMessage = message)
+  anaID = reactive(-1), batch = FALSE, active = reactive(TRUE),
+  logMessage = message)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -22,6 +23,8 @@ defineID(input, output, session, preselAnaId = reactive(-1),
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingPage}.}
 
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
+
+\item{active}{reactive expression whether the module state should be updated.}
 
 \item{logMessage}{function that will be passed info messages.}
 }

@@ -462,9 +462,9 @@ step3_configureOutput <- function(input, output, session,
 
   # Reset Param
   observe(if (active()) {
-    result$dashboardAnaID <- -1
     result$navigationstate <- NULL
-    if (!is.null(analysisID())) {
+    result$dashboardAnaID <- -1
+    if (!is.null(analysisID()) && analysisID() != "") {
       result$anaID <- analysisID()
     }
   })
@@ -923,7 +923,7 @@ step3_configureOutput <- function(input, output, session,
       hide("panelAnalysisLogs")
       if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-        logMessage(paste0("analysisId changed to", result$anaID))
+        logMessage(paste0("analysisId changed to ", result$anaID))
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
           show("panelAnalysisLogs")
           logMessage("showing analysis run log table")
@@ -936,7 +936,7 @@ step3_configureOutput <- function(input, output, session,
 
   # Navigation -----------------------------------------------------------------
   # Go to browse section
-  onclick("abuttondisplayoutput", {
+  observeEvent(input$abuttondisplayoutput, ignoreInit = TRUE, {
     result$dashboardAnaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     logMessage(paste0("selected analysis ID is ", result$dashboardAnaID))
     result$navigationstate <- "SBR"
@@ -1323,6 +1323,7 @@ step3_configureOutput <- function(input, output, session,
   }
 
   # Model Outout ---------------------------------------------------------------
+  
   moduleOutput <- c(
     list(
       navigationstate = reactive(result$navigationstate),

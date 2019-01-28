@@ -64,6 +64,7 @@ singleAna <- function(input, output, session,
   # and to panel 3 if coming from Browse
   observe(if (active()) {
     workflowSteps$update(analysisWorkflowSteps[[preselPanel()]])
+    result$dashboardanaID <- -1
   })
 
   observeEvent(workflowSteps$step(), ignoreInit = TRUE, {
@@ -120,8 +121,8 @@ singleAna <- function(input, output, session,
   # Sub-Modules output ---------------------------------------------------------
   # > Navigation ---------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$navigationstate(), ignoreInit = TRUE, {
-    if (submodulesList$step3_configureOutput$navigationstate() == "SBR") {
-      updateNavigation(navigation_state, "SBR")
+    if (!is.null(submodulesList$step3_configureOutput$navigationstate())) {
+      updateNavigation(navigation_state, submodulesList$step3_configureOutput$navigationstate())
     }
   })
 
@@ -137,7 +138,7 @@ singleAna <- function(input, output, session,
   observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), ignoreInit = TRUE, {
     anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
     #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
+    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != -1) {
       logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", anaID ))
       result$dashboardanaID <- anaID
     }
@@ -147,7 +148,7 @@ singleAna <- function(input, output, session,
     anaID <- submodulesList$step2_chooseAnalysis$analysisID()
     #Avoid updating input if not necessary
     if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
-      logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$dashboardAnaID() changed to: ", anaID ))
+      logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", anaID ))
       result$anaID <- anaID
     }
   })

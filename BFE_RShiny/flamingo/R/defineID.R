@@ -56,6 +56,7 @@ defineIDUI <- function(id, w, batch = FALSE){
 #' @template return-outputNavigation
 #' @template params-module
 #' @template params-logMessage
+#' @template params-active
 #'
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
 #' @param anaID reactive string expression for reselected run id from \link{step3_configureOutput}.
@@ -74,6 +75,7 @@ defineID <- function(input, output, session,
                      preselAnaId = reactive(-1),
                      anaID = reactive(-1),
                      batch = FALSE,
+                     active = reactive(TRUE),
                      logMessage = message) {
   
   ns <- session$ns
@@ -95,6 +97,12 @@ defineID <- function(input, output, session,
   if (batch) {
     labelana <- "Batch Analysis"
   }
+  
+  observe({
+    if (active()) {
+      result$preselRow <- NULL
+    }
+  })
   
   # Modal for AnaID selection --------------------------------------------------
   
@@ -167,8 +175,9 @@ defineID <- function(input, output, session,
   #Find row of anaid preselected in model analysis server step 3
   observeEvent({
     anaID()},{
+      logMessage(paste0("Updating preselected row because anaID() changed to ", anaID()))
       idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == anaID())
-      if (length(idx) > 0 && !isTRUE(all.equal(result$preselRow, idx)) && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
+      if (length(idx) > 0 && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx)) && anaID() != -1) {
         result$preselRow <- idx
       }
     })
@@ -176,7 +185,9 @@ defineID <- function(input, output, session,
   
   # > select analysis ID
   observeEvent(result$preselRow, {
-    .downloadOutput(idx = result$preselRow)
+    if (!is.null( result$preselRow)) {
+      .downloadOutput(idx = result$preselRow)
+    }
   })
   
   
@@ -229,6 +240,7 @@ defineID <- function(input, output, session,
     logMessage("Extract output files")
     api_get_analyses_output_file(result$selectAnaID)
   }
+  
   
   # Module Outout --------------------------------------------------------------
   
