@@ -361,7 +361,7 @@ userAdminDefinition <- function(input, output, session, dbSettings, user,
     ns <- session$ns
     modalDialog(label = "userdelmodal",
                 title = uiOutput(ns("userdelmodaltitle"), inline = TRUE),
-                paste0("Are you sure you want to delete?"),
+                paste0("Are you sure that you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonuconfirmdel"),
                                label = "Confirm", align = "center"),

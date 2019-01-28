@@ -13,7 +13,7 @@
 #' @export
 landingPageUI <- function(id) {
   ns <- NS(id)
-  
+
   tagList(
     flamingoPanel(
       collapsible = FALSE,
@@ -21,7 +21,7 @@ landingPageUI <- function(id) {
       heading = tagAppendChildren(
         h4("Analyses table"),
         actionButton(inputId = ns("abuttonrefreshanaInbox"), label = "Refresh", style = "float: right;")
-      ), 
+      ),
       DTOutput(ns("dt_anaInbox")),
       flamingoButton(ns("abuttongotoana"), "Dashboard of Analyses Outputs", align = "right") %>%
         bs_embed_tooltip(title = landing_page$abuttongotoana, placement = "right"),
@@ -45,7 +45,7 @@ landingPageUI <- function(id) {
 #' @template params-logMessage
 #' @template params-active
 #'
-#' @return anaID id of selected analysis 
+#' @return anaID id of selected analysis
 #'
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -55,28 +55,28 @@ landingPageUI <- function(id) {
 #'
 #' @export
 landingPage <- function(input, output, session, logMessage = message, active = reactive(TRUE)) {
-  
+
   # Reactive Values and parameters ---------------------------------------------
-  
+
   # parameter, number of milliseconds to wait before refreshing tables
   # (300000 == 5 mins)
   reloadMillis <- 300000
-  
+
   navigation_state <- reactiveNavigation()
-  
+
   result <- reactiveValues(
     tbl_anaInbox = NULL,
     anaID = -1
   )
-  
+
   # navigation -----------------------------------------------------------------
   observeEvent(input$abuttongotoana,{
     updateNavigation(navigation_state, "SBR")
     result$anaID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
   })
-  
+
   # Inbox table ----------------------------------------------------------------
-  
+
   # Reload Process Runs table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
@@ -84,21 +84,21 @@ landingPage <- function(input, output, session, logMessage = message, active = r
     logMessage("analyses table refreshed")
     invisible()
   }
-  
+
   observe(if (active()) {
     # Reset Param
     result$anaID <- -1
-    
+
     # invalidate if the refresh button updates
     force(input$abuttonrefreshanaInbox)
-    
+
     # reload automatically every so often
     invalidateLater(reloadMillis)
-    
+
     #refesh table
     .reloadAnaData()
   })
-  
+
   output$dt_anaInbox <- renderDT(if (!is.null(result$tbl_anaInbox)) {
     datatable(
       result$tbl_anaInbox,
@@ -118,30 +118,30 @@ landingPage <- function(input, output, session, logMessage = message, active = r
     .nothingToShowTable(contentMessage = "No analyses available")
   }
   )
-  
+
   output$downloadexcel_ana <- downloadHandler(
     filename = "analyses_inbox.csv",
     content = function(file) {
       fwrite(result$tbl_anaInbox, file, row.names = TRUE, quote = TRUE)
     }
   )
-  
+
   # Delete analysis ------------------------------------------------------------
   onclick("abuttondelana", {
     showModal(.deleteAna())
   })
-  
+
   output$deleteAnatitle <- renderUI({
     analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
     AnaName <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$name]
     paste0('Delete analysis ', analysisID, ' ', AnaName)
   })
-  
+
   .deleteAna <- function(){
     ns <- session$ns
     modalDialog(label = "deleteAnaModal",
                 title = uiOutput(ns("deleteAnatitle"), inline = TRUE),
-                paste0("Are you sure you want to delete this analysis?"),
+                paste0("Are you sure that you want to delete this analysis?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonConfirmDelAna"),
                                  label = "Confirm", align = "center") %>%
@@ -153,7 +153,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
                 easyClose = TRUE
     )
   }
-  
+
   observeEvent(input$abuttonConfirmDelAna, {
     removeModal()
     analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
@@ -167,13 +167,13 @@ landingPage <- function(input, output, session, logMessage = message, active = r
                            paste("Analysis id ", analysisID, " could not be deleted."))
     }
   })
-  
+
   # Enable /Disable buttons ----------------------------------------------------
   observeEvent(input$dt_anaInbox_rows_selected, ignoreNULL = FALSE, {
     if (length(input$dt_anaInbox_rows_selected) > 0) {
       enable("abuttondelana")
       if (result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
-        enable("abuttongotoana") 
+        enable("abuttongotoana")
       } else {
         disable("abuttongotoana")
       }
@@ -182,7 +182,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       disable("abuttondelana")
     }
   })
-  
+
   # Module Output --------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
@@ -190,7 +190,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       anaID = reactive({result$anaID})
     )
   )
-  
+
   # Help Functions -------------------------------------------------------------
   #empty table
   .nothingToShowTable <- function(contentMessage){
@@ -205,6 +205,6 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       options = list(searchHighlight = TRUE)
     )
   }
-  
+
   moduleOutput
 }

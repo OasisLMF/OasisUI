@@ -1029,7 +1029,7 @@ step3_configureOutput <- function(input, output, session,
     ns <- session$ns
     modalDialog(label = "cancelAnaModal",
                 title = uiOutput(ns("cancelAnaModaltitle"), inline = TRUE),
-                paste0("Are you sure you want to cancel this analysis?"),
+                paste0("Are you sure that you want to cancel this analysis?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonConfirmDelAna"),
                                  label = "Confirm", align = "center") %>%
