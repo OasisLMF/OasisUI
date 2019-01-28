@@ -1,8 +1,0 @@
-requests==2.20.0
-requests-toolbelt==0.8.0
-shutilwhich==1.1.0
-Flask==1.0.2
-jsonpickle==0.9.3
-pandas==0.21.0
-oasislmf
-anytree==2.4.3
