@@ -195,7 +195,7 @@ modelSupplierPage <- function(input, output, session, dbSettings,
     ns <- session$ns
     modalDialog(label = "delModal",
                 title = uiOutput(ns("delModaltitle"), inline = TRUE),
-                paste0("Are you sure you want to delete?"),
+                paste0("Are you sure that you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonConfirmDel"),
                                  label = "Confirm", align = "center") %>%

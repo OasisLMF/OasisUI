@@ -139,7 +139,7 @@ companyDefinition <- function(input, output, session, dbSettings,
     ns <- session$ns
     modalDialog(label = "compdelmodal",
                 title = uiOutput(ns("compdelmodaltitle"), inline = TRUE),
-                paste0("Are you sure you want to delete?"),
+                paste0("Are you sure that you want to delete?"),
                 footer = tagList(
                   flamingoButton(ns("abuttoncconfirmdel"),
                                label = "Confirm", align = "center"),

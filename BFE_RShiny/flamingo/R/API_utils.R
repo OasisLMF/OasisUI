@@ -61,13 +61,18 @@ return_df <- function(api_query, api_param = "") {
   responseList <- return_response(api_query, api_param)
 
   if (length(responseList) > 0) {
-    if (length(responseList[[1]]) > 1 ) {
+    if (length(responseList[[1]]) > 1) {
       responseList <- lapply(responseList, function(x) {lapply(x, showname)})
     } else {
       responseList <- lapply(responseList, showname)
     }
-    response_df <- bind_rows(responseList) %>%
-      as.data.frame()
+    if (length(responseList) > 1 || length(responseList[[1]]) > 1) {
+      response_df <- bind_rows(responseList) %>%
+        as.data.frame()
+    } else {
+      response_df <- NULL
+    }
+
   } else {
     response_df <- NULL
   }

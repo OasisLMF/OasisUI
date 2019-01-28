@@ -838,26 +838,33 @@ step3_configureOutput <- function(input, output, session,
     if (post_analysis_settings_file$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis  settings posted to ", result$anaID ,"."))
+
+      analyses_run <- return_df(api_post_analyses_run,result$anaID)
+
+
+      if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
+
+        idxSel <- match(result$anaID, analyses_run[, tbl_analysesDataNames$id])
+        pageSel <- ceiling(idxSel/pageLength)
+        .reloadAnaData()
+        hide("panelDefineOutputs")
+        .defaultview()
+        selectRows(dataTableProxy("dt_analyses"), idxSel)
+        selectPage(dataTableProxy("dt_analyses"), pageSel)
+
+        if (analyses_run[[tbl_analysesDataNames$status]] == "RUN_STARTED") {
+          flamingoNotification(type = "message",
+                               paste0("Analysis ", result$anaID ," is executing"))
+        }
+      } else {
+        flamingoNotification(type = "error",
+                             paste0("Run could not be started for analysis ", result$anaID))
+      }
+
     } else {
       flamingoNotification(type = "error",
                            paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analysis_settings_file$status))
     }
-    analyses_run <- return_df(api_post_analyses_run,result$anaID)
-
-    if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
-      if (analyses_run[[tbl_analysesDataNames$status]] == "RUN_STARTED") {
-        flamingoNotification(type = "message",
-                             paste0("Analysis ", result$anaID ," is executing"))
-      }
-    }
-    analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-    idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesDataNames$id])
-    pageSel <- ceiling(idxSel/pageLength)
-    .reloadAnaData()
-    hide("panelDefineOutputs")
-    .defaultview()
-    selectRows(dataTableProxy("dt_analyses"), idxSel)
-    selectPage(dataTableProxy("dt_analyses"), pageSel)
 
   })
 
@@ -1022,7 +1029,7 @@ step3_configureOutput <- function(input, output, session,
     ns <- session$ns
     modalDialog(label = "cancelAnaModal",
                 title = uiOutput(ns("cancelAnaModaltitle"), inline = TRUE),
-                paste0("Are you sure you want to cancel this analysis?"),
+                paste0("Are you sure that you want to cancel this analysis?"),
                 footer = tagList(
                   flamingoButton(ns("abuttonConfirmDelAna"),
                                  label = "Confirm", align = "center") %>%
@@ -1323,7 +1330,7 @@ step3_configureOutput <- function(input, output, session,
   }
 
   # Model Outout ---------------------------------------------------------------
-  
+
   moduleOutput <- c(
     list(
       navigationstate = reactive(result$navigationstate),
