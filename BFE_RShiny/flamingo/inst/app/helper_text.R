@@ -53,7 +53,7 @@ defineSingleAna <- list(
   abuttonuploadsourcefiles = "Upload source files to selected portfolio",
   portfolioID = "Select a portfolio ID",
   abuttonpfdetails = "Show details for selected portfolio",
-  abuttonamendpf = "Amend selected portfolio",
+  abuttonamendpf = "Amend selected portfolio name",
   abuttonpfsubmit = "Submit new portfolio",
   abuttondeletepf = "Delete selected portfolio",
   abuttonmodeldetails = "Show details for selected model",
