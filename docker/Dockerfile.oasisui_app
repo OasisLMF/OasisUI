@@ -10,23 +10,21 @@ RUN apt-get update && \
 # Install R
 RUN apt-get update && \
     apt-get install -y --no-install-recommends software-properties-common && \
-#    add-apt-repository "deb http://cran.ma.imperial.ac.uk/bin/linux/ubuntu trusty/" && \
     add-apt-repository "deb http://www.stats.bris.ac.uk/R/bin/linux/ubuntu xenial/" && \
     apt-get update && \
     apt-get install -y --no-install-recommends --allow-unauthenticated r-base && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Shiny Server dependencies
-# RUN apt-get install -y \
-#     gdebi-core pandoc pandoc-citeproc libcurl4-gnutls-dev libcairo2 libxt-dev && \
-#     rm -rf /var/lib/apt/lists/*
-
 # Install Flamingo dependencies
-RUN R -e "install.packages(c('shinyWidgets', 'V8', 'devtools', 'DT', 'shiny', 'shinyBS', 'bsplus', 'httr', 'rjson', 'odbc', 'RODBC', 'leaflet', 'ggplot2', 'curl', 'RCurl', 'xml2', 'XML', 'rmarkdown', 'logging'), repos='https://cloud.r-project.org/')" && \
+RUN R -e "install.packages(c('readr','shinyWidgets', 'V8', 'devtools', 'DT', 'shiny', 'shinyBS', 'bsplus', 'httr', 'rjson', 'odbc', 'RODBC', 'leaflet', 'ggplot2', 'curl', 'RCurl', 'xml2', 'XML', 'rmarkdown', 'logging'), repos='https://cloud.r-project.org/')" && \
     R -e "install.packages(c('Dataset'), repos='http://R-Forge.R-project.org')" && \
     R -e "install.packages(c('shinyjs'), repos='https://cloud.r-project.org/')" && \
     R -e "remove.packages(c('devtools'))"
-  
+
+
+
+
+
 RUN apt-get update && \
     apt install -y gfortran && \
     R -e "install.packages(c('plotly'), repos = 'https://cloud.r-project.org/')" \
@@ -34,6 +32,7 @@ RUN apt-get update && \
 
 # Create the logging directory
 RUN mkdir /var/log/shiny-server
+
 
 # Install the flamingo package
 RUN mkdir -p /root
@@ -43,13 +42,6 @@ RUN R CMD build /root/flamingo
 RUN mv $(find /root/ -name flamingo_*.tar.gz) /root/flamingo.tar.gz
 RUN R CMD INSTALL /root/flamingo.tar.gz
 RUN rm -rf /root/flamingo.tar.gz
-
-# COPY src/shell-scripts/shiny-server.sh /home/Flamingo/
-COPY config/freetds.conf /etc/freetds/ 
-COPY config/odbc.ini /etc/
-COPY config/odbcinst.ini /etc/
-# COPY config/shiny-server.conf /etc/shiny-server/
-COPY src/shell-scripts/db_conf.sh /home/Flamingo/
 
 COPY config/Rprofile.site /usr/lib/R/etc/
 

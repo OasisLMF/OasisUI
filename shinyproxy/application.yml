@@ -16,7 +16,7 @@ shiny:
     docker-cmd: ["R", "-e", "flamingo::runFlamingo()"]
     #docker-volumes: [ "%FLAMINGO_SHARE_FILEPATH_ON_HOST%:/var/www/oasis/Files" ]
     docker-image: %UI_DOCKER_IMAGE% 
-    docker-env-file: ui-settings.env
+    docker-env-file: settings.env
     docker-network: shiny-net
 
 logging:
