@@ -1,0 +1,12 @@
+FROM ubuntu:16.04
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y default-jre-headless iproute
+
+COPY ./shinyproxy/shinyproxy-1.1.0.jar ./
+COPY ./shinyproxy/application.yml ./
+COPY ./shinyproxy/settings.env ./
+COPY ./shinyproxy/startup.sh ./
+
+ENTRYPOINT ./startup.sh

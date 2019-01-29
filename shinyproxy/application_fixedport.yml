@@ -9,7 +9,10 @@ shiny:
     port: 8080
     authentication: none
     docker:
-      internal-networking: true
+      cert-path: /home/none
+      url: http://%DOCKER_HOST_IP%:2375
+      host: %DOCKER_HOST_IP%
+      port-range-start: %FLAMINGO_PORT_RANGE_START%
   apps:
   - name: BFE_RShiny
     display-name: Flamingo
@@ -17,7 +20,6 @@ shiny:
     docker-volumes: [ "%FLAMINGO_SHARE_FILEPATH_ON_HOST%:/var/www/oasis/Files" ]
     docker-image: %FLAMINGO_DOCKER_IMAGE% 
     docker-env-file: flamingo.env
-    docker-network: shiny-net
 
 logging:
   file:
