@@ -5,27 +5,27 @@
 \alias{accountDefinitionUI}
 \title{Account Definition Module}
 \usage{
-accountDefinition(input, output, session, dbSettings, active = reactive(TRUE))
+accountDefinition(input, output, session, dbSettings,
+  active = reactive(TRUE))
 
 accountDefinitionUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{shiny output object}
-
-\item{session}{shiny session object}
-
-\item{dbSettings}{setting object as returned by e.g. \link{flamingoDB}}
+\item{dbSettings}{Setting object as returned by e.g. [flamingoDB()].}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{id}{shiny module id}
+\item{id}{Namespace ID for the module.}
 }
 \value{
-empty list
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-list of tags
+Empty list.
+
+List of tags.
 }
 \description{
 Server logic to define an account.

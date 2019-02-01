@@ -1,64 +1,65 @@
-# Flamingo Shiny
-# 
-# (c) 2013-2017 Oasis LMF Ltd.
-# Software provided for early adopter evaluation only.
 ###############################################################################
+# note with shiny::runApp this statement isn't needed anymore
+# library(shiny, warn.conflicts = FALSE, quietly = TRUE)
 
-library(shiny)
-library(datasets)
-library(httr)
-library(rjson)
-library(shinyjs, warn.conflicts = FALSE)
-library(xml2)
-library(shinyBS)
-library(DT, warn.conflicts = FALSE)
-library(DBI)
-library(logging)
+library(flamingo, warn.conflicts = FALSE)
 
-library(flamingo)
+source(file.path(".", "helper_text.R"), local = TRUE)
 
-### logger
-
-#addHandler(writeToFile, logger="flamingo",
+### logger ---------------------------------------------------------------------
+#addHandler(writeToFile, logger = "flamingo",
 #    file = file.path("var", "log", "shinyproxy", "flamingo.log"))
 
-addHandler(writeToConsole, logger = "flamingo")
+#addHandler(writeToConsole, logger = "flamingo")
 
-loginfo("testing logger", logger="flamingo.module")
+#' loginfo
+#'
+#' @rdname loginfo
+#'
+#' @param ... Extra arguments.
+#' @param logger flamingo.module.
+#'
+#' @return Log in info.
+#'
+#' @export
+loginfo <- function(..., logger) {message(...)}
 
-logMessage <- function(msg) loginfo(msg, logger = "flamingo.module") 
+#' logerror
+#'
+#' @rdname logerror
+#'
+#' @param ... Extra arguments.
+#' @param logger flamingo.module.
+#'
+#' @return Warning message.
+#'
+#' @export
+logerror <- function(..., logger) {warning(...)}
 
+loginfo("testing logger", logger = "flamingo.module")
 
-### flamingo database 
+logMessage <- function(msg) loginfo(msg, logger = "flamingo.module")
 
-dbSettings <- flamingoDB(
-    server = Sys.getenv("FLAMINGO_DB_IP"),
-    port = Sys.getenv("FLAMINGO_DB_PORT"),
-    database = Sys.getenv("FLAMINGO_DB_NAME"),
-    uid = Sys.getenv("FLAMINGO_DB_USERNAME"),
-    pwd = Sys.getenv("FLAMINGO_DB_PASSWORD"))
+### Django API -----------------------------------------------------------------
+APISettings <- APIgetenv(
+  server = "API_IP",
+  port = "API_PORT",
+  version = "API_VERSION",
+  share_filepath = "API_SHARE_FILEPATH"
+)
 
+# options(flamingo.settings.api = api_init("localhost", "8000"))
+options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
+options(flamingo.settings.api.httptype = "application/json")
+options(flamingo.settings.api.version = APISettings$version)
+options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
+
+options(flamingo.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))
+
+#health check
+loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
 tryCatch({
-      conn <- do.call(dbConnect, dbSettings)
-      dbDisconnect(conn)
-      loginfo("sucessfully connected to database", logger = "flamingo.module")
-    }, error = function(e) {
-      logerror(paste("Could not connect to database:", e$message), logger="flamingo.module")
-    })
-
-reloadMillis <- 10000 # amount of time to wait before refreshing tables
-
-
-### flamingo API server
-
-apiSettings <- flamingoServer(
-    host = Sys.getenv("DOCKER_HOST_IP"),
-    # host = Sys.getenv("FLAMINGO_API_IP"), #TODO this would be a better variable
-    port = Sys.getenv("FLAMINGO_API_PORT"))
-
-loginfo(paste("flamingo server:", apiSettings$url), logger = "flamingo.module")
-tryCatch({
-      testFlamingoServer(apiSettings)
-    }, error = function(e) {
-      logerror(e$message, logger = "flamingo.module")
-    })
+  invisible(api_get_healthcheck())
+}, error = function(e) {
+  logerror(e$message, logger = "flamingo.module")
+})

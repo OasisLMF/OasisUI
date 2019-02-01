@@ -1,0 +1,26 @@
+shiny:
+  proxy:
+    title: Oasis Flamingo
+    #logo-url: http://www.openanalytics.eu/sites/www.openanalytics.eu/themes/oa/logo.png
+    #logo-url: https://www.boatoasis.com/uploads/9/2/9/3/92934216/published/boatlogo-nobg.png?1483977780
+    landing-page: /
+    heartbeat-rate: 10000
+    heartbeat-timeout: 60000
+    port: 8080
+    authentication: none
+    docker:
+      cert-path: /home/none
+      url: http://%DOCKER_HOST_IP%:2375
+      host: %DOCKER_HOST_IP%
+      port-range-start: %FLAMINGO_PORT_RANGE_START%
+  apps:
+  - name: BFE_RShiny
+    display-name: Flamingo
+    docker-cmd: ["R", "-e", "flamingo::runFlamingo()"]
+    docker-volumes: [ "%FLAMINGO_SHARE_FILEPATH_ON_HOST%:/var/www/oasis/Files" ]
+    docker-image: %FLAMINGO_DOCKER_IMAGE% 
+    docker-env-file: flamingo.env
+
+logging:
+  file:
+    shinyproxy.log

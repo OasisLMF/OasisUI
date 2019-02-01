@@ -2,15 +2,17 @@
 % Please edit documentation in R/runFlamingo.R
 \name{runFlamingo}
 \alias{runFlamingo}
-\title{Run the Flamingo Shiny application.}
+\title{runFlamingo}
 \usage{
 runFlamingo(port = 3838, ...)
 }
 \arguments{
-\item{...}{additional arguments to \code{\link[shiny]{runApp}}}
+\item{port}{port to pass to \code{\link[shiny]{runApp}}.}
+
+\item{...}{Additional arguments to \code{\link[shiny]{runApp}}.}
 }
 \value{
-no return value
+No return value.
 }
 \description{
 Runs the Flamingo Shiny application. Under normal circumstances

@@ -5,34 +5,32 @@
 \alias{fileViewerUI}
 \title{File Viewer Module}
 \usage{
-fileViewer(input, output, session, dbSettings, userId,
-  preselRunId = reactive(-1), active = reactive(TRUE),
-  logMessage = message)
+fileViewer(input, output, session, dbSettings,
+  preselAnaId = reactive(-1), active, logMessage = message)
 
 fileViewerUI(id)
 }
 \arguments{
-\item{input}{shiny input object}
+\item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{output}{shiny output object}
+\item{dbSettings}{Setting object as returned by e.g. [flamingoDB()].}
 
-\item{session}{shiny session object}
-
-\item{dbSettings}{as returned from \link{flamingoDB}}
-
-\item{userId}{user id}
-
-\item{preselRunId}{preselected run id}
+\item{preselAnaId}{Reactive string expression for reselected analysis id from landingpage.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{logMessage}{function that will be passed info messages}
+\item{logMessage}{function that will be passed info messages.}
+
+\item{id}{Namespace ID for the module.}
 }
 \value{
-empty list
+The returned list also includes reactive navigation state
+constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
+
+LIst of tags.
 }
 \description{
-Server logic to view files
+Server logic to view files.
 
-UI/View to view files
+UI/View to view files.
 }

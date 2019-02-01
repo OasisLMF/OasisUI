@@ -4,11 +4,14 @@
 \alias{createPlainMap}
 \title{Create Plain Map}
 \usage{
-createPlainMap(fileName)
+createPlainMap(df)
 }
 \arguments{
-\item{fileName}{full file path to marker data}
+\item{df}{df to plot as map}
+}
+\value{
+Leaflet map.
 }
 \description{
-creates a plain map using leaflet
+Creates a plain map using leaflet.
 }
