@@ -7,10 +7,10 @@ node {
     // Set Default Multibranch config
     try {
         source_branch = CHANGE_BRANCH
-    } catch (MissingPropertyException e) {
+    } catch (MissingPropertyException e1) {
         try {
             source_branch = BRANCH_NAME
-        } catch (MissingPropertyException e) {
+        } catch (MissingPropertyException e2) {
              source_branch = ""
         }    
     }   
