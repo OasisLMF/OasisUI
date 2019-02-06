@@ -39,9 +39,8 @@ node {
     String source_branch    = params.SOURCE_BRANCH  // Git repo branch to build from
     String source_name      = 'OasisUI'
     String source_git_url   = "git@github.com:OasisLMF/${source_name}.git"
-    String source_workspace = "${source_varient}_workspace"
+    String source_workspace = "ui_workspace"
     String source_sh        = '/buildscript/utils.sh'
-    String source_func      = "${source_varient}_${source_name}".toLowerCase()   // function name reference <function>_<model>_<varient>
 
 
     //env.PYTHON_ENV_DIR = "${script_dir}/pyth-env"           // Virtualenv location
@@ -74,7 +73,7 @@ node {
                 }   
             },  
             clone_model: {
-                stage('Clone: ' + source_func) {
+                stage('Clone: ' + source_name) {
                     sshagent (credentials: [git_creds]) {
                         dir(source_workspace) {
                            sh "git clone -b ${source_branch} --single-branch --no-tags ${source_git_url} ."
