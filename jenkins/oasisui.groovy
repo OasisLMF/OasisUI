@@ -72,7 +72,7 @@ node {
                     }   
                 }   
             },  
-            clone_model: {
+            clone_source: {
                 stage('Clone: ' + source_name) {
                     sshagent (credentials: [git_creds]) {
                         dir(source_workspace) {
@@ -85,14 +85,18 @@ node {
 
         // DOCKER BUILD
         parallel(
-            stage('Build: Shiny Proxy') {
-                dir(source_workspace) {
-                    sh PIPELINE + " build_image  ${docker_proxy}  ${image_proxy} ${env.TAG_RELEASE}"
-                }
+            build_proxy: {
+                stage('Build: Shiny Proxy') {
+                    dir(source_workspace) {
+                        sh PIPELINE + " build_image  ${docker_proxy}  ${image_proxy} ${env.TAG_RELEASE}"
+                    }
+                }    
             },
-            stage('Build: Shiny App') {
-                dir(source_workspace) {
-                    sh PIPELINE + " build_image  ${docker_app}  ${image_app} ${env.TAG_RELEASE}"
+            clone_app: {
+                stage('Build: Shiny App') {
+                    dir(source_workspace) {
+                        sh PIPELINE + " build_image  ${docker_app}  ${image_app} ${env.TAG_RELEASE}"
+                    }
                 }
             }
         )
@@ -108,16 +112,21 @@ node {
         //Optionaly Publish to docker hub stage
         if (params.PUBLISH){
             parallel(
-                stage ('Publish: Shiny Proxy') {
-                    dir(source_workspace) {
-                        sh PIPELINE + " push_image ${docker_proxy} ${env.TAG_RELEASE}"
+                publish_proxy: {
+                            
+                    stage ('Publish: Shiny Proxy') {
+                        dir(source_workspace) {
+                            sh PIPELINE + " push_image ${docker_proxy} ${env.TAG_RELEASE}"
+                        }
                     }
-                },
-                stage ('Publish: Shiny App') {
-                    dir(source_workspace) {
-                        sh PIPELINE + " push_image ${docker_app} ${env.TAG_RELEASE}"
+                 },
+                 publish_app: {
+                    stage ('Publish: Shiny App') {
+                        dir(source_workspace) {
+                            sh PIPELINE + " push_image ${docker_app} ${env.TAG_RELEASE}"
+                        }
                     }
-                }
+                 }
             )
         }
     } catch(hudson.AbortException | org.jenkinsci.plugins.workflow.steps.FlowInterruptedException buildException) {
