@@ -43,7 +43,7 @@ RUN mv $(find /root/ -name flamingo_*.tar.gz) /root/flamingo.tar.gz
 RUN R CMD INSTALL /root/flamingo.tar.gz
 RUN rm -rf /root/flamingo.tar.gz
 
-COPY config/Rprofile.site /usr/lib/R/etc/
+COPY shinyproxy/Rprofile.site /usr/lib/R/etc/
 
 EXPOSE 3838
 
