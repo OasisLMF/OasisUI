@@ -136,8 +136,8 @@ node {
         //Docker cleanup
         dir(build_workspace) {
             if(params.PURGE){
-                sh PIPELINE + " purge_image ${docker_proxy} ${env.TAG_RELEASE}"
-                sh PIPELINE + " purge_image ${docker_app} ${env.TAG_RELEASE}"
+                sh PIPELINE + " purge_image ${image_proxy} ${env.TAG_RELEASE}"
+                sh PIPELINE + " purge_image ${image_app} ${env.TAG_RELEASE}"
             }
         }
 
