@@ -116,14 +116,14 @@ node {
                             
                     stage ('Publish: Shiny Proxy') {
                         dir(source_workspace) {
-                            sh PIPELINE + " push_image ${docker_proxy} ${env.TAG_RELEASE}"
+                            sh PIPELINE + " push_image ${image_proxy} ${env.TAG_RELEASE}"
                         }
                     }
                  },
                  publish_app: {
                     stage ('Publish: Shiny App') {
                         dir(source_workspace) {
-                            sh PIPELINE + " push_image ${docker_app} ${env.TAG_RELEASE}"
+                            sh PIPELINE + " push_image ${image_app} ${env.TAG_RELEASE}"
                         }
                     }
                  }
