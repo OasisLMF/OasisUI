@@ -53,7 +53,7 @@ outputfilesUI <- function(id) {
 #'
 #' @export
 outputfiles <- function(input, output, session,
-                        tbl_filesListDataana = reactive(NULL), 
+                        tbl_filesListDataana = reactive(NULL),
                         tbl_filesListDatapf = reactive(NULL),
                         anaId = reactive(""),
                         portfolioId = reactive(""),
@@ -61,17 +61,11 @@ outputfiles <- function(input, output, session,
 
   ns <- session$ns
 
-  
-  
+
+
   # list of sub-modules
   sub_modules <- list()
 
-  # sub_modules$ViewFilesModule <- callModule(
-  #   ViewFilesModule,
-  #   id = "ViewOutputFilesModule",
-  #   filesListData =  filesListDatatoview,
-  #   logMessage = logMessage,
-  #   includechkbox = TRUE)
   sub_modules$ViewOutputFiles <- callModule(
     ViewFilesInTable,
     id = "ViewOutputFiles",
@@ -81,13 +75,6 @@ outputfiles <- function(input, output, session,
     file_column = "files",
     includechkbox = TRUE)
 
-  # sub_modules$ViewFilesModule <- callModule(
-  #   ViewFilesModule,
-  #   id = "ViewInputFilesModule",
-  #   filesListData =  reactive(NULL),
-  #   logMessage = logMessage,
-  #   includechkbox = TRUE)
-  
   sub_modules$ViewInputFiles <- callModule(
     ViewFilesInTable,
     id = "ViewInputFiles",
@@ -95,5 +82,5 @@ outputfiles <- function(input, output, session,
     param = portfolioId,
     logMessage = logMessage,
     includechkbox = TRUE)
-  
+
 }

@@ -50,16 +50,6 @@ em.rshiny-footer {
   margin-right: 2%;
 }
 
-div.flamingo-page-division {
-  margin-top: 2em;
-  /* border: 1px solid #e3e3e3; */
-  padding: 20px;
-  border-radius: 4px;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 1600px;
-}
-
 .btn {
   margin-bottom: 5px !important;
 }
@@ -103,20 +93,6 @@ div.flamingo-page-division {
 .login-dialog button {
   margin-top: 1em;
   margin-bottom: 1em;
-}
-
-/*** File Viewer ***/
-
-#fileViewer-plainmap {
-  height: calc(100vh - 230px) !important;
-}
-
-#FVPanelSwitcher {
-  color: rgba(0, 0, 0, 0);
-  background-color: rgba(0, 0, 0, 0);
-  font-size: 1%;
-  height: 1px;
-  border-style: none;
 }
 
 
