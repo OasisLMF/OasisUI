@@ -40,11 +40,11 @@ if (interactive()) {
     # replace eventually with flamingo-tweaks.css via system.file()
     tags$style(HTML('
                     .collapsebtn:after {
-                    font-family: "FontAwesome"; font-weight: 900; content: "\\\\f068";
+                    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\\\\f068";
                     float: right;
                     }
                     .collapsebtn.collapsed:after {
-                    content: "\\\\f065";
+                    content: "\\\\f31e";
                     }
                     '
     )),
