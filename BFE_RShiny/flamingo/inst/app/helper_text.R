@@ -23,28 +23,7 @@ landing_page <- list(
   abuttonfilemngt = "Access input/output files",
   abuttonsysconf = "System configuration",
   accountDD = "User information",
-  abuttonlogout = "Logout the application. You will need to sign back in",
-  abuttonuserupdate = "Update selected user",
-  abuttonuserdelete = "Delete selected user",
-  abuttonusersecurity = "Add security group to selected user",
-  abuttonuseroasis = "Add license to selected user"
-)
-
-define_account <- list(
-  abuttonamendac = "Amend selected account",
-  abuttondeleteac = "Delete selected account"
-)
-
-define_company <- list(
-  abuttoncompupdate = "Update selected company",
-  abuttoncompdel = "Delete selected company"
-)
-
-sys_conf <- list(
-  abuttonamend = "Amend selected model resource",
-  abuttondelete = "Delete selected model resource",
-  abuttonConfirmDel = "Delete selected model resource",
-  abuttonSubmitCrtAm = "Submit Programme"
+  abuttonlogout = "Logout the application. You will need to sign back in"
 )
 
 defineSingleAna <- list(

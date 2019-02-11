@@ -66,10 +66,6 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
               #img(src = "landingpage.png", width = "70%")
               landingPageUI("landingPage"),
 
-            # Define Account
-            DA =
-              accountDefinitionUI("accountDefinition"),
-
             # Define Single Analysis
             SA =
               singleAnaUI("singleAna"),
@@ -85,28 +81,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
             BBR = visualizationBBRUI("visualizationBBR"),
 
             # Compare run Batch
-            CBR = visualizationCBRUI("visualizationCBR"),
-
-            ## File Management
-            FM =
-              fileViewerUI("fileViewer"),
-
-            # System Config
-            SC =
-              modelSupplierPageUI("modelSupplierPage"),
-
-            # User Admin
-            UA = #navbarPage("User Administration", id = "ua",
-              tabsetPanel(
-                id = "ua",
-                tabPanel("Company",
-                         value = "definecompany",
-                         companyDefinitionUI("companyDefinition")),
-
-                tabPanel("Company User Administraton",
-                         value = "defineuser",
-                         userAdminDefinitionUI("userAdminDefinition"))
-              ) # End of tabsetpanel
+            CBR = visualizationCBRUI("visualizationCBR")
 
           ) # End of panels list
         ) # End of reactiveConditionalPanelsUI
