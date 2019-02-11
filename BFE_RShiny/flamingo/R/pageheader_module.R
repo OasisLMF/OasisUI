@@ -22,16 +22,6 @@ pageheaderUI <- function(id) {
                        right = TRUE,
                        textOutput(ns("textOutputHeaderData2")),
 
-                       # flamingoButton(ns("abuttonuseradmin"),
-                       #                label = "User Administration", align = "center", width = "100%"),
-                       # flamingoButton(ns("abuttondefineaccount"),
-                       #                label = "Define Account", align = "center", width = "100%") %>%
-                       #   bs_embed_tooltip(title = landing_page$abuttondefineaccount, placement = "left"),
-                       #
-                       # flamingoButton(ns("abuttonsysconf"),
-                       #                label = "System Configuration", align = "center", width = "100%") %>%
-                       #   bs_embed_tooltip(title = landing_page$abuttonsysconf, placement = "left"),
-
                        flamingoButton(ns("abuttonlogout"),
                                       label = "Logout", align = "center", width = "100%")  %>%
                          bs_embed_tooltip(title = landing_page$abuttonlogout, placement = "right")
@@ -68,26 +58,6 @@ pageheader <- function(input, output, session, user, logMessage = message, activ
 
   # Greeter ---------------------------------------------------
   output$textOutputHeaderData2 <- renderText(paste("User Name:", user()))
-
-  observeEvent(input$abuttonuseradmin, {
-    updateNavigation(navigation_state, "UA")
-    toggleDropdownButton(ns("accountDDmenu"))
-  })
-
-  observeEvent(input$abuttondefineaccount, {
-    updateNavigation(navigation_state, "DA")
-    toggleDropdownButton(ns("accountDDmenu"))
-  })
-
-  observeEvent(input$abuttonsysconf, {
-    updateNavigation(navigation_state, "SC")
-    toggleDropdownButton(ns("accountDDmenu"))
-  })
-
-  observeEvent(input$abuttonhome, {
-    updateNavigation(navigation_state, "LP")
-    toggleDropdownButton(ns("accountDDmenu"))
-  })
 
   .logoutModal <- function() {
     ns <- session$ns

@@ -181,11 +181,6 @@ server <- function(input, output, session) {
   observe(if (authenticated()) {
     switch(main_visible(),
 
-           "DA" = { # go to Define account submenu
-             loginfo(paste("Navigate to Define Account"),
-                     logger = "flamingo.module")
-           },
-
            "SA" = { # go to Define programme single submenu
              loginfo(paste("Navigate to Define Single Analysis"),
                      logger = "flamingo.module")
@@ -208,22 +203,6 @@ server <- function(input, output, session) {
 
            "CBR" = { # go to Compare Runs submenu
              loginfo(paste("Navigate to compare runs"),
-                     logger = "flamingo.module")
-           },
-
-           "UA" = { # go to User Admin submenu
-             loginfo(paste("Navigate to User Admin"),
-                     logger = "flamingo.module")
-             updateTabsetPanel(session, "ua", selected = "defineuser")
-           },
-
-           "FM" = { # go to File Management submenu
-             loginfo(paste("Navigate to File Management"),
-                     logger = "flamingo.module")
-           },
-
-           "SC" = { # go to System Configuration submenu
-             loginfo(paste("Navigate to System Config"),
                      logger = "flamingo.module")
            },
 
