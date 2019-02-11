@@ -110,11 +110,6 @@ pageheader <- function(input, output, session, user, logMessage = message, activ
                removeModal()
   )
 
-  ### Button permissions ---- --------------------------------------------------
-  # observe(if (active()) {
-  #   landingPageButtonUpdate(session, dbSettings, user())
-  # })
-
   ### Module Output ------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),
@@ -124,52 +119,4 @@ pageheader <- function(input, output, session, user, logMessage = message, activ
   )
 
   moduleOutput
-}
-
-
-#' Landing Page Access Control
-#'
-#' @rdname landingPageButtonUpdate
-#'
-#' @description Disable/Enable menu buttons based on permissions in database.
-#'
-#' @template params-logMessage
-#' @param dbSettings Setting object as returned by e.g. [flamingoDB()].
-#' @param session Shiny session object.
-#'
-#' @return NULL
-#'
-#' @export
-landingPageButtonUpdate <- function(session, dbSettings,
-                                    logMessage = message) {
-
-  logMessage("Checking Permissions")
-
-  # TODO: use shinyjs enable / disable on actionButtons according to permissions
-
-  # .updateButton <- function(db_resourceId, btn_inputId) {
-  #   permission <- flamingoDBCheckPermissions(dbSettings, user, db_resourceId)
-  #   if (identical(permission, character(0))) {
-  #     updateButton(session, session$ns(btn_inputId), disabled = TRUE)
-  #   } else {
-  #     updateButton(session, session$ns(btn_inputId), disabled = TRUE)
-  #   }
-  # }
-
-  # Not used anywhere else, probably just forgotten
-  # ("600", "abuttonenquiry")
-
-  #.updateButton("700", "abuttonanalysis")
-  #.updateButton("700", "abuttonbrowse")
-
-  # .updateButton("904", "abuttonuseradmin")
-
-  # Not used anywhere else, probably just forgotten
-  # ("950", "abuttonworkflowadmin")
-
-  # .updateButton("200", "abuttonsysconf")
-
-  #.updateButton("300", "abuttonfilemngt")
-
-  invisible()
 }
