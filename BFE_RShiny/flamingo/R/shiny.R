@@ -75,8 +75,7 @@ flamingoCheckboxButton <- function(inputId, label, icon = NULL, width = NULL, cl
 #'
 #' @md
 flamingoRefreshButton <- function(id, width = NULL) {
-  actionButton(id, label = NULL, width = width, style = "float: right") %>%
-    tagAppendAttributes(class = "refreshbtn")
+  actionButton(id, label = NULL, icon = icon("redo-alt"), width = width, style = "float: right")
 }
 
 
