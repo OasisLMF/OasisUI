@@ -44,7 +44,7 @@ panelAnalysisTable <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_AnalysisTable"), inline = TRUE),
-      actionButton(inputId = ns("abuttonanarefresh"), label = "Refresh", style = "float: right;")
+      flamingoRefreshButton(ns("abuttonanarefresh"))
     ),
     div(id = "divAnalysis",
         fluidRow(column(12,

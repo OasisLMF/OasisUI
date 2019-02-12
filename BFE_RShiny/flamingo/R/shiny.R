@@ -6,7 +6,7 @@
 #'
 #' @param class HTML class attribute.
 #' @param inputId widget id
-#' @param label widget label 
+#' @param label widget label
 #' @param icon widget icon
 #' @param width widget width
 #' @param ... Arguments to [shiny::actionButton()].
@@ -38,7 +38,7 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
 #' @description Modified version of the default [shiny::actionButton()].
 #'
 #' @param inputId widget id
-#' @param label widget label 
+#' @param label widget label
 #' @param icon widget icon
 #' @param width widget width
 #' @param class HTML class attribute.
@@ -62,6 +62,21 @@ flamingoCheckboxButton <- function(inputId, label, icon = NULL, width = NULL, cl
     list(shiny:::validateIcon(icon), label),
     ...
   )
+}
+
+#' flamingoRefreshButton
+#'
+#' @rdname flamingoRefreshButton
+#'
+#' @param id ID of the button
+#' @inheritParams shiny::actionButton
+#'
+#' @export
+#'
+#' @md
+flamingoRefreshButton <- function(id, width = NULL) {
+  actionButton(id, label = NULL, width = width, style = "float: right") %>%
+    tagAppendAttributes(class = "refreshbtn")
 }
 
 

@@ -199,6 +199,11 @@ em.rshiny-footer {
         display: table-row;
 }
 
+/* Button to refresh tables */
+.refreshbtn:after {
+  font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f2f9";
+  float: right;
+}
 
 /* Button to collapse flamingo panels */
 .collapsebtn:after {

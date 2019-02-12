@@ -48,7 +48,7 @@ panelCreateAnalysesTable <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_CreateAnalysesTable"), inline = TRUE),
-      actionButton(inputId = ns("abuttonanarefresh"), label = "Refresh", style = "float: right;")
+      flamingoRefreshButton(ns("abuttonanarefresh"))
     ),
     DTOutput(ns("dt_analyses")),
     fluidRow(
@@ -97,7 +97,7 @@ panelAnalysisDetails <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_panelAnalysisDetails"), inline = TRUE),
-      actionButton(inputId = ns("abuttonanadetailsrefresh"), label = "Refresh", style = "float: right;"),
+      flamingoRefreshButton(ns("abuttonanadetailsrefresh")),
       actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_analysisdetails"))
@@ -124,7 +124,7 @@ panelAnalysisLog <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_AnalysisLog"), inline = TRUE),
-      actionButton(inputId = ns("abuttonanalogrefresh"), label = "Refresh", style = "float: right;"),
+      flamingoRefreshButton(ns("abuttonanalogrefresh")),
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_analysislog"))
@@ -149,7 +149,7 @@ panelAnalysisGenInputs <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_panelAnalysisIG"), inline = TRUE),
-      actionButton(inputId = ns("abuttonanaIGrefresh"), label = "Refresh", style = "float: right;"),
+      flamingoRefreshButton(ns("abuttonanaIGrefresh")),
       actionButton(inputId = ns("buttonhideanaIG"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
@@ -177,7 +177,7 @@ panelModelTable <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_ModelTable"), inline = TRUE),
-      actionButton(inputId = ns("abuttonmodelrefresh"), label = "Refresh", style = "float: right;"),
+      flamingoRefreshButton(ns("abuttonmodelrefresh")),
       actionButton(inputId = ns("buttonhidemodel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_models")),
@@ -215,7 +215,7 @@ panelModelDetails <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_ModelDetails"), inline = TRUE),
-      actionButton(inputId = ns("abuttonmodeldetailrfsh"), label = "Refresh", style = "float: right;"),
+      flamingoRefreshButton(ns("abuttonmodeldetailrfsh")),
       actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_modelDetails"))
