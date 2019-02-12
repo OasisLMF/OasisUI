@@ -54,7 +54,7 @@ panelPortfolioTable <- function(id) {
     ns("panel_portfolios"),
     heading = tagAppendChildren(
       h4("Portfolios table"),
-      actionButton(inputId = ns("abuttonprgtblrfsh"), label = "Refresh", style = "float: right;")
+      flamingoRefreshButton(ns("abuttonprgtblrfsh"))
     ),
     DTOutput(ns("dt_Portfolios")),
     flamingoButton(ns("abuttoncreatepf"), "Create Portfolio", align = "centre"),
@@ -89,7 +89,7 @@ panelPortfolioDetails <- function(id) {
     heading = tagAppendChildren(
       h4("Source files for portfolio"),
       uiOutput(ns("paneltitle_pfDetails"), inline = TRUE),
-      actionButton(inputId = ns("abuttondefpfrfsh"), label = "Refresh", style = "float: right;"),
+      flamingoRefreshButton(ns("abuttondefpfrfsh")),
       actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     #DTOutput(ns("dt_portfolioDetails"))
