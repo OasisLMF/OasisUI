@@ -23,6 +23,7 @@ tbl_portfoliosDataNames <- list(
   name = "name",
   created = "created",
   modified = "modified",
+  status_detailed = "status_detailed",
   status = "status"
 )
 
@@ -35,7 +36,7 @@ tbl_modelsDataNames <- list(
   name = "name",
   created = "created",
   modified = "modified",
-  model_id = "model_id", 
+  model_id = "model_id",
   supplier_id = "supplier_id",
   version_id = "version_id"
 )
@@ -49,6 +50,7 @@ tbl_analysesDataNames <- list(
   name = "name",
   created = "created",
   modified = "modified",
+  status_detailed = "status_detailed",
   status = "status",
   portfolio = "portfolio",
   model = "model",
