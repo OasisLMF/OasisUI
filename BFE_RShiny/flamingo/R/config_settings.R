@@ -23,7 +23,6 @@ tbl_portfoliosDataNames <- list(
   name = "name",
   created = "created",
   modified = "modified",
-  status_detailed = "status_detailed",
   status = "status"
 )
 

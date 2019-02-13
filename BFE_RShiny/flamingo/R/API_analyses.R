@@ -149,7 +149,7 @@ api_post_analyses <- function(name, portfolio, model) {
 return_tbl_analysesData <- function(name = "") {
 
   .addIcons <- function(df) {
-    StatusGood <- ("RUN_COMPLETED")
+    StatusGood <- "RUN_COMPLETED"
     StatusBad <- c("INPUTS_GENERATION_ERROR", "RUN_ERROR", NA_character_)
     StatusAvailable <- "READY"
 
@@ -176,7 +176,7 @@ return_tbl_analysesData <- function(name = "") {
     tbl_analysesData <- convert_created_modified(tbl_analysesData)
     tbl_analysesData <- tbl_analysesData %>%
       arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
-      mutate(status_detailed = status) %>%
+      mutate(status_detailed = tolower(gsub(pattern = "_", " ", tbl_analysesData[, tbl_analysesDataNames$status]))) %>%
       .addIcons() %>%
       select(c(!! sym(tbl_analysesDataNames$id), !! sym(tbl_analysesDataNames$name),
                !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
