@@ -44,9 +44,6 @@ server <- function(input, output, session) {
   }) %>% debounce(100)
 
   # submodules ----
-  .callModule <- function(...) {
-    callModule(..., dbSettings = dbSettings)
-  }
 
   loginDialogModule <- callModule(
     loginDialog, "login",
@@ -79,12 +76,6 @@ server <- function(input, output, session) {
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "LP")
   )
-
-  # auth_modules$DA <- .callModule(
-  #   accountDefinition,
-  #   id = "accountDefinition",
-  #   active = reactive(authenticated() && main_visible() == "DA")
-  # )
 
   auth_modules$singleAna <- callModule(
     singleAna,
@@ -129,32 +120,6 @@ server <- function(input, output, session) {
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "CBR")
   )
-
-  # auth_modules$fileViewer <- .callModule(
-  #   fileViewer,
-  #   id = "fileViewer",
-  #   logMessage = logMessage,
-  #   active = reactive(authenticated()) # && main_visible() == "FM" ) #&& input$fm == "fileviewer"))
-  # )
-
-  # auth_modules$modelSupplierPage <- .callModule(
-  #   modelSupplierPage,
-  #   id = "modelSupplierPage",
-  #   active = reactive(authenticated()) # && main_visible() == "SC" )# && input$sc == "Model"))
-  # )
-
-  # auth_modules$userAdminDefinition <- .callModule(
-  #   userAdminDefinition,
-  #   id = "userAdminDefinition",
-  #   active = reactive(authenticated() && main_visible() == "UA" && input$ua == "defineuser"),
-  #   user = reactive(result$user)
-  # )
-
-  # auth_modules$companyDefinition <- .callModule(
-  #   companyDefinition,
-  #   id = "companyDefinition",
-  #   active = reactive(authenticated() && main_visible() == "UA" && input$ua == "definecompany")
-  # )
 
   # authenticated ----
   # show the logged-in part of the UI if login is completed
@@ -216,11 +181,6 @@ server <- function(input, output, session) {
   observe(if (authenticated()) {
     switch(main_visible(),
 
-           "DA" = { # go to Define account submenu
-             loginfo(paste("Navigate to Define Account"),
-                     logger = "flamingo.module")
-           },
-
            "SA" = { # go to Define programme single submenu
              loginfo(paste("Navigate to Define Single Analysis"),
                      logger = "flamingo.module")
@@ -243,22 +203,6 @@ server <- function(input, output, session) {
 
            "CBR" = { # go to Compare Runs submenu
              loginfo(paste("Navigate to compare runs"),
-                     logger = "flamingo.module")
-           },
-
-           "UA" = { # go to User Admin submenu
-             loginfo(paste("Navigate to User Admin"),
-                     logger = "flamingo.module")
-             updateTabsetPanel(session, "ua", selected = "defineuser")
-           },
-
-           "FM" = { # go to File Management submenu
-             loginfo(paste("Navigate to File Management"),
-                     logger = "flamingo.module")
-           },
-
-           "SC" = { # go to System Configuration submenu
-             loginfo(paste("Navigate to System Config"),
                      logger = "flamingo.module")
            },
 

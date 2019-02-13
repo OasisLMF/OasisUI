@@ -88,6 +88,8 @@ ViewFilesInTable <- function(input, output, session,
 
   maxrowsperpage <- 10
 
+  currfolder <- getOption("flamingo.settings.api.share_filepath")
+
   result <- reactiveValues(
     #df to show in table
     tbl_filesListData_wButtons = NULL,
@@ -162,41 +164,41 @@ ViewFilesInTable <- function(input, output, session,
   # Download zip button
   output$FLdownloadzip <- downloadHandler(
     filename = "files.zip",
-    content = function(fname){
-      
-      #path of files to download in Zip bundle
+    content = function(fname) {
+      # path of files to download in Zip bundle
       fs <- c()
-      for (f in 1:nrow(result$tbl_filesListData_wButtons)) {
+      g <- input$dt_outputFL_rows_selected
+      for (f in g) {
         filename <- result$tbl_filesListData_wButtons[f, file_column]
-        
-        #Get dataframe
+
+        # Get dataframe
         currNamespace <- ls("package:flamingo")
         func_wpattern <- currNamespace[grepl(filename, currNamespace)]
-        returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
+        returnfunc <- func_wpattern[grepl("api_get", func_wpattern)]
         if (length(returnfunc) != 0) {
           func <- get(returnfunc)
-          fileData <- return_file_df(func,param())
+          fileData <- return_file_df(func, param())
         } else {
           extractFolder <- set_extractFolder(id = param(), label = folderpath)
           currfilepath <- set_extractFilePath(extractFolder, filename)
-          fileData <- fread(currfilepath )
+          fileData <- fread(currfilepath)
         }
-        
+
         if (nrow(fileData) > 0) {
-          fpath <- file.path(".", paste0(filename, ".csv"))
+          fpath <- file.path(currfolder, filename)
           fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
           fs <- c(fs, fpath)
         }
       }
       zip(zipfile = fname, files = fs)
-      if (file.exists(paste0(fname, "./"))) {file.rename(paste0(fname, ".zip"), fname)}
-    }#,
-    #contentType = "application/zip"
+      if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
+    }
   )
 
   # Selected Row ---------------------------------------------------------------
-  observeEvent( input$dt_outputFL_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (length( input$dt_outputFL_rows_selected) > 0) {
+  observeEvent(input$dt_outputFL_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
+    if (length(input$dt_outputFL_rows_selected) > 0) {
+      enable("FLdownloadzip")
       lapply(input$dt_outputFL_rows_selected, function(i) {
         session$sendCustomMessage(type = 'resetcolorOasis', message =  session$ns( paste0("srows_", i)))
         show(paste0("vrows_", i))
@@ -208,6 +210,7 @@ ViewFilesInTable <- function(input, output, session,
         session$sendCustomMessage(type = 'resetcolorWhite', message = session$ns(paste0("srows_", i)))
         hide(paste0("vrows_", i))})
     }else {
+      disable("FLdownloadzip")
       lapply(input$dt_outputFL_rows_current, function(i){
         session$sendCustomMessage(type = 'resetcolorWhite', message = session$ns(paste0("srows_", i)))
         hide(paste0("vrows_", i))})
@@ -354,7 +357,7 @@ ViewFilesInTable <- function(input, output, session,
     if (length(returnfunc) != 0) {
       func <- get(returnfunc)
       result$tbl_fileData <- return_file_df(func,param())
-      if (!is.null(result$tbl_fileData )) {
+      if (!is.null(result$tbl_fileData)) {
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
         filerows <- nrow(result$tbl_fileData)
@@ -362,8 +365,8 @@ ViewFilesInTable <- function(input, output, session,
     } else {
       extractFolder <- set_extractFolder(id = param(), label = folderpath)
       result$currfilepath <- set_extractFilePath(extractFolder, result$currentFile)
-      result$tbl_fileData <- fread(result$currfilepath )
-      if (!is.null(result$tbl_fileData )) {
+      result$tbl_fileData <- fread(result$currfilepath)
+      if (!is.null(result$tbl_fileData)) {
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
       }
       filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")

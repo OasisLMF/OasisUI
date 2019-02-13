@@ -20,7 +20,7 @@ landingPageUI <- function(id) {
       ns("panel_landingpage"),
       heading = tagAppendChildren(
         h4("Analyses table"),
-        actionButton(inputId = ns("abuttonrefreshanaInbox"), label = "Refresh", style = "float: right;")
+        flamingoRefreshButton(ns("abuttonrefreshanaInbox"))
       ),
       DTOutput(ns("dt_anaInbox")),
       flamingoButton(ns("abuttongotoana"), "Dashboard of Analyses Outputs", align = "right") %>%
