@@ -148,10 +148,10 @@ api_post_analyses <- function(name, portfolio, model) {
 #' @export
 return_tbl_analysesData <- function(name = "") {
 
-  .replaceWithIcons <- function(df) {
-    StatusGood <- c("RUN_COMPLETED")
+  .addIcons <- function(df) {
+    StatusGood <- "RUN_COMPLETED"
     StatusBad <- c("INPUTS_GENERATION_ERROR", "RUN_ERROR", NA_character_)
-    StatusAvailable <- c("READY")
+    StatusAvailable <- "READY"
 
     # replace status in df
     if (!is.null(df)) {
@@ -176,11 +176,13 @@ return_tbl_analysesData <- function(name = "") {
     tbl_analysesData <- convert_created_modified(tbl_analysesData)
     tbl_analysesData <- tbl_analysesData %>%
       arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
-      .replaceWithIcons() %>%
+      mutate(status_detailed = tolower(gsub(pattern = "_", " ", tbl_analysesData[, tbl_analysesDataNames$status]))) %>%
+      .addIcons() %>%
       select(c(!! sym(tbl_analysesDataNames$id), !! sym(tbl_analysesDataNames$name),
                !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
                !! sym(tbl_analysesDataNames$modified), !! sym(tbl_analysesDataNames$created),
-               !! sym(tbl_analysesDataNames$status)))
+               !! sym(tbl_analysesDataNames$status_detailed), !! sym(tbl_analysesDataNames$status)))
+
   } else {
     tbl_analysesData <- NULL
   }
