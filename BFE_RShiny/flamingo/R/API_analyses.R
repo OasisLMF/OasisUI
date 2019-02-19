@@ -175,8 +175,8 @@ return_tbl_analysesData <- function(name = "") {
 
     tbl_analysesData <- convert_created_modified(tbl_analysesData)
     tbl_analysesData <- tbl_analysesData %>%
-      arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
       mutate(status_detailed = tolower(gsub(pattern = "_", " ", tbl_analysesData[, tbl_analysesDataNames$status]))) %>%
+      arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
       .addIcons() %>%
       select(c(!! sym(tbl_analysesDataNames$id), !! sym(tbl_analysesDataNames$name),
                !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
