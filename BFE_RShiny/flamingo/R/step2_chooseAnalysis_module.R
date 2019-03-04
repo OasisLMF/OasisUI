@@ -53,7 +53,7 @@ panelCreateAnalysesTable <- function(id) {
     DTOutput(ns("dt_analyses")),
     fluidRow(
       column(12,
-             flamingoButton(inputId = ns("abuttonstartIG"), label = "Start Input Generation") %>%
+             flamingoButton(inputId = ns("abuttonstartIG"), label = "Generate Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonstartIG, placement = "right"),
              flamingoButton(inputId = ns("abuttoncancelIG"), label = "Cancel Input Generation") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttoncancelIG, placement = "right"),
