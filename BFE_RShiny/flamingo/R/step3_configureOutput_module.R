@@ -157,11 +157,11 @@ panelDefineOutputsDetails <- function(id) {
                  selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "Long Term"),
                  checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
                  h5("Available Perils"),
-                 hidden(checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = TRUE)),
-                 hidden(checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = TRUE)),
-                 hidden(checkboxInput(ns("chkinputprquake"), label = "Peril: Quake", value = TRUE)),
-                 hidden(checkboxInput(ns("chkinputprflood"), label = "Peril: Flood", value = TRUE)),
-                 hidden(checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = TRUE)),
+                 hidden(checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = FALSE)),
+                 hidden(checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = FALSE)),
+                 hidden(checkboxInput(ns("chkinputprquake"), label = "Peril: Quake", value = FALSE)),
+                 hidden(checkboxInput(ns("chkinputprflood"), label = "Peril: Flood", value = FALSE)),
+                 hidden(checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = FALSE)),
                  hidden(sliderInput(ns("sliderleakagefac"), label = "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5))))
     )
   )
@@ -1067,7 +1067,7 @@ step3_configureOutput <- function(input, output, session,
     .clearOutputOptions()
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
-    modelID <- ifelse(modelID == "", -1,modelID)
+    modelID <- ifelse(modelID == "", -1, modelID)
     tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
     if (modelID != -1 && !is.null(tbl_modelsDetails)) {
       model_settings <- tbl_modelsDetails$model_settings

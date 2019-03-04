@@ -16,12 +16,12 @@
 #' @export
 defineIDUI <- function(id, w, batch = FALSE){
   ns <- NS(id)
-  
+
   labelana <- "Ana ID"
   if (batch) {
     labelana <- "Batch ID"
   }
-  
+
   column(w,
          actionButton(ns(paste0("chooseAnaID")), label = NULL, icon = icon("list-alt"),
                       style = " color: rgb(71, 73, 73);
@@ -42,7 +42,7 @@ defineIDUI <- function(id, w, batch = FALSE){
              # padding:10px; margin: 5px; border-style: solid;"
          ),
          style = "display:inline;")
-  
+
 }
 
 # Server -----------------------------------------------------------------------
@@ -64,7 +64,7 @@ defineIDUI <- function(id, w, batch = FALSE){
 #' @param batch Flag indicating if it is a batch or a simple analysis.
 #'
 #' @return selectAnaID reactive for anaID selected.
-#' 
+#'
 #' @importFrom dplyr sym
 #' @importFrom dplyr filter
 #' @importFrom shinyjs enable
@@ -77,35 +77,36 @@ defineID <- function(input, output, session,
                      batch = FALSE,
                      active = reactive(TRUE),
                      logMessage = message) {
-  
+
   ns <- session$ns
-  
+
   # Reactive Values and parameters ---------------------------------------------
   result <- reactiveValues(
     tbl_analysesData = NULL,
     selectAnaID = "",
     selectAnaName = "",
     selectportfolioID = "",
+    selectmodelID = "",
     preselRow = NULL
   )
-  
+
   # list of sub-modules
   sub_modules <- list()
-  
+
   #label
   labelana <- "Analysis"
   if (batch) {
     labelana <- "Batch Analysis"
   }
-  
+
   observe({
     if (active()) {
       result$preselRow <- NULL
     }
   })
-  
+
   # Modal for AnaID selection --------------------------------------------------
-  
+
   # > Modal Panel
   AnaList <- modalDialog(
     easyClose = TRUE,
@@ -119,26 +120,26 @@ defineID <- function(input, output, session,
                    label = "Cancel", align = "right")
     )
   )
-  
+
   # > update lsit of analyses
   observeEvent({
     input$chooseAnaID
     preselAnaId()
     anaID()}, ignoreInit = TRUE, {
-      tbl_analysesData  <- return_tbl_analysesData() 
+      tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
         result$tbl_analysesData <- tbl_analysesData  %>%
           filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
       }
     })
-  
+
   # > open modal
   observeEvent(
     input$chooseAnaID, {
       showModal(AnaList)
     })
-  
-  
+
+
   # > modal content
   sub_modules$flamingo_analyses <- callModule(
     flamingoTable,
@@ -153,16 +154,16 @@ defineID <- function(input, output, session,
     preselRow = reactive({result$preselRow}),
     maxrowsperpage = 10,
     logMessage = logMessage)
-  
+
   # > enable disable button
   observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
     if (is.null(sub_modules$flamingo_analyses$rows_selected())) {
-      disable("abuttonselectAna") 
+      disable("abuttonselectAna")
     } else {
       enable("abuttonselectAna")
     }
   })
-  
+
   #Find row of anaid preselected in landing page
   observeEvent({
     preselAnaId()},{
@@ -171,7 +172,7 @@ defineID <- function(input, output, session,
         result$preselRow <- idx
       }
     })
-  
+
   #Find row of anaid preselected in model analysis server step 3
   observeEvent({
     anaID()},{
@@ -181,21 +182,21 @@ defineID <- function(input, output, session,
         result$preselRow <- idx
       }
     })
-  
-  
+
+
   # > select analysis ID
   observeEvent(result$preselRow, {
     if (!is.null( result$preselRow)) {
       .downloadOutput(idx = result$preselRow)
     }
   })
-  
-  
+
+
   observeEvent(input$abuttonselectAna, {
     .downloadOutput(idx = sub_modules$flamingo_analyses$rows_selected())
     removeModal()
   })
-  
+
   # > Enable/disable select button
   observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
     if (!is.null(sub_modules$flamingo_analyses$rows_selected())) {
@@ -204,26 +205,26 @@ defineID <- function(input, output, session,
       disable("abuttonselectAna")
     }
   })
-  
+
   # > close modal
   observeEvent(input$abuttoncancel, {
     removeModal()
   })
-  
+
   # > ifo selected analysis
   output$selectAnaInfo1 <- renderText({
     paste0("Selected ", labelana, ":   ")
   })
-  
+
   output$selectAnaInfo2 <- renderText({
     if (result$selectAnaID == "") {
       info <- '" - "'
     } else {
-      info <- paste0(result$selectAnaID, ' "' ,result$selectAnaName, '"  ') 
+      info <- paste0(result$selectAnaID, ' "' ,result$selectAnaName, '"  ')
     }
     info
   })
-  
+
   # Help functions -------------------------------------------------------------
   .downloadOutput <- function(idx) {
     currid <- ""
@@ -231,24 +232,27 @@ defineID <- function(input, output, session,
     currpfId <- ""
     if (!is.null(idx)) {
       currid <- result$tbl_analysesData[idx,tbl_analysesDataNames$id]
-      currName <- result$tbl_analysesData[idx,tbl_analysesDataNames$name]
-      currpfId <- result$tbl_analysesData[idx,tbl_analysesDataNames$portfolio]
+      currName <- result$tbl_analysesData[idx, tbl_analysesDataNames$name]
+      currpfId <- result$tbl_analysesData[idx, tbl_analysesDataNames$portfolio]
+      currmdId <- result$tbl_analysesData[idx, tbl_analysesDataNames$model]
     }
     result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
+    result$selectmodelID <- ifelse(is.null(currmdId) | is.na(currmdId), "", currmdId)
     logMessage("Extract output files")
     api_get_analyses_output_file(result$selectAnaID)
   }
-  
-  
+
+
   # Module Outout --------------------------------------------------------------
-  
+
   moduleOutput <- c(
     list(
       selectAnaID = reactive({result$selectAnaID}),
-      selectPortfolioID = reactive({result$selectportfolioID})
+      selectPortfolioID = reactive({result$selectportfolioID}),
+      selectModelID = reactive({result$selectmodelID})
     )
   )
-  
+
 }

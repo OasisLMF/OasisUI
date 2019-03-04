@@ -31,13 +31,13 @@ summarytabUI <- function(id) {
                flamingoTableUI(ns("summaryInputTable")),
                h5("Parameters"),
                flamingoTableUI(ns("summaryParamsTable")),
-               h5("Output"),
+               h5("Outputs"),
                flamingoTableUI(ns("summaryOutputTable"))
-             ),
-             plotlyOutput(ns("summaryAALOutputPlot"))
+             )
       ),
       column(6,
              plotlyOutput(ns("summaryGULOutputPlot")),
+             plotlyOutput(ns("summaryAALOutputPlot")),
              plotlyOutput(ns("summaryILOutputPlot")),
              plotlyOutput(ns("summaryRIOutputPlot"))
       )
@@ -75,17 +75,19 @@ summarytabUI <- function(id) {
 #' @importFrom dplyr contains
 #' @importFrom dplyr left_join
 #' @importFrom dplyr mutate
+#' @importFrom dplyr mutate_if
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' @importFrom tidyr gather
 #' @importFrom tidyr separate
 #'
 #' @export
-summarytab <- function(input, output, session, 
-                       selectAnaID1 = reactive(""), 
+summarytab <- function(input, output, session,
+                       selectAnaID1 = reactive(""),
                        selectAnaID2 = reactive(""),
                        portfolioID1 = reactive(""),
                        portfolioID2 = reactive(""),
+                       model_perils_D = reactive(""),
                        tbl_filesListDataana1 = reactive(NULL),
                        compare = FALSE,
                        active, logMessage = message) {
@@ -107,12 +109,12 @@ summarytab <- function(input, output, session,
     selectAnaID2()
     tbl_filesListDataana1()
     active()}, {
-      
+
       # Initialize variables
       SummaryData1 <- NULL
       SummaryData2 <- NULL
       SummaryData <- NULL
-      
+
       if (selectAnaID1() != "" && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
         SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
       }
@@ -127,7 +129,7 @@ summarytab <- function(input, output, session,
           names(SummaryData1)[idx1] <- paste0("Analysis Id ", selectAnaID1())
           idx2 <- which(names(SummaryData2) == "Value")
           names(SummaryData2)[idx2] <- paste0("Analysis Id ", selectAnaID2())
-          result$SummaryData <- left_join(SummaryData1, SummaryData2, by = c("SummaryType", "Type"))
+          result$SummaryData <- left_join(SummaryData1, SummaryData2, by = c("Specification", "Type"))
         }
       } else {
         result$SummaryData <- SummaryData1
@@ -149,12 +151,12 @@ summarytab <- function(input, output, session,
     })
 
   # Output Summary Tables ------------------------------------------------------
-  
+
   # Summary Input tables
   dt_dataInput <- reactive({
     if (!is.null(result$SummaryData)) {
-      data <- result$SummaryData %>% 
-        filter(Type == "input") 
+      data <- result$SummaryData %>%
+        filter(Type == "input")
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -164,7 +166,7 @@ summarytab <- function(input, output, session,
     }
     data
   })
-  
+
   sub_modules$summaryTable <- callModule(
     flamingoTable,
     id = "summaryInputTable",
@@ -177,11 +179,11 @@ summarytab <- function(input, output, session,
     colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
-  
+
   dt_dataParam <- reactive({
     if (!is.null(result$SummaryData)) {
-      data <- result$SummaryData %>% 
-        filter(Type == "param") 
+      data <- result$SummaryData %>%
+        filter(Type == "param")
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -204,11 +206,13 @@ summarytab <- function(input, output, session,
     colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
-  
+
   dt_dataOutput <- reactive({
     if (!is.null(result$SummaryData)) {
-      data <- result$SummaryData %>% 
-        filter(Type == "output") 
+      data <- result$SummaryData %>%
+        filter(Type == "output") %>%
+        transform(Value = as.numeric(Value)) %>%
+        mutate_if(is.numeric, ~round(., 0))
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -233,20 +237,20 @@ summarytab <- function(input, output, session,
 
 
   # Plots ----------------------------------------------------------------------
-  
+
   # AAL histogram
   output$summaryAALOutputPlot <- renderPlotly({
     if (!is.null(result$SummaryData)) {
-    data <- result$SummaryData %>% 
+    data <- result$SummaryData %>%
       filter(Type == "AALplot")
     } else {
       data <- NULL
     }
     p <- NULL
     if (!is.null(data) && nrow(data) > 0) {
-      DFtype <- data.frame("Type" = {lapply(data$SummaryType, function(s) {
+      DFtype <- data.frame("Type" = {lapply(data$Specification, function(s) {
         gsub("Mean AAL ", "", s)
-      }) %>% 
+      }) %>%
           unlist()}
       ) %>%
         separate(Type,into = c("perspective", "type"), sep = " ")
@@ -254,23 +258,23 @@ summarytab <- function(input, output, session,
       multipleplots <- FALSE
       if (compare) {
         colnames <- names(select(data, contains("analysis", ignore.case = TRUE)))
-        data <- data %>% gather(key = "gridcol", value = "Value",colnames)
+        data <- data %>% gather(key = "gridcol", value = "Value", colnames)
         multipleplots <- TRUE
       }
       data <- data  %>%
-        rename("colour" = "SummaryType") %>%
+        rename("colour" = "Specification") %>%
         rename("xaxis" = "perspective") %>%
         rename("value" = "Value") %>%
         mutate(value = as.numeric(value) / 1000000)
-      xlabel <- "Sample Type"
+      xlabel <- "Perspective"
       ylabel <- "Loss in Millions"
       titleToUse <- "AAL"
-      
+
       p <- barPlot(xlabel, ylabel, titleToUse, data, multipleplots )
     }
     p
   })
-  
+
   # OEP / AEP
   output$summaryGULOutputPlot <- renderPlotly({
     p <- NULL
@@ -279,11 +283,11 @@ summarytab <- function(input, output, session,
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
       titleToUse <- "GUL EP Curve"
-      p <- linePlot(xlabel, ylabel, titleToUse, data) 
+      p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
   })
-  
+
   output$summaryILOutputPlot <- renderPlotly({
     p <- NULL
     data <- .prepareDataLinePlot("il")
@@ -291,11 +295,11 @@ summarytab <- function(input, output, session,
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
       titleToUse <- "IL EP Curve"
-      p <- linePlot(xlabel, ylabel, titleToUse, data) 
+      p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
   })
-  
+
   output$summaryRIOutputPlot <- renderPlotly({
     p <- NULL
     data <- .prepareDataLinePlot("ri")
@@ -303,12 +307,12 @@ summarytab <- function(input, output, session,
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
       titleToUse <- "RI EP Curve"
-      p <- linePlot(xlabel, ylabel, titleToUse, data) 
+      p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
   })
-  
-  
+
+
 
   # Helper functions -----------------------------------------------------------
   .returnData <- function(id, tbl_filesListDataana, filepattern, nonkeycols, variables) {
@@ -317,7 +321,7 @@ summarytab <- function(input, output, session,
     for (p in 1:length(perspectives)) { #p <- 1
       for (v in 1:length(variables)) { #v <-1
         variable <- variables[v]
-        fileName <- tbl_filesListDataana %>% 
+        fileName <- tbl_filesListDataana %>%
           filter(summary_level == "Portfolio") %>%
           filter(perspective == perspectives[p]) %>%
           filter(report == variable) %>%
@@ -329,8 +333,8 @@ summarytab <- function(input, output, session,
             splitvar <- unlist(strsplit(variable, " "))
             var <- splitvar[length(splitvar)]
             DFList[[c]] <- output_file_df %>%
-              gather(key = variable, value = value, -nonkeycols) %>% 
-              mutate(variable = paste0(variable, ".",var, ".",perspectives[p])) 
+              gather(key = variable, value = value, -nonkeycols) %>%
+              mutate(variable = paste0(variable, ".",var, ".",perspectives[p]))
           }
         }
       }
@@ -338,18 +342,18 @@ summarytab <- function(input, output, session,
     DF <- do.call(rbind, DFList)
     return(DF)
   }
-  
+
   .getSummary <- function(selectAnaID, portfolioID) {
 
     #analyses settings
     analysis_settings <- return_analyses_settings_file_list(selectAnaID)
-    
+
     #read aal files
     AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
     if (!is.null(AAL)) {
       #infer params
-      tiv <- AAL %>% 
-        filter(grepl("exposure_value", variable)) %>% 
+      tiv <- AAL %>%
+        filter(grepl("exposure_value", variable)) %>%
         select(value) %>%
         unique() %>%
         as.character()
@@ -361,20 +365,20 @@ summarytab <- function(input, output, session,
       outputsAALtmp <- outputsAALtmp %>%
         mutate(type = replace(type, type == "1", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (NI)"))) %>%
         mutate(type = replace(type, type == "2", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
-      outputsAAL <- data.frame("SummaryType" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
+      outputsAAL <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
       # AAL plot
-      plotAALtmp <- data.frame("SummaryType" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
+      plotAALtmp <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
     } else {
       tiv <- 0
       outputsAAL <- NULL
       plotAALtmp <- NULL
     }
-    #read OEP & aEP files 
+    #read OEP & aEP files
     leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty", nonkeycols = c("summary_id", "return_period"),variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
         mutate(variable = paste0(variable, ".", return_period))
-      plotleccalc <- data.frame("SummaryType" = leccalc$variable, "Value" = leccalc$value, "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
+      plotleccalc <- data.frame("Specification" = leccalc$variable, "Value" = leccalc$value, "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
     } else {
       plotleccalc <- NULL
     }
@@ -386,7 +390,7 @@ summarytab <- function(input, output, session,
     } else {
       locnum <- 0
     }
-    
+
     gul_threshold <- analysis_settings[["analysis_settings"]][["gul_threshold"]]
     gul_threshold <- ifelse(is.null(gul_threshold), 0, gul_threshold)
     number_of_samples <- analysis_settings[["analysis_settings"]][["number_of_samples"]]
@@ -405,11 +409,17 @@ summarytab <- function(input, output, session,
     demand_surge <- ifelse(is.null(demand_surge), FALSE, demand_surge)
     leakage_factor <- analysis_settings[["model_settings"]][["leakage_factor"]]
     leakage_factor <- ifelse(is.null(leakage_factor), FALSE, leakage_factor)
-    #sumamry DF
-    SummaryTypeRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", "peril_wind", "peril_surge", "peril_quake", "peril_flood", "demand_surge", "leakage_factor")
+
+    perils_list <- list("peril_wind", "peril_surge", "peril_quake", "peril_flood")
+    PerilsNotInModel <- setdiff(perils_list, model_perils_D())
+
+    #summary DF
+    SpecificationRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", "peril_wind", "peril_surge", "peril_quake", "peril_flood", "demand_surge", "leakage_factor")
     ValueRows <- unlist(c(locnum, tiv, gul_threshold, number_of_samples, event_set, peril_wind, peril_surge, peril_quake, peril_flood, demand_surge, leakage_factor))
     TypeRows <- c("input", "input", "param", "param", "param", "param", "param", "param", "param", "param", "param")
-    summary_df <- data.frame("SummaryType" = SummaryTypeRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE)
+    summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
+                    filter(Specification %notin% PerilsNotInModel)
+
     #add AAL outputs
     if (!is.null(outputsAAL)) {
       summary_df <- rbind(summary_df, outputsAAL)
@@ -422,24 +432,24 @@ summarytab <- function(input, output, session,
     if (!is.null(plotleccalc)) {
       summary_df <- rbind(summary_df, plotleccalc)
     }
-    
+
     return(summary_df)
   }
-  
+
   .prepareDataLinePlot <- function(P){
     if (!is.null(result$SummaryData)) {
-    data <- result$SummaryData %>% 
-      filter(Type == "leccalcplot") 
+    data <- result$SummaryData %>%
+      filter(Type == "leccalcplot")
     } else {
       data <- NULL
     }
     if (!is.null(data) && nrow(data) > 0) {
       if (compare) {
         data <- data %>%
-          gather(key = "gridcol", value = "Value",colnames) 
+          gather(key = "gridcol", value = "Value",colnames)
       }
       data <- data %>%
-        separate(SummaryType, into = c("loss", "variable", "perspective", "returnperiod"), sep = "\\.") %>%
+        separate(Specification, into = c("loss", "variable", "perspective", "returnperiod"), sep = "\\.") %>%
         mutate(returnperiod = as.numeric(returnperiod)) %>%
         mutate(variable = as.factor(variable))
       data <- data %>%
@@ -458,7 +468,7 @@ summarytab <- function(input, output, session,
     }
     data
   }
-  
+
   # Module output --------------------------------------------------------------
   invisible()
 }
@@ -471,7 +481,7 @@ summarytab <- function(input, output, session,
 #' @rdname basicplot
 #'
 #' @description basic plot
-#' 
+#'
 #' @param xlabel label x axis
 #' @param ylabel label y axis
 #' @param titleToUse plot title
@@ -514,7 +524,7 @@ basicplot <- function(xlabel, ylabel, titleToUse, data){
 #' @rdname barPlot
 #'
 #' @description bar plot
-#' 
+#'
 #' @param xlabel label X axis
 #' @param ylabel label y axis
 #' @param titleToUse title
@@ -548,7 +558,7 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
 #' @rdname linePlot
 #'
 #' @description line plot
-#' 
+#'
 #' @param xlabel label X axis
 #' @param ylabel label y axis
 #' @param titleToUse title
