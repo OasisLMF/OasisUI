@@ -151,8 +151,8 @@ panelDefineOutputsDetails <- function(id) {
       ns("panel_defAnaOutputDetails"),
       heading = h4("Model parameters"),
       div(id = ns("noofsample"), style = "width:100%; margin: 0 auto;",
-          hidden(selectInput(ns("sinputeventset"), label = "Event Set:", choices = "Probabilistic")),
-          hidden(selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "Long Term")),
+          hidden(selectInput(ns("sinputeventset"), label = "Event Set:", choices = "")),
+          hidden(selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "")),
           h5("Available Perils"),
           hidden(checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = TRUE)),
           hidden(checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = TRUE)),
@@ -1080,25 +1080,29 @@ step3_configureOutput <- function(input, output, session,
       }
 
       event_set_id <- names_settings[names(names_settings) == "event_set"]$event_set
-      event_set_list <- model_settings[[event_set_id]]$event_set
-      event_set_default <- event_set_list$default
-      eventSetChoices <- .SwapNamesValueInList(event_set_list$values)
-      updateSelectInput(session, "sinputeventset",
-                        selected = event_set_default,
-                        choices = eventSetChoices)
-      if (!is.null(event_set_id) || length(event_set_list) > 1) {
-        show("sinputeventset")
+      if (!is.null(event_set_id)) {
+        event_set_list <- model_settings[[event_set_id]]$event_set
+        event_set_default <- event_set_list$default
+        eventSetChoices <- .SwapNamesValueInList(event_set_list$values)
+        updateSelectInput(session, "sinputeventset",
+                          selected = event_set_default,
+                          choices = eventSetChoices)
+        if (length(event_set_list$values) > 1) {
+          show("sinputeventset")
+        }
       }
 
       occurrence_set_id <- names_settings[names(names_settings) == "event_occurrence_id"]$event_occurrence_id
-      occurrence_set_list <- model_settings[[occurrence_set_id]]$event_occurrence_id
-      occurrence_set_default <- occurrence_set_list$default
-      occurrenceSetChoices <- .SwapNamesValueInList(occurrence_set_list$values)
-      updateSelectInput(session, "sinputeventocc",
-                        selected = occurrence_set_default,
-                        choices = occurrenceSetChoices)
-      if (!is.null(occurrence_set_id) || length(occurrence_set_list) > 1) {
-        show("sinputeventocc")
+      if (!is.null(occurrence_set_id)) {
+        occurrence_set_list <- model_settings[[occurrence_set_id]]$event_occurrence_id
+        occurrence_set_default <- occurrence_set_list$default
+        occurrenceSetChoices <- .SwapNamesValueInList(occurrence_set_list$values)
+        updateSelectInput(session, "sinputeventocc",
+                          selected = occurrence_set_default,
+                          choices = occurrenceSetChoices)
+        if (length(occurrence_set_list$values) > 1) {
+          show("sinputeventocc")
+        }
       }
 
       perils_list <- list("peril_wind" = "chkinputprwind",
