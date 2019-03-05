@@ -82,7 +82,17 @@ collapseButton <- function(id, id_collapse, ..., width = NULL, collapsed = FALSE
 }
 
 
-# Utility for handling panel heading as character or pre-difined tags.
+#' Panel Heading
+#'
+#' Construct an appropriate heading for a [flamingoPanel].
+#'
+#' @param heading The desired heading, either a character string (which gets
+#'   properly wrapped) or a tags list (returned as-is).
+#' @inheritParams shiny::uiOutput
+#'
+#' @export
+#'
+#' @md
 flamingoPanelHeading <- function(heading) {
   if (is.character(heading)) {
     # TODO: fine-tune font size
@@ -100,14 +110,16 @@ flamingoPanelHeading <- function(heading) {
 #' @param outputId ID of the dynamical panel heading.
 #' @inheritParams shiny::uiOutput
 #'
-#' @seealso [flamingoPanelHeadingOutput()]
+#' @seealso [renderFlamingoPanelHeading()]
+#'
+#' @export
 #'
 #' @md
 flamingoPanelHeadingOutput <- function(outputId, ...) {
   div(uiOutput(outputId, inline = TRUE, ...))
 }
 
-#' Remder Heading UI
+#' Render Heading UI
 #'
 #' Render reactive panel heading content dynamically based on server logic.
 #'
@@ -115,6 +127,8 @@ flamingoPanelHeadingOutput <- function(outputId, ...) {
 #' @param ... Further arguments passed to [shiny::renderUI()].
 #'
 #' @seealso [flamingoPanelHeadingOutput()]
+#'
+#' @export
 #'
 #' @md
 renderFlamingoPanelHeading <- function(expr, env = parent.frame(), ...) {

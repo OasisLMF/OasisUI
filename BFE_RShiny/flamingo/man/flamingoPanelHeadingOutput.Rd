@@ -17,5 +17,5 @@ Panel heading UI placeholder to be rendered dynamically via
 \code{\link[=renderFlamingoPanelHeading]{renderFlamingoPanelHeading()}}.
 }
 \seealso{
-\code{\link[=flamingoPanelHeadingOutput]{flamingoPanelHeadingOutput()}}
+\code{\link[=renderFlamingoPanelHeading]{renderFlamingoPanelHeading()}}
 }

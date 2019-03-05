@@ -2,7 +2,7 @@
 % Please edit documentation in R/flamingoPanel.R
 \name{renderFlamingoPanelHeading}
 \alias{renderFlamingoPanelHeading}
-\title{Remder Heading UI}
+\title{Render Heading UI}
 \usage{
 renderFlamingoPanelHeading(expr, env = parent.frame(), ...)
 }
