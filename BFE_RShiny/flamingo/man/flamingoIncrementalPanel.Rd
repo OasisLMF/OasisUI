@@ -16,12 +16,13 @@ flamingoIncrementalPanelUI(id, ..., heading = NULL, footer = NULL,
 \arguments{
 \item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{panels_state}{State (taken/available) of panels placeholder, a reactive
-named logical vector where the names are the panel IDs. The state is
-updated upon addiotion / removal of panels.}
+\item{panels_state}{State (taken/available) of panels placeholders, a
+\code{\link[=reactiveValues]{reactiveValues()}} object with a named scalar logical element for each
+panel ID. The state is updated upon addiotin / removal of panels.}
 
-\item{new_content_IDs}{Character vector of IDs to be used for the content of
-each panel upon its creation.}
+\item{new_content_IDs}{Named character vector of IDs to be used for the
+content of each panel upon its creation. Names match the elements of
+\code{panels_state}.}
 
 \item{new_content_fun}{Function used to populate any new panel.}
 
@@ -30,7 +31,8 @@ each panel upon its creation.}
 inside the panel.}
 
 \item{new_headings}{Heading content to be used for each panel upon its
-creation, as a character vector or list.}
+creation, as a named character vector or list. Names match the elements of
+\code{panels_state}.}
 
 \item{collapsible}{Logical flag specifying if the panel is collapsible.}
 
@@ -98,7 +100,7 @@ if (interactive()) {
     # used for the UI components must include session$ns (relevant for module
     # server functions)
     ns <- session$ns
-    panel_IDs <- paste0("extpanel-", c(seq_len(n_panels)))
+    panel_IDs <- paste0("extpanel-", seq_len(n_panels))
     # content IDs used for the content module server and UI
     # content modules
     content_IDs <- paste0("content-", seq_len(n_panels))
@@ -111,8 +113,8 @@ if (interactive()) {
       collapsible = TRUE, show = TRUE,
       ns = ns
     )
-    panel_modules <- lapply(seq_along(content_IDs), function(i) {
-      callModule(examplePanel, content_IDs[i], reactive(all_panels$state()[[i]]))
+    panel_modules <- lapply(seq_len(n_panels), function(i) {
+      callModule(examplePanel, content_IDs[i], reactive(all_panels$state[[ns(panel_IDs[i])]]))
     })
     lapply(seq_along(panel_modules), function(i) {
       output[[paste0("paneltitle", i)]] <- renderFlamingoPanelHeading(panel_modules[[i]]())

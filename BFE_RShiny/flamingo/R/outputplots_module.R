@@ -50,21 +50,21 @@ outputplots <- function(input, output, session,
   sub_modules <- list()
 
   #incremental panels -----------------------------------------------------------
-  panel_names <- paste0("flamingoIncrementalPanelOutput-", c(seq_len(n_panels)))
+  panel_IDs <- paste0("flamingoIncrementalPanelOutput-", seq_len(n_panels))
   content_IDs <- paste0("flamingoIncrementalPanelOutputcontent-", seq_len(n_panels))
   plotPanels <- callIncrementalPanelModules(
-    panel_names, "flamingoIncrementalPanelOutput-0", content_IDs,
+    panel_IDs, "flamingoIncrementalPanelOutput-0", content_IDs,
     panelOutputModuleUI,
     headings = lapply(seq_len(n_panels), function(i) {
       flamingoPanelHeadingOutput(ns(paste0("paneltitle", i)))
     }),
     collapsible = TRUE, show = TRUE, ns = ns
   )
-  plotsubmodules <- lapply(seq_along(content_IDs), function(i) {
+  plotsubmodules <- lapply(seq_len(n_panels), function(i) {
     callModule(panelOutputModule, content_IDs[i],
                filesListData =  reactive(filesListData()),
                anaID = selectAnaID,
-               active = reactive(plotPanels$state()[[i]]))
+               active = reactive(plotPanels$state[[ns(panel_IDs[i])]]))
   })
   lapply(seq_along(plotsubmodules), function(i) {
     output[[paste0("paneltitle", i)]] <- renderFlamingoPanelHeading(plotsubmodules[[i]]())
@@ -92,7 +92,7 @@ outputplots <- function(input, output, session,
 #' @export
 panelOutputModuleUI <- function(id){
   ns <- NS(id)
-  
+
   tagList(
     flamingoPanel(
       id = ns("flamingoPanelOutputModule"),
@@ -226,7 +226,6 @@ panelOutputModule <- function(input, output, session, logMessage = message,
 
   observeEvent(inputplottype(), {
     result$Title <- ""
-    # plotlyOutput persists to re-creating the UI
     output$outputplot <- renderPlotly(NULL)
     if (length( plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
       show("chkboxuncertainty")
@@ -289,13 +288,13 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     input$abuttondraw
   }, ignoreNULL = FALSE, {
 
-  if (length(chkbox$chkboxgrplosstypes()) == 0 ||
-      length(chkbox$chkboxgrpvariables()) == 0 ||
-      length(chkbox$chkboxgrpgranularities()) == 0 ) {
-    disable("abuttondraw")
-  } else {
-    enable("abuttondraw")
-  }
+    if (length(chkbox$chkboxgrplosstypes()) == 0 ||
+        length(chkbox$chkboxgrpvariables()) == 0 ||
+        length(chkbox$chkboxgrpgranularities()) == 0 ) {
+      disable("abuttondraw")
+    } else {
+      enable("abuttondraw")
+    }
 
   })
 
@@ -312,7 +311,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                       # ", aggregated to Portfolio Level: ", input$chkboxaggregate
     ))
 
-        # > Setup ------------------------------------------------------------------
+    # > Setup ------------------------------------------------------------------
     # >> clear data
     # Content to plot
     fileData <- NULL
@@ -416,8 +415,8 @@ panelOutputModule <- function(input, output, session, logMessage = message,
             fileData <- left_join(fileData, currfileData, by = nonkey )
           }
         } else {
-        fileData <- NULL
-      }
+          fileData <- NULL
+        }
       }
     }
 
