@@ -31,6 +31,34 @@ flamingoButton <- function(inputId, label, icon = NULL, width = NULL, class = c(
   )
 }
 
+#' flamingoTableButton
+#'
+#' @rdname flamingoTableButton
+#'
+#' @description Modified version of the default [flamingo::flamingoButton()].
+#'
+#' @param ... Arguments to [flamingo::flamingoButton()].
+#'
+#' @return Acces to Oasis UI.
+#'
+#' @export
+#'
+#' @md
+flamingoTableButton <- function(inputId, label, icon = NULL, width = NULL, class = c("btn", "btn-secondary"), ...) {
+  value <- restoreInput(id = inputId, default = NULL)
+  df_class <- c("btn", "btn-default", "action-button")
+  fl_class <- paste(union(class, df_class), collapse = " ")
+  tags$button(
+    id = inputId,
+    style = if (!is.null(width)) paste0("width: ", validateCssUnit(width), ";"),
+    type = "button",
+    class = fl_class,
+    `data-val` = value,
+    list(shiny:::validateIcon(icon), label),
+    ...
+  )
+}
+
 #' flamingoCheckboxButton
 #'
 #' @rdname flamingoCheckboxButton

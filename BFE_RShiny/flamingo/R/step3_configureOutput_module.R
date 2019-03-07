@@ -50,9 +50,9 @@ panelAnalysisTable <- function(id) {
         DTOutput(ns("dt_analyses")),
         fluidRow(column(12,
                         div(id = ns("divAnalysisButtons"),
-                            flamingoButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
+                            flamingoTableButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttoncancelana, placement = "right"),
-                            flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+                            flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right")
                         ))
         ),

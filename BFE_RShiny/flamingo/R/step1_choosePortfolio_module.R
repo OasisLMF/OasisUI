@@ -59,13 +59,13 @@ panelPortfolioTable <- function(id) {
     DTOutput(ns("dt_Portfolios")),
     fluidRow(
       column(12,
-             flamingoButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
+             flamingoTableButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonamendpf, placement = "right"),
-             flamingoButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
+             flamingoTableButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttondeletepf, placement = "right"),
-             flamingoButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
+             flamingoTableButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonuploadsourcefiles, placement = "right"),
-             flamingoButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
+             flamingoTableButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonpfdetails, placement = "right")
       )
     ),
