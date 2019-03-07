@@ -25,7 +25,7 @@ landingPageUI <- function(id) {
       DTOutput(ns("dt_anaInbox")),
       flamingoButton(ns("abuttongotoana"), "Dashboard of Analyses Outputs", align = "right") %>%
         bs_embed_tooltip(title = landing_page$abuttongotoana, placement = "right"),
-      flamingoButton(inputId = ns("abuttondelana"), label = "Delete Analysis") %>%
+      flamingoTableButton(inputId = ns("abuttondelana"), label = "Delete Analysis") %>%
         bs_embed_tooltip(title = landing_page$abuttondelana, placement = "right"),
       downloadButton(ns("downloadexcel_ana"), label = "Export to csv") %>%
         bs_embed_tooltip(title = landing_page$downloadexcel_ana, placement = "right")

@@ -393,26 +393,26 @@ input[type="radio"]:checked + span{
 /* Flamingo Table Button */
 .btn-secondary {
   color: #8b2129;
-    background-color: #dda6a6;
-    border-color: #e2d9db;
+  background-color: #dda6a6;
+  border-color: #bf9797;
 }
 .btn-secondary:focus,
 .btn-secondary.focus {
-color: #8b2129;
+  color: #8b2129;
   background-color: #dda6a6;
-  border-color: #e2d9db;
+  border-color: #bf9797;
 }
 .btn-secondary:hover {
-color: #8b2129;
+  color: #8b2129;
   background-color: #dda6a6;
-  border-color: #e2d9db;
+  border-color: #bf9797;
 }
 .btn-secondary:active,
 .btn-secondary.active,
 .open > .dropdown-toggle.btn-secondary {
-color: #8b2129;
+  color: #8b2129;
   background-color: #dda6a6;
-  border-color: #e2d9db;
+  border-color: #bf9797;
 }
 .btn-secondary:active:hover,
 .btn-secondary.active:hover,
@@ -423,14 +423,14 @@ color: #8b2129;
 .btn-secondary:active.focus,
 .btn-secondary.active.focus,
 .open > .dropdown-toggle.btn-secondary.focus {
-color: #8b2129;
+  color: #8b2129;
   background-color: #dda6a6;
-  border-color: #e2d9db;
+  border-color: #bf9797;
 }
 .btn-secondary:active,
 .btn-secondary.active,
 .open > .dropdown-toggle.btn-secondary {
-background-image: none;
+  background-image: none;
 }
 .btn-secondary.disabled,
 .btn-secondary[disabled],
@@ -450,33 +450,33 @@ fieldset[disabled] .btn-secondary:active,
 .btn-secondary.disabled.active,
 .btn-secondary[disabled].active,
 fieldset[disabled] .btn-secondary.active {
-background-color: #b25b61;
-  border-color: #e2d9db;
+  background-color: #b25b61;
+  border-color: #d1c0c0;
 }
 .btn-secondary .badge {
-color: #dda6a6;
+  color: #dda6a6;
   background-color: #8b2129;
 }
 
 .btn-secondary {
-background-image: -webkit-linear-gradient(#ebcccc, #dda6a6 80%, #dda6a6);
+  background-image: -webkit-linear-gradient(#ebcccc, #dda6a6 80%, #dda6a6);
   background-image: -o-linear-gradient(#ebcccc, #dda6a6 80%, #dda6a6);
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#ebcccc), color-stop(80%, #dda6a6), to(#dda6a6));
-      background-image: linear-gradient(#ebcccc, #dda6a6 80%, #dda6a6);
-        background-repeat: no-repeat;
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6d94bf', endColorstr='#ff3e648d', GradientType=0);
-        -webkit-filter: none;
-        filter: none;
-        border: 1px solid #e2d9db;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ebcccc), color-stop(80%, #dda6a6), to(#dda6a6));
+  background-image: linear-gradient(#ebcccc, #dda6a6 80%, #dda6a6);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6d94bf', endColorstr='#ff3e648d', GradientType=0);
+  -webkit-filter: none;
+          filter: none;
+  border: 1px solid #e2d9db;
 }
 .btn-secondary:hover {
-background-image: -webkit-linear-gradient(#b25b61, #dda6a6 80%, #dda6a6);
+  background-image: -webkit-linear-gradient(#b25b61, #dda6a6 80%, #dda6a6);
   background-image: -o-linear-gradient(#b25b61, #dda6a6 80%, #dda6a6);
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#b25b61), color-stop(80%, #dda6a6), to(#dda6a6));
-      background-image: linear-gradient(#b25b61, #dda6a6 80%, #dda6a6);
-        background-repeat: no-repeat;
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5f8ab9', endColorstr='#ff385a7f', GradientType=0);
-        -webkit-filter: none;
-        filter: none;
-        border: 1px solid #e2d9db;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#b25b61), color-stop(80%, #dda6a6), to(#dda6a6));
+  background-image: linear-gradient(#b25b61, #dda6a6 80%, #dda6a6);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5f8ab9', endColorstr='#ff385a7f', GradientType=0);
+  -webkit-filter: none;
+          filter: none;
+  border: 1px solid #e2d9db;
 }
