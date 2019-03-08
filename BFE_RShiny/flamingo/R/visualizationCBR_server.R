@@ -37,8 +37,17 @@ visualizationCBR <- function(input, output, session,
   result <- reactiveValues(
     #Panel to select
     preselPanel = 1,
-    # output files table
-    filesListData = NULL
+    #id of selected analysis
+    selectAnaID = "",
+    #portfolio id of selected analysis
+    selectPortfolioID = "",
+    #model perils of selected analyses
+    model_perils1 = "",
+    model_perils2 = "",
+    # df analysis output files
+    tbl_filesListDataana = NULL,
+    # df portfolio input files
+    tbl_filesListDatapf = NULL
   )
 
   #number of plot output panels
@@ -48,6 +57,8 @@ visualizationCBR <- function(input, output, session,
   observeEvent(active(), {
     if (active()) {
       result$preselPanel <- 1
+      result$selectAnaID <- ""
+      result$selectPortfolioID = ""
     }
   })
 
@@ -70,9 +81,34 @@ visualizationCBR <- function(input, output, session,
 
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
-    updateNavigation(navigation_state, "SA")
     result$preselPanel <- 3
+    result$selectAnaID <- sub_modules$defineID1$selectAnaID()
+    result$selectPortfolioID <- sub_modules$defineID1$selectPortfolioID()
+    logMessage(paste0("Selected analysis id is ", result$selectAnaID, ". Selected portfolio id is ", result$selectPortfolioID))
+    updateNavigation(navigation_state, "SA")
   })
+
+  # Extract list of model perils -----------------------------------------------
+  observeEvent(sub_modules$defineID1$selectModelID(), {
+    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, sub_modules$defineID1$selectModelID())
+    model_settings <- tbl_modelsDetails$model_settings
+    names_settings <- list()
+    for (i in 1:length(model_settings)) {# i <- 1
+      names_settings[names(model_settings[[i]])] <- i
+    }
+    result$model_perils1 <- names(names_settings)[grepl("peril", names(names_settings))]
+  })
+
+  observeEvent(sub_modules$defineID2$selectModelID(), {
+    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, sub_modules$defineID2$selectModelID())
+    model_settings <- tbl_modelsDetails$model_settings
+    names_settings <- list()
+    for (i in 1:length(model_settings)) {# i <- 1
+      names_settings[names(model_settings[[i]])] <- i
+    }
+    result$model_perils2 <- names(names_settings)[grepl("peril", names(names_settings))]
+  })
+
 
   # Tab Summary ----------------------------------------------------------------
   sub_modules$summary <- callModule(
@@ -80,6 +116,8 @@ visualizationCBR <- function(input, output, session,
     id = "summarytab",
     selectAnaID1 = reactive(sub_modules$defineID1$selectAnaID()),
     selectAnaID2 = reactive(sub_modules$defineID2$selectAnaID()),
+    model_perils1 = reactive(result$model_perils1),
+    model_perils2 = reactive(result$model_perils2),
     compare = TRUE,
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)
@@ -111,7 +149,7 @@ visualizationCBR <- function(input, output, session,
       result$tbl_filesListDataana <- NULL
     }
   })
-  
+
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
     outputfiles,
@@ -119,11 +157,11 @@ visualizationCBR <- function(input, output, session,
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
     tbl_filesListDatapf = reactive(result$tbl_filesListDatapf),
     anaId = sub_modules$defineID1$selectAnaID,
-    portfolioId = sub_modules$defineID1$selectPortfolioID, 
+    portfolioId = sub_modules$defineID1$selectPortfolioID,
     active = reactive({active() && input$tabsSBR == "taboutputfiles"}),
     logMessage = logMessage)
-  
-  
+
+
   # Tab Output Plots -----------------------------------------------------------
   sub_modules$outputplots <- callModule(
     outputplots,
@@ -133,7 +171,7 @@ visualizationCBR <- function(input, output, session,
     n_panels = n_panels,
     active = reactive({active() && input$tabsSBR == "tabplots"}),
     logMessage = logMessage)
-  
+
 
   # Helper functions -----------------------------------------------------------
   #Add descritption fields to output files
@@ -147,7 +185,7 @@ visualizationCBR <- function(input, output, session,
     g <- granToOed[granToOed$oed == g_oed, "gran"]
     z <- data.frame("perspective" = y[1], "summary_level" = g, "report" = reportToVar(varsdf)[[ report ]])
   }
-  
+
   # Module Outout --------------------------------------------------------------
 
   moduleOutput <- c(
