@@ -62,6 +62,8 @@ summarytabUI <- function(id) {
 #' @param selectAnaID2 id of selected analysis
 #' @param portfolioID1 portfolio id associated with selected analysis
 #' @param portfolioID2 portfolio id associated with selected analysis
+#' @param model_perils1 list of parils associated with the selected analyisis
+#' @param model_perils2 list of parils associated with the selected analyisis
 #' @param tbl_filesListDataana1 dataframe of the output files
 #' @param compare logical indicating comparison
 #'
@@ -87,7 +89,8 @@ summarytab <- function(input, output, session,
                        selectAnaID2 = reactive(""),
                        portfolioID1 = reactive(""),
                        portfolioID2 = reactive(""),
-                       model_perils_D = reactive(""),
+                       model_perils1 = reactive(""),
+                       model_perils2 = reactive(""),
                        tbl_filesListDataana1 = reactive(NULL),
                        compare = FALSE,
                        active, logMessage = message) {
@@ -116,10 +119,10 @@ summarytab <- function(input, output, session,
       SummaryData <- NULL
 
       if (selectAnaID1() != "" && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
-        SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
+        SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1(), model_perils1())
       }
       if (selectAnaID2() != "" && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
-        SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
+        SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2(), model_perils2())
       }
 
       #define df to use
@@ -212,7 +215,8 @@ summarytab <- function(input, output, session,
       data <- result$SummaryData %>%
         filter(Type == "output") %>%
         transform(Value = as.numeric(Value)) %>%
-        mutate_if(is.numeric, ~round(., 0))
+        mutate_if(is.numeric, ~round(., 0)) %>%
+        transform(Value = as.character(Value))
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -241,8 +245,8 @@ summarytab <- function(input, output, session,
   # AAL histogram
   output$summaryAALOutputPlot <- renderPlotly({
     if (!is.null(result$SummaryData)) {
-    data <- result$SummaryData %>%
-      filter(Type == "AALplot")
+      data <- result$SummaryData %>%
+        filter(Type == "AALplot")
     } else {
       data <- NULL
     }
@@ -343,7 +347,7 @@ summarytab <- function(input, output, session,
     return(DF)
   }
 
-  .getSummary <- function(selectAnaID, portfolioID) {
+  .getSummary <- function(selectAnaID, portfolioID, model_perils) {
 
     #analyses settings
     analysis_settings <- return_analyses_settings_file_list(selectAnaID)
@@ -411,14 +415,14 @@ summarytab <- function(input, output, session,
     leakage_factor <- ifelse(is.null(leakage_factor), FALSE, leakage_factor)
 
     perils_list <- list("peril_wind", "peril_surge", "peril_quake", "peril_flood")
-    PerilsNotInModel <- setdiff(perils_list, model_perils_D())
+    PerilsNotInModel <- setdiff(perils_list, model_perils)
 
     #summary DF
     SpecificationRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", "peril_wind", "peril_surge", "peril_quake", "peril_flood", "demand_surge", "leakage_factor")
     ValueRows <- unlist(c(locnum, tiv, gul_threshold, number_of_samples, event_set, peril_wind, peril_surge, peril_quake, peril_flood, demand_surge, leakage_factor))
     TypeRows <- c("input", "input", "param", "param", "param", "param", "param", "param", "param", "param", "param")
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
-                    filter(Specification %notin% PerilsNotInModel)
+      filter(Specification %notin% PerilsNotInModel)
 
     #add AAL outputs
     if (!is.null(outputsAAL)) {
@@ -438,8 +442,8 @@ summarytab <- function(input, output, session,
 
   .prepareDataLinePlot <- function(P){
     if (!is.null(result$SummaryData)) {
-    data <- result$SummaryData %>%
-      filter(Type == "leccalcplot")
+      data <- result$SummaryData %>%
+        filter(Type == "leccalcplot")
     } else {
       data <- NULL
     }
@@ -545,9 +549,9 @@ basicplot <- function(xlabel, ylabel, titleToUse, data){
 barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
     geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(data$colour)))
-    if (multipleplots) {
-      p <- p + facet_wrap(.~ gridcol)
-    }
+  if (multipleplots) {
+    p <- p + facet_wrap(.~ gridcol)
+  }
   p
 }
 
