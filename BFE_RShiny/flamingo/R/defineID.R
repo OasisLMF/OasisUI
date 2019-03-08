@@ -63,7 +63,9 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @param batch Flag indicating if it is a batch or a simple analysis.
 #'
-#' @return selectAnaID reactive for anaID selected.
+#' @return selectAnaID reactive for the id the selected analysis.
+#' @return selectPortfolioID reactive for portfolio id associated with the selected analysis.
+#' @return selectModelID reactive for model id associated with the selected analysis.
 #'
 #' @importFrom dplyr sym
 #' @importFrom dplyr filter

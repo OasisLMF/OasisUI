@@ -34,7 +34,11 @@ List of tags.
 The returned list also includes reactive navigation state
 constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 
-selectAnaID reactive for anaID selected.
+selectAnaID reactive for the id the selected analysis.
+
+selectPortfolioID reactive for portfolio id associated with the selected analysis.
+
+selectModelID reactive for model id associated with the selected analysis.
 }
 \description{
 UI/View for defining one analysis ID
