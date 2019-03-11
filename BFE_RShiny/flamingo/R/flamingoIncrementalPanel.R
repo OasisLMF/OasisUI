@@ -8,7 +8,7 @@
 #' @template params-module
 #' @param panels_state State (taken/available) of panels placeholders, a
 #'   [reactiveValues()] object with a named scalar logical element for each
-#'   panel ID. The state is updated upon addiotin / removal of panels.
+#'   panel ID. The state is updated upon addition / removal of panels.
 #' @param new_content_IDs Named character vector of IDs to be used for the
 #'   content of each panel upon its creation. Names match the elements of
 #'   `panels_state`.
