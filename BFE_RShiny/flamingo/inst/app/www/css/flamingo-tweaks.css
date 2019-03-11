@@ -317,6 +317,7 @@ input[type="checkbox"] + span:before {
   border-radius: 2px;
   background-color: white;
   cursor: default;
+  font-weight: 900;
 }
 
 /* Custom checkbox text color when checked */
@@ -359,7 +360,7 @@ input[type="radio"]:checked + span{
 }
 
 /* Custom radio button */
-[type="radio"] + span:before {
+input[type="radio"] + span:before {
     content: '';
     position: absolute;
     left: 0;
@@ -370,7 +371,7 @@ input[type="radio"]:checked + span{
     border-radius: 9999px; /* circle */
     background: #fff;
 }
-[type="radio"] + span:after {
+input[type="radio"] + span:after {
     content: '';
     left: 3px;
     width: 8px;
@@ -382,7 +383,7 @@ input[type="radio"]:checked + span{
 
 }
 /* Radio button selection circle with actual color when checked */
-[type="radio"]:checked + span:after {
+input[type="radio"]:checked + span:after {
     background: #8b2129;
 }
 
