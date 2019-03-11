@@ -41,9 +41,6 @@ visualizationCBR <- function(input, output, session,
     selectAnaID = "",
     #portfolio id of selected analysis
     selectPortfolioID = "",
-    #model perils of selected analyses
-    model_perils1 = "",
-    model_perils2 = "",
     # df analysis output files
     tbl_filesListDataana = NULL,
     # df portfolio input files
@@ -88,27 +85,6 @@ visualizationCBR <- function(input, output, session,
     updateNavigation(navigation_state, "SA")
   })
 
-  # Extract list of model perils -----------------------------------------------
-  observeEvent(sub_modules$defineID1$selectModelID(), {
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, sub_modules$defineID1$selectModelID())
-    model_settings <- tbl_modelsDetails$model_settings
-    names_settings <- list()
-    for (i in 1:length(model_settings)) {# i <- 1
-      names_settings[names(model_settings[[i]])] <- i
-    }
-    result$model_perils1 <- names(names_settings)[grepl("peril", names(names_settings))]
-  })
-
-  observeEvent(sub_modules$defineID2$selectModelID(), {
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, sub_modules$defineID2$selectModelID())
-    model_settings <- tbl_modelsDetails$model_settings
-    names_settings <- list()
-    for (i in 1:length(model_settings)) {# i <- 1
-      names_settings[names(model_settings[[i]])] <- i
-    }
-    result$model_perils2 <- names(names_settings)[grepl("peril", names(names_settings))]
-  })
-
 
   # Tab Summary ----------------------------------------------------------------
   sub_modules$summary <- callModule(
@@ -116,8 +92,8 @@ visualizationCBR <- function(input, output, session,
     id = "summarytab",
     selectAnaID1 = reactive(sub_modules$defineID1$selectAnaID()),
     selectAnaID2 = reactive(sub_modules$defineID2$selectAnaID()),
-    model_perils1 = reactive(result$model_perils1),
-    model_perils2 = reactive(result$model_perils2),
+    model_perils1 = reactive(sub_modules$defineID1$model_perils()),
+    model_perils2 = reactive(sub_modules$defineID2$model_perils()),
     compare = TRUE,
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)

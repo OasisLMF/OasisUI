@@ -1,8 +1,8 @@
 # Input File -------------------------------------------------------------------
 #' Get analysis input file
-#' 
+#'
 #' @rdname api_get_analyses_input_file
-#' 
+#'
 #' @description Downloads the analysis input files.
 #'
 #' @param id A unique integer value identifying this analysis.
@@ -42,7 +42,7 @@ api_get_analyses_input_file <- function(id) {
     oldfileList <- list.files(extractFolder)
     Sys.sleep(2)
   }
-  
+
   #response needed in step2 to place icon
   api_handle_response(response)
 }
@@ -68,7 +68,7 @@ return_analyses_input_file_wicons_df <- function(id) {
   }
 
   analyses_input_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
-  
+
   if (nrow(analyses_input_file_df) > 0) {
   fnames <- analyses_input_file_df$files
   fnum <- length(fnames)
@@ -77,7 +77,7 @@ return_analyses_input_file_wicons_df <- function(id) {
     fname <- as.character(fnames[i])
     filePath <- set_extractFilePath(extractFolder, fname)
     info <- file.info(filePath)
-    
+
     if (is.na(info$size)) {
       status[i, "status"] <- Status$Processing
     } else if (info$size == 0) {
@@ -310,10 +310,11 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
   )
 
   analysis_settings <- list(
-    "analysis_settings" = list()
+    "analysis_settings" = list(
+      "model_settings" = list()
+    )
   )
 
-  analysis_settings$model_settings <- list()
   for (i in names(analysisSettingsMapping)) {
     if (!is.null(analysisSettingsMapping[[i]][["value"]])) {
       analysis_settings$analysis_settings[i] <- analysisSettingsMapping[[i]][["value"]]
@@ -322,7 +323,7 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
 
   for (j in names(modelSettingsMapping)) {
     if (!is.null(modelSettingsMapping[[j]][["value"]])) {
-      analysis_settings$model_settings[j] <- modelSettingsMapping[[j]][["value"]]
+      analysis_settings$analysis_settings$model_settings[j] <- modelSettingsMapping[[j]][["value"]]
     }
   }
 
@@ -410,7 +411,7 @@ api_get_analyses_input_errors_file <- function(id) {
   response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
-  
+
 }
 
 # Analysis input generation ----------------------------------------------------
@@ -509,7 +510,7 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
   response <- api_fetch_response("GET", request_list)
 
   api_handle_response(response)
-  
+
 }
 
 # Output file ------------------------------------------------------------------
@@ -564,16 +565,16 @@ api_get_analyses_output_file <- function(id) {
 }
 
 #' Define Extract Folder Path
-#' 
+#'
 #' @rdname set_extractFolder
-#' 
+#'
 #' @description constructs the path to the folder where to extract files
-#' 
+#'
 #' @return extractFolder
-#' 
+#'
 #' @param id A unique integer value identifying this analysis.
 #' @param label either input or output
-#' 
+#'
 #' @export
 set_extractFolder <- function(id, label) {
   currfolder <- getOption("flamingo.settings.api.share_filepath")
@@ -581,16 +582,16 @@ set_extractFolder <- function(id, label) {
 }
 
 #' Define File to extract Path
-#' 
+#'
 #' @rdname set_extractFilePath
-#' 
+#'
 #' @description constructs the path to the file to extract
-#' 
+#'
 #' @return filePath
-#' 
+#'
 #' @param extractFolder path to the folder where the file is placed
 #' @param fileName name of the file
-#' 
+#'
 #' @export
 set_extractFilePath <- function(extractFolder, fileName) {
   filePath <- file.path(extractFolder, fileName)
