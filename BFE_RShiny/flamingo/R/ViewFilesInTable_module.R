@@ -327,7 +327,7 @@ ViewFilesInTable <- function(input, output, session,
 
   # Export to .csv
   output$FVEdownloadexcel <- downloadHandler(
-    filename = result$currentFile,
+    filename = function(){paste0(result$currentFile)},
     content = function(file) {
       fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)}
   )
