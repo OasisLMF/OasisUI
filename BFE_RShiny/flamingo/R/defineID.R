@@ -241,8 +241,8 @@ defineID <- function(input, output, session,
     result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
-    result$selectmodelID <- ifelse(is.null(currmdId) | is.na(currmdId), "", currmdId)
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, result$selectmodelID)
+    selectmodelID <- ifelse(is.null(currmdId) | is.na(currmdId), "", currmdId)
+    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, selectmodelID)
     model_settings <- tbl_modelsDetails$model_settings
     names_settings <- list()
     for (i in 1:length(model_settings)) {# i <- 1
