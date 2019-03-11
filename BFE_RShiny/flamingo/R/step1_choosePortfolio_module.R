@@ -57,16 +57,26 @@ panelPortfolioTable <- function(id) {
       flamingoRefreshButton(ns("abuttonprgtblrfsh"))
     ),
     DTOutput(ns("dt_Portfolios")),
-    flamingoButton(ns("abuttoncreatepf"), "Create Portfolio", align = "centre"),
-    flamingoButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonamendpf, placement = "right"),
-    flamingoButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttondeletepf, placement = "right"),
-    flamingoButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonuploadsourcefiles, placement = "right"),
-    flamingoButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonpfdetails, placement = "right"),
-    actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Analysis", style = "float:right")
+    fluidRow(
+      column(12,
+             flamingoTableButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttonamendpf, placement = "right"),
+             flamingoTableButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttondeletepf, placement = "right"),
+             flamingoTableButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttonuploadsourcefiles, placement = "right"),
+             flamingoTableButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttonpfdetails, placement = "right")
+      )
+    ),
+    br(),
+    fluidRow(
+      column(12,
+             flamingoButton(ns("abuttoncreatepf"), "Create Portfolio", align = "centre"),
+             actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Analysis", style = "float:right")
+      ),
+      style = "margin-top: 10px;"
+    )
   )
 }
 
@@ -119,14 +129,14 @@ panelDefinePortfolio <- function(id) {
       actionButton(inputId = ns("abuttonhidedefpfpanel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     fluidRow(
-      column(12, h4("Portfolio metadata"))),
-    fluidRow(
       column(4,
-             textInput(inputId = ns("tinputpfName"), label = "Portfolio Name")) #,
-    ),
-    fluidRow(column(4,
-                    flamingoButton(ns("abuttonpfsubmit"), "Submit")), style = "float:right") %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonpfsubmit, placement = "right")
+             textInput(inputId = ns("tinputpfName"), label = "Portfolio Name")),
+      br(),
+      column(2,
+             flamingoButton(ns("abuttonpfsubmit"), "Submit") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttonpfsubmit, placement = "right"), style = "float:right"
+      )
+    )
   )
 }
 

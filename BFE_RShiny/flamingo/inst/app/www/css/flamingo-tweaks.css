@@ -390,3 +390,93 @@ input[type="radio"]:checked + span{
   padding-left: 0; /* controls indention */
 }
 
+/* Flamingo Table Button */
+.btn-secondary {
+  color: #8b2129;
+  background-color: #ffffff;
+  border: 1px solid #8b2129;
+}
+.btn-secondary:focus,
+.btn-secondary.focus {
+  color: #8b2129;
+  background-color: #ffffff;
+  border: 1px solid #8b2129;
+}
+.btn-secondary:hover {
+  color: #8b2129;
+  background-color: #ffffff;
+  border: 1px solid #8b2129;
+}
+.btn-secondary:active,
+.btn-secondary.active,
+.open > .dropdown-toggle.btn-secondary {
+  color: #8b2129;
+  background-color: #ffffff;
+  border: 1px solid #8b2129;
+}
+.btn-secondary:active:hover,
+.btn-secondary.active:hover,
+.open > .dropdown-toggle.btn-secondary:hover,
+.btn-secondary:active:focus,
+.btn-secondary.active:focus,
+.open > .dropdown-toggle.btn-secondary:focus,
+.btn-secondary:active.focus,
+.btn-secondary.active.focus,
+.open > .dropdown-toggle.btn-secondary.focus {
+  color: #8b2129;
+  background-color: #ffffff;
+  border: 1px solid #8b2129;
+}
+.btn-secondary:active,
+.btn-secondary.active,
+.open > .dropdown-toggle.btn-secondary {
+  background-image: none;
+}
+.btn-secondary.disabled,
+.btn-secondary[disabled],
+fieldset[disabled] .btn-secondary,
+.btn-secondary.disabled:hover,
+.btn-secondary[disabled]:hover,
+fieldset[disabled] .btn-secondary:hover,
+.btn-secondary.disabled:focus,
+.btn-secondary[disabled]:focus,
+fieldset[disabled] .btn-secondary:focus,
+.btn-secondary.disabled.focus,
+.btn-secondary[disabled].focus,
+fieldset[disabled] .btn-secondary.focus,
+.btn-secondary.disabled:active,
+.btn-secondary[disabled]:active,
+fieldset[disabled] .btn-secondary:active,
+.btn-secondary.disabled.active,
+.btn-secondary[disabled].active,
+fieldset[disabled] .btn-secondary.active {
+  background-color: #b25b61;
+  border: 1px solid #8b2129;
+}
+.btn-secondary .badge {
+  color: #8b2129;
+  background-color: #8b2129;
+}
+
+.btn-secondary {
+  background-image: -webkit-linear-gradient(#ffff, #f9f4f5 80%, #f9f4f5);
+  background-image: -o-linear-gradient(#ffffff, #f9f4f5 80%, #f9f4f5);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), color-stop(80%, #f9f4f5), to(#f9f4f5));
+  background-image: linear-gradient(#ffffff, #f9f4f5 80%, #f9f4f5);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6d94bf', endColorstr='#ff3e648d', GradientType=0);
+  -webkit-filter: none;
+          filter: none;
+  border: 1px solid #8b2129;
+}
+.btn-secondary:hover {
+  background-image: -webkit-linear-gradient(#ffffff, #f9f4f5 80%, #f9f4f5);
+  background-image: -o-linear-gradient(#ffffff, #f9f4f5 80%, #f9f4f5);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), color-stop(80%, #f9f4f5), to(#f9f4f5));
+  background-image: linear-gradient(#ffffff, #f9f4f5 80%, #f9f4f5);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5f8ab9', endColorstr='#ff385a7f', GradientType=0);
+  -webkit-filter: none;
+          filter: none;
+  border: 1px solid #8b2129;
+}

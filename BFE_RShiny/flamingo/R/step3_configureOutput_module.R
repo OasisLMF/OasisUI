@@ -47,22 +47,24 @@ panelAnalysisTable <- function(id) {
       flamingoRefreshButton(ns("abuttonanarefresh"))
     ),
     div(id = "divAnalysis",
-        fluidRow(column(12,
-                        radioButtons(inputId = ns("radioanaAllOrInProgress"), "Processes' Status", list("All", "In Progress"), inline = TRUE))),
         DTOutput(ns("dt_analyses")),
         fluidRow(column(12,
                         div(id = ns("divAnalysisButtons"),
-                            flamingoButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
+                            flamingoTableButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
                               bs_embed_tooltip(title = defineSingleAna$abuttoncancelana, placement = "right"),
-                            flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
-                              bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
-                            flamingoButton(inputId = ns("abuttonrunconfig"), label = "New Output Configuration") %>%
-                              bs_embed_tooltip(title = defineSingleAna$abuttonrunconfig, placement = "right"),
-                            div(
-                              actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Dashboard") %>%
-                                bs_embed_tooltip(title = defineSingleAna$abuttondisplayoutput, placement = "right"),
-                              style = "inline: true;float: right;")
-                        )))
+                            flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+                              bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right")
+                        ))
+        ),
+        br(),
+        fluidRow(column(12,
+                        flamingoButton(inputId = ns("abuttonrunconfig"), label = "New Output Configuration") %>%
+                          bs_embed_tooltip(title = defineSingleAna$abuttonrunconfig, placement = "right"),
+                        div(
+                          actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Dashboard") %>%
+                            bs_embed_tooltip(title = defineSingleAna$abuttondisplayoutput, placement = "right"),
+                          style = "inline: true;float: right;")
+        ))
     )
   )
 }
@@ -550,13 +552,6 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Analyses  Table ------------------------------------------------------------
-  # reload if radio buttons for 'All' vs 'In_Progress' change
-  observeEvent(input$radioanaAllOrInProgress, ignoreInit = TRUE, {
-    if (active()) {
-      logMessage(paste0("filter changed to ", input$radioanaAllOrInProgress))
-      .reloadAnaData()
-    }
-  })
 
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
@@ -977,10 +972,6 @@ step3_configureOutput <- function(input, output, session,
       tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
         tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
-        #Handling filter for 'In Progress'
-        if (input$radioanaAllOrInProgress == "In Progress") {
-          tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$status) == Status$Processing)
-        }
         result$tbl_analysesData <- tbl_analysesData
       }
       logMessage("analyses table refreshed")

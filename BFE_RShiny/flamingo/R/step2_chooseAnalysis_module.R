@@ -53,15 +53,15 @@ panelCreateAnalysesTable <- function(id) {
     DTOutput(ns("dt_analyses")),
     fluidRow(
       column(12,
-             flamingoButton(inputId = ns("abuttonstartIG"), label = "Start Input Generation") %>%
+             flamingoTableButton(inputId = ns("abuttonstartIG"), label = "Generate Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonstartIG, placement = "right"),
-             flamingoButton(inputId = ns("abuttoncancelIG"), label = "Cancel Input Generation") %>%
+             flamingoTableButton(inputId = ns("abuttoncancelIG"), label = "Cancel Input Generation") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttoncancelIG, placement = "right"),
-             flamingoButton(inputId = ns("abuttonshowIG"), label = "Show Generated Inputs") %>%
+             flamingoTableButton(inputId = ns("abuttonshowIG"), label = "Show Generated Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowIG, placement = "right"),
-             flamingoButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+             flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
-             flamingoButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
+             flamingoTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowanadetails, placement = "right")
       )
     ),
