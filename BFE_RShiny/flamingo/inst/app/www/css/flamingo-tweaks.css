@@ -352,7 +352,6 @@ input[type="radio"] + span{
   position: relative;
   padding-left: 22px;
   display: inline-block;
-  font-weight: 900;
   line-height: 14px; /* controls vertical alignment */
 }
 /* Checked radio text style */
@@ -361,7 +360,7 @@ input[type="radio"]:checked + span{
 }
 
 /* Custom radio button */
-[type="radio"] + span:before {
+input[type="radio"] + span:before {
     content: '';
     position: absolute;
     left: 0;
@@ -372,7 +371,7 @@ input[type="radio"]:checked + span{
     border-radius: 9999px; /* circle */
     background: #fff;
 }
-[type="radio"] + span:after {
+input[type="radio"] + span:after {
     content: '';
     left: 3px;
     width: 8px;
@@ -384,7 +383,7 @@ input[type="radio"]:checked + span{
 
 }
 /* Radio button selection circle with actual color when checked */
-[type="radio"]:checked + span:after {
+input[type="radio"]:checked + span:after {
     background: #8b2129;
 }
 
