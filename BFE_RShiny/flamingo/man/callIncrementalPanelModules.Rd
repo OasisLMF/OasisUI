@@ -88,7 +88,7 @@ if (interactive()) {
     # used for the UI components must include session$ns (relevant for module
     # server functions)
     ns <- session$ns
-    panel_IDs <- paste0("extpanel-", c(seq_len(n_panels)))
+    panel_IDs <- paste0("extpanel-", seq_len(n_panels))
     # content IDs used for the content module server and UI
     # content modules
     content_IDs <- paste0("content-", seq_len(n_panels))
@@ -101,8 +101,8 @@ if (interactive()) {
       collapsible = TRUE, show = TRUE,
       ns = ns
     )
-    panel_modules <- lapply(seq_along(content_IDs), function(i) {
-      callModule(examplePanel, content_IDs[i], reactive(all_panels$state()[[i]]))
+    panel_modules <- lapply(seq_len(n_panels), function(i) {
+      callModule(examplePanel, content_IDs[i], reactive(all_panels$state[[ns(panel_IDs[i])]]))
     })
     lapply(seq_along(panel_modules), function(i) {
       output[[paste0("paneltitle", i)]] <- renderFlamingoPanelHeading(panel_modules[[i]]())
