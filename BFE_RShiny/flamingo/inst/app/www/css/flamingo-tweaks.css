@@ -317,6 +317,7 @@ input[type="checkbox"] + span:before {
   border-radius: 2px;
   background-color: white;
   cursor: default;
+  font-weight: 900;
 }
 
 /* Custom checkbox text color when checked */
@@ -351,6 +352,7 @@ input[type="radio"] + span{
   position: relative;
   padding-left: 22px;
   display: inline-block;
+  font-weight: 900;
   line-height: 14px; /* controls vertical alignment */
 }
 /* Checked radio text style */
