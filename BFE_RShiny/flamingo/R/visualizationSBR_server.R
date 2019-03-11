@@ -40,8 +40,6 @@ visualizationSBR <- function(input, output, session,
     selectAnaID = "",
     #portfolio id of selected analysis
     selectPortfolioID = "",
-    #model perils of selected analysis
-    model_perils = "",
     # df analysis output files
     tbl_filesListDataana = NULL,
     # df portfolio input files
@@ -78,18 +76,6 @@ visualizationSBR <- function(input, output, session,
     updateNavigation(navigation_state, "SA")
   })
 
-  # Extract list of model perils -----------------------------------------------
-  observeEvent(sub_modules$defineID$selectModelID(), {
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, sub_modules$defineID$selectModelID())
-      model_settings <- tbl_modelsDetails$model_settings
-      names_settings <- list()
-      for (i in 1:length(model_settings)) {# i <- 1
-        names_settings[names(model_settings[[i]])] <- i
-      }
-      result$model_perils <- names(names_settings)[grepl("peril", names(names_settings))]
-    })
-
-
   # Extract Output files for given anaID----------------------------------------
   observeEvent(sub_modules$defineID$selectAnaID(), {
     if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
@@ -111,7 +97,7 @@ visualizationSBR <- function(input, output, session,
     id = "summarytab",
     selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
     portfolioID1 = reactive(sub_modules$defineID$selectPortfolioID()),
-    model_perils1 = reactive(result$model_perils),
+    model_perils1 = reactive(sub_modules$defineID$model_perils()),
     tbl_filesListDataana1 = reactive({result$tbl_filesListDataana}),
     active = reactive({active() && input$tabsSBR == "tabsummary"}),
     logMessage = logMessage)

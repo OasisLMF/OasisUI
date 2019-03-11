@@ -65,7 +65,7 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @return selectAnaID reactive for the id the selected analysis.
 #' @return selectPortfolioID reactive for portfolio id associated with the selected analysis.
-#' @return selectModelID reactive for model id associated with the selected analysis.
+#' @return model_perils reactive for model perils associated with model id.
 #'
 #' @importFrom dplyr sym
 #' @importFrom dplyr filter
@@ -88,7 +88,7 @@ defineID <- function(input, output, session,
     selectAnaID = "",
     selectAnaName = "",
     selectportfolioID = "",
-    selectmodelID = "",
+    model_perils = "",
     preselRow = NULL
   )
 
@@ -242,6 +242,13 @@ defineID <- function(input, output, session,
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
     result$selectmodelID <- ifelse(is.null(currmdId) | is.na(currmdId), "", currmdId)
+    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, result$selectmodelID)
+    model_settings <- tbl_modelsDetails$model_settings
+    names_settings <- list()
+    for (i in 1:length(model_settings)) {# i <- 1
+      names_settings[names(model_settings[[i]])] <- i
+    }
+    result$model_perils <- names(names_settings)[grepl("peril", names(names_settings))]
     logMessage("Extract output files")
     api_get_analyses_output_file(result$selectAnaID)
   }
@@ -253,7 +260,7 @@ defineID <- function(input, output, session,
     list(
       selectAnaID = reactive({result$selectAnaID}),
       selectPortfolioID = reactive({result$selectportfolioID}),
-      selectModelID = reactive({result$selectmodelID})
+      model_perils = reactive({result$model_perils})
     )
   )
 
