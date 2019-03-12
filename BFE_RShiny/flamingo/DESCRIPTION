@@ -15,7 +15,7 @@ NeedsCompilation: no
 Imports:
   bsplus (== 0.1.1),
   DT (== 0.5),
-  data.table (== 1.12.0),
+  data.table (== 1.11.8),
   dplyr (== 0.7.8),
   ggplot2 (== 3.1.0),
   htmltools (== 0.3.6),
