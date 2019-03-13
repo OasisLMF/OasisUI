@@ -3,32 +3,20 @@ node {
     sh 'sudo /var/lib/jenkins/jenkins-chown'
     deleteDir() // wipe out the workspace
 
-
-    // Set Default Multibranch config
-    try {
-        source_branch = CHANGE_BRANCH
-    } catch (MissingPropertyException e1) {
-        try {
-            source_branch = BRANCH_NAME
-        } catch (MissingPropertyException e2) {
-             source_branch = ""
-        }    
-    }   
-
     properties([
       parameters([
         [$class: 'StringParameterDefinition',  name: 'BUILD_BRANCH', defaultValue: 'master'],
-        [$class: 'StringParameterDefinition',  name: 'SOURCE_BRANCH', defaultValue: source_branch],
-        [$class: 'StringParameterDefinition',  name: 'RELEASE_TAG', defaultValue: "build-${BUILD_NUMBER}"],
+        [$class: 'StringParameterDefinition',  name: 'SOURCE_BRANCH', defaultValue: BRANCH_NAME],
+        [$class: 'StringParameterDefinition',  name: 'RELEASE_TAG', defaultValue: "${BRANCH_NAME}-${BUILD_NUMBER}"],
         [$class: 'StringParameterDefinition',  name: 'BASE_TAG', defaultValue: 'latest'],
         [$class: 'BooleanParameterDefinition', name: 'PURGE', value: Boolean.valueOf(false)],
         [$class: 'BooleanParameterDefinition', name: 'PUBLISH', value: Boolean.valueOf(false)],
         [$class: 'BooleanParameterDefinition', name: 'SLACK_MESSAGE', value: Boolean.valueOf(false)]
-      ])  
-    ]) 
+      ])
+    ])
 
 
-    // Build vars 
+    // Build vars
     String build_repo = 'git@github.com:OasisLMF/build.git'
     String build_branch = params.BUILD_BRANCH
     String build_workspace = 'oasis_build'
@@ -69,19 +57,32 @@ node {
                 stage('Clone: ' + build_workspace) {
                     dir(build_workspace) {
                        git url: build_repo, credentialsId: git_creds, branch: build_branch
-                    }   
-                }   
-            },  
+                    }
+                }
+            },
             clone_source: {
                 stage('Clone: ' + source_name) {
                     sshagent (credentials: [git_creds]) {
                         dir(source_workspace) {
-                           sh "git clone -b ${source_branch} --single-branch --no-tags ${source_git_url} ."
-                        }   
-                    }   
-                }   
-            }   
-        ) 
+                            sh "git clone --recursive ${source_git_url} ."
+                            if (source_branch.matches("PR-[0-9]+")){
+                                // Checkout PR and merge into target branch, test on the result
+                                sh "git fetch origin pull/$CHANGE_ID/head:$BRANCH_NAME"
+                                sh "git checkout $BRANCH_NAME"
+                                sh "git format-patch $CHANGE_TARGET --stdout > ${BRANCH_NAME}.patch"
+                                sh "git checkout $CHANGE_TARGET"
+                                sh "git apply --stat ${BRANCH_NAME}.patch"  // Print files changed
+                                sh "git apply --check ${BRANCH_NAME}.patch" // Check for merge conflicts
+                                sh "git apply ${BRANCH_NAME}.patch"         // Apply the patch
+                            } else {
+                                // Checkout branch
+                                sh "git checkout -b ${source_branch}"
+                            }
+                        }
+                    }
+                }
+            }
+        )
 
         // DOCKER BUILD
         parallel(
@@ -90,7 +91,7 @@ node {
                     dir(source_workspace) {
                         sh PIPELINE + " build_image  ${docker_proxy}  ${image_proxy} ${env.TAG_RELEASE}"
                     }
-                }    
+                }
             },
             clone_app: {
                 stage('Build: Shiny App') {
@@ -101,8 +102,7 @@ node {
             }
         )
 
-        // ToDO add run test here
-        //
+        // ToDO add testing here
         //stage('Run Flamingo') {
         //    dir('oasis_build') {
         //        sh PIPELINE + " run_ui"
@@ -113,7 +113,7 @@ node {
         if (params.PUBLISH){
             parallel(
                 publish_proxy: {
-                            
+
                     stage ('Publish: Shiny Proxy') {
                         dir(source_workspace) {
                             sh PIPELINE + " push_image ${image_proxy} ${env.TAG_RELEASE}"
