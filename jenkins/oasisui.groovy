@@ -72,8 +72,10 @@ node {
                                 sh "git format-patch $CHANGE_TARGET --stdout > ${BRANCH_NAME}.patch"
                                 sh "git checkout $CHANGE_TARGET"
                                 sh "git apply --stat ${BRANCH_NAME}.patch"  // Print files changed
-                                sh "git apply --check ${BRANCH_NAME}.patch" // Check for merge conflicts
-                                sh "git apply ${BRANCH_NAME}.patch"         // Apply the patch
+                                //sh "git apply --reject ${BRANCH_NAME}.patch" // Check for merge conflicts
+                                //sh "git apply ${BRANCH_NAME}.patch"         // Apply the patch
+                                sh "git merge $BRANCH_NAME"
+
                                 app_branch = CHANGE_BRANCH
                             } else {
                                 // Checkout branch
