@@ -55,13 +55,11 @@ panelCreateAnalysesTable <- function(id) {
       column(12,
              flamingoTableButton(inputId = ns("abuttonstartIG"), label = "Generate Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonstartIG, placement = "right"),
-             flamingoTableButton(inputId = ns("abuttoncancelIG"), label = "Cancel Input Generation") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttoncancelIG, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowIG"), label = "Show Generated Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowIG, placement = "right"),
-             flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+             flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Logs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
-             flamingoTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
+             flamingoTableButton(inputId = ns("abuttonshowanadetails"), label = "Details") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowanadetails, placement = "right")
       )
     ),
@@ -381,31 +379,32 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Generate input -------------------------------------------------------------
   onclick("abuttonstartIG", {
-    hide("panelAnalysisDetails")
-    hide("panelAnalysisLog")
-    hide("panelModelTable")
-    hide("panelAnalysisGenInputs")
-    hide("panelModelDetails")
-    input_generation_id <- api_post_analyses_generate_inputs(result$analysisID)
-
-    if (input_generation_id$status == "Success") {
-      flamingoNotification(type = "message",
-                           paste("Input generation id ", result$analysisID, " started."))
+    if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready &&
+        result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Completed &&
+        result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Failed) {
+      showModal(.cancelIGModal())
     } else {
-      flamingoNotification(type = "error",
-                           paste("Input generation id ", result$analysisID, " could not be started."))
+      hide("panelAnalysisDetails")
+      hide("panelAnalysisLog")
+      hide("panelModelTable")
+      hide("panelAnalysisGenInputs")
+      hide("panelModelDetails")
+      input_generation_id <- api_post_analyses_generate_inputs(result$analysisID)
+
+      if (input_generation_id$status == "Success") {
+        flamingoNotification(type = "message",
+                             paste("Input generation id ", result$analysisID, " started."))
+      } else {
+        flamingoNotification(type = "error",
+                             paste("Input generation id ", result$analysisID, " could not be started."))
+      }
+      anaid <- result$analysisID
+      .reloadAnaData()
+      idxSel <- match(anaid, result$tbl_analysesData[, tbl_analysesDataNames$id])
+      pageSel <- ceiling(idxSel/pageLength)
+      selectRows(dataTableProxy("dt_analyses"), idxSel)
+      selectPage(dataTableProxy("dt_analyses"), pageSel)
     }
-    anaid <- result$analysisID
-    .reloadAnaData()
-    idxSel <- match(anaid, result$tbl_analysesData[, tbl_analysesDataNames$id])
-    pageSel <- ceiling(idxSel/pageLength)
-    selectRows(dataTableProxy("dt_analyses"), idxSel)
-    selectPage(dataTableProxy("dt_analyses"), pageSel)
-  })
-
-
-  onclick("abuttoncancelIG", {
-    showModal(.cancelIGModal())
   })
 
   output$cancelIGModaltitle <- renderUI({
@@ -726,7 +725,6 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttonshowlog")
       disable("abuttonshowanadetails")
       disable("abuttondelana")
-      disable("abuttoncancelIG")
       disable("abuttonstartIG")
       disable("abuttonshowIG")
       disable("abuttonmodeldetails")
@@ -740,14 +738,15 @@ step2_chooseAnalysis <- function(input, output, session,
         enable("abuttonshowlog")
         enable("abuttondelana")
         enable("abuttonstartIG")
-        if ( result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready &&
-             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Completed) {
-          enable("abuttoncancelIG")
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready &&
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Completed) {
+          updateActionButton(session, inputId = "abuttonstartIG", label = "Cancel Input Generation")
         }
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready ||
             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
           enable("abuttonpgotonextstep")
           enable("abuttonshowIG")
+          updateActionButton(session, inputId = "abuttonstartIG", label = "Generate Inputs")
         }
       }
     })
