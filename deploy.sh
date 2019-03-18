@@ -2,8 +2,8 @@
 
 # build
 docker build -f docker/Dockerfile.oasisui_proxy -t coreoasis/oasisui_proxy .
-docker build -f docker/Dockerfile.oasisui_app -t coreoasis/oasisui_app .
+docker build -f docker/Dockerfile.oasisui_app --pull -t coreoasis/oasisui_app .
 
-# run 
+# run
 docker network create shiny-net
-docker-compose up -d 
+docker-compose up -d
