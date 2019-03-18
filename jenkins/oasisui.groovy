@@ -42,11 +42,11 @@ node {
     env.TAG_RUN_PLATFORM = env.TAG_BASE                     // Version of Oasis Platform to use for testing
     env.COMPOSE_PROJECT_NAME = UUID.randomUUID().toString().replaceAll("-","")
 
-    docker_proxy="docker/Dockerfile.oasisui_proxy"
-    image_proxy="coreoasis/oasisui_proxy"
+    proxy_docker="docker/Dockerfile.oasisui_proxy"
+    proxy_image="coreoasis/oasisui_proxy"
 
-    docker_app="docker/Dockerfile.oasisui_app"
-    image_app="coreoasis/oasisui_app"
+    app_docker="docker/Dockerfile.oasisui_app"
+    app_image="coreoasis/oasisui_app"
 
 
 
@@ -74,9 +74,11 @@ node {
                                 sh "git apply --stat ${BRANCH_NAME}.patch"  // Print files changed
                                 sh "git apply --check ${BRANCH_NAME}.patch" // Check for merge conflicts
                                 sh "git apply ${BRANCH_NAME}.patch"         // Apply the patch
+                                app_branch = CHANGE_BRANCH
                             } else {
                                 // Checkout branch
                                 sh "git checkout ${source_branch}"
+                                app_branch = source_branch
                             }
                         }
                     }
@@ -89,14 +91,14 @@ node {
             build_proxy: {
                 stage('Build: Shiny Proxy') {
                     dir(source_workspace) {
-                        sh PIPELINE + " build_image  ${docker_proxy}  ${image_proxy} ${env.TAG_RELEASE}"
+                        sh PIPELINE + " build_image  ${proxy_docker}  ${proxy_image} ${env.TAG_RELEASE}"
                     }
                 }
             },
             clone_app: {
                 stage('Build: Shiny App') {
                     dir(source_workspace) {
-                        sh PIPELINE + " build_image  ${docker_app}  ${image_app} ${env.TAG_RELEASE}"
+                        sh "docker build -f ${app_docker} --pull --build-arg REF_BRANCH=${app_branch} -t ${app_image} ."
                     }
                 }
             }
@@ -116,14 +118,14 @@ node {
 
                     stage ('Publish: Shiny Proxy') {
                         dir(source_workspace) {
-                            sh PIPELINE + " push_image ${image_proxy} ${env.TAG_RELEASE}"
+                            sh PIPELINE + " push_image ${proxy_image} ${env.TAG_RELEASE}"
                         }
                     }
                  },
                  publish_app: {
                     stage ('Publish: Shiny App') {
                         dir(source_workspace) {
-                            sh PIPELINE + " push_image ${image_app} ${env.TAG_RELEASE}"
+                            sh PIPELINE + " push_image ${app_image} ${env.TAG_RELEASE}"
                         }
                     }
                  }
@@ -136,8 +138,8 @@ node {
         //Docker cleanup
         dir(build_workspace) {
             if(params.PURGE){
-                sh PIPELINE + " purge_image ${image_proxy} ${env.TAG_RELEASE}"
-                sh PIPELINE + " purge_image ${image_app} ${env.TAG_RELEASE}"
+                sh PIPELINE + " purge_image ${proxy_image} ${env.TAG_RELEASE}"
+                sh PIPELINE + " purge_image ${app_image} ${env.TAG_RELEASE}"
             }
         }
 
