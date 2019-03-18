@@ -739,11 +739,13 @@ step2_chooseAnalysis <- function(input, output, session,
         enable("abuttondelana")
         enable("abuttonstartIG")
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready &&
-            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Completed) {
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Completed &&
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Failed) {
           updateActionButton(session, inputId = "abuttonstartIG", label = "Cancel Input Generation")
         }
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready ||
-            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed &&
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
           enable("abuttonpgotonextstep")
           enable("abuttonshowIG")
           updateActionButton(session, inputId = "abuttonstartIG", label = "Generate Inputs")
