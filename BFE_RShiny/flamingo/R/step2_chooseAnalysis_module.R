@@ -53,8 +53,8 @@ panelCreateAnalysesTable <- function(id) {
     DTOutput(ns("dt_analyses")),
     fluidRow(
       column(12,
-             flamingoTableButton(inputId = ns("abuttonstartIG"), label = "Generate Inputs") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonstartIG, placement = "right"),
+             flamingoTableButton(inputId = ns("abuttonstartcancIG"), label = "Generate Inputs") %>%
+               bs_embed_tooltip(title = defineSingleAna$abuttonstartcancIG, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowIG"), label = "Show Generated Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowIG, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
@@ -378,10 +378,8 @@ step2_chooseAnalysis <- function(input, output, session,
 
 
   # Generate input -------------------------------------------------------------
-  onclick("abuttonstartIG", {
-    if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready &&
-        result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Completed &&
-        result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Failed) {
+  onclick("abuttonstartcancIG", {
+    if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$input_gen_started) {
       showModal(.cancelIGModal())
     } else {
       hide("panelAnalysisDetails")
@@ -725,7 +723,7 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttonshowlog")
       disable("abuttonshowanadetails")
       disable("abuttondelana")
-      disable("abuttonstartIG")
+      disable("abuttonstartcancIG")
       disable("abuttonshowIG")
       disable("abuttonmodeldetails")
       disable("abuttonpgotonextstep")
@@ -737,18 +735,16 @@ step2_chooseAnalysis <- function(input, output, session,
         enable("abuttonshowanadetails")
         enable("abuttonshowlog")
         enable("abuttondelana")
-        enable("abuttonstartIG")
-        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Ready &&
-            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Completed &&
-            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] != Status$Failed) {
-          updateActionButton(session, inputId = "abuttonstartIG", label = "Cancel Input Generation")
+        enable("abuttonstartcancIG")
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_details] == Status_details$input_gen_started) {
+          updateActionButton(session, inputId = "abuttonstartcancIG", label = "Cancel Input Generation")
+        } else {
+          updateActionButton(session, inputId = "abuttonstartcancIG", label = "Generate Inputs")
         }
-        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready ||
-            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed &&
-            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_details] != Status_details$input_gen_failed ||
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_details] != Status_details$input_gen_started) {
           enable("abuttonpgotonextstep")
           enable("abuttonshowIG")
-          updateActionButton(session, inputId = "abuttonstartIG", label = "Generate Inputs")
         }
       }
     })
