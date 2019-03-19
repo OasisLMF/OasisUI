@@ -408,7 +408,7 @@ step2_chooseAnalysis <- function(input, output, session,
   output$cancelIGModaltitle <- renderUI({
     AnaId <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-    paste0('Cancel input generation for', AnaId, ' ', AnaName)
+    paste0('Cancel input generation for id ', AnaId, ', ', AnaName)
   })
 
   .cancelIGModal <- function(){
@@ -736,13 +736,13 @@ step2_chooseAnalysis <- function(input, output, session,
         enable("abuttonshowlog")
         enable("abuttondelana")
         enable("abuttonstartcancIG")
-        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_details] == Status_details$input_gen_started) {
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$input_gen_started) {
           updateActionButton(session, inputId = "abuttonstartcancIG", label = "Cancel Input Generation")
         } else {
           updateActionButton(session, inputId = "abuttonstartcancIG", label = "Generate Inputs")
         }
-        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_details] != Status_details$input_gen_failed ||
-            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_details] != Status_details$input_gen_started) {
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] != Status_details$input_gen_failed ||
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] != Status_details$input_gen_started) {
           enable("abuttonpgotonextstep")
           enable("abuttonshowIG")
         }
