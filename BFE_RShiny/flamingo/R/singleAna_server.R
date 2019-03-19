@@ -242,7 +242,6 @@ singleAna <- function(input, output, session,
       } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$status] == Status$Failed) {
         pfstatus <- "- Status: Failed"
       }
-      print
     }
     result$pfstatus <- pfstatus
   })
