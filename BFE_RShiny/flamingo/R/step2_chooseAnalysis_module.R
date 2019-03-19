@@ -216,7 +216,21 @@ panelModelDetails <- function(id) {
       flamingoRefreshButton(ns("abuttonmodeldetailrfsh")),
       actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_modelDetails"))
+    tabsetPanel(
+      id = ns("tabsModelsDetails"),
+
+      tabPanel(
+        title = "Resources",
+        DTOutput(ns("dt_modelDetails")),
+        value = ns("tabresources")
+      ),
+
+      tabPanel(
+        title = "Hazard Maps",
+        leafletOutput(ns("modelmap")),
+        value = ns("tabmaps")
+      )
+    )
   )
 }
 
@@ -295,7 +309,9 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis input generated
     tbl_anaIG = NULL,
     #analysis ID
-    analysisID = ""
+    analysisID = "",
+    #file for hazard map
+    mapfile = NULL
   )
 
   #Set Params
@@ -610,6 +626,7 @@ step2_chooseAnalysis <- function(input, output, session,
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
+    #result$mapfile <- getFileMap()
   })
 
   onclick("buttonhidemodeldetails", {
@@ -643,6 +660,14 @@ step2_chooseAnalysis <- function(input, output, session,
   #Hide panel if model id changes
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelModelDetails")
+  })
+
+  # Hazard Map -----------------------------------------------------------------
+
+  observeEvent(result$mapfile, ignoreNULL = FALSE, {
+    if (!is.null(result$mapfile)) {
+      output$modelmap <- renderLeaflet({createPlainMap(result$mapfile)})
+    }
   })
 
   # Create new Analysis --------------------------------------------------------
