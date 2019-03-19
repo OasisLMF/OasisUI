@@ -404,7 +404,8 @@ panel_configureAdvancedRI <- function(id) {
 #'
 #' @param currstep current selected step.
 #' @param portfolioID selected portfolio ID.
-#' @param analysisID selected analysis ID
+#' @param analysisID selected analysis ID.
+#' @param pfName Name of selected portfolio.
 #'
 #' @return dashboardAnaID id of selected run.
 #'
@@ -429,6 +430,7 @@ step3_configureOutput <- function(input, output, session,
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
+                                  pfName = reactive({""}),
                                   analysisID = reactive("")
 ) {
 
@@ -446,6 +448,8 @@ step3_configureOutput <- function(input, output, session,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
+    # reactive for portfolioID
+    portfolioID = "",
     # reactve value for navigation
     navigationstate = NULL,
     # reactive value for Analysis table
@@ -574,7 +578,8 @@ step3_configureOutput <- function(input, output, session,
   # Analyses Table Title
   output$paneltitle_AnalysisTable <- renderUI({
     if (portfolioID() != "") {
-      paste0('Analyses associated with portfolio id ', portfolioID())
+      pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
+      paste0('Analyses associated with portfolio ', pfName, ', id ', portfolioID())
     } else {
       paste0("Analyses")
     }
