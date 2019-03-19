@@ -57,9 +57,9 @@ panelCreateAnalysesTable <- function(id) {
                bs_embed_tooltip(title = defineSingleAna$abuttonstartIG, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowIG"), label = "Show Generated Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowIG, placement = "right"),
-             flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Logs") %>%
+             flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
-             flamingoTableButton(inputId = ns("abuttonshowanadetails"), label = "Details") %>%
+             flamingoTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowanadetails, placement = "right")
       )
     ),
