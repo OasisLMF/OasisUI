@@ -38,8 +38,7 @@ defineSingleAna <- list(
   abuttondisplayoutput = "Visualize outputs of selected analysis",
   abuttoncancelana = "Cancel selected analysis",
   abuttonConfirmDel = "Confirm deleting analysis",
-  abuttoncancelIG = "Interrupt input generation for selected analysis",
-  abuttonstartIG = "Start input generation for selected analysis",
+  abuttonstartIG = "Start/Cancel input generation for selected analysis",
   abuttonshowIG = "Visualize the generated inputs for selected analysis",
   abuttonConfirmDelIG = "Confirm interruption input generation",
   abuttonrunconfig = "Define output configuration and run analysis"
