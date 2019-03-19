@@ -3,7 +3,7 @@
 \docType{data}
 \name{Status}
 \alias{Status}
-\title{Status}
+\title{Status Icons}
 \format{Named \code{list} of Staus icons.}
 \usage{
 Status
