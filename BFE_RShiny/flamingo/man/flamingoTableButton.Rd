@@ -5,7 +5,7 @@
 \title{flamingoTableButton}
 \usage{
 flamingoTableButton(inputId, label, icon = NULL, width = NULL,
-  class = c("btn", "btn-primary"), ...)
+  class = c("btn", "btn-secondary"), ...)
 }
 \arguments{
 \item{...}{Arguments to \code{\link[flamingo:flamingoButton]{flamingo::flamingoButton()}}.}

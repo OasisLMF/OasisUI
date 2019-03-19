@@ -1,6 +1,6 @@
-# Icons ------------------------------------------------------------------------
+# Status -----------------------------------------------------------------------
 
-#' Status
+#' Status Icons
 #' @description List of icons representing status
 #' @format Named \code{list} of Staus icons.
 #' @export
@@ -9,6 +9,18 @@ Status <- list(
   Failed = '<i class="fa fa-times-circle"></i>',
   Completed = '<i class="fa fa-check-circle"></i>',
   Processing = '<i class="fa fa-spinner"></i>'
+)
+
+#' Status Details
+#' @description List of text representing status as returned by API
+#' @format Named \code{list} of Staus details.
+#' @export
+Status_details <- list(
+  input_gen_started = "inputs generation started",
+  input_gen_failed = "inputs generation error",
+  run_err = "run error",
+  ready = "ready",
+  run_ok = "run completed"
 )
 
 # Lists for tables cols names --------------------------------------------------

@@ -8,7 +8,7 @@
 #' @template params-module
 #' @template params-logMessage
 #' @template params-active
-#' 
+#'
 #' @param preselPanel selectedstep to visualize as returned from either
 #'  \link{visualizationSBR}, \link{visualizationCBR} or \link{visualizationBBR}
 #' @param selectAnaID id of selected analysis as returned from \link{visualizationSBR}
@@ -115,6 +115,7 @@ singleAna <- function(input, output, session,
     logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID =  reactive({input$portfolioID}),
+    pfName = reactive({result$pfName}),
     analysisID = reactive({result$anaID})
   )
 
@@ -171,7 +172,7 @@ singleAna <- function(input, output, session,
       result$portfolioID <- portfolioID
     }
   })
-  
+
   observeEvent(selectPortfolioID(),  ignoreInit = TRUE, {
     portfolioID <- selectPortfolioID()
     #Avoid updating input if not necessary
@@ -188,7 +189,7 @@ singleAna <- function(input, output, session,
       result$portfolioID <- input$portfolioID
     }
   })
-  
+
   observeEvent(result$portfolioID, ignoreInit = TRUE,{
     #Avoid updating input if not necessary
     if (input$portfolioID != result$portfolioID) {
@@ -241,11 +242,10 @@ singleAna <- function(input, output, session,
       } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$status] == Status$Failed) {
         pfstatus <- "- Status: Failed"
       }
-      print 
     }
     result$pfstatus <- pfstatus
   })
-  
+
   # Model Outout ---------------------------------------------------------------
   moduleOutput <- c(
     outputNavigation(navigation_state),

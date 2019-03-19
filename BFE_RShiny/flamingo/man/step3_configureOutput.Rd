@@ -9,7 +9,8 @@ step3_configureOutputUI(id)
 
 step3_configureOutput(input, output, session, active = reactive(TRUE),
   logMessage = message, currstep = reactive(-1),
-  portfolioID = reactive(""), analysisID = reactive(""))
+  portfolioID = reactive(""), pfName = reactive({     "" }),
+  analysisID = reactive(""))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -24,7 +25,9 @@ step3_configureOutput(input, output, session, active = reactive(TRUE),
 
 \item{portfolioID}{selected portfolio ID.}
 
-\item{analysisID}{selected analysis ID}
+\item{pfName}{Name of selected portfolio.}
+
+\item{analysisID}{selected analysis ID.}
 }
 \value{
 List of tags.

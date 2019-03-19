@@ -64,14 +64,6 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
                    icon = if (collapsed) icon("eye"),
                    align = "left",  width = "100%", disabled = TRUE) %>%
         bs_embed_tooltip(title = landing_page$abuttonbrowseCBR, placement = "right")
-    ) %>% bs_embed_tooltip(title = landing_page$abuttonbrowse, placement = "right")#,
-
-    # flamingoButton(
-    #   ns("abuttonfilemngt"),
-    #   label = if (!collapsed) "File Management",
-    #   icon = if (collapsed) icon("file", lib = "glyphicon"),
-    #   align = "left",  width = "100%"
-    # ) %>%
-    #   bs_embed_tooltip(title = landing_page$abuttonfilemngt, placement = "right")
+    ) %>% bs_embed_tooltip(title = landing_page$abuttonbrowse, placement = "right")
   )
 }
