@@ -10,7 +10,6 @@ file_Viewer <- list(
 landing_page <- list(
   abuttonanalysis = "Define analysis to run",
   abuttonbrowse = "Visualize outputs",
-  abuttondefineaccount = "Create/amend/delete account",
   abuttondefineanasingle = "Define single analysis",
   abuttondefineanabatch = "Define batch analysis",
   abuttonbrowseSBR = "Visualize outputs from single analysis",
@@ -20,8 +19,6 @@ landing_page <- list(
   abuttondelana = "Delete selected analysis",
   abuttonConfirmDelAna = "Confirm deleting analysis",
   downloadexcel_ana = "Download analyses table",
-  abuttonfilemngt = "Access input/output files",
-  abuttonsysconf = "System configuration",
   accountDD = "User information",
   abuttonlogout = "Logout the application. You will need to sign back in"
 )
@@ -36,7 +33,6 @@ defineSingleAna <- list(
   abuttonpfsubmit = "Submit new portfolio",
   abuttondeletepf = "Delete selected portfolio",
   abuttonmodeldetails = "Show details for selected model",
-  #abuttonsaveoutput = "Save selected output configuration",
   abuttonexecuteanarun = "Execute run with given output configuration",
   abuttonshowlog = "Show log for selected analysis",
   abuttondisplayoutput = "Visualize outputs of selected analysis",
