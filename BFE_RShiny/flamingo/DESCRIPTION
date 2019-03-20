@@ -24,7 +24,6 @@ Imports:
   jsonlite,
   leaflet,
   plotly,
-  purrr,
   readr,
   shiny,
   shinyjs,

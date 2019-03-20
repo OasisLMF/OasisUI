@@ -41,31 +41,38 @@ api_get_models_id_resource_file <- function(id) {
 #'
 #' @importFrom dplyr bind_rows
 #' @importFrom dplyr intersect
-#' @importFrom purrr flatten
 #' @importFrom tidyr unite
 #'
 #' @export
 return_models_id_resource_file_df <- function(id) {
+  #retrieve model resource file from API
   modelsIdResourceFileList <- return_response(api_get_models_id_resource_file, id)
   modelsList_names <- names(modelsIdResourceFileList)
-  return_list <- lapply(modelsList_names, function(i){ # i <- modelsList_names[1]
-    curr_list <- flatten(flatten(modelsIdResourceFileList[i]))
-    curr_list_names <- names(curr_list)
-    lst_names <- lapply(curr_list_names, function(k){names(curr_list[[k]])}) #k <- curr_list_names[1]
+  return_list <- lapply(modelsList_names, function(i){
+    #extract sublist
+    curr_list <- unlist(unlist(modelsIdResourceFileList[i], recursive = FALSE, use.names = FALSE), recursive = FALSE)
+    # get names of sub lists
+    lst_names <- lapply(curr_list, names)
+    # find sub-lists names that are common to all sublists
     colsResources <- Reduce(intersect, lst_names)
+    # find must-haves columns which are missing
     colsmust <- setdiff(c("values", "name"), colsResources)
+    #initialise dataframe to have the common names plus must-haves as columns
     if (length(colsmust) > 0) {
-      df <- data.frame(matrix(ncol = length(colsResources) + 1, nrow = 0), stringsAsFactors = FALSE)
+      df <- data.frame(matrix(ncol = length(colsResources) + length(colsmust), nrow = 0), stringsAsFactors = FALSE)
       names(df) <- c(colsResources, colsmust)
     } else {
       df <- data.frame(matrix(ncol = length(colsResources), nrow = 0), stringsAsFactors = FALSE)
       names(df) <- colsResources
     }
-    for (j in curr_list_names) {# j <- curr_list_names[1]
+    #construct dataframe
+    for (j in names(curr_list)) {
       curr_df <- unlist(curr_list[[j]]) %>%
         bind_rows() %>%
         as.data.frame(stringsAsFactors = FALSE)
+      #identify columns to be merged together
       cols2merge <- setdiff(names(curr_df), colsResources)
+      #identify missing columns for binding curr_df with df
       colmissing <- setdiff(unique(c(colsmust,colsResources)), names(curr_df))
       if (length(cols2merge) > 0) {
         curr_df <- curr_df %>%
@@ -75,6 +82,7 @@ return_models_id_resource_file_df <- function(id) {
         names(df2add) <- colmissing
         curr_df <- c(curr_df, df2add) %>% as.data.frame()
       }
+      # make sure the column names is filled in
       if ("name" %notin% names(curr_df)) {
         curr_df <- cbind(curr_df, data.frame(name = j))
       }
