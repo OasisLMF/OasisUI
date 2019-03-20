@@ -13,21 +13,19 @@ generatedinputsUI <- function(id) {
 
   ns <- NS(id)
 
+  tagList(
     flamingoPanel(
-      collapsible = TRUE,
-      show = TRUE,
-      ns("panel_analysisIG"),
-      heading = tagAppendChildren(
-        h4(""),
-        uiOutput(ns("paneltitle_panelAnalysisIG"), inline = TRUE),
-        flamingoRefreshButton(ns("abuttonanaIGrefresh")),
-        actionButton(inputId = ns("buttonhideanaIG"), label = NULL, icon = icon("times"), style = "float: right;")
-      ),
+      selection = list(mode = 'none'),
+      escape = FALSE,
+      scrollX = TRUE,
+      filter = "none",
+      rownames = TRUE,
+      colnames = c('row number' = 1),
+      id = ns("panel_analysisdetails"),
       ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
     )
-
+  )
 }
-
 
 # Server -----------------------------------------------------------------------
 
@@ -37,9 +35,32 @@ generatedinputsUI <- function(id) {
 #'
 #' @description  Server logic for uploaded inputs of an analysis.
 #'
+#' @param tbl_filesListData Table containing the list of files.
+#' @param param AnalysisID
+#' @param file_column Column in the file.
+#' @param folderpath Path to folder.
+#'
 #' @export
-generatedinputs <- function(input, output, session) {
+generatedinputs <- function(input,
+                            output,
+                            session,
+                            tbl_filesListData,
+                            param,
+                            file_column,
+                            folderpath) {
 
   ns <- session$ns
 
+  sub_modules <- list()
+
+  sub_modules$ViewIGFiles <- callModule(
+    ViewFilesInTable,
+    id = "ViewIGFiles",
+    tbl_filesListData = tbl_filesListData,
+    param = param,
+    file_column = file_column,
+    folderpath = folderpath,
+    includechkbox = TRUE)
+
+  sub_modules
 }

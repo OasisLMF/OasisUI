@@ -7,7 +7,8 @@
 \usage{
 panelAnalysisDetailsUI(id)
 
-panelAnalysisDetails(input, output, session, analysisID)
+panelAnalysisDetails(input, output, session, analysisID, tbl_filesListData,
+  param, file_column, folderpath)
 }
 \arguments{
 \item{id}{module id}

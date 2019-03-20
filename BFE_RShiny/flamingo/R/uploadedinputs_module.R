@@ -34,12 +34,15 @@ uploadedinputsUI <- function(id) {
 #'
 #' @rdname uploadedinputs
 #'
-#' @param analysisID Selected analysis id.
-#'
 #' @description Server logic for uploaded inputs of an analysis.
 #'
+#' @param analysisID Selected analysis id.
+#'
 #' @export
-uploadedinputs <- function(input, output, session, analysisID) {
+uploadedinputs <- function(input,
+                           output,
+                           session,
+                           analysisID) {
 
   ns <- session$ns
   result <- reactiveValues(
@@ -63,7 +66,6 @@ uploadedinputs <- function(input, output, session, analysisID) {
     data
   })
 
-  # DTOutput(ns("dt_analysisdetails"))
   sub_modules <- list()
   sub_modules$detailsTable <- callModule(
     flamingoTable,

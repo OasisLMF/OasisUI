@@ -56,7 +56,14 @@ panelAnalysisDetailsUI <- function(id) {
 #' @template params-module-ui
 #'
 #' @export
-panelAnalysisDetails <- function(input, output, session, analysisID) {
+panelAnalysisDetails <- function(input,
+                                 output,
+                                 session,
+                                 analysisID,
+                                 tbl_filesListData,
+                                 param,
+                                 file_column,
+                                 folderpath) {
 
   ns <- session$ns
 
@@ -72,7 +79,11 @@ panelAnalysisDetails <- function(input, output, session, analysisID) {
   # Tab Generated Inputs -------------------------------------------------------
   sub_modules$generatedinputs <- callModule(
     generatedinputs,
-    id = "generatedinputs"
+    id = "generatedinputs",
+    tbl_filesListData = tbl_filesListData,
+    param = param,
+    file_column = file_column,
+    folderpath = folderpath
   )
 
   # Tab Uploaded Inputs --------------------------------------------------------
@@ -80,4 +91,6 @@ panelAnalysisDetails <- function(input, output, session, analysisID) {
     uploadedinputs,
     id = "uploadedinputs",
     analysisID = analysisID)
+
+  sub_modules
 }

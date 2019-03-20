@@ -7,7 +7,17 @@
 \usage{
 generatedinputsUI(id)
 
-generatedinputs(input, output, session)
+generatedinputs(input, output, session, tbl_filesListData, param,
+  file_column, folderpath)
+}
+\arguments{
+\item{tbl_filesListData}{Table containing the list of files.}
+
+\item{param}{AnalysisID}
+
+\item{file_column}{Column in the file.}
+
+\item{folderpath}{Path to folder.}
 }
 \value{
 List of tags.

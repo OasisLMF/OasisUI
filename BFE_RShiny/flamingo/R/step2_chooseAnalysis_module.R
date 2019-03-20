@@ -22,7 +22,6 @@ step2_chooseAnalysisUI <- function(id) {
     hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetailsUI(ns("panelAnalysisDetails")))),
     hidden(div(id= ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
-    hidden(div(id = ns("panelAnalysisGenInputs"), panelAnalysisGenInputs(id))),
     hidden(div(id = ns("panelModelDetails"), panelModelDetails(id)))
   )
 }
@@ -57,8 +56,6 @@ panelCreateAnalysesTable <- function(id) {
                bs_embed_tooltip(title = defineSingleAna$abuttonstartIG, placement = "right"),
              flamingoTableButton(inputId = ns("abuttoncancelIG"), label = "Cancel Input Generation") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttoncancelIG, placement = "right"),
-             flamingoTableButton(inputId = ns("abuttonshowIG"), label = "Show Generated Inputs") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonshowIG, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
@@ -101,31 +98,6 @@ panelAnalysisLog <- function(id) {
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_analysislog"))
-  )
-}
-
-#' panelAnalysisGenInputs
-#'
-#' @rdname panelAnalysisGenInputs
-#'
-#' @description Function wrapping panel to show analyses generated inputs table.
-#'
-#' @template params-module-ui
-#'
-#' @export
-panelAnalysisGenInputs <- function(id) {
-  ns <- NS(id)
-  flamingoPanel(
-    collapsible = TRUE,
-    show = TRUE,
-    ns("panel_analysisIG"),
-    heading = tagAppendChildren(
-      h4(""),
-      uiOutput(ns("paneltitle_panelAnalysisIG"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonanaIGrefresh")),
-      actionButton(inputId = ns("buttonhideanaIG"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
-    ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
   )
 }
 
@@ -443,6 +415,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
+    .reloadAnaIG()
     .reloadAnaDetails()
   })
 
@@ -450,28 +423,14 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisDetails")
   })
 
-
   sub_modules$panelAnalysisDetails <- callModule(
     panelAnalysisDetails,
     id = "panelAnalysisDetails",
-    analysisID = reactive({result$analysisID}))
-
-  output$dt_analysisdetails <- renderDT(
-    if (!is.null(result$tbl_analysisdetails) && nrow(result$tbl_analysisdetails) > 0 ) {
-      logMessage("re-rendering analysis details table")
-      datatable(
-        result$tbl_analysisdetails,
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = list(mode = 'none'),
-        colnames = c('row number' = 1),
-        options = .getPRTableOptions(pageLengthVal = 10)
-      )
-    } else {
-      .nothingToShowTable(contentMessage = paste0("no files associtated with analysis id ", result$analysisID))
-    }
+    analysisID = reactive({result$analysisID}),
+    tbl_filesListData = reactive({result$tbl_anaIG}),
+    param = reactive({result$analysisID}),
+    file_column = "files",
+    folderpath = "_inputs/"
   )
 
   #  panelAnalysisDetails Table title
@@ -651,16 +610,6 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
   })
 
-  # Show generated inputs ------------------------------------------------------
-  observeEvent(input$abuttonshowIG, {
-    hide("panelAnalysisDetails")
-    hide("panelAnalysisLog")
-    hide("panelModelTable")
-    hide("panelModelDetails")
-    show("panelAnalysisGenInputs")
-    .reloadAnaIG()
-  })
-
   # Create Generated input Table  Title
   output$paneltitle_panelAnalysisIG <- renderUI({
     if (result$analysisID != "") {
@@ -706,7 +655,6 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttondelana")
       disable("abuttoncancelIG")
       disable("abuttonstartIG")
-      disable("abuttonshowIG")
       disable("abuttonmodeldetails")
       disable("abuttonpgotonextstep")
       disable("abuttonsubmit")
@@ -725,7 +673,6 @@ step2_chooseAnalysis <- function(input, output, session,
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready ||
             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
           enable("abuttonpgotonextstep")
-          enable("abuttonshowIG")
         }
       }
     })
