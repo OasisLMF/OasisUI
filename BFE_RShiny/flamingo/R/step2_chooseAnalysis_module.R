@@ -19,7 +19,7 @@ step2_chooseAnalysisUI <- function(id) {
 
   tagList(
     hidden(div(id = ns("panelCreateAnalysesTable"), panelCreateAnalysesTable(id))),
-    hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
+    hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetailsUI(ns("panelAnalysisDetails")))),
     hidden(div(id= ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
     hidden(div(id = ns("panelAnalysisGenInputs"), panelAnalysisGenInputs(id))),
@@ -74,33 +74,6 @@ panelCreateAnalysesTable <- function(id) {
       ),
       style = "margin-top: 10px;"
     )
-  )
-}
-
-#' panelAnalysisDetails
-#'
-#' @rdname panelAnalysisDetails
-#'
-#' @description Function wrapping panel to show analyses details table.
-#'
-#' @template params-module-ui
-#'
-#' @importFrom DT DTOutput
-#'
-#' @export
-panelAnalysisDetails <- function(id) {
-  ns <- NS(id)
-  flamingoPanel(
-    collapsible = TRUE,
-    show = TRUE,
-    ns("panel_analysisdetails"),
-    heading = tagAppendChildren(
-      h4(""),
-      uiOutput(ns("paneltitle_panelAnalysisDetails"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonanadetailsrefresh")),
-      actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
-    DTOutput(ns("dt_analysisdetails"))
   )
 }
 
@@ -378,7 +351,6 @@ step2_chooseAnalysis <- function(input, output, session,
       }
     })
 
-
   # Generate input -------------------------------------------------------------
   onclick("abuttonstartIG", {
     hide("panelAnalysisDetails")
@@ -477,6 +449,12 @@ step2_chooseAnalysis <- function(input, output, session,
   onclick("buttonhideanadetails", {
     hide("panelAnalysisDetails")
   })
+
+
+  sub_modules$panelAnalysisDetails <- callModule(
+    panelAnalysisDetails,
+    id = "panelAnalysisDetails",
+    analysisID = reactive({result$analysisID}))
 
   output$dt_analysisdetails <- renderDT(
     if (!is.null(result$tbl_analysisdetails) && nrow(result$tbl_analysisdetails) > 0 ) {
