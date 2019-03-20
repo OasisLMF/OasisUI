@@ -221,7 +221,10 @@ panelModelDetails <- function(id) {
 
       tabPanel(
         title = "Resources",
-        DTOutput(ns("dt_modelDetails")),
+        h4("Model Settings"),
+        DTOutput(ns("dt_model_settings")),
+        h4("Lookup Settings"),
+        DTOutput(ns("dt_lookup_settings")),
         value = ns("tabresources")
       ),
 
@@ -634,11 +637,11 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("hiding panelModelDetails")
   })
 
-  output$dt_modelDetails <- renderDT(
-    if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
-      logMessage("re-rendering model details table")
+  output$dt_model_settings <- renderDT(
+    if (!is.null(result$tbl_modelsDetails[1]) && nrow(result$tbl_modelsDetails[[1]]) > 0 ) {
+      logMessage("re-rendering model settings table")
       datatable(
-        result$tbl_modelsDetails,
+        result$tbl_modelsDetails[[1]],
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -648,7 +651,24 @@ step2_chooseAnalysis <- function(input, output, session,
         options = .getPRTableOptions()
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$modelID ))
+      .nothingToShowTable(contentMessage = paste0("no model settings files associated with Model ID ", result$modelID ))
+    })
+
+  output$dt_lookup_settings <- renderDT(
+    if (!is.null(result$tbl_modelsDetails[2]) && nrow(result$tbl_modelsDetails[[2]]) > 0 ) {
+      logMessage("re-rendering lookup settings table")
+      datatable(
+        result$tbl_modelsDetails[[2]],
+        class = "flamingo-table display",
+        rownames = TRUE,
+        filter = "none",
+        escape = FALSE,
+        selection = "none",
+        colnames = c('row number' = 1),
+        options = .getPRTableOptions()
+      )
+    } else {
+      .nothingToShowTable(contentMessage = paste0("no lookup settings files associated with Model ID ", result$modelID ))
     })
 
   # Details Model title
