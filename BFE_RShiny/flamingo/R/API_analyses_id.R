@@ -288,9 +288,9 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
       "path" = "model_settings",
       "value" =  inputsettings$peril_surge
     ),
-    "event_occurrence_file_id" = list(
+    "event_occurrence_id" = list(
       "path" = "model_settings",
-      "value" =  inputsettings$event_occurrence_file_id
+      "value" =  inputsettings$event_occurrence_id
     )
   )
 

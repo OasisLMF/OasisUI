@@ -1236,7 +1236,7 @@ step3_configureOutput <- function(input, output, session,
       "peril_flood" = input$chkinputprflood,
       "peril_surge" = input$chkinputprstsurge,
       "leakage_factor" = input$sliderleakagefac,
-      "event_occurrence_file_id" =  as.integer(input$sinputeventocc),
+      "event_occurrence_id" =  as.integer(input$sinputeventocc),
       #outoutSettingsMappings
       "gul_output" = input$chkinputGUL,
       "il_output" = input$chkinputIL,

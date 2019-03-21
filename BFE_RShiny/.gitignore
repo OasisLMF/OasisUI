@@ -5,3 +5,5 @@ notes.md
 .project
 .Rd2pdf*
 *.pdf
+Rlibrary
+*.Rprofile
