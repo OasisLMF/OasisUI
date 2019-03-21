@@ -20,23 +20,25 @@ panelAnalysisDetailsUI <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_panelAnalysisDetails"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonanadetailsrefresh")),
       actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     tabsetPanel(
       id = ns("tabsDetails"),
       tabPanel(
         title = "Exposure Validation",
+        flamingoRefreshButton(ns("abuttonexposurerefresh")),
         exposurevalidationUI(ns("exposurevalidation")),
         value = ns("tabvalidation")
       ),
       tabPanel(
         title = "Generated Inputs",
+        flamingoRefreshButton(ns("abuttongeneratedrefresh")),
         generatedinputsUI(ns("generatedinputs")),
         value = ns("tabgeneratedinputs")
       ),
       tabPanel(
         title = "Uploaded Inputs",
+        flamingoRefreshButton(ns("abuttonuploadedrefresh")),
         uploadedinputsUI(ns("uploadedinputs")),
         value = ns("tabuploadedinputs")
       )
@@ -63,7 +65,9 @@ panelAnalysisDetails <- function(input,
                                  tbl_filesListData,
                                  param,
                                  file_column,
-                                 folderpath) {
+                                 folderpath,
+                                 reload_generated,
+                                 reload_uploaded) {
 
   ns <- session$ns
 
@@ -91,6 +95,18 @@ panelAnalysisDetails <- function(input,
     uploadedinputs,
     id = "uploadedinputs",
     analysisID = analysisID)
+
+  onclick("abuttonexposurerefresh", {
+
+  })
+
+  onclick("abuttongeneratedrefresh", {
+    reload_generated
+  })
+
+  onclick("abuttonuploadedrefresh", {
+    reload_uploaded
+  })
 
   sub_modules
 }

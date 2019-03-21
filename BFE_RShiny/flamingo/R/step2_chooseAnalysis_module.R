@@ -416,7 +416,6 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
     .reloadAnaIG()
-    .reloadAnaDetails()
   })
 
   onclick("buttonhideanadetails", {
@@ -430,7 +429,9 @@ step2_chooseAnalysis <- function(input, output, session,
     tbl_filesListData = reactive({result$tbl_anaIG}),
     param = reactive({result$analysisID}),
     file_column = "files",
-    folderpath = "_inputs/"
+    folderpath = "_inputs/",
+    reload_generated = .reloadAnaIG(),
+    reload_uploaded = .reloadUploadedInputs()
   )
 
   #  panelAnalysisDetails Table title
@@ -691,27 +692,20 @@ step2_chooseAnalysis <- function(input, output, session,
   # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonanarefresh", {
     .reloadAnaData()
-  } )
-
-  onclick("abuttonanadetailsrefresh", {
-    .reloadAnaDetails()
   })
 
   onclick("abuttonanalogrefresh", {
+    print("abuttonanalogrefresh")
     .reloadAnaLog()
-  })
-
-  onclick("abuttonanaIGrefresh", {
-    .reloadAnaIG()
   })
 
   onclick("abuttonmodelrefresh", {
     .reloadtbl_modelsData()
-  } )
+  })
 
   onclick("abuttonmodeldetailrfsh", {
     .reloadtbl_modelsDetails()
-  } )
+  })
 
   # Help Functions -------------------------------------------------------------
   # hide all panels
@@ -753,9 +747,9 @@ step2_chooseAnalysis <- function(input, output, session,
   }
 
 
-  # Reload Analysis Details table
-  .reloadAnaDetails <- function() {
-    logMessage(".reloadAnaDetails called")
+  # Reload Uploaded Inputs table
+  .reloadUploadedInputs <- function() {
+    logMessage(".reloadUploadedInputs called")
     if (!is.null(result$analysisID) && result$analysisID != "") {
       result$tbl_analysisdetails <- return_tbl_analysisdetails(result$analysisID)
     } else {
