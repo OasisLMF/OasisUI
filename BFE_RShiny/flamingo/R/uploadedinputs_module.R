@@ -46,10 +46,6 @@ uploadedinputs <- function(input,
                            analysisID) {
 
   ns <- session$ns
-  result <- reactiveValues(
-    # analysis details
-    tbl_analysisdetails = NULL
-  )
 
   dt_uploaded <- reactive({
 
