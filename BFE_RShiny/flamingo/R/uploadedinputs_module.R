@@ -70,6 +70,9 @@ uploadedinputs <- function(input,
   sub_modules$detailsTable <- callModule(
     flamingoTable,
     id = "uploadedInputsTable",
-    data = dt_uploaded
+    data = dt_uploaded,
+    rownames = TRUE,
+    escape = FALSE,
+    colnames = c('row number' = 1)
   )
 }
