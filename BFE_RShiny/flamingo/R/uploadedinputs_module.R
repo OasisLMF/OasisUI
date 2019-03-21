@@ -22,6 +22,7 @@ uploadedinputsUI <- function(id) {
       rownames = TRUE,
       colnames = c('row number' = 1),
       id = ns("panel_analysisdetails"),
+      flamingoRefreshButton(ns("abuttonuploadedrefresh")),
       flamingoTableUI(ns("uploadedInputsTable"))
     )
   )
@@ -53,13 +54,13 @@ uploadedinputs <- function(input,
   dt_uploaded <- reactive({
 
     if (!is.null(analysisID()) && analysisID() != "") {
-      result$tbl_analysisdetails <- return_tbl_analysisdetails(analysisID())
+      tbl_analysisdetails <- return_tbl_analysisdetails(analysisID())
     } else {
-      result$tbl_analysisdetails <-  NULL
+      tbl_analysisdetails <-  NULL
     }
 
-    if (!is.null(result$tbl_analysisdetails) && nrow(result$tbl_analysisdetails) > 0) {
-      data <- result$tbl_analysisdetails
+    if (!is.null(tbl_analysisdetails) && nrow(tbl_analysisdetails) > 0) {
+      data <- tbl_analysisdetails
     } else {
       data <- NULL
     }
@@ -75,4 +76,19 @@ uploadedinputs <- function(input,
     escape = FALSE,
     colnames = c('row number' = 1)
   )
+
+  # Reload Uploaded Inputs table
+  .reloadUploadedInputs <- function() {
+    logMessage(".reloadUploadedInputs called")
+    if (!is.null(analysisID()) && analysisID() != "") {
+      tbl_analysisdetails <- return_tbl_analysisdetails(analysisID())
+    } else {
+      tbl_analysisdetails <-  NULL
+    }
+  }
+
+  onclick("abuttonuploadedrefresh", {
+    .reloadUploadedInputs()
+  })
+
 }

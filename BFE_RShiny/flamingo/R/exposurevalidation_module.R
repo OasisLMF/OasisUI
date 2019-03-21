@@ -14,7 +14,7 @@ exposurevalidationUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-
+    flamingoRefreshButton(ns("abuttonexposurerefresh"))
   )
 }
 
@@ -31,5 +31,9 @@ exposurevalidationUI <- function(id) {
 exposurevalidation <- function(input, output, session) {
 
   ns <- session$ns
+
+  onclick("abuttonexposurerefresh", {
+
+  })
 
 }

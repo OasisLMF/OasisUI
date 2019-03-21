@@ -7,11 +7,11 @@
 \usage{
 generatedinputsUI(id)
 
-generatedinputs(input, output, session, tbl_filesListData, param,
-  file_column, folderpath)
+generatedinputs(input, output, session, analysisID, param, file_column,
+  folderpath)
 }
 \arguments{
-\item{tbl_filesListData}{Table containing the list of files.}
+\item{analysisID}{selected analysis ID.}
 
 \item{param}{AnalysisID}
 

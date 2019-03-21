@@ -26,19 +26,16 @@ panelAnalysisDetailsUI <- function(id) {
       id = ns("tabsDetails"),
       tabPanel(
         title = "Exposure Validation",
-        flamingoRefreshButton(ns("abuttonexposurerefresh")),
         exposurevalidationUI(ns("exposurevalidation")),
         value = ns("tabvalidation")
       ),
       tabPanel(
         title = "Generated Inputs",
-        flamingoRefreshButton(ns("abuttongeneratedrefresh")),
         generatedinputsUI(ns("generatedinputs")),
         value = ns("tabgeneratedinputs")
       ),
       tabPanel(
         title = "Uploaded Inputs",
-        flamingoRefreshButton(ns("abuttonuploadedrefresh")),
         uploadedinputsUI(ns("uploadedinputs")),
         value = ns("tabuploadedinputs")
       )
@@ -61,7 +58,6 @@ panelAnalysisDetailsUI <- function(id) {
 #' @param file_column Name of the column containing filename. Default "files"
 #' @param folderpath path to files. Can be "_output/output/" or "_inputs/"; default output path.
 #' @param reload_generated Imports function to reload Generated Inputs table.
-#' @param reload_uploaded Imports function to reload Uploaded Inputs table.
 #' @param anaName Analysis name.
 #'
 #' @template params-module-ui
@@ -71,12 +67,9 @@ panelAnalysisDetails <- function(input,
                                  output,
                                  session,
                                  analysisID,
-                                 tbl_filesListData,
                                  param,
                                  file_column,
                                  folderpath,
-                                 reload_generated,
-                                 reload_uploaded,
                                  anaName) {
 
   ns <- session$ns
@@ -94,7 +87,7 @@ panelAnalysisDetails <- function(input,
   sub_modules$generatedinputs <- callModule(
     generatedinputs,
     id = "generatedinputs",
-    tbl_filesListData = tbl_filesListData,
+    analysisID = analysisID,
     param = param,
     file_column = file_column,
     folderpath = folderpath
@@ -105,18 +98,6 @@ panelAnalysisDetails <- function(input,
     uploadedinputs,
     id = "uploadedinputs",
     analysisID = analysisID)
-
-  onclick("abuttonexposurerefresh", {
-
-  })
-
-  onclick("abuttongeneratedrefresh", {
-    reload_generated
-  })
-
-  onclick("abuttonuploadedrefresh", {
-    reload_uploaded
-  })
 
   #  panelAnalysisDetails Table title
   output$paneltitle_panelAnalysisDetails <- renderUI({

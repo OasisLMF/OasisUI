@@ -235,12 +235,8 @@ step2_chooseAnalysis <- function(input, output, session,
     tbl_modelsDetails = NULL,
     # analyses table
     tbl_analysesData = NULL,
-    # analysis details
-    tbl_analysisdetails = NULL,
     #analysis log
     tbl_analysislog = NULL,
-    #analysis input generated
-    tbl_anaIG = NULL,
     #analysis ID
     analysisID = ""
   )
@@ -407,7 +403,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   })
 
-  # Analysis detais ------------------------------------------------------------
+  # Analysis details ------------------------------------------------------------
   onclick("abuttonshowanadetails", {
     hide("panelAnalysisLog")
     hide("panelModelTable")
@@ -415,7 +411,6 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
-    .reloadAnaIG()
   })
 
   onclick("buttonhideanadetails", {
@@ -426,12 +421,9 @@ step2_chooseAnalysis <- function(input, output, session,
     panelAnalysisDetails,
     id = "panelAnalysisDetails",
     analysisID = reactive({result$analysisID}),
-    tbl_filesListData = reactive({result$tbl_anaIG}),
     param = reactive({result$analysisID}),
     file_column = "files",
     folderpath = "_inputs/",
-    reload_generated = .reloadAnaIG(),
-    reload_uploaded = .reloadUploadedInputs(),
     anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
   )
 
@@ -602,16 +594,6 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
   })
 
-  sub_modules$ViewIGFiles <- callModule(
-    ViewFilesInTable,
-    id = "ViewIGFiles",
-    tbl_filesListData = reactive({result$tbl_anaIG}),
-    param = reactive({result$analysisID}),
-    logMessage = logMessage,
-    file_column = "files",
-    folderpath = "_inputs/",
-    includechkbox = TRUE)
-
   # Enable and disable buttons -------------------------------------------------
 
   #Make submit button dependent of analysis name
@@ -727,17 +709,6 @@ step2_chooseAnalysis <- function(input, output, session,
     updateTextInput(session = session, inputId = "anaName", value = "")
   }
 
-
-  # Reload Uploaded Inputs table
-  .reloadUploadedInputs <- function() {
-    logMessage(".reloadUploadedInputs called")
-    if (!is.null(result$analysisID) && result$analysisID != "") {
-      result$tbl_analysisdetails <- return_tbl_analysisdetails(result$analysisID)
-    } else {
-      result$tbl_analysisdetails <-  NULL
-    }
-  }
-
   # Reload Analysis Log table
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
@@ -745,16 +716,6 @@ step2_chooseAnalysis <- function(input, output, session,
       result$tbl_analysislog <- return_file_df(api_get_analyses_input_generation_traceback_file, result$analysisID)
     } else {
       result$tbl_analysislog <-  NULL
-    }
-  }
-
-  #reload input generated table
-  .reloadAnaIG <- function(){
-    logMessage(".reloadAnaIG called")
-    if (!is.null(result$analysisID) && result$analysisID != "") {
-      result$tbl_anaIG <- return_analyses_input_file_wicons_df(result$analysisID)
-    } else {
-      result$tbl_anaIG <-  NULL
     }
   }
 

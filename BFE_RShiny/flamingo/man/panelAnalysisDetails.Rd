@@ -7,16 +7,13 @@
 \usage{
 panelAnalysisDetailsUI(id)
 
-panelAnalysisDetails(input, output, session, analysisID, tbl_filesListData,
-  param, file_column, folderpath, reload_generated, reload_uploaded,
-  anaName)
+panelAnalysisDetails(input, output, session, analysisID, param,
+  file_column, folderpath, anaName)
 }
 \arguments{
 \item{id}{module id}
 
 \item{analysisID}{Selected analysis ID.}
-
-\item{tbl_filesListData}{Dataframe of the output files}
 
 \item{param}{analysisID}
 
@@ -24,11 +21,11 @@ panelAnalysisDetails(input, output, session, analysisID, tbl_filesListData,
 
 \item{folderpath}{path to files. Can be "_output/output/" or "_inputs/"; default output path.}
 
-\item{reload_generated}{Imports function to reload Generated Inputs table.}
-
-\item{reload_uploaded}{Imports function to reload Uploaded Inputs table.}
-
 \item{anaName}{Analysis name.}
+
+\item{tbl_filesListData}{Dataframe of the output files}
+
+\item{reload_generated}{Imports function to reload Generated Inputs table.}
 
 \item{id}{module id}
 }
