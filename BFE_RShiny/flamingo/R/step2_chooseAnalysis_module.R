@@ -431,18 +431,9 @@ step2_chooseAnalysis <- function(input, output, session,
     file_column = "files",
     folderpath = "_inputs/",
     reload_generated = .reloadAnaIG(),
-    reload_uploaded = .reloadUploadedInputs()
+    reload_uploaded = .reloadUploadedInputs(),
+    anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
   )
-
-  #  panelAnalysisDetails Table title
-  output$paneltitle_panelAnalysisDetails <- renderUI({
-    if (result$analysisID != "") {
-      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      paste0('Details of analysis id ', toString(result$analysisID), ' ', anaName)
-    } else {
-      paste0("Analysis details")
-    }
-  })
 
   # Analysis Logs --------------------------------------------------------------
   onclick("abuttonshowlog", {
@@ -609,16 +600,6 @@ step2_chooseAnalysis <- function(input, output, session,
     }
     hide("panelModelTable")
     hide("panelModelDetails")
-  })
-
-  # Create Generated input Table  Title
-  output$paneltitle_panelAnalysisIG <- renderUI({
-    if (result$analysisID != "") {
-      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      paste0('Generated inputs for analysis id ', toString(result$analysisID), ' ', anaName)
-    } else {
-      paste0("Generated inputs")
-    }
   })
 
   sub_modules$ViewIGFiles <- callModule(

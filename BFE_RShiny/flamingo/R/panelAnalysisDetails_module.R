@@ -62,6 +62,7 @@ panelAnalysisDetailsUI <- function(id) {
 #' @param folderpath path to files. Can be "_output/output/" or "_inputs/"; default output path.
 #' @param reload_generated Imports function to reload Generated Inputs table.
 #' @param reload_uploaded Imports function to reload Uploaded Inputs table.
+#' @param anaName Analysis name.
 #'
 #' @template params-module-ui
 #'
@@ -75,7 +76,8 @@ panelAnalysisDetails <- function(input,
                                  file_column,
                                  folderpath,
                                  reload_generated,
-                                 reload_uploaded) {
+                                 reload_uploaded,
+                                 anaName) {
 
   ns <- session$ns
 
@@ -114,6 +116,11 @@ panelAnalysisDetails <- function(input,
 
   onclick("abuttonuploadedrefresh", {
     reload_uploaded
+  })
+
+  #  panelAnalysisDetails Table title
+  output$paneltitle_panelAnalysisDetails <- renderUI({
+      paste0('Details of analysis id ', toString(analysisID()), ' ', anaName)
   })
 
   sub_modules

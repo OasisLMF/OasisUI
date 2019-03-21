@@ -8,7 +8,8 @@
 panelAnalysisDetailsUI(id)
 
 panelAnalysisDetails(input, output, session, analysisID, tbl_filesListData,
-  param, file_column, folderpath, reload_generated, reload_uploaded)
+  param, file_column, folderpath, reload_generated, reload_uploaded,
+  anaName)
 }
 \arguments{
 \item{id}{module id}
@@ -26,6 +27,8 @@ panelAnalysisDetails(input, output, session, analysisID, tbl_filesListData,
 \item{reload_generated}{Imports function to reload Generated Inputs table.}
 
 \item{reload_uploaded}{Imports function to reload Uploaded Inputs table.}
+
+\item{anaName}{Analysis name.}
 
 \item{id}{module id}
 }
