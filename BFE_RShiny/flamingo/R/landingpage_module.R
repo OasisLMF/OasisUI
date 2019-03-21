@@ -101,7 +101,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
 
   output$dt_anaInbox <- renderDT(if (!is.null(result$tbl_anaInbox)) {
     datatable(
-      result$tbl_anaInbox,
+      result$tbl_anaInbox %>% return_tbl_analysesData_nice(),
       class = "flamingo-table display",
       rownames = TRUE,
       selection = "single",

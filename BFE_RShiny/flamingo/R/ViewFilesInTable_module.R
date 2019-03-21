@@ -138,7 +138,7 @@ ViewFilesInTable <- function(input, output, session,
         selectionUsed <- "single"
       }
       datatable(
-        result$tbl_filesListData_wButtons,
+        result$tbl_filesListData_wButtons %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         escape = FALSE,
@@ -302,7 +302,7 @@ ViewFilesInTable <- function(input, output, session,
   output$dt_FVExposureSelected <- renderDT(
     if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0 ) {
       datatable(
-        result$tbl_fileData,
+        result$tbl_fileData %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         selection = "none",

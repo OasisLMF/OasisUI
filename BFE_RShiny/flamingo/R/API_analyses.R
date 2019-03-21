@@ -260,3 +260,48 @@ return_tbl_analysisdetails <- function(id) {
 
   tbl_analysisdetails
 }
+
+
+#' Return analysis table in nice format for DT
+#'
+#' @rdname return_tbl_analysesData_nice
+#'
+#' @description Returns a dataframe of analyses prettified for being rendered as a data table.
+#'
+#' @param tbl_analysesData dataframe of analyses
+#'
+#' @return Dataframe of analyses
+#'
+#' @importFrom tidyr unite
+#' @importFrom dplyr rename
+#' @importFrom dplyr left_join
+#' @importFrom dplyr sym
+#'
+#' @export
+return_tbl_analysesData_nice <- function(tbl_analysesData) {
+
+  # fetch model data to merge in table
+    tbl_modelsData <- return_tbl_modelsData() %>%
+      select(!! sym(tbl_modelsDataNames$id), !! sym(tbl_modelsDataNames$model_id), !! sym(tbl_modelsDataNames$supplier_id), !! sym(tbl_modelsDataNames$version_id))
+
+  # fetch portfolio data to merge in table
+    tbl_portfoliosData <- return_tbl_portfoliosData() %>%
+      select(!! sym(tbl_portfoliosDataNames$id), !! sym(tbl_portfoliosDataNames$name)) %>%
+      rename("portfolio_name" = tbl_portfoliosDataNames$name)
+
+  tbl_analysesData <- tbl_analysesData %>%
+    left_join(tbl_modelsData, by = c("model" = "id")) %>%
+    unite("model", c(tbl_modelsDataNames$model_id, tbl_modelsDataNames$version_id), sep = ", version ") %>%
+    left_join(tbl_portfoliosData, by = c("portfolio" = "id")) %>%
+    unite("status", c(tbl_analysesDataNames$status, tbl_analysesDataNames$status_detailed), sep = ", ") %>%
+    select(!! sym(tbl_analysesDataNames$id),
+           !! sym(tbl_analysesDataNames$name),
+           portfolio_name,
+           !! sym(tbl_analysesDataNames$model),
+           !! sym(tbl_modelsDataNames$supplier_id),
+           !! sym(tbl_analysesDataNames$created),
+           !! sym(tbl_analysesDataNames$modified),
+           !! sym(tbl_analysesDataNames$status)) %>%
+    capitalize_names_df()
+  tbl_analysesData
+}
