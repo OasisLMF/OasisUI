@@ -197,8 +197,6 @@ panelDefOutputConfiguration <- function(id) {
     hidden(div(id = ns("panel_configureAdvancedRI"), panel_configureAdvancedRI(id))),
     flamingoButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
     hidden(flamingoButton(inputId = ns("abuttonbasic"), label = "Basic")),
-    # hidden(flamingoButton(inputId = ns("abuttonsaveoutput"), label = "Save Configuration")) %>%
-    #   bs_embed_tooltip(title = defineSingleAna$abuttonsaveoutput, placement = "right"),
     hidden(flamingoButton(inputId = ns("abuttonclroutopt"), label = "Default"))
   )
 }
@@ -406,7 +404,8 @@ panel_configureAdvancedRI <- function(id) {
 #'
 #' @param currstep current selected step.
 #' @param portfolioID selected portfolio ID.
-#' @param analysisID selected analysis ID
+#' @param analysisID selected analysis ID.
+#' @param pfName Name of selected portfolio.
 #'
 #' @return dashboardAnaID id of selected run.
 #'
@@ -431,6 +430,7 @@ step3_configureOutput <- function(input, output, session,
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
+                                  pfName = reactive({""}),
                                   analysisID = reactive("")
 ) {
 
@@ -448,6 +448,8 @@ step3_configureOutput <- function(input, output, session,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
+    # reactive for portfolioID
+    portfolioID = "",
     # reactve value for navigation
     navigationstate = NULL,
     # reactive value for Analysis table
@@ -543,10 +545,8 @@ step3_configureOutput <- function(input, output, session,
   # Enable and disable buttons based on output confifig
   observeEvent(outputOptionsList(), ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (outputOptionsList() != "") {
-      # enable("abuttonsaveoutput")
       enable("abuttonexecuteanarun")
     } else {
-      # disable("abuttonsaveoutput")
       disable("abuttonexecuteanarun")
     }
   })
@@ -578,7 +578,8 @@ step3_configureOutput <- function(input, output, session,
   # Analyses Table Title
   output$paneltitle_AnalysisTable <- renderUI({
     if (portfolioID() != "") {
-      paste0('Analyses associated with portfolio id ', portfolioID())
+      pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
+      paste0('Analyses associated with portfolio ', pfName, ', id ', portfolioID())
     } else {
       paste0("Analyses")
     }
@@ -781,43 +782,6 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonbasic", {
     .basicview()
   })
-
-  # # Save output configuration --------------------------------------------------
-  #
-  # # Save output for later use as presets
-  # .modalsaveoutput <- function() {
-  #   ns <- session$ns
-  #   modalDialog(label = "modalsaveoutput",
-  #               title = "Save Configuration",
-  #               textInput(ns("tinputoutputname"), label = "Configuration Name:", value = ""),
-  #               footer = tagList(
-  #                 flamingoButton(inputId = ns("abuttonsubmitoutput"),
-  #                                label = "Submit")
-  #               ),
-  #               size = "s",
-  #               easyClose = TRUE
-  #   )
-  # }
-  #
-  # onclick("abuttonsaveoutput", {
-  #   showModal(.modalsaveoutput())
-  # })
-  #
-  # # Submit output configuration (to be saved)
-  # onclick("abuttonsubmitoutput", {
-  #   if (input$tinputoutputname == "") {
-  #     flamingoNotification(type = "warning", "Please enter Output Configuration Name")
-  #   } else {
-  #     dir.create("./analysis_settings")
-  #     #write out file to be uploades
-  #     analysis_settingsList <- .gen_analysis_settings()
-  #     write_json(analysis_settingsList, paste0("./analysis_settings/",input$tinputoutputname,".json"), pretty = TRUE, auto_unbox = TRUE)
-  #     flamingoNotification(type = "message", paste0("Output Configuration ", input$tinputoutputname ," saved"))
-  #     updateTextInput(session, "tinputoutputname", value = "")
-  #     removeModal()
-  #     .clearOutputOptions()
-  #   }
-  # })
 
   # Run Analyses ---------------------------------------------------------------
 
