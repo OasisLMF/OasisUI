@@ -8,7 +8,7 @@
 panelAnalysisDetailsUI(id)
 
 panelAnalysisDetails(input, output, session, analysisID, tbl_filesListData,
-  param, file_column, folderpath)
+  param, file_column, folderpath, reload_generated, reload_uploaded)
 }
 \arguments{
 \item{id}{module id}
