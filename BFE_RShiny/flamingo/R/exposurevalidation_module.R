@@ -4,7 +4,7 @@
 #' exposurevalidationUI
 #' @rdname exposurevalidation
 #'
-#' @description UI/View for uploaded inputs of an analysis.
+#' @description UI/View for exposure validation of an analysis.
 #'
 #' @return List of tags.
 #'
@@ -25,7 +25,7 @@ exposurevalidationUI <- function(id) {
 #'
 #' @rdname exposurevalidation
 #'
-#' @description  Server logic for uploaded inputs of an analysis.
+#' @description  Server logic for exposure validation of an analysis.
 #'
 #' @export
 exposurevalidation <- function(input, output, session) {

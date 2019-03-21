@@ -13,7 +13,7 @@ exposurevalidation(input, output, session)
 List of tags.
 }
 \description{
-UI/View for uploaded inputs of an analysis.
+UI/View for exposure validation of an analysis.
 
-Server logic for uploaded inputs of an analysis.
+Server logic for exposure validation of an analysis.
 }

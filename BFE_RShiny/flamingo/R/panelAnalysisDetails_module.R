@@ -55,6 +55,14 @@ panelAnalysisDetailsUI <- function(id) {
 #'
 #' @description Server side of function wrapping panel to show analyses details table.
 #'
+#' @param analysisID Selected analysis ID.
+#' @param tbl_filesListData Dataframe of the output files
+#' @param param analysisID
+#' @param file_column Name of the column containing filename. Default "files"
+#' @param folderpath path to files. Can be "_output/output/" or "_inputs/"; default output path.
+#' @param reload_generated Imports function to reload Generated Inputs table.
+#' @param reload_uploaded Imports function to reload Uploaded Inputs table.
+#'
 #' @template params-module-ui
 #'
 #' @export

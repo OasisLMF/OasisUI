@@ -13,6 +13,20 @@ panelAnalysisDetails(input, output, session, analysisID, tbl_filesListData,
 \arguments{
 \item{id}{module id}
 
+\item{analysisID}{Selected analysis ID.}
+
+\item{tbl_filesListData}{Dataframe of the output files}
+
+\item{param}{analysisID}
+
+\item{file_column}{Name of the column containing filename. Default "files"}
+
+\item{folderpath}{path to files. Can be "_output/output/" or "_inputs/"; default output path.}
+
+\item{reload_generated}{Imports function to reload Generated Inputs table.}
+
+\item{reload_uploaded}{Imports function to reload Uploaded Inputs table.}
+
 \item{id}{module id}
 }
 \description{
