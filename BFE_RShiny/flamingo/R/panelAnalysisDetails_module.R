@@ -57,6 +57,8 @@ panelAnalysisDetailsUI <- function(id) {
 #' @param reload_generated Imports function to reload Generated Inputs table.
 #' @param anaName Analysis name.
 #'
+#' @importFrom shinyjs hide
+#'
 #' @template params-module-ui
 #'
 #' @export
@@ -93,6 +95,10 @@ panelAnalysisDetails <- function(input,
   #  panelAnalysisDetails Table title
   output$paneltitle_panelAnalysisDetails <- renderUI({
       paste0('Details of analysis id ', toString(analysisID()), ' ', anaName)
+  })
+
+  onclick("buttonhideanadetails", {
+    hide("panel_analysisdetails")
   })
 
   sub_modules

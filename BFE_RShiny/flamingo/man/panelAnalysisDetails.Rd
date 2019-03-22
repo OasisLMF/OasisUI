@@ -7,14 +7,12 @@
 \usage{
 panelAnalysisDetailsUI(id)
 
-panelAnalysisDetails(input, output, session, analysisID, param, anaName)
+panelAnalysisDetails(input, output, session, analysisID, anaName)
 }
 \arguments{
 \item{id}{module id}
 
 \item{analysisID}{Selected analysis ID.}
-
-\item{param}{analysisID}
 
 \item{anaName}{Analysis name.}
 

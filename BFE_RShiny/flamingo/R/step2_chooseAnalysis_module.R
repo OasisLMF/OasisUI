@@ -410,10 +410,6 @@ step2_chooseAnalysis <- function(input, output, session,
     show("panelAnalysisDetails")
   })
 
-  onclick("buttonhideanadetails", {
-    hide("panelAnalysisDetails")
-  })
-
   sub_modules$panelAnalysisDetails <- callModule(
     panelAnalysisDetails,
     id = "panelAnalysisDetails",

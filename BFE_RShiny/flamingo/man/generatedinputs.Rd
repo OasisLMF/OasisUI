@@ -7,7 +7,7 @@
 \usage{
 generatedinputsUI(id)
 
-generatedinputs(input, output, session, analysisID, param)
+generatedinputs(input, output, session, analysisID)
 }
 \arguments{
 \item{analysisID}{selected analysis ID.}
