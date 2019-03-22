@@ -94,7 +94,7 @@ panelAnalysisDetails <- function(input,
 
   #  panelAnalysisDetails Table title
   output$paneltitle_panelAnalysisDetails <- renderUI({
-      paste0('Details of analysis id ', toString(analysisID()), ' ', anaName)
+      paste0('Details of analysis id ', toString(analysisID()), ' ', anaName())
   })
 
   onclick("buttonhideanadetails", {

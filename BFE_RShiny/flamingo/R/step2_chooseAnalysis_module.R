@@ -414,7 +414,7 @@ step2_chooseAnalysis <- function(input, output, session,
     panelAnalysisDetails,
     id = "panelAnalysisDetails",
     analysisID = reactive({result$analysisID}),
-    anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+    anaName <- reactive({result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]})
   )
 
   # Analysis Logs --------------------------------------------------------------
