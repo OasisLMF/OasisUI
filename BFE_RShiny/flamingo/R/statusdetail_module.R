@@ -1,15 +1,15 @@
 # uploaded inputs Module ----------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' uploadedinputsUI
-#' @rdname uploadedinputs
+#' statusdetailUI
+#' @rdname statusdetail
 #'
-#' @description UI/View for uploaded inputs of an analysis.
+#' @description UI/View for status detail of files of an analysis.
 #'
 #' @return List of tags.
 #'
 #' @export
-uploadedinputsUI <- function(id) {
+statusdetailUI <- function(id) {
 
   ns <- NS(id)
 
@@ -31,16 +31,16 @@ uploadedinputsUI <- function(id) {
 
 # Server -----------------------------------------------------------------------
 
-#' uploadedinputs
+#' statusdetail
 #'
-#' @rdname uploadedinputs
+#' @rdname statusdetail
 #'
-#' @description Server logic for uploaded inputs of an analysis.
+#' @description Server logic for status detail of files of an analysis.
 #'
 #' @param analysisID Selected analysis id.
 #'
 #' @export
-uploadedinputs <- function(input,
+statusdetail <- function(input,
                            output,
                            session,
                            analysisID) {
@@ -52,7 +52,7 @@ uploadedinputs <- function(input,
     dt_uploaded = NULL
   )
 
-  # Reload Uploaded Inputs table
+  # Reload Status Detail table
   .reloadUploadedInputs <- function() {
     logMessage(".reloadUploadedInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {

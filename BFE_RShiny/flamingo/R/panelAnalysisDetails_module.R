@@ -35,9 +35,9 @@ panelAnalysisDetailsUI <- function(id) {
         value = ns("tabgeneratedinputs")
       ),
       tabPanel(
-        title = "Uploaded Inputs",
-        uploadedinputsUI(ns("uploadedinputs")),
-        value = ns("tabuploadedinputs")
+        title = "Status Detail",
+        statusdetailUI(ns("statusdetail")),
+        value = ns("tabstatusdetail")
       )
     )
   )
@@ -86,10 +86,10 @@ panelAnalysisDetails <- function(input,
     analysisID = analysisID
   )
 
-  # Tab Uploaded Inputs --------------------------------------------------------
-  sub_modules$uploadedinputs <- callModule(
-    uploadedinputs,
-    id = "uploadedinputs",
+  # Tab Status Detail --------------------------------------------------------
+  sub_modules$statusdetail <- callModule(
+    statusdetail,
+    id = "statusdetail",
     analysisID = analysisID)
 
   #  panelAnalysisDetails Table title
