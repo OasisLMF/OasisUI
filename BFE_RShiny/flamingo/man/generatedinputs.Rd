@@ -7,17 +7,12 @@
 \usage{
 generatedinputsUI(id)
 
-generatedinputs(input, output, session, analysisID, param, file_column,
-  folderpath)
+generatedinputs(input, output, session, analysisID, param)
 }
 \arguments{
 \item{analysisID}{selected analysis ID.}
 
 \item{param}{AnalysisID}
-
-\item{file_column}{Column in the file.}
-
-\item{folderpath}{Path to folder.}
 }
 \value{
 List of tags.

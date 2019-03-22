@@ -7,8 +7,7 @@
 \usage{
 panelAnalysisDetailsUI(id)
 
-panelAnalysisDetails(input, output, session, analysisID, param,
-  file_column, folderpath, anaName)
+panelAnalysisDetails(input, output, session, analysisID, param, anaName)
 }
 \arguments{
 \item{id}{module id}
@@ -16,10 +15,6 @@ panelAnalysisDetails(input, output, session, analysisID, param,
 \item{analysisID}{Selected analysis ID.}
 
 \item{param}{analysisID}
-
-\item{file_column}{Name of the column containing filename. Default "files"}
-
-\item{folderpath}{path to files. Can be "_output/output/" or "_inputs/"; default output path.}
 
 \item{anaName}{Analysis name.}
 

@@ -47,41 +47,41 @@ uploadedinputs <- function(input,
 
   ns <- session$ns
 
-  dt_uploaded <- reactive({
-
-    if (!is.null(analysisID()) && analysisID() != "") {
-      tbl_analysisdetails <- return_tbl_analysisdetails(analysisID())
-    } else {
-      tbl_analysisdetails <-  NULL
-    }
-
-    if (!is.null(tbl_analysisdetails) && nrow(tbl_analysisdetails) > 0) {
-      data <- tbl_analysisdetails
-    } else {
-      data <- NULL
-    }
-    data
-  })
-
-  sub_modules <- list()
-  sub_modules$detailsTable <- callModule(
-    flamingoTable,
-    id = "uploadedInputsTable",
-    data = dt_uploaded,
-    rownames = TRUE,
-    escape = FALSE,
-    colnames = c('row number' = 1)
+  result <- reactiveValues(
+    data = NULL,
+    dt_uploaded = NULL
   )
 
   # Reload Uploaded Inputs table
   .reloadUploadedInputs <- function() {
     logMessage(".reloadUploadedInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
-      tbl_analysisdetails <- return_tbl_analysisdetails(analysisID())
+      tbl_uploaded <- return_tbl_analysisdetails(analysisID())
     } else {
-      tbl_analysisdetails <-  NULL
+      tbl_uploaded <-  NULL
     }
+
+    if (!is.null(tbl_uploaded) && nrow(tbl_uploaded) > 0) {
+      result$data <- tbl_uploaded
+    } else {
+      result$data <- NULL
+    }
+    result$data
   }
+
+  result$dt_uploaded <- reactive({
+    .reloadUploadedInputs()
+  })
+
+  sub_modules <- list()
+  sub_modules$detailsTable <- callModule(
+    flamingoTable,
+    id = "uploadedInputsTable",
+    data = result$dt_uploaded,
+    rownames = TRUE,
+    escape = FALSE,
+    colnames = c('row number' = 1)
+  )
 
   onclick("abuttonuploadedrefresh", {
     .reloadUploadedInputs()

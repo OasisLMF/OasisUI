@@ -54,8 +54,6 @@ panelCreateAnalysesTable <- function(id) {
       column(12,
              flamingoTableButton(inputId = ns("abuttonstartcancIG"), label = "Generate Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonstartcancIG, placement = "right"),
-             flamingoTableButton(inputId = ns("abuttonshowIG"), label = "Show Generated Inputs") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonshowIG, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
@@ -420,9 +418,6 @@ step2_chooseAnalysis <- function(input, output, session,
     panelAnalysisDetails,
     id = "panelAnalysisDetails",
     analysisID = reactive({result$analysisID}),
-    param = reactive({result$analysisID}),
-    file_column = "files",
-    folderpath = "_inputs/",
     anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
   )
 
@@ -617,7 +612,6 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttonshowanadetails")
       disable("abuttondelana")
       disable("abuttonstartcancIG")
-      disable("abuttonshowIG")
       disable("abuttonmodeldetails")
       disable("abuttonpgotonextstep")
       disable("abuttonsubmit")
@@ -658,7 +652,6 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
   onclick("abuttonanalogrefresh", {
-    print("abuttonanalogrefresh")
     .reloadAnaLog()
   })
 

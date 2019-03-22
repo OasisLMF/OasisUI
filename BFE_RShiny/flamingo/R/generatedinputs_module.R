@@ -38,54 +38,46 @@ generatedinputsUI <- function(id) {
 #'
 #' @param analysisID selected analysis ID.
 #' @param param AnalysisID
-#' @param file_column Column in the file.
-#' @param folderpath Path to folder.
 #'
 #' @export
 generatedinputs <- function(input,
                             output,
                             session,
-                            analysisID,
-                            param,
-                            file_column,
-                            folderpath) {
+                            analysisID) {
 
   ns <- session$ns
 
-  sub_modules <- list()
+  result <- reactiveValues(
+    data = NULL,
+    dt_generated = NULL
+  )
 
-  dt_anaIG <- reactive({
+  #reload input generated table
+  .reloadGeneratediInputs <- function(){
+    logMessage(".reloadGeneratediInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
-      tbl_anaIG <- return_analyses_input_file_wicons_df(analysisID())
+      result$data <- return_analyses_input_file_wicons_df(analysisID())
     } else {
-      tbl_anaIG <-  NULL
+      result$data <-  NULL
     }
-    tbl_anaIG
+    result$data
+  }
+
+  result$dt_generated <- reactive({
+    .reloadGeneratediInputs()
   })
 
+  sub_modules <- list()
   sub_modules$ViewIGFiles <- callModule(
     ViewFilesInTable,
     id = "ViewIGFiles",
-    tbl_filesListData = dt_anaIG,
-    param = param,
-    file_column = file_column,
-    folderpath = folderpath,
+    tbl_filesListData = result$dt_generated,
+    param = analysisID,
+    file_column = "files",
+    folderpath = "_inputs/",
     includechkbox = TRUE)
 
-  sub_modules
-
-  #reload input generated table
-  .reloadAnaIG <- function(){
-    logMessage(".reloadAnaIG called")
-    if (!is.null(analysisID()) && analysisID() != "") {
-      tbl_anaIG <- return_analyses_input_file_wicons_df(analysisID())
-    } else {
-      tbl_anaIG <-  NULL
-    }
-    tbl_anaIG
-  }
-
   onclick("abuttongeneratedrefresh", {
-    .reloadAnaIG()
+    .reloadGeneratediInputs()
   })
 }

@@ -54,9 +54,6 @@ panelAnalysisDetailsUI <- function(id) {
 #'
 #' @param analysisID Selected analysis ID.
 #' @param tbl_filesListData Dataframe of the output files
-#' @param param analysisID
-#' @param file_column Name of the column containing filename. Default "files"
-#' @param folderpath path to files. Can be "_output/output/" or "_inputs/"; default output path.
 #' @param reload_generated Imports function to reload Generated Inputs table.
 #' @param anaName Analysis name.
 #'
@@ -67,9 +64,6 @@ panelAnalysisDetails <- function(input,
                                  output,
                                  session,
                                  analysisID,
-                                 param,
-                                 file_column,
-                                 folderpath,
                                  anaName) {
 
   ns <- session$ns
@@ -87,10 +81,7 @@ panelAnalysisDetails <- function(input,
   sub_modules$generatedinputs <- callModule(
     generatedinputs,
     id = "generatedinputs",
-    analysisID = analysisID,
-    param = param,
-    file_column = file_column,
-    folderpath = folderpath
+    analysisID = analysisID
   )
 
   # Tab Uploaded Inputs --------------------------------------------------------
