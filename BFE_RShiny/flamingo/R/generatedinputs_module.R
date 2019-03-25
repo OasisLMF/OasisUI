@@ -53,22 +53,11 @@ generatedinputs <- function(input,
     dt_generated = NULL
   )
 
-  # Reload input generated table -----------------------------------------------
-  .reloadGeneratediInputs <- function(){
-    logMessage(".reloadGeneratediInputs called")
-    if (!is.null(analysisID()) && analysisID() != "") {
-      result$data <- return_analyses_input_file_wicons_df(analysisID())
-    } else {
-      result$data <-  NULL
-    }
-    result$data
-  }
-
+  # Create table ---------------------------------------------------------------
   result$dt_generated <- reactive({
     .reloadGeneratediInputs()
   })
 
-  # Create table ---------------------------------------------------------------
   callModule(
     ViewFilesInTable,
     id = "ViewIGFiles",
@@ -82,4 +71,15 @@ generatedinputs <- function(input,
   onclick("abuttongeneratedrefresh", {
     .reloadGeneratediInputs()
   })
+
+  # Reload input generated table -----------------------------------------------
+  .reloadGeneratediInputs <- function(){
+    logMessage(".reloadGeneratediInputs called")
+    if (!is.null(analysisID()) && analysisID() != "") {
+      result$data <- return_analyses_input_file_wicons_df(analysisID())
+    } else {
+      result$data <-  NULL
+    }
+    result$data
+  }
 }

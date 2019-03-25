@@ -53,6 +53,25 @@ statusdetail <- function(input,
     dt_uploaded = NULL
   )
 
+  # Create flamingoTable -------------------------------------------------------
+  result$dt_uploaded <- reactive({
+    .reloadStatusDetails()
+  })
+
+  callModule(
+    flamingoTable,
+    id = "statusDetailTable",
+    data = result$dt_uploaded,
+    rownames = TRUE,
+    escape = FALSE,
+    colnames = c('row number' = 1)
+  )
+
+  # reload Status Details table-------------------------------------------------
+  onclick("abuttonuploadedrefresh", {
+    .reloadStatusDetails()
+  })
+
   # Reload Status Detail table -------------------------------------------------
   .reloadStatusDetails <- function() {
     logMessage(".reloadStatusDetails called")
@@ -69,24 +88,5 @@ statusdetail <- function(input,
     }
     result$data
   }
-
-  result$dt_uploaded <- reactive({
-    .reloadStatusDetails()
-  })
-
-  # Create flamingoTable -------------------------------------------------------
-  callModule(
-    flamingoTable,
-    id = "statusDetailTable",
-    data = result$dt_uploaded,
-    rownames = TRUE,
-    escape = FALSE,
-    colnames = c('row number' = 1)
-  )
-
-  # reload Status Details table-------------------------------------------------
-  onclick("abuttonuploadedrefresh", {
-    .reloadStatusDetails()
-  })
 
 }
