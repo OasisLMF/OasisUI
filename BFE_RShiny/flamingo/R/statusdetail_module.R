@@ -23,7 +23,7 @@ statusdetailUI <- function(id) {
       colnames = c('row number' = 1),
       id = ns("panel_analysisdetails"),
       flamingoRefreshButton(ns("abuttonuploadedrefresh")),
-      flamingoTableUI(ns("uploadedInputsTable"))
+      flamingoTableUI(ns("statusDetailTable"))
     )
   )
 }
@@ -47,12 +47,13 @@ statusdetail <- function(input,
 
   ns <- session$ns
 
+  # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
     data = NULL,
     dt_uploaded = NULL
   )
 
-  # Reload Status Detail table
+  # Reload Status Detail table -------------------------------------------------
   .reloadUploadedInputs <- function() {
     logMessage(".reloadUploadedInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
@@ -73,10 +74,10 @@ statusdetail <- function(input,
     .reloadUploadedInputs()
   })
 
-  sub_modules <- list()
-  sub_modules$detailsTable <- callModule(
+
+  callModule(
     flamingoTable,
-    id = "uploadedInputsTable",
+    id = "statusDetailTable",
     data = result$dt_uploaded,
     rownames = TRUE,
     escape = FALSE,

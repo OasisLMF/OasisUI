@@ -11,7 +11,7 @@
 #' @importFrom DT DTOutput
 #'
 #' @export
-panelAnalysisDetailsUI <- function(id) {
+panelAnalysisDetailsUI <- function(id, button) {
 
   ns <- NS(id)
   flamingoPanel(
@@ -20,7 +20,7 @@ panelAnalysisDetailsUI <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_panelAnalysisDetails"), inline = TRUE),
-      actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")
+      button
     ),
     tabsetPanel(
       id = ns("tabsDetails"),
@@ -70,36 +70,29 @@ panelAnalysisDetails <- function(input,
 
   ns <- session$ns
 
-  # list of sub-modules
-  sub_modules <- list()
-
   # Tab Exposure Validation ----------------------------------------------------
-  sub_modules$exposurevalidation <- callModule(
+  callModule(
     exposurevalidation,
     id = "exposurevalidation"
   )
 
   # Tab Generated Inputs -------------------------------------------------------
-  sub_modules$generatedinputs <- callModule(
+  callModule(
     generatedinputs,
     id = "generatedinputs",
     analysisID = analysisID
   )
 
   # Tab Status Detail --------------------------------------------------------
-  sub_modules$statusdetail <- callModule(
+  callModule(
     statusdetail,
     id = "statusdetail",
-    analysisID = analysisID)
+    analysisID = analysisID
+  )
 
   #  panelAnalysisDetails Table title
   output$paneltitle_panelAnalysisDetails <- renderUI({
-      paste0('Details of analysis id ', toString(analysisID()), ' ', anaName())
+    paste0('Details of analysis id ', toString(analysisID()), ' ', anaName())
   })
 
-  onclick("buttonhideanadetails", {
-    hide("panel_analysisdetails")
-  })
-
-  sub_modules
 }

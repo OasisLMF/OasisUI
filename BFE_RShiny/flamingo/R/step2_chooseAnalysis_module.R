@@ -19,7 +19,8 @@ step2_chooseAnalysisUI <- function(id) {
 
   tagList(
     hidden(div(id = ns("panelCreateAnalysesTable"), panelCreateAnalysesTable(id))),
-    hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetailsUI(ns("panelAnalysisDetails")))),
+    hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetailsUI(ns("panelAnalysisDetails"),
+                                                                       actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")))),
     hidden(div(id= ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
     hidden(div(id = ns("panelModelDetails"), panelModelDetails(id)))
@@ -401,7 +402,7 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
   # Analysis details ------------------------------------------------------------
-  onclick("abuttonshowanadetails", {
+  observeEvent (input$abuttonshowanadetails, {
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
@@ -416,6 +417,10 @@ step2_chooseAnalysis <- function(input, output, session,
     analysisID = reactive({result$analysisID}),
     anaName <- reactive({result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]})
   )
+
+  onclick("buttonhideanadetails", {
+    hide("panelAnalysisDetails")
+  })
 
   # Analysis Logs --------------------------------------------------------------
   onclick("abuttonshowlog", {

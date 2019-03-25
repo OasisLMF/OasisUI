@@ -67,8 +67,7 @@ generatedinputs <- function(input,
     .reloadGeneratediInputs()
   })
 
-  sub_modules <- list()
-  sub_modules$ViewIGFiles <- callModule(
+  callModule(
     ViewFilesInTable,
     id = "ViewIGFiles",
     tbl_filesListData = result$dt_generated,
