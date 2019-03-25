@@ -37,7 +37,6 @@ generatedinputsUI <- function(id) {
 #' @description  Server logic for uploaded inputs of an analysis.
 #'
 #' @param analysisID selected analysis ID.
-#' @param param AnalysisID
 #'
 #' @export
 generatedinputs <- function(input,

@@ -11,8 +11,6 @@ generatedinputs(input, output, session, analysisID)
 }
 \arguments{
 \item{analysisID}{selected analysis ID.}
-
-\item{param}{AnalysisID}
 }
 \value{
 List of tags.

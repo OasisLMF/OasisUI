@@ -38,6 +38,11 @@ panelAnalysisDetailsUI <- function(id, button) {
         title = "Status Detail",
         statusdetailUI(ns("statusdetail")),
         value = ns("tabstatusdetail")
+      ),
+      tabPanel(
+        title = "Uploaded Inputs",
+        uploadedinputsUI(ns("uploadedinputs")),
+        value = ns("tabuploadedinputs")
       )
     )
   )
@@ -56,6 +61,7 @@ panelAnalysisDetailsUI <- function(id, button) {
 #' @param tbl_filesListData Dataframe of the output files
 #' @param reload_generated Imports function to reload Generated Inputs table.
 #' @param anaName Analysis name.
+#' @param portfolioID Selected portfolio ID.
 #'
 #' @importFrom shinyjs hide
 #'
@@ -66,7 +72,8 @@ panelAnalysisDetails <- function(input,
                                  output,
                                  session,
                                  analysisID,
-                                 anaName) {
+                                 anaName,
+                                 portfolioID) {
 
   ns <- session$ns
 
@@ -83,11 +90,18 @@ panelAnalysisDetails <- function(input,
     analysisID = analysisID
   )
 
-  # Tab Status Detail --------------------------------------------------------
+  # Tab Status Detail ----------------------------------------------------------
   callModule(
     statusdetail,
     id = "statusdetail",
     analysisID = analysisID
+  )
+
+  # Tab Uploaded Inputs --------------------------------------------------------
+  callModule(
+    uploadedinputs,
+    id = "uploadedinputs",
+    portfolioID = portfolioID
   )
 
   #  panelAnalysisDetails Table title

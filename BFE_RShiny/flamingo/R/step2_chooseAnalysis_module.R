@@ -237,7 +237,9 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis log
     tbl_analysislog = NULL,
     #analysis ID
-    analysisID = ""
+    analysisID = "",
+    #portfolio data table
+    tbl_portfoliosData = NULL
   )
 
   #Set Params
@@ -415,7 +417,8 @@ step2_chooseAnalysis <- function(input, output, session,
     panelAnalysisDetails,
     id = "panelAnalysisDetails",
     analysisID = reactive({result$analysisID}),
-    anaName <- reactive({result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]})
+    anaName = reactive({result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]}),
+    portfolioID = reactive(result$portfolioID)
   )
 
   onclick("buttonhideanadetails", {

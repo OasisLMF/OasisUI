@@ -1,4 +1,4 @@
-# uploaded inputs Module ----------------------------------------------------------
+# Exposure Validation Module ---------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
 #' exposurevalidationUI
@@ -25,7 +25,7 @@ exposurevalidationUI <- function(id) {
 #'
 #' @rdname exposurevalidation
 #'
-#' @description  Server logic for exposure validation of an analysis.
+#' @description Server logic for exposure validation of an analysis.
 #'
 #' @export
 exposurevalidation <- function(input, output, session) {

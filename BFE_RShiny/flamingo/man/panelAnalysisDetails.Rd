@@ -5,9 +5,10 @@
 \alias{panelAnalysisDetails}
 \title{panelAnalysisDetailsUI}
 \usage{
-panelAnalysisDetailsUI(id)
+panelAnalysisDetailsUI(id, button)
 
-panelAnalysisDetails(input, output, session, analysisID, anaName)
+panelAnalysisDetails(input, output, session, analysisID, anaName,
+  portfolioID)
 }
 \arguments{
 \item{id}{module id}
@@ -15,6 +16,8 @@ panelAnalysisDetails(input, output, session, analysisID, anaName)
 \item{analysisID}{Selected analysis ID.}
 
 \item{anaName}{Analysis name.}
+
+\item{portfolioID}{Selected portfolio ID.}
 
 \item{tbl_filesListData}{Dataframe of the output files}
 
