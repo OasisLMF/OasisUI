@@ -15,12 +15,8 @@ uploadedinputsUI <- function(id) {
   flamingoPanel(
     collapsible = FALSE,
     ns("panel_portfolio_details"),
-    heading = tagAppendChildren(
-      h4("Source files for portfolio"),
-      uiOutput(ns("paneltitle_pfDetails"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonuploadedrefresh")),
-      actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
+    flamingoRefreshButton(ns("abuttonuploadedrefresh")),
+    actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;"),
     ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
   )
 }
