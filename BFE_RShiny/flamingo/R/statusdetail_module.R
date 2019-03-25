@@ -54,8 +54,8 @@ statusdetail <- function(input,
   )
 
   # Reload Status Detail table -------------------------------------------------
-  .reloadUploadedInputs <- function() {
-    logMessage(".reloadUploadedInputs called")
+  .reloadStatusDetails <- function() {
+    logMessage(".reloadStatusDetails called")
     if (!is.null(analysisID()) && analysisID() != "") {
       tbl_uploaded <- return_tbl_analysisdetails(analysisID())
     } else {
@@ -71,10 +71,10 @@ statusdetail <- function(input,
   }
 
   result$dt_uploaded <- reactive({
-    .reloadUploadedInputs()
+    .reloadStatusDetails()
   })
 
-
+  # Create flamingoTable -------------------------------------------------------
   callModule(
     flamingoTable,
     id = "statusDetailTable",
@@ -84,8 +84,9 @@ statusdetail <- function(input,
     colnames = c('row number' = 1)
   )
 
+  # reload Status Details table-------------------------------------------------
   onclick("abuttonuploadedrefresh", {
-    .reloadUploadedInputs()
+    .reloadStatusDetails()
   })
 
 }

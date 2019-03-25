@@ -47,12 +47,13 @@ generatedinputs <- function(input,
 
   ns <- session$ns
 
+  # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
     data = NULL,
     dt_generated = NULL
   )
 
-  #reload input generated table
+  # Reload input generated table -----------------------------------------------
   .reloadGeneratediInputs <- function(){
     logMessage(".reloadGeneratediInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
@@ -67,6 +68,7 @@ generatedinputs <- function(input,
     .reloadGeneratediInputs()
   })
 
+  # Create table ---------------------------------------------------------------
   callModule(
     ViewFilesInTable,
     id = "ViewIGFiles",
@@ -76,6 +78,7 @@ generatedinputs <- function(input,
     folderpath = "_inputs/",
     includechkbox = TRUE)
 
+  # reload Generated Inputs table-----------------------------------------------
   onclick("abuttongeneratedrefresh", {
     .reloadGeneratediInputs()
   })
