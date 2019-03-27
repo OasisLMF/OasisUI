@@ -418,8 +418,7 @@ step2_chooseAnalysis <- function(input, output, session,
     id = "panelAnalysisDetails",
     analysisID = reactive({result$analysisID}),
     anaName = reactive({result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]}),
-    portfolioID = reactive(result$portfolioID)
-  )
+    portfolioID = reactive(result$portfolioID))
 
   onclick("buttonhideanadetails", {
     hide("panelAnalysisDetails")

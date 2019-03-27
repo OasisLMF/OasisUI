@@ -87,21 +87,24 @@ panelAnalysisDetails <- function(input,
   callModule(
     generatedinputs,
     id = "generatedinputs",
-    analysisID = analysisID
+    analysisID = analysisID,
+    active = reactive({input$tabsDetails == "tabgeneratedinputs"})
   )
 
   # Tab Status Detail ----------------------------------------------------------
   callModule(
     statusdetail,
     id = "statusdetail",
-    analysisID = analysisID
+    analysisID = analysisID,
+    active = reactive({input$tabsDetails == "tabstatusdetail"})
   )
 
   # Tab Uploaded Inputs --------------------------------------------------------
   callModule(
     uploadedinputs,
     id = "uploadedinputs",
-    portfolioID = portfolioID
+    portfolioID = portfolioID,
+    active = reactive({input$tabsDetails == "tabuploadedinputs"})
   )
 
   #  panelAnalysisDetails Table title

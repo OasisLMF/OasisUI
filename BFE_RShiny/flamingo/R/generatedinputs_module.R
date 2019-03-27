@@ -42,25 +42,28 @@ generatedinputsUI <- function(id) {
 generatedinputs <- function(input,
                             output,
                             session,
-                            analysisID) {
+                            analysisID,
+                            active = reactive(TRUE)) {
 
   ns <- session$ns
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
-    data = NULL,
     dt_generated = NULL
   )
 
   # Create table ---------------------------------------------------------------
-  result$dt_generated <- reactive({
-    .reloadGeneratediInputs()
+  observeEvent(active(), {
+    extractFolder <- set_extractFolder(id = analysisID(), label = "_outputs/output")
+    if (!dir.exists(extractFolder) && is.na(file.size(extractFolder))) {
+      .reloadGeneratediInputs()
+    }
   })
 
   callModule(
     ViewFilesInTable,
     id = "ViewIGFiles",
-    tbl_filesListData = result$dt_generated,
+    tbl_filesListData = reactive({result$dt_generated}),
     param = analysisID,
     file_column = "files",
     folderpath = "_inputs/",
@@ -75,10 +78,9 @@ generatedinputs <- function(input,
   .reloadGeneratediInputs <- function(){
     logMessage(".reloadGeneratediInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
-      result$data <- return_analyses_input_file_wicons_df(analysisID())
+      result$dt_generated <- return_analyses_input_file_wicons_df(analysisID())
     } else {
-      result$data <-  NULL
+      result$dt_generated <-  NULL
     }
-    result$data
   }
 }

@@ -41,27 +41,30 @@ statusdetailUI <- function(id) {
 #'
 #' @export
 statusdetail <- function(input,
-                           output,
-                           session,
-                           analysisID) {
+                         output,
+                         session,
+                         analysisID,
+                         active = reactive(TRUE)) {
 
   ns <- session$ns
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
-    data = NULL,
     dt_uploaded = NULL
   )
 
   # Create flamingoTable -------------------------------------------------------
-  result$dt_uploaded <- reactive({
-    .reloadStatusDetails()
+  observeEvent(active(), {
+    extractFolder <- set_extractFolder(id = analysisID(), label = "_outputs/output")
+    if (!dir.exists(extractFolder) && is.na(file.size(extractFolder))) {
+      .reloadStatusDetails()
+    }
   })
 
   callModule(
     flamingoTable,
     id = "statusDetailTable",
-    data = result$dt_uploaded,
+    data = reactive({result$dt_uploaded}),
     rownames = TRUE,
     escape = FALSE,
     colnames = c('row number' = 1)
@@ -82,11 +85,10 @@ statusdetail <- function(input,
     }
 
     if (!is.null(tbl_uploaded) && nrow(tbl_uploaded) > 0) {
-      result$data <- tbl_uploaded
+      result$dt_uploaded <- tbl_uploaded
     } else {
-      result$data <- NULL
+      result$dt_uploaded <- NULL
     }
-    result$data
   }
 
 }

@@ -33,26 +33,32 @@ uploadedinputsUI <- function(id) {
 #' @param portfolioID selected portfolio ID.
 #'
 #' @export
-uploadedinputs <- function(input, output, session, portfolioID) {
+uploadedinputs <- function(input,
+                           output,
+                           session,
+                           portfolioID,
+                           active = reactive(TRUE)) {
 
   ns <- session$ns
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
     pfId = NULL,
-    data = NULL,
     dt_uploaded = NULL
   )
 
   # Create table ---------------------------------------------------------------
-  result$dt_uploaded <- reactive({
-    .reloadtbl_portfolioDetails()
+  observeEvent(active(), {
+    extractFolder <- set_extractFolder(id = portfolioID(), label = "_outputs/output")
+    if (!dir.exists(extractFolder) && is.na(file.size(extractFolder))) {
+      .reloadtbl_portfolioDetails()
+    }
   })
 
   callModule(
     ViewFilesInTable,
     id = "portfolioDetails",
-    tbl_filesListData =  result$dt_uploaded,
+    tbl_filesListData =  reactive({result$dt_uploaded}),
     param = portfolioID,
     logMessage = logMessage,
     includechkbox = TRUE)
@@ -66,10 +72,9 @@ uploadedinputs <- function(input, output, session, portfolioID) {
   .reloadtbl_portfolioDetails <- function() {
     logMessage(".reloadtbl_portfolioDetails called")
     if (!is.null(portfolioID()) && portfolioID() != "") {
-      result$data  <- return_tbl_portfolioDetails(portfolioID())
+      result$dt_uploaded  <- return_tbl_portfolioDetails(portfolioID())
     } else {
-      result$data  <- NULL
+      result$dt_uploaded  <- NULL
     }
-    result$data
   }
 }
