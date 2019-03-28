@@ -5,9 +5,10 @@
 \alias{analysis_details}
 \title{analysis_detailsUI}
 \usage{
-analysis_detailsUI(id, button)
+analysis_detailsUI(id)
 
-analysis_details(input, output, session, analysisID, anaName, portfolioID)
+analysis_details(input, output, session, analysisID, anaName, portfolioID,
+  counter)
 }
 \arguments{
 \item{id}{module id}

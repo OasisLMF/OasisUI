@@ -7,7 +7,8 @@
 \usage{
 exposurevalidationUI(id)
 
-exposurevalidation(input, output, session, active = reactive(TRUE))
+exposurevalidation(input, output, session, counter = NULL, active,
+  portfolioID = "", analysisID = "")
 }
 \value{
 List of tags.

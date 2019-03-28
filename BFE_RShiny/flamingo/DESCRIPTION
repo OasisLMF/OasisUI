@@ -13,7 +13,6 @@ LazyData: true
 NeedsCompilation: no
 Imports:
   bsplus,
-  DBI,
   DT,
   data.table,
   dplyr,

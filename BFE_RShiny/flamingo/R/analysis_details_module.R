@@ -11,7 +11,7 @@
 #' @importFrom DT DTOutput
 #'
 #' @export
-analysis_detailsUI <- function(id, button) {
+analysis_detailsUI <- function(id) {
 
   ns <- NS(id)
   tabsetPanel(
@@ -64,14 +64,19 @@ analysis_details <- function(input,
                              session,
                              analysisID,
                              anaName,
-                             portfolioID) {
+                             portfolioID,
+                             counter) {
 
   ns <- session$ns
 
   # Tab Exposure Validation ----------------------------------------------------
   callModule(
     exposurevalidation,
-    id = "exposurevalidation"
+    id = "exposurevalidation",
+    analysisID = analysisID,
+    portfolioID = portfolioID,
+    counter = counter,
+    active = reactive({input$tabsDetails == "tabvalidation"})
   )
 
   # Tab Generated Inputs -------------------------------------------------------
