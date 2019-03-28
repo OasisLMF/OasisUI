@@ -54,7 +54,7 @@ generatedinputs <- function(input,
 
   # Create table ---------------------------------------------------------------
   observeEvent(active(), {
-    extractFolder <- set_extractFolder(id = analysisID(), label = "_outputs/output")
+    extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
     if (!dir.exists(extractFolder) && is.na(file.size(extractFolder))) {
       .reloadGeneratediInputs()
     }

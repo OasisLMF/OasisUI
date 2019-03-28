@@ -55,10 +55,7 @@ statusdetail <- function(input,
 
   # Create flamingoTable -------------------------------------------------------
   observeEvent(active(), {
-    extractFolder <- set_extractFolder(id = analysisID(), label = "_outputs/output")
-    if (!dir.exists(extractFolder) && is.na(file.size(extractFolder))) {
-      .reloadStatusDetails()
-    }
+    .reloadStatusDetails()
   })
 
   callModule(

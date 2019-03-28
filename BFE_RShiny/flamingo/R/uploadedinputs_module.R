@@ -49,10 +49,7 @@ uploadedinputs <- function(input,
 
   # Create table ---------------------------------------------------------------
   observeEvent(active(), {
-    extractFolder <- set_extractFolder(id = portfolioID(), label = "_outputs/output")
-    if (!dir.exists(extractFolder) && is.na(file.size(extractFolder))) {
-      .reloadtbl_portfolioDetails()
-    }
+    .reloadtbl_portfolioDetails()
   })
 
   callModule(
