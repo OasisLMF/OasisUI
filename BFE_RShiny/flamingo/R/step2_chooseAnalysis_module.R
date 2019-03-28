@@ -19,7 +19,7 @@ step2_chooseAnalysisUI <- function(id) {
 
   tagList(
     hidden(div(id = ns("panelCreateAnalysesTable"), panelCreateAnalysesTable(id))),
-    hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetailsUI(ns("panelAnalysisDetails"),
+    hidden(div(id = ns("analysis_details"), analysis_detailsUI(ns("analysis_details"),
                                                                        actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")))),
     hidden(div(id= ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
@@ -265,7 +265,7 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
-    hide("panelAnalysisDetails")
+    hide("analysis_details")
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
@@ -325,7 +325,7 @@ step2_chooseAnalysis <- function(input, output, session,
     if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$input_gen_started) {
       showModal(.cancelIGModal())
     } else {
-      hide("panelAnalysisDetails")
+      hide("analysis_details")
       hide("panelAnalysisLog")
       hide("panelModelTable")
       hide("panelAnalysisGenInputs")
@@ -373,7 +373,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   observeEvent(input$btnCancelIGDel, {
     removeModal()
-    hide("panelAnalysisDetails")
+    hide("analysis_details")
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
@@ -409,24 +409,24 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
-    logMessage("showing panelAnalysisDetails")
-    show("panelAnalysisDetails")
+    logMessage("showing analysis_details")
+    show("analysis_details")
   })
 
-  sub_modules$panelAnalysisDetails <- callModule(
-    panelAnalysisDetails,
-    id = "panelAnalysisDetails",
+  sub_modules$analysis_details <- callModule(
+    analysis_details,
+    id = "analysis_details",
     analysisID = reactive({result$analysisID}),
     anaName = reactive({result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]}),
     portfolioID = reactive(result$portfolioID))
 
   onclick("buttonhideanadetails", {
-    hide("panelAnalysisDetails")
+    hide("analysis_details")
   })
 
   # Analysis Logs --------------------------------------------------------------
   onclick("abuttonshowlog", {
-    hide("panelAnalysisDetails")
+    hide("analysis_details")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
@@ -478,7 +478,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Model Table ----------------------------------------------------------------
 
   onclick("abuttoncreateana", {
-    hide("panelAnalysisDetails")
+    hide("analysis_details")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
     logMessage("showing panelModelTable")
@@ -524,7 +524,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Show/hide Model Details Panel
   onclick("abuttonmodeldetails", {
-    hide("panelAnalysisDetails")
+    hide("analysis_details")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
     logMessage("showing panelModelDetails")
@@ -672,7 +672,7 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage(".hideDivs called")
     #Section "Choose Analysis" = "2"
     hide("panelCreateAnalysesTable")
-    hide("panelAnalysisDetails")
+    hide("analysis_details")
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")

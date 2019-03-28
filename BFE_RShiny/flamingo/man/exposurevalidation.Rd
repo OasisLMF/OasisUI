@@ -7,7 +7,7 @@
 \usage{
 exposurevalidationUI(id)
 
-exposurevalidation(input, output, session)
+exposurevalidation(input, output, session, active = reactive(TRUE))
 }
 \value{
 List of tags.

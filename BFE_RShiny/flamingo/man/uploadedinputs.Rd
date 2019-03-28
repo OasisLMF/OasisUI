@@ -7,7 +7,8 @@
 \usage{
 uploadedinputsUI(id)
 
-uploadedinputs(input, output, session, portfolioID)
+uploadedinputs(input, output, session, portfolioID,
+  active = reactive(TRUE))
 }
 \arguments{
 \item{portfolioID}{selected portfolio ID.}

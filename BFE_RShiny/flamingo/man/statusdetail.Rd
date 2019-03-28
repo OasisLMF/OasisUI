@@ -7,7 +7,7 @@
 \usage{
 statusdetailUI(id)
 
-statusdetail(input, output, session, analysisID)
+statusdetail(input, output, session, analysisID, active = reactive(TRUE))
 }
 \arguments{
 \item{analysisID}{Selected analysis id.}

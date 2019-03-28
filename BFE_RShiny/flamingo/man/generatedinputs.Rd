@@ -7,7 +7,8 @@
 \usage{
 generatedinputsUI(id)
 
-generatedinputs(input, output, session, analysisID)
+generatedinputs(input, output, session, analysisID,
+  active = reactive(TRUE))
 }
 \arguments{
 \item{analysisID}{selected analysis ID.}
