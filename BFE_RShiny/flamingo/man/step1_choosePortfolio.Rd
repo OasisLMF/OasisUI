@@ -12,7 +12,7 @@ step1_choosePortfolio(input, output, session, active = reactive(TRUE),
   portfolioID = reactive(""))
 }
 \arguments{
-\item{id}{Namespace ID for the module.}
+\item{id}{module id}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -23,6 +23,8 @@ step1_choosePortfolio(input, output, session, active = reactive(TRUE),
 \item{currstep}{current selected step.}
 
 \item{portfolioID}{selected portfolio ID.}
+
+\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

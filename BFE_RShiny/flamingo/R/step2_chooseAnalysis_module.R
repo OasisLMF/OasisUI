@@ -8,6 +8,8 @@
 #'
 #' @description UI/View for the step2_chooseAnalysis.
 #'
+#' @template params-module-ui
+#'
 #' @return List of tags.
 #'
 #' @importFrom shinyjs hidden
@@ -237,9 +239,7 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis log
     tbl_analysislog = NULL,
     #analysis ID
-    analysisID = "",
-    #portfolio data table
-    tbl_portfoliosData = NULL
+    analysisID = ""
   )
 
   #Set Params
