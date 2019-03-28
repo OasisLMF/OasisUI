@@ -71,8 +71,7 @@ analysis_details <- function(input,
   # Tab Exposure Validation ----------------------------------------------------
   callModule(
     exposurevalidation,
-    id = "exposurevalidation",
-    active = reactive({input$tabsDetails == "tabvalidation"})
+    id = "exposurevalidation"
   )
 
   # Tab Generated Inputs -------------------------------------------------------

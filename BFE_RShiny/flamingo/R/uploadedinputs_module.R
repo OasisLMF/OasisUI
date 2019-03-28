@@ -16,7 +16,6 @@ uploadedinputsUI <- function(id) {
     collapsible = FALSE,
     ns("panel_uploadedinputs"),
     flamingoRefreshButton(ns("abuttonuploadedrefresh")),
-    actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;"),
     ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
   )
 }

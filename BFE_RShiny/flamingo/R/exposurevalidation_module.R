@@ -30,15 +30,9 @@ exposurevalidationUI <- function(id) {
 #' @export
 exposurevalidation <- function(input,
                                output,
-                               session,
-                               active = reactive(TRUE)) {
+                               session) {
 
   ns <- session$ns
-
-  # Create table ---------------------------------------------------------------
-  observeEvent(active(), {
-
-  })
 
   onclick("abuttonexposurerefresh", {
 
