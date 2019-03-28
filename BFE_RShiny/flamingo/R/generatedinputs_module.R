@@ -21,7 +21,7 @@ generatedinputsUI <- function(id) {
       filter = "none",
       rownames = TRUE,
       colnames = c('row number' = 1),
-      id = ns("panel_analysisdetails"),
+      id = ns("panel_generatedinputs"),
       flamingoRefreshButton(ns("abuttongeneratedrefresh")),
       ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
     )

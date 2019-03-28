@@ -21,7 +21,7 @@ statusdetailUI <- function(id) {
       filter = "none",
       rownames = TRUE,
       colnames = c('row number' = 1),
-      id = ns("panel_analysisdetails"),
+      id = ns("panel_statusdetai"),
       flamingoRefreshButton(ns("abuttonuploadedrefresh")),
       flamingoTableUI(ns("statusDetailTable"))
     )
