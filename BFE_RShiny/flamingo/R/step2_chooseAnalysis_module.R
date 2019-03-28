@@ -21,8 +21,7 @@ step2_chooseAnalysisUI <- function(id) {
 
   tagList(
     hidden(div(id = ns("panelCreateAnalysesTable"), panelCreateAnalysesTable(id))),
-    hidden(div(id = ns("analysis_details"), analysis_detailsUI(ns("analysis_details"),
-                                                                       actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")))),
+    hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
     hidden(div(id= ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
     hidden(div(id = ns("panelModelDetails"), panelModelDetails(id)))
@@ -72,6 +71,31 @@ panelCreateAnalysesTable <- function(id) {
       ),
       style = "margin-top: 10px;"
     )
+  )
+}
+
+#' panelAnalysisDetails
+#'
+#' @rdname panelAnalysisDetails
+#'
+#' @description Function wrapping panel to show analyses details table.
+#'
+#' @template params-module-ui
+#'
+#' @export
+panelAnalysisDetails <- function(id) {
+  ns <- NS(id)
+  flamingoPanel(
+    collapsible = TRUE,
+    show = TRUE,
+    ns("panel_analysisdetails"),
+    heading = tagAppendChildren(
+      h4(""),
+      uiOutput(ns("paneltitle_analysis_details"), inline = TRUE),
+      flamingoRefreshButton(ns("abuttonanadetailsrefresh")),
+      actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")
+    ),
+    analysis_detailsUI(ns("analysis_details"))
   )
 }
 
@@ -410,7 +434,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
     logMessage("showing analysis_details")
-    show("analysis_details")
+    show("panelAnalysisDetails")
   })
 
   sub_modules$analysis_details <- callModule(
