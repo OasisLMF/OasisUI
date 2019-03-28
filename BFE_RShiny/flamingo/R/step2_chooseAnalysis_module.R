@@ -628,6 +628,9 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelModelDetails")
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
+    if (is.null(result$mapfile)) {
+      hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
+    }
     logMessage("showing panelModelDetails")
     #result$mapfile <- getFileMap()
   })
