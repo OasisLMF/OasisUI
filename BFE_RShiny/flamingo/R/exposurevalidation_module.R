@@ -93,7 +93,7 @@ exposurevalidation <- function(input,
 
   # Show/Hide table button -----------------------------------------------------
 
-  observeEvent(result$uploaded_locs_check, {
+  observe({
     hide("div_abuttonviewtbl")
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       show("div_abuttonviewtbl")
