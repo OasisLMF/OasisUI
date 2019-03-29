@@ -92,7 +92,6 @@ panelAnalysisDetails <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_analysis_details"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonanadetailsrefresh")),
       actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     analysis_detailsUI(ns("analysis_details"))
