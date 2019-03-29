@@ -71,6 +71,8 @@ generatedinputs <- function(input,
 
   # reload Generated Inputs table-----------------------------------------------
   onclick("abuttongeneratedrefresh", {
+    extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
+    unlink(extractFolder)
     .reloadGeneratediInputs()
   })
 

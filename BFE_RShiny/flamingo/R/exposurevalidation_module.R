@@ -55,7 +55,13 @@ exposurevalidationUI <- function(id) {
 #' @importFrom shinyjs show
 #'
 #' @export
-exposurevalidation <- function(input, output, session, counter = NULL, active, portfolioID = "", analysisID = "") {
+exposurevalidation <- function(input,
+                               output,
+                               session,
+                               analysisID = "",
+                               portfolioID = "",
+                               counter = NULL,
+                               active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -87,9 +93,9 @@ exposurevalidation <- function(input, output, session, counter = NULL, active, p
 
   # Show/Hide table button -----------------------------------------------------
 
-  observe({
+  observeEvent(result$uploaded_locs_check, {
     hide("div_abuttonviewtbl")
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0 ) {
+    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       show("div_abuttonviewtbl")
     }
   })
@@ -138,7 +144,7 @@ exposurevalidation <- function(input, output, session, counter = NULL, active, p
   # Export to .csv -------------------------------------------------------------
 
   output$exp_downloadexcel <- downloadHandler(
-    filename = function(){ result$filename2download},
+    filename = function() {result$filename2download},
     content = function(file) {
       fwrite(result$uploaded_locs_check, file, row.names = TRUE, quote = TRUE)}
   )
