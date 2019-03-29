@@ -441,9 +441,8 @@ step2_chooseAnalysis <- function(input, output, session,
     id = "analysis_details",
     portfolioID = reactive({result$portfolioID}),
     analysisID = reactive({result$analysisID}),
-    anaName = reactive({result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]}),
     counter = reactive({input$abuttonshowanadetails})
-)
+  )
 
   onclick("buttonhideanadetails", {
     hide("panelAnalysisDetails")
@@ -496,6 +495,15 @@ step2_chooseAnalysis <- function(input, output, session,
       paste0('Input generation Logs of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
       paste0("Input generation Logs")
+    }
+  })
+
+  #  analysis_details Table title
+  output$paneltitle_analysis_details <- renderUI({
+    if (result$analysisID != "") {
+      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+      paste0('Details of analysis id ', toString(analysisID), ' ', anaName)
     }
   })
 

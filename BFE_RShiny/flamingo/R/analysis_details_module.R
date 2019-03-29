@@ -51,7 +51,6 @@ analysis_detailsUI <- function(id) {
 #' @param analysisID Selected analysis ID.
 #' @param tbl_filesListData Dataframe of the output files
 #' @param reload_generated Imports function to reload Generated Inputs table.
-#' @param anaName Analysis name.
 #' @param portfolioID Selected portfolio ID.
 #'
 #' @importFrom shinyjs hide
@@ -63,7 +62,6 @@ analysis_details <- function(input,
                              output,
                              session,
                              analysisID,
-                             anaName,
                              portfolioID,
                              counter) {
 
@@ -76,7 +74,7 @@ analysis_details <- function(input,
     analysisID = analysisID,
     portfolioID = portfolioID,
     counter = counter,
-    active = reactive({input$tabsDetails == "tabvalidation"})
+    active = reactive({input$tabsDetails == ns("tabvalidation")})
   )
 
   # Tab Generated Inputs -------------------------------------------------------
@@ -84,7 +82,7 @@ analysis_details <- function(input,
     generatedinputs,
     id = "generatedinputs",
     analysisID = analysisID,
-    active = reactive({input$tabsDetails == "tabgeneratedinputs"})
+    active = reactive({input$tabsDetails == ns("tabgeneratedinputs")})
   )
 
   # Tab Status Detail ----------------------------------------------------------
@@ -92,7 +90,7 @@ analysis_details <- function(input,
     statusdetail,
     id = "statusdetail",
     analysisID = analysisID,
-    active = reactive({input$tabsDetails == "tabstatusdetail"})
+    active = reactive({input$tabsDetails == ns("tabstatusdetail")})
   )
 
   # Tab Uploaded Inputs --------------------------------------------------------
@@ -100,12 +98,7 @@ analysis_details <- function(input,
     uploadedinputs,
     id = "uploadedinputs",
     portfolioID = portfolioID,
-    active = reactive({input$tabsDetails == "tabuploadedinputs"})
+    active = reactive({input$tabsDetails == ns("tabuploadedinputs")})
   )
-
-  #  analysis_details Table title
-  output$paneltitle_analysis_details <- renderUI({
-    paste0('Details of analysis id ', toString(analysisID()), ' ', anaName())
-  })
 
 }
