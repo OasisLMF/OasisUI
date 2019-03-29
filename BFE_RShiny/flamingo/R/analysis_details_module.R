@@ -76,7 +76,7 @@ analysis_details <- function(input,
     analysisID = analysisID,
     portfolioID = portfolioID,
     counter = counter,
-    active = reactive({input$tabsDetails == "tabvalidation"})
+    active = reactive({input$tabsDetails == ns("tabvalidation")})
   )
 
   # Tab Generated Inputs -------------------------------------------------------
@@ -84,7 +84,7 @@ analysis_details <- function(input,
     generatedinputs,
     id = "generatedinputs",
     analysisID = analysisID,
-    active = reactive({input$tabsDetails == "tabgeneratedinputs"})
+    active = reactive({input$tabsDetails == ns("tabgeneratedinputs")})
   )
 
   # Tab Status Detail ----------------------------------------------------------
@@ -92,7 +92,7 @@ analysis_details <- function(input,
     statusdetail,
     id = "statusdetail",
     analysisID = analysisID,
-    active = reactive({input$tabsDetails == "tabstatusdetail"})
+    active = reactive({input$tabsDetails == ns("tabstatusdetail")})
   )
 
   # Tab Uploaded Inputs --------------------------------------------------------
@@ -100,7 +100,7 @@ analysis_details <- function(input,
     uploadedinputs,
     id = "uploadedinputs",
     portfolioID = portfolioID,
-    active = reactive({input$tabsDetails == "tabuploadedinputs"})
+    active = reactive({input$tabsDetails == ns("tabuploadedinputs")})
   )
 
   #  analysis_details Table title

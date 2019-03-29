@@ -41,6 +41,7 @@ exposurevalidationUI <- function(id) {
 #' @importFrom dplyr inner_join
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
+#' @importFrom tidyr spread
 #' @importFrom DT formatStyle
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -80,7 +81,7 @@ exposurevalidation <- function(input,
     active()
     counter()
   }, {
-    if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
+    if (active() && (!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
         (!is.null(analysisID()) && !is.na(analysisID()) && analysisID() != "")) {
       # Get modeled locations
       extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
@@ -88,6 +89,7 @@ exposurevalidation <- function(input,
         api_get_analyses_input_file(analysisID())
       }
       .reloadExposureValidation()
+      .reloadSummary()
     }
   })
 
@@ -101,10 +103,6 @@ exposurevalidation <- function(input,
   })
 
   # Summary table --------------------------------------------------------------
-
-  observeEvent(result$uploaded_locs_check,{
-    .reloadSummary()
-  })
 
   output$dt_summary_validation <- renderDT(
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
@@ -189,6 +187,29 @@ exposurevalidation <- function(input,
 
   # Utils functions ------------------------------------------------------------
 
+  # read summary.json
+
+  .read_summary <- function(anaID){
+    forig <- "./summary.json"
+    json_lst <- jsonlite::read_json(forig)
+
+    reg_expr_dot <- "^([^.]+)[.](.+)$"
+
+    col_ids <- "location_ids"
+    df <- lapply(
+      json_lst[sapply(json_lst, function(x) {!is.atomic(x)})],
+      function(x) {x[[col_ids]] <- toString(x[[col_ids]], width = 20); x}) %>%
+      as.data.frame()
+
+    df <- df %>%
+      t() %>%
+      as.data.frame() %>%
+      mutate(key = sub(reg_expr_dot, "\\1", rownames(.)),
+             type = sub(reg_expr_dot, "\\2", rownames(.))) %>%
+      spread(key, V1)
+    df
+  }
+
   # reload dataframes
 
   #dummy for summary table
@@ -201,19 +222,7 @@ exposurevalidation <- function(input,
 
     #Build df
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-      modelled_location <- result$uploaded_locs_check %>%
-        filter(modeled == TRUE) %>%
-        nrow()
-      dropped_location <- result$uploaded_locs_check %>%
-        filter(modeled == FALSE) %>%
-        nrow()
-      uploaded_location <- nrow(result$uploaded_locs_check)
-      result$summary_validation_tbl <- data.frame(
-        param = c("num location"),
-        input = c(uploaded_location),
-        modeled = c(modelled_location),
-        dropped = c(dropped_location)
-      )
+      result$summary_validation_tbl <- .read_summary(analysisID())
     } else {
       result$summary_validation_tbl <- NULL
     }
@@ -317,7 +326,7 @@ exposurevalidation <- function(input,
         lng = ~Longitude,
         lat = ~Latitude,
         icon = icon_map,
-        #clusterOptions = TRUE,
+        clusterOptions = TRUE,
         popup = toString(popupData))
   }
 
