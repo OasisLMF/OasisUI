@@ -33,5 +33,7 @@ capitalize_names_df <- function(df) {
   names(df) <- sapply(
     sapply(names(df), gsub, pattern = "_", replacement = " "),
     capitalize_first_letter)
+  #replace Id with ID
+  names(df)[names(df) == "Id"] <- "ID"
   df
 }
