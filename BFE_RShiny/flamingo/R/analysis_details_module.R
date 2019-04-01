@@ -27,9 +27,9 @@ analysis_detailsUI <- function(id) {
       value = ns("tabgeneratedinputs")
     ),
     tabPanel(
-      title = "Status Detail",
-      statusdetailUI(ns("statusdetail")),
-      value = ns("tabstatusdetail")
+      title = "Summary Status",
+      summarystatusUI(ns("summarystatus")),
+      value = ns("tabsummarystatus")
     ),
     tabPanel(
       title = "Uploaded Inputs",
@@ -87,10 +87,10 @@ analysis_details <- function(input,
 
   # Tab Status Detail ----------------------------------------------------------
   callModule(
-    statusdetail,
-    id = "statusdetail",
+    summarystatus,
+    id = "summarystatus",
     analysisID = analysisID,
-    active = reactive({input$tabsDetails == ns("tabstatusdetail")})
+    active = reactive({input$tabsDetails == ns("tabsummarystatus")})
   )
 
   # Tab Uploaded Inputs --------------------------------------------------------

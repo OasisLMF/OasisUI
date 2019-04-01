@@ -1,15 +1,15 @@
 # uploaded inputs Module ----------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' statusdetailUI
-#' @rdname statusdetail
+#' summarystatusUI
+#' @rdname summarystatus
 #'
-#' @description UI/View for status detail of files of an analysis.
+#' @description UI/View for summary status of files of an analysis.
 #'
 #' @return List of tags.
 #'
 #' @export
-statusdetailUI <- function(id) {
+summarystatusUI <- function(id) {
 
   ns <- NS(id)
 
@@ -21,9 +21,9 @@ statusdetailUI <- function(id) {
       filter = "none",
       rownames = TRUE,
       colnames = c('row number' = 1),
-      id = ns("panel_statusdetai"),
+      id = ns("panel_summarystatus"),
       flamingoRefreshButton(ns("abuttonuploadedrefresh")),
-      ViewFilesInTableUI(ns("statusDetailTable"), includechkbox = TRUE)
+      flamingoTableUI(ns("summaryStatusTable"))
     )
   )
 }
@@ -31,16 +31,16 @@ statusdetailUI <- function(id) {
 
 # Server -----------------------------------------------------------------------
 
-#' statusdetail
+#' summarystatus
 #'
-#' @rdname statusdetail
+#' @rdname summarystatus
 #'
-#' @description Server logic for status detail of files of an analysis.
+#' @description Server logic for summary status of files of an analysis.
 #'
 #' @param analysisID Selected analysis id.
 #'
 #' @export
-statusdetail <- function(input,
+summarystatus <- function(input,
                          output,
                          session,
                          analysisID,
@@ -55,34 +55,27 @@ statusdetail <- function(input,
 
   # Create flamingoTable -------------------------------------------------------
   observeEvent(active(), {
-    .reloadStatusDetails()
+    .reloadSummaryStatus()
   })
 
   callModule(
-    ViewFilesInTable,
-    id = "statusDetailTable",
-    tbl_filesListData = reactive({result$dt_uploaded}),
-    param = analysisID,
-    file_column = "files",
-    folderpath = "_inputs/",
-    includechkbox = TRUE
+    flamingoTable,
+    id = "summaryStatusTable",
+    data = reactive({result$dt_uploaded}),
+    rownames = TRUE,
+    escape = FALSE,
+    colnames = c('row number' = 1)
   )
 
   # reload Status Details table-------------------------------------------------
   onclick("abuttonuploadedrefresh", {
-    .reloadStatusDetails()
+    .reloadSummaryStatus()
   })
 
   # Reload Status Detail table -------------------------------------------------
-  .reloadStatusDetails <- function() {
-    logMessage(".reloadStatusDetails called")
+  .reloadSummaryStatus <- function() {
+    logMessage(".reloadSummaryStatus called")
     if (!is.null(analysisID()) && analysisID() != "") {
-    #   tbl_uploaded <- return_tbl_analysisdetails(analysisID())
-    # } else {
-    #   tbl_uploaded <-  NULL
-    # }
-    #
-    # if (!is.null(tbl_uploaded) && nrow(tbl_uploaded) > 0) {
       result$dt_uploaded <- return_tbl_analysisdetails(analysisID())
     } else {
       result$dt_uploaded <- NULL
