@@ -84,6 +84,7 @@ exposurevalidationUI <- function(id) {
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
 #' @importFrom tidyr spread
+#' @importFrom tidyr replace_na
 #'
 #' @export
 exposurevalidation <- function(input,
