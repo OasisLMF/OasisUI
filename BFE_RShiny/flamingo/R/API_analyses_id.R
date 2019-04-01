@@ -63,10 +63,6 @@ return_analyses_input_file_wicons_df <- function(id) {
   extractFolder <- set_extractFolder(id, label = "_inputs/")
   status_code_notfound <- 404
 
-  if (!file.exists(extractFolder)) {
-    api_get_analyses_input_file(id)
-  }
-
   analyses_input_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
 
   if (nrow(analyses_input_file_df) > 0) {
