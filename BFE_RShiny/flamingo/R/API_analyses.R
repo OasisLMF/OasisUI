@@ -281,7 +281,8 @@ return_tbl_analysisdetails <- function(id) {
 return_tbl_analysesData_nice <- function(tbl_analysesData) {
   # fetch model data to merge in table
     tbl_modelsData <- return_tbl_modelsData() %>%
-      select(!! sym(tbl_modelsDataNames$id), !! sym(tbl_modelsDataNames$model_id), !! sym(tbl_modelsDataNames$supplier_id), !! sym(tbl_modelsDataNames$version_id))
+      mutate(supplier = !! sym(tbl_modelsDataNames$supplier_id)) %>%
+      select(!! sym(tbl_modelsDataNames$id), !! sym(tbl_modelsDataNames$model_id), supplier, !! sym(tbl_modelsDataNames$version_id))
   # fetch portfolio data to merge in table
     tbl_portfoliosData <- return_tbl_portfoliosData() %>%
       select(!! sym(tbl_portfoliosDataNames$id), !! sym(tbl_portfoliosDataNames$name)) %>%
@@ -294,6 +295,7 @@ return_tbl_analysesData_nice <- function(tbl_analysesData) {
     unite("model_version", c(tbl_modelsDataNames$model_id, tbl_modelsDataNames$version_id), sep = ", version ") %>%
     left_join(tbl_portfoliosData, by = c("portfolio" = "id"))
 
+
  if (admin_mode == "admin") {
    tbl_analysesData <- tbl_analysesData %>%
      select(!! sym(tbl_analysesDataNames$id),
@@ -302,7 +304,7 @@ return_tbl_analysesData_nice <- function(tbl_analysesData) {
             portfolio_name,
             !! sym(tbl_analysesDataNames$model),
             model_version,
-            !! sym(tbl_modelsDataNames$supplier_id),
+            supplier,
             !! sym(tbl_analysesDataNames$created),
             !! sym(tbl_analysesDataNames$modified),
             !! sym(tbl_analysesDataNames$status_detailed),
@@ -315,7 +317,7 @@ return_tbl_analysesData_nice <- function(tbl_analysesData) {
             !! sym(tbl_analysesDataNames$name),
             portfolio_name,
             model_version,
-            !! sym(tbl_modelsDataNames$supplier_id),
+            supplier,
             !! sym(tbl_analysesDataNames$created),
             !! sym(tbl_analysesDataNames$modified),
             !! sym(tbl_analysesDataNames$status_detailed),
