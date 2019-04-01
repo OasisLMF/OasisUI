@@ -1,0 +1,45 @@
+{
+  "portfolio_id": 1,
+  "portfolio_description": "Test portfolio",
+  "model_id": 1,
+  "model_description": "Test model",
+  "all": {
+    "tiv": 1000000.0,
+    "tiv_by_coverage": {
+      "Buildings": 500000.0,
+      "Other buildings": 500000.0,
+      "Contents": 500000.0,
+      "BI": 500000.0
+    }
+  },
+  "success": {
+    "tiv": 1000000.0,
+    "tiv_by_coverage": {
+      "Buildings": 500000.0,
+      "Other buildings": 500000.0,
+      "Contents": 500000.0,
+      "BI": 500000.0
+    },
+    "location_ids": [1,2,3,4,5]
+  },
+  "fail": {
+    "tiv": 1000000.0,
+    "tiv_by_coverage": {
+      "Buildings": 500000.0,
+      "Other buildings": 500000.0,
+      "Contents": 500000.0,
+      "BI": 500000.0
+    },
+    "location_ids": [6,7,8,9,10]
+  },
+  "nomatch": {
+    "tiv": 1000000.0,
+    "tiv_by_coverage": {
+      "Buildings": 500000.0,
+      "Other buildings": 500000.0,
+      "Contents": 500000.0,
+      "BI": 500000.0
+    },
+    "location_ids": [11,12,13,14,15]
+  }
+}
