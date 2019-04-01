@@ -23,7 +23,7 @@ statusdetailUI <- function(id) {
       colnames = c('row number' = 1),
       id = ns("panel_statusdetai"),
       flamingoRefreshButton(ns("abuttonuploadedrefresh")),
-      flamingoTableUI(ns("statusDetailTable"))
+      ViewFilesInTableUI(ns("statusDetailTable"), includechkbox = TRUE)
     )
   )
 }
@@ -59,12 +59,13 @@ statusdetail <- function(input,
   })
 
   callModule(
-    flamingoTable,
+    ViewFilesInTable,
     id = "statusDetailTable",
-    data = reactive({result$dt_uploaded}),
-    rownames = TRUE,
-    escape = FALSE,
-    colnames = c('row number' = 1)
+    tbl_filesListData = reactive({result$dt_uploaded}),
+    param = analysisID,
+    file_column = "files",
+    folderpath = "_inputs/",
+    includechkbox = TRUE
   )
 
   # reload Status Details table-------------------------------------------------
@@ -76,13 +77,13 @@ statusdetail <- function(input,
   .reloadStatusDetails <- function() {
     logMessage(".reloadStatusDetails called")
     if (!is.null(analysisID()) && analysisID() != "") {
-      tbl_uploaded <- return_tbl_analysisdetails(analysisID())
-    } else {
-      tbl_uploaded <-  NULL
-    }
-
-    if (!is.null(tbl_uploaded) && nrow(tbl_uploaded) > 0) {
-      result$dt_uploaded <- tbl_uploaded
+    #   tbl_uploaded <- return_tbl_analysisdetails(analysisID())
+    # } else {
+    #   tbl_uploaded <-  NULL
+    # }
+    #
+    # if (!is.null(tbl_uploaded) && nrow(tbl_uploaded) > 0) {
+      result$dt_uploaded <- return_tbl_analysisdetails(analysisID())
     } else {
       result$dt_uploaded <- NULL
     }

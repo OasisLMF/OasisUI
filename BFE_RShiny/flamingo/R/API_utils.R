@@ -97,13 +97,16 @@ return_df <- function(api_query, api_param = "") {
 #' @export
 return_file_df <- function(api_query, api_param = "") {
   fileList <- content(api_query(api_param)$result)
-  if (is.null(names(fileList))) {
+  if (is.character(fileList)) {
+    if (is.null(names(fileList))) {
     file_df <- strsplit(fileList, split = "\n") %>%
       as.data.frame(stringsAsFactors = FALSE)
-    colnames(file_df) <- file_df[1, ]
-  } else {
+    } else {
     file_df <- bind_rows(fileList) %>%
-      as.data.frame()
+      as.data.frame(stringsAsFactors = FALSE)
+    }
+  } else {
+    file_df <- as.data.frame(fileList, stringsAsFactors = FALSE)
   }
   file_df
 }
