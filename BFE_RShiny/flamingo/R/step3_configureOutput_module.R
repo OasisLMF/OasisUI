@@ -561,7 +561,7 @@ step3_configureOutput <- function(input, output, session,
       }
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData,
+        result$tbl_analysesData %>% return_tbl_analysesData_nice(),
         class = "flamingo-table display",
         rownames = TRUE,
         selection = list(mode = 'single',
@@ -883,7 +883,7 @@ step3_configureOutput <- function(input, output, session,
       logMessage("re-rendering analysis log table")
       if (!is.null(result$tbl_analysisrunlog)) {
         datatable(
-          result$tbl_analysisrunlog,
+          result$tbl_analysisrunlog %>% capitalize_names_df(),
           class = "flamingo-table display",
           rownames = TRUE,
           selection = "none",
