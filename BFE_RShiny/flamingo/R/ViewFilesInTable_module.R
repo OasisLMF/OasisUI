@@ -143,7 +143,7 @@ ViewFilesInTable <- function(input, output, session,
         rownames = TRUE,
         escape = FALSE,
         selection =  selectionUsed,
-        colnames = c('row number' = 1),
+        colnames = c('Row Number' = 1),
         options = .getFLTableOptions()
       )
     } else {
@@ -307,7 +307,7 @@ ViewFilesInTable <- function(input, output, session,
         rownames = TRUE,
         selection = "none",
         filter = 'bottom',
-        colnames = c("row number" = 1),
+        colnames = c("Row Number" = 1),
         width = "100%",
         options = list(searchHighlight = TRUE,
                        scrollX = TRUE))
