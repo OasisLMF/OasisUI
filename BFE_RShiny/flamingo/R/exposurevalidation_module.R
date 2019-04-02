@@ -110,6 +110,9 @@ exposurevalidation <- function(input,
   #name of element with location ids
   loc_ids <- "location_ids"
 
+  color_success <- c('rgb(31,119,180)', 'rgb(255,127,14)')
+  color_match <- c('rgb(114,147,203)', 'rgb(211,94,96)')
+
   # Modeled exposure and uploaded exposure ------------------------------------
   observeEvent({
     active()
@@ -159,13 +162,13 @@ exposurevalidation <- function(input,
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl)) {
 
       df_loc <- .extract_df_pieplot(df = result$summary_validation_tbl, filter_row = loc_ids)
-      output$outputplot_loc1 <- renderPlotly({.plotly_pie(df = df_loc$df_sel1, pie_labs =  df_loc$df_sel1$key, pie_vals =  df_loc$df_sel1$value, colors2use = "Spectral")})
-      output$outputplot_loc2 <- renderPlotly({.plotly_pie(df = df_loc$df_sel2, pie_labs = df_loc$df_sel2$key, pie_vals = df_loc$df_sel2$value, colors2use = "PiYG")})
+      output$outputplot_loc1 <- renderPlotly({.plotly_pie(df = df_loc$df_sel1, pie_labs =  df_loc$df_sel1$key, pie_vals =  df_loc$df_sel1$value, colors2use = color_success)})
+      output$outputplot_loc2 <- renderPlotly({.plotly_pie(df = df_loc$df_sel2, pie_labs = df_loc$df_sel2$key, pie_vals = df_loc$df_sel2$value, colors2use = color_match)})
 
 
       df_tiv <- .extract_df_pieplot(df = result$summary_validation_tbl, filter_row = "tiv")
-      output$outputplot_tiv1 <- renderPlotly({.plotly_pie(df = df_tiv$df_sel1, pie_labs =  df_tiv$df_sel1$key, pie_vals =  df_tiv$df_sel1$value, colors2use = "Spectral")})
-      output$outputplot_tiv2 <- renderPlotly({.plotly_pie(df = df_tiv$df_sel2, pie_labs = df_tiv$df_sel2$key, pie_vals = df_tiv$df_sel2$value, colors2use = "PiYG")})
+      output$outputplot_tiv1 <- renderPlotly({.plotly_pie(df = df_tiv$df_sel1, pie_labs =  df_tiv$df_sel1$key, pie_vals =  df_tiv$df_sel1$value, colors2use = color_success)})
+      output$outputplot_tiv2 <- renderPlotly({.plotly_pie(df = df_tiv$df_sel2, pie_labs = df_tiv$df_sel2$key, pie_vals = df_tiv$df_sel2$value, colors2use = color_match)})
 
     }
   })
@@ -279,7 +282,7 @@ exposurevalidation <- function(input,
 
   # visualize exposure validation summary
   .plotly_pie <- function(df, pie_labs, pie_vals, pie_title, colors2use){
-    pie_ly <- plot_ly(df, labels = pie_labs, values = pie_vals, type = 'pie', colors = colors2use)
+    pie_ly <- plot_ly(df, labels = pie_labs, values = as.numeric(pie_vals), type = 'pie', marker = list(colors = colors2use))
     pie_ly
   }
 
