@@ -366,7 +366,7 @@ ViewFilesInTable <- function(input, output, session,
       extractFolder <- set_extractFolder(id = param(), label = folderpath)
       result$currfilepath <- set_extractFilePath(extractFolder, result$currentFile)
       if (dir.exists(result$currfilepath)) {
-        result$tbl_fileData <- list.files(result$currfilepath) %>%
+        result$tbl_fileData <- list.files(result$currfilepath, recursive = TRUE) %>%
           as.data.frame() %>%
           setNames("files")
         filecolumns <- ""

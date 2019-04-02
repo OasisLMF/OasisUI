@@ -67,7 +67,7 @@ return_analyses_input_file_wicons_df <- function(id) {
     api_get_analyses_input_file(id)
   }
 
-  analyses_input_file_df <- list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
+  analyses_input_file_df <- list.files(extractFolder, recursive = TRUE) %>% as.data.frame() %>% setNames("files")
 
   if (nrow(analyses_input_file_df) > 0) {
   fnames <- analyses_input_file_df$files
@@ -616,7 +616,7 @@ return_analyses_output_file_df <- function(id) {
   if (!file.exists(extractFolder)) {
     api_get_analyses_output_file(id)
   }
-  list.files(extractFolder) %>% as.data.frame() %>% setNames("files")
+  list.files(extractFolder, recursive = TRUE) %>% as.data.frame() %>% setNames("files")
 }
 
 #' Return specific analyses output file as dataframe
