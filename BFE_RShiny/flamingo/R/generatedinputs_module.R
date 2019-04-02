@@ -54,12 +54,16 @@ generatedinputs <- function(input,
 
   # Create table ---------------------------------------------------------------
   observeEvent(active(), ignoreInit = TRUE, {
-    if (active()) {
+    if (length(active()) > 0 && active()) {
       extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
       if (!dir.exists(extractFolder) || is.na(file.size(extractFolder))) {
-      api_get_analyses_input_file(analysisID())
+        api_get_analyses_input_file(analysisID())
       }
-      .reloadGeneratediInputs()
+      withModalSpinner(
+        .reloadGeneratediInputs(),
+        "Loading...",
+        size = "s"
+      )
     }
   })
 
@@ -75,7 +79,11 @@ generatedinputs <- function(input,
   # reload Generated Inputs table-----------------------------------------------
   onclick("abuttongeneratedrefresh", {
     api_get_analyses_input_file(analysisID())
-    .reloadGeneratediInputs()
+    withModalSpinner(
+      .reloadGeneratediInputs(),
+      "Refreshing...",
+      size = "s"
+    )
   })
 
   # Reload input generated table -----------------------------------------------

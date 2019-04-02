@@ -41,10 +41,10 @@ summarystatusUI <- function(id) {
 #'
 #' @export
 summarystatus <- function(input,
-                         output,
-                         session,
-                         analysisID,
-                         active = reactive(TRUE)) {
+                          output,
+                          session,
+                          analysisID,
+                          active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -55,7 +55,13 @@ summarystatus <- function(input,
 
   # Create flamingoTable -------------------------------------------------------
   observeEvent(active(), {
-    .reloadSummaryStatus()
+    if (length(active()) > 0 && active()) {
+      withModalSpinner(
+        .reloadSummaryStatus(),
+        "Loading...",
+        size = "s"
+      )
+    }
   })
 
   callModule(
@@ -69,7 +75,11 @@ summarystatus <- function(input,
 
   # reload Status Details table-------------------------------------------------
   onclick("abuttonuploadedrefresh", {
-    .reloadSummaryStatus()
+    withModalSpinner(
+      .reloadSummaryStatus(),
+      "Refreshing...",
+      size = "s"
+    )
   })
 
   # Reload Status Detail table -------------------------------------------------

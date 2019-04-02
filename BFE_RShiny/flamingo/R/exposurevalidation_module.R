@@ -118,15 +118,27 @@ exposurevalidation <- function(input,
     active()
     counter()
   }, {
-    if (active() && (!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
-        (!is.null(analysisID()) && !is.na(analysisID()) && analysisID() != "")) {
-      # Get modeled locations
-      extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
-      if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
-        api_get_analyses_input_file(analysisID())
+    if (length(active()) > 0 && active()) {
+      if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
+          (!is.null(analysisID()) && !is.na(analysisID()) && analysisID() != "")) {
+        # Get modeled locations
+        extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
+        if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
+          api_get_analyses_input_file(analysisID())
+        }
+        if (length(active()) > 0 && active()) {
+          withModalSpinner(
+            .reloadExposureValidation(),
+            "Loading...",
+            size = "s"
+          )
+          withModalSpinner(
+            .reloadSummary(),
+            "Loading...",
+            size = "s"
+          )
+        }
       }
-      .reloadExposureValidation()
-      .reloadSummary()
     }
   })
 
@@ -231,12 +243,15 @@ exposurevalidation <- function(input,
 
   })
 
-
   # Refresh button -------------------------------------------------------------
   onclick("abuttonexposurerefresh", {
-    # Get modeled locations
     api_get_analyses_input_file(analysisID())
-    .reloadExposureValidation()
+    # Get modeled locations
+    withModalSpinner(
+      .reloadExposureValidation(),
+      "Refreshing...",
+      size = "s"
+    )
   })
 
   # Utils functions ------------------------------------------------------------

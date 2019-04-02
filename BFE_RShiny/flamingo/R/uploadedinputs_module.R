@@ -48,7 +48,13 @@ uploadedinputs <- function(input,
 
   # Create table ---------------------------------------------------------------
   observeEvent(active(), {
-    .reloadtbl_portfolioDetails()
+    if (length(active()) > 0 && active()) {
+      withModalSpinner(
+        .reloadtbl_portfolioDetails(),
+        "Loading...",
+        size = "s"
+      )
+    }
   })
 
   callModule(
@@ -61,7 +67,11 @@ uploadedinputs <- function(input,
 
   # reload Uploaded Inputs table-----------------------------------------------
   onclick("abuttonuploadedrefresh", {
-    .reloadtbl_portfolioDetails()
+    withModalSpinner(
+      .reloadtbl_portfolioDetails(),
+      "Refreshing...",
+      size = "s"
+    )
   })
 
   # Reload uploaded inputs table -----------------------------------------------

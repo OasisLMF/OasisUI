@@ -195,8 +195,12 @@ defineID <- function(input, output, session,
 
 
   observeEvent(input$abuttonselectAna, {
-    .downloadOutput(idx = sub_modules$flamingo_analyses$rows_selected())
     removeModal()
+    withModalSpinner(
+      .downloadOutput(idx = sub_modules$flamingo_analyses$rows_selected()),
+      "Loading...",
+      size = "s"
+    )
   })
 
   # > Enable/disable select button
