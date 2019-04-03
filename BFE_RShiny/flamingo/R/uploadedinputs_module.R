@@ -36,6 +36,7 @@ uploadedinputs <- function(input,
                            output,
                            session,
                            portfolioID,
+                           counter = NULL,
                            active = reactive(TRUE)) {
 
   ns <- session$ns
@@ -47,7 +48,10 @@ uploadedinputs <- function(input,
   )
 
   # Create table ---------------------------------------------------------------
-  observeEvent(active(), {
+  observeEvent({
+    active()
+    counter()
+  }, {
     if (length(active()) > 0 && active()) {
       withModalSpinner(
         .reloadtbl_portfolioDetails(),

@@ -43,6 +43,7 @@ generatedinputs <- function(input,
                             output,
                             session,
                             analysisID,
+                            counter = NULL,
                             active = reactive(TRUE)) {
 
   ns <- session$ns
@@ -53,7 +54,10 @@ generatedinputs <- function(input,
   )
 
   # Create table ---------------------------------------------------------------
-  observeEvent(active(), ignoreInit = TRUE, {
+  observeEvent({
+    active()
+    counter()
+  }, ignoreInit = TRUE, {
     if (length(active()) > 0 && active()) {
       extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
       if (!dir.exists(extractFolder) || is.na(file.size(extractFolder))) {
@@ -80,8 +84,8 @@ generatedinputs <- function(input,
   onclick("abuttongeneratedrefresh", {
     withModalSpinner(
       api_get_analyses_input_file(analysisID()),
-    "Refreshing...",
-    size = "s"
+      "Refreshing...",
+      size = "s"
     )
     .reloadGeneratediInputs()
   })

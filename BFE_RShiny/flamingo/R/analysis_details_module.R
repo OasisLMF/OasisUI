@@ -82,6 +82,7 @@ analysis_details <- function(input,
     generatedinputs,
     id = "generatedinputs",
     analysisID = analysisID,
+    counter = counter,
     active = reactive({input$tabsDetails == ns("tabgeneratedinputs")})
   )
 
@@ -90,6 +91,7 @@ analysis_details <- function(input,
     summarystatus,
     id = "summarystatus",
     analysisID = analysisID,
+    counter = counter,
     active = reactive({input$tabsDetails == ns("tabsummarystatus")})
   )
 
@@ -98,6 +100,7 @@ analysis_details <- function(input,
     uploadedinputs,
     id = "uploadedinputs",
     portfolioID = portfolioID,
+    counter = counter,
     active = reactive({input$tabsDetails == ns("tabuploadedinputs")})
   )
 

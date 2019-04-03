@@ -44,6 +44,7 @@ summarystatus <- function(input,
                           output,
                           session,
                           analysisID,
+                          counter = NULL,
                           active = reactive(TRUE)) {
 
   ns <- session$ns
@@ -54,7 +55,10 @@ summarystatus <- function(input,
   )
 
   # Create flamingoTable -------------------------------------------------------
-  observeEvent(active(), {
+  observeEvent({
+    active()
+    counter()
+  }, {
     if (length(active()) > 0 && active()) {
       withModalSpinner({
         .reloadSummaryStatus()
