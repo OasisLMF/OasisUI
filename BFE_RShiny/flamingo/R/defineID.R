@@ -189,7 +189,11 @@ defineID <- function(input, output, session,
   # > select analysis ID
   observeEvent(result$preselRow, {
     if (!is.null( result$preselRow)) {
-      .downloadOutput(idx = result$preselRow)
+      withModalSpinner(
+      .downloadOutput(idx = result$preselRow),
+      "Loading...",
+      size = "s"
+      )
     }
   })
 
