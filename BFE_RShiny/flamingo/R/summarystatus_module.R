@@ -56,10 +56,11 @@ summarystatus <- function(input,
   # Create flamingoTable -------------------------------------------------------
   observeEvent(active(), {
     if (length(active()) > 0 && active()) {
-      withModalSpinner(
-        .reloadSummaryStatus(),
-        "Loading...",
-        size = "s"
+      withModalSpinner({
+        .reloadSummaryStatus()
+      },
+      "Loading...",
+      size = "s"
       )
     }
   })

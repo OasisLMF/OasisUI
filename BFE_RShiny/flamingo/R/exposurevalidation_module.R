@@ -121,23 +121,18 @@ exposurevalidation <- function(input,
     if (length(active()) > 0 && active()) {
       if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
           (!is.null(analysisID()) && !is.na(analysisID()) && analysisID() != "")) {
-        # Get modeled locations
-        extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
-        if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
-          api_get_analyses_input_file(analysisID())
-        }
-        if (length(active()) > 0 && active()) {
-          withModalSpinner(
-            .reloadExposureValidation(),
-            "Loading...",
-            size = "s"
-          )
-          withModalSpinner(
-            .reloadSummary(),
-            "Loading...",
-            size = "s"
-          )
-        }
+
+        withModalSpinner({
+          extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
+          if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
+            api_get_analyses_input_file(analysisID())
+          }
+          .reloadExposureValidation()
+          .reloadSummary()
+        },
+        "Loading...",
+        size = "s"
+        )
       }
     }
   })
