@@ -537,7 +537,7 @@ step2_chooseAnalysis <- function(input, output, session,
   )
 
   observeEvent(result$tbl_analysislog, {
-    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 0  && nrow(result$tbl_analysislog) != 1) {
+    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 1) {
       show("download_log")
     } else {
       hide("download_log")
@@ -545,7 +545,7 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
   output$dt_analysislog <- renderDT(
-    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 0 &&  nrow(result$tbl_analysislog) != 1) {
+    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 1) {
       logMessage("re-rendering analysis log table")
       datatable(
         result$tbl_analysislog %>% capitalize_names_df(),

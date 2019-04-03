@@ -886,7 +886,7 @@ step3_configureOutput <- function(input, output, session,
   )
 
   observeEvent(result$tbl_analysisrunlog, {
-    if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 0 &&  nrow(result$tbl_analysislog) != 1) {
+    if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 1) {
       show("download_log")
     } else {
       hide("download_log")
@@ -897,7 +897,7 @@ step3_configureOutput <- function(input, output, session,
   output$dt_analysesrunlog <- renderDT({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
-      if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 0 &&  nrow(result$tbl_analysislog) != 1) {
+      if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 1) {
         datatable(
           result$tbl_analysisrunlog %>% capitalize_names_df(),
           class = "flamingo-table display",
