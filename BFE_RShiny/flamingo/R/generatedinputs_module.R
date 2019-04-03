@@ -55,16 +55,15 @@ generatedinputs <- function(input,
   # Create table ---------------------------------------------------------------
   observeEvent(active(), ignoreInit = TRUE, {
     if (length(active()) > 0 && active()) {
-      withModalSpinner({
-        extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
-        if (!dir.exists(extractFolder) || is.na(file.size(extractFolder))) {
-          api_get_analyses_input_file(analysisID())
-        }
-        .reloadGeneratediInputs()
-      },
-      "Loading...",
-      size = "s"
-      )
+      extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
+      if (!dir.exists(extractFolder) || is.na(file.size(extractFolder))) {
+        withModalSpinner(
+          api_get_analyses_input_file(analysisID()),
+          "Loading...",
+          size = "s"
+        )
+      }
+      .reloadGeneratediInputs()
     }
   })
 
@@ -79,13 +78,12 @@ generatedinputs <- function(input,
 
   # reload Generated Inputs table-----------------------------------------------
   onclick("abuttongeneratedrefresh", {
-    withModalSpinner({
-      api_get_analyses_input_file(analysisID())
-      .reloadGeneratediInputs()
-    },
+    withModalSpinner(
+      api_get_analyses_input_file(analysisID()),
     "Refreshing...",
     size = "s"
     )
+    .reloadGeneratediInputs()
   })
 
   # Reload input generated table -----------------------------------------------
