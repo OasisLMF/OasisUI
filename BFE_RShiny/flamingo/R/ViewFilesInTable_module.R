@@ -195,6 +195,14 @@ ViewFilesInTable <- function(input, output, session,
     }
   )
 
+  # Download to csv ------------------------------------------------------------
+  # Export to .csv
+  output$FLdownloadexcel <- downloadHandler(
+    filename = "file.csv",
+    content = function(file) {
+      fwrite(result$tbl_filesListData_wButtons, file, row.names = TRUE, quote = TRUE)}
+  )
+
   # Selected Row ---------------------------------------------------------------
   observeEvent(input$dt_outputFL_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (length(input$dt_outputFL_rows_selected) > 0) {

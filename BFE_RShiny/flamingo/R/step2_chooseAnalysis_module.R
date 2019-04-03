@@ -127,7 +127,8 @@ panelAnalysisLog <- function(id) {
       flamingoRefreshButton(ns("abuttonanalogrefresh")),
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analysislog"))
+    DTOutput(ns("dt_analysislog")),
+    downloadButton(ns("download_log"), label = "Export to csv")
   )
 }
 
@@ -527,8 +528,24 @@ step2_chooseAnalysis <- function(input, output, session,
     paste0('Logs for analysis ', analysisID, ' ', AnaName)
   })
 
+
+  # Export to .csv
+  output$download_log <- downloadHandler(
+    filename = "analysis_inputs_log.csv",
+    content = function(file) {
+      fwrite(result$tbl_analysislog, file, row.names = TRUE, quote = TRUE)}
+  )
+
+  observeEvent(result$tbl_analysislog, {
+    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 1) {
+      show("download_log")
+    } else {
+      hide("download_log")
+    }
+  })
+
   output$dt_analysislog <- renderDT(
-    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 0 ) {
+    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 1) {
       logMessage("re-rendering analysis log table")
       datatable(
         result$tbl_analysislog %>% capitalize_names_df(),
