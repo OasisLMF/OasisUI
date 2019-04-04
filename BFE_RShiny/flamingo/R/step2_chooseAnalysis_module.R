@@ -230,7 +230,7 @@ panelModelDetails <- function(id) {
 
       tabPanel(
         title = "Hazard Maps",
-        leafletOutput(ns("modelmap")),
+        createPlainMapUI(ns("createPlainMap")),
         value = ns("tabmaps")
       )
     )
@@ -628,11 +628,12 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelModelDetails")
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
+    path <- "./www/hazard_500_PGA.geojson"
+    result$mapfile <- jsonlite::fromJSON(path)
     if (is.null(result$mapfile)) {
       hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
     }
     logMessage("showing panelModelDetails")
-    #result$mapfile <- getFileMap()
   })
 
   onclick("buttonhidemodeldetails", {
@@ -689,7 +690,10 @@ step2_chooseAnalysis <- function(input, output, session,
 
   observeEvent(result$mapfile, ignoreNULL = FALSE, {
     if (!is.null(result$mapfile)) {
-      output$modelmap <- renderLeaflet({createPlainMap(result$mapfile)})
+      callModule(
+        createPlainMap,
+        id = "createPlainMap",
+        result$mapfile)
     }
   })
 
