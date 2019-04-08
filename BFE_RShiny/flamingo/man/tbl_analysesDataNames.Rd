@@ -9,6 +9,6 @@
 tbl_analysesDataNames
 }
 \description{
-Creating List for col names of Model Runs Table
+Creating List for col names of Analyses Table
 }
 \keyword{datasets}

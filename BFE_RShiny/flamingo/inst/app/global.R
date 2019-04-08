@@ -54,6 +54,8 @@ options(flamingo.settings.api.httptype = "application/json")
 options(flamingo.settings.api.version = APISettings$version)
 options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
 
+options(flamingo.settings.admin.mode = Sys.getenv("ADMIN_MODE"))
+
 options(flamingo.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))
 
 #health check

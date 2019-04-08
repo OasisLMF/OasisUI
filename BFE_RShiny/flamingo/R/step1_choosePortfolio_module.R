@@ -343,7 +343,7 @@ step1_choosePortfolio <- function(input, output, session,
         rowToSelect <- 1
       }
       datatable(
-        result$tbl_portfoliosData,
+        result$tbl_portfoliosData %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
