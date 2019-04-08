@@ -3,10 +3,20 @@ OasisUI Changelog
 
 .. AUTO_INSERT-CHANGE_LIST  
 
+`1.0.2`_
+--------
+* Update and simplify Dockerfile for `oasisui_app` 
+* Update for status display of an analysis
+* New table headers
+* Added Download Button for log files
+* Fixed display of folders in files list 
+
 `1.0.1`_
 --------
-.. TODO
-
+* Update to Summary Output reporting tables 
+* Cosmetics updates
+* Fix for file names on download 
+* Fix model_settings sublevel in analysis_settings.json
 
 `1.0.0`_
 --------
@@ -48,6 +58,7 @@ OasisUI Changelog
 
 
 .. AUTO_INSERT-CHANGE_DIFF
+.. _`1.0.2`:  https://github.com/OasisLMF/OasisUI/compare/1.0.1...1.0.2
 .. _`1.0.1`:  https://github.com/OasisLMF/OasisUI/compare/1.0.0...1.0.1
 .. _`1.0.0`:  https://github.com/OasisLMF/OasisUI/compare/1.0.0-rc1...1.0.0
 .. _`1.0.0-rc1`:  https://github.com/OasisLMF/OasisUI/compare/0.397.0...1.0.0-rc1
