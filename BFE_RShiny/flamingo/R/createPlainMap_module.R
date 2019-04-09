@@ -1,16 +1,16 @@
-# Create PLain Map module -----------------------------------------------------------
+# Create Hazard Map module -----------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' createPlainMap_ui
+#' createHazardMap
 #'
-#' @rdname createPlainMap
+#' @rdname createHazardMap
 #'
-#' @description Creates a plain map using leaflet.
+#' @description Creates a hazard map using leaflet.
 #'
 #' @param file File to plot as map.
 #'
 #' @export
-createPlainMapUI <- function(id) {
+createHazardMapUI <- function(id) {
   ns <- NS(id)
 
   tagList(
@@ -40,11 +40,11 @@ createPlainMapUI <- function(id) {
 }
 
 # Server -----------------------------------------------------------------------
-#' Create Plain Map
+#' Create Hazard Map
 #'
-#' @rdname createPlainMap
+#' @rdname createHazardMap
 #'
-#' @description Creates a plain map using leaflet.
+#' @description Creates a hazard map using leaflet.
 #'
 #' @return Leaflet map.
 #'
@@ -59,7 +59,7 @@ createPlainMapUI <- function(id) {
 #' @importFrom leaflet addAwesomeMarkers
 #'
 #' @export
-createPlainMap <- function(input, output, session,
+createHazardMap <- function(input, output, session,
                            file) {
 
   ns <- session$ns
@@ -88,11 +88,11 @@ createPlainMap <- function(input, output, session,
 
   # Plot leaflet
   output$plainmap <- renderLeaflet({
-    .createPlainMap(file)
+    .buildHazardMap(file)
   })
 
   # Create map
-  .createPlainMap <- function(df) {
+  .buildHazardMap <- function(df) {
 
     # Create map color palette
     pal <- colorNumeric(input$map_colors, col)

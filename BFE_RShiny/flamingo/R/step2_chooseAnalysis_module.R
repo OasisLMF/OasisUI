@@ -230,7 +230,7 @@ panelModelDetails <- function(id) {
 
       tabPanel(
         title = "Hazard Maps",
-        createPlainMapUI(ns("createPlainMap")),
+        createHazardMapUI(ns("createHazardMap")),
         value = ns("tabmaps")
       )
     )
@@ -691,8 +691,8 @@ step2_chooseAnalysis <- function(input, output, session,
   observeEvent(result$mapfile, ignoreNULL = FALSE, {
     if (!is.null(result$mapfile)) {
       callModule(
-        createPlainMap,
-        id = "createPlainMap",
+        createHazardMap,
+        id = "createHazardMap",
         result$mapfile)
     }
   })
