@@ -14,7 +14,7 @@ createHazardMapUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    leafletOutput(ns("plainmap")),
+    leafletOutput(ns("hazardmap")),
     fluidRow(
       column(5,
              radioButtons(ns("legend"), "Move legend", choices = c("top right",
@@ -87,7 +87,7 @@ createHazardMap <- function(input, output, session,
   )
 
   # Plot leaflet
-  output$plainmap <- renderLeaflet({
+  output$hazardmap <- renderLeaflet({
     .buildHazardMap(file)
   })
 
