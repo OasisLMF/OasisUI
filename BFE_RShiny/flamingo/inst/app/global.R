@@ -6,6 +6,9 @@ library(flamingo, warn.conflicts = FALSE)
 
 source(file.path(".", "helper_text.R"), local = TRUE)
 
+#Extend max uploadable file size from default 5MB to 40MB
+options(shiny.maxRequestSize = 400*1024^2)
+
 ### logger ---------------------------------------------------------------------
 #addHandler(writeToFile, logger = "flamingo",
 #    file = file.path("var", "log", "shinyproxy", "flamingo.log"))
