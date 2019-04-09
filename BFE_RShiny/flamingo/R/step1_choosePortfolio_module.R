@@ -327,7 +327,7 @@ step1_choosePortfolio <- function(input, output, session,
       enable("abuttondeletepf")
       enable("abuttonamendpf")
       enable("abuttonuploadsourcefiles")
-      if (result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$status] == Status$Completed) {
+      if (!is.null(result$tbl_portfoliosData) && result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$status] == Status$Completed) {
         enable("abuttonpgotonextstep")
       }
     }
