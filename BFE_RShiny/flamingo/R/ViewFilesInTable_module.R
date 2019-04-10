@@ -375,7 +375,7 @@ ViewFilesInTable <- function(input, output, session,
     #Show buttons
     if ("latitude" %in% names(result$tbl_fileData)) {
       if (!is.null(result$tbl_fileData)) {
-        output$plainmap <- renderLeaflet({createHazardMap(result$tbl_fileData)})
+        output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
       }
       show("abuttonmap")
     } else {
