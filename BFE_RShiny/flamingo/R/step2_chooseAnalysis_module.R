@@ -230,6 +230,10 @@ panelModelDetails <- function(id) {
 
       tabPanel(
         title = "Hazard Maps",
+        selectInput(inputId = ns("hazard_files"),
+                    label = "Choose hazard file",
+                    choices = list.files("./www/hazard_files")
+        ),
         createHazardMapUI(ns("createHazardMap")),
         value = ns("tabmaps")
       )
@@ -628,11 +632,6 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelModelDetails")
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
-    path <- "./www/hazard_500_PGA.geojson"
-    result$mapfile <- jsonlite::fromJSON(path)
-    if (is.null(result$mapfile)) {
-      hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
-    }
     logMessage("showing panelModelDetails")
   })
 
@@ -688,12 +687,25 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Hazard Map -----------------------------------------------------------------
 
+  # Choose hazard file
+  observeEvent(input$hazard_files, {
+    if (!is.null(input$hazard_files)) {
+      path <- paste0("./www/hazard_files/", input$hazard_files)
+      result$mapfile <- jsonlite::fromJSON(path)
+      if (is.null(result$mapfile)) {
+        hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
+      }
+    }
+  })
+
+  # Draw map
   observeEvent(result$mapfile, ignoreNULL = FALSE, {
     if (!is.null(result$mapfile)) {
       callModule(
         createHazardMap,
         id = "createHazardMap",
-        result$mapfile)
+        file_map = result$mapfile,
+        portfolioID = reactive({result$portfolioID}))
     }
   })
 

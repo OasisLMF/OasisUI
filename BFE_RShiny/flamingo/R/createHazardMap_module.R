@@ -7,35 +7,15 @@
 #'
 #' @description Creates a hazard map using leaflet.
 #'
-#' @param file File to plot as map.
-#'
 #' @export
 createHazardMapUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    leafletOutput(ns("hazardmap")),
-    fluidRow(
-      column(5,
-             radioButtons(ns("legend"), "Move legend", choices = c("top right",
-                                                                   "top left",
-                                                                   "bottom right",
-                                                                   "bottom left")),
-             radioButtons(ns("map_colors"), "Choose map colors", choices = c("Reds",
-                                                                             "Blues",
-                                                                             "Greens"))
-      ),
-      column(5,
-             radioButtons(ns("map_style"), "Choose map style", choices = c("Street view",
-                                                                           "Portrait",
-                                                                           "Black and white",
-                                                                           "Basic")),
-             radioButtons(ns("pin_colors"), "Choose pin color", choices = c("Red",
-                                                                            "Blue",
-                                                                            "Green"))
-      ),
-      sliderInput(ns("contrast_colors"), "Adjust color contrast", min = 0.1, max = 1, value = 0.5)
-    )
+    leafletOutput(ns("hazardmap"))
+    # fluidRow(
+    #   sliderInput(ns("contrast_colors"), "Adjust color contrast", min = 0.1, max = 1, value = 0.5)
+    # )
   )
 }
 
@@ -45,6 +25,9 @@ createHazardMapUI <- function(id) {
 #' @rdname createHazardMap
 #'
 #' @description Creates a hazard map using leaflet.
+#'
+#' @param file_map File to plot as map.
+#' @param portfolioID ID of the portfolio.
 #'
 #' @return Leaflet map.
 #'
@@ -60,77 +43,64 @@ createHazardMapUI <- function(id) {
 #'
 #' @export
 createHazardMap <- function(input, output, session,
-                           file) {
+                            file_map,
+                            portfolioID = "") {
 
   ns <- session$ns
 
   # Isolate coordinates and Return Level
-  i <- 1:max(file$features$id)
-  coor <- sapply(i, function(x) {file$features$geometry$coordinates[[x]]})
-  col <- sapply(i, function(x) {file$features$properties[1][[1]][x]})
+  i <- 1:max(file_map$features$id)
+  coor <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]]})
+  col <- sapply(i, function(x) {file_map$features$properties[1][[1]][x]})
 
   # Find maximum negative (lng) number and minimum (lat) values
   pos_min <- function(x) {min(x[x > 0])}
   neg_max <- function(x) {max(x[x < 0])}
 
-  # Set up lng and lat for pins
-  pin_lng <- c(file$features$geometry$coordinates[[78]][2],
-               file$features$geometry$coordinates[[1000]][2],
-               file$features$geometry$coordinates[[3000]][2],
-               file$features$geometry$coordinates[[6000]][2]
-  )
-
-  pin_lat <- c(file$features$geometry$coordinates[[78]][7],
-               file$features$geometry$coordinates[[1000]][7],
-               file$features$geometry$coordinates[[3000]][7],
-               file$features$geometry$coordinates[[6000]][7]
-  )
-
   # Plot leaflet
   output$hazardmap <- renderLeaflet({
-    .buildHazardMap(file)
+    .buildHazardMap(file_map, portfolioID())
   })
 
   # Create map
-  .buildHazardMap <- function(df) {
+  .buildHazardMap <- function(df_map, portfolioID) {
+
+    uploaded_locs <- return_file_df(api_get_portfolios_location_file, portfolioID())
 
     # Create map color palette
-    pal <- colorNumeric(input$map_colors, col)
+    pal <- colorNumeric("Reds", col)
 
     # Create custom icons
-    icon <- awesomeIcons(
-      icon = 'ios-close',
-      iconColor = 'black',
-      library = 'ion',
-      markerColor = tolower(input$pin_colors)
+
+    icon_map <- awesomeIcons(
+      icon = 'map-marker-alt',
+      library = 'fa',
+      iconColor ='green',
+      markerColor =  'red'
     )
 
-    # Customize map
-    if (input$map_style == "Street view") {
-      style <- leaflet::providers$OpenStreetMap
-    } else if (input$map_style == "Portrait") {
-      style <- leaflet::providers$Esri.NatGeoWorldMap
-    } else if (input$map_style == "Black and white") {
-      style <- leaflet::providers$Stamen.Toner
-    } else if (input$map_style == "Basic") {
-      style <- leaflet::providers$Esri.WorldShadedRelief
-    }
+    popupData <- tagList(
+      strong("Location ID: "), uploaded_locs$LocNumber,
+      br(), strong("Latitude: "), uploaded_locs$Latitude,
+      br(), strong("Longitude: "), uploaded_locs$Longitude)
 
-    leaflet(df) %>%
-      addProviderTiles(style) %>%
-      addGeoJSON(df) %>%
+    leaflet() %>%
+      addTiles() %>%
+      addGeoJSON(df_map) %>%
       addRectangles(lng1 = apply(coor, 2, min),
                     lat1 = apply(coor, 2, max),
                     lng2 = apply(coor, 2, neg_max),
                     lat2 = apply(coor, 2, pos_min),
                     color = "transparent",
                     fillColor = pal(col),
-                    fillOpacity = input$contrast_colors) %>%
-      addLegend(position = gsub("\\s+", "", input$legend),
+                    fillOpacity = 1) %>%
+      addLegend(position = "topright",
                 pal = pal,
                 values = col) %>%
-      addAwesomeMarkers(lng = pin_lng,
-                        lat = pin_lat,
-                        icon = icon)
+      addAwesomeMarkers(lng = uploaded_locs$Longitude,
+                        lat = uploaded_locs$Latitude,
+                        icon = icon_map,
+                        clusterOptions = TRUE,
+                        popup = toString(popupData))
   }
 }
