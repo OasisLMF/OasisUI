@@ -7,10 +7,12 @@
 \usage{
 createHazardMapUI(id)
 
-createHazardMap(input, output, session, file)
+createHazardMap(input, output, session, file_map, portfolioID = "")
 }
 \arguments{
-\item{file}{File to plot as map.}
+\item{file_map}{File to plot as map.}
+
+\item{portfolioID}{ID of the portfolio.}
 }
 \value{
 Leaflet map.

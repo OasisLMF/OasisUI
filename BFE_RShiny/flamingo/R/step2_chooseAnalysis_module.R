@@ -676,13 +676,18 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
-    modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsDataNames$id]
+    modelId <- result$tbl_modelsData[input$dt_models_rows_selected,tbl_modelsDataNames$id]
     paste0('Resources of model id ', modelId)
   })
 
   #Hide panel if model id changes
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelModelDetails")
+    updateSelectInput(session,
+                      inputId = ns("hazard_files"),
+                      label = "Choose hazard file",
+                      choices = list.files("./www/hazard_files")
+    )
   })
 
   # Hazard Map -----------------------------------------------------------------

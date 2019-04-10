@@ -35,9 +35,8 @@ createHazardMapUI <- function(id) {
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet colorNumeric
 #' @importFrom leaflet awesomeIcons
-#' @importFrom leaflet addProviderTiles
+#' @importFrom leaflet addPolygons
 #' @importFrom leaflet addGeoJSON
-#' @importFrom leaflet addRectangles
 #' @importFrom leaflet addLegend
 #' @importFrom leaflet addAwesomeMarkers
 #'
@@ -52,10 +51,12 @@ createHazardMap <- function(input, output, session,
   i <- 1:max(file_map$features$id)
   coor <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]]})
   col <- sapply(i, function(x) {file_map$features$properties[1][[1]][x]})
+  pol_lng <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][1:5]})
+  pol_lat <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][6:10]})
 
   # Find maximum negative (lng) number and minimum (lat) values
-  pos_min <- function(x) {min(x[x > 0])}
-  neg_max <- function(x) {max(x[x < 0])}
+  # pos_min <- function(x) {min(x[x > 0])}
+  # neg_max <- function(x) {max(x[x < 0])}
 
   # Plot leaflet
   output$hazardmap <- renderLeaflet({
@@ -71,7 +72,6 @@ createHazardMap <- function(input, output, session,
     pal <- colorNumeric("Reds", col)
 
     # Create custom icons
-
     icon_map <- awesomeIcons(
       icon = 'map-marker-alt',
       library = 'fa',
@@ -87,13 +87,11 @@ createHazardMap <- function(input, output, session,
     leaflet() %>%
       addTiles() %>%
       addGeoJSON(df_map) %>%
-      addRectangles(lng1 = apply(coor, 2, min),
-                    lat1 = apply(coor, 2, max),
-                    lng2 = apply(coor, 2, neg_max),
-                    lat2 = apply(coor, 2, pos_min),
-                    color = "transparent",
-                    fillColor = pal(col),
-                    fillOpacity = 1) %>%
+      addPolygons(lng = pol_lng,
+                  lat = pol_lat,
+                  color = "red",
+                  # fillColor = pal(col),
+                  fillOpacity = 1) %>%
       addLegend(position = "topright",
                 pal = pal,
                 values = col) %>%
