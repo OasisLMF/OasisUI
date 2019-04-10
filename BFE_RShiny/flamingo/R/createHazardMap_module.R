@@ -51,8 +51,8 @@ createHazardMap <- function(input, output, session,
   i <- 1:max(file_map$features$id)
   coor <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]]})
   col <- sapply(i, function(x) {file_map$features$properties[1][[1]][x]})
-  pol_lng <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][1:5]})
-  pol_lat <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][6:10]})
+  pol_lng <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][1:4]})
+  pol_lat <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][6:9]})
 
   # Find maximum negative (lng) number and minimum (lat) values
   # pos_min <- function(x) {min(x[x > 0])}
@@ -76,7 +76,7 @@ createHazardMap <- function(input, output, session,
       icon = 'map-marker-alt',
       library = 'fa',
       iconColor ='green',
-      markerColor =  'red'
+      markerColor =  'blue'
     )
 
     popupData <- tagList(
