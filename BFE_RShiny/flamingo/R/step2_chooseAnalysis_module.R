@@ -644,11 +644,8 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelModelDetails")
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
-    updateSelectInput(session,
-                      inputId = ns("hazard_files"),
-                      label = "Choose hazard file",
-                      choices = list.files("./www/hazard_files")
-    )
+    result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
+                                           result$portfolioID)
     logMessage("showing panelModelDetails")
   })
 
@@ -703,11 +700,13 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Hazard Map -----------------------------------------------------------------
 
-  # import location file to plot pins
-  observeEvent(result$portfolioID, {
-    if(!is.null(result$portfolioID) && !is.na(result$portfolioID) && result$portfolioID != "") {
-      result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
-                                             result$portfolioID)
+  observeEvent(result$modelID, {
+    if (!is.null(result$modelID) && result$modelID != "" && !is.na(result$modelID)) {
+      updateSelectInput(session,
+                        inputId = ns("hazard_files"),
+                        label = "Choose hazard file",
+                        choices = list.files("./www/hazard_files")
+      )
     }
   })
 
