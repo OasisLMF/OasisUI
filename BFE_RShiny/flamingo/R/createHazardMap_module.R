@@ -71,20 +71,24 @@ createHazardMap <- function(input, output, session,
       br(), strong("Latitude: "), file_pins$Latitude,
       br(), strong("Longitude: "), file_pins$Longitude)
 
-    leaflet(file_map) %>%
-      addTiles() %>%
-      addPolygons(color = "transparent",
-                  fillColor = ~pal(file_map$ReturnLevel),
-                  fillOpacity = 1) %>%
-      addLegend(position = "topright",
-                pal = pal,
-                values = file_map$ReturnLevel) %>%
-        addAwesomeMarkers(lng = file_pins$Longitude,
-                          lat = file_pins$Latitude,
-                          icon = icon_map,
-                          clusterOptions = TRUE,
-                          popup = toString(popupData))
+    withModalSpinner(
+        hazardmap <- leaflet(file_map) %>%
+          addTiles() %>%
+          addPolygons(color = "transparent",
+                      fillColor = ~pal(file_map$ReturnLevel),
+                      fillOpacity = 1) %>%
+          addLegend(position = "topright",
+                    pal = pal,
+                    values = file_map$ReturnLevel) %>%
+          addAwesomeMarkers(lng = file_pins$Longitude,
+                            lat = file_pins$Latitude,
+                            icon = icon_map,
+                            clusterOptions = TRUE,
+                            popup = toString(popupData)),
+      "Rendering map...",
+      size = "s"
+    )
 
-
+    return(hazardmap)
   }
 }
