@@ -138,12 +138,12 @@ ViewFilesInTable <- function(input, output, session,
         selectionUsed <- "single"
       }
       datatable(
-        result$tbl_filesListData_wButtons,
+        result$tbl_filesListData_wButtons %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         escape = FALSE,
         selection =  selectionUsed,
-        colnames = c('row number' = 1),
+        colnames = c('Row Number' = 1),
         options = .getFLTableOptions()
       )
     } else {
@@ -193,6 +193,14 @@ ViewFilesInTable <- function(input, output, session,
       zip(zipfile = fname, files = fs)
       if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
     }
+  )
+
+  # Download to csv ------------------------------------------------------------
+  # Export to .csv
+  output$FLdownloadexcel <- downloadHandler(
+    filename = "file.csv",
+    content = function(file) {
+      fwrite(result$tbl_filesListData_wButtons, file, row.names = TRUE, quote = TRUE)}
   )
 
   # Selected Row ---------------------------------------------------------------
@@ -302,12 +310,12 @@ ViewFilesInTable <- function(input, output, session,
   output$dt_FVExposureSelected <- renderDT(
     if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0 ) {
       datatable(
-        result$tbl_fileData,
+        result$tbl_fileData %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         selection = "none",
         filter = 'bottom',
-        colnames = c("row number" = 1),
+        colnames = c("Row Number" = 1),
         width = "100%",
         options = list(searchHighlight = TRUE,
                        scrollX = TRUE))
@@ -365,52 +373,81 @@ ViewFilesInTable <- function(input, output, session,
     } else {
       extractFolder <- set_extractFolder(id = param(), label = folderpath)
       result$currfilepath <- set_extractFilePath(extractFolder, result$currentFile)
-      result$tbl_fileData <- fread(result$currfilepath)
-      if (!is.null(result$tbl_fileData)) {
-        names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
-      }
-      filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
-      filerows <- length(count.fields(result$currfilepath, skip = 1))
-    }
-    #Show buttons
-    if ("latitude" %in% names(result$tbl_fileData)) {
-      if (!is.null(result$tbl_fileData)) {
-        output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
-      }
-      show("abuttonmap")
-    } else {
-      hide("abuttonmap")
-    }
-    # Extra info table
-    output$FVExposureStatisticInfo <- renderUI({
-      tagList(
-        fluidRow(
-          column(2,
-                 h5("File Name: ")
-          ),
-          column(10,
-                 p(result$currentFile, style = "margin-top: 10px;")
+      if (dir.exists(result$currfilepath)) {
+        result$tbl_fileData <- list.files(result$currfilepath, recursive = TRUE) %>%
+          as.data.frame() %>%
+          setNames("files")
+        filecolumns <- ""
+        filerows <- length(result$tbl_fileData)
+        hide("abuttonmap")
+        output$FVExposureStatisticInfo <- renderUI({
+          tagList(
+            fluidRow(
+              column(2,
+                     h5("Dir Name: ")
+              ),
+              column(10,
+                     p(result$currentFile, style = "margin-top: 10px;")
+              )
+            ),
+            fluidRow(
+              column(2,
+                     h5("Number of Files ")
+              ),
+              column(10,
+                     p(filerows, style = "margin-top: 10px;")
+              )
+            )
           )
-        ),
-        fluidRow(
-          column(2,
-                 h5("Number of Rows ")
-          ),
-          column(10,
-                 p(filerows, style = "margin-top: 10px;")
-          )
-        ),
-        fluidRow(
-          column(2,
-                 h5("Column names")
-          ),
-          column(10,
-                 p(filecolumns, style = "margin-top: 10px;")
-          )
-        )
-      )
-    })
+        })
+      } else {
+        result$tbl_fileData <- fread(result$currfilepath)
+        if (!is.null(result$tbl_fileData)) {
+          names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
+        }
+        filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
+        filerows <- length(count.fields(result$currfilepath, skip = 1))
 
+        #Show buttons
+        if ("latitude" %in% names(result$tbl_fileData)) {
+          if (!is.null(result$tbl_fileData)) {
+            output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
+          }
+          show("abuttonmap")
+        } else {
+          hide("abuttonmap")
+        }
+        # Extra info table
+        output$FVExposureStatisticInfo <- renderUI({
+          tagList(
+            fluidRow(
+              column(2,
+                     h5("File Name: ")
+              ),
+              column(10,
+                     p(result$currentFile, style = "margin-top: 10px;")
+              )
+            ),
+            fluidRow(
+              column(2,
+                     h5("Number of Rows ")
+              ),
+              column(10,
+                     p(filerows, style = "margin-top: 10px;")
+              )
+            ),
+            fluidRow(
+              column(2,
+                     h5("Column names")
+              ),
+              column(10,
+                     p(filecolumns, style = "margin-top: 10px;")
+              )
+            )
+          )
+        })
+      }
+    }
   })#end observeEvent
 
 

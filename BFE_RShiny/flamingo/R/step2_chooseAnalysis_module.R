@@ -125,7 +125,8 @@ panelAnalysisLog <- function(id) {
       flamingoRefreshButton(ns("abuttonanalogrefresh")),
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analysislog"))
+    DTOutput(ns("dt_analysislog")),
+    downloadButton(ns("download_log"), label = "Export to csv")
   )
 }
 
@@ -330,12 +331,11 @@ step2_chooseAnalysis <- function(input, output, session,
   # Analyses  Table ------------------------------------------------------------
 
   output$dt_analyses <- renderDT(
-
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- 1
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData,
+        result$tbl_analysesData %>% return_tbl_analysesData_nice(),
         class = "flamingo-table display",
         rownames = TRUE,
         selection = list(mode = 'single',
@@ -479,7 +479,7 @@ step2_chooseAnalysis <- function(input, output, session,
     if (!is.null(result$tbl_analysisdetails) && nrow(result$tbl_analysisdetails) > 0 ) {
       logMessage("re-rendering analysis details table")
       datatable(
-        result$tbl_analysisdetails,
+        result$tbl_analysisdetails %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -525,11 +525,27 @@ step2_chooseAnalysis <- function(input, output, session,
     paste0('Logs for analysis ', analysisID, ' ', AnaName)
   })
 
+
+  # Export to .csv
+  output$download_log <- downloadHandler(
+    filename = "analysis_inputs_log.csv",
+    content = function(file) {
+      fwrite(result$tbl_analysislog, file, row.names = TRUE, quote = TRUE)}
+  )
+
+  observeEvent(result$tbl_analysislog, {
+    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 1) {
+      show("download_log")
+    } else {
+      hide("download_log")
+    }
+  })
+
   output$dt_analysislog <- renderDT(
-    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 0 ) {
+    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 1) {
       logMessage("re-rendering analysis log table")
       datatable(
-        result$tbl_analysislog,
+        result$tbl_analysislog %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -574,7 +590,7 @@ step2_chooseAnalysis <- function(input, output, session,
     if (!is.null(result$tbl_modelsData) && nrow(result$tbl_modelsData) > 0 ) {
       logMessage("re-rendering model table")
       datatable(
-        result$tbl_modelsData,
+        result$tbl_modelsData %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -621,7 +637,7 @@ step2_chooseAnalysis <- function(input, output, session,
     if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
       logMessage("re-rendering model details table")
       datatable(
-        result$tbl_modelsDetails,
+        result$tbl_modelsDetails %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",

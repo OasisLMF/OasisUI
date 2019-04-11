@@ -3,32 +3,20 @@ node {
     sh 'sudo /var/lib/jenkins/jenkins-chown'
     deleteDir() // wipe out the workspace
 
-
-    // Set Default Multibranch config
-    try {
-        source_branch = CHANGE_BRANCH
-    } catch (MissingPropertyException e1) {
-        try {
-            source_branch = BRANCH_NAME
-        } catch (MissingPropertyException e2) {
-             source_branch = ""
-        }    
-    }   
-
     properties([
       parameters([
         [$class: 'StringParameterDefinition',  name: 'BUILD_BRANCH', defaultValue: 'master'],
-        [$class: 'StringParameterDefinition',  name: 'SOURCE_BRANCH', defaultValue: source_branch],
-        [$class: 'StringParameterDefinition',  name: 'RELEASE_TAG', defaultValue: "build-${BUILD_NUMBER}"],
+        [$class: 'StringParameterDefinition',  name: 'SOURCE_BRANCH', defaultValue: BRANCH_NAME],
+        [$class: 'StringParameterDefinition',  name: 'RELEASE_TAG', defaultValue: BRANCH_NAME.split('/').last() + "-${BUILD_NUMBER}"],
         [$class: 'StringParameterDefinition',  name: 'BASE_TAG', defaultValue: 'latest'],
         [$class: 'BooleanParameterDefinition', name: 'PURGE', value: Boolean.valueOf(false)],
         [$class: 'BooleanParameterDefinition', name: 'PUBLISH', value: Boolean.valueOf(false)],
         [$class: 'BooleanParameterDefinition', name: 'SLACK_MESSAGE', value: Boolean.valueOf(false)]
-      ])  
-    ]) 
+      ])
+    ])
 
 
-    // Build vars 
+    // Build vars
     String build_repo = 'git@github.com:OasisLMF/build.git'
     String build_branch = params.BUILD_BRANCH
     String build_workspace = 'oasis_build'
@@ -54,11 +42,11 @@ node {
     env.TAG_RUN_PLATFORM = env.TAG_BASE                     // Version of Oasis Platform to use for testing
     env.COMPOSE_PROJECT_NAME = UUID.randomUUID().toString().replaceAll("-","")
 
-    docker_proxy="docker/Dockerfile.oasisui_proxy"
-    image_proxy="coreoasis/oasisui_proxy"
+    proxy_docker="docker/Dockerfile.oasisui_proxy"
+    proxy_image="coreoasis/oasisui_proxy"
 
-    docker_app="docker/Dockerfile.oasisui_app"
-    image_app="coreoasis/oasisui_app"
+    app_docker="docker/Dockerfile.oasisui_app"
+    app_image="coreoasis/oasisui_app"
 
 
 
@@ -69,40 +57,51 @@ node {
                 stage('Clone: ' + build_workspace) {
                     dir(build_workspace) {
                        git url: build_repo, credentialsId: git_creds, branch: build_branch
-                    }   
-                }   
-            },  
+                    }
+                }
+            },
             clone_source: {
                 stage('Clone: ' + source_name) {
                     sshagent (credentials: [git_creds]) {
                         dir(source_workspace) {
-                           sh "git clone -b ${source_branch} --single-branch --no-tags ${source_git_url} ."
-                        }   
-                    }   
-                }   
-            }   
-        ) 
+                            sh "git clone --recursive ${source_git_url} ."
+                            if (source_branch.matches("PR-[0-9]+")){
+                                sh "git fetch origin pull/$CHANGE_ID/head:$BRANCH_NAME"
+                                sh "git checkout $CHANGE_TARGET"
+                                sh "git merge $BRANCH_NAME"
+                                app_branch = CHANGE_BRANCH
+                                // WARNING: this will fail for external pull requests 
+
+                            } else {
+                                // Checkout branch
+                                sh "git checkout ${source_branch}"
+                                app_branch = source_branch
+                            }
+                        }
+                    }
+                }
+            }
+        )
 
         // DOCKER BUILD
         parallel(
             build_proxy: {
                 stage('Build: Shiny Proxy') {
                     dir(source_workspace) {
-                        sh PIPELINE + " build_image  ${docker_proxy}  ${image_proxy} ${env.TAG_RELEASE}"
+                        sh PIPELINE + " build_image  ${proxy_docker}  ${proxy_image} ${env.TAG_RELEASE}"
                     }
-                }    
+                }
             },
             clone_app: {
                 stage('Build: Shiny App') {
                     dir(source_workspace) {
-                        sh PIPELINE + " build_image  ${docker_app}  ${image_app} ${env.TAG_RELEASE}"
+                        sh "docker build -f ${app_docker} --pull --build-arg REF_BRANCH=${app_branch} -t ${app_image} -t ${app_image}:${env.TAG_RELEASE} ."
                     }
                 }
             }
         )
 
-        // ToDO add run test here
-        //
+        // ToDO add testing here
         //stage('Run Flamingo') {
         //    dir('oasis_build') {
         //        sh PIPELINE + " run_ui"
@@ -113,17 +112,17 @@ node {
         if (params.PUBLISH){
             parallel(
                 publish_proxy: {
-                            
+
                     stage ('Publish: Shiny Proxy') {
                         dir(source_workspace) {
-                            sh PIPELINE + " push_image ${image_proxy} ${env.TAG_RELEASE}"
+                            sh PIPELINE + " push_image ${proxy_image} ${env.TAG_RELEASE}"
                         }
                     }
                  },
                  publish_app: {
                     stage ('Publish: Shiny App') {
                         dir(source_workspace) {
-                            sh PIPELINE + " push_image ${image_app} ${env.TAG_RELEASE}"
+                            sh PIPELINE + " push_image ${app_image} ${env.TAG_RELEASE}"
                         }
                     }
                  }
@@ -136,8 +135,8 @@ node {
         //Docker cleanup
         dir(build_workspace) {
             if(params.PURGE){
-                sh PIPELINE + " purge_image ${image_proxy} ${env.TAG_RELEASE}"
-                sh PIPELINE + " purge_image ${image_app} ${env.TAG_RELEASE}"
+                sh PIPELINE + " purge_image ${proxy_image} ${env.TAG_RELEASE}"
+                sh PIPELINE + " purge_image ${app_image} ${env.TAG_RELEASE}"
             }
         }
 
@@ -162,9 +161,5 @@ node {
                 }
             }
         }
-        //Store logs
-        //dir('oasis_build') {
-        //    archiveArtifacts artifacts: 'stage/log/**/*.*', excludes: '*stage/log/**/*.gitkeep'
-        //}
     }
 }
