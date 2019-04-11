@@ -633,6 +633,11 @@ step2_chooseAnalysis <- function(input, output, session,
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
+    updateSelectInput(session,
+                      inputId = ns("hazard_files"),
+                      label = "Choose hazard file",
+                      choices = list.files("./www/hazard_files")
+    )
   })
 
   onclick("buttonhidemodeldetails", {
@@ -683,11 +688,6 @@ step2_chooseAnalysis <- function(input, output, session,
   #Hide panel if model id changes
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelModelDetails")
-    updateSelectInput(session,
-                      inputId = ns("hazard_files"),
-                      label = "Choose hazard file",
-                      choices = list.files("./www/hazard_files")
-    )
   })
 
   # Hazard Map -----------------------------------------------------------------
