@@ -217,7 +217,28 @@ panelModelDetails <- function(id) {
       flamingoRefreshButton(ns("abuttonmodeldetailrfsh")),
       actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_modelDetails"))
+    tabsetPanel(
+      id = ns("tabsModelsDetails"),
+
+      tabPanel(
+        title = "Resources",
+        h4("Model Settings"),
+        DTOutput(ns("dt_model_settings")),
+        h4("Lookup Settings"),
+        DTOutput(ns("dt_lookup_settings")),
+        value = ns("tabresources")
+      ),
+
+      tabPanel(
+        title = "Hazard Maps",
+        selectInput(inputId = ns("hazard_files"),
+                    label = "Choose hazard file",
+                    choices = list.files("./www/hazard_files")
+        ),
+        createHazardMapUI(ns("createHazardMap")),
+        value = ns("tabmaps")
+      )
+    )
   )
 }
 
@@ -296,7 +317,11 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis input generated
     tbl_anaIG = NULL,
     #analysis ID
-    analysisID = ""
+    analysisID = "",
+    #file for hazard map
+    mapfile = NULL,
+    # file for pins
+    uploaded_locs = NULL
   )
 
   #Set Params
@@ -306,7 +331,6 @@ step2_chooseAnalysis <- function(input, output, session,
     } else {
       result$portfolioID <- ""
     }
-
   })
 
   # Panels Visualization -------------------------------------------------------
@@ -376,6 +400,17 @@ step2_chooseAnalysis <- function(input, output, session,
       }
     })
 
+  # Model ID -------------------------------------------------------------------
+
+  observeEvent({
+    input$dt_models_rows_selected
+    result$portfolioID}, ignoreNULL = FALSE, {
+      if (!is.null(input$dt_models_rows_selected)) {
+        result$modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
+      } else {
+        result$modelID <- ""
+      }
+    })
 
   # Generate input -------------------------------------------------------------
   onclick("abuttonstartcancIG", {
@@ -625,6 +660,8 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelModelDetails")
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
+    result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
+                                           result$portfolioID)
     logMessage("showing panelModelDetails")
   })
 
@@ -633,11 +670,11 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("hiding panelModelDetails")
   })
 
-  output$dt_modelDetails <- renderDT(
-    if (!is.null(result$tbl_modelsDetails) && nrow(result$tbl_modelsDetails) > 0 ) {
-      logMessage("re-rendering model details table")
+  output$dt_model_settings <- renderDT(
+    if (!is.null(result$tbl_modelsDetails[1]) && nrow(result$tbl_modelsDetails[[1]]) > 0 ) {
+      logMessage("re-rendering model settings table")
       datatable(
-        result$tbl_modelsDetails %>% capitalize_names_df(),
+        result$tbl_modelsDetails[[1]] %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = TRUE,
         filter = "none",
@@ -647,13 +684,29 @@ step2_chooseAnalysis <- function(input, output, session,
         options = .getPRTableOptions()
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no files associated with Model ID ", result$modelID ))
+      .nothingToShowTable(contentMessage = paste0("no model settings files associated with Model ID ", result$modelID ))
+    })
+
+  output$dt_lookup_settings <- renderDT(
+    if (!is.null(result$tbl_modelsDetails[2]) && nrow(result$tbl_modelsDetails[[2]]) > 0 ) {
+      logMessage("re-rendering lookup settings table")
+      datatable(
+        result$tbl_modelsDetails[[2]],
+        class = "flamingo-table display",
+        rownames = TRUE,
+        filter = "none",
+        escape = FALSE,
+        selection = "none",
+        colnames = c('row number' = 1),
+        options = .getPRTableOptions()
+      )
+    } else {
+      .nothingToShowTable(contentMessage = paste0("no lookup settings files associated with Model ID ", result$modelID ))
     })
 
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
-    modelId <- result$tbl_modelsData[ input$dt_models_rows_selected,tbl_modelsDataNames$id]
-    paste0('Resources of model id ', modelId)
+    paste0('Resources of model id ', result$modelID)
   })
 
   #Hide panel if model id changes
@@ -661,15 +714,51 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
   })
 
+  # Hazard Map -----------------------------------------------------------------
+
+  observeEvent(result$modelID, {
+    if (!is.null(result$modelID) && result$modelID != "" && !is.na(result$modelID)) {
+      updateSelectInput(session,
+                        inputId = ns("hazard_files"),
+                        label = "Choose hazard file",
+                        choices = list.files("./www/hazard_files")
+      )
+    }
+  })
+
+  # Choose hazard file
+  observeEvent(input$hazard_files, {
+    if (!is.null(input$hazard_files)) {
+      path <- paste0("./www/hazard_files/", input$hazard_files)
+      result$mapfile <- geojsonio::geojson_read(path, what = "sp")
+      if (is.null(result$mapfile)) {
+        hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
+      }
+    }
+  })
+
+  # Draw map
+  observeEvent(result$mapfile, ignoreNULL = FALSE, {
+    if (!is.null(result$mapfile)) {
+      callModule(
+        createHazardMap,
+        id = "createHazardMap",
+        file_map = result$mapfile,
+        file_pins = result$uploaded_locs
+      )
+    }
+  })
+
   # Create new Analysis --------------------------------------------------------
 
   onclick("abuttonsubmit", {
     if (input$anaName != "") {
-      modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
       post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID,
                                                                              name = input$anaName,
-                                                                             model = modelID)
-      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID, " name ", input$anaName, " model ",  modelID))
+                                                                             model = result$modelID)
+      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID,
+                        " name ", input$anaName,
+                        " model ",  result$modelID))
       if (post_portfolios_create_analysis$status == "Success") {
         flamingoNotification(type = "message",
                              paste("New analysis ", input$anaName, " created."))
@@ -887,8 +976,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadtbl_modelsDetails <- function() {
     logMessage(".reloadtbl_modelsDetails called")
     if (length(input$dt_models_rows_selected) > 0) {
-      modelId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
-      tbl_modelsDetails <- return_models_id_resource_file_df(modelId)
+      tbl_modelsDetails <- return_models_id_resource_file_df(result$modelID)
       if (!is.null(tbl_modelsDetails)) {
         result$tbl_modelsDetails <-  tbl_modelsDetails
       }

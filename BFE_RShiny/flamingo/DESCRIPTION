@@ -17,6 +17,7 @@ Imports:
   DT (== 0.5),
   data.table (== 1.11.8),
   dplyr (== 0.7.8),
+  geojsonio (== 0.6.0), 
   ggplot2 (== 3.1.0),
   htmltools (== 0.3.6),
   htmlwidgets (== 1.3),

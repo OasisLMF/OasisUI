@@ -403,9 +403,9 @@ panel_configureAdvancedRI <- function(id) {
 #' @template params-logMessage
 #' @template params-active
 #'
-#' @param currstep current selected step.
-#' @param portfolioID selected portfolio ID.
-#' @param analysisID selected analysis ID.
+#' @param currstep Current selected step.
+#' @param portfolioID Selected portfolio ID.
+#' @param analysisID Selected analysis ID.
 #' @param pfName Name of selected portfolio.
 #'
 #' @return dashboardAnaID id of selected run.
@@ -431,7 +431,7 @@ step3_configureOutput <- function(input, output, session,
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
-                                  pfName = reactive({""}),
+                                  pfName = reactive(""),
                                   analysisID = reactive("")
 ) {
 
