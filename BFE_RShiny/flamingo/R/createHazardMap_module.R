@@ -47,12 +47,12 @@ createHazardMap <- function(input, output, session,
 
   ns <- session$ns
 
-  # Isolate coordinates and Return Level
+  # Isolate coordinates, Return Level, lng and lat
   i <- 1:max(file_map$features$id)
   coor <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]]})
   col <- sapply(i, function(x) {file_map$features$properties[1][[1]][x]})
-  pol_lng <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][1:4]})
-  pol_lat <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][6:9]})
+  pol_lng <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][2:5]})
+  pol_lat <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][7:10]})
 
   # Plot leaflet
   output$hazardmap <- renderLeaflet({

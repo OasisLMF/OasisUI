@@ -330,7 +330,6 @@ step2_chooseAnalysis <- function(input, output, session,
     } else {
       result$portfolioID <- ""
     }
-
   })
 
   # Panels Visualization -------------------------------------------------------
@@ -401,6 +400,17 @@ step2_chooseAnalysis <- function(input, output, session,
       }
     })
 
+  # Model ID -------------------------------------------------------------------
+
+  observeEvent({
+    input$dt_models_rows_selected
+    result$portfolioID}, ignoreNULL = FALSE, {
+      if (!is.null(input$dt_models_rows_selected)) {
+        result$modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
+      } else {
+        result$modelID <- ""
+      }
+    })
 
   # Generate input -------------------------------------------------------------
   onclick("abuttonstartcancIG", {
@@ -635,11 +645,6 @@ step2_chooseAnalysis <- function(input, output, session,
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
-    updateSelectInput(session,
-                      inputId = ns("hazard_files"),
-                      label = "Choose hazard file",
-                      choices = list.files("./www/hazard_files")
-    )
   })
 
   onclick("buttonhidemodeldetails", {
@@ -683,8 +688,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
-    modelId <- result$tbl_modelsData[input$dt_models_rows_selected,tbl_modelsDataNames$id]
-    paste0('Resources of model id ', modelId)
+    paste0('Resources of model id ', result$modelID)
   })
 
   #Hide panel if model id changes
@@ -694,11 +698,21 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Hazard Map -----------------------------------------------------------------
 
+  # import location file to plot pins
   observeEvent(result$portfolioID, {
     if(!is.null(result$portfolioID) && !is.na(result$portfolioID) && result$portfolioID != "") {
       result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
                                              result$portfolioID)
     }
+  })
+
+  # update files list when model changes
+  observeEvent(result$modelID, {
+    updateSelectInput(session,
+                      inputId = ns("hazard_files"),
+                      label = "Choose hazard file",
+                      choices = list.files("./www/hazard_files")
+    )
   })
 
   # Choose hazard file
@@ -728,11 +742,12 @@ step2_chooseAnalysis <- function(input, output, session,
 
   onclick("abuttonsubmit", {
     if (input$anaName != "") {
-      modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
       post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID,
                                                                              name = input$anaName,
-                                                                             model = modelID)
-      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID, " name ", input$anaName, " model ",  modelID))
+                                                                             model = result$modelID)
+      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID,
+                        " name ", input$anaName,
+                        " model ",  result$modelID))
       if (post_portfolios_create_analysis$status == "Success") {
         flamingoNotification(type = "message",
                              paste("New analysis ", input$anaName, " created."))
@@ -950,8 +965,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadtbl_modelsDetails <- function() {
     logMessage(".reloadtbl_modelsDetails called")
     if (length(input$dt_models_rows_selected) > 0) {
-      modelId <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
-      tbl_modelsDetails <- return_models_id_resource_file_df(modelId)
+      tbl_modelsDetails <- return_models_id_resource_file_df(result$modelID)
       if (!is.null(tbl_modelsDetails)) {
         result$tbl_modelsDetails <-  tbl_modelsDetails
       }
