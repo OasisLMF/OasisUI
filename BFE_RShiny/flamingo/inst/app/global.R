@@ -6,6 +6,9 @@ library(flamingo, warn.conflicts = FALSE)
 
 source(file.path(".", "helper_text.R"), local = TRUE)
 
+#Extend max uploadable file size from default 5MB to 40MB
+options(shiny.maxRequestSize = 400*1024^2)
+
 ### logger ---------------------------------------------------------------------
 #addHandler(writeToFile, logger = "flamingo",
 #    file = file.path("var", "log", "shinyproxy", "flamingo.log"))
@@ -53,6 +56,8 @@ options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
 options(flamingo.settings.api.httptype = "application/json")
 options(flamingo.settings.api.version = APISettings$version)
 options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
+
+options(flamingo.settings.admin.mode = Sys.getenv("ADMIN_MODE"))
 
 options(flamingo.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))
 

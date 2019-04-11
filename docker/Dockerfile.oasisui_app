@@ -1,50 +1,46 @@
-FROM ubuntu:16.04
+FROM rocker/r-ver:3.5.1
+# -> debian stretch (9)
+# -> don't use latest R release, since that will keep getting linked with later build-dates and MRAN snapshots
+# -> sets repository to MRAN for specific build date of R version, being the last date CRAN distributed that R version
+# -> installs R to /usr/local/lib/R
 
 RUN apt-get update && \
-    apt-get install -y gcc g++ && \
-    apt-get install -y --no-install-recommends libv8-3.14-dev libcurl4-gnutls-dev libcairo2-dev libxt-dev libssl-dev libssh2-1-dev libssl1.0.0 apt-utils && \        
-    apt-get install -y --no-install-recommends -f libxml2-dev libssl-dev libiodbc2 libiodbc2-dev && \
-    apt-get install -y --no-install-recommends unixodbc unixodbc-dev freetds-dev freetds-bin tdsodbc libgeos-dev && \
+    apt-get install -y --no-install-recommends libv8-3.14-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils && \
+    # if desired, add tools such as: sudo, vim, wget, curl, procps
     rm -rf /var/lib/apt/lists/*
 
-# Install R
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends software-properties-common && \
-    add-apt-repository "deb http://www.stats.bris.ac.uk/R/bin/linux/ubuntu xenial/" && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends --allow-unauthenticated r-base && \
-    rm -rf /var/lib/apt/lists/*
+# libcairo2-dev and libxt-dev needed for Cairo, e.g. graphics
+# libcurl4-openssl-dev and libcurl4-gnutls-dev are mutually exclusive. we choose GNU TLS, which seems preferred on Ubuntu / Debian systems and is recommended e.g. by RStudio
+# libssl-dev depends on libssl1.1, which in turn depends on libc6
+# (libcurl4-openssl-dev / openssl would depend on libc6 and libssl1.1 as well)
 
-# Install Flamingo dependencies
-RUN R -e "install.packages(c('readr','shinyWidgets', 'V8', 'devtools', 'DT', 'shiny', 'shinyBS', 'bsplus', 'httr', 'rjson', 'odbc', 'RODBC', 'leaflet', 'ggplot2', 'curl', 'RCurl', 'xml2', 'XML', 'rmarkdown', 'logging'), repos='https://cloud.r-project.org/')" && \
-    R -e "install.packages(c('Dataset'), repos='http://R-Forge.R-project.org')" && \
-    R -e "install.packages(c('shinyjs'), repos='https://cloud.r-project.org/')" && \
-    R -e "remove.packages(c('devtools'))"
-
-
-
-
-
-RUN apt-get update && \
-    apt install -y gfortran && \
-    R -e "install.packages(c('plotly'), repos = 'https://cloud.r-project.org/')" \
+# Install Flamingo with dependencies
+ARG REF_BRANCH
+ENV REF_BRANCH=${REF_BRANCH:-master}
+RUN R -e "install.packages('remotes')" && \
+    R -e "remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/flamingo')" && \
     rm -rf /var/lib/apt/lists/*
 
 # Create the logging directory
 RUN mkdir /var/log/shiny-server
 
-
-# Install the flamingo package
+# Make root directory
 RUN mkdir -p /root
 WORKDIR /root
-COPY BFE_RShiny/flamingo /root/flamingo
-RUN R CMD build /root/flamingo
-RUN mv $(find /root/ -name flamingo_*.tar.gz) /root/flamingo.tar.gz
-RUN R CMD INSTALL /root/flamingo.tar.gz
-RUN rm -rf /root/flamingo.tar.gz
 
-COPY shinyproxy/Rprofile.site /usr/lib/R/etc/
+# Add shiny options upon startup
+COPY shinyproxy/Rprofile.site /usr/local/lib/R/etc/
 
+# Set port
 EXPOSE 3838
 
+# Use below for stand-alone build, i.e. without shinyproxy
+# ARG API_IP_CMD_RES
+# ENV API_IP=${API_IP_CMD_RES:-0.0.0.0}
+# ENV API_PORT=8000
+# ENV API_VERSION=v1
+# ENV API_SHARE_FILEPATH=./downloads
+# ENV OASIS_ENVIRONMENT=oasis_localhost
+
+# Launch Flamingo
 CMD ["R", "-e", "flamingo::runFlamingo()"]

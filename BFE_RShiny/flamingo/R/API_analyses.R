@@ -260,3 +260,70 @@ return_tbl_analysisdetails <- function(id) {
 
   tbl_analysisdetails
 }
+
+
+#' Return analysis table in nice format for DT
+#'
+#' @rdname return_tbl_analysesData_nice
+#'
+#' @description Returns a dataframe of analyses prettified for being rendered as a data table.
+#'
+#' @param tbl_analysesData dataframe of analyses
+#'
+#' @return Dataframe of analyses
+#'
+#' @importFrom tidyr unite
+#' @importFrom dplyr rename
+#' @importFrom dplyr left_join
+#' @importFrom dplyr sym
+#'
+#' @export
+return_tbl_analysesData_nice <- function(tbl_analysesData) {
+  # fetch model data to merge in table
+    tbl_modelsData <- return_tbl_modelsData() %>%
+      mutate(supplier = !! sym(tbl_modelsDataNames$supplier_id)) %>%
+      select(!! sym(tbl_modelsDataNames$id), !! sym(tbl_modelsDataNames$model_id), supplier, !! sym(tbl_modelsDataNames$version_id))
+  # fetch portfolio data to merge in table
+    tbl_portfoliosData <- return_tbl_portfoliosData() %>%
+      select(!! sym(tbl_portfoliosDataNames$id), !! sym(tbl_portfoliosDataNames$name)) %>%
+      rename("portfolio_name" = tbl_portfoliosDataNames$name)
+
+    admin_mode <- getOption("flamingo.settings.admin.mode")
+
+  tbl_analysesData <- tbl_analysesData %>%
+    left_join(tbl_modelsData, by = c("model" = "id")) %>%
+    unite("model_version", c(tbl_modelsDataNames$model_id, tbl_modelsDataNames$version_id), sep = ", version ") %>%
+    left_join(tbl_portfoliosData, by = c("portfolio" = "id"))
+
+
+ if (admin_mode == "admin") {
+   tbl_analysesData <- tbl_analysesData %>%
+     select(!! sym(tbl_analysesDataNames$id),
+            !! sym(tbl_analysesDataNames$name),
+            !! sym(tbl_analysesDataNames$portfolio),
+            portfolio_name,
+            !! sym(tbl_analysesDataNames$model),
+            model_version,
+            supplier,
+            !! sym(tbl_analysesDataNames$created),
+            !! sym(tbl_analysesDataNames$modified),
+            !! sym(tbl_analysesDataNames$status_detailed),
+            !! sym(tbl_analysesDataNames$status)) %>%
+     rename("portfolio_id" = tbl_analysesDataNames$portfolio) %>%
+     rename("model_id" = tbl_analysesDataNames$model)
+ } else {
+   tbl_analysesData <- tbl_analysesData %>%
+     select(!! sym(tbl_analysesDataNames$id),
+            !! sym(tbl_analysesDataNames$name),
+            portfolio_name,
+            model_version,
+            supplier,
+            !! sym(tbl_analysesDataNames$created),
+            !! sym(tbl_analysesDataNames$modified),
+            !! sym(tbl_analysesDataNames$status_detailed),
+            !! sym(tbl_analysesDataNames$status))
+ }
+  tbl_analysesData <- tbl_analysesData %>%
+    capitalize_names_df()
+  tbl_analysesData
+}
