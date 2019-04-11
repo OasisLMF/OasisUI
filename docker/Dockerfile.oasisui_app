@@ -7,6 +7,10 @@ FROM rocker/r-ver:3.5.1
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libv8-3.14-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils && \
     # if desired, add tools such as: sudo, vim, wget, curl, procps
+    # library necessary for dependency of geojsonio
+    apt-get install -y libprotobuf-dev protobuf-compiler  && \
+    # library necessary for dependency of geojsonio
+    apt-get install libjq-dev  && \
     rm -rf /var/lib/apt/lists/*
 
 # libcairo2-dev and libxt-dev needed for Cairo, e.g. graphics
