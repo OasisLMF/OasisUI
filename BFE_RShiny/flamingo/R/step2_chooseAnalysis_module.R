@@ -8,6 +8,8 @@
 #'
 #' @description UI/View for the step2_chooseAnalysis.
 #'
+#' @template params-module-ui
+#'
 #' @return List of tags.
 #'
 #' @importFrom shinyjs hidden
@@ -20,9 +22,8 @@ step2_chooseAnalysisUI <- function(id) {
   tagList(
     hidden(div(id = ns("panelCreateAnalysesTable"), panelCreateAnalysesTable(id))),
     hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
-    hidden(div(id= ns("panelAnalysisLog"), panelAnalysisLog(id))),
+    hidden(div(id = ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
-    hidden(div(id = ns("panelAnalysisGenInputs"), panelAnalysisGenInputs(id))),
     hidden(div(id = ns("panelModelDetails"), panelModelDetails(id)))
   )
 }
@@ -55,8 +56,6 @@ panelCreateAnalysesTable <- function(id) {
       column(12,
              flamingoTableButton(inputId = ns("abuttonstartcancIG"), label = "Generate Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonstartcancIG, placement = "right"),
-             flamingoTableButton(inputId = ns("abuttonshowIG"), label = "Show Generated Inputs") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonshowIG, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
                bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
              flamingoTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
@@ -83,8 +82,6 @@ panelCreateAnalysesTable <- function(id) {
 #'
 #' @template params-module-ui
 #'
-#' @importFrom DT DTOutput
-#'
 #' @export
 panelAnalysisDetails <- function(id) {
   ns <- NS(id)
@@ -94,11 +91,10 @@ panelAnalysisDetails <- function(id) {
     ns("panel_analysisdetails"),
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitle_panelAnalysisDetails"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonanadetailsrefresh")),
+      uiOutput(ns("paneltitle_analysis_details"), inline = TRUE),
       actionButton(inputId = ns("buttonhideanadetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analysisdetails"))
+    analysis_detailsUI(ns("analysis_details"))
   )
 }
 
@@ -127,31 +123,6 @@ panelAnalysisLog <- function(id) {
     ),
     DTOutput(ns("dt_analysislog")),
     downloadButton(ns("download_log"), label = "Export to csv")
-  )
-}
-
-#' panelAnalysisGenInputs
-#'
-#' @rdname panelAnalysisGenInputs
-#'
-#' @description Function wrapping panel to show analyses generated inputs table.
-#'
-#' @template params-module-ui
-#'
-#' @export
-panelAnalysisGenInputs <- function(id) {
-  ns <- NS(id)
-  flamingoPanel(
-    collapsible = TRUE,
-    show = TRUE,
-    ns("panel_analysisIG"),
-    heading = tagAppendChildren(
-      h4(""),
-      uiOutput(ns("paneltitle_panelAnalysisIG"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonanaIGrefresh")),
-      actionButton(inputId = ns("buttonhideanaIG"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
-    ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
   )
 }
 
@@ -310,12 +281,8 @@ step2_chooseAnalysis <- function(input, output, session,
     tbl_modelsDetails = NULL,
     # analyses table
     tbl_analysesData = NULL,
-    # analysis details
-    tbl_analysisdetails = NULL,
     #analysis log
     tbl_analysislog = NULL,
-    #analysis input generated
-    tbl_anaIG = NULL,
     #analysis ID
     analysisID = "",
     #file for hazard map
@@ -495,47 +462,26 @@ step2_chooseAnalysis <- function(input, output, session,
 
   })
 
-  # Analysis detais ------------------------------------------------------------
-  onclick("abuttonshowanadetails", {
+  # Analysis details ------------------------------------------------------------
+  observeEvent (input$abuttonshowanadetails, {
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
-    .reloadAnaDetails()
   })
+
+  sub_modules$analysis_details <- callModule(
+    analysis_details,
+    id = "analysis_details",
+    portfolioID = reactive({result$portfolioID}),
+    analysisID = reactive({result$analysisID}),
+    counter = reactive({input$abuttonshowanadetails})
+  )
 
   onclick("buttonhideanadetails", {
     hide("panelAnalysisDetails")
-  })
-
-  output$dt_analysisdetails <- renderDT(
-    if (!is.null(result$tbl_analysisdetails) && nrow(result$tbl_analysisdetails) > 0 ) {
-      logMessage("re-rendering analysis details table")
-      datatable(
-        result$tbl_analysisdetails %>% capitalize_names_df(),
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = list(mode = 'none'),
-        colnames = c('row number' = 1),
-        options = .getPRTableOptions(pageLengthVal = 10)
-      )
-    } else {
-      .nothingToShowTable(contentMessage = paste0("no files associtated with analysis id ", result$analysisID))
-    }
-  )
-
-  #  panelAnalysisDetails Table title
-  output$paneltitle_panelAnalysisDetails <- renderUI({
-    if (result$analysisID != "") {
-      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      paste0('Details of analysis id ', toString(result$analysisID), ' ', anaName)
-    } else {
-      paste0("Analysis details")
-    }
   })
 
   # Analysis Logs --------------------------------------------------------------
@@ -601,6 +547,15 @@ step2_chooseAnalysis <- function(input, output, session,
       paste0('Input generation Logs of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
       paste0("Input generation Logs")
+    }
+  })
+
+  #  analysis_details Table title
+  output$paneltitle_analysis_details <- renderUI({
+    if (result$analysisID != "") {
+      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
+      analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+      paste0('Details of analysis id ', toString(analysisID), ' ', anaName)
     }
   })
 
@@ -775,36 +730,6 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
   })
 
-  # Show generated inputs ------------------------------------------------------
-  observeEvent(input$abuttonshowIG, {
-    hide("panelAnalysisDetails")
-    hide("panelAnalysisLog")
-    hide("panelModelTable")
-    hide("panelModelDetails")
-    show("panelAnalysisGenInputs")
-    .reloadAnaIG()
-  })
-
-  # Create Generated input Table  Title
-  output$paneltitle_panelAnalysisIG <- renderUI({
-    if (result$analysisID != "") {
-      anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      paste0('Generated inputs for analysis id ', toString(result$analysisID), ' ', anaName)
-    } else {
-      paste0("Generated inputs")
-    }
-  })
-
-  sub_modules$ViewIGFiles <- callModule(
-    ViewFilesInTable,
-    id = "ViewIGFiles",
-    tbl_filesListData = reactive({result$tbl_anaIG}),
-    param = reactive({result$analysisID}),
-    logMessage = logMessage,
-    file_column = "files",
-    folderpath = "_inputs/",
-    includechkbox = TRUE)
-
   # Enable and disable buttons -------------------------------------------------
 
   #Make submit button dependent of analysis name
@@ -829,7 +754,6 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttonshowanadetails")
       disable("abuttondelana")
       disable("abuttonstartcancIG")
-      disable("abuttonshowIG")
       disable("abuttonmodeldetails")
       disable("abuttonpgotonextstep")
       disable("abuttonsubmit")
@@ -849,7 +773,6 @@ step2_chooseAnalysis <- function(input, output, session,
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] != Status_details$input_gen_failed ||
             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] != Status_details$input_gen_started) {
           enable("abuttonpgotonextstep")
-          enable("abuttonshowIG")
         }
       }
     })
@@ -868,27 +791,19 @@ step2_chooseAnalysis <- function(input, output, session,
   # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonanarefresh", {
     .reloadAnaData()
-  } )
-
-  onclick("abuttonanadetailsrefresh", {
-    .reloadAnaDetails()
   })
 
   onclick("abuttonanalogrefresh", {
     .reloadAnaLog()
   })
 
-  onclick("abuttonanaIGrefresh", {
-    .reloadAnaIG()
-  })
-
   onclick("abuttonmodelrefresh", {
     .reloadtbl_modelsData()
-  } )
+  })
 
   onclick("abuttonmodeldetailrfsh", {
     .reloadtbl_modelsDetails()
-  } )
+  })
 
   # Help Functions -------------------------------------------------------------
   # hide all panels
@@ -929,17 +844,6 @@ step2_chooseAnalysis <- function(input, output, session,
     updateTextInput(session = session, inputId = "anaName", value = "")
   }
 
-
-  # Reload Analysis Details table
-  .reloadAnaDetails <- function() {
-    logMessage(".reloadAnaDetails called")
-    if (!is.null(result$analysisID) && result$analysisID != "") {
-      result$tbl_analysisdetails <- return_tbl_analysisdetails(result$analysisID)
-    } else {
-      result$tbl_analysisdetails <-  NULL
-    }
-  }
-
   # Reload Analysis Log table
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
@@ -947,16 +851,6 @@ step2_chooseAnalysis <- function(input, output, session,
       result$tbl_analysislog <- return_file_df(api_get_analyses_input_generation_traceback_file, result$analysisID)
     } else {
       result$tbl_analysislog <-  NULL
-    }
-  }
-
-  #reload input generated table
-  .reloadAnaIG <- function(){
-    logMessage(".reloadAnaIG called")
-    if (!is.null(result$analysisID) && result$analysisID != "") {
-      result$tbl_anaIG <- return_analyses_input_file_wicons_df(result$analysisID)
-    } else {
-      result$tbl_anaIG <-  NULL
     }
   }
 

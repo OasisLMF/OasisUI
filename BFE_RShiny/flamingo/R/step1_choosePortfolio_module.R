@@ -7,6 +7,8 @@
 #'
 #' @description UI/View for the step1_choosePortfolio.
 #'
+#' @template params-module-ui
+#'
 #' @return List of tags.
 #'
 #' @importFrom shinyjs hidden
@@ -591,7 +593,11 @@ step1_choosePortfolio <- function(input, output, session,
       datapath <- paste(c(tmp[-length(tmp)], ""), collapse = "/")
       newfile <- paste0(datapath, inFile$name)
       file.rename(inFile$datapath, newfile)
-      post_file <- APIfunction(pfId, newfile)
+      withModalSpinner(
+        post_file <- APIfunction(pfId, newfile),
+        "Linking...",
+        size = "s"
+      )
       if (post_file$status == "Success") {
         flamingoNotification(type = "message",
                              paste("File linked successfully"))

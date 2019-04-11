@@ -481,4 +481,5 @@ ViewFilesInTable <- function(input, output, session,
     inputs
   }
 
+  invisible()
 }
