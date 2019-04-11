@@ -9,8 +9,8 @@ step3_configureOutputUI(id)
 
 step3_configureOutput(input, output, session, active = reactive(TRUE),
   logMessage = message, currstep = reactive(-1),
-  portfolioID = reactive(""), modelID = reactive(""),
-  pfName = reactive(""), analysisID = reactive(""))
+  portfolioID = reactive(""), pfName = reactive(""),
+  analysisID = reactive(""))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -24,8 +24,6 @@ step3_configureOutput(input, output, session, active = reactive(TRUE),
 \item{currstep}{Current selected step.}
 
 \item{portfolioID}{Selected portfolio ID.}
-
-\item{modelID}{Selected model ID.}
 
 \item{pfName}{Name of selected portfolio.}
 

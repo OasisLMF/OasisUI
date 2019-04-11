@@ -404,7 +404,6 @@ panel_configureAdvancedRI <- function(id) {
 #'
 #' @param currstep Current selected step.
 #' @param portfolioID Selected portfolio ID.
-#' @param modelID Selected model ID.
 #' @param analysisID Selected analysis ID.
 #' @param pfName Name of selected portfolio.
 #'
@@ -431,7 +430,6 @@ step3_configureOutput <- function(input, output, session,
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
-                                  modelID = reactive(""),
                                   pfName = reactive(""),
                                   analysisID = reactive("")
 ) {
@@ -452,8 +450,6 @@ step3_configureOutput <- function(input, output, session,
   result <- reactiveValues(
     # reactive for portfolioID
     portfolioID = "",
-    # reactive for modelID
-    modelID = "",
     # reactve value for navigation
     navigationstate = NULL,
     # reactive value for Analysis table
@@ -470,20 +466,12 @@ step3_configureOutput <- function(input, output, session,
     analysis_settings = NULL
   )
 
-  # Reset Params
+  # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
     result$dashboardAnaID <- -1
     if (!is.null(analysisID()) && analysisID() != "") {
       result$anaID <- analysisID()
-    }
-  })
-
-  observeEvent(modelID(), {
-    if (!is.null(modelID())) {
-      result$modelID <- modelID()
-    } else {
-      result$modelID <- ""
     }
   })
 
@@ -1035,9 +1023,10 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".clearotherparams called")
     .clearOutputOptions()
     updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
-    result$modelID <- ifelse(result$modelID == "", -1, result$modelID)
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, result$modelID)
-    if (result$modelID != -1 && !is.null(tbl_modelsDetails)) {
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
+    modelID <- ifelse(modelID == "", -1, modelID)
+    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
+    if (modelID != -1 && !is.null(tbl_modelsDetails)) {
       model_settings <- tbl_modelsDetails$model_settings
 
       names_settings <- list()
@@ -1190,7 +1179,8 @@ step3_configureOutput <- function(input, output, session,
 
     logMessage(".gen_analysis_settings called")
 
-    modelData <- return_tbl_modelData(result$modelID)
+    modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
+    modelData <- return_tbl_modelData(modelID)
 
     inputsettings <- list(
       #analysisSettingsMapping
