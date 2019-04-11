@@ -7,7 +7,7 @@
 \usage{
 summarystatusUI(id)
 
-summarystatus(input, output, session, analysisID,
+summarystatus(input, output, session, analysisID, counter = NULL,
   active = reactive(TRUE))
 }
 \arguments{

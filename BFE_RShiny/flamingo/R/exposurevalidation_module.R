@@ -149,7 +149,7 @@ exposurevalidation <- function(input,
   output$dt_summary_validation <- renderDT(
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
       datatable(
-        result$summary_validation_tbl,
+        result$summary_validation_tbl %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = FALSE,
         escape = FALSE,
@@ -210,7 +210,7 @@ exposurevalidation <- function(input,
   output$dt_output_uploaded_lock_check <- renderDT(
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       datatable(
-        result$uploaded_locs_check,
+        result$uploaded_locs_check %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = FALSE,
         escape = FALSE,

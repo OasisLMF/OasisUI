@@ -74,12 +74,12 @@ flamingoTable <- function(input, output, session,
       if (colnames) {
         colnamesToUse <- names(tbl_flamingoTable)
         if (rownames) {
-          colnamesToUse <- c('row number', colnamesToUse)
+          colnamesToUse <- c('Row Number', colnamesToUse)
         }
       }
 
       datatable(
-        tbl_flamingoTable,
+        tbl_flamingoTable %>% capitalize_names_df(),
           class = "flamingo-table display",
           rownames = rownames,
           selection = list(mode = selection,
@@ -90,13 +90,13 @@ flamingoTable <- function(input, output, session,
           options = .getPRTableOptions(scrollX, maxrowsperpage, filter)
         )
     })
-    
+
     observeEvent(data(), ignoreNULL = FALSE, {
       if (is.null(data()) || length(nrow(data())) == 0) {
         selectRows(dataTableProxy("dt_flamingoTable"), NULL)
       }
     } )
-    
+
   # Helper functions -----------------------------------------------------------
 
   #table settings for pr tab: returns option list for datatable

@@ -92,7 +92,8 @@ panelAnalysisLogs <- function(id) {
       uiOutput(ns("paneltitle_AnaLogs"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analysesrunlog"))
+    DTOutput(ns("dt_analysesrunlog")),
+    downloadButton(ns("download_log"), label = "Export to csv")
   )
 }
 
@@ -404,9 +405,9 @@ panel_configureAdvancedRI <- function(id) {
 #' @template params-logMessage
 #' @template params-active
 #'
-#' @param currstep current selected step.
-#' @param portfolioID selected portfolio ID.
-#' @param analysisID selected analysis ID.
+#' @param currstep Current selected step.
+#' @param portfolioID Selected portfolio ID.
+#' @param analysisID Selected analysis ID.
 #' @param pfName Name of selected portfolio.
 #'
 #' @return dashboardAnaID id of selected run.
@@ -432,7 +433,7 @@ step3_configureOutput <- function(input, output, session,
                                   logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
-                                  pfName = reactive({""}),
+                                  pfName = reactive(""),
                                   analysisID = reactive("")
 ) {
 
@@ -563,7 +564,7 @@ step3_configureOutput <- function(input, output, session,
       }
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData,
+        result$tbl_analysesData %>% return_tbl_analysesData_nice(),
         class = "flamingo-table display",
         rownames = TRUE,
         selection = list(mode = 'single',
@@ -843,13 +844,28 @@ step3_configureOutput <- function(input, output, session,
     hide("panelAnalysisLogs")
   })
 
+  # Export to .csv
+  output$download_log <- downloadHandler(
+    filename = "analysis_run_log.csv",
+    content = function(file) {
+      fwrite(result$tbl_analysisrunlog, file, row.names = TRUE, quote = TRUE)}
+  )
+
+  observeEvent(result$tbl_analysisrunlog, {
+    if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 1) {
+      show("download_log")
+    } else {
+      hide("download_log")
+    }
+  })
+
   ### Log Table
   output$dt_analysesrunlog <- renderDT({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
-      if (!is.null(result$tbl_analysisrunlog)) {
+      if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 1) {
         datatable(
-          result$tbl_analysisrunlog,
+          result$tbl_analysisrunlog %>% capitalize_names_df(),
           class = "flamingo-table display",
           rownames = TRUE,
           selection = "none",
@@ -1202,7 +1218,7 @@ step3_configureOutput <- function(input, output, session,
       "peril_flood" = input$chkinputprflood,
       "peril_surge" = input$chkinputprstsurge,
       "leakage_factor" = input$sliderleakagefac,
-      "event_occurrence_file_id" =  as.integer(input$sinputeventocc),
+      "event_occurrence_id" =  as.integer(input$sinputeventocc),
       #outoutSettingsMappings
       "gul_output" = input$chkinputGUL,
       "il_output" = input$chkinputIL,

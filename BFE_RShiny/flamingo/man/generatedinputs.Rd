@@ -7,7 +7,7 @@
 \usage{
 generatedinputsUI(id)
 
-generatedinputs(input, output, session, analysisID,
+generatedinputs(input, output, session, analysisID, counter = NULL,
   active = reactive(TRUE))
 }
 \arguments{

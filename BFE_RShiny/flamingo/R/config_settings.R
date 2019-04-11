@@ -53,7 +53,7 @@ tbl_modelsDataNames <- list(
 )
 
 #' tbl_analysesDataNames
-#' @description Creating List for col names of Model Runs Table
+#' @description Creating List for col names of Analyses Table
 #' @format Named \code{list} of tbl_analysesData column names.
 #' @export
 tbl_analysesDataNames <- list(
@@ -72,6 +72,7 @@ tbl_analysesDataNames <- list(
   output_file = "output_file",
   run_traceback_file = "run_traceback_file"
 )
+
 
 #' filesListDataNames
 #' @description Creating List for  col names of filesListData

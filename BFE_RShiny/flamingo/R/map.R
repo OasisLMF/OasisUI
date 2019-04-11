@@ -17,13 +17,13 @@
 createPlainMap <- function(df) {
 
   popupData <- tagList(
-      strong("Location ID: "), df$locnum,
-      br(), strong("Latitude: "), df$latitude,
-      br(), strong("Longitude: "), df$longitude)
+    strong("Location ID: "), df$locnum,
+    br(), strong("Latitude: "), df$latitude,
+    br(), strong("Longitude: "), df$longitude)
 
   leaflet() %>%
-      addTiles() %>%
-      addMarkers(data = df,
-          clusterOptions= markerClusterOptions(maxClusterRadius = 50),
-          popup = toString(popupData))
+    addTiles() %>%
+    addMarkers(data = df,
+               clusterOptions= markerClusterOptions(maxClusterRadius = 50),
+               popup = toString(popupData))
 }

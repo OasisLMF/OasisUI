@@ -7,7 +7,7 @@
 \usage{
 uploadedinputsUI(id)
 
-uploadedinputs(input, output, session, portfolioID,
+uploadedinputs(input, output, session, portfolioID, counter = NULL,
   active = reactive(TRUE))
 }
 \arguments{

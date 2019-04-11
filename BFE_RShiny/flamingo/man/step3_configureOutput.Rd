@@ -9,7 +9,7 @@ step3_configureOutputUI(id)
 
 step3_configureOutput(input, output, session, active = reactive(TRUE),
   logMessage = message, currstep = reactive(-1),
-  portfolioID = reactive(""), pfName = reactive({     "" }),
+  portfolioID = reactive(""), pfName = reactive(""),
   analysisID = reactive(""))
 }
 \arguments{
@@ -21,13 +21,13 @@ step3_configureOutput(input, output, session, active = reactive(TRUE),
 
 \item{logMessage}{function that will be passed info messages.}
 
-\item{currstep}{current selected step.}
+\item{currstep}{Current selected step.}
 
-\item{portfolioID}{selected portfolio ID.}
+\item{portfolioID}{Selected portfolio ID.}
 
 \item{pfName}{Name of selected portfolio.}
 
-\item{analysisID}{selected analysis ID.}
+\item{analysisID}{Selected analysis ID.}
 
 \item{id}{Namespace ID for the module.}
 }
