@@ -17,6 +17,7 @@ Imports:
   DT,
   data.table,
   dplyr,
+  geojsonio, 
   ggplot2,
   htmltools,
   htmlwidgets,

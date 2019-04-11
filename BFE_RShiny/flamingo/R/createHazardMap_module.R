@@ -31,12 +31,12 @@ createHazardMapUI <- function(id) {
 #'
 #' @return Leaflet map.
 #'
+#' @importFrom geojsonio geojson_read
 #' @importFrom leaflet leaflet
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet colorNumeric
 #' @importFrom leaflet awesomeIcons
 #' @importFrom leaflet addPolygons
-#' @importFrom leaflet addGeoJSON
 #' @importFrom leaflet addLegend
 #' @importFrom leaflet addAwesomeMarkers
 #'
@@ -47,13 +47,6 @@ createHazardMap <- function(input, output, session,
 
   ns <- session$ns
 
-  # Isolate coordinates, Return Level, lng and lat
-  i <- 1:max(file_map$features$id)
-  coor <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]]})
-  col <- sapply(i, function(x) {file_map$features$properties[1][[1]][x]})
-  pol_lng <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][2:5]})
-  pol_lat <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][7:10]})
-
   # Plot leaflet
   output$hazardmap <- renderLeaflet({
     .buildHazardMap(file_map, file_pins)
@@ -63,7 +56,7 @@ createHazardMap <- function(input, output, session,
   .buildHazardMap <- function(df_map, file_pins) {
 
     # Create map color palette
-    pal <- colorNumeric("Reds", col)
+    pal <- colorNumeric("Reds", NULL)
 
     # Create custom icons
     icon_map <- awesomeIcons(
@@ -78,21 +71,20 @@ createHazardMap <- function(input, output, session,
       br(), strong("Latitude: "), file_pins$Latitude,
       br(), strong("Longitude: "), file_pins$Longitude)
 
-    leaflet() %>%
+    leaflet(file_map) %>%
       addTiles() %>%
-      addGeoJSON(df_map) %>%
-      addPolygons(lng = pol_lng,
-                  lat = pol_lat,
-                  color = "red",
-                  # fillColor = pal(col),
+      addPolygons(color = "transparent",
+                  fillColor = ~pal(file_map$ReturnLevel),
                   fillOpacity = 1) %>%
       addLegend(position = "topright",
                 pal = pal,
-                values = col) %>%
-      addAwesomeMarkers(lng = file_pins$Longitude,
-                        lat = file_pins$Latitude,
-                        icon = icon_map,
-                        clusterOptions = TRUE,
-                        popup = toString(popupData))
+                values = file_map$ReturnLevel) %>%
+        addAwesomeMarkers(lng = file_pins$Longitude,
+                          lat = file_pins$Latitude,
+                          icon = icon_map,
+                          clusterOptions = TRUE,
+                          popup = toString(popupData))
+
+
   }
 }

@@ -715,7 +715,7 @@ step2_chooseAnalysis <- function(input, output, session,
   observeEvent(input$hazard_files, {
     if (!is.null(input$hazard_files)) {
       path <- paste0("./www/hazard_files/", input$hazard_files)
-      result$mapfile <- jsonlite::fromJSON(path)
+      result$mapfile <- geojsonio::geojson_read(path, what = "sp")
       if (is.null(result$mapfile)) {
         hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
       }
