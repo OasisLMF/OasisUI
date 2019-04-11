@@ -318,7 +318,9 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis ID
     analysisID = "",
     #file for hazard map
-    mapfile = NULL
+    mapfile = NULL,
+    # file for pins
+    uploaded_locs = NULL
   )
 
   #Set Params
@@ -692,6 +694,13 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Hazard Map -----------------------------------------------------------------
 
+  observeEvent(result$portfolioID, {
+    if(!is.null(result$portfolioID) && !is.na(result$portfolioID) && result$portfolioID != "") {
+      result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
+                                             result$portfolioID)
+    }
+  })
+
   # Choose hazard file
   observeEvent(input$hazard_files, {
     if (!is.null(input$hazard_files)) {
@@ -710,7 +719,8 @@ step2_chooseAnalysis <- function(input, output, session,
         createHazardMap,
         id = "createHazardMap",
         file_map = result$mapfile,
-        portfolioID = reactive({result$portfolioID}))
+        file_pins = result$uploaded_locs
+      )
     }
   })
 

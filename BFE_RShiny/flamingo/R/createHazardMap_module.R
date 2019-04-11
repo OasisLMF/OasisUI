@@ -27,7 +27,7 @@ createHazardMapUI <- function(id) {
 #' @description Creates a hazard map using leaflet.
 #'
 #' @param file_map File to plot as map.
-#' @param portfolioID ID of the portfolio.
+#' @param file_pins File to plot pins.
 #'
 #' @return Leaflet map.
 #'
@@ -43,7 +43,7 @@ createHazardMapUI <- function(id) {
 #' @export
 createHazardMap <- function(input, output, session,
                             file_map,
-                            portfolioID = "") {
+                            file_pins) {
 
   ns <- session$ns
 
@@ -54,19 +54,13 @@ createHazardMap <- function(input, output, session,
   pol_lng <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][1:4]})
   pol_lat <- sapply(i, function(x) {file_map$features$geometry$coordinates[[x]][6:9]})
 
-  # Find maximum negative (lng) number and minimum (lat) values
-  # pos_min <- function(x) {min(x[x > 0])}
-  # neg_max <- function(x) {max(x[x < 0])}
-
   # Plot leaflet
   output$hazardmap <- renderLeaflet({
-    .buildHazardMap(file_map, portfolioID())
+    .buildHazardMap(file_map, file_pins)
   })
 
   # Create map
-  .buildHazardMap <- function(df_map, portfolioID) {
-
-    uploaded_locs <- return_file_df(api_get_portfolios_location_file, portfolioID())
+  .buildHazardMap <- function(df_map, file_pins) {
 
     # Create map color palette
     pal <- colorNumeric("Reds", col)
@@ -80,9 +74,9 @@ createHazardMap <- function(input, output, session,
     )
 
     popupData <- tagList(
-      strong("Location ID: "), uploaded_locs$LocNumber,
-      br(), strong("Latitude: "), uploaded_locs$Latitude,
-      br(), strong("Longitude: "), uploaded_locs$Longitude)
+      strong("Location ID: "), file_pins$LocNumber,
+      br(), strong("Latitude: "), file_pins$Latitude,
+      br(), strong("Longitude: "), file_pins$Longitude)
 
     leaflet() %>%
       addTiles() %>%
@@ -95,8 +89,8 @@ createHazardMap <- function(input, output, session,
       addLegend(position = "topright",
                 pal = pal,
                 values = col) %>%
-      addAwesomeMarkers(lng = uploaded_locs$Longitude,
-                        lat = uploaded_locs$Latitude,
+      addAwesomeMarkers(lng = file_pins$Longitude,
+                        lat = file_pins$Latitude,
                         icon = icon_map,
                         clusterOptions = TRUE,
                         popup = toString(popupData))
