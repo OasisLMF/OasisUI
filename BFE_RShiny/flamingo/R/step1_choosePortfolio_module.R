@@ -345,13 +345,13 @@ step1_choosePortfolio <- function(input, output, session,
       datatable(
         result$tbl_portfoliosData %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'single',
                          selected = rowToSelect,
                          target = 'row'),
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         options = .getPRTableOptions()
       )
     } else {

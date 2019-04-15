@@ -564,11 +564,11 @@ step3_configureOutput <- function(input, output, session,
       datatable(
         result$tbl_analysesData %>% return_tbl_analysesData_nice(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         selection = list(mode = 'single',
                          selected = rownames(result$tbl_analysesData)[c(as.integer(index))]),
         escape = FALSE,
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = .getPRTableOptions()
       )
@@ -901,10 +901,10 @@ step3_configureOutput <- function(input, output, session,
         datatable(
           result$tbl_analysisrunlog %>% capitalize_names_df(),
           class = "flamingo-table display",
-          rownames = TRUE,
+          rownames = FALSE,
           selection = "none",
           escape = FALSE,
-          colnames = c('row number' = 1),
+          # colnames = c('Row Number' = 1),
           filter = 'bottom',
           options = .getPRTableOptions()
         )

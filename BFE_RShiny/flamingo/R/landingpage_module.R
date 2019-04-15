@@ -103,9 +103,9 @@ landingPage <- function(input, output, session, logMessage = message, active = r
     datatable(
       result$tbl_anaInbox %>% return_tbl_analysesData_nice(),
       class = "flamingo-table display",
-      rownames = TRUE,
+      rownames = FALSE,
       selection = "single",
-      colnames = c("row number" = 1),
+      #colnames = c("Row Number" = 1),
       filter = 'bottom',
       escape = FALSE,
       plugins = 'natural',
