@@ -555,7 +555,7 @@ step2_chooseAnalysis <- function(input, output, session,
       datatable(
         result$tbl_analysislog %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = FALSE,
+        rownames = TRUE,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'none'),

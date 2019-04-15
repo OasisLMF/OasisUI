@@ -906,7 +906,7 @@ step3_configureOutput <- function(input, output, session,
         datatable(
           result$tbl_analysisrunlog %>% capitalize_names_df(),
           class = "flamingo-table display",
-          rownames = FALSE,
+          rownames = TRUE,
           selection = "none",
           escape = FALSE,
           # colnames = c('Row Number' = 1),
