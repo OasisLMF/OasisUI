@@ -128,7 +128,7 @@ panelAnalysisLog <- function(id) {
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_analysislog")),
-    downloadButton(ns("download_log"), label = "Export to csv")
+    downloadButton(ns("download_log"), label = "Download")
   )
 }
 
@@ -531,9 +531,14 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Export to .csv
   output$download_log <- downloadHandler(
-    filename = "analysis_inputs_log.csv",
+    filename = "analysis_inputs_log.txt",
     content = function(file) {
-      fwrite(result$tbl_analysislog, file, row.names = TRUE, quote = TRUE)}
+      fwrite(result$tbl_analysislog,
+             file,
+             row.names = FALSE,
+             col.names = FALSE,
+             quote = FALSE)
+      }
   )
 
   observeEvent(result$tbl_analysislog, {
