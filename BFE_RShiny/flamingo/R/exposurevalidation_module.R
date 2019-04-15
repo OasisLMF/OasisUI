@@ -310,18 +310,19 @@ exposurevalidation <- function(input,
       as.data.frame()
 
     df <- df %>%
+      format(scientific = FALSE) %>%
       t() %>%
       as.data.frame(stringsAsFactors = FALSE) %>%
       mutate(key = sub(reg_expr_dot, "\\1", rownames(.)),
              type = sub(reg_expr_dot, "\\2", rownames(.))) %>%
-      spread(key, V1, convert = TRUE)
+      spread(key, 1, convert = TRUE)
     df
   }
 
   # reload dataframes
 
   #reload summary table
-  .reloadSummary <- function(.reloadSummary){
+  .reloadSummary <- function(){
 
     logMessage(".reloadSummary called")
 
