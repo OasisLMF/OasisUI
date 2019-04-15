@@ -140,10 +140,10 @@ ViewFilesInTable <- function(input, output, session,
       datatable(
         result$tbl_filesListData_wButtons %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         escape = FALSE,
         selection =  selectionUsed,
-        colnames = c('Row Number' = 1),
+        #colnames = c('Row Number' = 1),
         options = .getFLTableOptions()
       )
     } else {
@@ -312,10 +312,10 @@ ViewFilesInTable <- function(input, output, session,
       datatable(
         result$tbl_fileData %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         selection = "none",
         filter = 'bottom',
-        colnames = c("Row Number" = 1),
+        #colnames = c("Row Number" = 1),
         width = "100%",
         options = list(searchHighlight = TRUE,
                        scrollX = TRUE))

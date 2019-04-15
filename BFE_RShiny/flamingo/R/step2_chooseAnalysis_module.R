@@ -339,11 +339,11 @@ step2_chooseAnalysis <- function(input, output, session,
       datatable(
         result$tbl_analysesData %>% return_tbl_analysesData_nice(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         selection = list(mode = 'single',
                          selected = rownames(result$tbl_analysesData)[c(as.integer(index))]),
         escape = FALSE,
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = .getPRTableOptions()
       )
@@ -484,11 +484,11 @@ step2_chooseAnalysis <- function(input, output, session,
       datatable(
         result$tbl_analysisdetails %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'none'),
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         options = .getPRTableOptions(pageLengthVal = 10)
       )
     } else {
@@ -550,11 +550,11 @@ step2_chooseAnalysis <- function(input, output, session,
       datatable(
         result$tbl_analysislog %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'none'),
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         options = .getPRTableOptions()
       )
     } else {
@@ -595,12 +595,12 @@ step2_chooseAnalysis <- function(input, output, session,
       datatable(
         result$tbl_modelsData %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'single',
                          selected = rownames(result$tbl_modelsData)[1]),
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         options = .getPRTableOptions()
       )
     } else {
@@ -642,11 +642,11 @@ step2_chooseAnalysis <- function(input, output, session,
       datatable(
         result$tbl_modelsDetails %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         filter = "none",
         escape = FALSE,
         selection = "none",
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         options = .getPRTableOptions()
       )
     } else {
