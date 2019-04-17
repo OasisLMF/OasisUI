@@ -7,8 +7,8 @@
 \usage{
 portfolio_detailsUI(id)
 
-portfolio_details(input, output, session, refresh_opt, portfolioID,
-  counter = NULL, active = reactive(TRUE))
+portfolio_details(input, output, session, refresh_opt = TRUE,
+  portfolioID, counter = NULL, active = reactive(TRUE))
 }
 \arguments{
 \item{portfolioID}{selected portfolio ID.}
