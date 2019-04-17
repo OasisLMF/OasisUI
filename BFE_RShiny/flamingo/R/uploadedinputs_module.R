@@ -1,20 +1,20 @@
-# Uploaded Inputs Module -------------------------------------------------------
+# Portfolio Details Module -------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' uploadedinputsUI
-#' @rdname uploadedinputs
+#' portfolio_detailsUI
+#' @rdname portfolio_details
 #'
-#' @description UI/View for uploaded inputs of an analysis.
+#' @description UI/View for portfolio details.
 #'
 #' @return List of tags.
 #'
 #' @export
-uploadedinputsUI <- function(id) {
+portfolio_detailsUI <- function(id) {
 
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("panel_uploadedinputs"),
+    ns("panel_portfolio_details"),
     flamingoRefreshButton(ns("abuttonuploadedrefresh")),
     ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
   )
@@ -23,16 +23,16 @@ uploadedinputsUI <- function(id) {
 
 # Server -----------------------------------------------------------------------
 
-#' uploadedinputs
+#' portfolio_details
 #'
-#' @rdname uploadedinputs
+#' @rdname portfolio_details
 #'
-#' @description Server logic for exposure validation of an analysis.
+#' @description Server logic for portfolio details.
 #'
 #' @param portfolioID selected portfolio ID.
 #'
 #' @export
-uploadedinputs <- function(input,
+portfolio_details <- function(input,
                            output,
                            session,
                            portfolioID,

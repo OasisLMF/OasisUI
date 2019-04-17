@@ -101,11 +101,9 @@ panelPortfolioDetails <- function(id) {
     heading = tagAppendChildren(
       h4("Source files for portfolio"),
       uiOutput(ns("paneltitle_pfDetails"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttondefpfrfsh")),
       actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    #DTOutput(ns("dt_portfolioDetails"))
-    ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
+    portfolio_detailsUI(ns("portfolio_details"))
   )
 }
 
@@ -388,6 +386,14 @@ step1_choosePortfolio <- function(input, output, session,
     logMessage("showing panelPortfolioDetails")
     .reloadtbl_portfolioDetails()
   })
+
+  sub_modules$portfolio_details <- callModule(
+    portfolio_details,
+    id = "portfolio_details",
+    portfolioID = portfolioID,
+    counter = reactive({input$abuttonpfdetails}),
+    active = active
+  )
 
   # Hide portfolio Details
   onclick("buttonhidepfdetails", {

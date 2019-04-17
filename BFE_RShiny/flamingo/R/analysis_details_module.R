@@ -33,7 +33,7 @@ analysis_detailsUI <- function(id) {
     ),
     tabPanel(
       title = "Uploaded Inputs",
-      uploadedinputsUI(ns("uploadedinputs")),
+      portfolio_detailsUI(ns("portfolio_details")),
       value = ns("tabuploadedinputs")
     )
   )
@@ -97,8 +97,8 @@ analysis_details <- function(input,
 
   # Tab Uploaded Inputs --------------------------------------------------------
   callModule(
-    uploadedinputs,
-    id = "uploadedinputs",
+    portfolio_details,
+    id = "portfolio_details",
     portfolioID = portfolioID,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabuploadedinputs")})
