@@ -374,7 +374,7 @@ step1_choosePortfolio <- function(input, output, session,
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
-    paste0('details of portfolio id ', pfId, ' ', pfName)
+    paste0(' ', pfId, ' ', pfName)
   })
 
 
