@@ -62,6 +62,11 @@ exposurevalidationUI <- function(id) {
 #'
 #' @description Server logic for exposure validation of an analysis.
 #'
+#' @template params-module
+#' @param analysisID Selected analysis id.
+#' @param portfolioID selected portfolio ID.
+#' @param counter Reactive value storing actionButton status.
+#'
 #' @importFrom data.table fread
 #' @importFrom dplyr select
 #' @importFrom dplyr inner_join

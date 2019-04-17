@@ -29,7 +29,10 @@ portfolio_detailsUI <- function(id) {
 #'
 #' @description Server logic for portfolio details.
 #'
+#' @template params-module
+#' @param refresh_opt Option to hide/show refresh button.
 #' @param portfolioID selected portfolio ID.
+#' @param counter Reactive value storing actionButton status.
 #'
 #' @importFrom shinyjs hide
 #'

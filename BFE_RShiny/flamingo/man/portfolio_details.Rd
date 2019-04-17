@@ -11,7 +11,15 @@ portfolio_details(input, output, session, refresh_opt = TRUE,
   portfolioID, counter = NULL, active = reactive(TRUE))
 }
 \arguments{
+\item{id}{Namespace ID for the module.}
+
+\item{input, output, session}{Shiny input, output, and session objects.}
+
+\item{refresh_opt}{Option to hide/show refresh button.}
+
 \item{portfolioID}{selected portfolio ID.}
+
+\item{counter}{Reactive value storing actionButton status.}
 }
 \value{
 List of tags.
