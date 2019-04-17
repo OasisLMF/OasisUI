@@ -255,6 +255,15 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
     )
   )
 
+  perils <- names(inputsettings)[grepl("peril", names(inputsettings))]
+  perils_lst_mapping <- lapply(perils, function(p){
+    list(
+      "path" = "model_settings",
+      "value" =  inputsettings[[p]]
+    )
+  }) %>%
+    setNames(perils)
+
   modelSettingsMapping <- list(
     "event_set" = list(
       "path" = "model_settings",
@@ -264,31 +273,16 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
       "path" = "model_settings",
       "value" =  inputsettings$leakage_factor
     ),
-    "peril_wind" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$peril_wind
-    ),
     "demand_surge" = list(
       "path" = "model_settings",
       "value" =  inputsettings$demand_surge
-    ),
-    "peril_quake" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$peril_quake
-    ),
-    "peril_flood" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$peril_flood
-    ),
-    "peril_surge" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$peril_surge
     ),
     "event_occurrence_id" = list(
       "path" = "model_settings",
       "value" =  inputsettings$event_occurrence_id
     )
-  )
+  ) %>%
+    c(perils_lst_mapping)
 
   outoutSettingsMappings <- list(
     "gul_output" = list(
