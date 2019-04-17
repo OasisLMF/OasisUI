@@ -15,7 +15,7 @@ portfolio_detailsUI <- function(id) {
   flamingoPanel(
     collapsible = FALSE,
     ns("panel_portfolio_details"),
-    flamingoRefreshButton(ns("abuttonuploadedrefresh")),
+    div(id = ns("refresh"), flamingoRefreshButton(ns("abuttonuploadedrefresh"))),
     ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
   )
 }
@@ -31,10 +31,13 @@ portfolio_detailsUI <- function(id) {
 #'
 #' @param portfolioID selected portfolio ID.
 #'
+#' @importFrom shinyjs hide
+#'
 #' @export
 portfolio_details <- function(input,
                            output,
                            session,
+                           refresh_opt = TRUE,
                            portfolioID,
                            counter = NULL,
                            active = reactive(TRUE)) {
@@ -43,7 +46,6 @@ portfolio_details <- function(input,
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
-    pfId = NULL,
     dt_uploaded = NULL
   )
 
@@ -53,6 +55,9 @@ portfolio_details <- function(input,
     counter()
   }, {
     if (length(active()) > 0 && active()) {
+      if (!refresh_opt) {
+        hide("refresh")
+      }
       withModalSpinner(
         .reloadtbl_portfolioDetails(),
         "Loading...",

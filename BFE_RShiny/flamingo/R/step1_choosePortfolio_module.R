@@ -101,6 +101,7 @@ panelPortfolioDetails <- function(id) {
     heading = tagAppendChildren(
       h4("Source files for portfolio"),
       uiOutput(ns("paneltitle_pfDetails"), inline = TRUE),
+      flamingoRefreshButton(ns("abuttondefpfrfsh")),
       actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     portfolio_detailsUI(ns("portfolio_details"))
@@ -390,6 +391,7 @@ step1_choosePortfolio <- function(input, output, session,
   sub_modules$portfolio_details <- callModule(
     portfolio_details,
     id = "portfolio_details",
+    refresh_opt = FALSE,
     portfolioID = portfolioID,
     counter = reactive({input$abuttonpfdetails}),
     active = active

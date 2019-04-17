@@ -53,8 +53,6 @@ analysis_detailsUI <- function(id) {
 #' @param reload_generated Imports function to reload Generated Inputs table.
 #' @param portfolioID Selected portfolio ID.
 #'
-#' @importFrom shinyjs hide
-#'
 #' @template params-module-ui
 #'
 #' @export
@@ -99,6 +97,7 @@ analysis_details <- function(input,
   callModule(
     portfolio_details,
     id = "portfolio_details",
+    refresh_opt = TRUE,
     portfolioID = portfolioID,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabuploadedinputs")})
