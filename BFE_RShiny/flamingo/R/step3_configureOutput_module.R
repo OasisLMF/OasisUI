@@ -159,10 +159,7 @@ panelDefineOutputsDetails <- function(id) {
           hidden(selectInput(ns("sinputeventset"), label = "Event Set:", choices = "")),
           hidden(selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "")),
           h5("Available Perils"),
-          hidden(checkboxInput(ns("chkinputprwind"), label = "Peril: Wind", value = FALSE)),
-          hidden(checkboxInput(ns("chkinputprstsurge"), label = "Peril: Surge", value = FALSE)),
-          hidden(checkboxInput(ns("chkinputprquake"), label = "Peril: Quake", value = FALSE)),
-          hidden(checkboxInput(ns("chkinputprflood"), label = "Peril: Flood", value = FALSE))
+          uiOutput(ns("chkinputsperils"))
           ),
       hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
                  textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
@@ -1078,24 +1075,16 @@ step3_configureOutput <- function(input, output, session,
         }
       }
 
-      perils_list <- list("peril_wind" = "chkinputprwind",
-                          "peril_surge" = "chkinputprstsurge",
-                          "peril_quake" = "chkinputprquake",
-                          "peril_flood" = "chkinputprflood",
-                          "demand_surge" = "chkinputdsurge")
-
       model_perils <- names(names_settings)[grepl("peril", names(names_settings))]
 
-      for (p in names(perils_list)) {
-        peril_id <- names_settings[names(names_settings) == p][[p]]
-        if (p %in% model_perils) {
-          show(perils_list[[p]])
-          updateCheckboxInput(session, perils_list[[p]], value = model_settings[[peril_id]][[p]]$default)
-        } else{
-          hide(perils_list[[p]])
-          updateCheckboxInput(session, perils_list[[p]], value = NULL)
-        }
-      }
+      ui_perils <- lapply(model_perils, function(p){
+        curr_peril_lst <- model_settings[[names_settings[[p]]]][[p]]
+        peril_label <- curr_peril_lst$name #capitalize_first_letter(gsub("_", ": ", p))
+        peril_val <-  curr_peril_lst$default
+        checkboxInput(ns(paste0("chkinput_", p)), label = peril_label, value = peril_val)
+      })
+
+      output$chkinputsperils <- renderUI(ui_perils)
 
       leakage_id <- names_settings[names(names_settings) == "leakage_factor"][["leakage_factor"]]
       leakage_list <- model_settings[[leakage_id]]$leakage_factor
@@ -1199,6 +1188,12 @@ step3_configureOutput <- function(input, output, session,
 
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelData <- return_tbl_modelData(modelID)
+    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
+    model_settings <- tbl_modelsDetails$model_settings %>%
+      unlist(recursive = FALSE)
+    model_perils <- names(model_settings)[grepl("peril", names(model_settings))]
+    perils_lst <- lapply(model_perils, function(p){input[[paste0("chkinput_", p)]]}) %>%
+      setNames(model_perils)
 
     inputsettings <- list(
       #analysisSettingsMapping
@@ -1212,11 +1207,7 @@ step3_configureOutput <- function(input, output, session,
       "source_tag" = getOption("flamingo.settings.oasis_environment"), # potential new tag environment_tag,
       #modelSettingsMapping
       "event_set" = input$sinputeventset,
-      "peril_wind" = input$chkinputprwind,
       "demand_surge" = input$chkinputdsurge,
-      "peril_quake" = input$chkinputprquake,
-      "peril_flood" = input$chkinputprflood,
-      "peril_surge" = input$chkinputprstsurge,
       "leakage_factor" = input$sliderleakagefac,
       "event_occurrence_id" =  as.integer(input$sinputeventocc),
       #outoutSettingsMappings
@@ -1224,7 +1215,8 @@ step3_configureOutput <- function(input, output, session,
       "il_output" = input$chkinputIL,
       "ri_output" = input$chkinputRI,
       "return_period_file" = TRUE  # currenlty hardcoded
-    )
+    ) %>%
+      c(perils_lst)
 
     outputsLossTypes <- list(
       "gul_output" = list("prog" = input$chkgulprog, "policy" = input$chkgulpolicy, "state" = input$chkgulstate, "county" = input$chkgulcounty, "location" = input$chkgulloc, "lob" = input$chkgullob),

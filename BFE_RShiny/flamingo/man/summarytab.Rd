@@ -9,8 +9,7 @@ summarytabUI(id)
 
 summarytab(input, output, session, selectAnaID1 = reactive(""),
   selectAnaID2 = reactive(""), portfolioID1 = reactive(""),
-  portfolioID2 = reactive(""), model_perils1 = reactive(""),
-  model_perils2 = reactive(""), tbl_filesListDataana1 = reactive(NULL),
+  portfolioID2 = reactive(""), tbl_filesListDataana1 = reactive(NULL),
   compare = FALSE, active, logMessage = message)
 }
 \arguments{
@@ -25,10 +24,6 @@ summarytab(input, output, session, selectAnaID1 = reactive(""),
 \item{portfolioID1}{portfolio id associated with selected analysis}
 
 \item{portfolioID2}{portfolio id associated with selected analysis}
-
-\item{model_perils1}{list of parils associated with the selected analyisis}
-
-\item{model_perils2}{list of parils associated with the selected analyisis}
 
 \item{tbl_filesListDataana1}{dataframe of the output files}
 
