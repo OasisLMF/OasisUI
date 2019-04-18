@@ -188,28 +188,7 @@ panelModelDetails <- function(id) {
       flamingoRefreshButton(ns("abuttonmodeldetailrfsh")),
       actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    tabsetPanel(
-      id = ns("tabsModelsDetails"),
-
-      tabPanel(
-        title = "Resources",
-        h4("Model Settings"),
-        DTOutput(ns("dt_model_settings")),
-        h4("Lookup Settings"),
-        DTOutput(ns("dt_lookup_settings")),
-        value = ns("tabresources")
-      ),
-
-      tabPanel(
-        title = "Hazard Maps",
-        selectInput(inputId = ns("hazard_files"),
-                    label = "Choose hazard file",
-                    choices = list.files("./www/hazard_files")
-        ),
-        createHazardMapUI(ns("createHazardMap")),
-        value = ns("tabmaps")
-      )
-    )
+    modeldetailsUI(ns("modeldetails"))
   )
 }
 
@@ -617,6 +596,7 @@ step2_chooseAnalysis <- function(input, output, session,
     show("panelModelDetails")
     result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
                                            result$portfolioID)
+    result$modelID
     logMessage("showing panelModelDetails")
   })
 
@@ -624,40 +604,6 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
     logMessage("hiding panelModelDetails")
   })
-
-  output$dt_model_settings <- renderDT(
-    if (!is.null(result$tbl_modelsDetails[1]) && nrow(result$tbl_modelsDetails[[1]]) > 0 ) {
-      logMessage("re-rendering model settings table")
-      datatable(
-        result$tbl_modelsDetails[[1]] %>% capitalize_names_df(),
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = "none",
-        colnames = c('row number' = 1),
-        options = .getPRTableOptions()
-      )
-    } else {
-      .nothingToShowTable(contentMessage = paste0("no model settings files associated with Model ID ", result$modelID ))
-    })
-
-  output$dt_lookup_settings <- renderDT(
-    if (!is.null(result$tbl_modelsDetails[2]) && nrow(result$tbl_modelsDetails[[2]]) > 0 ) {
-      logMessage("re-rendering lookup settings table")
-      datatable(
-        result$tbl_modelsDetails[[2]],
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = "none",
-        colnames = c('row number' = 1),
-        options = .getPRTableOptions()
-      )
-    } else {
-      .nothingToShowTable(contentMessage = paste0("no lookup settings files associated with Model ID ", result$modelID ))
-    })
 
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
@@ -669,40 +615,16 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
   })
 
-  # Hazard Map -----------------------------------------------------------------
-
-  observeEvent(result$modelID, {
-    if (!is.null(result$modelID) && result$modelID != "" && !is.na(result$modelID)) {
-      updateSelectInput(session,
-                        inputId = ns("hazard_files"),
-                        label = "Choose hazard file",
-                        choices = list.files("./www/hazard_files")
-      )
-    }
-  })
-
-  # Choose hazard file
-  observeEvent(input$hazard_files, {
-    if (!is.null(input$hazard_files)) {
-      path <- paste0("./www/hazard_files/", input$hazard_files)
-      result$mapfile <- geojsonio::geojson_read(path, what = "sp")
-      if (is.null(result$mapfile)) {
-        hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
-      }
-    }
-  })
-
-  # Draw map
-  observeEvent(result$mapfile, ignoreNULL = FALSE, {
-    if (!is.null(result$mapfile)) {
-      callModule(
-        createHazardMap,
-        id = "createHazardMap",
-        file_map = result$mapfile,
-        file_pins = result$uploaded_locs
-      )
-    }
-  })
+  callModule(
+    modeldetails,
+    id = "modeldetails",
+    modelID = reactive({result$modelID}),
+    file_pins = result$uploaded_locs,
+    options = .getPRTableOptions(),
+    nothing_to_show = .nothingToShowTable(),
+    counter = reactive({input$abuttonmodeldetails}),
+    active = reactive(TRUE)
+  )
 
   # Create new Analysis --------------------------------------------------------
 
