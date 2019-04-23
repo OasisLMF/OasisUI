@@ -87,7 +87,10 @@ flamingoTable <- function(input, output, session,
                            target = 'row'),
           escape = escape,
           colnames = colnamesToUse,
-          options = .getPRTableOptions(scrollX, maxrowsperpage, filter)
+          options = getTableOptions(scrollX = scrollX,
+                                    maxrowsperpage = maxrowsperpage,
+                                    filter = filter,
+                                    escape = escape)
         )
     })
 
@@ -95,32 +98,7 @@ flamingoTable <- function(input, output, session,
       if (is.null(data()) || length(nrow(data())) == 0) {
         selectRows(dataTableProxy("dt_flamingoTable"), NULL)
       }
-    } )
-
-  # Helper functions -----------------------------------------------------------
-
-  #table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function(scrollX, maxrowsperpage, filter) {
-    options <- list(
-      #columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
-      processing = 0,
-      scrollX = scrollX,
-      pageLength = maxrowsperpage
-      #autoWidth = TRUE
-    )
-    if (filter) {
-      options$dom <- 'ft'
-      options$search <- list(caseInsensitive = TRUE)
-      options$searchHighlight <- TRUE
-    } else {
-      options$dom <- 't'
-    }
-    if (!escape) {
-      options$preDrawCallback <- JS('function() { Shiny.unbindAll(this.api().table().node()); }')
-      options$drawCallback <- JS('function() { Shiny.bindAll(this.api().table().node()); } ')
-    }
-    return(options)
-  }
+    })
 
     # Module Outout --------------------------------------------------------------
     moduleOutput <- c(

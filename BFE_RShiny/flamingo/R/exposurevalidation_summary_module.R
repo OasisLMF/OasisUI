@@ -97,8 +97,8 @@ exposurevalidationsummary <- function(input,
 
   # Modeled exposure and uploaded exposure ------------------------------------
   observeEvent({
-    counter()
     active()
+    counter()
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
       .reloadExposureValidation()
@@ -116,10 +116,10 @@ exposurevalidationsummary <- function(input,
         rownames = FALSE,
         escape = FALSE,
         selection = "none",
-        options = .getFLTableOptions()
+        options = getTableOptions()
       )
     } else {
-      .nothingToShowTable("Exposure validation summary not found.")
+      nothingToShowTable("Exposure validation summary not found.")
     }
   )
 
@@ -261,32 +261,6 @@ exposurevalidationsummary <- function(input,
       result$uploaded_locs_check <- uploaded_locs_check
     }
 
-  }
-
-  # default table options
-  .getFLTableOptions <- function() {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      processing = 0,
-      scrollX = TRUE,
-      pageLength = 5
-    )
-    return(options)
-  }
-
-  #empty table
-  .nothingToShowTable <- function(contentMessage){
-    datatable(
-      data.frame(content = contentMessage),
-      class = "flamingo-table display",
-      selection = "none",
-      rownames = FALSE,
-      #filter = 'bottom',
-      colnames = c(""),
-      escape = FALSE,
-      options = list(searchHighlight = TRUE)
-    )
   }
 
 }

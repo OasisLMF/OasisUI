@@ -24,7 +24,7 @@ step2_chooseAnalysisUI <- function(id) {
     hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
     hidden(div(id = ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
-    hidden(div(id = ns("panelModelDetails"), panelModelDetails(id)))
+    hidden(div(id = ns("panelModelDetails"), modeldetailsUI(ns("modeldetails"))))
   )
 }
 
@@ -166,54 +166,6 @@ panelModelTable <- function(id) {
   )
 }
 
-#' panelModelDetails
-#'
-#' @rdname panelModelDetails
-#'
-#' @description Function wrapping panel to show details of programme table.
-#'
-#' @template params-module-ui
-#'
-#' @importFrom DT DTOutput
-#'
-#' @export
-panelModelDetails <- function(id) {
-  ns <- NS(id)
-  flamingoPanel(
-    collapsible = FALSE,
-    ns("panel_model_details"),
-    heading = tagAppendChildren(
-      h4(""),
-      uiOutput(ns("paneltitle_ModelDetails"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonmodeldetailrfsh")),
-      actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
-    tabsetPanel(
-      id = ns("tabsModelsDetails"),
-
-      tabPanel(
-        title = "Resources",
-        h4("Model Settings"),
-        DTOutput(ns("dt_model_settings")),
-        h4("Lookup Settings"),
-        DTOutput(ns("dt_lookup_settings")),
-        value = ns("tabresources")
-      ),
-
-      tabPanel(
-        title = "Hazard Maps",
-        selectInput(inputId = ns("hazard_files"),
-                    label = "Choose hazard file",
-                    choices = list.files("./www/hazard_files")
-        ),
-        createHazardMapUI(ns("createHazardMap")),
-        value = ns("tabmaps")
-      )
-    )
-  )
-}
-
-
 # Server -----------------------------------------------------------------------
 
 #' step2_chooseAnalysis Server
@@ -277,18 +229,12 @@ step2_chooseAnalysis <- function(input, output, session,
     modelID = "",
     # reactive value for model table
     tbl_modelsData = NULL,
-    # reactive value for detail of model table
-    tbl_modelsDetails = NULL,
     # analyses table
     tbl_analysesData = NULL,
     #analysis log
     tbl_analysislog = NULL,
     #analysis ID
-    analysisID = "",
-    #file for hazard map
-    mapfile = NULL,
-    # file for pins
-    uploaded_locs = NULL
+    analysisID = ""
   )
 
   #Set Params
@@ -299,6 +245,7 @@ step2_chooseAnalysis <- function(input, output, session,
       result$portfolioID <- ""
     }
   })
+
 
   # Panels Visualization -------------------------------------------------------
   observeEvent({
@@ -334,10 +281,10 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         colnames = c('row number' = 1),
         filter = 'bottom',
-        options = .getPRTableOptions()
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no analysis available"))
+      nothingToShowTable(contentMessage = paste0("no analysis available"))
     })
 
   # Create Analyses Table  Title
@@ -533,10 +480,10 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         selection = list(mode = 'none'),
         colnames = c('row number' = 1),
-        options = .getPRTableOptions()
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no log files associtated with analysis id ", result$analysisID))
+      nothingToShowTable(contentMessage = paste0("no log files associtated with analysis id ", result$analysisID))
     }
   )
 
@@ -588,10 +535,10 @@ step2_chooseAnalysis <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = rownames(result$tbl_modelsData)[1]),
         colnames = c('row number' = 1),
-        options = .getPRTableOptions()
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no Models associated with Portfolio ID ", result$portfolioID))
+      nothingToShowTable(contentMessage = paste0("no Models associated with Portfolio ID ", result$portfolioID))
     }
   )
 
@@ -613,55 +560,8 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
     logMessage("showing panelModelDetails")
-    .reloadtbl_modelsDetails()
     show("panelModelDetails")
-    result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
-                                           result$portfolioID)
     logMessage("showing panelModelDetails")
-  })
-
-  onclick("buttonhidemodeldetails", {
-    hide("panelModelDetails")
-    logMessage("hiding panelModelDetails")
-  })
-
-  output$dt_model_settings <- renderDT(
-    if (!is.null(result$tbl_modelsDetails[1]) && nrow(result$tbl_modelsDetails[[1]]) > 0 ) {
-      logMessage("re-rendering model settings table")
-      datatable(
-        result$tbl_modelsDetails[[1]] %>% capitalize_names_df(),
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = "none",
-        colnames = c('row number' = 1),
-        options = .getPRTableOptions()
-      )
-    } else {
-      .nothingToShowTable(contentMessage = paste0("no model settings files associated with Model ID ", result$modelID ))
-    })
-
-  output$dt_lookup_settings <- renderDT(
-    if (!is.null(result$tbl_modelsDetails[2]) && nrow(result$tbl_modelsDetails[[2]]) > 0 ) {
-      logMessage("re-rendering lookup settings table")
-      datatable(
-        result$tbl_modelsDetails[[2]],
-        class = "flamingo-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = "none",
-        colnames = c('row number' = 1),
-        options = .getPRTableOptions()
-      )
-    } else {
-      .nothingToShowTable(contentMessage = paste0("no lookup settings files associated with Model ID ", result$modelID ))
-    })
-
-  # Details Model title
-  output$paneltitle_ModelDetails <- renderUI({
-    paste0('Resources of model id ', result$modelID)
   })
 
   #Hide panel if model id changes
@@ -669,40 +569,14 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
   })
 
-  # Hazard Map -----------------------------------------------------------------
-
-  observeEvent(result$modelID, {
-    if (!is.null(result$modelID) && result$modelID != "" && !is.na(result$modelID)) {
-      updateSelectInput(session,
-                        inputId = ns("hazard_files"),
-                        label = "Choose hazard file",
-                        choices = list.files("./www/hazard_files")
-      )
-    }
-  })
-
-  # Choose hazard file
-  observeEvent(input$hazard_files, {
-    if (!is.null(input$hazard_files)) {
-      path <- paste0("./www/hazard_files/", input$hazard_files)
-      result$mapfile <- geojsonio::geojson_read(path, what = "sp")
-      if (is.null(result$mapfile)) {
-        hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
-      }
-    }
-  })
-
-  # Draw map
-  observeEvent(result$mapfile, ignoreNULL = FALSE, {
-    if (!is.null(result$mapfile)) {
-      callModule(
-        createHazardMap,
-        id = "createHazardMap",
-        file_map = result$mapfile,
-        file_pins = result$uploaded_locs
-      )
-    }
-  })
+  callModule(
+    modeldetails,
+    id = "modeldetails",
+    modelID = reactive({result$modelID}),
+    portfolioID = reactive({result$portfolioID}),
+    counter = reactive({input$abuttonmodeldetails}),
+    active = reactive(TRUE)
+  )
 
   # Create new Analysis --------------------------------------------------------
 
@@ -801,10 +675,6 @@ step2_chooseAnalysis <- function(input, output, session,
     .reloadtbl_modelsData()
   })
 
-  onclick("abuttonmodeldetailrfsh", {
-    .reloadtbl_modelsDetails()
-  })
-
   # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
@@ -864,46 +734,6 @@ step2_chooseAnalysis <- function(input, output, session,
       result$tbl_modelsData <- NULL
     }
     invisible()
-  }
-
-  # Reload Programme Model Details table
-  .reloadtbl_modelsDetails <- function() {
-    logMessage(".reloadtbl_modelsDetails called")
-    if (length(input$dt_models_rows_selected) > 0) {
-      tbl_modelsDetails <- return_models_id_resource_file_df(result$modelID)
-      if (!is.null(tbl_modelsDetails)) {
-        result$tbl_modelsDetails <-  tbl_modelsDetails
-      }
-      logMessage("model resources table refreshed")
-    } else {
-      result$tbl_modelsDetails <- NULL
-    }
-    invisible()
-  }
-
-  # table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function(pageLengthVal = pageLength) {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      processing = 0,
-      pageLength = pageLengthVal,
-      columnDefs = list(list(visible = FALSE, targets = 0)))
-    return(options)
-  }
-
-  #empty table
-  .nothingToShowTable <- function(contentMessage){
-    datatable(
-      data.frame(content = contentMessage),
-      class = "flamingo-table display",
-      selection = "none",
-      rownames = FALSE,
-      #filter = 'bottom',
-      colnames = c(""),
-      escape = FALSE,
-      options = list(searchHighlight = TRUE)
-    )
   }
 
   # Model Outout ---------------------------------------------------------------

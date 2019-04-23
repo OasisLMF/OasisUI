@@ -109,13 +109,10 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       filter = 'bottom',
       escape = FALSE,
       plugins = 'natural',
-      options = list(
-        searchHighlight = TRUE,
-        columnDefs = list(list(visible = FALSE, targets = 0, type = 'natural'))
-      )
+      options = getTableOptions()
     )
   } else {
-    .nothingToShowTable(contentMessage = "No analyses available")
+    nothingToShowTable(contentMessage = "No analyses available")
   }
   )
 
@@ -190,21 +187,6 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       anaID = reactive({result$anaID})
     )
   )
-
-  # Help Functions -------------------------------------------------------------
-  #empty table
-  .nothingToShowTable <- function(contentMessage){
-    datatable(
-      data.frame(content = contentMessage),
-      class = "flamingo-table display",
-      selection = "none",
-      rownames = FALSE,
-      #filter = 'bottom',
-      colnames = c(""),
-      escape = FALSE,
-      options = list(searchHighlight = TRUE)
-    )
-  }
 
   moduleOutput
 }

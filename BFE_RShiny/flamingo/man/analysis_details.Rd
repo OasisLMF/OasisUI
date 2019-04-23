@@ -16,7 +16,7 @@ analysis_details(input, output, session, analysisID, portfolioID, counter)
 
 \item{portfolioID}{Selected portfolio ID.}
 
-\item{tbl_filesListData}{Dataframe of the output files}
+\item{id}{module id}
 
 \item{reload_generated}{Imports function to reload Generated Inputs table.}
 

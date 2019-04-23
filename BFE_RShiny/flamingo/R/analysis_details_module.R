@@ -43,8 +43,8 @@ analysis_detailsUI <- function(id) {
 #'
 #' @description Server side of function wrapping panel to show analyses details table.
 #'
+#' @template params-module-ui
 #' @param analysisID Selected analysis ID.
-#' @param tbl_filesListData Dataframe of the output files
 #' @param reload_generated Imports function to reload Generated Inputs table.
 #' @param portfolioID Selected portfolio ID.
 #'

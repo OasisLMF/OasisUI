@@ -10,6 +10,8 @@ createHazardMapUI(id)
 createHazardMap(input, output, session, file_map, file_pins)
 }
 \arguments{
+\item{id}{module id}
+
 \item{file_map}{File to plot as map.}
 
 \item{file_pins}{File to plot pins.}

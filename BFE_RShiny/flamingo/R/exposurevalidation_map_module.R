@@ -74,10 +74,10 @@ exposurevalidationmap <- function(input,
 
   # Modeled exposure and uploaded exposure ------------------------------------
   observeEvent({
-    active()
     counter()
+    active()
   }, {
-    if (length(active()) > 0 && active()&& counter() > 0) {
+    if (length(active()) > 0 && active() && counter() > 0) {
         .reloadExposureValidation()
     }
   })
@@ -130,14 +130,14 @@ exposurevalidationmap <- function(input,
         rownames = FALSE,
         escape = FALSE,
         selection = "none",
-        options = .getFLTableOptions()
+        options = getTableOptions()
       ) %>% formatStyle(
         'Modeled',
         target = 'row',
         backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
       )
     } else {
-      .nothingToShowTable("Generated inputs not found.")
+      nothingToShowTable("Generated inputs not found.")
     }
   )
 
@@ -176,32 +176,6 @@ exposurevalidationmap <- function(input,
       result$uploaded_locs_check <- uploaded_locs_check
     }
 
-  }
-
-  # default table options
-  .getFLTableOptions <- function() {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      processing = 0,
-      scrollX = TRUE,
-      pageLength = 5
-    )
-    return(options)
-  }
-
-  #empty table
-  .nothingToShowTable <- function(contentMessage){
-    datatable(
-      data.frame(content = contentMessage),
-      class = "flamingo-table display",
-      selection = "none",
-      rownames = FALSE,
-      #filter = 'bottom',
-      colnames = c(""),
-      escape = FALSE,
-      options = list(searchHighlight = TRUE)
-    )
   }
 
 

@@ -26,6 +26,7 @@ createHazardMapUI <- function(id) {
 #'
 #' @description Creates a hazard map using leaflet.
 #'
+#' @template params-module-ui
 #' @param file_map File to plot as map.
 #' @param file_pins File to plot pins.
 #'
