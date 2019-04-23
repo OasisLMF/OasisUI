@@ -15,7 +15,9 @@ anainputs(input, output, session, analysisID, portfolioID,
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{analysisID}{Selected analysis id.}
+\item{analysisID}{Selected analysis ID.}
+
+\item{portfolioID}{Selected portfolio ID.}
 
 \item{counter}{Reactive value storing actionButton status.}
 }

@@ -37,7 +37,8 @@ anainputsUI <- function(id) {
 #' @description  Server logic for inputs of an analysis.
 #'
 #' @template params-module
-#' @param analysisID Selected analysis id.
+#' @param analysisID Selected analysis ID.
+#' @param portfolioID Selected portfolio ID.
 #' @param counter Reactive value storing actionButton status.
 #'
 #' @importFrom tibble add_column
