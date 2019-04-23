@@ -37,7 +37,9 @@ summarystatusUI <- function(id) {
 #'
 #' @description Server logic for summary status of files of an analysis.
 #'
+#' @template params-module
 #' @param analysisID Selected analysis id.
+#' @param counter Reactive value storing actionButton status.
 #'
 #' @export
 summarystatus <- function(input,

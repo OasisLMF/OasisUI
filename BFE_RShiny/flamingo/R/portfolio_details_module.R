@@ -1,21 +1,21 @@
-# Uploaded Inputs Module -------------------------------------------------------
+# Portfolio Details Module -------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' uploadedinputsUI
-#' @rdname uploadedinputs
+#' portfolio_detailsUI
+#' @rdname portfolio_details
 #'
-#' @description UI/View for uploaded inputs of an analysis.
+#' @description UI/View for portfolio details.
 #'
 #' @return List of tags.
 #'
 #' @export
-uploadedinputsUI <- function(id) {
+portfolio_detailsUI <- function(id) {
 
   ns <- NS(id)
   flamingoPanel(
     collapsible = FALSE,
-    ns("panel_uploadedinputs"),
-    flamingoRefreshButton(ns("abuttonuploadedrefresh")),
+    ns("panel_portfolio_details"),
+    div(id = ns("refresh"), flamingoRefreshButton(ns("abuttonuploadedrefresh"))),
     ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
   )
 }
@@ -23,18 +23,24 @@ uploadedinputsUI <- function(id) {
 
 # Server -----------------------------------------------------------------------
 
-#' uploadedinputs
+#' portfolio_details
 #'
-#' @rdname uploadedinputs
+#' @rdname portfolio_details
 #'
-#' @description Server logic for exposure validation of an analysis.
+#' @description Server logic for portfolio details.
 #'
+#' @template params-module
+#' @param refresh_opt Option to hide/show refresh button.
 #' @param portfolioID selected portfolio ID.
+#' @param counter Reactive value storing actionButton status.
+#'
+#' @importFrom shinyjs hide
 #'
 #' @export
-uploadedinputs <- function(input,
+portfolio_details <- function(input,
                            output,
                            session,
+                           refresh_opt = TRUE,
                            portfolioID,
                            counter = NULL,
                            active = reactive(TRUE)) {
@@ -43,7 +49,6 @@ uploadedinputs <- function(input,
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
-    pfId = NULL,
     dt_uploaded = NULL
   )
 
@@ -53,6 +58,9 @@ uploadedinputs <- function(input,
     counter()
   }, {
     if (length(active()) > 0 && active()) {
+      if (!refresh_opt) {
+        hide("refresh")
+      }
       withModalSpinner(
         .reloadtbl_portfolioDetails(),
         "Loading...",

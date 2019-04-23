@@ -104,8 +104,7 @@ panelPortfolioDetails <- function(id) {
       flamingoRefreshButton(ns("abuttondefpfrfsh")),
       actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    #DTOutput(ns("dt_portfolioDetails"))
-    ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
+    portfolio_detailsUI(ns("portfolio_details"))
   )
 }
 
@@ -376,7 +375,7 @@ step1_choosePortfolio <- function(input, output, session,
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
-    paste0('details of portfolio id ', pfId, ' ', pfName)
+    paste0(' ', pfId, ' ', pfName)
   })
 
 
@@ -388,6 +387,15 @@ step1_choosePortfolio <- function(input, output, session,
     logMessage("showing panelPortfolioDetails")
     .reloadtbl_portfolioDetails()
   })
+
+  sub_modules$portfolio_details <- callModule(
+    portfolio_details,
+    id = "portfolio_details",
+    refresh_opt = FALSE,
+    portfolioID = portfolioID,
+    counter = reactive({input$abuttonpfdetails}),
+    active = active
+  )
 
   # Hide portfolio Details
   onclick("buttonhidepfdetails", {
