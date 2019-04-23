@@ -7,15 +7,15 @@
 \usage{
 modeldetailsUI(id)
 
-modeldetails(input, output, session, modelID, file_pins, options,
-  nothing_to_show, counter, active = reactive(TRUE))
+modeldetails(input, output, session, modelID, portfolioID, file_pins,
+  options, nothing_to_show, counter, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{module id}
 
 \item{modelID}{Selected model ID.}
 
-\item{file_pins}{Location file to plot pins.}
+\item{portfolioID}{Selected portfolio ID.}
 
 \item{options}{Functions displaying options for table.}
 

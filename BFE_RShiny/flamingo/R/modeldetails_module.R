@@ -45,7 +45,7 @@ modeldetailsUI <- function(id) {
 #' @description Server side of function wrapping panel to show analyses details table.
 #'
 #' @param modelID Selected model ID.
-#' @param file_pins Location file to plot pins.
+#' @param portfolioID Selected portfolio ID.
 #' @param options Functions displaying options for table.
 #' @param nothing_to_show Function used when no table is available.
 #' @template params-module-ui
@@ -55,6 +55,7 @@ modeldetails <- function(input,
                          output,
                          session,
                          modelID,
+                         portfolioID,
                          file_pins,
                          options,
                          nothing_to_show,
@@ -78,7 +79,7 @@ modeldetails <- function(input,
     counter()
   }, ignoreInit = TRUE, {
 
-    # Tab Resources --------------------------------------------------------------
+    # Tab Resources ------------------------------------------------------------
     result$tbl_modelsDetails <- return_models_id_resource_file_df(modelID())
 
     output$dt_model_settings <- renderDT(
@@ -115,7 +116,10 @@ modeldetails <- function(input,
         nothing_to_show(contentMessage = paste0("no lookup settings files associated with Model ID ", modelID()))
       })
 
-    # Tab Hazard Map -------------------------------------------------------------
+    # Tab Hazard Map -----------------------------------------------------------
+    result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
+                                           portfolioID())
+
     updateSelectInput(session,
                       inputId = ns("hazard_files"),
                       label = "Choose hazard file",
@@ -140,7 +144,7 @@ modeldetails <- function(input,
           createHazardMap,
           id = "createHazardMap",
           file_map = result$mapfile,
-          file_pins = file_pins
+          file_pins = result$uploaded_locs
         )
       }
     })

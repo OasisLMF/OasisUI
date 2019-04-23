@@ -265,9 +265,7 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis ID
     analysisID = "",
     #file for hazard map
-    mapfile = NULL,
-    # file for pins
-    uploaded_locs = NULL
+    mapfile = NULL
   )
 
   #Set Params
@@ -594,9 +592,6 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelModelDetails")
     .reloadtbl_modelsDetails()
     show("panelModelDetails")
-    result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
-                                           result$portfolioID)
-    result$modelID
     logMessage("showing panelModelDetails")
   })
 
@@ -619,7 +614,7 @@ step2_chooseAnalysis <- function(input, output, session,
     modeldetails,
     id = "modeldetails",
     modelID = reactive({result$modelID}),
-    file_pins = result$uploaded_locs,
+    portfolioID = reactive({result$portfolioID}),
     options = .getPRTableOptions(),
     nothing_to_show = .nothingToShowTable(),
     counter = reactive({input$abuttonmodeldetails}),
