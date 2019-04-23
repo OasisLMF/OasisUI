@@ -98,11 +98,12 @@ analysis_details <- function(input,
     active = reactive({input$tabsDetails == ns("tabvalidationmap")})
   )
 
-  # Tab Generated Inputs -------------------------------------------------------
+  # Tab Analysis Inputs --------------------------------------------------------
   callModule(
     anainputs,
     id = "anainputs",
     analysisID = analysisID,
+    portfolioID = portfolioID,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabanainputs")})
   )

@@ -7,8 +7,8 @@
 \usage{
 anainputsUI(id)
 
-anainputs(input, output, session, analysisID, counter = NULL,
-  active = reactive(TRUE))
+anainputs(input, output, session, analysisID, portfolioID,
+  counter = NULL, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

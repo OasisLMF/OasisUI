@@ -77,7 +77,7 @@ exposurevalidationmap <- function(input,
     active()
     counter()
   }, {
-    if (length(active()) > 0 && active()) {
+    if (length(active()) > 0 && active()&& counter() > 0) {
         .reloadExposureValidation()
     }
   })

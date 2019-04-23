@@ -98,8 +98,9 @@ exposurevalidationsummary <- function(input,
   # Modeled exposure and uploaded exposure ------------------------------------
   observeEvent({
     counter()
+    active()
   }, {
-    if (length(active()) > 0 && active()) {
+    if (length(active()) > 0 && active() && counter() > 0) {
       .reloadExposureValidation()
       .reloadSummary()
     }

@@ -26,9 +26,10 @@ check_loc <- function(analysisID, portfolioID){
   fileslist <- list.files(extractFolder)
   modeled_loc_filename <- return_portfolios_stored_name(portfolioID,"location_file")
 
-  if (!is.na(modeled_loc_filename)) {
+  currfilepath <- paste0(extractFolder, modeled_loc_filename)
 
-    currfilepath <- paste0(extractFolder, modeled_loc_filename)
+  if (!is.na(modeled_loc_filename) && file.exists(currfilepath) && !is.null(uploaded_locs)) {
+
     modeled_locs <- fread(currfilepath, integer64 = "numeric")
 
     # Hack: drop LocName as it seems to cause issues in the inner_join

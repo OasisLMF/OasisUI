@@ -40,13 +40,17 @@ anainputsUI <- function(id) {
 #' @param analysisID Selected analysis id.
 #' @param counter Reactive value storing actionButton status.
 #'
+#' @importFrom tibble add_column
+#' @importFrom shinyjs onclick
+#'
 #' @export
 anainputs <- function(input,
-                            output,
-                            session,
-                            analysisID,
-                            counter = NULL,
-                            active = reactive(TRUE)) {
+                      output,
+                      session,
+                      analysisID,
+                      portfolioID,
+                      counter = NULL,
+                      active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -96,9 +100,34 @@ anainputs <- function(input,
   .reloadGeneratediInputs <- function(){
     logMessage(".reloadGeneratediInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
-      result$dt_generated <- return_analyses_input_file_wicons_df(analysisID())
+      dt_generated <- return_analyses_input_file_wicons_df(analysisID())
+      if (!is.null(dt_generated)) {
+        dt_generated <- .replace_uploaded_files(dt_generated, portfolioID())
+      }
     } else {
-      result$dt_generated <-  NULL
+      dt_generated <-  NULL
     }
+    result$dt_generated  <- dt_generated
   }
+
+  .replace_uploaded_files <- function(dt_generated, portfolioID){
+
+    logMessage(".replace_uploaded_files called")
+
+    filetypes <- c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_source_file")
+
+    types <- sapply(dt_generated$files, function(fi){strsplit(fi, split = "[.]")[[1]][1]})
+    dt_generated <- dt_generated %>%
+      add_column(type = types , .after = "files")
+
+    for (filetype in filetypes){
+      stored_name <- return_portfolios_stored_name(portfolioID, filetype)
+      if (!is.null(stored_name) && !is.na(stored_name) && stored_name %in% dt_generated$files) {
+        dt_generated$type[which(dt_generated$files == stored_name)] <- filetype
+      }
+    }
+
+    return(dt_generated)
+  }
+
 }
