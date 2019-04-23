@@ -7,7 +7,7 @@
 api_post_portfolios_accounts_file(id, filepath_accounts)
 }
 \arguments{
-\item{id}{A unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this portfolio.}
 
 \item{filepath_accounts}{Path to accounts file.}
 }

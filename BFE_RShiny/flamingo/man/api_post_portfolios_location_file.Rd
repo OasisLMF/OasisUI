@@ -7,7 +7,7 @@
 api_post_portfolios_location_file(id, filepath_location)
 }
 \arguments{
-\item{id}{A unique integer value identifying this analysis.}
+\item{id}{A unique integer value identifying this portfolio.}
 
 \item{filepath_location}{Path to the location file.}
 }

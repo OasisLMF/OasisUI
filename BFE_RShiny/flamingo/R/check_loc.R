@@ -24,7 +24,7 @@ check_loc <- function(analysisID, portfolioID){
   # Analysis location input
   extractFolder <- set_extractFolder(analysisID, label = "_inputs/")
   fileslist <- list.files(extractFolder)
-  modeled_loc_filename <- httr::content(api_get_portfolios_id(portfolioID)$result)$location_file$stored
+  modeled_loc_filename <- return_portfolios_stored_name(portfolioID,"location_file")
 
   if (!is.na(modeled_loc_filename)) {
 
