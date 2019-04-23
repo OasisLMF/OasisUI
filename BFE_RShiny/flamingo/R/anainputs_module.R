@@ -1,10 +1,10 @@
-# uploaded inputs Module ----------------------------------------------------------
+# Analysis inputs Module ----------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
 #' anainputsUI
 #' @rdname anainputs
 #'
-#' @description UI/View for uploaded inputs of an analysis.
+#' @description UI/View for inputs of an analysis.
 #'
 #' @return List of tags.
 #'
@@ -34,7 +34,7 @@ anainputsUI <- function(id) {
 #'
 #' @rdname anainputs
 #'
-#' @description  Server logic for uploaded inputs of an analysis.
+#' @description  Server logic for inputs of an analysis.
 #'
 #' @template params-module
 #' @param analysisID Selected analysis id.
