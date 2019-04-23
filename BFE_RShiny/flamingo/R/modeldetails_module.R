@@ -121,7 +121,7 @@ modeldetails <- function(input,
         options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
       )
     } else {
-      nothing_to_show(contentMessage = paste0("no model settings files associated with Model ID ", modelID()))
+      nothingToShowTable(contentMessage = paste0("no model settings files associated with Model ID ", modelID()))
     }
   )
 
@@ -139,7 +139,7 @@ modeldetails <- function(input,
         options = options
       )
     } else {
-      nothing_to_show(contentMessage = paste0("no lookup settings files associated with Model ID ", modelID()))
+      nothingToShowTable(contentMessage = paste0("no lookup settings files associated with Model ID ", modelID()))
     }
   )
 
