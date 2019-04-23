@@ -234,9 +234,7 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis log
     tbl_analysislog = NULL,
     #analysis ID
-    analysisID = "",
-    #file for hazard map
-    mapfile = NULL
+    analysisID = ""
   )
 
   #Set Params
