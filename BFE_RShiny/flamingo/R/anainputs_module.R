@@ -1,15 +1,15 @@
-# uploaded inputs Module ----------------------------------------------------------
+# Analysis inputs Module ----------------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' generatedinputsUI
-#' @rdname generatedinputs
+#' anainputsUI
+#' @rdname anainputs
 #'
-#' @description UI/View for uploaded inputs of an analysis.
+#' @description UI/View for inputs of an analysis.
 #'
 #' @return List of tags.
 #'
 #' @export
-generatedinputsUI <- function(id) {
+anainputsUI <- function(id) {
 
   ns <- NS(id)
 
@@ -21,7 +21,7 @@ generatedinputsUI <- function(id) {
       filter = "none",
       rownames = TRUE,
       colnames = c('row number' = 1),
-      id = ns("panel_generatedinputs"),
+      id = ns("panel_anainputs"),
       flamingoRefreshButton(ns("abuttongeneratedrefresh")),
       ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
     )
@@ -30,23 +30,28 @@ generatedinputsUI <- function(id) {
 
 # Server -----------------------------------------------------------------------
 
-#' generatedinputs
+#' anainputs
 #'
-#' @rdname generatedinputs
+#' @rdname anainputs
 #'
-#' @description  Server logic for uploaded inputs of an analysis.
+#' @description  Server logic for inputs of an analysis.
 #'
 #' @template params-module
-#' @param analysisID Selected analysis id.
+#' @param analysisID Selected analysis ID.
+#' @param portfolioID Selected portfolio ID.
 #' @param counter Reactive value storing actionButton status.
 #'
+#' @importFrom tibble add_column
+#' @importFrom shinyjs onclick
+#'
 #' @export
-generatedinputs <- function(input,
-                            output,
-                            session,
-                            analysisID,
-                            counter = NULL,
-                            active = reactive(TRUE)) {
+anainputs <- function(input,
+                      output,
+                      session,
+                      analysisID,
+                      portfolioID,
+                      counter = NULL,
+                      active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -96,9 +101,34 @@ generatedinputs <- function(input,
   .reloadGeneratediInputs <- function(){
     logMessage(".reloadGeneratediInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
-      result$dt_generated <- return_analyses_input_file_wicons_df(analysisID())
+      dt_generated <- return_analyses_input_file_wicons_df(analysisID())
+      if (!is.null(dt_generated)) {
+        dt_generated <- .replace_uploaded_files(dt_generated, portfolioID())
+      }
     } else {
-      result$dt_generated <-  NULL
+      dt_generated <-  NULL
     }
+    result$dt_generated  <- dt_generated
   }
+
+  .replace_uploaded_files <- function(dt_generated, portfolioID){
+
+    logMessage(".replace_uploaded_files called")
+
+    filetypes <- c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_source_file")
+
+    types <- sapply(dt_generated$files, function(fi){strsplit(fi, split = "[.]")[[1]][1]})
+    dt_generated <- dt_generated %>%
+      add_column(type = types , .after = "files")
+
+    for (filetype in filetypes){
+      stored_name <- return_portfolios_stored_name(portfolioID, filetype)
+      if (!is.null(stored_name) && !is.na(stored_name) && stored_name %in% dt_generated$files) {
+        dt_generated$type[which(dt_generated$files == stored_name)] <- filetype
+      }
+    }
+
+    return(dt_generated)
+  }
+
 }

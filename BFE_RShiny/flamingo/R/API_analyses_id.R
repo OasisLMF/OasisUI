@@ -63,7 +63,7 @@ return_analyses_input_file_wicons_df <- function(id) {
   extractFolder <- set_extractFolder(id, label = "_inputs/")
   status_code_notfound <- 404
 
-  analyses_input_file_df <- list.files(extractFolder, recursive = TRUE) %>% as.data.frame() %>% setNames("files")
+  analyses_input_file_df <- list.files(extractFolder, recursive = TRUE) %>% as.data.frame(stringsAsFactors = FALSE) %>% setNames("files")
 
   if (nrow(analyses_input_file_df) > 0) {
   fnames <- analyses_input_file_df$files
