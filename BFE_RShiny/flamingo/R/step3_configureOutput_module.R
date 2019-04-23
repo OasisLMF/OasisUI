@@ -474,6 +474,10 @@ step3_configureOutput <- function(input, output, session,
       result$anaID <- analysisID()
     }
   })
+  scrollX <- FALSE
+  maxrowsperpage <- 5
+  filter <- TRUE
+  escape <- TRUE
 
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
@@ -569,10 +573,10 @@ step3_configureOutput <- function(input, output, session,
         escape = FALSE,
         colnames = c('row number' = 1),
         filter = 'bottom',
-        options = .getPRTableOptions()
+        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no analysis available"))
+      nothingToShowTable(contentMessage = paste0("no analysis available"))
     })
 
   # Analyses Table Title
@@ -869,10 +873,10 @@ step3_configureOutput <- function(input, output, session,
           escape = FALSE,
           colnames = c('row number' = 1),
           filter = 'bottom',
-          options = .getPRTableOptions()
+          options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
         )
       } else {
-        .nothingToShowTable(contentMessage = paste0("no log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL")))
+        nothingToShowTable(contentMessage = paste0("no log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL")))
       }
     }
   })
@@ -968,33 +972,6 @@ step3_configureOutput <- function(input, output, session,
     } else {
       result$tbl_analysisrunlog <-  NULL
     }
-  }
-
-  # table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function() {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      processing = 0,
-      pageLength = pageLength,
-      #width = "100%",
-      #autoWidth = TRUE,
-      columnDefs = list(list(visible = FALSE, targets = 0)))
-    return(options)
-  }
-
-  #empty table
-  .nothingToShowTable <- function(contentMessage){
-    datatable(
-      data.frame(content = contentMessage),
-      class = "flamingo-table display",
-      selection = "none",
-      rownames = FALSE,
-      #filter = 'bottom',
-      colnames = c(""),
-      escape = FALSE,
-      options = list(searchHighlight = TRUE)
-    )
   }
 
   .cancelAnaModal <- function(){

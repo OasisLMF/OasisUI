@@ -37,3 +37,63 @@ capitalize_names_df <- function(df) {
   names(df)[names(df) == "Id"] <- "ID"
   df
 }
+
+#' Nothing to show in table
+#'
+#' @rdname nothingToShowTable
+#'
+#' @description Shows message in case table is table.
+#'
+#' @param contentMessage Message to be displayed.
+#'
+#' @export
+nothingToShowTable <- function(contentMessage){
+  datatable(
+    data.frame(content = contentMessage),
+    class = "flamingo-table display",
+    selection = "none",
+    rownames = FALSE,
+    #filter = 'bottom',
+    colnames = c(""),
+    escape = FALSE,
+    options = list(searchHighlight = TRUE)
+  )
+}
+
+#' Get table options.
+#'
+#' @rdname getTableOptions
+#'
+#' @description Returns option list for datatable.
+#'
+#' @param scrollX Param to allow scrollX.
+#' @param maxrowsperpage Maximum number of rows to display per page.
+#' @param filter Show or hide filter.
+#' @param escape Param to avoid escape row.
+#'
+#' @export
+getTableOptions <- function(scrollX, maxrowsperpage, filter, escape) {
+
+  options <- list(
+    search = list(caseInsensitive = TRUE),
+    searchHighlight = TRUE,
+    #columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
+    processing = 0,
+    scrollX = scrollX,
+    pageLength = maxrowsperpage,
+    #autoWidth = TRUE,
+    columnDefs = list(list(visible = FALSE, targets = 0))
+  )
+  if (filter) {
+    options$dom <- 'ft'
+    options$search <- list(caseInsensitive = TRUE)
+    options$searchHighlight <- TRUE
+  } else {
+    options$dom <- 't'
+  }
+  if (!escape) {
+    options$preDrawCallback <- JS('function() { Shiny.unbindAll(this.api().table().node()); }')
+    options$drawCallback <- JS('function() { Shiny.bindAll(this.api().table().node()); } ')
+  }
+  return(options)
+}

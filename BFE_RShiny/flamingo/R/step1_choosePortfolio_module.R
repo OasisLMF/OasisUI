@@ -278,6 +278,10 @@ step1_choosePortfolio <- function(input, output, session,
   observe( if (active()) {
     result$portfolioID <- isolate(portfolioID())
   })
+  scrollX <- FALSE
+  maxrowsperpage <- 5
+  filter <- TRUE
+  escape <- TRUE
 
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
@@ -353,10 +357,10 @@ step1_choosePortfolio <- function(input, output, session,
                          selected = rowToSelect,
                          target = 'row'),
         colnames = c('row number' = 1),
-        options = .getPRTableOptions()
+        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
       )
     } else {
-      .nothingToShowTable(contentMessage = "No portfolio available")
+      nothingToShowTable(contentMessage = "No portfolio available")
     }
   })
 
@@ -784,31 +788,6 @@ step1_choosePortfolio <- function(input, output, session,
       result$tbl_portfolioDetails  <- NULL
     }
     invisible()
-  }
-
-  # table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function(pageLengthVal = pageLength) {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      processing = 0,
-      pageLength = pageLengthVal,
-      columnDefs = list(list(visible = FALSE, targets = 0)))
-    return(options)
-  }
-
-  #empty table
-  .nothingToShowTable <- function(contentMessage){
-    datatable(
-      data.frame(content = contentMessage),
-      class = "flamingo-table display",
-      selection = "none",
-      rownames = FALSE,
-      #filter = 'bottom',
-      colnames = c(""),
-      escape = FALSE,
-      options = list(searchHighlight = TRUE)
-    )
   }
 
   .clearPortfolioName <- function() {

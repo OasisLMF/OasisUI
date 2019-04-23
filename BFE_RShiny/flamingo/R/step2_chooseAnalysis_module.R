@@ -247,6 +247,10 @@ step2_chooseAnalysis <- function(input, output, session,
       result$portfolioID <- ""
     }
   })
+  scrollX <- FALSE
+  maxrowsperpage <- 5
+  filter <- TRUE
+  escape <- TRUE
 
   # Panels Visualization -------------------------------------------------------
   observeEvent({
@@ -282,10 +286,10 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         colnames = c('row number' = 1),
         filter = 'bottom',
-        options = .getPRTableOptions()
+        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no analysis available"))
+      nothingToShowTable(contentMessage = paste0("no analysis available"))
     })
 
   # Create Analyses Table  Title
@@ -481,10 +485,10 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         selection = list(mode = 'none'),
         colnames = c('row number' = 1),
-        options = .getPRTableOptions()
+        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no log files associtated with analysis id ", result$analysisID))
+      nothingToShowTable(contentMessage = paste0("no log files associtated with analysis id ", result$analysisID))
     }
   )
 
@@ -536,10 +540,10 @@ step2_chooseAnalysis <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = rownames(result$tbl_modelsData)[1]),
         colnames = c('row number' = 1),
-        options = .getPRTableOptions()
+        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
       )
     } else {
-      .nothingToShowTable(contentMessage = paste0("no Models associated with Portfolio ID ", result$portfolioID))
+      nothingToShowTable(contentMessage = paste0("no Models associated with Portfolio ID ", result$portfolioID))
     }
   )
 
@@ -575,8 +579,6 @@ step2_chooseAnalysis <- function(input, output, session,
     id = "modeldetails",
     modelID = reactive({result$modelID}),
     portfolioID = reactive({result$portfolioID}),
-    options = .getPRTableOptions(),
-    nothing_to_show = .nothingToShowTable(),
     counter = reactive({input$abuttonmodeldetails}),
     active = reactive(TRUE)
   )
@@ -737,31 +739,6 @@ step2_chooseAnalysis <- function(input, output, session,
       result$tbl_modelsData <- NULL
     }
     invisible()
-  }
-
-  # table settings for pr tab: returns option list for datatable
-  .getPRTableOptions <- function(pageLengthVal = pageLength) {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      processing = 0,
-      pageLength = pageLengthVal,
-      columnDefs = list(list(visible = FALSE, targets = 0)))
-    return(options)
-  }
-
-  #empty table
-  .nothingToShowTable <- function(contentMessage){
-    datatable(
-      data.frame(content = contentMessage),
-      class = "flamingo-table display",
-      selection = "none",
-      rownames = FALSE,
-      #filter = 'bottom',
-      colnames = c(""),
-      escape = FALSE,
-      options = list(searchHighlight = TRUE)
-    )
   }
 
   # Model Outout ---------------------------------------------------------------

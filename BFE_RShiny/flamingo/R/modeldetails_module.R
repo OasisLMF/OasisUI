@@ -57,8 +57,6 @@ modeldetailsUI <- function(id) {
 #'
 #' @param modelID Selected model ID.
 #' @param portfolioID Selected portfolio ID.
-#' @param options Functions displaying options for table.
-#' @param nothing_to_show Function used when no table is available.
 #' @template params-module-ui
 #'
 #' @importFrom shinyjs hide
@@ -71,8 +69,6 @@ modeldetails <- function(input,
                          modelID,
                          portfolioID,
                          file_pins,
-                         options,
-                         nothing_to_show,
                          counter,
                          active = reactive(TRUE)) {
 
@@ -94,6 +90,10 @@ modeldetails <- function(input,
   }, ignoreInit = TRUE, {
 
     show("panel_model_details")
+    scrollX <- FALSE
+    maxrowsperpage <- 5
+    filter <- TRUE
+    escape <- TRUE
 
     # Reload Programme Model Details table
     .reloadtbl_modelsDetails <- function() {
@@ -121,7 +121,7 @@ modeldetails <- function(input,
           escape = FALSE,
           selection = "none",
           colnames = c('row number' = 1),
-          options = options
+          options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
         )
       } else {
         nothing_to_show(contentMessage = paste0("no model settings files associated with Model ID ", modelID()))

@@ -162,7 +162,7 @@ exposurevalidation <- function(input,
         options = .getFLTableOptions()
       )
     } else {
-      .nothingToShowTable("Exposure validation summary not found.")
+      nothingToShowTable("Exposure validation summary not found.")
     }
   )
 
@@ -227,7 +227,7 @@ exposurevalidation <- function(input,
         backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
       )
     } else {
-      .nothingToShowTable("Generated inputs not found.")
+      nothingToShowTable("Generated inputs not found.")
     }
   )
 
@@ -399,21 +399,6 @@ exposurevalidation <- function(input,
     )
     return(options)
   }
-
-  #empty table
-  .nothingToShowTable <- function(contentMessage){
-    datatable(
-      data.frame(content = contentMessage),
-      class = "flamingo-table display",
-      selection = "none",
-      rownames = FALSE,
-      #filter = 'bottom',
-      colnames = c(""),
-      escape = FALSE,
-      options = list(searchHighlight = TRUE)
-    )
-  }
-
 
   # Exposure validation map
   .createExposureValMap <- function(df) {
