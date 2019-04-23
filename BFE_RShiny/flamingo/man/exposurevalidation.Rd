@@ -10,6 +10,17 @@ exposurevalidationUI(id)
 exposurevalidation(input, output, session, analysisID = "",
   portfolioID = "", counter = NULL, active = reactive(TRUE))
 }
+\arguments{
+\item{id}{Namespace ID for the module.}
+
+\item{input, output, session}{Shiny input, output, and session objects.}
+
+\item{analysisID}{Selected analysis id.}
+
+\item{portfolioID}{selected portfolio ID.}
+
+\item{counter}{Reactive value storing actionButton status.}
+}
 \value{
 List of tags.
 }

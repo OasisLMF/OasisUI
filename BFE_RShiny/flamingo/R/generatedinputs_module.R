@@ -36,7 +36,9 @@ generatedinputsUI <- function(id) {
 #'
 #' @description  Server logic for uploaded inputs of an analysis.
 #'
-#' @param analysisID selected analysis ID.
+#' @template params-module
+#' @param analysisID Selected analysis id.
+#' @param counter Reactive value storing actionButton status.
 #'
 #' @export
 generatedinputs <- function(input,
