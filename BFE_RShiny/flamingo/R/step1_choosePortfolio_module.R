@@ -278,10 +278,6 @@ step1_choosePortfolio <- function(input, output, session,
   observe( if (active()) {
     result$portfolioID <- isolate(portfolioID())
   })
-  scrollX <- FALSE
-  maxrowsperpage <- 5
-  filter <- TRUE
-  escape <- TRUE
 
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
@@ -357,7 +353,7 @@ step1_choosePortfolio <- function(input, output, session,
                          selected = rowToSelect,
                          target = 'row'),
         colnames = c('row number' = 1),
-        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
+        options = getTableOptions()
       )
     } else {
       nothingToShowTable(contentMessage = "No portfolio available")

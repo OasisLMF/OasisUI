@@ -79,13 +79,6 @@ modeldetails <- function(input,
 
   ns <- session$ns
 
-  # Params ---------------------------------------------------------------------
-  scrollX <- FALSE
-  maxrowsperpage <- 5
-  filter <- TRUE
-  escape <- TRUE
-
-
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
     # reactive value for detail of model table
@@ -118,7 +111,7 @@ modeldetails <- function(input,
         escape = FALSE,
         selection = "none",
         colnames = c('row number' = 1),
-        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
+        options = getTableOptions()
       )
     } else {
       nothingToShowTable(contentMessage = paste0("no model settings files associated with Model ID ", modelID()))
@@ -136,7 +129,7 @@ modeldetails <- function(input,
         escape = FALSE,
         selection = "none",
         colnames = c('row number' = 1),
-        options = options
+        options = getTableOptions()
       )
     } else {
       nothingToShowTable(contentMessage = paste0("no lookup settings files associated with Model ID ", modelID()))

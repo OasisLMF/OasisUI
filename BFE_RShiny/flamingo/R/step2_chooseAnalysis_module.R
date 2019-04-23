@@ -245,10 +245,7 @@ step2_chooseAnalysis <- function(input, output, session,
       result$portfolioID <- ""
     }
   })
-  scrollX <- FALSE
-  maxrowsperpage <- 5
-  filter <- TRUE
-  escape <- TRUE
+
 
   # Panels Visualization -------------------------------------------------------
   observeEvent({
@@ -284,7 +281,7 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         colnames = c('row number' = 1),
         filter = 'bottom',
-        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
       nothingToShowTable(contentMessage = paste0("no analysis available"))
@@ -483,7 +480,7 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         selection = list(mode = 'none'),
         colnames = c('row number' = 1),
-        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
       nothingToShowTable(contentMessage = paste0("no log files associtated with analysis id ", result$analysisID))
@@ -538,7 +535,7 @@ step2_chooseAnalysis <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = rownames(result$tbl_modelsData)[1]),
         colnames = c('row number' = 1),
-        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
       nothingToShowTable(contentMessage = paste0("no Models associated with Portfolio ID ", result$portfolioID))

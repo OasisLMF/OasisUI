@@ -474,10 +474,7 @@ step3_configureOutput <- function(input, output, session,
       result$anaID <- analysisID()
     }
   })
-  scrollX <- FALSE
-  maxrowsperpage <- 5
-  filter <- TRUE
-  escape <- TRUE
+
 
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
@@ -573,7 +570,7 @@ step3_configureOutput <- function(input, output, session,
         escape = FALSE,
         colnames = c('row number' = 1),
         filter = 'bottom',
-        options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
       nothingToShowTable(contentMessage = paste0("no analysis available"))
@@ -873,7 +870,7 @@ step3_configureOutput <- function(input, output, session,
           escape = FALSE,
           colnames = c('row number' = 1),
           filter = 'bottom',
-          options = getTableOptions(scrollX, maxrowsperpage, filter, escape)
+          options = getTableOptions(maxrowsperpage = pageLength)
         )
       } else {
         nothingToShowTable(contentMessage = paste0("no log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL")))

@@ -4,7 +4,7 @@
 \alias{nothingToShowTable}
 \title{Nothing to show in table}
 \usage{
-nothingToShowTable(contentMessage)
+nothingToShowTable(contentMessage = "No data found")
 }
 \arguments{
 \item{contentMessage}{Message to be displayed.}

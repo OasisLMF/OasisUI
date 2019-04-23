@@ -144,18 +144,10 @@ ViewFilesInTable <- function(input, output, session,
         escape = FALSE,
         selection =  selectionUsed,
         colnames = c('Row Number' = 1),
-        options = .getFLTableOptions()
+        options = getTableOptions(maxrowsperpage = maxrowsperpage, escape = FALSE)
       )
     } else {
-      datatable(
-        data.frame(content = "nothing to show"),
-        class = "flamingo-table display",
-        selection = "none",
-        rownames = FALSE,
-        filter = 'bottom',
-        colnames = c(""),
-        width = "100%",
-        options = list(searchHighlight = TRUE))
+      nothingToShowTable("nothing to show")
     }
   )
 
@@ -317,19 +309,10 @@ ViewFilesInTable <- function(input, output, session,
         filter = 'bottom',
         colnames = c("Row Number" = 1),
         width = "100%",
-        options = list(searchHighlight = TRUE,
-                       scrollX = TRUE))
+        options = getTableOptions()
+      )
     } else {
-      datatable(
-        data.frame(content = "nothing to show"),
-        class = "flamingo-table display",
-        selection = "none",
-        rownames = FALSE,
-        filter = 'bottom',
-        colnames = c(""),
-        width = "100%",
-        options = list(searchHighlight = TRUE,
-                       scrollX = TRUE))
+      nothingToShowTable("nothing to show")
     }
   )
 
@@ -452,21 +435,6 @@ ViewFilesInTable <- function(input, output, session,
 
 
   # Helper functions -----------------------------------------------------------
-
-  # default table options
-  .getFLTableOptions <- function() {
-    options <- list(
-      search = list(caseInsensitive = TRUE),
-      searchHighlight = TRUE,
-      # columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
-      processing = 0,
-      scrollX = FALSE,
-      pageLength = maxrowsperpage,
-      preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
-      drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
-    )
-    return(options)
-  }
 
   # utility function to add to buttons in table
   .shinyInput <- function(FUN, id, num, Label = NULL, hidden = FALSE,  ...) {

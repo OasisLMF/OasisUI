@@ -109,10 +109,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       filter = 'bottom',
       escape = FALSE,
       plugins = 'natural',
-      options = list(
-        searchHighlight = TRUE,
-        columnDefs = list(list(visible = FALSE, targets = 0, type = 'natural'))
-      )
+      options = getTableOptions()
     )
   } else {
     nothingToShowTable(contentMessage = "No analyses available")
