@@ -114,7 +114,7 @@ modeldetails <- function(input,
         options = getTableOptions()
       )
     } else {
-      nothingToShowTable(contentMessage = paste0("no model settings files associated with Model ID ", modelID()))
+      nothingToShowTable(paste0("no model settings files associated with Model ID ", modelID()))
     }
   )
 
@@ -132,7 +132,7 @@ modeldetails <- function(input,
         options = getTableOptions()
       )
     } else {
-      nothingToShowTable(contentMessage = paste0("no lookup settings files associated with Model ID ", modelID()))
+      nothingToShowTable(paste0("no lookup settings files associated with Model ID ", modelID()))
     }
   )
 

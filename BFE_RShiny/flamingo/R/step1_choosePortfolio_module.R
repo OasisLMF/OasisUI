@@ -353,10 +353,10 @@ step1_choosePortfolio <- function(input, output, session,
                          selected = rowToSelect,
                          target = 'row'),
         colnames = c('row number' = 1),
-        options = getTableOptions()
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      nothingToShowTable(contentMessage = "No portfolio available")
+      nothingToShowTable("No portfolio available")
     }
   })
 

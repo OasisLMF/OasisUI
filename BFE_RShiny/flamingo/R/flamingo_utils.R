@@ -53,7 +53,6 @@ nothingToShowTable <- function(contentMessage = "No data found"){
     class = "flamingo-table display",
     selection = "none",
     rownames = FALSE,
-    #filter = 'bottom',
     colnames = c(""),
     escape = FALSE,
     options = list(searchHighlight = TRUE)
@@ -80,20 +79,11 @@ getTableOptions <- function(scrollX = FALSE,
   options <- list(
     search = list(caseInsensitive = TRUE),
     searchHighlight = TRUE,
-    #columnDefs = list(list(visible = FALSE, targets = c(0,5,6))),
     processing = 0,
     scrollX = scrollX,
     pageLength = maxrowsperpage,
-    #autoWidth = TRUE,
     columnDefs = list(list(visible = FALSE, targets = 0))
   )
-  if (filter) {
-    options$dom <- 'ft'
-    options$search <- list(caseInsensitive = TRUE)
-    options$searchHighlight <- TRUE
-  } else {
-    options$dom <- 't'
-  }
   if (!escape) {
     options$preDrawCallback <- JS('function() { Shiny.unbindAll(this.api().table().node()); }')
     options$drawCallback <- JS('function() { Shiny.bindAll(this.api().table().node()); } ')

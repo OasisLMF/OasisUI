@@ -112,7 +112,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       options = getTableOptions()
     )
   } else {
-    nothingToShowTable(contentMessage = "No analyses available")
+    nothingToShowTable("No analyses available")
   }
   )
 

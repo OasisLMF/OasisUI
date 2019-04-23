@@ -573,7 +573,7 @@ step3_configureOutput <- function(input, output, session,
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      nothingToShowTable(contentMessage = paste0("no analysis available"))
+      nothingToShowTable(paste0("no analysis available"))
     })
 
   # Analyses Table Title
@@ -873,7 +873,7 @@ step3_configureOutput <- function(input, output, session,
           options = getTableOptions(maxrowsperpage = pageLength)
         )
       } else {
-        nothingToShowTable(contentMessage = paste0("no log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL")))
+        nothingToShowTable(paste0("No log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL")))
       }
     }
   })
