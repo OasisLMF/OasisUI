@@ -22,7 +22,7 @@ analysis_detailsUI <- function(id) {
       value = ns("tabvalidation")
     ),
     tabPanel(
-      title = "Generated Inputs",
+      title = "Inputs",
       anainputsUI(ns("anainputs")),
       value = ns("tabanainputs")
     ),
