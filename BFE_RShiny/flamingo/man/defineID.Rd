@@ -37,8 +37,6 @@ constructed via \code{\link[=outputNavigation]{outputNavigation()}}.
 selectAnaID reactive for the id the selected analysis.
 
 selectPortfolioID reactive for portfolio id associated with the selected analysis.
-
-model_perils reactive for model perils associated with model id.
 }
 \description{
 UI/View for defining one analysis ID

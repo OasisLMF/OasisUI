@@ -62,8 +62,6 @@ summarytabUI <- function(id) {
 #' @param selectAnaID2 id of selected analysis
 #' @param portfolioID1 portfolio id associated with selected analysis
 #' @param portfolioID2 portfolio id associated with selected analysis
-#' @param model_perils1 list of parils associated with the selected analyisis
-#' @param model_perils2 list of parils associated with the selected analyisis
 #' @param tbl_filesListDataana1 dataframe of the output files
 #' @param compare logical indicating comparison
 #'
@@ -89,8 +87,6 @@ summarytab <- function(input, output, session,
                        selectAnaID2 = reactive(""),
                        portfolioID1 = reactive(""),
                        portfolioID2 = reactive(""),
-                       model_perils1 = reactive(""),
-                       model_perils2 = reactive(""),
                        tbl_filesListDataana1 = reactive(NULL),
                        compare = FALSE,
                        active, logMessage = message) {
@@ -119,10 +115,10 @@ summarytab <- function(input, output, session,
       SummaryData <- NULL
 
       if (selectAnaID1() != "" && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
-        SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1(), model_perils1())
+        SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
       }
       if (selectAnaID2() != "" && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
-        SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2(), model_perils2())
+        SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
       }
 
       #define df to use
@@ -347,7 +343,7 @@ summarytab <- function(input, output, session,
     return(DF)
   }
 
-  .getSummary <- function(selectAnaID, portfolioID, model_perils) {
+  .getSummary <- function(selectAnaID, portfolioID) {
     #analyses settings
     analysis_settings <- return_analyses_settings_file_list(selectAnaID)
 
@@ -397,39 +393,28 @@ summarytab <- function(input, output, session,
     ana_settings <- analysis_settings[["analysis_settings"]]
     model_settings <- analysis_settings[["analysis_settings"]][["model_settings"]]
 
+    perils_in_model <- names(model_settings)[grepl("peril", names(model_settings))]
+    perils_in_ana <- names(ana_settings[["model_settings"]])[grepl("peril", names(ana_settings[["model_settings"]]))]
+    perils_in_ana_lst <- sapply(perils_in_ana, function(i){ana_settings[["model_settings"]][[i]]})
+
     gul_threshold <- ana_settings[["gul_threshold"]]
     gul_threshold <- ifelse(is.null(gul_threshold), 0, gul_threshold)
     number_of_samples <- ana_settings[["number_of_samples"]]
     number_of_samples <- ifelse(is.null(number_of_samples), 0, number_of_samples)
     event_set <- model_settings[["event_set"]]
     event_set <- ifelse(is.null(event_set), FALSE, event_set)
-    peril_wind <- model_settings[["peril_wind"]]
-    peril_wind <- ifelse(is.null(peril_wind), FALSE, peril_wind)
-    peril_surge <- model_settings[["peril_surge"]]
-    peril_surge <- ifelse(is.null(peril_surge), FALSE, peril_surge)
-    peril_quake <- model_settings[["peril_quake"]]
-    peril_quake <- ifelse(is.null(peril_quake), FALSE, peril_quake)
-    peril_flood <- model_settings[["peril_flood"]]
-    peril_flood <- ifelse(is.null(peril_flood), FALSE, peril_flood)
-    demand_surge <-model_settings[["demand_surge"]]
+
+    demand_surge <- model_settings[["demand_surge"]]
     demand_surge <- ifelse(is.null(demand_surge), FALSE, demand_surge)
     leakage_factor <- model_settings[["leakage_factor"]]
     leakage_factor <- ifelse(is.null(leakage_factor), FALSE, leakage_factor)
 
-    perils_list <- list("peril_wind", "peril_surge", "peril_quake", "peril_flood")
-    if (model_perils == "") {
-      PerilsNotInModel <- c()
-    } else {
-      PerilsNotInModel <- setdiff(perils_list, model_perils)
-    }
-
-
     #summary DF
-    SpecificationRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", "peril_wind", "peril_surge", "peril_quake", "peril_flood", "demand_surge", "leakage_factor")
-    ValueRows <- unlist(c(locnum, tiv, gul_threshold, number_of_samples, event_set, peril_wind, peril_surge, peril_quake, peril_flood, demand_surge, leakage_factor))
-    TypeRows <- c("input", "input", "param", "param", "param", "param", "param", "param", "param", "param", "param")
+    SpecificationRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", perils_in_model , "demand_surge", "leakage_factor")
+    ValueRows <- unlist(c(locnum, tiv, gul_threshold, number_of_samples, event_set, perils_in_ana_lst, demand_surge, leakage_factor))
+    TypeRows <- c("input", "input", "param", "param", "param", rep("param", length(perils_in_model)), "param", "param")
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
-      filter(Specification %notin% PerilsNotInModel)
+      mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 
     #add AAL outputs
     if (!is.null(outputsAAL)) {
