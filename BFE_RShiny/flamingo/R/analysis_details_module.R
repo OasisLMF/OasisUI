@@ -17,24 +17,19 @@ analysis_detailsUI <- function(id) {
   tabsetPanel(
     id = ns("tabsDetails"),
     tabPanel(
-      title = "Exposure Validation",
-      exposurevalidationUI(ns("exposurevalidation")),
-      value = ns("tabvalidation")
+      title = "Validation Summary",
+      exposurevalidationsummaryUI(ns("exposurevalidationsummary")),
+      value = ns("tabvalidationsummary")
     ),
     tabPanel(
-      title = "Generated Inputs",
-      generatedinputsUI(ns("generatedinputs")),
-      value = ns("tabgeneratedinputs")
+      title = "Validation Map",
+      exposurevalidationmapUI(ns("exposurevalidationmap")),
+      value = ns("tabvalidationmap")
     ),
     tabPanel(
-      title = "Summary Status",
-      summarystatusUI(ns("summarystatus")),
-      value = ns("tabsummarystatus")
-    ),
-    tabPanel(
-      title = "Uploaded Inputs",
-      portfolio_detailsUI(ns("portfolio_details")),
-      value = ns("tabuploadedinputs")
+      title = "Inputs",
+      anainputsUI(ns("anainputs")),
+      value = ns("tabanainputs")
     )
   )
 }
@@ -65,42 +60,52 @@ analysis_details <- function(input,
 
   ns <- session$ns
 
+  # Download inputs ------------------------------------------------------------
+  observeEvent({
+    counter()
+  }, {
+    if (length(counter()) > 0 && counter() > 0) {
+      if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
+          (!is.null(analysisID()) && !is.na(analysisID()) && analysisID() != "")) {
+        extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
+        if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
+          withModalSpinner(
+            api_get_analyses_input_file(analysisID()),
+            "Loading...",
+            size = "s"
+          )
+        }
+      }
+    }
+  })
+
   # Tab Exposure Validation ----------------------------------------------------
   callModule(
-    exposurevalidation,
-    id = "exposurevalidation",
+    exposurevalidationsummary,
+    id = "exposurevalidationsummary",
     analysisID = analysisID,
     portfolioID = portfolioID,
     counter = counter,
-    active = reactive({input$tabsDetails == ns("tabvalidation")})
+    active = reactive({input$tabsDetails == ns("tabvalidationsummary")})
   )
 
-  # Tab Generated Inputs -------------------------------------------------------
   callModule(
-    generatedinputs,
-    id = "generatedinputs",
+    exposurevalidationmap,
+    id = "exposurevalidationmap",
     analysisID = analysisID,
-    counter = counter,
-    active = reactive({input$tabsDetails == ns("tabgeneratedinputs")})
-  )
-
-  # Tab Status Detail ----------------------------------------------------------
-  callModule(
-    summarystatus,
-    id = "summarystatus",
-    analysisID = analysisID,
-    counter = counter,
-    active = reactive({input$tabsDetails == ns("tabsummarystatus")})
-  )
-
-  # Tab Uploaded Inputs --------------------------------------------------------
-  callModule(
-    portfolio_details,
-    id = "portfolio_details",
-    refresh_opt = TRUE,
     portfolioID = portfolioID,
     counter = counter,
-    active = reactive({input$tabsDetails == ns("tabuploadedinputs")})
+    active = reactive({input$tabsDetails == ns("tabvalidationmap")})
+  )
+
+  # Tab Analysis Inputs --------------------------------------------------------
+  callModule(
+    anainputs,
+    id = "anainputs",
+    analysisID = analysisID,
+    portfolioID = portfolioID,
+    counter = counter,
+    active = reactive({input$tabsDetails == ns("tabanainputs")})
   )
 
 }

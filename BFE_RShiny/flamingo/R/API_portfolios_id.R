@@ -35,7 +35,7 @@ api_get_portfolios_location_file <- function(id) {
 #'
 #' @rdname api_post_portfolios_location_file
 #'
-#' @param id A unique integer value identifying this analysis.
+#' @param id A unique integer value identifying this portfolio.
 #' @param filepath_location Path to the location file.
 #'
 #' @return The posted portfolio location file.
@@ -100,7 +100,7 @@ api_get_portfolios_accounts_file <- function(id) {
 #'
 #' @rdname api_post_portfolios_accounts_file
 #'
-#' @param id A unique integer value identifying this analysis.
+#' @param id A unique integer value identifying this portfolio.
 #' @param filepath_accounts Path to accounts file.
 #'
 #' @return The posted portfolio accounts file.
@@ -165,7 +165,7 @@ api_get_portfolios_reinsurance_info_file <- function(id) {
 #'
 #' @rdname api_post_portfolios_reinsurance_info
 #'
-#' @param id A unique integer value identifying this analysis.
+#' @param id A unique integer value identifying this portfolio.
 #' @param filepath_reinsurance_info Path to reinsurance info file.
 #'
 #' @return The posted portfolio reinsurance info file.
@@ -230,7 +230,7 @@ api_get_portfolios_reinsurance_source_file <- function(id) {
 #'
 #' @rdname api_post_portfolios_reinsurance_source
 #'
-#' @param id A unique integer value identifying this analysis.
+#' @param id A unique integer value identifying this portfolio.
 #' @param filepath_reinsurance_source Path to reinsurance source file.
 #'
 #' @return the posted portfolio reinsurance source file.
@@ -257,3 +257,25 @@ api_post_portfolios_reinsurance_source_file <- function(id, filepath_reinsurance
 
   api_handle_response(response)
 }
+
+
+#' Return portfolio file stored name
+#'
+#' Returns file stored name
+#'
+#' @rdname return_portfolios_stored_name
+#'
+#' @param id A unique integer value identifying this portfolio.
+#' @param filetype character string indicating the type of file: can be location_file, accounts_file, reinsurance_info_file or reinsurance_source_file.
+#'
+#' @return The stored name of the file.
+#'
+#' @importFrom httr content
+
+#'
+#' @export
+return_portfolios_stored_name <- function(id, filetype){
+  res <- content(api_get_portfolios_id(id)$result)
+  res[[filetype]]$stored
+}
+
