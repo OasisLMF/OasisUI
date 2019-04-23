@@ -47,7 +47,7 @@ capitalize_names_df <- function(df) {
 #' @param contentMessage Message to be displayed.
 #'
 #' @export
-nothingToShowTable <- function(contentMessage){
+nothingToShowTable <- function(contentMessage = "No data found"){
   datatable(
     data.frame(content = contentMessage),
     class = "flamingo-table display",
