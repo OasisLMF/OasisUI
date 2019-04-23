@@ -12,25 +12,36 @@
 modeldetailsUI <- function(id) {
 
   ns <- NS(id)
-  tabsetPanel(
-    id = ns("tabsModelsDetails"),
-
-    tabPanel(
-      title = "Resources",
-      h4("Model Settings"),
-      DTOutput(ns("dt_model_settings")),
-      h4("Lookup Settings"),
-      DTOutput(ns("dt_lookup_settings")),
-      value = ns("tabresources")
+  flamingoPanel(
+    collapsible = FALSE,
+    ns("panel_model_details"),
+    heading = tagAppendChildren(
+      h4(""),
+      uiOutput(ns("paneltitle_ModelDetails"), inline = TRUE),
+      flamingoRefreshButton(ns("abuttonmodeldetailrfsh")),
+      actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    tabPanel(
-      title = "Hazard Maps",
-      selectInput(inputId = ns("hazard_files"),
-                  label = "Choose hazard file",
-                  choices = list.files("./www/hazard_files")
+
+    tabsetPanel(
+      id = ns("tabsModelsDetails"),
+
+      tabPanel(
+        title = "Resources",
+        h4("Model Settings"),
+        DTOutput(ns("dt_model_settings")),
+        h4("Lookup Settings"),
+        DTOutput(ns("dt_lookup_settings")),
+        value = ns("tabresources")
       ),
-      createHazardMapUI(ns("createHazardMap")),
-      value = ns("tabmaps")
+      tabPanel(
+        title = "Hazard Maps",
+        selectInput(inputId = ns("hazard_files"),
+                    label = "Choose hazard file",
+                    choices = list.files("./www/hazard_files")
+        ),
+        createHazardMapUI(ns("createHazardMap")),
+        value = ns("tabmaps")
+      )
     )
   )
 }
@@ -49,6 +60,9 @@ modeldetailsUI <- function(id) {
 #' @param options Functions displaying options for table.
 #' @param nothing_to_show Function used when no table is available.
 #' @template params-module-ui
+#'
+#' @importFrom shinyjs hide
+#' @importFrom shinyjs show
 #'
 #' @export
 modeldetails <- function(input,
@@ -79,9 +93,23 @@ modeldetails <- function(input,
     counter()
   }, ignoreInit = TRUE, {
 
-    # Tab Resources ------------------------------------------------------------
-    result$tbl_modelsDetails <- return_models_id_resource_file_df(modelID())
+    show("panel_model_details")
 
+    # Reload Programme Model Details table
+    .reloadtbl_modelsDetails <- function() {
+      logMessage(".reloadtbl_modelsDetails called")
+      tbl_modelsDetails <- return_models_id_resource_file_df(modelID())
+      if (!is.null(tbl_modelsDetails)) {
+        result$tbl_modelsDetails <- tbl_modelsDetails
+        logMessage("model resources table refreshed")
+      } else {
+        result$tbl_modelsDetails <- NULL
+      }
+      result$tbl_modelsDetails
+    }
+
+    # Tab Resources ------------------------------------------------------------
+    .reloadtbl_modelsDetails()
     output$dt_model_settings <- renderDT(
       if (!is.null(result$tbl_modelsDetails[1]) && nrow(result$tbl_modelsDetails[[1]]) > 0) {
         logMessage("re-rendering model settings table")
@@ -97,7 +125,8 @@ modeldetails <- function(input,
         )
       } else {
         nothing_to_show(contentMessage = paste0("no model settings files associated with Model ID ", modelID()))
-      })
+      }
+  )
 
     output$dt_lookup_settings <- renderDT(
       if (!is.null(result$tbl_modelsDetails[2]) && nrow(result$tbl_modelsDetails[[2]]) > 0) {
@@ -114,7 +143,8 @@ modeldetails <- function(input,
         )
       } else {
         nothing_to_show(contentMessage = paste0("no lookup settings files associated with Model ID ", modelID()))
-      })
+      }
+  )
 
     # Tab Hazard Map -----------------------------------------------------------
     result$uploaded_locs <- return_file_df(api_get_portfolios_location_file,
@@ -148,6 +178,22 @@ modeldetails <- function(input,
         )
       }
     })
+
+    # Details Model title
+    output$paneltitle_ModelDetails <- renderUI({
+      paste0('Resources of model id ', modelID())
+    })
+
+    # onclick buttons
+    onclick("buttonhidemodeldetails", {
+      hide("panel_model_details")
+      logMessage("hiding panelModelDetails")
+    })
+
+    onclick("abuttonmodeldetailrfsh", {
+      .reloadtbl_modelsDetails()
+    })
+
   })
 
 }

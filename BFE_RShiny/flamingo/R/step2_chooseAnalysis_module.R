@@ -24,7 +24,7 @@ step2_chooseAnalysisUI <- function(id) {
     hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
     hidden(div(id = ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
-    hidden(div(id = ns("panelModelDetails"), panelModelDetails(id)))
+    hidden(div(id = ns("panelModelDetails"), modeldetailsUI(ns("modeldetails"))))
   )
 }
 
@@ -166,33 +166,6 @@ panelModelTable <- function(id) {
   )
 }
 
-#' panelModelDetails
-#'
-#' @rdname panelModelDetails
-#'
-#' @description Function wrapping panel to show details of programme table.
-#'
-#' @template params-module-ui
-#'
-#' @importFrom DT DTOutput
-#'
-#' @export
-panelModelDetails <- function(id) {
-  ns <- NS(id)
-  flamingoPanel(
-    collapsible = FALSE,
-    ns("panel_model_details"),
-    heading = tagAppendChildren(
-      h4(""),
-      uiOutput(ns("paneltitle_ModelDetails"), inline = TRUE),
-      flamingoRefreshButton(ns("abuttonmodeldetailrfsh")),
-      actionButton(inputId = ns("buttonhidemodeldetails"), label = NULL, icon = icon("times"), style = "float: right;")
-    ),
-    modeldetailsUI(ns("modeldetails"))
-  )
-}
-
-
 # Server -----------------------------------------------------------------------
 
 #' step2_chooseAnalysis Server
@@ -256,8 +229,6 @@ step2_chooseAnalysis <- function(input, output, session,
     modelID = "",
     # reactive value for model table
     tbl_modelsData = NULL,
-    # reactive value for detail of model table
-    tbl_modelsDetails = NULL,
     # analyses table
     tbl_analysesData = NULL,
     #analysis log
@@ -590,19 +561,8 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
     logMessage("showing panelModelDetails")
-    .reloadtbl_modelsDetails()
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
-  })
-
-  onclick("buttonhidemodeldetails", {
-    hide("panelModelDetails")
-    logMessage("hiding panelModelDetails")
-  })
-
-  # Details Model title
-  output$paneltitle_ModelDetails <- renderUI({
-    paste0('Resources of model id ', result$modelID)
   })
 
   #Hide panel if model id changes
@@ -718,10 +678,6 @@ step2_chooseAnalysis <- function(input, output, session,
     .reloadtbl_modelsData()
   })
 
-  onclick("abuttonmodeldetailrfsh", {
-    .reloadtbl_modelsDetails()
-  })
-
   # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
@@ -779,21 +735,6 @@ step2_chooseAnalysis <- function(input, output, session,
       logMessage("models table refreshed")
     } else {
       result$tbl_modelsData <- NULL
-    }
-    invisible()
-  }
-
-  # Reload Programme Model Details table
-  .reloadtbl_modelsDetails <- function() {
-    logMessage(".reloadtbl_modelsDetails called")
-    if (length(input$dt_models_rows_selected) > 0) {
-      tbl_modelsDetails <- return_models_id_resource_file_df(result$modelID)
-      if (!is.null(tbl_modelsDetails)) {
-        result$tbl_modelsDetails <-  tbl_modelsDetails
-      }
-      logMessage("model resources table refreshed")
-    } else {
-      result$tbl_modelsDetails <- NULL
     }
     invisible()
   }
