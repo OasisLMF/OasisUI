@@ -1,8 +1,8 @@
 # Exposure Validation Module ---------------------------------------------------
 
 # UI ---------------------------------------------------------------------------
-#' exposurevalidationUI
-#' @rdname exposurevalidation
+#' exposurevalidationsummaryUI
+#' @rdname exposurevalidationsummary
 #'
 #' @description UI/View for exposure validation of an analysis.
 #'
@@ -12,7 +12,7 @@
 #' @importFrom DT DTOutput
 #'
 #' @export
-exposurevalidationUI <- function(id) {
+exposurevalidationsummaryUI <- function(id) {
 
   ns <- NS(id)
 
@@ -20,34 +20,27 @@ exposurevalidationUI <- function(id) {
     fluidRow(div(flamingoRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
       column(12,
-             tabsetPanel(
-               id = ns("tabsExposureValidationDetails"),
-               tabPanel(
-                 title = "Summary",
-                 DTOutput(ns("dt_summary_validation")),
-                 fluidRow(
-                   column(6,
-                          plotlyOutput(ns("outputplot_loc1"))),
-                   column(6,
-                          plotlyOutput(ns("outputplot_loc2"))
-                   )
-                 ),
-                 fluidRow(
-                   column(6,
-                          plotlyOutput(ns("outputplot_tiv1"))),
-                   column(6,
-                          plotlyOutput(ns("outputplot_tiv2"))
-                   )
-                 ),
-                 value = ns("tabvalidation_summary")
-               ),
-               tabPanel(
-                 title = "Details",
-                 leafletOutput(ns("exposure_map")),
-                 hidden(div(id = ns("div_abuttonviewtbl"), flamingoButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;"))),
-                 value = ns("tabvalidation_details")
-               )
-             )
+             DTOutput(ns("dt_summary_validation"))
+      )
+    ),
+    fluidRow(
+      column(12,
+             h4("Locations Overview")
+      ),
+      column(6,
+             plotlyOutput(ns("outputplot_loc1"))),
+      column(6,
+             plotlyOutput(ns("outputplot_loc2"))
+      )
+    ),
+    fluidRow(
+      column(12,
+             h4("TIV Overview")
+      ),
+      column(6,
+             plotlyOutput(ns("outputplot_tiv1"))),
+      column(6,
+             plotlyOutput(ns("outputplot_tiv2"))
       )
     )
   )
@@ -56,9 +49,9 @@ exposurevalidationUI <- function(id) {
 
 # Server -----------------------------------------------------------------------
 
-#' exposurevalidation
+#' exposurevalidationsummary
 #'
-#' @rdname exposurevalidation
+#' @rdname exposurevalidationsummary
 #'
 #' @description Server logic for exposure validation of an analysis.
 #'
@@ -67,49 +60,33 @@ exposurevalidationUI <- function(id) {
 #' @param portfolioID selected portfolio ID.
 #' @param counter Reactive value storing actionButton status.
 #'
-#' @importFrom data.table fread
 #' @importFrom dplyr select
-#' @importFrom dplyr inner_join
 #' @importFrom dplyr mutate
-#' @importFrom dplyr case_when
-#' @importFrom dplyr contains
 #' @importFrom dplyr filter
-#' @importFrom DT formatStyle
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
-#' @importFrom DT styleEqual
-#' @importFrom leaflet leaflet
-#' @importFrom leaflet addTiles
-#' @importFrom leaflet addAwesomeMarkers
-#' @importFrom leaflet markerClusterOptions
-#' @importFrom leaflet awesomeIcons
 #' @importFrom plotly plot_ly
 #' @importFrom plotly renderPlotly
-#' @importFrom shinyjs hide
-#' @importFrom shinyjs show
 #' @importFrom tidyr spread
 #' @importFrom tidyr replace_na
+#' @importFrom tidyr gather
 #'
 #' @export
-exposurevalidation <- function(input,
-                               output,
-                               session,
-                               analysisID = "",
-                               portfolioID = "",
-                               counter = NULL,
-                               active = reactive(TRUE)) {
+exposurevalidationsummary <- function(input,
+                                      output,
+                                      session,
+                                      analysisID = "",
+                                      portfolioID = "",
+                                      counter = NULL,
+                                      active = reactive(TRUE)) {
 
   ns <- session$ns
 
   # Params and Reactive Values -------------------------------------------------
   result <- reactiveValues(
-    #dataframe of checked exposures
-    uploaded_locs_check = NULL,
     #dataframe summary
-    summary_validation_tbl = NULL,
-    #filename for export
-    filename2download = ""
+    summary_validation_tbl = NULL
   )
 
   #name of element with location ids
@@ -120,32 +97,11 @@ exposurevalidation <- function(input,
 
   # Modeled exposure and uploaded exposure ------------------------------------
   observeEvent({
-    active()
     counter()
   }, {
     if (length(active()) > 0 && active()) {
-      if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
-          (!is.null(analysisID()) && !is.na(analysisID()) && analysisID() != "")) {
-        extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
-        if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
-          withModalSpinner(
-            api_get_analyses_input_file(analysisID()),
-            "Loading...",
-            size = "s"
-          )
-        }
-        .reloadExposureValidation()
-        .reloadSummary()
-      }
-    }
-  })
-
-  # Show/Hide table button -----------------------------------------------------
-
-  observe({
-    hide("div_abuttonviewtbl")
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-      show("div_abuttonviewtbl")
+      .reloadExposureValidation()
+      .reloadSummary()
     }
   })
 
@@ -184,63 +140,6 @@ exposurevalidation <- function(input,
   })
 
 
-  # Modal for tabular view  ----------------------------------------------------
-  # Modal Panel
-  FileContent <- modalDialog(
-    easyClose = TRUE,
-    size = "l",
-    fluidPage(
-      fluidRow(
-        h4("Validated Exposure")),
-      fluidRow(
-        DTOutput(ns("dt_output_uploaded_lock_check")),
-        downloadButton(ns("exp_downloadexcel"), label = "Export to csv"),
-        style = "display: inline")
-    )
-  )
-
-  onclick("abuttonviewtbl", {
-    showModal(FileContent)
-  })
-
-  # Export to .csv -------------------------------------------------------------
-
-  output$exp_downloadexcel <- downloadHandler(
-    filename = function() {result$filename2download},
-    content = function(file) {
-      fwrite(result$uploaded_locs_check, file, row.names = TRUE, quote = TRUE)}
-  )
-
-  # Tabular data ---------------------------------------------------------------
-  output$dt_output_uploaded_lock_check <- renderDT(
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-      datatable(
-        result$uploaded_locs_check %>% capitalize_names_df(),
-        class = "flamingo-table display",
-        rownames = FALSE,
-        escape = FALSE,
-        selection = "none",
-        options = .getFLTableOptions()
-      ) %>% formatStyle(
-        'modeled',
-        target = 'row',
-        backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
-      )
-    } else {
-      .nothingToShowTable("Generated inputs not found.")
-    }
-  )
-
-  # Map ------------------------------------------------------------------------
-  output$exposure_map <- renderLeaflet({
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-      .createExposureValMap(result$uploaded_locs_check)
-    } else {
-      NULL
-    }
-
-  })
-
   # Refresh button -------------------------------------------------------------
   onclick("abuttonexposurerefresh", {
     # Get modeled locations
@@ -250,6 +149,7 @@ exposurevalidation <- function(input,
       size = "s"
     )
     .reloadExposureValidation()
+    .reloadSummary()
   })
 
   # Utils functions ------------------------------------------------------------
@@ -353,37 +253,11 @@ exposurevalidation <- function(input,
 
     logMessage(".reloadExposureValidation called")
 
-    # Filename to download
-    result$filename2download <- paste0("exposure_validation_", analysisID(), ".csv")
+    uploaded_locs_check <- check_loc(analysisID(), portfolioID())
 
-    # Clean up df
-    result$uploaded_locs_check <- NULL
-
-    # Get uploaded locations
-    uploaded_locs <- return_file_df(api_get_portfolios_location_file, portfolioID())
-
-    extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
-    fileslist <- list.files(extractFolder)
-    modeled_loc_filename <- fileslist[order(nchar(fileslist), fileslist, decreasing = TRUE)][1]
-    if (!is.na(modeled_loc_filename)) {
-      currfilepath <- paste0(extractFolder, modeled_loc_filename)
-      modeled_locs <- fread(currfilepath)
-      # Hack: drop LocName as it seems to cause issues in the inner_join
-      modeled_locs <- modeled_locs %>%
-        select(-LocName)
-
-      # compare uploaded locations with modeled locations
-      idx_in <- inner_join(uploaded_locs, modeled_locs) %>%
-        select(LocNumber)
-
-      uploaded_locs_check <- uploaded_locs %>%
-        mutate(modeled = case_when(LocNumber %in% idx_in$LocNumber ~ "TRUE",
-                                   TRUE ~ "FALSE"))
-
-      #updating reactive only when needed
-      if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
-        result$uploaded_locs_check <- uploaded_locs_check
-      }
+    #updating reactive only when needed
+    if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
+      result$uploaded_locs_check <- uploaded_locs_check
     }
 
   }
@@ -412,40 +286,6 @@ exposurevalidation <- function(input,
       escape = FALSE,
       options = list(searchHighlight = TRUE)
     )
-  }
-
-
-  # Exposure validation map
-  .createExposureValMap <- function(df) {
-
-    marker_colors <- c('green', 'red')
-
-    df <- df %>%
-      mutate(modeled = case_when(
-        modeled == "TRUE" ~ 1,
-        TRUE ~ 2
-      ))
-
-    popupData <- tagList(
-      strong("Location ID: "), df$LocNumber,
-      br(), strong("Latitude: "), df$Latitude,
-      br(), strong("Longitude: "), df$Longitude)
-
-    icon_map <- awesomeIcons(
-      icon = 'map-marker-alt',
-      library = 'fa',
-      iconColor = marker_colors[df$modeled],
-      markerColor =  marker_colors[df$modeled]
-    )
-
-    leaflet(df) %>%
-      addTiles() %>%
-      addAwesomeMarkers(
-        lng = ~Longitude,
-        lat = ~Latitude,
-        icon = icon_map,
-        clusterOptions = TRUE,
-        popup = toString(popupData))
   }
 
 }
