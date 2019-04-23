@@ -72,7 +72,10 @@ nothingToShowTable <- function(contentMessage){
 #' @param escape Param to avoid escape row.
 #'
 #' @export
-getTableOptions <- function(scrollX, maxrowsperpage, filter, escape) {
+getTableOptions <- function(  scrollX = FALSE,
+                              maxrowsperpage = 5,
+                              filter = TRUE,
+                              escape = TRUE) {
 
   options <- list(
     search = list(caseInsensitive = TRUE),
