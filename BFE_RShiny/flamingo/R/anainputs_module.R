@@ -22,7 +22,7 @@ anainputsUI <- function(id) {
       rownames = TRUE,
       colnames = c('row number' = 1),
       id = ns("panel_anainputs"),
-      flamingoRefreshButton(ns("abuttongeneratedrefresh")),
+      div(id = ns("refresh_ana"), flamingoRefreshButton(ns("abuttonanainputrefresh"))),
       ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
     )
   )
@@ -37,8 +37,10 @@ anainputsUI <- function(id) {
 #' @description  Server logic for inputs of an analysis.
 #'
 #' @template params-module
+#' @template params-active
 #' @param analysisID Selected analysis ID.
 #' @param portfolioID Selected portfolio ID.
+#' @param refresh_opt Option to hide/show refresh button.
 #' @param counter Reactive value storing actionButton status.
 #'
 #' @importFrom tibble add_column
@@ -50,6 +52,7 @@ anainputs <- function(input,
                       session,
                       analysisID,
                       portfolioID,
+                      refresh_opt = TRUE,
                       counter = NULL,
                       active = reactive(TRUE)) {
 
@@ -65,7 +68,10 @@ anainputs <- function(input,
     active()
     counter()
   }, ignoreInit = TRUE, {
-    if (length(active()) > 0 && active()) {
+    if (length(active()) > 0 && active() && !is.null(counter()) && !is.na(counter()) &&  counter() != "" &&  counter() != 0) {
+      if (!refresh_opt) {
+        hide("refresh_ana")
+      }
       extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
       if (!dir.exists(extractFolder) || is.na(file.size(extractFolder))) {
         withModalSpinner(
@@ -74,7 +80,7 @@ anainputs <- function(input,
           size = "s"
         )
       }
-      .reloadGeneratediInputs()
+      .reloadInputs()
     }
   })
 
@@ -88,18 +94,18 @@ anainputs <- function(input,
     includechkbox = TRUE)
 
   # reload Generated Inputs table-----------------------------------------------
-  onclick("abuttongeneratedrefresh", {
+  onclick("abuttonanainputrefresh", {
     withModalSpinner(
       api_get_analyses_input_file(analysisID()),
       "Refreshing...",
       size = "s"
     )
-    .reloadGeneratediInputs()
+    .reloadInputs()
   })
 
   # Reload input generated table -----------------------------------------------
-  .reloadGeneratediInputs <- function(){
-    logMessage(".reloadGeneratediInputs called")
+  .reloadInputs <- function(){
+    logMessage(".reloadInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
       dt_generated <- return_analyses_input_file_wicons_df(analysisID())
       if (!is.null(dt_generated)) {

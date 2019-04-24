@@ -7,9 +7,9 @@
 \usage{
 ViewFilesInTableUI(id, includechkbox = FALSE)
 
-ViewFilesInTable(input, output, session, logMessage = message,
-  tbl_filesListData, param = NULL, file_column = "files",
-  folderpath = "_outputs/output", includechkbox = FALSE)
+ViewFilesInTable(input, output, session, tbl_filesListData, param = NULL,
+  file_column = "files", folderpath = "_outputs/output",
+  includechkbox = FALSE)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -17,8 +17,6 @@ ViewFilesInTable(input, output, session, logMessage = message,
 \item{includechkbox}{logical indicating the presence of checkboxes. Default FALSE.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{tbl_filesListData}{dataframe of output files.}
 

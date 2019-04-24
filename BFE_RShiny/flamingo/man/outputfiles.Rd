@@ -8,26 +8,24 @@
 outputfilesUI(id)
 
 outputfiles(input, output, session,
-  tbl_filesListDataana = reactive(NULL),
-  tbl_filesListDatapf = reactive(NULL), anaId = reactive(""),
-  portfolioId = reactive(""), active, logMessage = message)
+  tbl_filesListDataana = reactive(NULL), anaId = reactive(""),
+  portfolioId = reactive(""), active = reactive(TRUE),
+  counter = reactive(NULL))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{tbl_filesListDataana}{tbl of output files to view}
+\item{tbl_filesListDataana}{Tbl of output files to view.}
 
-\item{tbl_filesListDatapf}{dataframe of input files to view}
+\item{anaId}{Id of analysis.}
 
-\item{anaId}{id of analysis}
-
-\item{portfolioId}{id of portfolio associated to the analysis}
+\item{portfolioId}{Id of portfolio associated to the analysis.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 
-\item{logMessage}{function that will be passed info messages.}
+\item{counter}{Reactive value to trigger inputs download.}
 }
 \value{
 List of tags.

@@ -367,7 +367,6 @@ step1_choosePortfolio <- function(input, output, session,
     id = "portfolioDetails",
     tbl_filesListData =  reactive(result$tbl_portfolioDetails),
     param = reactive(result$portfolioID),
-    logMessage = logMessage,
     includechkbox = TRUE)
 
   # Title Portfolio Details Panel

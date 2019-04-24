@@ -17,9 +17,11 @@ exposurevalidationsummary(input, output, session, analysisID = "",
 
 \item{analysisID}{Selected analysis id.}
 
-\item{portfolioID}{selected portfolio ID.}
+\item{portfolioID}{Selected portfolio ID.}
 
-\item{counter}{Reactive value storing actionButton status.}
+\item{counter}{Reactive value to trigger inputs download.}
+
+\item{active}{reactive expression whether the module state should be updated.}
 }
 \value{
 List of tags.

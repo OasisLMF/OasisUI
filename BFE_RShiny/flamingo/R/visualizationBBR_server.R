@@ -101,7 +101,7 @@ visualizationBBR <- function(input, output, session,
     selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
     portfolioID1 = reactive(sub_modules$defineID$selectPortfolioID()),
     tbl_filesListDataana1 = reactive({result$tbl_filesListDataana}),
-    active = reactive({active() && input$tabsSBR == "tabsummary"}),
+    active = reactive({active() && input$tabsBBR == ns("tabsummary")}),
     logMessage = logMessage)
 
 
@@ -110,11 +110,10 @@ visualizationBBR <- function(input, output, session,
     outputfiles,
     id = "outputfiles",
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
-    tbl_filesListDatapf = reactive(result$tbl_filesListDatapf),
     anaId = sub_modules$defineID$selectAnaID,
     portfolioId = sub_modules$defineID$selectPortfolioID,
-    active = reactive({active() && input$tabsSBR == "taboutputfiles"}),
-    logMessage = logMessage)
+    counter = sub_modules$defineID$selectAnaID,
+    active = reactive({active() && input$tabsBBR == ns("taboutputfiles")}))
 
 
   # Tab Output Plots -----------------------------------------------------------
@@ -124,7 +123,7 @@ visualizationBBR <- function(input, output, session,
     selectAnaID = reactive(sub_modules$defineID$selectAnaID()),
     filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    active = reactive({active() && input$tabsSBR == "tabplots"}),
+    active = reactive({active() && input$tabsBBR == ns("tabplots")}),
     logMessage = logMessage)
 
 

@@ -104,6 +104,7 @@ analysis_details <- function(input,
     id = "anainputs",
     analysisID = analysisID,
     portfolioID = portfolioID,
+    refresh_opt = TRUE,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabanainputs")})
   )

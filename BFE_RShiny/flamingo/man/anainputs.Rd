@@ -8,7 +8,7 @@
 anainputsUI(id)
 
 anainputs(input, output, session, analysisID, portfolioID,
-  counter = NULL, active = reactive(TRUE))
+  refresh_opt = TRUE, counter = NULL, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -19,7 +19,11 @@ anainputs(input, output, session, analysisID, portfolioID,
 
 \item{portfolioID}{Selected portfolio ID.}
 
+\item{refresh_opt}{Option to hide/show refresh button.}
+
 \item{counter}{Reactive value storing actionButton status.}
+
+\item{active}{reactive expression whether the module state should be updated.}
 }
 \value{
 List of tags.
