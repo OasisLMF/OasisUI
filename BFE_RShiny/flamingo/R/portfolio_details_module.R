@@ -74,7 +74,6 @@ portfolio_details <- function(input,
     id = "portfolioDetails",
     tbl_filesListData =  reactive({result$dt_uploaded}),
     param = portfolioID,
-    logMessage = logMessage,
     includechkbox = TRUE)
 
   # reload Uploaded Inputs table-----------------------------------------------

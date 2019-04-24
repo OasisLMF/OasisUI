@@ -45,7 +45,6 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #'
 #' @param tbl_filesListData dataframe of output files.
 #' @param param id to be used
@@ -74,7 +73,6 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #'
 #' @export
 ViewFilesInTable <- function(input, output, session,
-                             logMessage = message,
                              tbl_filesListData,
                              param = NULL,
                              file_column = "files",

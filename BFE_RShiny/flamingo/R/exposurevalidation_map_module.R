@@ -35,9 +35,10 @@ exposurevalidationmapUI <- function(id) {
 #' @description Server logic for exposure validation of an analysis.
 #'
 #' @template params-module
+#' @template params-active
 #' @param analysisID Selected analysis id.
-#' @param portfolioID selected portfolio ID.
-#' @param counter Reactive value storing actionButton status.
+#' @param portfolioID Selected portfolio ID.
+#' @param counter Reactive value to trigger inputs download.
 #'
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when

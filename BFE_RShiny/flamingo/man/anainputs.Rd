@@ -22,6 +22,8 @@ anainputs(input, output, session, analysisID, portfolioID,
 \item{refresh_opt}{Option to hide/show refresh button.}
 
 \item{counter}{Reactive value storing actionButton status.}
+
+\item{active}{reactive expression whether the module state should be updated.}
 }
 \value{
 List of tags.
