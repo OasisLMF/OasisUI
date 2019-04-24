@@ -108,9 +108,8 @@ visualizationSBR <- function(input, output, session,
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
     anaId = sub_modules$defineID$selectAnaID,
     portfolioId = sub_modules$defineID$selectPortfolioID,
-    counter = reactive({input$tabsSBR == ns("taboutputfiles")}),
-    active = reactive({active() && input$tabsSBR == ns("taboutputfiles")}),
-    logMessage = logMessage)
+    counter = sub_modules$defineID$selectAnaID,
+    active = reactive({active() && input$tabsSBR == ns("taboutputfiles")}))
 
   # Tab Output Plots -----------------------------------------------------------
   sub_modules$outputplots <- callModule(

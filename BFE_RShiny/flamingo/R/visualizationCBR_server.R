@@ -133,9 +133,8 @@ visualizationCBR <- function(input, output, session,
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
     anaId = sub_modules$defineID1$selectAnaID,
     portfolioId = sub_modules$defineID1$selectPortfolioID,
-    counter = reactive({input$tabsCBR == ns("taboutputfiles")}),
-    active = reactive({active() && input$tabsCBR == ns("taboutputfiles")}),
-    logMessage = logMessage)
+    counter = sub_modules$defineID1$selectAnaID,
+    active = reactive({active() && input$tabsCBR == ns("taboutputfiles")}))
 
 
   # Tab Output Plots -----------------------------------------------------------
