@@ -4,15 +4,12 @@
 \alias{getTableOptions}
 \title{Get table options.}
 \usage{
-getTableOptions(scrollX = FALSE, maxrowsperpage = 5, filter = TRUE,
-  escape = TRUE)
+getTableOptions(scrollX = FALSE, maxrowsperpage = 5, escape = TRUE)
 }
 \arguments{
 \item{scrollX}{Param to allow scrollX. Default FALSE.}
 
 \item{maxrowsperpage}{Maximum number of rows to display per page. Default 5.}
-
-\item{filter}{Show or hide filter. Default TRUE.}
 
 \item{escape}{Param to avoid escape row. Default TRUE.}
 }

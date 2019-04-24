@@ -67,13 +67,11 @@ nothingToShowTable <- function(contentMessage = "No data found"){
 #'
 #' @param scrollX Param to allow scrollX. Default FALSE.
 #' @param maxrowsperpage Maximum number of rows to display per page. Default 5.
-#' @param filter Show or hide filter. Default TRUE.
 #' @param escape Param to avoid escape row. Default TRUE.
 #'
 #' @export
 getTableOptions <- function(scrollX = FALSE,
                             maxrowsperpage = 5,
-                            filter = TRUE,
                             escape = TRUE) {
 
   options <- list(

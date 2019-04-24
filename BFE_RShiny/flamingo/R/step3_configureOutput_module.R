@@ -573,7 +573,7 @@ step3_configureOutput <- function(input, output, session,
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      nothingToShowTable(paste0("no analysis available"))
+      nothingToShowTable(paste0("No analysis available"))
     })
 
   # Analyses Table Title

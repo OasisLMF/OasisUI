@@ -89,7 +89,6 @@ flamingoTable <- function(input, output, session,
           colnames = colnamesToUse,
           options = getTableOptions(scrollX = scrollX,
                                     maxrowsperpage = maxrowsperpage,
-                                    filter = filter,
                                     escape = escape)
         )
     })
