@@ -119,7 +119,7 @@ exposurevalidationsummary <- function(input,
         options = getTableOptions()
       )
     } else {
-      nothingToShowTable("Exposure validation summary not found.")
+      nothingToShowTable("Exposure validation summary not found")
     }
   )
 

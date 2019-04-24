@@ -284,7 +284,7 @@ step2_chooseAnalysis <- function(input, output, session,
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      nothingToShowTable(contentMessage = paste0("no analysis available"))
+      nothingToShowTable("No analysis available")
     })
 
   # Create Analyses Table  Title
@@ -483,7 +483,7 @@ step2_chooseAnalysis <- function(input, output, session,
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      nothingToShowTable(contentMessage = paste0("no log files associtated with analysis id ", result$analysisID))
+      nothingToShowTable(paste0("No log files associtated with analysis id ", result$analysisID))
     }
   )
 
@@ -538,7 +538,7 @@ step2_chooseAnalysis <- function(input, output, session,
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      nothingToShowTable(contentMessage = paste0("no Models associated with Portfolio ID ", result$portfolioID))
+      nothingToShowTable(paste0("No models associated with Portfolio ID ", result$portfolioID))
     }
   )
 

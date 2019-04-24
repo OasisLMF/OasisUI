@@ -147,7 +147,7 @@ ViewFilesInTable <- function(input, output, session,
         options = getTableOptions(maxrowsperpage = maxrowsperpage, escape = FALSE)
       )
     } else {
-      nothingToShowTable("nothing to show")
+      nothingToShowTable("Nothing to show")
     }
   )
 
@@ -312,7 +312,7 @@ ViewFilesInTable <- function(input, output, session,
         options = getTableOptions()
       )
     } else {
-      nothingToShowTable("nothing to show")
+      nothingToShowTable("Nothing to show")
     }
   )
 

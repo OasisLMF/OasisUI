@@ -137,7 +137,7 @@ exposurevalidationmap <- function(input,
         backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
       )
     } else {
-      nothingToShowTable("Generated inputs not found.")
+      nothingToShowTable("Generated inputs not found")
     }
   )
 
