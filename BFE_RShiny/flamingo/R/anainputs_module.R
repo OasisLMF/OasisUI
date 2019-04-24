@@ -22,7 +22,7 @@ anainputsUI <- function(id) {
       rownames = TRUE,
       colnames = c('row number' = 1),
       id = ns("panel_anainputs"),
-      div(id = ns("refresh_ana"), flamingoRefreshButton(ns("abuttongeneratedrefresh"))),
+      div(id = ns("refresh_ana"), flamingoRefreshButton(ns("abuttonanainputrefresh"))),
       ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
     )
   )
@@ -94,7 +94,7 @@ anainputs <- function(input,
     includechkbox = TRUE)
 
   # reload Generated Inputs table-----------------------------------------------
-  onclick("abuttongeneratedrefresh", {
+  onclick("abuttonanainputrefresh", {
     withModalSpinner(
       api_get_analyses_input_file(analysisID()),
       "Refreshing...",
