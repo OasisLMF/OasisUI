@@ -37,6 +37,7 @@ anainputsUI <- function(id) {
 #' @description  Server logic for inputs of an analysis.
 #'
 #' @template params-module
+#' @template params-active
 #' @param analysisID Selected analysis ID.
 #' @param portfolioID Selected portfolio ID.
 #' @param refresh_opt Option to hide/show refresh button.
@@ -67,7 +68,7 @@ anainputs <- function(input,
     active()
     counter()
   }, ignoreInit = TRUE, {
-    if (length(active()) > 0 && active()) {
+    if (length(active()) > 0 && active() && !is.null(counter()) && !is.na(counter()) &&  counter() != "" &&  counter() != 0) {
       if (!refresh_opt) {
         hide("refresh_ana")
       }
@@ -79,7 +80,7 @@ anainputs <- function(input,
           size = "s"
         )
       }
-      .reloadGeneratediInputs()
+      .reloadInputs()
     }
   })
 
@@ -99,12 +100,12 @@ anainputs <- function(input,
       "Refreshing...",
       size = "s"
     )
-    .reloadGeneratediInputs()
+    .reloadInputs()
   })
 
   # Reload input generated table -----------------------------------------------
-  .reloadGeneratediInputs <- function(){
-    logMessage(".reloadGeneratediInputs called")
+  .reloadInputs <- function(){
+    logMessage(".reloadInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
       dt_generated <- return_analyses_input_file_wicons_df(analysisID())
       if (!is.null(dt_generated)) {
