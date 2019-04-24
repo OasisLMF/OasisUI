@@ -95,7 +95,7 @@ visualizationCBR <- function(input, output, session,
     portfolioID1 = reactive(sub_modules$defineID1$selectPortfolioID()),
     portfolioID2 = reactive(sub_modules$defineID2$selectPortfolioID()),
     compare = TRUE,
-    active = reactive({active() && input$tabsSBR == "tabsummary"}),
+    active = reactive({active() && input$tabsCBR == ns("tabsummary")}),
     logMessage = logMessage)
 
 
@@ -131,10 +131,10 @@ visualizationCBR <- function(input, output, session,
     outputfiles,
     id = "outputfiles",
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
-    tbl_filesListDatapf = reactive(result$tbl_filesListDatapf),
     anaId = sub_modules$defineID1$selectAnaID,
     portfolioId = sub_modules$defineID1$selectPortfolioID,
-    active = reactive({active() && input$tabsSBR == "taboutputfiles"}),
+    counter = reactive({input$tabsCBR == ns("taboutputfiles")}),
+    active = reactive({active() && input$tabsCBR == ns("taboutputfiles")}),
     logMessage = logMessage)
 
 
@@ -145,7 +145,7 @@ visualizationCBR <- function(input, output, session,
     selectAnaID = reactive(sub_modules$defineID1$selectAnaID()),
     filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    active = reactive({active() && input$tabsSBR == "tabplots"}),
+    active = reactive({active() && input$tabsCBR == ns("tabplots")}),
     logMessage = logMessage)
 
 

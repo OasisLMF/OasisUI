@@ -8,9 +8,8 @@
 outputfilesUI(id)
 
 outputfiles(input, output, session,
-  tbl_filesListDataana = reactive(NULL),
-  tbl_filesListDatapf = reactive(NULL), anaId = reactive(""),
-  portfolioId = reactive(""), active, logMessage = message)
+  tbl_filesListDataana = reactive(NULL), anaId = reactive(""),
+  portfolioId = reactive(""), active, counter, logMessage = message)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -18,8 +17,6 @@ outputfiles(input, output, session,
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{tbl_filesListDataana}{tbl of output files to view}
-
-\item{tbl_filesListDatapf}{dataframe of input files to view}
 
 \item{anaId}{id of analysis}
 

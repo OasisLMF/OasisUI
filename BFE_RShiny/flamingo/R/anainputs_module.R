@@ -22,7 +22,7 @@ anainputsUI <- function(id) {
       rownames = TRUE,
       colnames = c('row number' = 1),
       id = ns("panel_anainputs"),
-      flamingoRefreshButton(ns("abuttongeneratedrefresh")),
+      div(id = ns("refresh_ana"), flamingoRefreshButton(ns("abuttongeneratedrefresh"))),
       ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
     )
   )
@@ -39,6 +39,7 @@ anainputsUI <- function(id) {
 #' @template params-module
 #' @param analysisID Selected analysis ID.
 #' @param portfolioID Selected portfolio ID.
+#' @param refresh_opt Option to hide/show refresh button.
 #' @param counter Reactive value storing actionButton status.
 #'
 #' @importFrom tibble add_column
@@ -50,6 +51,7 @@ anainputs <- function(input,
                       session,
                       analysisID,
                       portfolioID,
+                      refresh_opt = TRUE,
                       counter = NULL,
                       active = reactive(TRUE)) {
 
@@ -66,6 +68,9 @@ anainputs <- function(input,
     counter()
   }, ignoreInit = TRUE, {
     if (length(active()) > 0 && active()) {
+      if (!refresh_opt) {
+        hide("refresh_ana")
+      }
       extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
       if (!dir.exists(extractFolder) || is.na(file.size(extractFolder))) {
         withModalSpinner(
