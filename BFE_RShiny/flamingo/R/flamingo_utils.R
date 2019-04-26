@@ -65,12 +65,12 @@ nothingToShowTable <- function(contentMessage = "No data found"){
 #'
 #' @description Returns option list for datatable.
 #'
-#' @param scrollX Param to allow scrollX. Default FALSE.
+#' @param scrollX Param to allow scrollX. Default TRUE
 #' @param maxrowsperpage Maximum number of rows to display per page. Default 5.
 #' @param escape Param to avoid escape row. Default TRUE.
 #'
 #' @export
-getTableOptions <- function(scrollX = FALSE,
+getTableOptions <- function(scrollX = TRUE,
                             maxrowsperpage = 5,
                             escape = TRUE) {
 
