@@ -190,15 +190,16 @@ exposurevalidationsummary <- function(input,
 
   # # visualize exposure validation summary
   .plot_stack_hist <- function(df, titleToUse) {
-    p <- ggplot(data = df, aes(x = df$ref, y = df$value , fill = df$key)) +
-      labs(title = titleToUse, y = "percentage") +
+    df_val_cent <- (df$value)*100
+    p <- ggplot(data = df, aes(x = df$ref, y = df_val_cent, fill = df$key)) +
+      labs(title = titleToUse, y = "Percentage") +
       theme(
         plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
         text = element_text(size = 12),
         panel.background = element_blank(),
         axis.line.x = element_line(color = "grey45", size = 0.5),
         axis.line.y = element_line(color = "grey45", size = 0.5),
-        axis.title.x=element_blank(),
+        axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.title =  element_blank(),
