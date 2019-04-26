@@ -65,6 +65,8 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 element_blank
 #' @importFrom ggplot2 geom_bar
+#' @importFrom ggplot2 scale_fill_manual
+#' @importFrom ggplot2 scale_y_continuous
 #' @importFrom tidyr spread
 #' @importFrom tidyr replace_na
 #' @importFrom tidyr gather
@@ -182,7 +184,7 @@ exposurevalidationsummary <- function(input,
       mutate(ref = 2)
 
     df <- rbind(df_sel1, df_sel2) %>%
-      mutate(value = as.numeric(value),
+      mutate(value = as.numeric(value)*100,
              key = as.factor(key))
 
     df
@@ -190,8 +192,9 @@ exposurevalidationsummary <- function(input,
 
   # # visualize exposure validation summary
   .plot_stack_hist <- function(df, titleToUse) {
-    df_val_cent <- (df$value)*100
-    p <- ggplot(data = df, aes(x = df$ref, y = df_val_cent, fill = df$key)) +
+    brks <- c(0, 25, 50, 75, 100)
+    lbs <- c("0%", "25%", "50%", "75%", "100%")
+    p <- ggplot(data = df, aes(x = df$ref, y = df$value, fill = df$key)) +
       labs(title = titleToUse, y = "Percentage") +
       theme(
         plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
@@ -206,7 +209,8 @@ exposurevalidationsummary <- function(input,
         legend.position = "right"
       ) +
       geom_bar(position = "stack", stat = "identity") +
-      ggplot2::scale_fill_manual(values = c("fail" = "#db1e2a", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E"))
+      scale_fill_manual(values = c("fail" = "#db1e2a", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E")) +
+      scale_y_continuous(breaks = brks, labels = lbs)
     p
   }
 
