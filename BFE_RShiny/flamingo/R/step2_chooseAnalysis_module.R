@@ -390,10 +390,10 @@ step2_chooseAnalysis <- function(input, output, session,
 
     if (input_generation_id$status == "Success") {
       flamingoNotification(type = "message",
-                           paste("Input generation id ", result$analysisID, " started."))
+                           paste0("Input generation for analysis id ", result$analysisID, " started."))
     } else {
       flamingoNotification(type = "error",
-                           paste("Input generation id ", result$analysisID, " could not be started."))
+                           paste0("Input generation for analysis id ", result$analysisID, " could not be started."))
     }
     anaid <- result$analysisID
     .reloadAnaData()
@@ -448,10 +448,10 @@ step2_chooseAnalysis <- function(input, output, session,
 
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
-                           paste("Cancelled Input Generation for analysis id ", analysisID, "."))
+                           paste0("Input Generation for analysis id ", analysisID, "cancelled."))
     } else {
       flamingoNotification(type = "error",
-                           paste("Input Generation id ", analysisID, " could not be cancelled."))
+                           paste0("Input Generation for analysis id ", analysisID, " could not be cancelled."))
     }
 
     anaid <- result$analysisID
@@ -538,7 +538,7 @@ step2_chooseAnalysis <- function(input, output, session,
              row.names = FALSE,
              col.names = FALSE,
              quote = FALSE)
-      }
+    }
   )
 
   observeEvent(result$tbl_analysislog, {
@@ -680,15 +680,12 @@ step2_chooseAnalysis <- function(input, output, session,
       logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID, " name ", input$anaName, " model ",  modelID))
       if (post_portfolios_create_analysis$status == "Success") {
         flamingoNotification(type = "message",
-                             paste("New analysis ", input$anaName, " created."))
+                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()
       } else {
         flamingoNotification(type = "error",
-                             paste("Analysis ", input$anaName, " not created."))
+                             paste0("Analysis ", input$anaName, " could not be created."))
       }
-    } else {
-      flamingoNotification(type = "error",
-                           paste("Provide name for analysis creation."))
     }
     hide("panelModelTable")
     hide("panelModelDetails")

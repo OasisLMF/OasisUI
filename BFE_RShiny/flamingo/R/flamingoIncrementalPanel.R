@@ -46,7 +46,8 @@ flamingoIncrementalPanel <- function(input, output, session, panels_state,
                                    collapsible = collapsible, show = show)
       )
     } else {
-      flamingoNotification("Reached maximum number of panels", type = "warning")
+      flamingoNotification(type = "warning",
+                           "Maximum number of panels reached.")
     }
   })
   observeEvent(input$delete, {

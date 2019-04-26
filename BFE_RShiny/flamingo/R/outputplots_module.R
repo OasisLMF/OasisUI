@@ -345,18 +345,16 @@ panelOutputModule <- function(input, output, session, logMessage = message,
     l_variables <- length(chkbox$chkboxgrpvariables())
     l_granularities <- length(chkbox$chkboxgrpgranularities())
     sanytyChecks <- FALSE
-    if (l_losstypes == 0 | l_variables == 0 | l_granularities == 0) {
-      flamingoNotification("Select the perspective(s), the summary level(s) and the report to plot", type = "error")
+    if (l_losstypes > 1 && l_variables > 1) {
+      flamingoNotification(type = "error",
+                           "Only comparisons among perspectives or reports are allowed.")
     } else {
-      if (l_losstypes > 1 && l_variables > 1) {
-        flamingoNotification("Only comparison across either perspectives or reports are allowed", type = "error")
-      } else {
-        logMessage("Sanity checks passed")
-        sanytyChecks <- TRUE
-        # >> define plot structure
-        plotstrc <- data.frame("perspective" = c(l_losstypes), "report" = c(l_variables), "summary_level" = c(l_granularities))
-      }
+      logMessage("Sanity checks passed")
+      sanytyChecks <- TRUE
+      # >> define plot structure
+      plotstrc <- data.frame("perspective" = c(l_losstypes), "report" = c(l_variables), "summary_level" = c(l_granularities))
     }
+
 
     # >> define dynamic default title
     if (sanytyChecks) {
@@ -380,7 +378,8 @@ panelOutputModule <- function(input, output, session, logMessage = message,
                                                    report %in% chkbox$chkboxgrpvariables(),
                                                    summary_level %in%  chkbox$chkboxgrpgranularities())
         if (nrow(filesToPlot) != prod(plotstrc)) {
-          flamingoNotification("The analysis did not produce the selected output. Please check the logs", type = "error")
+          flamingoNotification(type = "error",
+                               "The analysis did not produce the selected output. Please check the logs.")
           filesToPlot <- NULL
         }
       }
@@ -466,7 +465,7 @@ panelOutputModule <- function(input, output, session, logMessage = message,
       }
       output$outputplot <- renderPlotly({ggplotly(p)})
     } else {
-      flamingoNotification("No data to plot", type = "error")
+      flamingoNotification(type = "error", "No data to plot.")
     }
 
   })
@@ -499,12 +498,12 @@ panelOutputModule <- function(input, output, session, logMessage = message,
         fileData <- fread(fileName) #read.csv(fileName, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE, comment.char = "")
       }, error = function(e) {
         flamingoNotification(type = "error",
-                             paste("Could not read file:", e$message))
+                             paste0("Could not read file: ", e$message, "."))
         fileData <- NULL
       })
     } else {
       flamingoNotification(type = "error",
-                           paste("File invalid"))
+                           "Invalid file.")
       fileData <- NULL
     }
     return(fileData)
