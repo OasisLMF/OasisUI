@@ -93,7 +93,7 @@ panelAnalysisLogs <- function(id) {
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_analysesrunlog")),
-    downloadButton(ns("download_log"), label = "Export to csv")
+    downloadButton(ns("download_log"), label = "Download")
   )
 }
 
@@ -564,11 +564,11 @@ step3_configureOutput <- function(input, output, session,
       datatable(
         result$tbl_analysesData %>% return_tbl_analysesData_nice(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         selection = list(mode = 'single',
-                         selected = rownames(result$tbl_analysesData)[c(as.integer(index))]),
+                         selected = index),
         escape = FALSE,
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = getTableOptions(maxrowsperpage = pageLength)
       )
@@ -660,9 +660,10 @@ step3_configureOutput <- function(input, output, session,
         analysis_settings <- return_analyses_settings_file_list(result$anaID)
         analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
         if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
-          flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID))
+          flamingoNotification(type = "error",
+                               paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID, "."))
         } else {
-          logMessage(paste0("appling the output configuration of analysis ",analysisName," id ", result$anaID))
+          logMessage(paste0("appling the output configuration of analysis ", analysisName, " id ", result$anaID))
           #Set inputs
           .updateOutputConfig(analysis_settings)
         }
@@ -760,7 +761,8 @@ step3_configureOutput <- function(input, output, session,
       anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
       analysis_settings <-  return_analyses_settings_file_list(anaID)
       if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
-        flamingoNotification(type = "error", paste0("No output configuration associated to analysis ", anaName," id ", anaID))
+        flamingoNotification(type = "error",
+                             paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
       } else {
         logMessage(paste0("appling the output configuration of analysis ", anaName," id ", anaID))
         #Set inputs
@@ -799,7 +801,7 @@ step3_configureOutput <- function(input, output, session,
 
     if (post_analysis_settings_file$status == "Success") {
       flamingoNotification(type = "message",
-                           paste0("Analysis  settings posted to ", result$anaID ,"."))
+                           paste0("Analysis settings posted to ", result$anaID ,"."))
 
       analyses_run <- return_df(api_post_analyses_run,result$anaID)
 
@@ -816,16 +818,17 @@ step3_configureOutput <- function(input, output, session,
 
         if (analyses_run[[tbl_analysesDataNames$status]] == "RUN_STARTED") {
           flamingoNotification(type = "message",
-                               paste0("Analysis ", result$anaID ," is executing"))
+                               paste0("Analysis ", result$anaID ," is executing."))
         }
       } else {
         flamingoNotification(type = "error",
-                             paste0("Run could not be started for analysis ", result$anaID))
+                             paste0("Run could not be started for analysis ", result$anaID, "."))
       }
 
     } else {
       flamingoNotification(type = "error",
-                           paste0("Analysis settings not posted to ", result$anaID ,"; error ", post_analysis_settings_file$status))
+                           paste0("Analysis settings not posted to ", result$anaID ,
+                                  "; error ", post_analysis_settings_file$status, "."))
     }
 
   })
@@ -844,9 +847,14 @@ step3_configureOutput <- function(input, output, session,
 
   # Export to .csv
   output$download_log <- downloadHandler(
-    filename = "analysis_run_log.csv",
+    filename = "analysis_run_log.txt",
     content = function(file) {
-      fwrite(result$tbl_analysisrunlog, file, row.names = TRUE, quote = TRUE)}
+      fwrite(result$tbl_analysisrunlog,
+             file,
+             row.names = FALSE,
+             col.names = FALSE,
+             quote = FALSE)
+      }
   )
 
   observeEvent(result$tbl_analysisrunlog, {
@@ -868,7 +876,7 @@ step3_configureOutput <- function(input, output, session,
           rownames = TRUE,
           selection = "none",
           escape = FALSE,
-          colnames = c('row number' = 1),
+          # colnames = c('Row Number' = 1),
           filter = 'bottom',
           options = getTableOptions(maxrowsperpage = pageLength)
         )

@@ -59,8 +59,8 @@ loginDialog <- function(input, output, session, logout,
         options(flamingo.settings.api.refresh = res$refresh_token)
       } else {
         options(flamingo.settings.api.token = NULL)
-        flamingoNotification("Login Failed, please check your credentials.",
-                              type = "error")
+        flamingoNotification(type = "error",
+                             "Login Failed, please check your credentials.")
       }
     }
     logMessage(paste("In Login User: ", result$user))
