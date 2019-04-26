@@ -122,7 +122,7 @@ panelAnalysisLog <- function(id) {
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_analysislog")),
-    downloadButton(ns("download_log"), label = "Export to csv")
+    downloadButton(ns("download_log"), label = "Download")
   )
 }
 
@@ -275,11 +275,11 @@ step2_chooseAnalysis <- function(input, output, session,
       datatable(
         result$tbl_analysesData %>% return_tbl_analysesData_nice(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         selection = list(mode = 'single',
-                         selected = rownames(result$tbl_analysesData)[c(as.integer(index))]),
+                         selected = index),
         escape = FALSE,
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = getTableOptions(maxrowsperpage = pageLength)
       )
@@ -315,8 +315,8 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   # Model ID -------------------------------------------------------------------
-
-  observeEvent({
+  
+observeEvent({
     input$dt_models_rows_selected
     result$portfolioID}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_models_rows_selected)) {
@@ -327,7 +327,7 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   # Generate input -------------------------------------------------------------
-  onclick("abuttonstartcancIG", {
+onclick("abuttonstartcancIG", {
     if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$input_gen_started) {
       showModal(.cancelIGModal())
     } else {
@@ -340,10 +340,10 @@ step2_chooseAnalysis <- function(input, output, session,
 
       if (input_generation_id$status == "Success") {
         flamingoNotification(type = "message",
-                             paste("Input generation id ", result$analysisID, " started."))
+                           paste0("Input generation for analysis id ", result$analysisID, " started."))
       } else {
-        flamingoNotification(type = "error",
-                             paste("Input generation id ", result$analysisID, " could not be started."))
+              flamingoNotification(type = "error",
+                           paste0("Input generation for analysis id ", result$analysisID, " could not be started."))
       }
       anaid <- result$analysisID
       .reloadAnaData()
@@ -394,10 +394,10 @@ step2_chooseAnalysis <- function(input, output, session,
 
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
-                           paste("Cancelled Input Generation for analysis id ", analysisID, "."))
+                           paste0("Input Generation for analysis id ", analysisID, "cancelled."))
     } else {
       flamingoNotification(type = "error",
-                           paste("Input Generation id ", analysisID, " could not be cancelled."))
+                           paste0("Input Generation for analysis id ", analysisID, " could not be cancelled."))
     }
 
     anaid <- result$analysisID
@@ -456,9 +456,14 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Export to .csv
   output$download_log <- downloadHandler(
-    filename = "analysis_inputs_log.csv",
+    filename = "analysis_inputs_log.txt",
     content = function(file) {
-      fwrite(result$tbl_analysislog, file, row.names = TRUE, quote = TRUE)}
+      fwrite(result$tbl_analysislog,
+             file,
+             row.names = FALSE,
+             col.names = FALSE,
+             quote = FALSE)
+    }
   )
 
   observeEvent(result$tbl_analysislog, {
@@ -479,7 +484,7 @@ step2_chooseAnalysis <- function(input, output, session,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'none'),
-        colnames = c('row number' = 1),
+        #colnames = c('Row Number' = 1),
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
@@ -529,12 +534,12 @@ step2_chooseAnalysis <- function(input, output, session,
       datatable(
         result$tbl_modelsData %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'single',
-                         selected = rownames(result$tbl_modelsData)[1]),
-        colnames = c('row number' = 1),
+                         selected = 1),
+        #colnames = c('Row Number' = 1),
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
@@ -590,15 +595,12 @@ step2_chooseAnalysis <- function(input, output, session,
                         " model ",  result$modelID))
       if (post_portfolios_create_analysis$status == "Success") {
         flamingoNotification(type = "message",
-                             paste("New analysis ", input$anaName, " created."))
+                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()
       } else {
         flamingoNotification(type = "error",
-                             paste("Analysis ", input$anaName, " not created."))
+                             paste0("Analysis ", input$anaName, " could not be created."))
       }
-    } else {
-      flamingoNotification(type = "error",
-                           paste("Provide name for analysis creation."))
     }
     hide("panelModelTable")
     hide("panelModelDetails")
