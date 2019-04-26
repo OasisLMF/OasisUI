@@ -350,6 +350,16 @@ ViewFilesInTable <- function(input, output, session,
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
         filerows <- nrow(result$tbl_fileData)
+
+        #Show buttons
+        if ("latitude" %in% names(result$tbl_fileData)) {
+          if (!is.null(result$tbl_fileData)) {
+            output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
+          }
+          show("abuttonmap")
+        } else {
+          hide("abuttonmap")
+        }
       }
     } else {
       extractFolder <- set_extractFolder(id = param(), label = folderpath)
@@ -361,26 +371,7 @@ ViewFilesInTable <- function(input, output, session,
         filecolumns <- ""
         filerows <- length(result$tbl_fileData)
         hide("abuttonmap")
-        output$FVExposureStatisticInfo <- renderUI({
-          tagList(
-            fluidRow(
-              column(2,
-                     h5("Dir Name: ")
-              ),
-              column(10,
-                     p(result$currentFile, style = "margin-top: 10px;")
-              )
-            ),
-            fluidRow(
-              column(2,
-                     h5("Number of Files ")
-              ),
-              column(10,
-                     p(filerows, style = "margin-top: 10px;")
-              )
-            )
-          )
-        })
+
       } else {
         result$tbl_fileData <- fread(result$currfilepath)
         if (!is.null(result$tbl_fileData)) {
@@ -398,37 +389,58 @@ ViewFilesInTable <- function(input, output, session,
         } else {
           hide("abuttonmap")
         }
-        # Extra info table
-        output$FVExposureStatisticInfo <- renderUI({
-          tagList(
-            fluidRow(
-              column(2,
-                     h5("File Name: ")
-              ),
-              column(10,
-                     p(result$currentFile, style = "margin-top: 10px;")
-              )
-            ),
-            fluidRow(
-              column(2,
-                     h5("Number of Rows ")
-              ),
-              column(10,
-                     p(filerows, style = "margin-top: 10px;")
-              )
-            ),
-            fluidRow(
-              column(2,
-                     h5("Column names")
-              ),
-              column(10,
-                     p(filecolumns, style = "margin-top: 10px;")
-              )
-            )
-          )
-        })
       }
     }
+    # Extra info table
+    output$FVExposureStatisticInfo <- renderUI({
+      if (filecolumns == "") {
+        tagList(
+          fluidRow(
+            column(2,
+                   h5("Dir Name:")
+            ),
+            column(10,
+                   p(result$currentFile, style = "margin-top: 10px;")
+            )
+          ),
+          fluidRow(
+            column(2,
+                   h5("Number of Files")
+            ),
+            column(10,
+                   p(filerows, style = "margin-top: 10px;")
+            )
+          )
+        )
+      } else {
+        tagList(
+          fluidRow(
+            column(2,
+                   h5("File Name")
+            ),
+            column(10,
+                   p(result$currentFile, style = "margin-top: 10px;")
+            )
+          ),
+          fluidRow(
+            column(2,
+                   h5("Number of Rows")
+            ),
+            column(10,
+                   p(filerows, style = "margin-top: 10px;")
+            )
+          ),
+          fluidRow(
+            column(2,
+                   h5("Column names")
+            ),
+            column(10,
+                   p(filecolumns, style = "margin-top: 10px;")
+            )
+          )
+        )
+      }
+    })
   })#end observeEvent
 
 
