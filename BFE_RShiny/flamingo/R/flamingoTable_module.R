@@ -32,7 +32,6 @@ flamingoTableUI <-  function(id){
 #' @param data dataframe to show in table.
 #' @param selection param of datatable, default"none".
 #' @param escape param of datatable, default TRUE.
-#' @param scrollX param of datatable, default FALSE.
 #' @param filter param of datatable, default FALSE.
 #' @param rownames param of datatable, default FALSE.
 #' @param colnames param of datatable, default TRUE.
@@ -52,7 +51,6 @@ flamingoTable <- function(input, output, session,
                           data,
                           selection = "none",
                           escape = TRUE,
-                          scrollX = FALSE,
                           filter = FALSE,
                           rownames = FALSE,
                           colnames = TRUE,
@@ -87,8 +85,7 @@ flamingoTable <- function(input, output, session,
                            target = 'row'),
           escape = escape,
           colnames = colnamesToUse,
-          options = getTableOptions(scrollX = scrollX,
-                                    maxrowsperpage = maxrowsperpage,
+          options = getTableOptions(maxrowsperpage = maxrowsperpage,
                                     escape = escape)
         )
     })

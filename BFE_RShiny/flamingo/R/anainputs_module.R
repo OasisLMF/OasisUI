@@ -17,7 +17,6 @@ anainputsUI <- function(id) {
     flamingoPanel(
       selection = list(mode = 'none'),
       escape = FALSE,
-      scrollX = TRUE,
       filter = "none",
       rownames = TRUE,
       colnames = c('row number' = 1),

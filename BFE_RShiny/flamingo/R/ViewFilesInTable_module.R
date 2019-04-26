@@ -142,7 +142,7 @@ ViewFilesInTable <- function(input, output, session,
         escape = FALSE,
         selection =  selectionUsed,
         colnames = c('Row Number' = 1),
-        options = getTableOptions(scrollX = TRUE, maxrowsperpage = maxrowsperpage, escape = FALSE)
+        options = getTableOptions(maxrowsperpage = maxrowsperpage, escape = FALSE)
       )
     } else {
       nothingToShowTable("Nothing to show")
@@ -307,7 +307,7 @@ ViewFilesInTable <- function(input, output, session,
         filter = 'bottom',
         colnames = c("Row Number" = 1),
         width = "100%",
-        options = getTableOptions(scrollX = TRUE)
+        options = getTableOptions()
       )
     } else {
       nothingToShowTable("Nothing to show")

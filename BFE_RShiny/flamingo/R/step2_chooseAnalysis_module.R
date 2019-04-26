@@ -281,7 +281,7 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         colnames = c('row number' = 1),
         filter = 'bottom',
-        options = getTableOptions(scrollX = TRUE, maxrowsperpage = pageLength)
+        options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
       nothingToShowTable("No analysis available")

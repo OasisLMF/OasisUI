@@ -8,9 +8,9 @@
 flamingoTableUI(id)
 
 flamingoTable(input, output, session, data, selection = "none",
-  escape = TRUE, scrollX = FALSE, filter = FALSE, rownames = FALSE,
-  colnames = TRUE, preselRow = reactive({     NULL }),
-  maxrowsperpage = 10, logMessage = message)
+  escape = TRUE, filter = FALSE, rownames = FALSE, colnames = TRUE,
+  preselRow = reactive({     NULL }), maxrowsperpage = 10,
+  logMessage = message)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -22,8 +22,6 @@ flamingoTable(input, output, session, data, selection = "none",
 \item{selection}{param of datatable, default"none".}
 
 \item{escape}{param of datatable, default TRUE.}
-
-\item{scrollX}{param of datatable, default FALSE.}
 
 \item{filter}{param of datatable, default FALSE.}
 
