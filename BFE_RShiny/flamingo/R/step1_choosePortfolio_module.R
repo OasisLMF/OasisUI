@@ -468,7 +468,7 @@ step1_choosePortfolio <- function(input, output, session,
                              paste0("Portfolio ", pfId, " updated."))
       } else {
         flamingoNotification(type = "error",
-                             paste0("Failed to amend a portfolio ", pfId, " could not be update."))
+                             paste0("Failed to amend a portfolio ", pfId, " could not be updated."))
       }
     }
 
@@ -524,7 +524,7 @@ step1_choosePortfolio <- function(input, output, session,
                            paste0("Portfolio ", pfName, "deleted."))
     } else {
       flamingoNotification(type = "error",
-                           paste0("An error occurred. Portfolio ", pfName, " could not deleted."))
+                           paste0("Portfolio ", pfName, " could not deleted."))
     }
     .reloadtbl_portfoliosData()
     removeModal()
