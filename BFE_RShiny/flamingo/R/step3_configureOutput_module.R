@@ -570,7 +570,7 @@ step3_configureOutput <- function(input, output, session,
         escape = FALSE,
         colnames = c('row number' = 1),
         filter = 'bottom',
-        options = getTableOptions(maxrowsperpage = pageLength)
+        options = getTableOptions(scrollX = TRUE, maxrowsperpage = pageLength)
       )
     } else {
       nothingToShowTable(paste0("No analysis available"))
