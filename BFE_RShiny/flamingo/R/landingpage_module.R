@@ -160,11 +160,11 @@ landingPage <- function(input, output, session, logMessage = message, active = r
     delete_analyses_id <- api_delete_analyses_id(analysisID)
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
-                           paste("Analysis id ", analysisID, " deleted."))
+                           paste0("Analysis id ", analysisID, " deleted."))
       .reloadAnaData()
     } else {
       flamingoNotification(type = "error",
-                           paste("Analysis id ", analysisID, " could not be deleted."))
+                           paste0("Analysis id ", analysisID, " could not be deleted."))
     }
   })
 

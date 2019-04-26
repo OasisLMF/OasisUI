@@ -451,12 +451,12 @@ step1_choosePortfolio <- function(input, output, session,
       post_portfolios <- api_post_portfolios(input$tinputpfName)
       if (post_portfolios$status == "Success") {
         flamingoNotification(type = "message",
-                             paste("portfolio ", input$tinputpfName, " created."))
+                             paste0("Portfolio ", input$tinputpfName, " created."))
         .clearUploadFiles()
         show("panelLinkFiles")
       } else {
-        flamingoNotification(type = "Error",
-                             paste("An error has occurred. Portfolio ", input$tinputpfName, " has not been created."))
+        flamingoNotification(type = "error",
+                             paste0("Portfolio ", input$tinputpfName, " could not be created."))
       }
     } else if (result$portfolio_flag == "A") {
       idxSel <- input$dt_Portfolios_rows_selected
@@ -465,10 +465,10 @@ step1_choosePortfolio <- function(input, output, session,
       put_portfolios_id <- api_put_portfolios_id(id = pfId, name = input$tinputpfName)
       if (put_portfolios_id$status == "Success") {
         flamingoNotification(type = "message",
-                             paste("portfolio ",pfId, " updated."))
+                             paste0("Portfolio ", pfId, " updated."))
       } else {
-        flamingoNotification(type = "Error",
-                             paste("Failed to amend a portfolio ", pfId, " has not been update."))
+        flamingoNotification(type = "error",
+                             paste0("Failed to amend a portfolio ", pfId, " could not be update."))
       }
     }
 
@@ -521,10 +521,10 @@ step1_choosePortfolio <- function(input, output, session,
     delete_portfolios_id <- api_delete_portfolios_id(pfid)
     if (delete_portfolios_id$status == "Success") {
       flamingoNotification(type = "message",
-                           sprintf("portfolio %s deleted", pfName))
+                           paste0("Portfolio ", pfName, "deleted."))
     } else {
       flamingoNotification(type = "error",
-                           sprintf("An error occurred. Portfolio %s has not deleted", pfName))
+                           paste0("An error occurred. Portfolio ", pfName, " could not deleted."))
     }
     .reloadtbl_portfoliosData()
     removeModal()
@@ -594,15 +594,12 @@ step1_choosePortfolio <- function(input, output, session,
       post_file <- APIfunction(pfId, newfile)
       if (post_file$status == "Success") {
         flamingoNotification(type = "message",
-                             paste("File linked successfully"))
+                             paste("File linked successfully."))
       } else {
         flamingoNotification(type = "error",
                              paste("File link failed."))
       }
       .reloadtbl_portfoliosData()
-    } else {
-      flamingoNotification(type = "warning",
-                           paste("Select file to link"))
     }
   }
 
