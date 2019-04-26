@@ -350,6 +350,34 @@ ViewFilesInTable <- function(input, output, session,
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
         filerows <- nrow(result$tbl_fileData)
+        output$FVExposureStatisticInfo <- renderUI({
+          tagList(
+            fluidRow(
+              column(2,
+                     h5("File Name")
+              ),
+              column(10,
+                     p(names(result$tbl_fileData), style = "margin-top: 10px;")
+              )
+            ),
+            fluidRow(
+              column(2,
+                     h5("Number of Rows")
+              ),
+              column(10,
+                     p(filerows, style = "margin-top: 10px;")
+              )
+            ),
+            fluidRow(
+              column(2,
+                     h5("Column names")
+              ),
+              column(10,
+                     p(filecolumns, style = "margin-top: 10px;")
+              )
+            )
+          )
+        })
       }
     } else {
       extractFolder <- set_extractFolder(id = param(), label = folderpath)
@@ -365,7 +393,7 @@ ViewFilesInTable <- function(input, output, session,
           tagList(
             fluidRow(
               column(2,
-                     h5("Dir Name: ")
+                     h5("Dir Name:")
               ),
               column(10,
                      p(result$currentFile, style = "margin-top: 10px;")
@@ -373,7 +401,7 @@ ViewFilesInTable <- function(input, output, session,
             ),
             fluidRow(
               column(2,
-                     h5("Number of Files ")
+                     h5("Number of Files")
               ),
               column(10,
                      p(filerows, style = "margin-top: 10px;")
@@ -403,7 +431,7 @@ ViewFilesInTable <- function(input, output, session,
           tagList(
             fluidRow(
               column(2,
-                     h5("File Name: ")
+                     h5("File Name")
               ),
               column(10,
                      p(result$currentFile, style = "margin-top: 10px;")
@@ -411,7 +439,7 @@ ViewFilesInTable <- function(input, output, session,
             ),
             fluidRow(
               column(2,
-                     h5("Number of Rows ")
+                     h5("Number of Rows")
               ),
               column(10,
                      p(filerows, style = "margin-top: 10px;")
