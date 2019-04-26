@@ -24,23 +24,11 @@ exposurevalidationsummaryUI <- function(id) {
       )
     ),
     fluidRow(
-      column(12,
-             h4("Locations Overview")
+      column(6,
+             plotlyOutput(ns("outputplot_loc"))
       ),
       column(6,
-             plotlyOutput(ns("outputplot_loc1"))),
-      column(6,
-             plotlyOutput(ns("outputplot_loc2"))
-      )
-    ),
-    fluidRow(
-      column(12,
-             h4("TIV Overview")
-      ),
-      column(6,
-             plotlyOutput(ns("outputplot_tiv1"))),
-      column(6,
-             plotlyOutput(ns("outputplot_tiv2"))
+             plotlyOutput(ns("outputplot_tiv"))
       )
     )
   )
@@ -67,8 +55,16 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
-#' @importFrom plotly plot_ly
+#' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 element_line
+#' @importFrom ggplot2 element_blank
+#' @importFrom ggplot2 geom_bar
 #' @importFrom tidyr spread
 #' @importFrom tidyr replace_na
 #' @importFrom tidyr gather
@@ -92,9 +88,6 @@ exposurevalidationsummary <- function(input,
 
   #name of element with location ids
   loc_ids <- "location_ids"
-
-  color_success <- c('rgb(31,119,180)', 'rgb(255,127,14)')
-  color_match <- c('rgb(114,147,203)', 'rgb(211,94,96)')
 
   # Modeled exposure and uploaded exposure ------------------------------------
   observeEvent({
@@ -129,14 +122,11 @@ exposurevalidationsummary <- function(input,
   observeEvent(result$summary_validation_tbl, {
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl)) {
 
-      df_loc <- .extract_df_pieplot(df = result$summary_validation_tbl, filter_row = loc_ids)
-      output$outputplot_loc1 <- renderPlotly({.plotly_pie(df = df_loc$df_sel1, pie_labs =  df_loc$df_sel1$key, pie_vals =  df_loc$df_sel1$value, colors2use = color_success)})
-      output$outputplot_loc2 <- renderPlotly({.plotly_pie(df = df_loc$df_sel2, pie_labs = df_loc$df_sel2$key, pie_vals = df_loc$df_sel2$value, colors2use = color_match)})
+      df_loc <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = "location_ids")
+      output$outputplot_loc <- renderPlotly({ggplotly(.plot_stack_hist(df = df_loc, titleToUse = "Locations Overview") )})
 
-
-      df_tiv <- .extract_df_pieplot(df = result$summary_validation_tbl, filter_row = "tiv")
-      output$outputplot_tiv1 <- renderPlotly({.plotly_pie(df = df_tiv$df_sel1, pie_labs =  df_tiv$df_sel1$key, pie_vals =  df_tiv$df_sel1$value, colors2use = color_success)})
-      output$outputplot_tiv2 <- renderPlotly({.plotly_pie(df = df_tiv$df_sel2, pie_labs = df_tiv$df_sel2$key, pie_vals = df_tiv$df_sel2$value, colors2use = color_match)})
+      df_tiv <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = "tiv")
+      output$outputplot_tiv <- renderPlotly({ggplotly(.plot_stack_hist(df = df_tiv, titleToUse = "TIV Overview"))})
 
     }
   })
@@ -156,7 +146,7 @@ exposurevalidationsummary <- function(input,
 
   # Utils functions ------------------------------------------------------------
 
-  .extract_df_pieplot <- function(df,filter_row){
+  .extract_df_plot <- function(df,filter_row){
     tot <- df$all[df$type == filter_row] %>% as.numeric()
     df_sel <- df %>%
       filter(type == filter_row) %>%
@@ -183,22 +173,40 @@ exposurevalidationsummary <- function(input,
       mutate(value = as.numeric(value)/tot)
 
     df_sel1 <- df_sel %>%
-      filter(key %in% c("fail", "success"))
+      filter(key %in% c("fail", "success")) %>%
+      mutate(ref = 1)
 
     df_sel2 <- df_sel %>%
       rbind(c("match", 1 - df_sel$value[df_sel$key == "nomatch"])) %>%
-      filter(key %in% c("nomatch", "match"))
+      filter(key %in% c("nomatch", "match")) %>%
+      mutate(ref = 2)
 
-    return(list(
-      df_sel1 = df_sel1,
-      df_sel2 = df_sel2
-    ))
+    df <- rbind(df_sel1, df_sel2) %>%
+      mutate(value = as.numeric(value),
+             key = as.factor(key))
+
+    df
   }
 
-  # visualize exposure validation summary
-  .plotly_pie <- function(df, pie_labs, pie_vals, pie_title, colors2use){
-    pie_ly <- plot_ly(df, labels = pie_labs, values = as.numeric(pie_vals), type = 'pie', marker = list(colors = colors2use))
-    pie_ly
+  # # visualize exposure validation summary
+  .plot_stack_hist <- function(df, titleToUse) {
+    p <- ggplot(data = df, aes(x = df$ref, y = df$value , fill = df$key)) +
+      labs(title = titleToUse, y = "percentage") +
+      theme(
+        plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
+        text = element_text(size = 12),
+        panel.background = element_blank(),
+        axis.line.x = element_line(color = "grey45", size = 0.5),
+        axis.line.y = element_line(color = "grey45", size = 0.5),
+        axis.title.x=element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title =  element_blank(),
+        legend.position = "right"
+      ) +
+      geom_bar(position = "stack", stat = "identity") +
+      ggplot2::scale_fill_manual(values = c("fail" = "#db1e2a", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E"))
+    p
   }
 
   # dummy read summary.json
