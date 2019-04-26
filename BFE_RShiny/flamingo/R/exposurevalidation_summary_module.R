@@ -24,11 +24,8 @@ exposurevalidationsummaryUI <- function(id) {
       )
     ),
     fluidRow(
-      column(6,
-             plotlyOutput(ns("outputplot_loc"))
-      ),
-      column(6,
-             plotlyOutput(ns("outputplot_tiv"))
+      column(12,
+             plotlyOutput(ns("outputplot_vis"))
       )
     )
   )
@@ -58,7 +55,6 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 labs
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 element_text
@@ -88,7 +84,6 @@ exposurevalidationsummary <- function(input,
     summary_validation_tbl = NULL
   )
 
-  #name of element with location ids
   loc_ids <- "location_ids"
 
   # Modeled exposure and uploaded exposure ------------------------------------
@@ -124,12 +119,15 @@ exposurevalidationsummary <- function(input,
   observeEvent(result$summary_validation_tbl, {
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl)) {
 
-      df_loc <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = "location_ids")
-      output$outputplot_loc <- renderPlotly({ggplotly(.plot_stack_hist(df = df_loc, titleToUse = "Locations Overview") )})
+      df_loc <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = loc_ids) %>%
+        mutate(gridcol = "Locations")
 
-      df_tiv <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = "tiv")
-      output$outputplot_tiv <- renderPlotly({ggplotly(.plot_stack_hist(df = df_tiv, titleToUse = "TIV Overview"))})
+      df_tiv <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = "tiv") %>%
+        mutate(gridcol = "TIV")
 
+      df_vis <- rbind(df_loc, df_tiv) %>%
+        mutate(gridcol = as.factor(gridcol))
+      output$outputplot_vis <- renderPlotly({ggplotly(.plot_stack_hist(df = df_vis) )})
     }
   })
 
@@ -191,18 +189,18 @@ exposurevalidationsummary <- function(input,
   }
 
   # # visualize exposure validation summary
-  .plot_stack_hist <- function(df, titleToUse) {
+  .plot_stack_hist <- function(df) {
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
     p <- ggplot(data = df, aes(x = df$ref, y = df$value, fill = df$key)) +
-      labs(title = titleToUse, y = "Percentage") +
       theme(
-        plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
+        plot.title = element_blank(),
         text = element_text(size = 12),
         panel.background = element_blank(),
         axis.line.x = element_line(color = "grey45", size = 0.5),
         axis.line.y = element_line(color = "grey45", size = 0.5),
         axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.title =  element_blank(),
@@ -210,7 +208,8 @@ exposurevalidationsummary <- function(input,
       ) +
       geom_bar(position = "stack", stat = "identity") +
       scale_fill_manual(values = c("fail" = "#db1e2a", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E")) +
-      scale_y_continuous(breaks = brks, labels = lbs)
+      scale_y_continuous(breaks = brks, labels = lbs) +
+      facet_wrap(df$gridcol)
     p
   }
 
