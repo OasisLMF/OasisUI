@@ -58,12 +58,12 @@ exposurevalidationmapUI <- function(id) {
 #'
 #' @export
 exposurevalidationmap <- function(input,
-                               output,
-                               session,
-                               analysisID = "",
-                               portfolioID = "",
-                               counter = NULL,
-                               active = reactive(TRUE)) {
+                                  output,
+                                  session,
+                                  analysisID = "",
+                                  portfolioID = "",
+                                  counter = reactive(NULL),
+                                  active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -79,7 +79,7 @@ exposurevalidationmap <- function(input,
     active()
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
-        .reloadExposureValidation()
+      .reloadExposureValidation()
     }
   })
 

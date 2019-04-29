@@ -48,7 +48,7 @@ portfolio_details <- function(input,
                               session,
                               refresh_opt = TRUE,
                               portfolioID,
-                              counter = NULL,
+                              counter = reactive(NULL),
                               active = reactive(TRUE)) {
 
   ns <- session$ns
