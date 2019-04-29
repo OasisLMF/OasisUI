@@ -23,13 +23,9 @@ outputfilesUI <- function(id) {
       ViewFilesInTableUI(id  = ns("ViewOutputFiles"), includechkbox = TRUE)
     ),
 
-    flamingoPanel(
-      id = ns("flamingoPanelViewInputFiles"),
-      collapsible = TRUE,
-      show = FALSE,
-      heading = "Input files table",
-      anainputsUI(id  = ns("anainputs"))
-    )
+    anainputsUI(id  = ns("anainputs"),
+                heading = "Input files table",
+                collapsible = TRUE)
   )
 }
 
@@ -47,22 +43,15 @@ outputfilesUI <- function(id) {
 #' @param tbl_filesListDataana Tbl of output files to view.
 #' @param anaId Id of analysis.
 #' @param portfolioId Id of portfolio associated to the analysis.
-#' @param counter Reactive value to trigger inputs download.
 #'
 #' @export
 outputfiles <- function(input, output, session,
                         tbl_filesListDataana = reactive(NULL),
                         anaId = reactive(""),
                         portfolioId = reactive(""),
-                        active = reactive(TRUE),
-                        counter = reactive(NULL)) {
+                        active = reactive(TRUE)) {
 
   ns <- session$ns
-
-  #Params
-  result <- reactiveValues(
-    show = FALSE
-  )
 
   # list of sub-modules
   sub_modules <- list()
@@ -75,20 +64,12 @@ outputfiles <- function(input, output, session,
     file_column = "files",
     includechkbox = TRUE)
 
-  observeEvent(input[["flamingoPanelViewInputFiles-collapse-button"]], {
-    if (input[["flamingoPanelViewInputFiles-collapse-button"]] > 0) {
-      result$show <- TRUE
-    }
-  })
-
-
   sub_modules$anainputs <- callModule(
     anainputs,
     id = "anainputs",
     analysisID = anaId,
     portfolioID = portfolioId,
     refresh_opt = FALSE,
-    counter = counter,
-    active = reactive({active() && result$show})
+    active = reactive({active()})
   )
 }

@@ -6,15 +6,25 @@
 #'
 #' @description UI/View for inputs of an analysis.
 #'
+#' @param heading Panel title.
+#' @param collapsible Option to collapse panel, Default FALSE.
+#' @param show Show panel. Default FALSE.
+#'
 #' @return List of tags.
 #'
 #' @export
-anainputsUI <- function(id) {
+anainputsUI <- function(id,
+                        heading = NULL,
+                        collapsible = FALSE,
+                        show = FALSE) {
 
   ns <- NS(id)
 
   tagList(
     flamingoPanel(
+      heading = heading,
+      collapsible = collapsible,
+      show = show,
       selection = list(mode = 'none'),
       escape = FALSE,
       filter = "none",
@@ -52,22 +62,33 @@ anainputs <- function(input,
                       analysisID,
                       portfolioID,
                       refresh_opt = TRUE,
-                      counter = NULL,
+                      counter = reactive(NULL),
                       active = reactive(TRUE)) {
 
   ns <- session$ns
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
-    dt_generated = NULL
+    dt_generated = NULL,
+    counter = NULL
   )
+
+  observeEvent( input[["panel_anainputs-collapse-button"]], {
+    logMessage(paste0("changing result$counter to ", result$counter, " because input[['panel_anainputs-collapse-button']] chanhed to ",  input[["panel_anainputs-collapse-button"]]))
+    result$counter <- input[["panel_anainputs-collapse-button"]]
+  })
+
+  observeEvent(counter(), {
+    logMessage(paste0("changing result$counter to ", result$counter, " because counter() chanhed to ", counter()))
+    result$counter <- counter()
+  })
 
   # Create table ---------------------------------------------------------------
   observeEvent({
     active()
-    counter()
+    result$counter
   }, ignoreInit = TRUE, {
-    if (length(active()) > 0 && active() && !is.null(counter()) && !is.na(counter()) &&  counter() != "" &&  counter() != 0) {
+    if (length(active()) > 0 && active() && !is.null(result$counter) && !is.na(result$counter) &&  result$counter != "" &&  result$counter != 0) {
       if (!refresh_opt) {
         hide("refresh_ana")
       }

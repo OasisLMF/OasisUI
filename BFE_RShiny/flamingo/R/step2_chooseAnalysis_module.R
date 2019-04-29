@@ -315,8 +315,8 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   # Model ID -------------------------------------------------------------------
-  
-observeEvent({
+
+  observeEvent({
     input$dt_models_rows_selected
     result$portfolioID}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_models_rows_selected)) {
@@ -327,7 +327,7 @@ observeEvent({
     })
 
   # Generate input -------------------------------------------------------------
-onclick("abuttonstartcancIG", {
+  onclick("abuttonstartcancIG", {
     if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$input_gen_started) {
       showModal(.cancelIGModal())
     } else {
@@ -340,10 +340,10 @@ onclick("abuttonstartcancIG", {
 
       if (input_generation_id$status == "Success") {
         flamingoNotification(type = "message",
-                           paste0("Input generation for analysis id ", result$analysisID, " started."))
+                             paste0("Input generation for analysis id ", result$analysisID, " started."))
       } else {
-              flamingoNotification(type = "error",
-                           paste0("Input generation for analysis id ", result$analysisID, " could not be started."))
+        flamingoNotification(type = "error",
+                             paste0("Input generation for analysis id ", result$analysisID, " could not be started."))
       }
       anaid <- result$analysisID
       .reloadAnaData()

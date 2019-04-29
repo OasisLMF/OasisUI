@@ -82,8 +82,8 @@ visualizationSBR <- function(input, output, session,
       tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
       analysis_settings <- return_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
       result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
-                                    do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
-                                                                     .addDescription, analysis_settings)))
+                                           do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
+                                                                            .addDescription, analysis_settings)))
       result$tbl_filesListDatapf <- return_tbl_portfolioDetails(sub_modules$defineID$selectPortfolioID())
     } else {
       result$tbl_filesListDatapf <- NULL
@@ -108,7 +108,6 @@ visualizationSBR <- function(input, output, session,
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
     anaId = sub_modules$defineID$selectAnaID,
     portfolioId = sub_modules$defineID$selectPortfolioID,
-    counter = sub_modules$defineID$selectAnaID,
     active = reactive({active() && input$tabsSBR == ns("taboutputfiles")}))
 
   # Tab Output Plots -----------------------------------------------------------

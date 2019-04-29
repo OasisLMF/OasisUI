@@ -5,13 +5,20 @@
 \alias{anainputs}
 \title{anainputsUI}
 \usage{
-anainputsUI(id)
+anainputsUI(id, heading = NULL, collapsible = FALSE, show = FALSE)
 
 anainputs(input, output, session, analysisID, portfolioID,
-  refresh_opt = TRUE, counter = NULL, active = reactive(TRUE))
+  refresh_opt = TRUE, counter = reactive(NULL),
+  active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
+
+\item{heading}{Panel title.}
+
+\item{collapsible}{Option to collapse panel, Default FALSE.}
+
+\item{show}{Show panel. Default FALSE.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 

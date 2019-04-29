@@ -112,7 +112,6 @@ visualizationBBR <- function(input, output, session,
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
     anaId = sub_modules$defineID$selectAnaID,
     portfolioId = sub_modules$defineID$selectPortfolioID,
-    counter = sub_modules$defineID$selectAnaID,
     active = reactive({active() && input$tabsBBR == ns("taboutputfiles")}))
 
 

@@ -73,7 +73,7 @@ exposurevalidationsummary <- function(input,
                                       session,
                                       analysisID = "",
                                       portfolioID = "",
-                                      counter = NULL,
+                                      counter = reactive(NULL),
                                       active = reactive(TRUE)) {
 
   ns <- session$ns
