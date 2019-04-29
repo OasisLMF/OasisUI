@@ -431,7 +431,7 @@ step3_configureOutput <- function(input, output, session,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
                                   pfName = reactive(""),
-                                  analysisID = reactive("")
+                                  analysisID = reactive(NULL)
 ) {
 
   ns <- session$ns
@@ -459,7 +459,7 @@ step3_configureOutput <- function(input, output, session,
     # flag to know if the user is creating a new output configuration or rerunning an analysis
     ana_flag = "C",
     # Id of the Analysis
-    anaID = -1,
+    anaID = NULL,
     # anaId for Dashboard
     dashboardAnaID = -1,
     # analysis_ setting
@@ -556,7 +556,7 @@ step3_configureOutput <- function(input, output, session,
 
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
-      index <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == result$anaID )
+      index <- which(result$tbl_analysesData[ ,tbl_analysesDataNames$id] == result$anaID)
       if (length(index) == 0) {
         index <- 1
       }
@@ -920,8 +920,6 @@ step3_configureOutput <- function(input, output, session,
           show("panelAnalysisLogs")
           logMessage("showing analysis run log table")
         }
-      } else {
-        result$anaID <- -1
       }
     }
   })
@@ -972,7 +970,7 @@ step3_configureOutput <- function(input, output, session,
   # Reload Analysis Run Log table
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
-    if (!is.null(result$anaID) && result$anaID != "") {
+    if (!is.null(result$anaID)) {
       result$tbl_analysisrunlog <- return_file_df(api_get_analyses_run_traceback_file, result$anaID)
     } else {
       result$tbl_analysisrunlog <-  NULL
