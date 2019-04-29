@@ -9,8 +9,7 @@ outputfilesUI(id)
 
 outputfiles(input, output, session,
   tbl_filesListDataana = reactive(NULL), anaId = reactive(""),
-  portfolioId = reactive(""), active = reactive(TRUE),
-  counter = reactive(NULL))
+  portfolioId = reactive(""), active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -24,8 +23,6 @@ outputfiles(input, output, session,
 \item{portfolioId}{Id of portfolio associated to the analysis.}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{counter}{Reactive value to trigger inputs download.}
 }
 \value{
 List of tags.

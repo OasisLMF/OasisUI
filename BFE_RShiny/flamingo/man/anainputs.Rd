@@ -8,7 +8,8 @@
 anainputsUI(id, heading = NULL, collapsible = FALSE, show = FALSE)
 
 anainputs(input, output, session, analysisID, portfolioID,
-  refresh_opt = TRUE, counter = NULL, active = reactive(TRUE))
+  refresh_opt = TRUE, counter = reactive(NULL),
+  active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

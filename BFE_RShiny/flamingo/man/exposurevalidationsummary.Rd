@@ -8,7 +8,8 @@
 exposurevalidationsummaryUI(id)
 
 exposurevalidationsummary(input, output, session, analysisID = "",
-  portfolioID = "", counter = NULL, active = reactive(TRUE))
+  portfolioID = "", counter = reactive(NULL),
+  active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
