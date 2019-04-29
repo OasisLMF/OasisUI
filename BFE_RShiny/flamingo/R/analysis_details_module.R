@@ -28,7 +28,7 @@ analysis_detailsUI <- function(id) {
     ),
     tabPanel(
       title = "Inputs",
-      anainputsUI(ns("anainputs")),
+      anainputsUI(ns("anainputs"), show = TRUE),
       value = ns("tabanainputs")
     )
   )

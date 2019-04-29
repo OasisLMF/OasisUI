@@ -6,15 +6,25 @@
 #'
 #' @description UI/View for inputs of an analysis.
 #'
+#' @param heading Panel title.
+#' @param collapsible Option to collapse panel, Default FALSE.
+#' @param show Show panel. Default FALSE.
+#'
 #' @return List of tags.
 #'
 #' @export
-anainputsUI <- function(id) {
+anainputsUI <- function(id,
+                        heading = NULL,
+                        collapsible = FALSE,
+                        show = FALSE) {
 
   ns <- NS(id)
 
   tagList(
     flamingoPanel(
+      heading = heading,
+      collapsible = collapsible,
+      show = show,
       selection = list(mode = 'none'),
       escape = FALSE,
       filter = "none",

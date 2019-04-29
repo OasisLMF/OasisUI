@@ -23,13 +23,9 @@ outputfilesUI <- function(id) {
       ViewFilesInTableUI(id  = ns("ViewOutputFiles"), includechkbox = TRUE)
     ),
 
-    flamingoPanel(
-      id = ns("flamingoPanelViewInputFiles"),
-      collapsible = TRUE,
-      show = FALSE,
-      heading = "Input files table",
-      anainputsUI(id  = ns("anainputs"))
-    )
+    anainputsUI(id  = ns("anainputs"),
+                heading = "Input files table",
+                collapsible = TRUE)
   )
 }
 
@@ -75,12 +71,11 @@ outputfiles <- function(input, output, session,
     file_column = "files",
     includechkbox = TRUE)
 
-  observeEvent(input[["flamingoPanelViewInputFiles-collapse-button"]], {
-    if (input[["flamingoPanelViewInputFiles-collapse-button"]] > 0) {
+  observeEvent(input[["anainputs-panel_anainputs-collapse-button"]], {
+    if (input[["anainputs-panel_anainputs-collapse-button"]] > 0) {
       result$show <- TRUE
     }
   })
-
 
   sub_modules$anainputs <- callModule(
     anainputs,
