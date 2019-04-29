@@ -20,10 +20,10 @@
 #'
 #' @export
 visualizationCBR <- function(input, output, session,
-                            active = reactive(TRUE),
-                            preselAnaId = reactive(-1),
-                            anaID  = reactive(-1),
-                            logMessage = message) {
+                             active = reactive(TRUE),
+                             preselAnaId = reactive(-1),
+                             anaID  = reactive(-1),
+                             logMessage = message) {
 
   ns <- session$ns
 
@@ -105,26 +105,26 @@ visualizationCBR <- function(input, output, session,
     sub_modules$defineID2$selectAnaID()}, {
       if (!is.na(sub_modules$defineID1$selectAnaID()) && sub_modules$defineID1$selectAnaID() != "" &&
           !is.na(sub_modules$defineID2$selectAnaID()) && sub_modules$defineID2$selectAnaID() != "") {
-      tbl_filesListDataana1 <- return_analyses_output_file_df(sub_modules$defineID1$selectAnaID())
-      analysis_settings1 <- return_analyses_settings_file_list(sub_modules$defineID1$selectAnaID())
-      result$tbl_filesListDataana <- cbind(tbl_filesListDataana1,
-                                           do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
-                                                                            .addDescription, analysis_settings1)))
-      tbl_filesListDataana2 <- return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
-      analysis_settings2 <- return_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
-      bl_filesListDataana2 <- return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
-      analysis_settings2 <- return_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
-      result$tbl_filesListDataana <- rbind(result$tbl_filesListDataana, cbind(tbl_filesListDataana1,
-                                           do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
-                                                                            .addDescription, analysis_settings1))))
-      tbl_filesListDatapf1 <- return_tbl_portfolioDetails(sub_modules$defineID1$selectPortfolioID())
-      tbl_filesListDatapf2 <- return_tbl_portfolioDetails(sub_modules$defineID2$selectPortfolioID())
-      result$tbl_filesListDatapf <- rbind(tbl_filesListDatapf1, tbl_filesListDatapf2)
-    } else {
-      result$tbl_filesListDatapf <- NULL
-      result$tbl_filesListDataana <- NULL
-    }
-  })
+        tbl_filesListDataana1 <- return_analyses_output_file_df(sub_modules$defineID1$selectAnaID())
+        analysis_settings1 <- return_analyses_settings_file_list(sub_modules$defineID1$selectAnaID())
+        result$tbl_filesListDataana <- cbind(tbl_filesListDataana1,
+                                             do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
+                                                                              .addDescription, analysis_settings1)))
+        tbl_filesListDataana2 <- return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
+        analysis_settings2 <- return_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
+        bl_filesListDataana2 <- return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
+        analysis_settings2 <- return_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
+        result$tbl_filesListDataana <- rbind(result$tbl_filesListDataana, cbind(tbl_filesListDataana1,
+                                                                                do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
+                                                                                                                 .addDescription, analysis_settings1))))
+        tbl_filesListDatapf1 <- return_tbl_portfolioDetails(sub_modules$defineID1$selectPortfolioID())
+        tbl_filesListDatapf2 <- return_tbl_portfolioDetails(sub_modules$defineID2$selectPortfolioID())
+        result$tbl_filesListDatapf <- rbind(tbl_filesListDatapf1, tbl_filesListDatapf2)
+      } else {
+        result$tbl_filesListDatapf <- NULL
+        result$tbl_filesListDataana <- NULL
+      }
+    })
 
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
@@ -133,7 +133,6 @@ visualizationCBR <- function(input, output, session,
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
     anaId = sub_modules$defineID1$selectAnaID,
     portfolioId = sub_modules$defineID1$selectPortfolioID,
-    counter = sub_modules$defineID1$selectAnaID,
     active = reactive({active() && input$tabsCBR == ns("taboutputfiles")}))
 
 

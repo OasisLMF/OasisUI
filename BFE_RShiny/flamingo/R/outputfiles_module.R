@@ -43,15 +43,13 @@ outputfilesUI <- function(id) {
 #' @param tbl_filesListDataana Tbl of output files to view.
 #' @param anaId Id of analysis.
 #' @param portfolioId Id of portfolio associated to the analysis.
-#' @param counter Reactive value to trigger inputs download.
 #'
 #' @export
 outputfiles <- function(input, output, session,
                         tbl_filesListDataana = reactive(NULL),
                         anaId = reactive(""),
                         portfolioId = reactive(""),
-                        active = reactive(TRUE),
-                        counter = reactive(NULL)) {
+                        active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -72,7 +70,6 @@ outputfiles <- function(input, output, session,
     analysisID = anaId,
     portfolioID = portfolioId,
     refresh_opt = FALSE,
-    counter = counter,
-    active = reactive({active() })
+    active = reactive({active()})
   )
 }
