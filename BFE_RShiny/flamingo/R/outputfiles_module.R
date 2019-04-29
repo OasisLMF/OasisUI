@@ -55,11 +55,6 @@ outputfiles <- function(input, output, session,
 
   ns <- session$ns
 
-  #Params
-  result <- reactiveValues(
-    show = FALSE
-  )
-
   # list of sub-modules
   sub_modules <- list()
 
@@ -71,12 +66,6 @@ outputfiles <- function(input, output, session,
     file_column = "files",
     includechkbox = TRUE)
 
-  observeEvent(input[["anainputs-panel_anainputs-collapse-button"]], {
-    if (input[["anainputs-panel_anainputs-collapse-button"]] > 0) {
-      result$show <- TRUE
-    }
-  })
-
   sub_modules$anainputs <- callModule(
     anainputs,
     id = "anainputs",
@@ -84,6 +73,6 @@ outputfiles <- function(input, output, session,
     portfolioID = portfolioId,
     refresh_opt = FALSE,
     counter = counter,
-    active = reactive({active() && result$show})
+    active = reactive({active() })
   )
 }
