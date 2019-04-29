@@ -461,7 +461,7 @@ step3_configureOutput <- function(input, output, session,
     # Id of the Analysis
     anaID = NULL,
     # anaId for Dashboard
-    dashboardAnaID = -1,
+    dashboardAnaID = NULL,
     # analysis_ setting
     analysis_settings = NULL
   )
@@ -469,7 +469,7 @@ step3_configureOutput <- function(input, output, session,
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
-    result$dashboardAnaID <- -1
+    result$dashboardAnaID <- NULL
     if (!is.null(analysisID()) && analysisID() != "") {
       result$anaID <- analysisID()
     }

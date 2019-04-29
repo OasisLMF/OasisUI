@@ -22,7 +22,7 @@
 #' @export
 singleAna <- function(input, output, session,
                      active = reactive(TRUE), logMessage = message,
-                     selectAnaID = reactive(""),
+                     selectAnaID = reactive(NULL),
                      selectPortfolioID = reactive(""),
                      preselPanel = reactive(1)) {
 
@@ -38,9 +38,9 @@ singleAna <- function(input, output, session,
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # Id of the analysis to use in dashboard
-    dashboardanaID = -1,
+    dashboardanaID = NULL,
     # Id of analysis
-    anaID = "",
+    anaID = NULL,
     # Id of the portfolio
     portfolioID = "",
     # Portfolio table
@@ -64,7 +64,7 @@ singleAna <- function(input, output, session,
   # and to panel 3 if coming from Browse
   observe(if (active()) {
     workflowSteps$update(analysisWorkflowSteps[[preselPanel()]])
-    result$dashboardanaID <- -1
+    result$dashboardanaID <- NULL
   })
 
   observeEvent(workflowSteps$step(), ignoreInit = TRUE, {
@@ -148,7 +148,7 @@ singleAna <- function(input, output, session,
   observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), ignoreInit = TRUE, {
     anaID <- submodulesList$step2_chooseAnalysis$analysisID()
     #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
+    if (!is.null(anaID) && !is.na(anaID) && anaID != "") {
       logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", anaID ))
       result$anaID <- anaID
     }

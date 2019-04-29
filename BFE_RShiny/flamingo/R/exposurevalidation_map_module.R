@@ -60,7 +60,7 @@ exposurevalidationmapUI <- function(id) {
 exposurevalidationmap <- function(input,
                                   output,
                                   session,
-                                  analysisID = "",
+                                  analysisID = NULL,
                                   portfolioID = "",
                                   counter = reactive(NULL),
                                   active = reactive(TRUE)) {

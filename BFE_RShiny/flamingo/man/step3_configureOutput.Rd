@@ -10,7 +10,7 @@ step3_configureOutputUI(id)
 step3_configureOutput(input, output, session, active = reactive(TRUE),
   logMessage = message, currstep = reactive(-1),
   portfolioID = reactive(""), pfName = reactive(""),
-  analysisID = reactive(""))
+  analysisID = reactive(NULL))
 }
 \arguments{
 \item{id}{module id}

@@ -6,8 +6,8 @@
 \alias{visualizationSBRUI}
 \title{visualizationSBR}
 \usage{
-visualizationSBR(input, output, session, preselAnaId = reactive(-1),
-  anaID = reactive(-1), active = reactive(TRUE),
+visualizationSBR(input, output, session, preselAnaId = reactive(NULL),
+  anaID = reactive(NULL), active = reactive(TRUE),
   logMessage = message)
 
 visualizationSBRUI(id)

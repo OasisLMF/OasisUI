@@ -73,8 +73,8 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @export
 defineID <- function(input, output, session,
-                     preselAnaId = reactive(-1),
-                     anaID = reactive(-1),
+                     preselAnaId = reactive(NULL),
+                     anaID = reactive(NULL),
                      batch = FALSE,
                      active = reactive(TRUE),
                      logMessage = message) {
@@ -84,7 +84,7 @@ defineID <- function(input, output, session,
   # Reactive Values and parameters ---------------------------------------------
   result <- reactiveValues(
     tbl_analysesData = NULL,
-    selectAnaID = "",
+    selectAnaID = NULL,
     selectAnaName = "",
     selectportfolioID = "",
     preselRow = NULL
@@ -224,7 +224,7 @@ defineID <- function(input, output, session,
   })
 
   output$selectAnaInfo2 <- renderText({
-    if (result$selectAnaID == "") {
+    if (is.null(result$selectAnaID)) {
       info <- '" - "'
     } else {
       info <- paste0(result$selectAnaID, ' "' ,result$selectAnaName, '"  ')

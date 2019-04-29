@@ -21,8 +21,8 @@
 #' @export
 visualizationCBR <- function(input, output, session,
                              active = reactive(TRUE),
-                             preselAnaId = reactive(-1),
-                             anaID  = reactive(-1),
+                             preselAnaId = reactive(NULL),
+                             anaID = reactive(NULL),
                              logMessage = message) {
 
   ns <- session$ns
@@ -38,7 +38,7 @@ visualizationCBR <- function(input, output, session,
     #Panel to select
     preselPanel = 1,
     #id of selected analysis
-    selectAnaID = "",
+    selectAnaID = NULL,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
@@ -54,7 +54,7 @@ visualizationCBR <- function(input, output, session,
   observeEvent(active(), {
     if (active()) {
       result$preselPanel <- 1
-      result$selectAnaID <- ""
+      result$selectAnaID <- NULL
       result$selectPortfolioID = ""
     }
   })

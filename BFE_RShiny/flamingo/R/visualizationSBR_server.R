@@ -22,8 +22,8 @@
 #'
 #' @export
 visualizationSBR <- function(input, output, session,
-                             preselAnaId = reactive(-1),
-                             anaID  = reactive(-1),
+                             preselAnaId = reactive(NULL),
+                             anaID  = reactive(NULL),
                              active = reactive(TRUE), logMessage = message) {
 
   ns <- session$ns
@@ -37,7 +37,7 @@ visualizationSBR <- function(input, output, session,
     #Panel to select
     preselPanel = 1,
     #id of selected analysis
-    selectAnaID = "",
+    selectAnaID = NULL,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
@@ -53,7 +53,7 @@ visualizationSBR <- function(input, output, session,
   observeEvent(active(), {
     if (active()) {
       result$preselPanel <- 1
-      result$selectAnaID <- ""
+      result$selectAnaID <- NULL
       result$selectPortfolioID = ""
     }
   })

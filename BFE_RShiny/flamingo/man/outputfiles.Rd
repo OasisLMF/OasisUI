@@ -8,7 +8,7 @@
 outputfilesUI(id)
 
 outputfiles(input, output, session,
-  tbl_filesListDataana = reactive(NULL), anaId = reactive(""),
+  tbl_filesListDataana = reactive(NULL), anaId = reactive(NULL),
   portfolioId = reactive(""), active = reactive(TRUE))
 }
 \arguments{

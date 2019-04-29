@@ -47,7 +47,7 @@ outputfilesUI <- function(id) {
 #' @export
 outputfiles <- function(input, output, session,
                         tbl_filesListDataana = reactive(NULL),
-                        anaId = reactive(""),
+                        anaId = reactive(NULL),
                         portfolioId = reactive(""),
                         active = reactive(TRUE)) {
 

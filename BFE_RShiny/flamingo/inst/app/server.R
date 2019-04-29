@@ -106,8 +106,8 @@ server <- function(input, output, session) {
   auth_modules$visualizationBBR <- callModule(
     visualizationBBR,
     id = "visualizationBBR",
-    preselAnaId = reactive(-1),
-    anaID = reactive(-1),
+    preselAnaId = reactive(NULL),
+    anaID = reactive(NULL),
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "BBR")
   )
@@ -115,8 +115,8 @@ server <- function(input, output, session) {
   auth_modules$visualizationCBR <- callModule(
     visualizationCBR,
     id = "visualizationCBR",
-    preselAnaId = reactive(-1),
-    anaID =  reactive(-1),
+    preselAnaId = reactive(NULL),
+    anaID =  reactive(NULL),
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "CBR")
   )

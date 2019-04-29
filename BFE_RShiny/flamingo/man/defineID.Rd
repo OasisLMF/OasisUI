@@ -7,8 +7,8 @@
 \usage{
 defineIDUI(id, w, batch = FALSE)
 
-defineID(input, output, session, preselAnaId = reactive(-1),
-  anaID = reactive(-1), batch = FALSE, active = reactive(TRUE),
+defineID(input, output, session, preselAnaId = reactive(NULL),
+  anaID = reactive(NULL), batch = FALSE, active = reactive(TRUE),
   logMessage = message)
 }
 \arguments{

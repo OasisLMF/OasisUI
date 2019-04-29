@@ -234,7 +234,7 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis log
     tbl_analysislog = NULL,
     #analysis ID
-    analysisID = ""
+    analysisID = NULL
   )
 
   #Set Params
@@ -251,6 +251,7 @@ step2_chooseAnalysis <- function(input, output, session,
   observeEvent({
     currstep()
     portfolioID()}, {
+      .hideDivs()
       .hideDivs()
       if (currstep() == 2 ) {
         .defaultAssociateModel()
