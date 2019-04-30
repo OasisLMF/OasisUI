@@ -126,7 +126,7 @@ anainputs <- function(input,
   # Reload input generated table -----------------------------------------------
   .reloadInputs <- function(){
     logMessage(".reloadInputs called")
-    if (!is.null(analysisID()) && analysisID() != "") {
+    if (!is.null(analysisID())) {
       dt_generated <- return_analyses_input_file_wicons_df(analysisID())
       if (!is.null(dt_generated)) {
         dt_generated <- .replace_uploaded_files(dt_generated, portfolioID())

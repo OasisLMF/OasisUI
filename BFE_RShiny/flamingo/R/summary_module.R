@@ -114,10 +114,10 @@ summarytab <- function(input, output, session,
       SummaryData2 <- NULL
       SummaryData <- NULL
 
-      if (selectAnaID1() != "" && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
+      if (!is.null(selectAnaID1()) && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
         SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
       }
-      if (selectAnaID2() != "" && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
+      if (!is.null(selectAnaID2()) && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
         SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
       }
 

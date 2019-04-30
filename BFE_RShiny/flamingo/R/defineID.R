@@ -242,7 +242,7 @@ defineID <- function(input, output, session,
       currName <- result$tbl_analysesData[idx, tbl_analysesDataNames$name]
       currpfId <- result$tbl_analysesData[idx, tbl_analysesDataNames$portfolio]
     }
-    result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
+    result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), NULL, currid)
     result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
     logMessage("Extract output files")
