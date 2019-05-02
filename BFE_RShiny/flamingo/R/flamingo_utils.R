@@ -79,8 +79,7 @@ getTableOptions <- function(scrollX = TRUE,
     searchHighlight = TRUE,
     processing = 0,
     scrollX = scrollX,
-    pageLength = maxrowsperpage,
-    columnDefs = list(list(visible = FALSE, targets = 0))
+    pageLength = maxrowsperpage
   )
   if (!escape) {
     options$preDrawCallback <- JS('function() { Shiny.unbindAll(this.api().table().node()); }')
