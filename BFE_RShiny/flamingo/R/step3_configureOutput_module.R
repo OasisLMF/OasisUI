@@ -470,7 +470,7 @@ step3_configureOutput <- function(input, output, session,
   observe(if (active()) {
     result$navigationstate <- NULL
     result$dashboardAnaID <- NULL
-    if (!is.null(analysisID()) && analysisID() != "") {
+    if (!is.null(analysisID())) {
       result$anaID <- analysisID()
     }
   })
@@ -479,7 +479,7 @@ step3_configureOutput <- function(input, output, session,
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
-    if (currstep() == 3 ) {
+    if (currstep() == 3) {
       .defaultstep3()
       .reloadAnaData()
     }
@@ -557,7 +557,7 @@ step3_configureOutput <- function(input, output, session,
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- which(result$tbl_analysesData[ ,tbl_analysesDataNames$id] == result$anaID)
-      if (length(index) == 0) {
+      if (length(index) == 0 && is.null(result$anaID)) {
         index <- 1
       }
       logMessage("re-rendering analysis table")
@@ -909,17 +909,19 @@ step3_configureOutput <- function(input, output, session,
     input$dt_analyses_rows_selected
     portfolioID()
   }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (active()) {
+    if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
+      if (max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
         logMessage(paste0("analysisId changed to ", result$anaID))
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
           show("panelAnalysisLogs")
           logMessage("showing analysis run log table")
         }
+      } else {
+        result$anaID <- NULL
       }
     }
   })
