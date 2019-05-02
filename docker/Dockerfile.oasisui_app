@@ -5,7 +5,7 @@ FROM rocker/r-ver:3.5.1
 # -> installs R to /usr/local/lib/R
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libv8-3.14-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils libjq-dev gdal-bin proj-bin libgdal1-dev libudunits2-dev && \
+    apt-get install -y --no-install-recommends libv8-3.14-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils libjq-dev gdal-bin proj-bin libgdal-dev libudunits2-dev && \
     # if desired, add tools such as: sudo, vim, wget, curl, procps
     # library necessary for dependency of geojsonio
     apt-get install -y libprotobuf-dev protobuf-compiler  && \
