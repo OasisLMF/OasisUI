@@ -20,6 +20,11 @@ exposurevalidationsummaryUI <- function(id) {
     fluidRow(div(flamingoRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
       column(12,
+             selectInput(ns("input_peril"), label = "Pick peril", choices = NULL)
+      )
+    ),
+    fluidRow(
+      column(12,
              DTOutput(ns("dt_summary_validation"))
       )
     ),
@@ -49,6 +54,7 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
 #' @importFrom dplyr filter
+#' @importFrom dplyr bind_rows
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
@@ -80,8 +86,12 @@ exposurevalidationsummary <- function(input,
 
   # Params and Reactive Values -------------------------------------------------
   result <- reactiveValues(
+    # checked locations
+    uploaded_locs_check = NULL,
     #dataframe summary
-    summary_validation_tbl = NULL
+    summary_validation_tbl = NULL,
+    #summary for all perils
+    summary_lst = NULL
   )
 
   loc_ids <- "location_ids"
@@ -93,7 +103,15 @@ exposurevalidationsummary <- function(input,
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
       .reloadExposureValidation()
-      .reloadSummary()
+      result$summary_lst <- .read_summary(analysisID())
+      updateSelectInput(session, inputId = "input_peril", choices = names(result$summary_lst)[names(result$summary_lst) != "all"])
+    }
+  })
+
+  # Perils ---------------------------------------------------------------------
+  observeEvent(input$input_peril, {
+    if (!is.na(input$input_peril) && input$input_peril != "") {
+      .reloadSummary(input_peril = input$input_peril)
     }
   })
 
@@ -119,13 +137,18 @@ exposurevalidationsummary <- function(input,
   observeEvent(result$summary_validation_tbl, {
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl)) {
 
-      df_loc <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = loc_ids) %>%
-        mutate(gridcol = "Locations")
+      df_vis <- lapply(result$summary_validation_tbl$type, function(g){
+        g_label <- g %>%
+          gsub(pattern = "_", replacement = " ") %>%
+          gsub(pattern = "\\.", replacement = " ") %>%
+          capitalize_first_letter()
+        df_to_plot <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = g, all = result$summary_lst[["all"]]) %>%
+          mutate(gridcol = g_label)
+        df_to_plot
+      }) %>%
+        bind_rows( .id = "column_label")
 
-      df_tiv <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = "tiv") %>%
-        mutate(gridcol = "TIV")
-
-      df_vis <- rbind(df_loc, df_tiv) %>%
+      df_vis <- df_vis %>%
         mutate(gridcol = as.factor(gridcol))
       output$outputplot_vis <- renderPlotly({ggplotly(.plot_stack_hist(df = df_vis) )})
     }
@@ -146,8 +169,15 @@ exposurevalidationsummary <- function(input,
 
   # Utils functions ------------------------------------------------------------
 
-  .extract_df_plot <- function(df,filter_row){
-    tot <- df$all[df$type == filter_row] %>% as.numeric()
+  .extract_df_plot <- function(df,filter_row, all){
+    all_df <- t(all) %>%
+      as.data.frame() %>%
+      mutate(type = rownames(.),
+             all = as.numeric(V1),
+             V1 = NULL)
+
+    df <- left_join(df, all_df, by = "type")
+    tot <- df$all[df$type == filter_row]
     df_sel <- df %>%
       filter(type == filter_row) %>%
       select(-type) %>%
@@ -209,7 +239,7 @@ exposurevalidationsummary <- function(input,
       geom_bar(position = "stack", stat = "identity") +
       scale_fill_manual(values = c("fail" = "#db1e2a", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E")) +
       scale_y_continuous(breaks = brks, labels = lbs) +
-      facet_wrap(df$gridcol)
+      facet_wrap(df$gridcol, ncol = 3)
     p
   }
 
@@ -219,29 +249,48 @@ exposurevalidationsummary <- function(input,
     logMessage(".read_summary called")
 
     forig <- "./www/summary.json"
-    json_lst <- jsonlite::read_json(forig)
+    json_lst <- jsonlite::read_json(forig, simplifyVector = TRUE)
+
+    #drop portfolio and modle data
+    json_lst <- json_lst[sapply(json_lst, function(x) {is.list(x)})]
+
+    json_lst_all <- json_lst[["all"]] %>%
+      as.data.frame()
+
+    #drop field all data
+    json_lst["all"] <- NULL
 
     reg_expr_dot <- "^([^.]+)[.](.+)$"
 
-    df <- lapply(
-      json_lst[sapply(json_lst, function(x) {!is.atomic(x)})],
-      function(x) {x[[loc_ids]] <- toString(x[[loc_ids]], width = 20); x}) %>%
-      as.data.frame()
+    lst_peril <- lapply(json_lst, function(json_lst_curr) {
+      df <- lapply(
+        json_lst_curr[sapply(json_lst_curr, function(x) {!is.atomic(x)})],
+        function(x) {
+          x[[loc_ids]] <- toString(x[[loc_ids]], width = 20)
+          x}) %>%
+        as.data.frame()
 
-    df <- df %>%
-      format(scientific = FALSE) %>%
-      t() %>%
-      as.data.frame(stringsAsFactors = FALSE) %>%
-      mutate(key = sub(reg_expr_dot, "\\1", rownames(.)),
-             type = sub(reg_expr_dot, "\\2", rownames(.))) %>%
-      spread(key, 1, convert = TRUE)
-    df
+      df <- df %>%
+        format(scientific = FALSE) %>%
+        t() %>%
+        as.data.frame(stringsAsFactors = FALSE) %>%
+        mutate(key = sub(reg_expr_dot, "\\1", rownames(.)),
+               type = sub(reg_expr_dot, "\\2", rownames(.))) %>%
+        spread(key, 1, convert = TRUE)
+
+      df
+    })
+
+    lst_peril$all <- cbind(data.frame(location_ids = nrow(result$uploaded_locs_check)),json_lst_all)
+
+    lst_peril
+
   }
 
   # reload dataframes
 
   #reload summary table
-  .reloadSummary <- function(){
+  .reloadSummary <- function(input_peril){
 
     logMessage(".reloadSummary called")
 
@@ -249,14 +298,8 @@ exposurevalidationsummary <- function(input,
     result$summary_validation_tbl <- NULL
 
     #Build df
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-      df <- .read_summary(analysisID())
-      replace_lst <- lapply(names(df),
-                            function(x){toString(nrow(result$uploaded_locs_check))}
-      ) %>%
-        setNames(names(df))
-      result$summary_validation_tbl <- df %>%
-        replace_na(replace_lst)
+    if (!is.null(result$summary_lst) && length(result$summary_lst) > 0 && !is.null(input_peril)) {
+      result$summary_validation_tbl <- result$summary_lst[[input_peril]]
     } else {
       result$summary_validation_tbl <- NULL
     }
