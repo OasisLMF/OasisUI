@@ -252,8 +252,7 @@ step2_chooseAnalysis <- function(input, output, session,
     currstep()
     portfolioID()}, {
       .hideDivs()
-      .hideDivs()
-      if (currstep() == 2 ) {
+      if (currstep() == 2) {
         .defaultAssociateModel()
         .reloadAnaData()
         .reloadtbl_modelsData()
