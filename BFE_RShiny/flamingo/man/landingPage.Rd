@@ -7,15 +7,12 @@
 \usage{
 landingPageUI(id)
 
-landingPage(input, output, session, logMessage = message,
-  active = reactive(TRUE))
+landingPage(input, output, session, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 }

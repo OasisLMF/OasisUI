@@ -27,7 +27,6 @@ flamingoTableUI <-  function(id){
 #' @description Server logic to show the flamingo table output
 #'
 #' @template params-module
-#' @template params-logMessage
 #'
 #' @param data dataframe to show in table.
 #' @param selection param of datatable, default"none".
@@ -55,8 +54,7 @@ flamingoTable <- function(input, output, session,
                           rownames = FALSE,
                           colnames = TRUE,
                           preselRow = reactive({NULL}),
-                          maxrowsperpage = 10,
-                          logMessage = message ) {
+                          maxrowsperpage = 10) {
 
   ns <- session$ns
 

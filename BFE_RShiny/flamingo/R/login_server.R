@@ -18,8 +18,6 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #'
 #'@template params-module
 #'
-#' @param logMessage function that will be passed info messages.
-#' @param logError function that will be passed error messages.
 #' @param logout Reactive yielding logout signal.
 #'
 #' @return List of reactive expressions:
@@ -33,8 +31,7 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #' @importFrom shinyjs js
 #'
 #' @export
-loginDialog <- function(input, output, session, logout,
-    logMessage = message, logError = logMessage) {
+loginDialog <- function(input, output, session, logout) {
 
   result <- reactiveValues(
       user = FLAMINGO_GUEST_ID
