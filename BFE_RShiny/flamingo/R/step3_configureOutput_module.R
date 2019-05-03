@@ -160,7 +160,7 @@ panelDefineOutputsDetails <- function(id) {
           hidden(selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "")),
           h5("Available Perils"),
           uiOutput(ns("chkinputsperils"))
-          ),
+      ),
       hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
                  textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
@@ -448,8 +448,6 @@ step3_configureOutput <- function(input, output, session,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
-    # reactive for portfolioID
-    portfolioID = "",
     # reactve value for navigation
     navigationstate = NULL,
     # reactive value for Analysis table
@@ -470,9 +468,6 @@ step3_configureOutput <- function(input, output, session,
   observe(if (active()) {
     result$navigationstate <- NULL
     result$dashboardAnaID <- NULL
-    if (!is.null(analysisID())) {
-      result$anaID <- analysisID()
-    }
   })
 
 
@@ -556,8 +551,8 @@ step3_configureOutput <- function(input, output, session,
 
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
-      index <- which(result$tbl_analysesData[ ,tbl_analysesDataNames$id] == result$anaID)
-      if (length(index) == 0 && is.null(result$anaID)) {
+      index <- which(result$tbl_analysesData[ ,tbl_analysesDataNames$id] == analysisID())
+      if (length(index) == 0 && is.null(analysisID())) {
         index <- 1
       }
       logMessage("re-rendering analysis table")
@@ -854,7 +849,7 @@ step3_configureOutput <- function(input, output, session,
              row.names = FALSE,
              col.names = FALSE,
              quote = FALSE)
-      }
+    }
   )
 
   observeEvent(result$tbl_analysisrunlog, {
@@ -907,13 +902,13 @@ step3_configureOutput <- function(input, output, session,
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent({
     input$dt_analyses_rows_selected
-    portfolioID()
+    result$tbl_analysesData
   }, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (length(input$dt_analyses_rows_selected) > 0) {
+    if (active()) {
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
+      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
         logMessage(paste0("analysisId changed to ", result$anaID))
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
