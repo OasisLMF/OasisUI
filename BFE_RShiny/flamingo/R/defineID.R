@@ -121,30 +121,21 @@ defineID <- function(input, output, session,
     )
   )
 
-  # > update lsit of analyses
-  observeEvent({
-    input$chooseAnaID
-    preselAnaId()
-    anaID()}, ignoreInit = TRUE, {
+  # > update list of analyses
+  observeEvent(input$chooseAnaID, ignoreNULL = TRUE, {
       tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
         result$tbl_analysesData <- tbl_analysesData  %>%
-          filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
+          filter(!!sym(tbl_analysesDataNames$status) == Status$Completed)
       }
-    })
-
-  # > open modal
-  observeEvent(
-    input$chooseAnaID, {
       showModal(AnaList)
     })
-
 
   # > modal content
   sub_modules$flamingo_analyses <- callModule(
     flamingoTable,
     id = "flamingo_analyses",
-    data = reactive(result$tbl_analysesData),
+    data = reactive({result$tbl_analysesData}),
     selection = "single",
     escape = FALSE,
     filter = FALSE,
@@ -177,7 +168,7 @@ defineID <- function(input, output, session,
     anaID()},{
       logMessage(paste0("Updating preselected row because anaID() changed to ", anaID()))
       idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == anaID())
-      if (length(idx) > 0 && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx)) && anaID() != -1) {
+      if (length(idx) > 0 && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
         result$preselRow <- idx
       }
     })
@@ -187,9 +178,9 @@ defineID <- function(input, output, session,
   observeEvent(result$preselRow, {
     if (!is.null( result$preselRow)) {
       withModalSpinner(
-      .downloadOutput(idx = result$preselRow),
-      "Loading...",
-      size = "s"
+        .downloadOutput(idx = result$preselRow),
+        "Loading...",
+        size = "s"
       )
     }
   })
@@ -227,14 +218,14 @@ defineID <- function(input, output, session,
     if (is.null(result$selectAnaID)) {
       info <- '" - "'
     } else {
-      info <- paste0(result$selectAnaID, ' "' ,result$selectAnaName, '"  ')
+      info <- paste0(result$selectAnaID, ' "' , result$selectAnaName, '"  ')
     }
     info
   })
 
   # Help functions -------------------------------------------------------------
   .downloadOutput <- function(idx) {
-    currid <- ""
+    currid <- NULL
     currName <- ""
     currpfId <- ""
     if (!is.null(idx)) {

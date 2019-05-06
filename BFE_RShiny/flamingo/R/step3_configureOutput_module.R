@@ -468,6 +468,9 @@ step3_configureOutput <- function(input, output, session,
   observe(if (active()) {
     result$navigationstate <- NULL
     result$dashboardAnaID <- NULL
+    if (!is.null(analysisID())) {
+      result$anaID <- analysisID()
+    }
   })
 
 

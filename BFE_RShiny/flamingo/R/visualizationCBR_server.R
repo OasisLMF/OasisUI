@@ -103,8 +103,7 @@ visualizationCBR <- function(input, output, session,
   observeEvent( {
     sub_modules$defineID1$selectAnaID()
     sub_modules$defineID2$selectAnaID()}, {
-      if (!is.na(sub_modules$defineID1$selectAnaID()) && sub_modules$defineID1$selectAnaID() != "" &&
-          !is.na(sub_modules$defineID2$selectAnaID()) && sub_modules$defineID2$selectAnaID() != "") {
+      if (!is.null(sub_modules$defineID1$selectAnaID()) && !is.null(sub_modules$defineID2$selectAnaID())) {
         tbl_filesListDataana1 <- return_analyses_output_file_df(sub_modules$defineID1$selectAnaID())
         analysis_settings1 <- return_analyses_settings_file_list(sub_modules$defineID1$selectAnaID())
         result$tbl_filesListDataana <- cbind(tbl_filesListDataana1,

@@ -21,10 +21,10 @@
 #'
 #' @export
 singleAna <- function(input, output, session,
-                     active = reactive(TRUE), logMessage = message,
-                     selectAnaID = reactive(NULL),
-                     selectPortfolioID = reactive(""),
-                     preselPanel = reactive(1)) {
+                      active = reactive(TRUE), logMessage = message,
+                      selectAnaID = reactive(NULL),
+                      selectPortfolioID = reactive(""),
+                      preselPanel = reactive(1)) {
 
   ns <- session$ns
 
@@ -136,28 +136,30 @@ singleAna <- function(input, output, session,
   })
 
   # > AnaId --------------------------------------------------------------------
-  observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), ignoreInit = TRUE, {
-    anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
-    #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != -1) {
-      logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", anaID ))
-      result$dashboardanaID <- anaID
-    }
-  })
+  observeEvent({submodulesList$step3_configureOutput$dashboardAnaID()
+    result$anaID}, ignoreInit = TRUE, {
+      anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
+      #Avoid updating input if not necessary
+      if (!is.null(anaID) && !is.na(anaID) && result$anaID != anaID) {
+        logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", anaID ))
+        result$dashboardanaID <- anaID
+      }
+    })
 
-  observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), ignoreInit = TRUE, {
-    anaID <- submodulesList$step2_chooseAnalysis$analysisID()
-    #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID)) {
-      logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", anaID ))
-      result$anaID <- anaID
-    }
-  })
+  observeEvent({submodulesList$step2_chooseAnalysis$analysisID()
+    result$anaID}, ignoreInit = TRUE, {
+      anaID <- submodulesList$step2_chooseAnalysis$analysisID()
+      #Avoid updating input if not necessary
+      if (!is.null(anaID) && !is.na(anaID)  && result$anaID != anaID) {
+        logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", anaID ))
+        result$anaID <- anaID
+      }
+    })
 
   observeEvent(selectAnaID(), ignoreInit = TRUE, {
     anaID <- selectAnaID()
     #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != result$anaID) {
+    if (!is.null(anaID) && !is.na(anaID) && result$anaID != anaID) {
       logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", anaID ))
       result$anaID <- anaID
     }

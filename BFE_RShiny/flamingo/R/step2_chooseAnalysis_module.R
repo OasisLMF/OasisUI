@@ -494,7 +494,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   #  panelAnalysisLog Table title
   output$paneltitle_panelAnalysisLog <- renderUI({
-    if (is.null(result$analysisID)) {
+    if (!is.null(result$analysisID)) {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       paste0('Input generation Logs of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
@@ -504,7 +504,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   #  analysis_details Table title
   output$paneltitle_analysis_details <- renderUI({
-    if (is.null(result$analysisID)) {
+    if (!is.null(result$analysisID)) {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
       paste0('Details of analysis id ', toString(analysisID), ' ', anaName)

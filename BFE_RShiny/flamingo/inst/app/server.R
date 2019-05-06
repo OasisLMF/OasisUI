@@ -97,7 +97,7 @@ server <- function(input, output, session) {
   auth_modules$visualizationSBR <- callModule(
     visualizationSBR,
     id = "visualizationSBR",
-    preselAnaId =  auth_modules$landingPage$anaID,
+    preselAnaId = auth_modules$landingPage$anaID,
     anaID = auth_modules$singleAna$anaID,
     logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "SBR")

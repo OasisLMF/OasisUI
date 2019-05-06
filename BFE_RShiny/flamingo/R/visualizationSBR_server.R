@@ -78,7 +78,7 @@ visualizationSBR <- function(input, output, session,
 
   # Extract Output files for given anaID----------------------------------------
   observeEvent(sub_modules$defineID$selectAnaID(), {
-    if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
+    if (!is.null(sub_modules$defineID$selectAnaID())) {
       tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
       analysis_settings <- return_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
       result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
@@ -106,7 +106,7 @@ visualizationSBR <- function(input, output, session,
     outputfiles,
     id = "outputfiles",
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
-    anaId = sub_modules$defineID$selectAnaID,
+    anaId = reactive(sub_modules$defineID$selectAnaID()),
     portfolioId = sub_modules$defineID$selectPortfolioID,
     active = reactive({active() && input$tabsSBR == ns("taboutputfiles")}))
 
