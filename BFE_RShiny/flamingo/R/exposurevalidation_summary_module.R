@@ -48,7 +48,6 @@ exposurevalidationsummaryUI <- function(id) {
 #' @template params-module
 #' @template params-active
 #' @param analysisID Selected analysis id.
-#' @param portfolioID Selected portfolio ID.
 #' @param counter Reactive value to trigger inputs download.
 #'
 #' @importFrom dplyr select
@@ -80,7 +79,6 @@ exposurevalidationsummary <- function(input,
                                       output,
                                       session,
                                       analysisID = "",
-                                      portfolioID = "",
                                       counter = reactive(NULL),
                                       active = reactive(TRUE)) {
 

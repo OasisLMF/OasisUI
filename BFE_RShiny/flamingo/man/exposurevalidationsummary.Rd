@@ -8,8 +8,7 @@
 exposurevalidationsummaryUI(id)
 
 exposurevalidationsummary(input, output, session, analysisID = "",
-  portfolioID = "", counter = reactive(NULL),
-  active = reactive(TRUE))
+  counter = reactive(NULL), active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -17,8 +16,6 @@ exposurevalidationsummary(input, output, session, analysisID = "",
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{analysisID}{Selected analysis id.}
-
-\item{portfolioID}{Selected portfolio ID.}
 
 \item{counter}{Reactive value to trigger inputs download.}
 

@@ -84,7 +84,6 @@ analysis_details <- function(input,
     exposurevalidationsummary,
     id = "exposurevalidationsummary",
     analysisID = analysisID,
-    portfolioID = portfolioID,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabvalidationsummary")})
   )
