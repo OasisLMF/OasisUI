@@ -54,6 +54,7 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
 #' @importFrom dplyr filter
+#' @importFrom dplyr case_when
 #' @importFrom dplyr bind_rows
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -69,9 +70,12 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 scale_fill_manual
 #' @importFrom ggplot2 scale_y_continuous
+#' @importFrom stats setNames
 #' @importFrom tidyr spread
 #' @importFrom tidyr replace_na
 #' @importFrom tidyr gather
+#' @importFrom tidyr unite
+#' @importFrom tidyr separate
 #'
 #' @export
 exposurevalidationsummary <- function(input,
@@ -86,15 +90,15 @@ exposurevalidationsummary <- function(input,
 
   # Params and Reactive Values -------------------------------------------------
   result <- reactiveValues(
-    # checked locations
-    uploaded_locs_check = NULL,
     #dataframe summary
     summary_validation_tbl = NULL,
     #summary for all perils
-    summary_lst = NULL
+    summary_tbl = NULL,
+    #list perils
+    perils = NULL
   )
 
-  loc_ids <- "location_ids"
+  type_to_plot <- c("number of locations", "tiv")
 
   # Modeled exposure and uploaded exposure ------------------------------------
   observeEvent({
@@ -102,9 +106,9 @@ exposurevalidationsummary <- function(input,
     counter()
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
-      .reloadExposureValidation()
-      result$summary_lst <- .read_summary(analysisID())
-      updateSelectInput(session, inputId = "input_peril", choices = names(result$summary_lst)[names(result$summary_lst) != "all"])
+      result$summary_tbl <- .read_summary(analysisID())
+      result$perils <- unique(result$summary_tbl$peril)
+      updateSelectInput(session, inputId = "input_peril", choices = result$perils)
     }
   })
 
@@ -134,22 +138,9 @@ exposurevalidationsummary <- function(input,
 
   # Vusualize Summary ----------------------------------------------------------
 
-  observeEvent(result$summary_validation_tbl, {
-    if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl)) {
-
-      df_vis <- lapply(result$summary_validation_tbl$type, function(g){
-        g_label <- g %>%
-          gsub(pattern = "_", replacement = " ") %>%
-          gsub(pattern = "\\.", replacement = " ") %>%
-          capitalize_first_letter()
-        df_to_plot <- .extract_df_plot(df = result$summary_validation_tbl, filter_row = g, all = result$summary_lst[["all"]]) %>%
-          mutate(gridcol = g_label)
-        df_to_plot
-      }) %>%
-        bind_rows( .id = "column_label")
-
-      df_vis <- df_vis %>%
-        mutate(gridcol = as.factor(gridcol))
+  observeEvent(result$summary_tbl, {
+    if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0) {
+      df_vis <- .extract_df_plot(df = result$summary_tbl)
       output$outputplot_vis <- renderPlotly({ggplotly(.plot_stack_hist(df = df_vis) )})
     }
   })
@@ -163,58 +154,21 @@ exposurevalidationsummary <- function(input,
       "Refreshing...",
       size = "s"
     )
-    .reloadExposureValidation()
     .reloadSummary()
   })
 
   # Utils functions ------------------------------------------------------------
 
-  .extract_df_plot <- function(df,filter_row, all){
-    all_df <- t(all) %>%
-      as.data.frame() %>%
-      mutate(type = rownames(.),
-             all = as.numeric(V1),
-             V1 = NULL)
-
-    df <- left_join(df, all_df, by = "type")
-    tot <- df$all[df$type == filter_row]
-    df_sel <- df %>%
-      filter(type == filter_row) %>%
-      select(-type) %>%
-      gather(key, value)
-    has_commas <- lapply(seq(nrow(df_sel)),
-                         function(x){grepl(",", df_sel$value[x])}) %>%
-      unlist() %>%
-      any()
-    if (!has_commas) {
-      df_sel$value <- as.numeric(df_sel$value)
-    }
-    df_sel <- df_sel %>%
-      mutate(value = sapply(seq(nrow(df_sel)),
-                            function(x) {
-                              if (df_sel$key[x] != "all" && !is.numeric(df_sel$value[x])) {
-                                df_sel$value[x] %>%
-                                  strsplit(",") %>%
-                                  unlist() %>% length()
-                              } else {
-                                df_sel$value[x]
-                              }
-                            })) %>%
-      mutate(value = as.numeric(value)/tot)
-
-    df_sel1 <- df_sel %>%
-      filter(key %in% c("fail", "success")) %>%
-      mutate(ref = 1)
-
-    df_sel2 <- df_sel %>%
-      rbind(c("match", 1 - df_sel$value[df_sel$key == "nomatch"])) %>%
-      filter(key %in% c("nomatch", "match")) %>%
-      mutate(ref = 2)
-
-    df <- rbind(df_sel1, df_sel2) %>%
-      mutate(value = as.numeric(value)*100,
-             key = as.factor(key))
-
+  .extract_df_plot <- function(df){
+    df <- df %>%
+      filter(type %in% type_to_plot) %>%
+      mutate(fail = 100*fail/all,
+             success = 100*success/all,
+             nomatch = 100*nomatch/all,
+             all = NULL) %>%
+      gather(key, value, factor_key = TRUE, -c(peril, type)) %>%
+      mutate(peril = as.factor(peril),
+             type = as.factor(type))
     df
   }
 
@@ -222,7 +176,8 @@ exposurevalidationsummary <- function(input,
   .plot_stack_hist <- function(df) {
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
-    p <- ggplot(data = df, aes(x = df$ref, y = df$value, fill = df$key)) +
+    n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
+    p <- ggplot(data = df, aes(x = df$type, y = df$value, fill = df$key)) +
       theme(
         plot.title = element_blank(),
         text = element_text(size = 12),
@@ -231,15 +186,14 @@ exposurevalidationsummary <- function(input,
         axis.line.y = element_line(color = "grey45", size = 0.5),
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.title =  element_blank(),
         legend.position = "right"
       ) +
       geom_bar(position = "stack", stat = "identity") +
-      scale_fill_manual(values = c("fail" = "#db1e2a", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E")) +
+      scale_fill_manual(values = c("fail" = "#f29c24", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E")) +
       scale_y_continuous(breaks = brks, labels = lbs) +
-      facet_wrap(df$gridcol, ncol = 3)
+      facet_wrap(df$peril, ncol = n_plots_row)
     p
   }
 
@@ -248,42 +202,25 @@ exposurevalidationsummary <- function(input,
 
     logMessage(".read_summary called")
 
-    forig <- "./www/summary.json"
+    forig <- "./www/exposure_summary_report.json"
     json_lst <- jsonlite::read_json(forig, simplifyVector = TRUE)
 
-    #drop portfolio and modle data
-    json_lst <- json_lst[sapply(json_lst, function(x) {is.list(x)})]
+    reg_expr_dot <- "^([^.]+)[.](.+)[.](.+)$"
 
-    json_lst_all <- json_lst[["all"]] %>%
-      as.data.frame()
+    df <- unlist(json_lst) %>%
+      as.data.frame(stringsAsFactors = FALSE)  %>%
+      setNames("vals") %>%
+      mutate(rowname = rownames(.)) %>%
+      separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
+      mutate(type2 = case_when(
+        is.na(type2) ~ "",
+        TRUE ~ paste0(": ", type2)
+      )) %>%
+      unite("type", c("type", "type2"), sep = "") %>%
+      mutate(type = gsub(pattern = "_", replacement = " ", type)) %>%
+      spread(key, 1, convert = TRUE)
 
-    #drop field all data
-    json_lst["all"] <- NULL
-
-    reg_expr_dot <- "^([^.]+)[.](.+)$"
-
-    lst_peril <- lapply(json_lst, function(json_lst_curr) {
-      df <- lapply(
-        json_lst_curr[sapply(json_lst_curr, function(x) {!is.atomic(x)})],
-        function(x) {
-          x[[loc_ids]] <- toString(x[[loc_ids]], width = 20)
-          x}) %>%
-        as.data.frame()
-
-      df <- df %>%
-        format(scientific = FALSE) %>%
-        t() %>%
-        as.data.frame(stringsAsFactors = FALSE) %>%
-        mutate(key = sub(reg_expr_dot, "\\1", rownames(.)),
-               type = sub(reg_expr_dot, "\\2", rownames(.))) %>%
-        spread(key, 1, convert = TRUE)
-
-      df
-    })
-
-    lst_peril$all <- cbind(data.frame(location_ids = nrow(result$uploaded_locs_check)),json_lst_all)
-
-    lst_peril
+    df
 
   }
 
@@ -298,25 +235,13 @@ exposurevalidationsummary <- function(input,
     result$summary_validation_tbl <- NULL
 
     #Build df
-    if (!is.null(result$summary_lst) && length(result$summary_lst) > 0 && !is.null(input_peril)) {
-      result$summary_validation_tbl <- result$summary_lst[[input_peril]]
+    if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0 && !is.null(input_peril)) {
+      result$summary_validation_tbl <- result$summary_tbl %>%
+        filter(peril == input_peril) %>%
+        select(-peril)
     } else {
       result$summary_validation_tbl <- NULL
     }
-  }
-
-  #dummy for exposure location comparison
-  .reloadExposureValidation <- function(){
-
-    logMessage(".reloadExposureValidation called")
-
-    uploaded_locs_check <- check_loc(analysisID(), portfolioID())
-
-    #updating reactive only when needed
-    if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
-      result$uploaded_locs_check <- uploaded_locs_check
-    }
-
   }
 
 }
