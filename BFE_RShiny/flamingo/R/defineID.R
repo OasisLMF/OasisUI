@@ -131,6 +131,12 @@ defineID <- function(input, output, session,
       showModal(AnaList)
     })
 
+  # > open modal
+  observeEvent(
+    input$chooseAnaID, {
+      showModal(AnaList)
+    })
+
   # > modal content
   sub_modules$flamingo_analyses <- callModule(
     flamingoTable,
@@ -168,7 +174,8 @@ defineID <- function(input, output, session,
     anaID()},{
       logMessage(paste0("Updating preselected row because anaID() changed to ", anaID()))
       idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == anaID())
-      if (length(idx) > 0 && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
+      if (length(idx) > 0 && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))
+          && !is.null(anaID())) {
         result$preselRow <- idx
       }
     })
