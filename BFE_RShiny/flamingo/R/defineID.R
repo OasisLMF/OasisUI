@@ -131,7 +131,6 @@ defineID <- function(input, output, session,
         result$tbl_analysesData <- tbl_analysesData  %>%
           filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
       }
-      showModal(AnaList)
     })
 
   # > open modal
