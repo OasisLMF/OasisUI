@@ -55,7 +55,6 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom dplyr mutate
 #' @importFrom dplyr filter
 #' @importFrom dplyr case_when
-#' @importFrom dplyr bind_rows
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
@@ -72,7 +71,6 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom ggplot2 scale_y_continuous
 #' @importFrom stats setNames
 #' @importFrom tidyr spread
-#' @importFrom tidyr replace_na
 #' @importFrom tidyr gather
 #' @importFrom tidyr unite
 #' @importFrom tidyr separate
