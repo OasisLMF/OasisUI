@@ -9,7 +9,7 @@ outputfilesUI(id)
 
 outputfiles(input, output, session,
   tbl_filesListDataana = reactive(NULL), anaId = reactive(""),
-  portfolioId = reactive(""), active = reactive(TRUE))
+  active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -19,8 +19,6 @@ outputfiles(input, output, session,
 \item{tbl_filesListDataana}{Tbl of output files to view.}
 
 \item{anaId}{Id of analysis.}
-
-\item{portfolioId}{Id of portfolio associated to the analysis.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 }

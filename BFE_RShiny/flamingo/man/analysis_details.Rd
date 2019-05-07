@@ -7,14 +7,12 @@
 \usage{
 analysis_detailsUI(id)
 
-analysis_details(input, output, session, analysisID, portfolioID, counter)
+analysis_details(input, output, session, analysisID, counter)
 }
 \arguments{
 \item{id}{module id}
 
 \item{analysisID}{Selected analysis ID.}
-
-\item{portfolioID}{Selected portfolio ID.}
 
 \item{id}{module id}
 
