@@ -19,8 +19,13 @@ exposurevalidationmapUI <- function(id) {
   tagList(
     fluidRow(div(flamingoRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
-      leafletOutput(ns("exposure_map")),
-      hidden(div(id = ns("div_abuttonviewtbl"), flamingoButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;")))
+      column(1,
+             checkboxGroupInput(inputId =ns("chkgrp_perils"), label = "Pick peril", choices = c("WTC"))
+             ),
+      column(11,
+             leafletOutput(ns("exposure_map")),
+             hidden(div(id = ns("div_abuttonviewtbl"), flamingoButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;")))
+             )
     )
   )
 }
@@ -37,7 +42,6 @@ exposurevalidationmapUI <- function(id) {
 #' @template params-module
 #' @template params-active
 #' @param analysisID Selected analysis id.
-#' @param portfolioID Selected portfolio ID.
 #' @param counter Reactive value to trigger inputs download.
 #'
 #' @importFrom dplyr mutate
@@ -61,7 +65,6 @@ exposurevalidationmap <- function(input,
                                   output,
                                   session,
                                   analysisID = "",
-                                  portfolioID = "",
                                   counter = reactive(NULL),
                                   active = reactive(TRUE)) {
 
@@ -70,7 +73,9 @@ exposurevalidationmap <- function(input,
   # Params and Reactive Values -------------------------------------------------
   result <- reactiveValues(
     #dataframe of checked exposures
-    uploaded_locs_check = NULL
+    uploaded_locs_check = NULL,
+    #dataframe of checked exposures by perils
+    uploaded_locs_check_peril = NULL
   )
 
   # Modeled exposure and uploaded exposure ------------------------------------
@@ -80,15 +85,32 @@ exposurevalidationmap <- function(input,
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
       .reloadExposureValidation()
+      perils <- result$uploaded_locs_check$peril[!is.na(result$uploaded_locs_check$peril)] %>%
+        unique()
+      logMessage("Updating input$chkgrp_perils")
+      updateCheckboxGroupInput(session, inputId = "chkgrp_perils", choices = perils, selected = perils)
+    }
+  })
+
+  observeEvent(input$chkgrp_perils, {
+    if (any(input$chkgrp_perils != "")) {
+      result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
+        mutate( modeled = case_when(
+          peril_id %in% input$chkgrp_perils ~ TRUE,
+          TRUE ~ FALSE
+        )) %>%
+      select(-peril_id) %>%
+        distinct()
     }
   })
 
   # Show/Hide table button -----------------------------------------------------
 
-  observe({
-    hide("div_abuttonviewtbl")
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+  observeEvent(result$uploaded_locs_check_peril, ignoreNULL = FALSE, {
+    if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
       show("div_abuttonviewtbl")
+    } else {
+      hide("div_abuttonviewtbl")
     }
   })
 
@@ -100,7 +122,7 @@ exposurevalidationmap <- function(input,
     size = "l",
     fluidPage(
       fluidRow(
-        h4("Validated Exposure")),
+        h4("Validated Exposure by Peril")),
       fluidRow(
         DTOutput(ns("dt_output_uploaded_lock_check")),
         downloadButton(ns("exp_downloadexcel"), label = "Export to csv"),
@@ -119,14 +141,15 @@ exposurevalidationmap <- function(input,
     filename2download <- paste0("exposure_validation_", analysisID(), ".csv"),
     filename = function() {filename2download},
     content = function(file) {
-      fwrite(result$uploaded_locs_check, file, row.names = TRUE, quote = TRUE)}
+      fwrite(result$uploaded_locs_check_peril, file, row.names = TRUE, quote = TRUE)}
   )
 
   # Tabular data ---------------------------------------------------------------
   output$dt_output_uploaded_lock_check <- renderDT(
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+    if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
       datatable(
-        result$uploaded_locs_check %>% capitalize_names_df(),
+        result$uploaded_locs_check_peril %>%
+          capitalize_names_df(),
         class = "flamingo-table display",
         rownames = FALSE,
         escape = FALSE,
@@ -144,8 +167,8 @@ exposurevalidationmap <- function(input,
 
   # Map ------------------------------------------------------------------------
   output$exposure_map <- renderLeaflet({
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-      .createExposureValMap(result$uploaded_locs_check)
+    if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
+      .createExposureValMap(result$uploaded_locs_check_peril)
     } else {
       NULL
     }
@@ -170,7 +193,7 @@ exposurevalidationmap <- function(input,
 
     logMessage(".reloadExposureValidation called")
 
-    uploaded_locs_check <- check_loc(analysisID(), portfolioID())
+    uploaded_locs_check <- check_loc(analysisID())
 
     #updating reactive only when needed
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
