@@ -132,7 +132,6 @@ visualizationCBR <- function(input, output, session,
     id = "outputfiles",
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
     anaId = sub_modules$defineID1$selectAnaID,
-    portfolioId = sub_modules$defineID1$selectPortfolioID,
     active = reactive({active() && input$tabsCBR == ns("taboutputfiles")}))
 
 

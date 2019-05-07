@@ -48,7 +48,6 @@ anainputsUI <- function(id,
 #' @template params-module
 #' @template params-active
 #' @param analysisID Selected analysis ID.
-#' @param portfolioID Selected portfolio ID.
 #' @param refresh_opt Option to hide/show refresh button.
 #' @param counter Reactive value storing actionButton status.
 #'
@@ -60,7 +59,6 @@ anainputs <- function(input,
                       output,
                       session,
                       analysisID,
-                      portfolioID,
                       refresh_opt = TRUE,
                       counter = reactive(NULL),
                       active = reactive(TRUE)) {
@@ -128,33 +126,11 @@ anainputs <- function(input,
     logMessage(".reloadInputs called")
     if (!is.null(analysisID()) && analysisID() != "") {
       dt_generated <- return_analyses_input_file_wicons_df(analysisID())
-      if (!is.null(dt_generated)) {
-        dt_generated <- .replace_uploaded_files(dt_generated, portfolioID())
-      }
     } else {
       dt_generated <-  NULL
     }
     result$dt_generated  <- dt_generated
   }
 
-  .replace_uploaded_files <- function(dt_generated, portfolioID){
-
-    logMessage(".replace_uploaded_files called")
-
-    filetypes <- c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_source_file")
-
-    types <- sapply(dt_generated$files, function(fi){strsplit(fi, split = "[.]")[[1]][1]})
-    dt_generated <- dt_generated %>%
-      add_column(type = types , .after = "files")
-
-    for (filetype in filetypes){
-      stored_name <- return_portfolios_stored_name(portfolioID, filetype)
-      if (!is.null(stored_name) && !is.na(stored_name) && stored_name %in% dt_generated$files) {
-        dt_generated$type[which(dt_generated$files == stored_name)] <- filetype
-      }
-    }
-
-    return(dt_generated)
-  }
 
 }

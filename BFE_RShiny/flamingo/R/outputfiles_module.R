@@ -42,13 +42,11 @@ outputfilesUI <- function(id) {
 #' @template params-active
 #' @param tbl_filesListDataana Tbl of output files to view.
 #' @param anaId Id of analysis.
-#' @param portfolioId Id of portfolio associated to the analysis.
 #'
 #' @export
 outputfiles <- function(input, output, session,
                         tbl_filesListDataana = reactive(NULL),
                         anaId = reactive(""),
-                        portfolioId = reactive(""),
                         active = reactive(TRUE)) {
 
   ns <- session$ns
@@ -68,7 +66,6 @@ outputfiles <- function(input, output, session,
     anainputs,
     id = "anainputs",
     analysisID = anaId,
-    portfolioID = portfolioId,
     refresh_opt = FALSE,
     active = reactive({active()})
   )
