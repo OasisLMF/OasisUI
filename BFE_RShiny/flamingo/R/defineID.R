@@ -55,7 +55,6 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
@@ -76,8 +75,7 @@ defineID <- function(input, output, session,
                      preselAnaId = reactive(-1),
                      anaID = reactive(-1),
                      batch = FALSE,
-                     active = reactive(TRUE),
-                     logMessage = message) {
+                     active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -151,8 +149,7 @@ defineID <- function(input, output, session,
     rownames = FALSE,
     colnames =  c("row number" = 1),
     preselRow = reactive({result$preselRow}),
-    maxrowsperpage = 10,
-    logMessage = logMessage)
+    maxrowsperpage = 10)
 
   # > enable disable button
   observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {

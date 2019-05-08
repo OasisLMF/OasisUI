@@ -7,15 +7,13 @@
 \usage{
 panelOutputModuleUI(id)
 
-panelOutputModule(input, output, session, logMessage = message, anaID,
+panelOutputModule(input, output, session, anaID,
   filesListData = reactive(NULL), active)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{anaID}{is selectAnaID}
 

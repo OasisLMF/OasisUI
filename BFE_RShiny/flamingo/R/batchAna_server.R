@@ -6,13 +6,11 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @export
 batchAna <- function(input, output, session,
-                    active = reactive(TRUE),
-                    logMessage = message) {
+                    active = reactive(TRUE)) {
 
   ns <- session$ns
 
