@@ -6,7 +6,6 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param preselPanel selectedstep to visualize as returned from either
@@ -21,7 +20,7 @@
 #'
 #' @export
 singleAna <- function(input, output, session,
-                      active = reactive(TRUE), logMessage = message,
+                      active = reactive(TRUE),
                       selectAnaID = reactive(NULL),
                       selectPortfolioID = reactive(""),
                       preselPanel = reactive(1)) {
@@ -92,7 +91,6 @@ singleAna <- function(input, output, session,
     step1_choosePortfolio,
     id = "step1_choosePortfolio",
     active = reactive({active() && workflowSteps$step() == 1}),
-    logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID = reactive(result$portfolioID)
   )
@@ -101,7 +99,6 @@ singleAna <- function(input, output, session,
     step2_chooseAnalysis,
     id = "step2_chooseAnalysis",
     active = reactive({active() && workflowSteps$step() == 2}),
-    logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID = reactive(input$portfolioID),
     pfName = reactive({result$pfName}),
@@ -112,7 +109,6 @@ singleAna <- function(input, output, session,
     step3_configureOutput,
     id = "step3_configureOutput",
     active = reactive({active() && workflowSteps$step() == 3}),
-    logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID =  reactive({input$portfolioID}),
     pfName = reactive({result$pfName}),

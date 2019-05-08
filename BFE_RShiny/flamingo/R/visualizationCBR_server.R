@@ -8,7 +8,6 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
@@ -22,8 +21,7 @@
 visualizationCBR <- function(input, output, session,
                              active = reactive(TRUE),
                              preselAnaId = reactive(NULL),
-                             anaID = reactive(NULL),
-                             logMessage = message) {
+                             anaID = reactive(NULL)) {
 
   ns <- session$ns
 
@@ -65,15 +63,13 @@ visualizationCBR <- function(input, output, session,
     defineID,
     id = "defineID-1",
     preselAnaId = preselAnaId,
-    anaID =  anaID,
-    logMessage = logMessage)
+    anaID =  anaID)
 
   sub_modules$defineID2 <- callModule(
     defineID,
     id = "defineID-2",
     preselAnaId = preselAnaId,
-    anaID =  anaID,
-    logMessage = logMessage)
+    anaID =  anaID)
 
 
   # Go to Configure Output button ----------------------------------------------
@@ -95,8 +91,7 @@ visualizationCBR <- function(input, output, session,
     portfolioID1 = reactive(sub_modules$defineID1$selectPortfolioID()),
     portfolioID2 = reactive(sub_modules$defineID2$selectPortfolioID()),
     compare = TRUE,
-    active = reactive({active() && input$tabsCBR == ns("tabsummary")}),
-    logMessage = logMessage)
+    active = reactive({active() && input$tabsCBR == ns("tabsummary")}))
 
 
   # Extract Output files for given anaID----------------------------------------
@@ -142,8 +137,7 @@ visualizationCBR <- function(input, output, session,
     selectAnaID = reactive(sub_modules$defineID1$selectAnaID()),
     filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    active = reactive({active() && input$tabsCBR == ns("tabplots")}),
-    logMessage = logMessage)
+    active = reactive({active() && input$tabsCBR == ns("tabplots")}))
 
 
   # Helper functions -----------------------------------------------------------

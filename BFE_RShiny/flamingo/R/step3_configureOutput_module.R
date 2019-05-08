@@ -399,7 +399,6 @@ panel_configureAdvancedRI <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param currstep Current selected step.
@@ -427,7 +426,6 @@ panel_configureAdvancedRI <- function(id) {
 #' @export
 step3_configureOutput <- function(input, output, session,
                                   active = reactive(TRUE),
-                                  logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
                                   pfName = reactive(""),

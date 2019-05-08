@@ -5,8 +5,7 @@
 \alias{loginDialogUI}
 \title{loginDialog}
 \usage{
-loginDialog(input, output, session, logout, logMessage = message,
-  logError = logMessage)
+loginDialog(input, output, session, logout)
 
 loginDialogUI(id)
 }
@@ -14,10 +13,6 @@ loginDialogUI(id)
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{logout}{Reactive yielding logout signal.}
-
-\item{logMessage}{function that will be passed info messages.}
-
-\item{logError}{function that will be passed error messages.}
 
 \item{id}{Namespace ID for the module.}
 }

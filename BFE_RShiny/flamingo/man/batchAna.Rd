@@ -5,8 +5,7 @@
 \alias{batchAnaUI}
 \title{batchAna}
 \usage{
-batchAna(input, output, session, active = reactive(TRUE),
-  logMessage = message)
+batchAna(input, output, session, active = reactive(TRUE))
 
 batchAnaUI(id)
 }
@@ -14,8 +13,6 @@ batchAnaUI(id)
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
 }

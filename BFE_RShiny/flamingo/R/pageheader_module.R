@@ -37,7 +37,6 @@ pageheaderUI <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param user reactive expression yielding user name
@@ -50,7 +49,7 @@ pageheaderUI <- function(id) {
 #' @importFrom shinyWidgets toggleDropdownButton
 #'
 #' @export
-pageheader <- function(input, output, session, user, logMessage = message, active = reactive(TRUE)) {
+pageheader <- function(input, output, session, user, active = reactive(TRUE)) {
 
   ns <- session$ns
 

@@ -8,8 +8,7 @@
 visualizationCBR}
 \usage{
 visualizationCBR(input, output, session, active = reactive(TRUE),
-  preselAnaId = reactive(NULL), anaID = reactive(NULL),
-  logMessage = message)
+  preselAnaId = reactive(NULL), anaID = reactive(NULL))
 
 visualizationCBRUI(id)
 }
@@ -21,8 +20,6 @@ visualizationCBRUI(id)
 \item{preselAnaId}{reactive string expression for reselected analysis id from \link{landingPage}.}
 
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
 }

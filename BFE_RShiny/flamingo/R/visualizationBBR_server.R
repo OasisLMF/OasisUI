@@ -8,7 +8,6 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
@@ -24,7 +23,7 @@
 visualizationBBR <- function(input, output, session,
                              preselAnaId = reactive(NULL),
                              anaID  = reactive(NULL),
-                             active = reactive(TRUE), logMessage = message) {
+                             active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -66,8 +65,7 @@ visualizationBBR <- function(input, output, session,
     id = "defineID",
     preselAnaId = preselAnaId,
     anaID =  anaID,
-    active = active,
-    logMessage = logMessage)
+    active = active)
 
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
@@ -101,8 +99,7 @@ visualizationBBR <- function(input, output, session,
     selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
     portfolioID1 = reactive(sub_modules$defineID$selectPortfolioID()),
     tbl_filesListDataana1 = reactive({result$tbl_filesListDataana}),
-    active = reactive({active() && input$tabsBBR == ns("tabsummary")}),
-    logMessage = logMessage)
+    active = reactive({active() && input$tabsBBR == ns("tabsummary")}))
 
 
   # Tab Output files -----------------------------------------------------------
@@ -122,8 +119,7 @@ visualizationBBR <- function(input, output, session,
     selectAnaID = reactive(sub_modules$defineID$selectAnaID()),
     filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    active = reactive({active() && input$tabsBBR == ns("tabplots")}),
-    logMessage = logMessage)
+    active = reactive({active() && input$tabsBBR == ns("tabplots")}))
 
 
   # Helper functions -----------------------------------------------------------

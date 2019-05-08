@@ -56,7 +56,6 @@ summarytabUI <- function(id) {
 #' @description Server logic of summary elements of an analysis.
 #'
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #' @param selectAnaID1 id of selected analysis
 #' @param selectAnaID2 id of selected analysis
@@ -89,7 +88,7 @@ summarytab <- function(input, output, session,
                        portfolioID2 = reactive(""),
                        tbl_filesListDataana1 = reactive(NULL),
                        compare = FALSE,
-                       active, logMessage = message) {
+                       active) {
 
   ns <- session$ns
 
@@ -175,8 +174,7 @@ summarytab <- function(input, output, session,
     filter = FALSE,
     rownames = FALSE,
     colnames = TRUE,
-    maxrowsperpage = 10,
-    logMessage = logMessage)
+    maxrowsperpage = 10)
 
   dt_dataParam <- reactive({
     if (!is.null(result$SummaryData)) {
@@ -201,8 +199,7 @@ summarytab <- function(input, output, session,
     filter = FALSE,
     rownames = FALSE,
     colnames = TRUE,
-    maxrowsperpage = 10,
-    logMessage = logMessage)
+    maxrowsperpage = 10)
 
   dt_dataOutput <- reactive({
     if (!is.null(result$SummaryData)) {
@@ -229,8 +226,7 @@ summarytab <- function(input, output, session,
     escape = TRUE,
     rownames = FALSE,
     colnames = TRUE,
-    maxrowsperpage = 10,
-    logMessage = logMessage)
+    maxrowsperpage = 10)
 
 
   # Plots ----------------------------------------------------------------------

@@ -7,8 +7,7 @@
 \title{visualizationSBR}
 \usage{
 visualizationSBR(input, output, session, preselAnaId = reactive(NULL),
-  anaID = reactive(NULL), active = reactive(TRUE),
-  logMessage = message)
+  anaID = reactive(NULL), active = reactive(TRUE))
 
 visualizationSBRUI(id)
 }
@@ -20,8 +19,6 @@ visualizationSBRUI(id)
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
 }

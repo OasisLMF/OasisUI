@@ -8,9 +8,8 @@
 step3_configureOutputUI(id)
 
 step3_configureOutput(input, output, session, active = reactive(TRUE),
-  logMessage = message, currstep = reactive(-1),
-  portfolioID = reactive(""), pfName = reactive(""),
-  analysisID = reactive(NULL))
+  currstep = reactive(-1), portfolioID = reactive(""),
+  pfName = reactive(""), analysisID = reactive(NULL))
 }
 \arguments{
 \item{id}{module id}
@@ -18,8 +17,6 @@ step3_configureOutput(input, output, session, active = reactive(TRUE),
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{currstep}{Current selected step.}
 

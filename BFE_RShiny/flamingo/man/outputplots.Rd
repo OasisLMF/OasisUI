@@ -8,7 +8,7 @@
 outputplotsUI(id)
 
 outputplots(input, output, session, selectAnaID, n_panels,
-  filesListData = reactive(NULL), active, logMessage = message)
+  filesListData = reactive(NULL), active)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -22,8 +22,6 @@ outputplots(input, output, session, selectAnaID, n_panels,
 \item{filesListData}{Table of output files for a given analysis id}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{logMessage}{function that will be passed info messages.}
 }
 \value{
 List of tags.

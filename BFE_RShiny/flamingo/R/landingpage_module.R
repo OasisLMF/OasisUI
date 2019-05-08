@@ -42,7 +42,6 @@ landingPageUI <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @return anaID id of selected analysis
@@ -54,7 +53,7 @@ landingPageUI <- function(id) {
 #' @importFrom data.table fwrite
 #'
 #' @export
-landingPage <- function(input, output, session, logMessage = message, active = reactive(TRUE)) {
+landingPage <- function(input, output, session, active = reactive(TRUE)) {
 
   # Reactive Values and parameters ---------------------------------------------
 
