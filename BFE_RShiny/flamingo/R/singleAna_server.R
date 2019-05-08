@@ -137,29 +137,29 @@ singleAna <- function(input, output, session,
 
   # > AnaId --------------------------------------------------------------------
   observeEvent({submodulesList$step3_configureOutput$dashboardAnaID()
-    result$anaID}, ignoreInit = TRUE, {
+    result$anaID}, ignoreInit = TRUE, ignoreNULL = TRUE, {
       anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
       #Avoid updating input if not necessary
-      if (!is.null(anaID) && !is.na(anaID) && result$anaID != anaID) {
+      if (result$anaID != anaID) {
         logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", anaID ))
         result$dashboardanaID <- anaID
       }
     })
 
   observeEvent({submodulesList$step2_chooseAnalysis$analysisID()
-    result$anaID}, ignoreInit = TRUE, {
+    result$anaID}, ignoreInit = TRUE, ignoreNULL = TRUE, {
       anaID <- submodulesList$step2_chooseAnalysis$analysisID()
       #Avoid updating input if not necessary
-      if (!is.null(anaID) && !is.na(anaID)  && result$anaID != anaID) {
+      if (result$anaID != anaID) {
         logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", anaID ))
         result$anaID <- anaID
       }
     })
 
-  observeEvent(selectAnaID(), ignoreInit = TRUE, {
+  observeEvent(selectAnaID(), ignoreInit = TRUE, ignoreNULL = TRUE, {
     anaID <- selectAnaID()
     #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && result$anaID != anaID) {
+    if (result$anaID != anaID) {
       logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", anaID ))
       result$anaID <- anaID
     }
