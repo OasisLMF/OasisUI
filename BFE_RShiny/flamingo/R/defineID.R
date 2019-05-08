@@ -101,14 +101,13 @@ defineID <- function(input, output, session,
 
   # Modal for AnaID selection --------------------------------------------------
 
+  tbl_analysesData <- return_tbl_analysesData()
+
   #Find row of anaid preselected in landing page
   observeEvent({
     preselAnaId()}, ignoreNULL = TRUE, {
-      tbl_analysesData <- return_tbl_analysesData()
-      if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData  %>%
-          filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
-      }
+      result$tbl_analysesData <- tbl_analysesData  %>%
+        filter(!!sym(tbl_analysesDataNames$status) == Status$Completed)
       idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == preselAnaId())
       if (length(idx) > 0 && !isTRUE(all.equal(result$preselRow, idx))
           && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
@@ -119,15 +118,11 @@ defineID <- function(input, output, session,
   #Find row of anaid preselected in model analysis server step 3
   observeEvent({
     anaID()}, ignoreNULL = TRUE, {
-      tbl_analysesData <- return_tbl_analysesData()
-      if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData  %>%
-          filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
-      }
+      result$tbl_analysesData <- tbl_analysesData  %>%
+        filter(!!sym(tbl_analysesDataNames$status) == Status$Completed)
       logMessage(paste0("Updating preselected row because anaID() changed to ", anaID()))
       idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == anaID())
-      if (length(idx) > 0 && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))
-          && !is.null(anaID())) {
+      if (length(idx) > 0 && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
         result$preselRow <- idx
       }
     })
@@ -173,8 +168,7 @@ defineID <- function(input, output, session,
 
   # > open modal
   observeEvent(
-    input$chooseAnaID, {
-      tbl_analysesData <- return_tbl_analysesData()
+    input$chooseAnaID, ignoreNULL = TRUE, {
       if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
         result$tbl_analysesData <- tbl_analysesData  %>%
           filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
