@@ -132,19 +132,19 @@ singleAna <- function(input, output, session,
   })
 
   # > AnaId --------------------------------------------------------------------
-  observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), ignoreNULL = TRUE, {
+  observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), {
     anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
     logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", anaID ))
     result$dashboardanaID <- anaID
   })
 
-  observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), ignoreNULL = TRUE, {
+  observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), {
     anaID <- submodulesList$step2_chooseAnalysis$analysisID()
     logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", anaID ))
     result$anaID <- anaID
   })
 
-  observeEvent(selectAnaID(), ignoreNULL = TRUE, {
+  observeEvent(selectAnaID(), {
     anaID <- selectAnaID()
     logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", anaID))
     result$anaID <- anaID
