@@ -609,7 +609,7 @@ step2_chooseAnalysis <- function(input, output, session,
   #Make submit button dependent of analysis name
   observeEvent({
     input$dt_models_rows_selected
-    input$anaName}, ignoreNULL = TRUE, ignoreInit = TRUE, {
+    input$anaName}, ignoreInit = TRUE, {
       if (length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
         enable("abuttonsubmit")
       } else {
