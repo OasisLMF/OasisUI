@@ -7,7 +7,7 @@
 \usage{
 exposurevalidationsummaryUI(id)
 
-exposurevalidationsummary(input, output, session, analysisID = "",
+exposurevalidationsummary(input, output, session, analysisID = NULL,
   portfolioID = "", counter = reactive(NULL),
   active = reactive(TRUE))
 }

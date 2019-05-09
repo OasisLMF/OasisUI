@@ -82,8 +82,8 @@ summarytabUI <- function(id) {
 #'
 #' @export
 summarytab <- function(input, output, session,
-                       selectAnaID1 = reactive(""),
-                       selectAnaID2 = reactive(""),
+                       selectAnaID1 = reactive(NULL),
+                       selectAnaID2 = reactive(NULL),
                        portfolioID1 = reactive(""),
                        portfolioID2 = reactive(""),
                        tbl_filesListDataana1 = reactive(NULL),
@@ -113,10 +113,10 @@ summarytab <- function(input, output, session,
       SummaryData2 <- NULL
       SummaryData <- NULL
 
-      if (selectAnaID1() != "" && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
+      if (!is.null(selectAnaID1()) && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
         SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
       }
-      if (selectAnaID2() != "" && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
+      if (!is.null(selectAnaID2()) && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
         SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
       }
 

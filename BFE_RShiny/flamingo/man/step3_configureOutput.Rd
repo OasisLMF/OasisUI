@@ -9,7 +9,7 @@ step3_configureOutputUI(id)
 
 step3_configureOutput(input, output, session, active = reactive(TRUE),
   currstep = reactive(-1), portfolioID = reactive(""),
-  pfName = reactive(""), analysisID = reactive(""))
+  pfName = reactive(""), analysisID = reactive(NULL))
 }
 \arguments{
 \item{id}{module id}

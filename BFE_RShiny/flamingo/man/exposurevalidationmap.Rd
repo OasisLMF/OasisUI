@@ -7,7 +7,7 @@
 \usage{
 exposurevalidationmapUI(id)
 
-exposurevalidationmap(input, output, session, analysisID = "",
+exposurevalidationmap(input, output, session, analysisID = NULL,
   portfolioID = "", counter = reactive(NULL),
   active = reactive(TRUE))
 }

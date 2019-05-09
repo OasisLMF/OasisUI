@@ -20,10 +20,10 @@
 #'
 #' @export
 singleAna <- function(input, output, session,
-                     active = reactive(TRUE),
-                     selectAnaID = reactive(""),
-                     selectPortfolioID = reactive(""),
-                     preselPanel = reactive(1)) {
+                      active = reactive(TRUE),
+                      selectAnaID = reactive(NULL),
+                      selectPortfolioID = reactive(""),
+                      preselPanel = reactive(1)) {
 
   ns <- session$ns
 
@@ -37,9 +37,9 @@ singleAna <- function(input, output, session,
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # Id of the analysis to use in dashboard
-    dashboardanaID = -1,
+    dashboardanaID = NULL,
     # Id of analysis
-    anaID = "",
+    anaID = NULL,
     # Id of the portfolio
     portfolioID = "",
     # Portfolio table
@@ -63,7 +63,7 @@ singleAna <- function(input, output, session,
   # and to panel 3 if coming from Browse
   observe(if (active()) {
     workflowSteps$update(analysisWorkflowSteps[[preselPanel()]])
-    result$dashboardanaID <- -1
+    result$dashboardanaID <- NULL
   })
 
   observeEvent(workflowSteps$step(), ignoreInit = TRUE, {
@@ -132,31 +132,19 @@ singleAna <- function(input, output, session,
   })
 
   # > AnaId --------------------------------------------------------------------
-  observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), ignoreInit = TRUE, {
-    anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
-    #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != -1) {
-      logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", anaID ))
-      result$dashboardanaID <- anaID
-    }
+  observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), {
+    result$dashboardanaID <- submodulesList$step3_configureOutput$dashboardAnaID()
+    logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", result$dashboardanaID))
   })
 
-  observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), ignoreInit = TRUE, {
-    anaID <- submodulesList$step2_chooseAnalysis$analysisID()
-    #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
-      logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", anaID ))
-      result$anaID <- anaID
-    }
+  observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), {
+    result$anaID <- submodulesList$step2_chooseAnalysis$analysisID()
+    logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", result$anaID))
   })
 
-  observeEvent(selectAnaID(), ignoreInit = TRUE, {
-    anaID <- selectAnaID()
-    #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
-      logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", anaID ))
-      result$anaID <- anaID
-    }
+  observeEvent(selectAnaID(), {
+    result$anaID <- selectAnaID()
+    logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", result$anaID))
   })
 
   # > portfolioID --------------------------------------------------------------

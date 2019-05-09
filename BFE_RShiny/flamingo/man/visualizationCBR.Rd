@@ -8,7 +8,7 @@
 visualizationCBR}
 \usage{
 visualizationCBR(input, output, session, active = reactive(TRUE),
-  preselAnaId = reactive(-1), anaID = reactive(-1))
+  preselAnaId = reactive(NULL), anaID = reactive(NULL))
 
 visualizationCBRUI(id)
 }

@@ -6,7 +6,7 @@
 \title{singleAna}
 \usage{
 singleAna(input, output, session, active = reactive(TRUE),
-  selectAnaID = reactive(""), selectPortfolioID = reactive(""),
+  selectAnaID = reactive(NULL), selectPortfolioID = reactive(""),
   preselPanel = reactive(1))
 
 singleAnaUI(id)

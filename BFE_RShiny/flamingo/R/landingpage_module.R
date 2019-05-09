@@ -65,7 +65,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
 
   result <- reactiveValues(
     tbl_anaInbox = NULL,
-    anaID = -1
+    anaID = NULL
   )
 
   # navigation -----------------------------------------------------------------
@@ -86,7 +86,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
 
   observe(if (active()) {
     # Reset Param
-    result$anaID <- -1
+    result$anaID <- NULL
 
     # invalidate if the refresh button updates
     force(input$abuttonrefreshanaInbox)

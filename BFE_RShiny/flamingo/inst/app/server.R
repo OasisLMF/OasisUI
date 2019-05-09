@@ -91,7 +91,7 @@ server <- function(input, output, session) {
   auth_modules$visualizationSBR <- callModule(
     visualizationSBR,
     id = "visualizationSBR",
-    preselAnaId =  auth_modules$landingPage$anaID,
+    preselAnaId = auth_modules$landingPage$anaID,
     anaID = auth_modules$singleAna$anaID,
     active = reactive(authenticated() && main_visible() == "SBR")
   )
@@ -99,16 +99,16 @@ server <- function(input, output, session) {
   auth_modules$visualizationBBR <- callModule(
     visualizationBBR,
     id = "visualizationBBR",
-    preselAnaId = reactive(-1),
-    anaID = reactive(-1),
+    preselAnaId = reactive(NULL),
+    anaID = reactive(NULL),
     active = reactive(authenticated() && main_visible() == "BBR")
   )
 
   auth_modules$visualizationCBR <- callModule(
     visualizationCBR,
     id = "visualizationCBR",
-    preselAnaId = reactive(-1),
-    anaID =  reactive(-1),
+    preselAnaId = reactive(NULL),
+    anaID =  reactive(NULL),
     active = reactive(authenticated() && main_visible() == "CBR")
   )
 

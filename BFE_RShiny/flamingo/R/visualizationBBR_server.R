@@ -21,8 +21,8 @@
 #'
 #' @export
 visualizationBBR <- function(input, output, session,
-                             preselAnaId = reactive(-1),
-                             anaID  = reactive(-1),
+                             preselAnaId = reactive(NULL),
+                             anaID  = reactive(NULL),
                              active = reactive(TRUE)) {
 
   ns <- session$ns
@@ -38,7 +38,7 @@ visualizationBBR <- function(input, output, session,
     #Panel to select
     preselPanel = 1,
     #id of selected analysis
-    selectAnaID = "",
+    selectAnaID = NULL,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
@@ -54,7 +54,7 @@ visualizationBBR <- function(input, output, session,
   observeEvent(active(), {
     if (active()) {
       result$preselPanel <- 1
-      result$selectAnaID <- ""
+      result$selectAnaID <- NULL
       result$selectPortfolioID = ""
     }
   })
@@ -79,7 +79,7 @@ visualizationBBR <- function(input, output, session,
 
   # Extract Output files for given anaID----------------------------------------
   observeEvent(sub_modules$defineID$selectAnaID(), {
-    if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
+    if (!is.null(sub_modules$defineID$selectAnaID())) {
       tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
       analysis_settings <- return_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
       result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
