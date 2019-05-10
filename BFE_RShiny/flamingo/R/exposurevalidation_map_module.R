@@ -46,6 +46,7 @@ exposurevalidationmapUI <- function(id) {
 #'
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
+#' @importFrom dplyr distinct
 #' @importFrom DT formatStyle
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
