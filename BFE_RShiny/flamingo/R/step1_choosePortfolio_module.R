@@ -256,8 +256,6 @@ step1_choosePortfolio <- function(input, output, session,
     SRfile = NULL,
     # SA file to load
     SRSfile = NULL,
-    # reactive value for details of portfolio table
-    tbl_portfolioDetails = NULL,
     # flag to know if the user is creating or amending a portfolio
     portfolio_flag = "C"
   )
@@ -350,21 +348,12 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Portfolio Details Table ----------------------------------------------------
 
-  sub_modules$portfolioDetails <- callModule(
-    ViewFilesInTable,
-    id = "portfolioDetails",
-    tbl_filesListData =  reactive(result$tbl_portfolioDetails),
-    param = reactive(result$portfolioID),
-    includechkbox = TRUE)
-
-
   # Show Portfolio Details
   onclick("abuttonpfdetails", {
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
     show("panelPortfolioDetails")
     logMessage("showing panelPortfolioDetails")
-    .reloadtbl_portfolioDetails()
   })
 
   sub_modules$portfolio_details <- callModule(
@@ -686,10 +675,6 @@ step1_choosePortfolio <- function(input, output, session,
   # Refresh Buttons ------------------------------------------------------------
   onclick("abuttonprgtblrfsh", {
     .reloadtbl_portfoliosData()
-  } )
-
-  onclick("abuttondefpfrfsh", {
-    .reloadtbl_portfolioDetails()
   } )
 
   # Updates dependent on changed: dt_Portfolios_rows_selected ------------------
