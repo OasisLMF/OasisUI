@@ -1,0 +1,332 @@
+### Data Hub for OasisUI ----
+# Description: Set of R6 classes for managing files and files lists in OasisUI
+
+library(R6)
+library(flamingo)
+
+# Questions:
+# * How to write tests for a class?
+
+# Params:
+# id                  : Portfolio Id | Model Id | Analysis Id
+# type                : Identifier for Analysis Id: inputs / outputs
+# dataset_identifier  : Identifier:
+#                       * file path for Analysis Id
+#                       * api call for Portfolio Id and Model Id
+
+### R6 Class for OasisUI Data Hub ----
+
+#' DataHub
+#'
+#' @rdname DataHub
+#'
+#' @description R6 Class for OasisUI Data Hub.
+#'
+#' @docType class
+#'
+#' @return Object of \code{\link{R6Class}} with methods for Oasis files lists and Datatasets explorations.
+#'
+#' @format \code{\link{R6Class}} object.
+#'
+#' @section Arguments:
+#' \describe{
+#' \item{id}{Portfolio Id | Model Id | Analysis Id}
+#' \item{type}{Identifier for Analysis Id: inputs / outputs}
+#' \item{dataset_identifier}{Identifier:  file path for Analysis Id /  api call for Portfolio Id and Model Id}
+#' }
+#'
+#' @section Methods:
+#' \describe{
+#' LISTS
+#' > Portfolio
+#' \item{\code{get_pf_data_list(id)} {return list of portfolio source files}
+#' \item{\code{invalidate_pf_data_list(id)} {invalidate list of portfolio source files}
+#' > Model
+#' \item{\code{get_model_data_list(id)} {return list of model resources}
+#' \item{\code{invalidate_model_data_list(id)} {invalidate list of model resources}
+#' > Analysis
+#' \item{\code{get_ana_inputs_data_list(id)} {return list of analysis inputs}
+#' \item{\code{get_ana_outputs_data_list(id)} {return list of analysis outputs}
+#' \item{\code{invalidate_ana_inputs_data_list(id)} {invalidate list of analysis inputs}
+#' \item{\code{invalidate_ana_outputs_data_list(id)} {invalidate list of analysis outputs}
+#'
+#' DATASETS
+#' > Portfolio
+#' \item{\code{get_pf_dataset_content(id, dataset_identifier)} {extract a source file (location/account...) content given a portfolio id}
+#' \item{\code{invalidate_pf_dataset_content(id, dataset_identifier)} {invalidate a source file (location/account...) content given a portfolio id}
+#' \item{\code{get_pf_location_content(id)} {extract location source file content given a portfolio id}
+#' \item{\code{invalidate_pf_location_content(id)} {invalidate a source file (location/account...) content given a portfolio id}
+#' \item{\code{get_pf_dataset_header(id, dataset_identifier)} {extract a source file (location/account...) header given a portfolio id}
+#' \item{\code{invalidate_pf_dataset_header(id, dataset_identifier)} {invalidate a source file (location/account...) header given a portfolio id}
+#' \item{\code{get_pf_dataset_nrow(id, dataset_identifier)} {extract a source file (location/account...) nrow given a portfolio id}
+#' \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)} {invalidate a source file (location/account...) header given a portfolio id}
+#' > Model
+#' \item{\code{get_model_resource_dataset_content(id)} {extract model resource file given model id}
+#' \item{\code{invalidate_model_resource_dataset_content(id)} {invalidate model resource file given model id}
+#' \item{\code{get_model_hazard_dataset_content(id)} {extract model hazard resource file given model id}
+#' \item{\code{invalidate_model_hazard_dataset_content(id)} {invalidate model hazard resource file given model id}
+#' > Analysis
+#' \item{\code{get_ana_dataset_content(id, type, dataset_identifier)} {extract a inputs/outputs file content given an analysis id}
+#' \item{\code{invalidate_ana_dataset_content(id, type, dataset_identifier)} {invalidate a inputs/outputs file content given an analysis id}
+#' \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)} {extract a inputs file content given an analysis id}
+#' \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)} {invalidate a inputs file content given an analysis id}
+#' \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)} {extract a outputs file content given an analysis id}
+#' \item{\code{invalidate_ana_outputs_dataset_content(id,  dataset_identifier)} {invalidate a outputs file content given an analysis id}
+#' \item{\code{get_ana_dataset_header(id, type, dataset_identifier)} {extract a inputs/outputs file nrow given an analysis id}
+#' \item{\code{invalidate_ana_dataset_header(id, type, dataset_identifier)} {invalidate a inputs/outputs file header given an analysis id}
+#' \item{\code{get_ana_dataset_nrow(id, type, dataset_identifier)} {extract a inputs/outputs file nrow given an analysis id}
+#' \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)} {invalidate a inputs/outputs file nrow given an analysis id}
+#' \item{\code{get_ana_dataset_size(id, type, dataset_identifier)} {extract a inputs/outputs file size given an analysis id}
+#' \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)} {invalidate a inputs/outputs file size given an analysis id}
+#' \item{\code{get_ana_settings_content(id)} {extract analysis settings content}
+#' \item{\code{invalidate_ana_settings_content(id)} {invalidate analysis settings content}
+#' \item{\code{get_ana_validation_summary_content(id)} {extract analysis validation summary content}
+#' \item{\code{invalidate_ana_validation_summary_content(id)} {invalidate analysis validation summary content}
+#' }
+#'
+#' @section Usage:
+#' \preformatted{data_hub <- DataHub$new()
+#' data_hub$get_pf_data_list(id)
+#' }
+#'
+#' @importFrom R6 R6Class
+#' @importFrom utils untar
+#'
+#' @export
+
+DataHub <- R6Class(
+  "DataHub",
+  public = list(
+    # LISTS ----
+    # > Portfolio ----
+    #return list of portfolio source files
+    get_pf_data_list = function(id, ...){
+      data_list <- return_tbl_portfolioDetails(id) #assuming id !is.null(id) && id != "" && id != -1 && !is.na(id)
+      data_list
+    }
+    #invalidate list of portfolio source files
+    invalidate_pf_data_list = function(id, ...){
+      invisible()
+    }
+    # > Model ----
+    #return list of model resources
+    get_model_data_list = function(id, ...){
+      data_list <- NULL #assuming id !is.null(id) && id != "" && id != -1 && !is.na(id)
+      data_list
+    }
+    #invalidate list of model resources
+    invalidate_model_data_list = function(id, ...){
+      invisible()
+    }
+    # > Analysis ----
+    #return list of analysis resources
+    get_ana_inputs_data_list = function(id, ...){
+      tar_path <- get_analyses_inputs_tar(id, destdir)
+      data_list <- untar_list(tarfile)
+      data_list
+    }
+    get_ana_outputs_data_list = function(id, ...){
+      tar_path <- get_analyses_outputs_tar(id, destdir)
+      data_list <- untar_list(tar_path, label = "output")
+      analysis_settings <- self$get_ana_settings_content(id)
+      data_list <- cbind(data_list,
+                         do.call(rbind.data.frame,
+                                 lapply(data_list$files,
+                                        .addDescription, analysis_settings)))
+    }
+    #invalidate list of analysis resources
+    invalidate_ana_inputs_data_list = function(id, ...){
+      invisible()
+    }
+    invalidate_ana_outputs_data_list = function(id, ...){
+      invisible()
+    }
+
+    # DATASETS ----
+    # > PORTFLIO METHODS ----
+    #extract a source file (location/account...) content given a portfolio id
+    #dataset_identifier is location/account/reinsurance_info/reinsurance_source
+    get_pf_dataset_content = function(id, dataset_identifier, ...){
+      currNamespace <- ls("package:flamingo")
+      func_wpattern <- currNamespace[grepl(dataset_identifier, currNamespace)]
+      returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
+      dataset_content <- return_file_df(func, id)
+      dataset_content
+    }
+    #invalidate a source file (location/account...) content given a portfolio id
+    #dataset_identifier is location/account/reinsurance_info/reinsurance_source
+    invalidate_pf_dataset_content = function(id, dataset_identifier, ...){
+      invisible()
+    }
+    #extract location source file content given a portfolio id
+    get_pf_location_content = function(id,  ...){
+      dataset_content <-  self$get_pf_dataset_content = function(id, dataset_identifier = "location", ...)
+      dataset_content
+    }
+    #invalidate a source file (location/account...) content given a portfolio id
+    #dataset_identifier is location/account/reinsurance_info/reinsurance_source
+    invalidate_pf_location_content = function(id, dataset_identifier, ...){
+      invisible()
+    }
+    #extract a source file (location/account...) header given a portfolio id
+    get_pf_dataset_header = function(id, dataset_identifier, ...){
+      dataset_content <- self$get_pf_dataset_content(id, ...)
+      dataset_header <- names(dataset_content)
+      dataset_header
+    }
+    #invalidate a source file (location/account...) header given a portfolio id
+    invalidate_pf_dataset_header = function(id, dataset_identifier, ...){
+      invisible()
+    }
+    #extract a source file (location/account...) nrow given a portfolio id
+    get_pf_dataset_nrow = function(id, dataset_identifier, ...){
+      dataset_content <- self$get_pf_dataset_content(id, ...)
+      dataset_nrow <- nrow(dataset_content)
+      dataset_nrow
+    }
+    #invalidate a source file (location/account...) header given a portfolio id
+    invalidate_pf_dataset_nrow = function(id, dataset_identifier, ...){
+      invisible()
+    }
+
+    # > MODEL METHODS ----
+    #extract model resource file given model id
+    get_model_resource_dataset_content = function(id, ...){
+      dataset_content <- return_models_id_resource_file_df(id)
+      dataset_content
+    }
+    #invalidate model resource file given model id
+    invalidate_model_resource_dataset_content = function(id, ...){
+      invisible()
+    }
+    #extract model hazard resource file given model id
+    get_model_hazard_dataset_content = function(id,  ...){
+      #currently no api function
+      path <- system.file("inst", "app", "www", "hazard_files", "hazard_500_PGA.geojson", package = "flamingo")
+      mapfile <- geojsonio::geojson_read(path, what = "sp")
+      mapfile
+    }
+    #invalidate model hazard resource file given model id
+    invalidate_model_hazard_dataset_content = function(id,  ...){
+      invisible()
+    }
+
+    # > ANALYSIS METHODS ----
+    #extract a inputs/outputs file content given an analysis id
+    get_ana_dataset_content = function(id, type, dataset_identifier, ...){
+      extractFolder <- set_extractFolder(id = id, label = type)
+      currfilepath <- set_extractFilePath(extractFolder, dataset_identifier)
+      if (dir.exists(currfilepath)) {
+        dataset_content <- list.files(currfilepath, recursive = TRUE) %>%
+          as.data.frame() %>%
+          setNames("files")
+      } else {
+        dataset_content <- fread(currfilepath)
+      }
+      dataset_content
+    }
+    #invalidate a inputs/outputs file content given an analysis id
+    invalidate_ana_dataset_content = function(id, type, dataset_identifier, ...){
+      invisible()
+    }
+    #extract a inputs file content given an analysis id
+    get_ana_inputs_dataset_content = function(id, dataset_identifier, ...){
+      dataset_content <- self$get_ana_dataset_content(id, type = "inputs", dataset_identifier, ...)
+      dataset_content
+    }
+    #invalidate a inputs file content given an analysis id
+    invalidate_ana_inputs_dataset_content = function(id, dataset_identifier, ...){
+      invisible()
+    }
+    #extract a outputs file content given an analysis id
+    get_ana_outpu_dataset_content = function(id, dataset_identifier, ...){
+      dataset_content <- self$get_ana_dataset_content(id, type = "outputs", dataset_identifier, ...)
+      dataset_content
+    }
+    #invalidate a outputs file content given an analysis id
+    invalidate_ana_outputs_dataset_content = function(id, dataset_identifier, ...){
+      invisible()
+    }
+    #extract a inputs/outputs file header given an analysis id
+    get_ana_dataset_header = function(id, type, dataset_identifier, ...){
+      dataset_content <- self$get_ana_dataset_content(id, type, dataset_identifier, ...)
+      dataset_header <- names(dataset_content)
+      dataset_header
+    }
+    #invalidate a inputs/outputs file header given an analysis id
+    invalidate_ana_dataset_header = function(id, type, dataset_identifier, ...){
+      invisible()
+    }
+    #extract a inputs/outputs file nrow given an analysis id
+    get_ana_dataset_nrow = function(id, type, dataset_identifier, ...){
+      dataset_content <- self$get_ana_dataset_content(id, type, dataset_identifier, ...)
+      dataset_nrow <- nrow(dataset_content)
+      dataset_nrow
+    }
+    #invalidate a inputs/outputs file nrow given an analysis id
+    invalidate_ana_dataset_nrow = function(id, type, dataset_identifier, ...){
+      invisible()
+    }
+    #extract a inputs/outputs file size given an analysis id
+    get_ana_dataset_size = function(id, type, dataset_identifier, ...){
+      extractFolder <- set_extractFolder(id, label = type)
+      currfilepath <- set_extractFilePath(extractFolder, dataset_identifier)
+      dataset_size <- file.size(currfilepath)
+      dataset_size
+    }
+    #invalidate a inputs/outputs file size given an analysis id
+    invalidate_ana_dataset_size = function(id, type, dataset_identifier, ...){
+      invisible()
+    }
+    #extract analysis settings content
+    get_ana_settings_content = function(id, ...){
+      dataset_content <- return_analyses_settings_file_list(id)
+      dataset_content
+    }
+    #invalidate analysis settings content
+    invalidate_ana_settings_content = function(id, ...){
+      invisible()
+    }
+    #extract analysis validation summary content
+    get_ana_validation_summary_content = function(id, ...){
+      #missing api function for the time being
+      forig <- system.file( "app", "www", "exposure_summary_report.json", package = "flamingo", mustWork = TRUE)
+      json_lst <- jsonlite::read_json(forig, simplifyVector = TRUE)
+
+      reg_expr_dot <- "^([^.]+)[.](.+)[.](.+)$"
+
+      dataset_content <- unlist(json_lst) %>%
+        as.data.frame(stringsAsFactors = FALSE)  %>%
+        setNames("vals") %>%
+        mutate(rowname = rownames(.)) %>%
+        separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
+        mutate(type2 = case_when(
+          is.na(type2) ~ "",
+          TRUE ~ paste0(": ", type2)
+        )) %>%
+        unite("type", c("type", "type2"), sep = "") %>%
+        mutate(type = gsub(pattern = "_", replacement = " ", type)) %>%
+        spread(key, 1, convert = TRUE)
+
+      dataset_content
+    }
+    #invalidate analysis validation summary content
+    invalidate_ana_validation_summary_content = function(id, ...){
+      invisible()
+    }
+  )
+)
+
+# Helper functions -----
+
+#Add descritption fields to outputs files
+.addDescription <- function(x, analysis_settings){
+  x <- as.character(x)
+  x <- strsplit(x, split = "[.]")[[1]][1]
+  y <- unlist(strsplit(x, split = "_"))
+  report <-  paste(y[3:(length(y))], collapse = "_")
+  g_idx <- as.integer(gsub("S", "", y[2]))
+  g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
+  g <- granToOed[granToOed$oed == g_oed, "gran"]
+  z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = reportToVar(varsdf)[[ report ]], stringsAsFactors = FALSE)
+}
