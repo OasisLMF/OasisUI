@@ -5,4 +5,7 @@ test_that("simplify_path returns correct sets",{
   expect_equal(expected_set, constructed_set1)
   constructed_set2 <- simplify_path(orig_set, "output/")
   expect_equal(expected_set, constructed_set2)
+  constructed_set3 <- simplify_path(orig_set)
+  expected_set1 <- c("output/test", "test1", "output_test2")
+  expect_equal(expected_set, constructed_set2)
 })
