@@ -94,7 +94,6 @@ exposurevalidationmap <- function(input,
   })
 
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
-    print(paste0("input$chkgrp_perils is ", input$chkgrp_perils))
     if (any(input$chkgrp_perils != "")) {
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
         left_join(
