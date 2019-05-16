@@ -149,8 +149,8 @@ simplify_path <- function(x, to_strip = NULL) {
   x <- x[!grepl("/$", x)] # exclude directories
   if (length(to_strip) > 0) {
     to_strip <- sub("/$", "", to_strip)
-    to_strip <- sub("$", "/", glob2rx(to_strip))
-    to_strip <- paste0("^", to_strip , collapse = "|")
+    to_strip <- sub("\\$", "/", glob2rx(to_strip))
+    to_strip <- paste0(to_strip , collapse = "|")
     x <- sub(to_strip, "", x)
   }
   x

@@ -7,9 +7,9 @@
 \usage{
 exposurevalidationmapUI(id)
 
-exposurevalidationmap(input, output, session, analysisID = NULL,
-  portfolioID = "", counter = reactive(NULL),
-  active = reactive(TRUE))
+exposurevalidationmap(input, output, session,
+  analysisID = reactive(NULL), portfolioID = "",
+  counter = reactive(NULL), active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
