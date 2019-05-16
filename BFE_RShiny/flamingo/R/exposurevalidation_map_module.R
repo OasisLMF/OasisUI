@@ -93,15 +93,24 @@ exposurevalidationmap <- function(input,
     }
   })
 
-  observeEvent(input$chkgrp_perils, {
+  observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
+    print(paste0("input$chkgrp_perils is ", input$chkgrp_perils))
     if (any(input$chkgrp_perils != "")) {
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-        mutate( modeled = case_when(
-          peril_id %in% input$chkgrp_perils ~ TRUE,
-          TRUE ~ FALSE
-        )) %>%
+        left_join(
+          data.frame(
+            LocNumber = unique( result$uploaded_locs_check$LocNumber),
+            modelled = sapply(unique( result$uploaded_locs_check$LocNumber), function(x){
+              curr_loc <- result$uploaded_locs_check %>%
+                filter(LocNumber == x)
+              any(curr_loc$peril_id %in% "WSS")#input$chkgrp_perils)
+            })
+          )
+        ) %>%
       select(-peril_id) %>%
         distinct()
+    } else {
+      result$uploaded_locs_check_peril <- NULL
     }
   })
 
@@ -194,7 +203,8 @@ exposurevalidationmap <- function(input,
 
     logMessage(".reloadExposureValidation called")
 
-    uploaded_locs_check <- check_loc(analysisID())
+    uploaded_locs_check <- check_loc(analysisID()) %>%
+      distinct()
 
     #updating reactive only when needed
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
