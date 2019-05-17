@@ -27,7 +27,7 @@ check_loc <- function(analysisID){
 
   if (file.exists(uploaded_locs_filepath)) {
     uploaded_locs <- fread(uploaded_locs_filepath, integer64 = "numeric") %>%
-      mutate(loc_idx = seq(nrow(.))-1)
+      mutate(loc_idx = seq(nrow(.)) - 1)
   }
 
   if (file.exists(modelled_locs_filepath)) {
@@ -35,8 +35,8 @@ check_loc <- function(analysisID){
   }
 
   uploaded_locs_check <- full_join(uploaded_locs, modelled_locs, by = "loc_idx") %>%
-    mutate(modeled = ifelse(is.na(peril_id), FALSE, TRUE)) %>%
-    select(-one_of( names(modelled_locs %>% select(-"peril_id"))))
+    select(-one_of( names(modelled_locs %>% select(-"peril_id")))) %>%
+      distinct()
 
   return(uploaded_locs_check)
 }

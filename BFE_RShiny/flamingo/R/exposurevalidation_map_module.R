@@ -94,22 +94,20 @@ exposurevalidationmap <- function(input,
   })
 
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
-    if (any(input$chkgrp_perils != "")) {
+    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
         left_join(
           data.frame(
             LocNumber = unique( result$uploaded_locs_check$LocNumber),
-            modelled = sapply(unique( result$uploaded_locs_check$LocNumber), function(x){
+            modeled = sapply(unique( result$uploaded_locs_check$LocNumber), function(x){
               curr_loc <- result$uploaded_locs_check %>%
                 filter(LocNumber == x)
-              any(curr_loc$peril_id %in% "WSS")#input$chkgrp_perils)
+              any(curr_loc$peril_id %in% input$chkgrp_perils)
             })
           )
         ) %>%
-      select(-peril_id) %>%
+        select(-peril_id) %>%
         distinct()
-    } else {
-      result$uploaded_locs_check_peril <- NULL
     }
   })
 
@@ -158,7 +156,8 @@ exposurevalidationmap <- function(input,
     if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
       datatable(
         result$uploaded_locs_check_peril %>%
-          capitalize_names_df(),
+          capitalize_names_df() %>%
+          mutate(Modeled = as.character(Modeled)),
         class = "flamingo-table display",
         rownames = FALSE,
         escape = FALSE,
@@ -167,7 +166,7 @@ exposurevalidationmap <- function(input,
       ) %>% formatStyle(
         'Modeled',
         target = 'row',
-        backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
+        backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), values = c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
       )
     } else {
       nothingToShowTable("Generated inputs not found")
@@ -202,8 +201,7 @@ exposurevalidationmap <- function(input,
 
     logMessage(".reloadExposureValidation called")
 
-    uploaded_locs_check <- check_loc(analysisID()) %>%
-      distinct()
+    uploaded_locs_check <- check_loc(analysisID())
 
     #updating reactive only when needed
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
