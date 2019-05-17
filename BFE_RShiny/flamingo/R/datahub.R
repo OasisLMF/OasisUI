@@ -31,57 +31,57 @@
 #' @section Arguments:
 #' \describe{
 #' \item{id}{Portfolio Id | Model Id | Analysis Id}
-#' \item{type}{Identifier for Analysis Id: inputs / outputs}
-#' \item{dataset_identifier}{Identifier:  file path for Analysis Id /  api call for Portfolio Id and Model Id}
+#' \item{type}{Identifier for Analysis Id: inputs | outputs}
+#' \item{dataset_identifier}{Identifier:  file name for Analysis Id |  api call for Portfolio Id and Model Id}
 #' }
 #'
 #' @section Methods:
 #' \describe{
 #' LISTS
+#'
 #' > Portfolio
-#' \item{\code{get_pf_data_list(id)} {return list of portfolio source files}
-#' \item{\code{invalidate_pf_data_list(id)} {invalidate list of portfolio source files}
+#' \item{\code{get_pf_data_list(id)}}{return list of portfolio source files}
+#' \item{\code{invalidate_pf_data_list(id)}}{invalidate list of portfolio source files}
 #' > Model
-#' \item{\code{get_model_data_list(id)} {return list of model resources}
-#' \item{\code{invalidate_model_data_list(id)} {invalidate list of model resources}
+#' \item{\code{get_model_data_list(id)}}{return list of model resources}
+#' \item{\code{invalidate_model_data_list(id)}}{invalidate list of model resources}
 #' > Analysis
-#' \item{\code{get_ana_inputs_data_list(id)} {return list of analysis inputs}
-#' \item{\code{get_ana_outputs_data_list(id)} {return list of analysis outputs}
-#' \item{\code{invalidate_ana_inputs_data_list(id)} {invalidate list of analysis inputs}
-#' \item{\code{invalidate_ana_outputs_data_list(id)} {invalidate list of analysis outputs}
+#' \item{\code{get_ana_inputs_data_list(id)}}{return list of analysis inputs}
+#' \item{\code{get_ana_outputs_data_list(id)}}{return list of analysis outputs}
+#' \item{\code{invalidate_ana_inputs_data_list(id)}}{invalidate list of analysis inputs}
+#' \item{\code{invalidate_ana_outputs_data_list(id)}}{invalidate list of analysis outputs}
 #'
 #' DATASETS
+#'
 #' > Portfolio
-#' \item{\code{get_pf_dataset_content(id, dataset_identifier)} {extract a source file (location/account...) content given a portfolio id}
-#' \item{\code{invalidate_pf_dataset_content(id, dataset_identifier)} {invalidate a source file (location/account...) content given a portfolio id}
-#' \item{\code{get_pf_location_content(id)} {extract location source file content given a portfolio id}
-#' \item{\code{invalidate_pf_location_content(id)} {invalidate a source file (location/account...) content given a portfolio id}
-#' \item{\code{get_pf_dataset_header(id, dataset_identifier)} {extract a source file (location/account...) header given a portfolio id}
-#' \item{\code{invalidate_pf_dataset_header(id, dataset_identifier)} {invalidate a source file (location/account...) header given a portfolio id}
-#' \item{\code{get_pf_dataset_nrow(id, dataset_identifier)} {extract a source file (location/account...) nrow given a portfolio id}
-#' \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)} {invalidate a source file (location/account...) header given a portfolio id}
+#' \item{\code{get_pf_dataset_content(id, dataset_identifier)}}{extract a source file (location/account...) content given a portfolio id}
+#' \item{\code{invalidate_pf_dataset_content(id, dataset_identifier)}}{invalidate a source file (location/account...) content given a portfolio id}
+#' \item{\code{get_pf_location_content(id)}}{extract location source file content given a portfolio id}
+#' \item{\code{invalidate_pf_location_content(id)}}{invalidate a source file (location/account...) content given a portfolio id}
+#' \item{\code{get_pf_dataset_header(id, dataset_identifier)}}{extract a source file (location/account...) header given a portfolio id}
+#' \item{\code{invalidate_pf_dataset_header(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
+#' \item{\code{get_pf_dataset_nrow(id, dataset_identifier)}}{extract a source file (location/account...) nrow given a portfolio id}
+#' \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
 #' > Model
-#' \item{\code{get_model_resource_dataset_content(id)} {extract model resource file given model id}
-#' \item{\code{invalidate_model_resource_dataset_content(id)} {invalidate model resource file given model id}
-#' \item{\code{get_model_hazard_dataset_content(id)} {extract model hazard resource file given model id}
-#' \item{\code{invalidate_model_hazard_dataset_content(id)} {invalidate model hazard resource file given model id}
+#' \item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
+#' \item{\code{invalidate_model_resource_dataset_content(id)}}{invalidate model resource file given model id}
+#' \item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file given model id}
+#' \item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file given model id}
 #' > Analysis
-#' \item{\code{get_ana_dataset_content(id, type, dataset_identifier)} {extract a inputs/outputs file content given an analysis id}
-#' \item{\code{invalidate_ana_dataset_content(id, type, dataset_identifier)} {invalidate a inputs/outputs file content given an analysis id}
-#' \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)} {extract a inputs file content given an analysis id}
-#' \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)} {invalidate a inputs file content given an analysis id}
-#' \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)} {extract a outputs file content given an analysis id}
-#' \item{\code{invalidate_ana_outputs_dataset_content(id,  dataset_identifier)} {invalidate a outputs file content given an analysis id}
-#' \item{\code{get_ana_dataset_header(id, type, dataset_identifier)} {extract a inputs/outputs file nrow given an analysis id}
-#' \item{\code{invalidate_ana_dataset_header(id, type, dataset_identifier)} {invalidate a inputs/outputs file header given an analysis id}
-#' \item{\code{get_ana_dataset_nrow(id, type, dataset_identifier)} {extract a inputs/outputs file nrow given an analysis id}
-#' \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)} {invalidate a inputs/outputs file nrow given an analysis id}
-#' \item{\code{get_ana_dataset_size(id, type, dataset_identifier)} {extract a inputs/outputs file size given an analysis id}
-#' \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)} {invalidate a inputs/outputs file size given an analysis id}
-#' \item{\code{get_ana_settings_content(id)} {extract analysis settings content}
-#' \item{\code{invalidate_ana_settings_content(id)} {invalidate analysis settings content}
-#' \item{\code{get_ana_validation_summary_content(id)} {extract analysis validation summary content}
-#' \item{\code{invalidate_ana_validation_summary_content(id)} {invalidate analysis validation summary content}
+#' \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)}}{extract a inputs file content given an analysis id}
+#' \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)}}{invalidate a inputs file content given an analysis id}
+#' \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)}}{extract a outputs file content given an analysis id}
+#' \item{\code{invalidate_ana_outputs_dataset_content(id,  dataset_identifier)}}{invalidate a outputs file content given an analysis id}
+#' \item{\code{get_ana_dataset_header(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
+#' \item{\code{invalidate_ana_dataset_header(id, type, dataset_identifier)}}{invalidate a inputs/outputs file header given an analysis id}
+#' \item{\code{get_ana_dataset_nrow(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
+#' \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
+#' \item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
+#' \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
+#' \item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
+#' \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
+#' \item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
+#' \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
 #' }
 #'
 #' @section Usage:
@@ -220,8 +220,8 @@ DataHub <- R6Class(
     # > ANALYSIS METHODS ----
     #extract a inputs file content given an analysis id
     get_ana_inputs_dataset_content = function(id, dataset_identifier, ...){
-      tarfile <- aget_analyses_inputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
-      dataset_content <- untar_file(tarfile, dataset_identifier, destdir = getOption("flamingo.settings.api.share_filepath"))
+      tarfile <- get_analyses_inputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
+      dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir = getOption("flamingo.settings.api.share_filepath"))
       dataset_content
     },
     #invalidate a inputs file content given an analysis id
@@ -230,8 +230,10 @@ DataHub <- R6Class(
     },
     #extract a outputs file content given an analysis id
     get_ana_output_dataset_content = function(id, dataset_identifier, ...){
-      tarfile <- aget_analyses_outputss_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
-      dataset_content <- untar_file(tarfile, dataset_identifier, destdir = getOption("flamingo.settings.api.share_filepath"), to_strip = "output")
+      tarfile <- get_analyses_outputss_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
+      #necessary step because outputs comes with subfolder
+      dataset_identifier <- file.path("output", dataset_identifier)
+      dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir = getOption("flamingo.settings.api.share_filepath"))
       dataset_content
     },
     #invalidate a outputs file content given an analysis id
@@ -240,14 +242,12 @@ DataHub <- R6Class(
     },
     #extract a inputs/outputs file header given an analysis id
     get_ana_dataset_header = function(id, type, dataset_identifier, ...){
-      tarfile <- aget_analyses_tar(id, label = type, destdir = getOption("flamingo.settings.api.share_filepath"))
-      #necessary step because output comes with subfolder
+      tarfile <- get_analyses_tar(id, label = type, destdir = getOption("flamingo.settings.api.share_filepath"))
+      #necessary step because outputs comes with subfolder
       if (grepl(paste0(type, "/"),  untar(tarfile, list = TRUE))) {
-        to_strip = type
-      } else {
-        to_strip = ""
+        dataset_identifier <- file.path(type, dataset_identifier)
       }
-      dataset_header <- untar_file(tarfile, dataset_identifier, nrow = 1, to_strip = to_strip, destdir = getOption("flamingo.settings.api.share_filepath"))
+      dataset_header <- read_file_from_tar(tarfile, dataset_identifier, nrows = 1, destdir = getOption("flamingo.settings.api.share_filepath"))
       dataset_header
     },
     #invalidate a inputs/outputs file header given an analysis id
@@ -256,8 +256,13 @@ DataHub <- R6Class(
     },
     #extract a inputs/outputs file nrow given an analysis id
     get_ana_dataset_nrow = function(id, type, dataset_identifier, ...){
-      dataset_content <- self$get_ana_dataset_content(id, type, dataset_identifier, ...)
-      dataset_nrow <- nrow(dataset_content)
+      tarfile <- get_analyses_tar(id, label = type, destdir = getOption("flamingo.settings.api.share_filepath"))
+      if (grepl(paste0(type, "/"),  untar(tarfile, list = TRUE))) {
+        dataset_identifier <- file.path(type, dataset_identifier)
+      }
+      untar(tarfile, files = dataset_identifier, exdir = destdir)
+      dataset_nrow <- read.table(pipe(paste0("wc -l ", file.path(destdir, dataset_identifier))))[[1]]
+      file.remove(file.path(destdir, dataset_identifier))
       dataset_nrow
     },
     #invalidate a inputs/outputs file nrow given an analysis id
@@ -266,9 +271,13 @@ DataHub <- R6Class(
     },
     #extract a inputs/outputs file size given an analysis id
     get_ana_dataset_size = function(id, type, dataset_identifier, ...){
-      extractFolder <- set_extractFolder(id, label = type)
-      currfilepath <- set_extractFilePath(extractFolder, dataset_identifier)
-      dataset_size <- file.size(currfilepath)
+      tarfile <- get_analyses_tar(id, label = type, destdir = getOption("flamingo.settings.api.share_filepath"))
+      if (grepl(paste0(type, "/"),  untar(tarfile, list = TRUE))) {
+        dataset_identifier <- file.path(type, dataset_identifier)
+      }
+      untar(tarfile, files = dataset_identifier, exdir = destdir)
+      dataset_size <- file.size(file.path(destdir, dataset_identifier))
+      file.remove(file.path(destdir, dataset_identifier))
       dataset_size
     },
     #invalidate a inputs/outputs file size given an analysis id

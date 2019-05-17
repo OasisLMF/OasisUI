@@ -112,26 +112,25 @@ untar_list <- function(tarfile, to_strip = NULL){
 
 #' untar file
 #'
-#' @rdname untar_file
+#' @rdname read_file_from_tar
 #'
 #' @description Returns list of files in a tar bundle.
 #'
 #' @param tarfile path to tar bundle.
-#' @param file_name name of file to untar.
+#' @param dataset_identifier name and relative path of file to untar.
 #' @param destdir path where to extract file.
 #' @param nrows number of rows to read. Default Inf indicates full content.
-#' @param to_strip character vector of initial path to strip relative to the tar bundle content.
 #'
-#' @return content of file_name
+#' @return content of dataset_identifier
 #'
 #' @importFrom data.table fread
 #'
 #' @export
 
-untar_file <- function(tarfile, file_name, destdir = tempdir(), nrows = Inf, to_strip = ""){
-  untar(tarfile, files = file.path(to_strip, file_name), exdir = destdir)
-  data <- fread(file.path(destdir, to_strip, file_name))
-  file.remove(file.path(destdir, to_strip, file_name)) #remove extracted file after reading
+read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(), nrows = Inf){
+  untar(tarfile, files = dataset_identifier, exdir = destdir)
+  data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
+  file.remove(file.path(destdir, dataset_identifier)) #remove extracted file after reading
   data
 }
 

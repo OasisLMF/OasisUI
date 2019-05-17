@@ -18,8 +18,59 @@ R6 Class for OasisUI Data Hub.
 
 \describe{
 \item{id}{Portfolio Id | Model Id | Analysis Id}
-\item{type}{Identifier for Analysis Id: inputs / outputs}
-\item{dataset_identifier}{Identifier:  file path for Analysis Id /  api call for Portfolio Id and Model Id}
+\item{type}{Identifier for Analysis Id: inputs | outputs}
+\item{dataset_identifier}{Identifier:  file name for Analysis Id |  api call for Portfolio Id and Model Id}
+}
+}
+
+\section{Methods}{
+
+\describe{
+LISTS
+
+> Portfolio
+\item{\code{get_pf_data_list(id)}}{return list of portfolio source files}
+\item{\code{invalidate_pf_data_list(id)}}{invalidate list of portfolio source files}
+> Model
+\item{\code{get_model_data_list(id)}}{return list of model resources}
+\item{\code{invalidate_model_data_list(id)}}{invalidate list of model resources}
+> Analysis
+\item{\code{get_ana_inputs_data_list(id)}}{return list of analysis inputs}
+\item{\code{get_ana_outputs_data_list(id)}}{return list of analysis outputs}
+\item{\code{invalidate_ana_inputs_data_list(id)}}{invalidate list of analysis inputs}
+\item{\code{invalidate_ana_outputs_data_list(id)}}{invalidate list of analysis outputs}
+
+DATASETS
+
+> Portfolio
+\item{\code{get_pf_dataset_content(id, dataset_identifier)}}{extract a source file (location/account...) content given a portfolio id}
+\item{\code{invalidate_pf_dataset_content(id, dataset_identifier)}}{invalidate a source file (location/account...) content given a portfolio id}
+\item{\code{get_pf_location_content(id)}}{extract location source file content given a portfolio id}
+\item{\code{invalidate_pf_location_content(id)}}{invalidate a source file (location/account...) content given a portfolio id}
+\item{\code{get_pf_dataset_header(id, dataset_identifier)}}{extract a source file (location/account...) header given a portfolio id}
+\item{\code{invalidate_pf_dataset_header(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
+\item{\code{get_pf_dataset_nrow(id, dataset_identifier)}}{extract a source file (location/account...) nrow given a portfolio id}
+\item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
+> Model
+\item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
+\item{\code{invalidate_model_resource_dataset_content(id)}}{invalidate model resource file given model id}
+\item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file given model id}
+\item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file given model id}
+> Analysis
+\item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)}}{extract a inputs file content given an analysis id}
+\item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)}}{invalidate a inputs file content given an analysis id}
+\item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)}}{extract a outputs file content given an analysis id}
+\item{\code{invalidate_ana_outputs_dataset_content(id,  dataset_identifier)}}{invalidate a outputs file content given an analysis id}
+\item{\code{get_ana_dataset_header(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
+\item{\code{invalidate_ana_dataset_header(id, type, dataset_identifier)}}{invalidate a inputs/outputs file header given an analysis id}
+\item{\code{get_ana_dataset_nrow(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
+\item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
+\item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
+\item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
+\item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
+\item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
+\item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
+\item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
 }
 }
 
