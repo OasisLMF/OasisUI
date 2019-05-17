@@ -121,7 +121,7 @@ untar_list <- function(tarfile, to_strip = NULL){
 #' @param destdir path where to extract file.
 #' @param nrows number of rows to read. Default Inf indicates full content.
 #'
-#' @return content of dataset_identifier
+#' @return nrows rows of the content of dataset_identifier
 #'
 #' @importFrom data.table fread
 #'
@@ -129,8 +129,11 @@ untar_list <- function(tarfile, to_strip = NULL){
 
 read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(), nrows = Inf){
   untar(tarfile, files = dataset_identifier, exdir = destdir)
-  data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
-  file.remove(file.path(destdir, dataset_identifier)) #remove extracted file after reading
+  data = NULL
+  if (file.exists(file.path(destdir, dataset_identifier))) {
+    data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
+    file.remove(file.path(destdir, dataset_identifier)) #remove extracted file after reading
+  }
   data
 }
 

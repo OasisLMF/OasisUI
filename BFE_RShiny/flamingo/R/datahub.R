@@ -200,7 +200,7 @@ DataHub <- R6Class(
     },
     #extract a source file (location/account...) nrow given a portfolio id
     get_pf_dataset_nrow = function(id, dataset_identifier, ...){
-      dataset_content <- self$get_pf_dataset_content(id, ...)
+      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier, ...)
       dataset_nrow <- nrow(dataset_content)
       dataset_nrow
     },
@@ -222,8 +222,8 @@ DataHub <- R6Class(
     #extract model hazard resource file given model id
     get_model_hazard_dataset_content = function(id,  ...){
       #currently no api function
-      path <- system.file("inst", "app", "www", "hazard_files", "hazard_500_PGA.geojson", package = "flamingo")
-      mapfile <- geojsonio::geojson_read(path, what = "sp")
+      path <- system.file("app", "www", "hazard_files", "hazard_500_PGA.geojson", package = "flamingo")
+      mapfile <- geojsonio::geojson_read(path, what = "sp") #SLOW!
       mapfile
     },
     #invalidate model hazard resource file given model id
@@ -244,7 +244,7 @@ DataHub <- R6Class(
     },
     #extract a outputs file content given an analysis id
     get_ana_output_dataset_content = function(id, dataset_identifier, ...){
-      tarfile <- get_analyses_outputss_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
+      tarfile <- get_analyses_outputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
       #necessary step because outputs comes with subfolder
       dataset_identifier <- file.path("output", dataset_identifier)
       dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir = getOption("flamingo.settings.api.share_filepath"))
@@ -261,7 +261,8 @@ DataHub <- R6Class(
       if (grepl(paste0(type, "/"),  untar(tarfile, list = TRUE))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
-      dataset_header <- read_file_from_tar(tarfile, dataset_identifier, nrows = 1, destdir = getOption("flamingo.settings.api.share_filepath"))
+      dataset_header <- read_file_from_tar(tarfile, dataset_identifier, nrows = 1, destdir = getOption("flamingo.settings.api.share_filepath")) %>%
+        names()
       dataset_header
     },
     #invalidate a inputs/outputs file header given an analysis id
@@ -270,12 +271,13 @@ DataHub <- R6Class(
     },
     #extract a inputs/outputs file nrow given an analysis id
     get_ana_dataset_nrow = function(id, type, dataset_identifier, ...){
-      tarfile <- get_analyses_tar(id, label = type, destdir = getOption("flamingo.settings.api.share_filepath"))
-      if (grepl(paste0(type, "/"),  untar(tarfile, list = TRUE))) {
+      destdir =  getOption("flamingo.settings.api.share_filepath")
+      tarfile <- get_analyses_tar(id, label = type, destdir = destdir)
+      if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
       untar(tarfile, files = dataset_identifier, exdir = destdir)
-      dataset_nrow <- read.table(pipe(paste0("wc -l ", file.path(destdir, dataset_identifier))))[[1]]
+      dataset_nrow <- read.table(pipe(paste0("wc -l ", file.path(destdir, dataset_identifier))))[[1]] - 1 # Remove header
       file.remove(file.path(destdir, dataset_identifier))
       dataset_nrow
     },
@@ -285,7 +287,8 @@ DataHub <- R6Class(
     },
     #extract a inputs/outputs file size given an analysis id
     get_ana_dataset_size = function(id, type, dataset_identifier, ...){
-      tarfile <- get_analyses_tar(id, label = type, destdir = getOption("flamingo.settings.api.share_filepath"))
+      destdir =  getOption("flamingo.settings.api.share_filepath")
+      tarfile <- get_analyses_tar(id, label = type, destdir = destdir)
       if (grepl(paste0(type, "/"),  untar(tarfile, list = TRUE))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
