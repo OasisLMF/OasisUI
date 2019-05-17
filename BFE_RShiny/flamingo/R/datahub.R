@@ -123,21 +123,31 @@ DataHub <- R6Class(
     #return list of analysis resources
     get_ana_inputs_data_list = function(id, ...){
       tarfile <- get_analyses_inputs_tar(id,  destdir = getOption("flamingo.settings.api.share_filepath"))
-      data_list <- untar_list(tarfile) %>%
-        as.data.frame() %>%
-        setNames("files")
+      data_list <- untar_list(tarfile)
+      if (length(data_list) > 0) {
+        data_list <- data_list %>%
+          as.data.frame() %>%
+          setNames("files")
+      } else {
+        data_list <- NULL
+      }
       data_list
     },
     get_ana_outputs_data_list = function(id, ...){
       tarfile <- get_analyses_outputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
-      data_list <- untar_list(tarfile, to_strip = "output")%>%
-        as.data.frame() %>%
-        setNames("files")
-      analysis_settings <- self$get_ana_settings_content(id)
-      data_list <- cbind(data_list,
-                         do.call(rbind.data.frame,
-                                 lapply(data_list$files,
-                                        .addDescription, analysis_settings)))
+      data_list <- untar_list(tarfile, to_strip = "output")
+      if (length(data_list) > 0) {
+        data_list <- data_list %>%
+          as.data.frame() %>%
+          setNames("files")
+        analysis_settings <- self$get_ana_settings_content(id)
+        data_list <- cbind(data_list,
+                           do.call(rbind.data.frame,
+                                   lapply(data_list$files,
+                                          .addDescription, analysis_settings)))
+      } else {
+        data_list <- NULL
+      }
       data_list
     },
     #invalidate list of analysis resources
@@ -152,10 +162,14 @@ DataHub <- R6Class(
     # > PORTFLIO METHODS ----
     #extract a source file (location/account...) content given a portfolio id
     #dataset_identifier is location/account/reinsurance_info/reinsurance_source
+    #If file does not exists returns df details: Not Found
     get_pf_dataset_content = function(id, dataset_identifier, ...){
       currNamespace <- ls("package:flamingo")
       func_wpattern <- currNamespace[grepl(dataset_identifier, currNamespace)]
       returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
+      if (length(returnfunc) != 0) {
+        func <- get(returnfunc)
+      }
       dataset_content <- return_file_df(func, id)
       dataset_content
     },
@@ -166,7 +180,7 @@ DataHub <- R6Class(
     },
     #extract location source file content given a portfolio id
     get_pf_location_content = function(id,  ...){
-      dataset_content <-  self$get_pf_dataset_content = function(id, dataset_identifier = "location", ...)
+      dataset_content <-  self$get_pf_dataset_content(id, dataset_identifier = "location", ...)
         dataset_content
     },
     #invalidate a source file (location/account...) content given a portfolio id
@@ -176,7 +190,7 @@ DataHub <- R6Class(
     },
     #extract a source file (location/account...) header given a portfolio id
     get_pf_dataset_header = function(id, dataset_identifier, ...){
-      dataset_content <- self$get_pf_dataset_content(id, ...)
+      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier,...)
       dataset_header <- names(dataset_content)
       dataset_header
     },

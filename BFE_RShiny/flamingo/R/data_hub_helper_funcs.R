@@ -72,7 +72,7 @@ get_analyses_tar <- function(id, label, destdir = tempdir()) {
 #' @export
 
 get_analyses_inputs_tar <- function(id, destdir = tempdir()) {
-  get_analyses_tar(id, label = "input", dest)
+  get_analyses_tar(id, label = "input", destdir)
 }
 
 #' Get analysis outputs tar path
@@ -88,7 +88,7 @@ get_analyses_inputs_tar <- function(id, destdir = tempdir()) {
 #'
 #' @export
 get_analyses_outputs_tar <- function(id, destdir = tempdir()) {
-  get_analyses_tar(id, label = "output", dest)
+  get_analyses_tar(id, label = "output", destdir)
 }
 
 #' untar list
