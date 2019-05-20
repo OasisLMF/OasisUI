@@ -76,7 +76,7 @@ ViewFilesInTable <- function(input, output, session,
                              tbl_filesListData,
                              param = NULL,
                              file_column = "files",
-                             folderpath = "_outputs/output",
+                             folderpath = "output",
                              includechkbox = FALSE) {
 
   ns <- session$ns
@@ -167,11 +167,11 @@ ViewFilesInTable <- function(input, output, session,
         returnfunc <- func_wpattern[grepl("api_get", func_wpattern)]
         if (length(returnfunc) != 0) {
           func <- get(returnfunc)
-          fileData <- return_file_df(func, param())
+          fileData <- data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename) #return_file_df(func, param())
         } else {
-          extractFolder <- set_extractFolder(id = param(), label = folderpath)
-          currfilepath <- set_extractFilePath(extractFolder, filename)
-          fileData <- fread(currfilepath)
+          # extractFolder <- set_extractFolder(id = param(), label = folderpath)
+          # currfilepath <- set_extractFilePath(extractFolder, filename)
+          fileData <- data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath) #fread(currfilepath)
         }
 
         if (nrow(fileData) > 0) {
@@ -344,76 +344,41 @@ ViewFilesInTable <- function(input, output, session,
     filerows <- NULL
     filecolumns <- NULL
     if (length(returnfunc) != 0) {
-      func <- get(returnfunc)
-      result$tbl_fileData <- return_file_df(func,param())
+      result$tbl_fileData <- data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
       if (!is.null(result$tbl_fileData)) {
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
-        filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
-        filerows <- nrow(result$tbl_fileData)
+        filecolumns <- data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
+        filerows <- data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
         result$currentFile <- paste0(result$currentFile, ".csv")
-
         #Show buttons
-        if ("latitude" %in% names(result$tbl_fileData)) {
-          if (!is.null(result$tbl_fileData)) {
+        if ("latitude" %in% names(result$tbl_fileData) && !is.null(result$tbl_fileData)) {
             output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
-          }
           show("abuttonmap")
         } else {
           hide("abuttonmap")
         }
       }
     } else {
-      extractFolder <- set_extractFolder(id = param(), label = folderpath)
-      result$currfilepath <- set_extractFilePath(extractFolder, result$currentFile)
-      if (dir.exists(result$currfilepath)) {
-        result$tbl_fileData <- list.files(result$currfilepath, recursive = TRUE) %>%
-          as.data.frame() %>%
-          setNames("files")
-        filecolumns <- ""
-        filerows <- length(result$tbl_fileData)
-        hide("abuttonmap")
+      result$tbl_fileData <- data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+      if (!is.null(result$tbl_fileData)) {
+        names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
+        filecolumns <- data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+        filerows <- data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+      }
 
-      } else {
-        result$tbl_fileData <- fread(result$currfilepath)
+      #Show buttons
+      if ("latitude" %in% names(result$tbl_fileData)) {
         if (!is.null(result$tbl_fileData)) {
-          names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
+          output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
         }
-        filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
-        filerows <- length(count.fields(result$currfilepath, skip = 1))
-
-        #Show buttons
-        if ("latitude" %in% names(result$tbl_fileData)) {
-          if (!is.null(result$tbl_fileData)) {
-            output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
-          }
-          show("abuttonmap")
-        } else {
-          hide("abuttonmap")
-        }
+        show("abuttonmap")
+      } else {
+        hide("abuttonmap")
       }
     }
+
     # Extra info table
     output$FVExposureStatisticInfo <- renderUI({
-      if (filecolumns == "") {
-        tagList(
-          fluidRow(
-            column(2,
-                   h5("Dir Name:")
-            ),
-            column(10,
-                   p(result$currentFile, style = "margin-top: 10px;")
-            )
-          ),
-          fluidRow(
-            column(2,
-                   h5("Number of Files")
-            ),
-            column(10,
-                   p(filerows, style = "margin-top: 10px;")
-            )
-          )
-        )
-      } else {
         tagList(
           fluidRow(
             column(2,
@@ -436,11 +401,10 @@ ViewFilesInTable <- function(input, output, session,
                    h5("Column names")
             ),
             column(10,
-                   p(filecolumns, style = "margin-top: 10px;")
+                   p(paste0(filecolumns, collapse = ", "), style = "margin-top: 10px;")
             )
           )
         )
-      }
     })
   })#end observeEvent
 
