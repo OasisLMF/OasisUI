@@ -97,18 +97,16 @@ visualizationCBR <- function(input, output, session,
     sub_modules$defineID1$selectAnaID()
     sub_modules$defineID2$selectAnaID()}, {
       if (!is.null(sub_modules$defineID1$selectAnaID()) && !is.null(sub_modules$defineID2$selectAnaID())) {
-        tbl_filesListDataana1 <- return_analyses_output_file_df(sub_modules$defineID1$selectAnaID())
-        analysis_settings1 <- return_analyses_settings_file_list(sub_modules$defineID1$selectAnaID())
-        result$tbl_filesListDataana <- cbind(tbl_filesListDataana1,
-                                             do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
-                                                                              .addDescription, analysis_settings1)))
-        tbl_filesListDataana2 <- return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
-        analysis_settings2 <- return_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
-        bl_filesListDataana2 <- return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
-        analysis_settings2 <- return_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
-        result$tbl_filesListDataana <- rbind(result$tbl_filesListDataana, cbind(tbl_filesListDataana1,
-                                                                                do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
-                                                                                                                 .addDescription, analysis_settings1))))
+        result$tbl_filesListDataana1 <- data_hub$get_ana_outputs_data_list(sub_modules$defineID1$selectAnaID()) #return_analyses_output_file_df(sub_modules$defineID1$selectAnaID())
+        # analysis_settings1 <- data_hub$get_ana_settings_content(sub_modules$defineID1$selectAnaID())#rreturn_analyses_settings_file_list(sub_modules$defineID1$selectAnaID())
+        # result$tbl_filesListDataana <- cbind(tbl_filesListDataana1,
+        #                                      do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
+        #                                                                       .addDescription, analysis_settings1)))
+        result$tbl_filesListDataana2 <- data_hub$get_ana_outputs_data_list(sub_modules$defineID2$selectAnaID()) #return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
+        # analysis_settings2 <- data_hub$get_ana_settings_content(sub_modules$defineID2$selectAnaID())#rreturn_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
+        # result$tbl_filesListDataana <- rbind(result$tbl_filesListDataana, cbind(tbl_filesListDataana1,
+        #                                                                         do.call(rbind.data.frame, lapply(tbl_filesListDataana2$files,
+        #                                                                                                          .addDescription, analysis_settings2))))
       } else {
         result$tbl_filesListDataana <- NULL
       }

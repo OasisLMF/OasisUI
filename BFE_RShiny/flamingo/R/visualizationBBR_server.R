@@ -78,11 +78,11 @@ visualizationBBR <- function(input, output, session,
   # Extract Output files for given anaID----------------------------------------
   observeEvent(sub_modules$defineID$selectAnaID(), {
     if (!is.null(sub_modules$defineID$selectAnaID())) {
-      tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
-      analysis_settings <- return_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
-      result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
-                                           do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
-                                                                            .addDescription, analysis_settings)))
+      result$tbl_filesListDataana <- data_hub$get_ana_outputs_data_list(sub_modules$defineID$selectAnaID()) #return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
+      # analysis_settings <- data_hub$get_ana_settings_content(sub_modules$defineID$selectAnaID())#rreturn_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
+      # result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
+      #                                      do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
+      #                                                                       .addDescription, analysis_settings)))
     } else {
       result$tbl_filesListDataana <- NULL
     }
