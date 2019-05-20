@@ -17,7 +17,7 @@ read_file_from_tar(tarfile, dataset_identifier, destdir = tempdir(),
 \item{nrows}{number of rows to read. Default Inf indicates full content.}
 }
 \value{
-content of dataset_identifier
+nrows rows of the content of dataset_identifier
 }
 \description{
 Returns list of files in a tar bundle.
