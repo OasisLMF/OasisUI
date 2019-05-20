@@ -57,6 +57,8 @@ DATASETS
 \item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file given model id}
 \item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file given model id}
 > Analysis
+\item{\code{get_ana_dataset_content(id, dataset_identifier, type)}}{extract a input/output file content given an analysis id}
+\item{\code{invalidate_ana_dataset_content(id, dataset_identifier, type)}}{invalidate a input/output file content given an analysis id}
 \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)}}{extract a inputs file content given an analysis id}
 \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)}}{invalidate a inputs file content given an analysis id}
 \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)}}{extract a outputs file content given an analysis id}

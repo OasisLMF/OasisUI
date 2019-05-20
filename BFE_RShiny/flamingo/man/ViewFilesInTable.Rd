@@ -8,7 +8,7 @@
 ViewFilesInTableUI(id, includechkbox = FALSE)
 
 ViewFilesInTable(input, output, session, tbl_filesListData, param = NULL,
-  file_column = "files", folderpath = "_outputs/output",
+  file_column = "files", folderpath = "output",
   includechkbox = FALSE)
 }
 \arguments{
