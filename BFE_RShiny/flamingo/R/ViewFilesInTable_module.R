@@ -350,6 +350,7 @@ ViewFilesInTable <- function(input, output, session,
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
         filerows <- nrow(result$tbl_fileData)
+        result$currentFile <- paste0(result$currentFile, ".csv")
 
         #Show buttons
         if ("latitude" %in% names(result$tbl_fileData)) {
