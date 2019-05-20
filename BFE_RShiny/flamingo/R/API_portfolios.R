@@ -112,18 +112,23 @@ api_put_portfolios_id <- function(id, name) {
 #' @export
 api_get_portfolios_id <- function(id) {
 
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "portfolios", id, "", sep = "/")
-  ))
+  if (!is.null(id)){
+    request_list <- expression(list(
+      get_url(),
+      config = add_headers(
+        Accept = get_http_type(),
+        Authorization = sprintf("Bearer %s", get_token())
+      ),
+      path = paste(get_version(), "portfolios", id, "", sep = "/")
+    ))
 
-  response <- api_fetch_response("GET", request_list)
+    response <- api_fetch_response("GET", request_list)
 
-  api_handle_response(response)
+    res <- api_handle_response(response)
+  } else {
+    res <- NULL
+  }
+
 }
 
 #' Delete portfolios by id
