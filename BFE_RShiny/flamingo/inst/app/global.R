@@ -68,3 +68,6 @@ tryCatch({
 }, error = function(e) {
   logerror(e$message, logger = "flamingo.module")
 })
+
+# Data Hub ---------------------------------------------------------------------
+data_hub <- DataHub$new()
