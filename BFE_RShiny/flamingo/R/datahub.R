@@ -68,6 +68,8 @@
 #' \item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file given model id}
 #' \item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file given model id}
 #' > Analysis
+#' \item{\code{get_ana_dataset_content(id, dataset_identifier, type)}}{extract a input/output file content given an analysis id}
+#' \item{\code{invalidate_ana_dataset_content(id, dataset_identifier, type)}}{invalidate a input/output file content given an analysis id}
 #' \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)}}{extract a inputs file content given an analysis id}
 #' \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)}}{invalidate a inputs file content given an analysis id}
 #' \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)}}{extract a outputs file content given an analysis id}
@@ -176,12 +178,14 @@ DataHub <- R6Class(
     #invalidate a source file (location/account...) content given a portfolio id
     #dataset_identifier is location/account/reinsurance_info/reinsurance_source
     invalidate_pf_dataset_content = function(id, dataset_identifier, ...){
+      self$invalidate_pf_dataset_header(id, dataset_identifier, ...)
+      self$invalidate_pf_dataset_nrow(id, dataset_identifier, ...)
       invisible()
     },
     #extract location source file content given a portfolio id
     get_pf_location_content = function(id,  ...){
       dataset_content <-  self$get_pf_dataset_content(id, dataset_identifier = "location", ...)
-        dataset_content
+      dataset_content
     },
     #invalidate a source file (location/account...) content given a portfolio id
     #dataset_identifier is location/account/reinsurance_info/reinsurance_source
@@ -232,6 +236,23 @@ DataHub <- R6Class(
     },
 
     # > ANALYSIS METHODS ----
+    #extract a input/output file given an analysis id
+    get_ana_dataset_content = function(id, dataset_identifier, type, ...){
+      if (type == "input") {
+        dataset_content <- self$get_ana_inputs_dataset_content(id, dataset_identifier)
+      } else if (type == "output") {
+        dataset_content <- self$get_ana_outputs_dataset_content(id, dataset_identifier)
+      } else {
+        dataset_content <- NULL
+      }
+      dataset_content
+    },
+    #invalidate a input/output file given an analysis id
+    invalidate_ana_dataset_content = function(id, dataset_identifier, type, ...){
+      self$invalidate_ana_dataset_header(id, dataset_identifier, type, ...)
+      self$invalidate_ana_dataset_row(id, dataset_identifier, type, ...)
+      invisible()
+    },
     #extract a inputs file content given an analysis id
     get_ana_inputs_dataset_content = function(id, dataset_identifier, ...){
       tarfile <- get_analyses_inputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
@@ -240,10 +261,12 @@ DataHub <- R6Class(
     },
     #invalidate a inputs file content given an analysis id
     invalidate_ana_inputs_dataset_content = function(id, dataset_identifier, ...){
+      self$invalidate_ana_dataset_header(id, dataset_identifier, type = "input", ...)
+      self$invalidate_ana_dataset_row(id, dataset_identifier, type = "input", ...)
       invisible()
     },
     #extract a outputs file content given an analysis id
-    get_ana_output_dataset_content = function(id, dataset_identifier, ...){
+    get_ana_outputs_dataset_content = function(id, dataset_identifier, ...){
       tarfile <- get_analyses_outputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
       #necessary step because outputs comes with subfolder
       dataset_identifier <- file.path("output", dataset_identifier)
@@ -252,13 +275,15 @@ DataHub <- R6Class(
     },
     #invalidate a outputs file content given an analysis id
     invalidate_ana_outputs_dataset_content = function(id, dataset_identifier, ...){
+      self$invalidate_ana_dataset_header(id, dataset_identifier, type = "output", ...)
+      self$invalidate_ana_dataset_row(id, dataset_identifier, type = "output", ...)
       invisible()
     },
     #extract a inputs/outputs file header given an analysis id
     get_ana_dataset_header = function(id, type, dataset_identifier, ...){
       tarfile <- get_analyses_tar(id, label = type, destdir = getOption("flamingo.settings.api.share_filepath"))
       #necessary step because outputs comes with subfolder
-      if (grepl(paste0(type, "/"),  untar(tarfile, list = TRUE))) {
+      if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
       dataset_header <- read_file_from_tar(tarfile, dataset_identifier, nrows = 1, destdir = getOption("flamingo.settings.api.share_filepath")) %>%
@@ -289,7 +314,7 @@ DataHub <- R6Class(
     get_ana_dataset_size = function(id, type, dataset_identifier, ...){
       destdir =  getOption("flamingo.settings.api.share_filepath")
       tarfile <- get_analyses_tar(id, label = type, destdir = destdir)
-      if (grepl(paste0(type, "/"),  untar(tarfile, list = TRUE))) {
+      if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
       untar(tarfile, files = dataset_identifier, exdir = destdir)
@@ -334,6 +359,8 @@ DataHub <- R6Class(
     #invalidate analysis validation summary content
     invalidate_ana_validation_summary_content = function(id, ...){
       invisible()
+      self$invalidate_ana_dataset_header(id, dataset_identifier, type, ...)
+      self$invalidate_ana_dataset_row(id, dataset_identifier, type, ...)
     }
   )
 )
