@@ -653,7 +653,7 @@ step3_configureOutput <- function(input, output, session,
         show("panelDefineOutputs")
         logMessage("showing panelDefineOutputs")
         result$ana_flag <- "R"
-        analysis_settings <- return_analyses_settings_file_list(result$anaID)
+        analysis_settings <- data_hub$get_ana_settings_content(result$anaID)#return_analyses_settings_file_list(result$anaID)
         analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
         if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
           flamingoNotification(type = "error",
@@ -755,7 +755,7 @@ step3_configureOutput <- function(input, output, session,
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
       anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
       anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
-      analysis_settings <-  return_analyses_settings_file_list(anaID)
+      analysis_settings <- data_hub$get_ana_settings_content(anaID)#rreturn_analyses_settings_file_list(anaID)
       if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
         flamingoNotification(type = "error",
                              paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
