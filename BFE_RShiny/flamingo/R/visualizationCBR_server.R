@@ -96,20 +96,8 @@ visualizationCBR <- function(input, output, session,
   observeEvent( {
     sub_modules$defineID1$selectAnaID()
     sub_modules$defineID2$selectAnaID()}, {
-      if (!is.null(sub_modules$defineID1$selectAnaID()) && !is.null(sub_modules$defineID2$selectAnaID())) {
-        result$tbl_filesListDataana1 <- data_hub$get_ana_outputs_data_list(sub_modules$defineID1$selectAnaID()) #return_analyses_output_file_df(sub_modules$defineID1$selectAnaID())
-        # analysis_settings1 <- data_hub$get_ana_settings_content(sub_modules$defineID1$selectAnaID())#rreturn_analyses_settings_file_list(sub_modules$defineID1$selectAnaID())
-        # result$tbl_filesListDataana <- cbind(tbl_filesListDataana1,
-        #                                      do.call(rbind.data.frame, lapply(tbl_filesListDataana1$files,
-        #                                                                       .addDescription, analysis_settings1)))
-        result$tbl_filesListDataana2 <- data_hub$get_ana_outputs_data_list(sub_modules$defineID2$selectAnaID()) #return_analyses_output_file_df(sub_modules$defineID2$selectAnaID())
-        # analysis_settings2 <- data_hub$get_ana_settings_content(sub_modules$defineID2$selectAnaID())#rreturn_analyses_settings_file_list(sub_modules$defineID2$selectAnaID())
-        # result$tbl_filesListDataana <- rbind(result$tbl_filesListDataana, cbind(tbl_filesListDataana1,
-        #                                                                         do.call(rbind.data.frame, lapply(tbl_filesListDataana2$files,
-        #                                                                                                          .addDescription, analysis_settings2))))
-      } else {
-        result$tbl_filesListDataana <- NULL
-      }
+      result$tbl_filesListDataana1 <- data_hub$get_ana_outputs_data_list(sub_modules$defineID1$selectAnaID())
+      result$tbl_filesListDataana2 <- data_hub$get_ana_outputs_data_list(sub_modules$defineID2$selectAnaID())
     })
 
   # Tab Output files -----------------------------------------------------------
@@ -131,19 +119,6 @@ visualizationCBR <- function(input, output, session,
     n_panels = n_panels,
     active = reactive({active() && input$tabsCBR == ns("tabplots")}))
 
-
-  # Helper functions -----------------------------------------------------------
-  #Add descritption fields to output files
-  .addDescription <- function(x, analysis_settings){
-    x <- as.character(x)
-    x <- strsplit(x, split = "[.]")[[1]][1]
-    y <- unlist(strsplit(x, split = "_"))
-    report <-  paste(y[3:(length(y))], collapse = "_")
-    g_idx <- as.integer(gsub("S", "", y[2]))
-    g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
-    g <- granToOed[granToOed$oed == g_oed, "gran"]
-    z <- data.frame("perspective" = y[1], "summary_level" = g, "report" = reportToVar(varsdf)[[ report ]])
-  }
 
   # Module Outout --------------------------------------------------------------
 

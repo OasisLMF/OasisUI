@@ -137,18 +137,19 @@ DataHub <- R6Class(
     },
     get_ana_outputs_data_list = function(id, ...){
       tarfile <- get_analyses_outputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
-      data_list <- untar_list(tarfile, to_strip = "output")
-      if (length(data_list) > 0) {
-        data_list <- data_list %>%
-          as.data.frame() %>%
-          setNames("files")
-        analysis_settings <- self$get_ana_settings_content(id)
-        data_list <- cbind(data_list,
-                           do.call(rbind.data.frame,
-                                   lapply(data_list$files,
-                                          .addDescription, analysis_settings)))
-      } else {
-        data_list <- NULL
+      data_list <- NULL
+      if (file.exists(tarfile)) {
+        data_list <- untar_list(tarfile, to_strip = "output")
+        if (length(data_list) > 0) {
+          data_list <- data_list %>%
+            as.data.frame() %>%
+            setNames("files")
+          analysis_settings <- self$get_ana_settings_content(id)
+          data_list <- cbind(data_list,
+                             do.call(rbind.data.frame,
+                                     lapply(data_list$files,
+                                            .addDescription, analysis_settings)))
+        }
       }
       data_list
     },

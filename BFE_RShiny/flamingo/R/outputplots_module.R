@@ -493,7 +493,7 @@ panelOutputModule <- function(input, output, session,
     if (!is.na(fileName)) {
       logMessage(paste0("Reading file ", fileName))
       tryCatch({
-        fileData <- data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = fileName)#fread(fileName) #read.csv(fileName, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+        fileData <- data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = fileName)
       }, error = function(e) {
         flamingoNotification(type = "error",
                              paste0("Could not read file: ", e$message, "."))

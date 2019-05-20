@@ -143,7 +143,8 @@ modeldetails <- function(input,
     if (!is.null(input$hazard_files)) {
       data_hub$invalidate_model_hazard_dataset_content(modelID())
       path <- paste0("./www/hazard_files/", input$hazard_files)
-      result$mapfile <- data_hub$get_model_hazard_dataset_content(id = modelID())#geojsonio::geojson_read(path, what = "sp")
+      #geojsonio::geojson_read(path, what = "sp")
+      result$mapfile <- data_hub$get_model_hazard_dataset_content(id = modelID())
       if (is.null(result$mapfile)) {
         hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
       }
@@ -183,12 +184,12 @@ modeldetails <- function(input,
   .reloadtbl_modelsDetails <- function() {
     logMessage(".reloadtbl_modelsDetails called")
     data_hub$invalidate_model_resource_dataset_content(modelID())
-    tbl_modelsDetails <- data_hub$get_model_resource_dataset_content(modelID())#return_models_id_resource_file_df(modelID())
+    tbl_modelsDetails <- data_hub$get_model_resource_dataset_content(modelID())
     if (!is.null(tbl_modelsDetails)) {
       result$tbl_modelsDetails <- tbl_modelsDetails
       logMessage("model resources table refreshed")
 
-      result$uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID()) #return_file_df(api_get_portfolios_location_file, portfolioID())
+      result$uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID())
       logMessage("uploaded_locs refreshed")
       updateSelectInput(session,
                         inputId = ns("hazard_files"),

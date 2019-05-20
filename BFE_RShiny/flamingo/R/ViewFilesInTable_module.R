@@ -167,13 +167,10 @@ ViewFilesInTable <- function(input, output, session,
         returnfunc <- func_wpattern[grepl("api_get", func_wpattern)]
         if (length(returnfunc) != 0) {
           func <- get(returnfunc)
-          fileData <- data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename) #return_file_df(func, param())
+          fileData <- data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename)
         } else {
-          # extractFolder <- set_extractFolder(id = param(), label = folderpath)
-          # currfilepath <- set_extractFilePath(extractFolder, filename)
-          fileData <- data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath) #fread(currfilepath)
+          fileData <- data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
         }
-
         if (nrow(fileData) > 0) {
           fpath <- file.path(currfolder, filename)
           fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
@@ -346,7 +343,6 @@ ViewFilesInTable <- function(input, output, session,
     if (length(returnfunc) != 0) {
       result$tbl_fileData <- data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
       if (!is.null(result$tbl_fileData)) {
-        names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
         filerows <- data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
         result$currentFile <- paste0(result$currentFile, ".csv")
@@ -361,7 +357,6 @@ ViewFilesInTable <- function(input, output, session,
     } else {
       result$tbl_fileData <- data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
       if (!is.null(result$tbl_fileData)) {
-        names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
         filerows <- data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
       }

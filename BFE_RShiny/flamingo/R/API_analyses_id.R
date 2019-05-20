@@ -505,55 +505,6 @@ api_get_analyses_input_generation_traceback_file <- function(id) {
 
 # Output file ------------------------------------------------------------------
 
-#' Get analysis output file
-#'
-#' Gets the analysis output_file contents
-#'
-#' @rdname api_get_analyses_output_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Previously posted analysis output file.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#' @importFrom httr write_disk
-#' @importFrom utils untar
-#'
-#' @export
-api_get_analyses_output_file <- function(id) {
-
-  currfolder <- getOption("flamingo.settings.api.share_filepath")
-  dest <- file.path(currfolder, paste0(id, "_outputs.tar"))
-  extractFolder <- set_extractFolder(id, label = "_outputs")
-  dir.create(extractFolder, showWarnings = FALSE)
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "output_file", "", sep = "/"),
-    write_disk(dest, overwrite = TRUE)
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  untar(tarfile = dest, exdir = extractFolder)
-
-  # wait for untar to finish
-  oldfileList <- NULL
-  while (all.equal(oldfileList, list.files(extractFolder)) != TRUE) {
-    oldfileList <- list.files(extractFolder)
-    Sys.sleep(2)
-  }
-
-  #response needed in step2 to place icon
-  api_handle_response(response)
-
-}
-
 #' Define Extract Folder Path
 #'
 #' @rdname set_extractFolder
@@ -585,53 +536,6 @@ set_extractFolder <- function(id, label) {
 #' @export
 set_extractFilePath <- function(extractFolder, fileName) {
   filePath <- file.path(extractFolder, fileName)
-}
-
-#' Return analyses output files  Dataframe
-#'
-#' @rdname return_analyses_output_file_df
-#'
-#' @description Returns a dataframe of output files.
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Dataframe of output files.
-#'
-#' @importFrom stats setNames
-#'
-#' @export
-return_analyses_output_file_df <- function(id) {
-
-  extractFolder <- set_extractFolder(id, label = "_outputs/output")
-  if (!file.exists(extractFolder)) {
-    api_get_analyses_output_file(id)
-  }
-  list.files(extractFolder, recursive = TRUE) %>% as.data.frame() %>% setNames("files")
-}
-
-#' Return specific analyses output file as dataframe
-#'
-#' @rdname return_analyses_spec_output_file_df
-#'
-#' @description Returns a dataframe of a specific output file.
-#'
-#' @param id A unique integer value identifying this analysis.
-#' @param fileName Name of file to read.
-#'
-#' @return Dataframe of specific output file.
-#'
-#' @importFrom data.table fread
-#'
-#' @export
-return_analyses_spec_output_file_df <- function(id, fileName) {
-  extractFolder <- set_extractFolder(id, label = "_outputs/output/")
-  filePath <- set_extractFilePath(extractFolder, fileName)
-  info <- file.info(filePath)
-  analyses_spec_output_file_df <- NULL
-  if (!is.na(info$size) && info$size != 0 ) {
-    analyses_spec_output_file_df <- fread(filePath)
-  }
-  analyses_spec_output_file_df
 }
 
 # Run traceback file -----------------------------------------------------------

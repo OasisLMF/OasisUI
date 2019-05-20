@@ -19,7 +19,7 @@ check_loc <- function(analysisID, portfolioID){
   uploaded_locs_check <- NULL
 
   # Get uploaded locations
-  uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID) # return_file_df(api_get_portfolios_location_file, portfolioID)
+  uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID)
 
   # Analysis location input
   extractFolder <- set_extractFolder(analysisID, label = "_inputs/")

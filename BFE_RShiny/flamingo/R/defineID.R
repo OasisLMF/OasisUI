@@ -225,7 +225,7 @@ defineID <- function(input, output, session,
     result$selectAnaName <-  ifelse(is.null(currName) || is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) || is.na(currpfId), "", currpfId)
     logMessage("Extract output files")
-    data_hub$get_ana_outputs_data_list(result$selectAnaID) #api_get_analyses_output_file(result$selectAnaID)
+    data_hub$get_ana_outputs_data_list(result$selectAnaID)
   }
 
 
