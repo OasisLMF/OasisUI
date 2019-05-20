@@ -110,7 +110,7 @@ anainputs <- function(input,
     tbl_filesListData = reactive({result$dt_generated}),
     param = analysisID,
     file_column = "files",
-    folderpath = "_inputs/",
+    folderpath = "input",
     includechkbox = TRUE)
 
   # reload Generated Inputs table-----------------------------------------------
