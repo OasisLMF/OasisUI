@@ -246,6 +246,8 @@ step1_choosePortfolio <- function(input, output, session,
   result <- reactiveValues(
     # reactive for portfolioID
     portfolioID = "",
+    # reactive for portfolio name
+    portfolioName = "",
     # reactive value for the portfolio table
     tbl_portfoliosData = NULL,
     # SL file to load
@@ -360,7 +362,14 @@ step1_choosePortfolio <- function(input, output, session,
     portfolio_details,
     id = "portfolio_details",
     refresh_opt = FALSE,
-    portfolioID = portfolioID,
+    portfolioID = reactive({
+      result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
+    }),
+    portfolioName = reactive({
+      pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
+      pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
+      pfName
+    }),
     counter = reactive({input$abuttonpfdetails}),
     active = active
   )
@@ -731,19 +740,6 @@ step1_choosePortfolio <- function(input, output, session,
     logMessage(".reloadtbl_portfoliosData called")
     result$tbl_portfoliosData <- return_tbl_portfoliosData()
     logMessage("portfolio table refreshed")
-    invisible()
-  }
-
-  # Reload portfolio Details table
-  .reloadtbl_portfolioDetails <- function() {
-    logMessage(".reloadtbl_portfolioDetails called")
-    if (length(input$dt_Portfolios_rows_selected) > 0) {
-      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
-      result$tbl_portfolioDetails  <- return_tbl_portfolioDetails(pfId)
-      logMessage("portfolio details table refreshed")
-    } else {
-      result$tbl_portfolioDetails  <- NULL
-    }
     invisible()
   }
 
