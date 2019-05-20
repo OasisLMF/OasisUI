@@ -42,9 +42,7 @@ visualizationBBR <- function(input, output, session,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
-    tbl_filesListDataana = NULL,
-    # df portfolio input files
-    tbl_filesListDatapf = NULL
+    tbl_filesListDataana = NULL
   )
 
   #number of plot output panels
@@ -85,9 +83,7 @@ visualizationBBR <- function(input, output, session,
       result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
                                            do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
                                                                             .addDescription, analysis_settings)))
-      result$tbl_filesListDatapf <- return_tbl_portfolioDetails(sub_modules$defineID$selectPortfolioID())
     } else {
-      result$tbl_filesListDatapf <- NULL
       result$tbl_filesListDataana <- NULL
     }
   })
