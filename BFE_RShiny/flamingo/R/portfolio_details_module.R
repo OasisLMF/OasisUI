@@ -92,6 +92,7 @@ portfolio_details <- function(input,
 
   # reload Uploaded Inputs table-----------------------------------------------
   onclick("abuttonuploadedrefresh", {
+    data_hub$invalidate_pf_data_list()
     withModalSpinner(
       .reloadtbl_portfolioDetails(),
       "Refreshing...",
@@ -102,10 +103,10 @@ portfolio_details <- function(input,
   # Reload uploaded inputs table -----------------------------------------------
   .reloadtbl_portfolioDetails <- function() {
     logMessage(".reloadtbl_portfolioDetails called")
-    if (!is.null(portfolioID()) && portfolioID() != "") {
-      result$dt_uploaded  <- return_tbl_portfolioDetails(portfolioID())
-    } else {
-      result$dt_uploaded  <- NULL
-    }
+    # if (!is.null(portfolioID()) && portfolioID() != "") {
+          result$dt_uploaded  <- data_hub$get_pf_data_list(portfolioID())
+    # } else {
+    #  result$dt_uploaded  <- NULL
+    # }
   }
 }
