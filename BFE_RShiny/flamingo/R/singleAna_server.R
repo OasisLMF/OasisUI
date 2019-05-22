@@ -134,6 +134,7 @@ singleAna <- function(input, output, session,
   # > AnaId --------------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), {
     result$dashboardanaID <- submodulesList$step3_configureOutput$dashboardAnaID()
+    session$userData$data_hub$invalidate_ana_inputs_data_list(result$dashboardanaID)
     logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", result$dashboardanaID))
   })
 
@@ -154,6 +155,7 @@ singleAna <- function(input, output, session,
     if (!is.na(portfolioID) && result$portfolioID != portfolioID) {
       logMessage(paste0("updating result$portfolioID because submodulesList$step1_choosePortfolio$portfolioID() changed to: ", portfolioID ))
       result$portfolioID <- portfolioID
+      session$userData$data_hub$invalidate_pf_data_list(result$portfolioID)
     }
   })
 
@@ -163,6 +165,7 @@ singleAna <- function(input, output, session,
     if (!is.na(portfolioID) && portfolioID != "" && result$portfolioID != portfolioID) {
       logMessage(paste0("updating result$portfolioID becauseselectPortfolioID() changed to: ", portfolioID ))
       result$portfolioID <- portfolioID
+      session$userData$data_hub$invalidate_pf_data_list(result$portfolioID)
     }
   })
 
@@ -171,6 +174,7 @@ singleAna <- function(input, output, session,
     if (input$portfolioID != result$portfolioID) {
       logMessage(paste0("updating result$portfolioID because input$portfolioID changed to: ", input$portfolioID ))
       result$portfolioID <- input$portfolioID
+      session$userData$data_hub$invalidate_pf_data_list(result$portfolioID)
     }
   })
 

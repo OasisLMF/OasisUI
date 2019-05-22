@@ -77,7 +77,7 @@ visualizationBBR <- function(input, output, session,
 
   # Extract Output files for given anaID----------------------------------------
   observeEvent(sub_modules$defineID$selectAnaID(), {
-    result$tbl_filesListDataana <- data_hub$get_ana_outputs_data_list(sub_modules$defineID$selectAnaID())
+    result$tbl_filesListDataana <- session$userData$data_hub$get_ana_outputs_data_list(sub_modules$defineID$selectAnaID())
   })
 
   # Tab Summary ----------------------------------------------------------------

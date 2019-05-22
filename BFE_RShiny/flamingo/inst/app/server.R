@@ -17,6 +17,7 @@ server <- function(input, output, session) {
   #clean up folder upon login
   clean_downloadedData()
 
+
   # active main panel based on the reactive navigation state
   navigation_state <- reactiveNavigation("LP")
   main_visible <- getNavigation(outputNavigation(

@@ -167,9 +167,9 @@ ViewFilesInTable <- function(input, output, session,
         returnfunc <- func_wpattern[grepl("api_get", func_wpattern)]
         if (length(returnfunc) != 0) {
           func <- get(returnfunc)
-          fileData <- data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename)
+          fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename)
         } else {
-          fileData <- data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
+          fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
         }
         if (nrow(fileData) > 0) {
           fpath <- file.path(currfolder, filename)
@@ -341,10 +341,10 @@ ViewFilesInTable <- function(input, output, session,
     filerows <- NULL
     filecolumns <- NULL
     if (length(returnfunc) != 0) {
-      result$tbl_fileData <- data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
+      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
-        filerows <- data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
+        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
+        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
         result$currentFile <- paste0(result$currentFile, ".csv")
         #Show buttons
         if ("latitude" %in% names(result$tbl_fileData) && !is.null(result$tbl_fileData)) {
@@ -355,10 +355,10 @@ ViewFilesInTable <- function(input, output, session,
         }
       }
     } else {
-      result$tbl_fileData <- data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
-        filerows <- data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+        filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+        filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
       }
 
       #Show buttons
