@@ -485,48 +485,28 @@ fieldset[disabled] .btn-secondary.active {
 
 /*Flamingo leaflet cluster color*/
 .marker-cluster-small {
-  background-color: rgba(241, 211, 87, 0.6) !important;
+  background-color: rgba(0,128,0, 0.6) !important;
 }
 
 .marker-cluster-small div {
-  background-color: rgba(241, 211, 87, 0.6) !important;
+  background-color: rgba(0,128,0, 0.6) !important;
 }
 
 .marker-cluster-medium {
-  background-color: rgba(241, 211, 87, 0.6) !important;
+  background-color: rgba(0,128,0, 0.6) !important;
 }
 .marker-cluster-medium div {
-  background-color: rgba(241, 211, 87, 0.6) !important;
+  background-color: rgba(0,128,0, 0.6) !important;
 }
 
 .marker-cluster-large {
-  background-color: rgba(241, 211, 87, 0.6) !important;
+  background-color: rgba(0,128,0, 0.6) !important;
 }
 
 .marker-cluster-large div {
-  background-color: rgba(240, 194, 12, 0.6) !important;
+  background-color:rgba(0,128,0, 0.6) !important;
 }
 
-.leaflet-oldie .marker-cluster-small {
-  background-color: rgb(141, 211, 87) !important;
-}
-
-.leaflet-oldie .marker-cluster-small div {
-  background-color: rgb(141, 211, 87) !important;
-}
-
-.leaflet-oldie .marker-cluster-medium {
-  background-color: rgb(141, 211, 87) !important;
-}
-
-.leaflet-oldie .marker-cluster-medium div {
-  background-color: rgb(141, 211, 87) !important;
-}
-
-.leaflet-oldie .marker-cluster-large {
-  background-color: rgb(141, 211, 87) !important;
-}
-
-.leaflet-oldie .marker-cluster-large div {
-  background-color: rgb(141, 211, 87) !important;
+.marker-cluster-small-red {
+  background-color: rgba(220,20,60, 0.6) !important;
 }

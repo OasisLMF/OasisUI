@@ -21,11 +21,11 @@ exposurevalidationmapUI <- function(id) {
     fluidRow(
       column(1,
              checkboxGroupInput(inputId =ns("chkgrp_perils"), label = "Pick peril", choices = c("WTC"))
-             ),
+      ),
       column(11,
              leafletOutput(ns("exposure_map")),
              hidden(div(id = ns("div_abuttonviewtbl"), flamingoButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;")))
-             )
+      )
     )
   )
 }
@@ -52,6 +52,7 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
 #' @importFrom DT styleEqual
+#' @importFrom htmlwidgets onRender
 #' @importFrom leaflet leaflet
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet addAwesomeMarkers
@@ -234,14 +235,59 @@ exposurevalidationmap <- function(input,
       markerColor =  marker_colors[df$modeled]
     )
 
+    # color clusters red if any mark is red, and green in fall marks are green.
+    # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
     leaflet(df) %>%
       addTiles() %>%
       addAwesomeMarkers(
         lng = ~Longitude,
         lat = ~Latitude,
         icon = icon_map,
-        clusterOptions = TRUE,
-        popup = toString(popupData))
+        clusterOptions = markerClusterOptions(),
+        group = "clustered",
+        clusterId = "cluster",
+        popup = toString(popupData)) %>%
+      onRender("function(el,x) {
+                            map = this;
+
+                            var style = document.createElement('style');
+                            style.type = 'text/css';
+                            style.innerHTML = '.red, .red div { background-color: rgba(255,0,0,0.6); }'; // set both at the same time
+                            document.getElementsByTagName('head')[0].appendChild(style);
+
+
+                            var cluster = map.layerManager.getLayer('cluster','cluster');
+                            cluster.options.iconCreateFunction = function(c) {
+                            var markers = c.getAllChildMarkers();
+                            var priority = {
+                            'green': 0,
+                            'red': 1,
+                            'red': 2
+                            };
+                            var highestRank = 0; // defaults to the lowest level to start
+
+                            markers.forEach(function(m) {
+                            var color = m.options.icon.options.markerColor;
+
+                            // check each marker to see if it is the highest value
+                            if(priority[color] > highestRank) {
+                            highestRank = priority[color];
+                            }
+                            })
+
+                            var styles = [
+                            'marker-cluster-small', // green
+                            'marker-cluster-large',  // red
+                            'red' // red
+                            ]
+
+                            var style = styles[highestRank];
+                            var count = markers.length;
+
+                            return L.divIcon({ html: '<div><span>'+count+'</span></div>', className: 'marker-cluster ' + style, iconSize: new L.Point(40, 40) });
+                            }
+  }")
+
   }
 
 }
