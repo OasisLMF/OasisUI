@@ -8,7 +8,7 @@
 exposurevalidationmapUI(id)
 
 exposurevalidationmap(input, output, session,
-  analysisID = reactive(NULL), portfolioID = "",
+  analysisID = reactive(NULL), portfolioID = reactive(""),
   counter = reactive(NULL), active = reactive(TRUE))
 }
 \arguments{

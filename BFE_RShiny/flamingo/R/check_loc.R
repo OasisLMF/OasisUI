@@ -4,45 +4,35 @@
 #'
 #' @param analysisID Selected analysis id.
 #' @param portfolioID selected portfolio ID.
+#' @param data_hub data hub stored in session$userData$data_hub
 #'
 #' @importFrom data.table fread
-#' @importFrom dplyr select
-#' @importFrom dplyr intersect
+#' @importFrom dplyr full_join
+#' @importFrom dplyr one_of
 #' @importFrom dplyr mutate
-#' @importFrom dplyr case_when
+#' @importFrom dplyr select
 #'
 #' @export
-check_loc <- function(analysisID, portfolioID){
+check_loc <- function(analysisID, portfolioID, data_hub){
 
   logMessage(".check_loc called")
 
+  #initialize df
   uploaded_locs_check <- NULL
+  uploaded_locs <- NULL
+  modelled_locs <- NULL
 
-  # Get uploaded locations
-  uploaded_locs <- session$userData$data_hub$get_pf_location_content(id = portfolioID)
+  uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID) %>%
+    mutate(loc_idx = seq(nrow(.)) - 1)
 
-  # Analysis location input
-  extractFolder <- set_extractFolder(analysisID, label = "_inputs/")
-  fileslist <- list.files(extractFolder)
-  modeled_loc_filename <- return_portfolios_stored_name(portfolioID,"location_file")
+  modelled_locs <-  data_hub$get_ana_inputs_dataset_content(analysisID, dataset_identifier = "gul_summary_map.csv")
 
-  currfilepath <- paste0(extractFolder, modeled_loc_filename)
+  #dummy to test validation
+  #modelled_locs <- modelled_locs[1:30,]
 
-  if (!is.na(modeled_loc_filename) && file.exists(currfilepath) && !is.null(uploaded_locs)) {
-
-    modeled_locs <- fread(currfilepath, integer64 = "numeric")
-
-    # Hack: drop LocName as it seems to cause issues in the inner_join
-    modeled_locs <- modeled_locs %>%
-      select(LocNumber)
-
-    # compare uploaded locations with modeled locations
-    idx_in <- intersect(uploaded_locs$LocNumber, modeled_locs$LocNumber)
-
-    uploaded_locs_check <- uploaded_locs %>%
-      mutate(modeled = case_when(LocNumber %in% idx_in ~ "TRUE",
-                                 TRUE ~ "FALSE"))
-  }
+  uploaded_locs_check <- full_join(uploaded_locs, modelled_locs, by = "loc_idx") %>%
+    select(-one_of( names(modelled_locs %>% select(-"peril_id")))) %>%
+    distinct()
 
   return(uploaded_locs_check)
 }

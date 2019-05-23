@@ -141,7 +141,6 @@ modeldetails <- function(input,
   # Choose hazard file
   observeEvent(input$hazard_files, {
     if (!is.null(input$hazard_files)) {
-      session$userData$data_hub$invalidate_model_hazard_dataset_content(modelID())
       path <- paste0("./www/hazard_files/", input$hazard_files)
       #geojsonio::geojson_read(path, what = "sp")
       result$mapfile <- session$userData$data_hub$get_model_hazard_dataset_content(id = modelID())
@@ -183,7 +182,6 @@ modeldetails <- function(input,
   # Reload Programme Model Details table
   .reloadtbl_modelsDetails <- function() {
     logMessage(".reloadtbl_modelsDetails called")
-    session$userData$data_hub$invalidate_model_resource_dataset_content(modelID())
     tbl_modelsDetails <- session$userData$data_hub$get_model_resource_dataset_content(modelID())
     if (!is.null(tbl_modelsDetails)) {
       result$tbl_modelsDetails <- tbl_modelsDetails

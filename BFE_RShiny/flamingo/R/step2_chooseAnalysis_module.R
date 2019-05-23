@@ -221,8 +221,6 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
-    # reactive for portfolioID
-    portfolioID = "",
     # reactive for modelID
     modelID = "",
     # reactive value for model table
@@ -234,16 +232,6 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis ID
     analysisID = NULL
   )
-
-  #Set Params
-  observeEvent(portfolioID(), {
-    if (!is.null(portfolioID())) {
-      result$portfolioID <- portfolioID()
-    } else {
-      result$portfolioID <- ""
-    }
-  })
-
 
   # Panels Visualization -------------------------------------------------------
   observeEvent({
@@ -287,15 +275,15 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Create Analyses Table  Title
   output$paneltitle_CreateAnalysesTable <- renderUI({
-    if (result$portfolioID != "") {
+    if (!is.null(portfolioID()) && portfolioID() != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
-      paste0('Analyses associated with portfolio ', pfName, ', id ', toString(result$portfolioID))
+      paste0('Analyses associated with portfolio ', pfName, ', id ', toString(portfolioID()))
     } else {
       paste0('Analyses')
     }
   })
 
-  observeEvent(result$portfolioID, {
+  observeEvent(portfolioID(), {
     .reloadAnaData()
   })
 
@@ -304,7 +292,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   observeEvent({
     input$dt_analyses_rows_selected
-    result$portfolioID}, ignoreNULL = FALSE, {
+    portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_analyses_rows_selected)) {
         result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
       } else {
@@ -316,7 +304,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   observeEvent({
     input$dt_models_rows_selected
-    result$portfolioID}, ignoreNULL = FALSE, {
+    portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_models_rows_selected)) {
         result$modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
       } else {
@@ -420,8 +408,8 @@ step2_chooseAnalysis <- function(input, output, session,
   sub_modules$analysis_details <- callModule(
     analysis_details,
     id = "analysis_details",
-    portfolioID = reactive({result$portfolioID}),
     analysisID = reactive({result$analysisID}),
+    portfolioID = portfolioID,
     counter = reactive({input$abuttonshowanadetails})
   )
 
@@ -541,13 +529,13 @@ step2_chooseAnalysis <- function(input, output, session,
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      nothingToShowTable(paste0("No models associated with Portfolio ID ", result$portfolioID))
+      nothingToShowTable(paste0("No models associated with Portfolio ID ", portfolioID()))
     }
   )
 
   # Model Table title
   output$paneltitle_ModelTable <- renderUI({
-    if (result$portfolioID != "") {
+    if (!is.null(portfolioID()) && portfolioID() != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
       paste0('Pick a model and choose an analysis name')
     } else {
@@ -576,7 +564,7 @@ step2_chooseAnalysis <- function(input, output, session,
     modeldetails,
     id = "modeldetails",
     modelID = reactive({result$modelID}),
-    portfolioID = reactive({result$portfolioID}),
+    portfolioID = portfolioID,
     counter = reactive({input$abuttonmodeldetails}),
     active = reactive(TRUE)
   )
@@ -585,10 +573,10 @@ step2_chooseAnalysis <- function(input, output, session,
 
   onclick("abuttonsubmit", {
     if (input$anaName != "") {
-      post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID,
+      post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = portfolioID(),
                                                                              name = input$anaName,
                                                                              model = result$modelID)
-      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID,
+      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", portfolioID(),
                         " name ", input$anaName,
                         " model ",  result$modelID))
       if (post_portfolios_create_analysis$status == "Success") {
@@ -653,7 +641,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   #Not allowed creation of an analysis for an incomplete portfolio
   observeEvent({
-    result$portfolioID
+    portfolioID()
     pfstatus()}, {
       if (pfstatus() == "- Status: Completed") {
         enable("abuttoncreateana")
@@ -697,10 +685,10 @@ step2_chooseAnalysis <- function(input, output, session,
   # Reload Analysis table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
-    if (result$portfolioID  != "") {
+    if (!is.null(portfolioID()) && portfolioID()  != "") {
       tbl_analysesData  <- return_tbl_analysesData()
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == result$portfolioID)
+        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
       }
       logMessage("analyses table refreshed")
     }  else {
@@ -727,7 +715,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Reload Programme Model table
   .reloadtbl_modelsData <- function() {
     logMessage(".reloadtbl_modelsData called")
-    if (result$portfolioID != "") {
+    if (!is.null(portfolioID()) && portfolioID() != "") {
       result$tbl_modelsData <- return_tbl_modelsData()
       logMessage("models table refreshed")
     } else {

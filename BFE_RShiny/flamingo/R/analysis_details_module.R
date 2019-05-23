@@ -45,8 +45,8 @@ analysis_detailsUI <- function(id) {
 #'
 #' @template params-module-ui
 #' @param analysisID Selected analysis ID.
-#' @param reload_generated Imports function to reload Generated Inputs table.
 #' @param portfolioID Selected portfolio ID.
+#' @param reload_generated Imports function to reload Generated Inputs table.
 #'
 #' @template params-module-ui
 #'
@@ -65,8 +65,7 @@ analysis_details <- function(input,
     counter()
   }, {
     if (length(counter()) > 0 && counter() > 0) {
-      if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
-          (!is.null(analysisID()))) {
+      if (!is.null(analysisID()) && !is.na(analysisID()) && analysisID() != "") {
         extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
         if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
           withModalSpinner(
@@ -84,7 +83,6 @@ analysis_details <- function(input,
     exposurevalidationsummary,
     id = "exposurevalidationsummary",
     analysisID = analysisID,
-    portfolioID = portfolioID,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabvalidationsummary")})
   )
@@ -103,7 +101,6 @@ analysis_details <- function(input,
     anainputs,
     id = "anainputs",
     analysisID = analysisID,
-    portfolioID = portfolioID,
     refresh_opt = TRUE,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabanainputs")})

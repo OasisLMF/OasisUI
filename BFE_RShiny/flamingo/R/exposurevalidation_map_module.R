@@ -19,8 +19,13 @@ exposurevalidationmapUI <- function(id) {
   tagList(
     fluidRow(div(flamingoRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
-      leafletOutput(ns("exposure_map")),
-      hidden(div(id = ns("div_abuttonviewtbl"), flamingoButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;")))
+      column(1,
+             checkboxGroupInput(inputId =ns("chkgrp_perils"), label = "Pick peril", choices = c("WTC"))
+      ),
+      column(11,
+             leafletOutput(ns("exposure_map")),
+             hidden(div(id = ns("div_abuttonviewtbl"), flamingoButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;")))
+      )
     )
   )
 }
@@ -42,11 +47,13 @@ exposurevalidationmapUI <- function(id) {
 #'
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
+#' @importFrom dplyr distinct
 #' @importFrom DT formatStyle
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
 #' @importFrom DT styleEqual
+#' @importFrom htmlwidgets onRender
 #' @importFrom leaflet leaflet
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet addAwesomeMarkers
@@ -61,7 +68,7 @@ exposurevalidationmap <- function(input,
                                   output,
                                   session,
                                   analysisID = reactive(NULL),
-                                  portfolioID = "",
+                                  portfolioID = reactive(""),
                                   counter = reactive(NULL),
                                   active = reactive(TRUE)) {
 
@@ -70,7 +77,9 @@ exposurevalidationmap <- function(input,
   # Params and Reactive Values -------------------------------------------------
   result <- reactiveValues(
     #dataframe of checked exposures
-    uploaded_locs_check = NULL
+    uploaded_locs_check = NULL,
+    #dataframe of checked exposures by perils
+    uploaded_locs_check_peril = NULL
   )
 
   # Modeled exposure and uploaded exposure ------------------------------------
@@ -80,15 +89,38 @@ exposurevalidationmap <- function(input,
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
       .reloadExposureValidation()
+      perils <- result$uploaded_locs_check$peril[!is.na(result$uploaded_locs_check$peril)] %>%
+        unique()
+      logMessage("Updating input$chkgrp_perils")
+      updateCheckboxGroupInput(session, inputId = "chkgrp_perils", choices = perils, selected = perils)
+    }
+  })
+
+  observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
+    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+      result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
+        left_join(
+          data.frame(
+            LocNumber = unique( result$uploaded_locs_check$LocNumber),
+            modeled = sapply(unique( result$uploaded_locs_check$LocNumber), function(x){
+              curr_loc <- result$uploaded_locs_check %>%
+                filter(LocNumber == x)
+              any(curr_loc$peril_id %in% input$chkgrp_perils)
+            })
+          )
+        ) %>%
+        select(-peril_id) %>%
+        distinct()
     }
   })
 
   # Show/Hide table button -----------------------------------------------------
 
-  observe({
-    hide("div_abuttonviewtbl")
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+  observeEvent(result$uploaded_locs_check_peril, ignoreNULL = FALSE, {
+    if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
       show("div_abuttonviewtbl")
+    } else {
+      hide("div_abuttonviewtbl")
     }
   })
 
@@ -100,7 +132,7 @@ exposurevalidationmap <- function(input,
     size = "l",
     fluidPage(
       fluidRow(
-        h4("Validated Exposure")),
+        h4("Validated Exposure by Peril")),
       fluidRow(
         DTOutput(ns("dt_output_uploaded_lock_check")),
         downloadButton(ns("exp_downloadexcel"), label = "Export to csv"),
@@ -119,14 +151,16 @@ exposurevalidationmap <- function(input,
     filename2download <- paste0("exposure_validation_", analysisID(), ".csv"),
     filename = function() {filename2download},
     content = function(file) {
-      fwrite(result$uploaded_locs_check, file, row.names = TRUE, quote = TRUE)}
+      fwrite(result$uploaded_locs_check_peril, file, row.names = TRUE, quote = TRUE)}
   )
 
   # Tabular data ---------------------------------------------------------------
   output$dt_output_uploaded_lock_check <- renderDT(
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+    if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
       datatable(
-        result$uploaded_locs_check %>% capitalize_names_df(),
+        result$uploaded_locs_check_peril %>%
+          capitalize_names_df() %>%
+          mutate(Modeled = as.character(Modeled)),
         class = "flamingo-table display",
         rownames = FALSE,
         escape = FALSE,
@@ -135,7 +169,7 @@ exposurevalidationmap <- function(input,
       ) %>% formatStyle(
         'Modeled',
         target = 'row',
-        backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
+        backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), values = c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
       )
     } else {
       nothingToShowTable("Generated inputs not found")
@@ -144,8 +178,8 @@ exposurevalidationmap <- function(input,
 
   # Map ------------------------------------------------------------------------
   output$exposure_map <- renderLeaflet({
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-      .createExposureValMap(result$uploaded_locs_check)
+    if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
+      .createExposureValMap(result$uploaded_locs_check_peril)
     } else {
       NULL
     }
@@ -170,7 +204,7 @@ exposurevalidationmap <- function(input,
 
     logMessage(".reloadExposureValidation called")
 
-    uploaded_locs_check <- check_loc(analysisID(), portfolioID())
+    uploaded_locs_check <- check_loc(analysisID(), portfolioID(), data_hub = session$userData$data_hub)
 
     #updating reactive only when needed
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
@@ -203,14 +237,59 @@ exposurevalidationmap <- function(input,
       markerColor =  marker_colors[df$modeled]
     )
 
+    # color clusters red if any mark is red, and green in fall marks are green.
+    # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
     leaflet(df) %>%
       addTiles() %>%
       addAwesomeMarkers(
         lng = ~Longitude,
         lat = ~Latitude,
         icon = icon_map,
-        clusterOptions = TRUE,
-        popup = toString(popupData))
+        clusterOptions = markerClusterOptions(),
+        group = "clustered",
+        clusterId = "cluster",
+        popup = toString(popupData)) %>%
+      onRender("function(el,x) {
+                            map = this;
+
+                            var style = document.createElement('style');
+                            style.type = 'text/css';
+                            style.innerHTML = '.red, .red div { background-color: rgba(255,0,0,0.6); }'; // set both at the same time
+                            document.getElementsByTagName('head')[0].appendChild(style);
+
+
+                            var cluster = map.layerManager.getLayer('cluster','cluster');
+                            cluster.options.iconCreateFunction = function(c) {
+                            var markers = c.getAllChildMarkers();
+                            var priority = {
+                            'green': 0,
+                            'red': 1,
+                            'red': 2
+                            };
+                            var highestRank = 0; // defaults to the lowest level to start
+
+                            markers.forEach(function(m) {
+                            var color = m.options.icon.options.markerColor;
+
+                            // check each marker to see if it is the highest value
+                            if(priority[color] > highestRank) {
+                            highestRank = priority[color];
+                            }
+                            })
+
+                            var styles = [
+                            'marker-cluster-small', // green
+                            'marker-cluster-large',  // red
+                            'red' // red
+                            ]
+
+                            var style = styles[highestRank];
+                            var count = markers.length;
+
+                            return L.divIcon({ html: '<div><span>'+count+'</span></div>', className: 'marker-cluster ' + style, iconSize: new L.Point(40, 40) });
+                            }
+  }")
+
   }
 
 }
