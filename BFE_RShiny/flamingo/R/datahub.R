@@ -35,8 +35,17 @@
 #' \item{dataset_identifier}{Identifier:  file name for Analysis Id |  api call for Portfolio Id and Model Id}
 #' }
 #'
+#' @section Privates:
+#' \describe{
+#' \item{user}{string identifying the user.}
+#' \item{destdir = tempdir()}{user specific destdir.}
+#' }
 #' @section Methods:
 #' \describe{
+#'
+#' Initialize
+#'  \item{\code{create_destdir(user, destir)}}{create and return path of user specific foder}
+#'
 #' LISTS
 #'
 #' > Portfolio
@@ -99,7 +108,17 @@
 
 DataHub <- R6Class(
   "DataHub",
-  public = list(
+  public = list (
+    # Initialize ----
+    initialize = function(user, destdir = tempdir()){
+      self$create_destdir(user, destdir)
+    },
+    #create dest dir for user
+    create_destdir = function(user, destdir){
+      private$user <- user
+      private$user_destdir <- file.path(destdir, private$user)
+      dir.create(private$user_destdir, showWarnings = FALSE)
+    },
     # LISTS ----
     # > Portfolio ----
     #return list of portfolio source files
@@ -124,7 +143,7 @@ DataHub <- R6Class(
     # > Analysis ----
     #return list of analysis resources
     get_ana_inputs_data_list = function(id, ...){
-      tarfile <- get_analyses_inputs_tar(id,  destdir = getOption("flamingo.settings.api.share_filepath"))
+      tarfile <- get_analyses_inputs_tar(id,  destdir = private$user_destdir)
       data_list <- untar_list(tarfile)
       if (length(data_list) > 0) {
         data_list <- data_list %>%
@@ -136,7 +155,7 @@ DataHub <- R6Class(
       data_list
     },
     get_ana_outputs_data_list = function(id, ...){
-      tarfile <- get_analyses_outputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
+      tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir)
       data_list <- NULL
       if (file.exists(tarfile)) {
         data_list <- untar_list(tarfile, to_strip = "output")
@@ -256,8 +275,8 @@ DataHub <- R6Class(
     },
     #extract a inputs file content given an analysis id
     get_ana_inputs_dataset_content = function(id, dataset_identifier, ...){
-      tarfile <- get_analyses_inputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
-      dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir = getOption("flamingo.settings.api.share_filepath"))
+      tarfile <- get_analyses_inputs_tar(id, destdir =  private$user_destdir)
+      dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir =  private$user_destdir)
       dataset_content
     },
     #invalidate a inputs file content given an analysis id
@@ -268,10 +287,10 @@ DataHub <- R6Class(
     },
     #extract a outputs file content given an analysis id
     get_ana_outputs_dataset_content = function(id, dataset_identifier, ...){
-      tarfile <- get_analyses_outputs_tar(id, destdir = getOption("flamingo.settings.api.share_filepath"))
+      tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir)
       #necessary step because outputs comes with subfolder
       dataset_identifier <- file.path("output", dataset_identifier)
-      dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir = getOption("flamingo.settings.api.share_filepath"))
+      dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir =  private$user_destdir)
       dataset_content
     },
     #invalidate a outputs file content given an analysis id
@@ -282,12 +301,12 @@ DataHub <- R6Class(
     },
     #extract a inputs/outputs file header given an analysis id
     get_ana_dataset_header = function(id, type, dataset_identifier, ...){
-      tarfile <- get_analyses_tar(id, label = type, destdir = getOption("flamingo.settings.api.share_filepath"))
+      tarfile <- get_analyses_tar(id, label = type, destdir =  private$user_destdir)
       #necessary step because outputs comes with subfolder
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
-      dataset_header <- read_file_from_tar(tarfile, dataset_identifier, nrows = 1, destdir = getOption("flamingo.settings.api.share_filepath")) %>%
+      dataset_header <- read_file_from_tar(tarfile, dataset_identifier, nrows = 1, destdir = private$user_destdir) %>%
         names()
       dataset_header
     },
@@ -297,7 +316,7 @@ DataHub <- R6Class(
     },
     #extract a inputs/outputs file nrow given an analysis id
     get_ana_dataset_nrow = function(id, type, dataset_identifier, ...){
-      destdir =  getOption("flamingo.settings.api.share_filepath")
+      destdir =   private$user_destdir
       tarfile <- get_analyses_tar(id, label = type, destdir = destdir)
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
@@ -313,7 +332,7 @@ DataHub <- R6Class(
     },
     #extract a inputs/outputs file size given an analysis id
     get_ana_dataset_size = function(id, type, dataset_identifier, ...){
-      destdir =  getOption("flamingo.settings.api.share_filepath")
+      destdir =   private$user_destdir
       tarfile <- get_analyses_tar(id, label = type, destdir = destdir)
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
@@ -363,6 +382,11 @@ DataHub <- R6Class(
       self$invalidate_ana_dataset_header(id, dataset_identifier, type, ...)
       self$invalidate_ana_dataset_row(id, dataset_identifier, type, ...)
     }
+  ),
+  # Private ----
+  private = list(
+    user = "",
+    user_destdir = ""
   )
 )
 

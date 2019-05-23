@@ -51,7 +51,6 @@ api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar")) {
 #'
 #' @export
 get_analyses_tar <- function(id, label, destdir = tempdir()) {
-
   dest <- tempfile(tmpdir = destdir, fileext = ".tar")
   response <- api_get_analyses_tar(id, paste0(label, "_file"), dest)
 

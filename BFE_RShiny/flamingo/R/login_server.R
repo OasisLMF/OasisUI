@@ -50,12 +50,12 @@ loginDialog <- function(input, output, session, logout) {
       pwd <- isolate(input$password)
       res <- api_access_token(user, pwd)
       if (res$status == "Success") {
-        # Data Hub
-        session$userData$data_hub <- DataHub$new()
         result$user <- user # for later
         res <- content(res$result)
         options(flamingo.settings.api.token = res$access_token)
         options(flamingo.settings.api.refresh = res$refresh_token)
+        # Data Hub
+        session$userData$data_hub <- DataHub$new(user = res$access_token, destdir = getOption("flamingo.settings.api.share_filepath"))
       } else {
         options(flamingo.settings.api.token = NULL)
         flamingoNotification(type = "error",
