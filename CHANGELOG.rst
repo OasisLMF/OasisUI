@@ -3,6 +3,9 @@ OasisUI Changelog
 
 .. AUTO_INSERT-CHANGE_LIST  
 
+`1.1.0`_
+--------
+
 `1.0.2`_
 --------
 * Update and simplify Dockerfile for `oasisui_app` 
