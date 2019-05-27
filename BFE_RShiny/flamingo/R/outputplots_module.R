@@ -31,7 +31,6 @@ outputplotsUI <- function(id) {
 #' @description Server logic for outputplots of a run.
 #'
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #' @param selectAnaID id of selected analysis
 #' @param n_panels number of panels
@@ -42,7 +41,7 @@ outputplots <- function(input, output, session,
                         selectAnaID,
                         n_panels,
                         filesListData = reactive(NULL),
-                        active, logMessage = message) {
+                        active) {
 
   ns <- session$ns
 
@@ -137,7 +136,6 @@ panelOutputModuleUI <- function(id){
 #' @description Server logic to show graphical output such as plots.
 #'
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param filesListData table of output files for a given anaID
@@ -179,7 +177,7 @@ panelOutputModuleUI <- function(id){
 #' @importFrom shinyjs enable
 #'
 #' @export
-panelOutputModule <- function(input, output, session, logMessage = message,
+panelOutputModule <- function(input, output, session,
                               anaID,
                               filesListData = reactive(NULL), active) {
 

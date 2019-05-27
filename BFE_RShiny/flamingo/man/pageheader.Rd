@@ -7,8 +7,7 @@
 \usage{
 pageheaderUI(id)
 
-pageheader(input, output, session, user, logMessage = message,
-  active = reactive(TRUE))
+pageheader(input, output, session, user, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -16,8 +15,6 @@ pageheader(input, output, session, user, logMessage = message,
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{user}{reactive expression yielding user name}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 }

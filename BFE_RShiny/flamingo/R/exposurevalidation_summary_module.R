@@ -78,7 +78,7 @@ exposurevalidationsummaryUI <- function(id) {
 exposurevalidationsummary <- function(input,
                                       output,
                                       session,
-                                      analysisID = "",
+                                      analysisID = reactive(NULL),
                                       counter = reactive(NULL),
                                       active = reactive(TRUE)) {
 

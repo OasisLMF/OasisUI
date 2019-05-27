@@ -160,7 +160,7 @@ panelDefineOutputsDetails <- function(id) {
           hidden(selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "")),
           h5("Available Perils"),
           uiOutput(ns("chkinputsperils"))
-          ),
+      ),
       hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
                  textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
@@ -399,7 +399,6 @@ panel_configureAdvancedRI <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param currstep Current selected step.
@@ -427,11 +426,10 @@ panel_configureAdvancedRI <- function(id) {
 #' @export
 step3_configureOutput <- function(input, output, session,
                                   active = reactive(TRUE),
-                                  logMessage = message,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
                                   pfName = reactive(""),
-                                  analysisID = reactive("")
+                                  analysisID = reactive(NULL)
 ) {
 
   ns <- session$ns
@@ -448,8 +446,6 @@ step3_configureOutput <- function(input, output, session,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
-    # reactive for portfolioID
-    portfolioID = "",
     # reactve value for navigation
     navigationstate = NULL,
     # reactive value for Analysis table
@@ -459,9 +455,9 @@ step3_configureOutput <- function(input, output, session,
     # flag to know if the user is creating a new output configuration or rerunning an analysis
     ana_flag = "C",
     # Id of the Analysis
-    anaID = -1,
+    anaID = NULL,
     # anaId for Dashboard
-    dashboardAnaID = -1,
+    dashboardAnaID = NULL,
     # analysis_ setting
     analysis_settings = NULL
   )
@@ -469,8 +465,8 @@ step3_configureOutput <- function(input, output, session,
   # Reset Param
   observe(if (active()) {
     result$navigationstate <- NULL
-    result$dashboardAnaID <- -1
-    if (!is.null(analysisID()) && analysisID() != "") {
+    result$dashboardAnaID <- NULL
+    if (!is.null(analysisID())) {
       result$anaID <- analysisID()
     }
   })
@@ -479,7 +475,7 @@ step3_configureOutput <- function(input, output, session,
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
-    if (currstep() == 3 ) {
+    if (currstep() == 3) {
       .defaultstep3()
       .reloadAnaData()
     }
@@ -556,8 +552,8 @@ step3_configureOutput <- function(input, output, session,
 
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
-      index <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == result$anaID )
-      if (length(index) == 0) {
+      index <- which(result$tbl_analysesData[ ,tbl_analysesDataNames$id] == analysisID())
+      if (length(index) == 0 && is.null(analysisID())) {
         index <- 1
       }
       logMessage("re-rendering analysis table")
@@ -568,7 +564,6 @@ step3_configureOutput <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = index),
         escape = FALSE,
-        #colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = getTableOptions(maxrowsperpage = pageLength)
       )
@@ -854,7 +849,7 @@ step3_configureOutput <- function(input, output, session,
              row.names = FALSE,
              col.names = FALSE,
              quote = FALSE)
-      }
+    }
   )
 
   observeEvent(result$tbl_analysisrunlog, {
@@ -876,7 +871,6 @@ step3_configureOutput <- function(input, output, session,
           rownames = TRUE,
           selection = "none",
           escape = FALSE,
-          # colnames = c('Row Number' = 1),
           filter = 'bottom',
           options = getTableOptions(maxrowsperpage = pageLength)
         )
@@ -907,7 +901,7 @@ step3_configureOutput <- function(input, output, session,
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent({
     input$dt_analyses_rows_selected
-    portfolioID()
+    result$tbl_analysesData
   }, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
@@ -921,7 +915,7 @@ step3_configureOutput <- function(input, output, session,
           logMessage("showing analysis run log table")
         }
       } else {
-        result$anaID <- -1
+        result$anaID <- NULL
       }
     }
   })
@@ -972,7 +966,7 @@ step3_configureOutput <- function(input, output, session,
   # Reload Analysis Run Log table
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
-    if (!is.null(result$anaID) && result$anaID != "") {
+    if (!is.null(result$anaID)) {
       result$tbl_analysisrunlog <- return_file_df(api_get_analyses_run_traceback_file, result$anaID)
     } else {
       result$tbl_analysisrunlog <-  NULL

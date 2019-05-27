@@ -8,7 +8,8 @@
 portfolio_detailsUI(id)
 
 portfolio_details(input, output, session, refresh_opt = TRUE,
-  portfolioID, counter = reactive(NULL), active = reactive(TRUE))
+  portfolioID, portfolioName, counter = reactive(NULL),
+  active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -18,6 +19,8 @@ portfolio_details(input, output, session, refresh_opt = TRUE,
 \item{refresh_opt}{Option to hide/show refresh button.}
 
 \item{portfolioID}{selected portfolio ID.}
+
+\item{portfolioName}{selected portfolio Name.}
 
 \item{counter}{Reactive value storing actionButton status.}
 }

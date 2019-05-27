@@ -141,7 +141,6 @@ ViewFilesInTable <- function(input, output, session,
         rownames = FALSE,
         escape = FALSE,
         selection =  selectionUsed,
-        #colnames = c('Row Number' = 1),
         options = getTableOptions(maxrowsperpage = maxrowsperpage, escape = FALSE)
       )
     } else {
@@ -305,7 +304,6 @@ ViewFilesInTable <- function(input, output, session,
         rownames = FALSE,
         selection = "none",
         filter = 'bottom',
-        #colnames = c("Row Number" = 1),
         width = "100%",
         options = getTableOptions()
       )
@@ -350,6 +348,7 @@ ViewFilesInTable <- function(input, output, session,
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
         filerows <- nrow(result$tbl_fileData)
+        result$currentFile <- paste0(result$currentFile, ".csv")
 
         #Show buttons
         if ("latitude" %in% names(result$tbl_fileData)) {

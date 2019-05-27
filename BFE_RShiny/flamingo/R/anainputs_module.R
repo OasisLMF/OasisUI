@@ -29,7 +29,6 @@ anainputsUI <- function(id,
       escape = FALSE,
       filter = "none",
       rownames = TRUE,
-      colnames = c('row number' = 1),
       id = ns("panel_anainputs"),
       div(id = ns("refresh_ana"), flamingoRefreshButton(ns("abuttonanainputrefresh"))),
       ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)
@@ -124,7 +123,7 @@ anainputs <- function(input,
   # Reload input generated table -----------------------------------------------
   .reloadInputs <- function(){
     logMessage(".reloadInputs called")
-    if (!is.null(analysisID()) && analysisID() != "") {
+    if (!is.null(analysisID())) {
       dt_generated <- return_analyses_input_file_wicons_df(analysisID())
     } else {
       dt_generated <-  NULL

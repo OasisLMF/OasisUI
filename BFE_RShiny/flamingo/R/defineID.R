@@ -55,7 +55,6 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
@@ -73,18 +72,17 @@ defineIDUI <- function(id, w, batch = FALSE){
 #'
 #' @export
 defineID <- function(input, output, session,
-                     preselAnaId = reactive(-1),
-                     anaID = reactive(-1),
+                     preselAnaId = reactive(NULL),
+                     anaID = reactive(NULL),
                      batch = FALSE,
-                     active = reactive(TRUE),
-                     logMessage = message) {
+                     active = reactive(TRUE)) {
 
   ns <- session$ns
 
   # Reactive Values and parameters ---------------------------------------------
   result <- reactiveValues(
     tbl_analysesData = NULL,
-    selectAnaID = "",
+    selectAnaID = NULL,
     selectAnaName = "",
     selectportfolioID = "",
     preselRow = NULL
@@ -99,15 +97,43 @@ defineID <- function(input, output, session,
     labelana <- "Batch Analysis"
   }
 
-  observe({
-    if (active()) {
-      result$preselRow <- NULL
-    }
-  })
+  # Table and AnaID selection --------------------------------------------------
 
-  # Modal for AnaID selection --------------------------------------------------
+  # > find row of anaid preselected in landing page
+  observeEvent({preselAnaId()}, {
+      .reload_tbl_analysesData()
+      logMessage(paste0("Updating preselected row because preselAnaId() changed to ", preselAnaId()))
+      .preselectAna(preselAnaId())
+    })
 
-  # > Modal Panel
+  # > find row of anaid preselected in model analysis server step 3
+  observeEvent({anaID()}, {
+      .reload_tbl_analysesData()
+      logMessage(paste0("Updating preselected row because anaID() changed to ", anaID()))
+      .preselectAna(anaID())
+    })
+
+  # > open modal
+  observeEvent(input$chooseAnaID, ignoreInit = TRUE, {
+      .reload_tbl_analysesData()
+      showModal(AnaList)
+    })
+
+  # Modal Panel ----------------------------------------------------------------
+
+  # > modal content
+  sub_modules$flamingo_analyses <- callModule(
+    flamingoTable,
+    id = "flamingo_analyses",
+    data = reactive({result$tbl_analysesData}),
+    selection = "single",
+    escape = FALSE,
+    filter = FALSE,
+    rownames = FALSE,
+    preselRow = reactive({result$preselRow}),
+    maxrowsperpage = 10)
+
+  # > Modal Dialogue
   AnaList <- modalDialog(
     easyClose = TRUE,
     size = "l",
@@ -121,38 +147,12 @@ defineID <- function(input, output, session,
     )
   )
 
-  # > update lsit of analyses
-  observeEvent({
-    input$chooseAnaID
-    preselAnaId()
-    anaID()}, ignoreInit = TRUE, {
-      tbl_analysesData  <- return_tbl_analysesData()
-      if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData  %>%
-          filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
-      }
-    })
+  # > close modal
+  observeEvent(input$abuttoncancel, {
+    removeModal()
+  })
 
-  # > open modal
-  observeEvent(
-    input$chooseAnaID, {
-      showModal(AnaList)
-    })
-
-
-  # > modal content
-  sub_modules$flamingo_analyses <- callModule(
-    flamingoTable,
-    id = "flamingo_analyses",
-    data = reactive(result$tbl_analysesData),
-    selection = "single",
-    escape = FALSE,
-    filter = FALSE,
-    rownames = FALSE,
-    colnames =  c("row number" = 1),
-    preselRow = reactive({result$preselRow}),
-    maxrowsperpage = 10,
-    logMessage = logMessage)
+  # Enable / Disable buttons ---------------------------------------------------
 
   # > enable disable button
   observeEvent(sub_modules$flamingo_analyses$rows_selected(), ignoreNULL = FALSE, {
@@ -161,47 +161,6 @@ defineID <- function(input, output, session,
     } else {
       enable("abuttonselectAna")
     }
-  })
-
-  #Find row of anaid preselected in landing page
-  observeEvent({
-    preselAnaId()},{
-      idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == preselAnaId())
-      if (length(idx) > 0 && !isTRUE(all.equal(result$preselRow, idx)) && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
-        result$preselRow <- idx
-      }
-    })
-
-  #Find row of anaid preselected in model analysis server step 3
-  observeEvent({
-    anaID()},{
-      logMessage(paste0("Updating preselected row because anaID() changed to ", anaID()))
-      idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == anaID())
-      if (length(idx) > 0 && !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx)) && anaID() != -1) {
-        result$preselRow <- idx
-      }
-    })
-
-
-  # > select analysis ID
-  observeEvent(result$preselRow, {
-    if (!is.null( result$preselRow)) {
-      withModalSpinner(
-      .downloadOutput(idx = result$preselRow),
-      "Loading...",
-      size = "s"
-      )
-    }
-  })
-
-
-  observeEvent(input$abuttonselectAna, {
-    removeModal()
-    withModalSpinner(
-      .downloadOutput(idx = sub_modules$flamingo_analyses$rows_selected()),
-      "Loading...",
-      size = "s"
-    )
   })
 
   # > Enable/disable select button
@@ -213,28 +172,47 @@ defineID <- function(input, output, session,
     }
   })
 
-  # > close modal
-  observeEvent(input$abuttoncancel, {
-    removeModal()
+  # Download data --------------------------------------------------------------
+
+  # > download data for preselected analysis
+  observeEvent(result$preselRow, {
+    if (!is.null( result$preselRow)) {
+      withModalSpinner(
+        .downloadOutput(idx = result$preselRow),
+        "Loading...",
+        size = "s"
+      )
+    }
   })
 
-  # > ifo selected analysis
+  # > download data after clicking on button to select analysis
+  observeEvent(input$abuttonselectAna, {
+    removeModal()
+    withModalSpinner(
+      .downloadOutput(idx = sub_modules$flamingo_analyses$rows_selected()),
+      "Loading...",
+      size = "s"
+    )
+  })
+
+  # Display analysis infos -----------------------------------------------------
+
   output$selectAnaInfo1 <- renderText({
     paste0("Selected ", labelana, ":   ")
   })
 
   output$selectAnaInfo2 <- renderText({
-    if (result$selectAnaID == "") {
+    if (is.null(result$selectAnaID)) {
       info <- '" - "'
     } else {
-      info <- paste0(result$selectAnaID, ' "' ,result$selectAnaName, '"  ')
+      info <- paste0(result$selectAnaID, ' "' , result$selectAnaName, '"  ')
     }
     info
   })
 
   # Help functions -------------------------------------------------------------
   .downloadOutput <- function(idx) {
-    currid <- ""
+    currid <- NULL
     currName <- ""
     currpfId <- ""
     if (!is.null(idx)) {
@@ -242,13 +220,34 @@ defineID <- function(input, output, session,
       currName <- result$tbl_analysesData[idx, tbl_analysesDataNames$name]
       currpfId <- result$tbl_analysesData[idx, tbl_analysesDataNames$portfolio]
     }
-    result$selectAnaID <- ifelse(is.null(currid) | is.na(currid), "", currid)
-    result$selectAnaName <-  ifelse(is.null(currName) | is.na(currName), "", currName)
-    result$selectportfolioID <- ifelse(is.null(currpfId) | is.na(currpfId), "", currpfId)
+    result$selectAnaID <- ifelse(is.null(currid), NULL, currid)
+    result$selectAnaName <-  ifelse(is.null(currName) || is.na(currName), "", currName)
+    result$selectportfolioID <- ifelse(is.null(currpfId) || is.na(currpfId), "", currpfId)
     logMessage("Extract output files")
     api_get_analyses_output_file(result$selectAnaID)
   }
 
+
+  .reload_tbl_analysesData <- function(){
+    tbl_analysesData <- return_tbl_analysesData()
+    if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
+      result$tbl_analysesData <- tbl_analysesData  %>%
+        filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)
+    } else {
+      result$tbl_analysesData <- NULL
+    }
+  }
+
+  .preselectAna <- function(preselAna) {
+    if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 ) {
+      idx <- which(result$tbl_analysesData[,tbl_analysesDataNames$id] == preselAna)
+      if (length(idx) > 0 &&
+          !isTRUE(all.equal(result$preselRow, idx)) &&
+          !isTRUE(all.equal(sub_modules$flamingo_analyses$rows_selected(), idx))) {
+        result$preselRow <- idx
+      }
+    }
+  }
 
   # Module Outout --------------------------------------------------------------
 

@@ -8,7 +8,6 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
@@ -21,9 +20,8 @@
 #' @export
 visualizationCBR <- function(input, output, session,
                              active = reactive(TRUE),
-                             preselAnaId = reactive(-1),
-                             anaID  = reactive(-1),
-                             logMessage = message) {
+                             preselAnaId = reactive(NULL),
+                             anaID = reactive(NULL)) {
 
   ns <- session$ns
 
@@ -38,7 +36,7 @@ visualizationCBR <- function(input, output, session,
     #Panel to select
     preselPanel = 1,
     #id of selected analysis
-    selectAnaID = "",
+    selectAnaID = NULL,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
@@ -54,7 +52,7 @@ visualizationCBR <- function(input, output, session,
   observeEvent(active(), {
     if (active()) {
       result$preselPanel <- 1
-      result$selectAnaID <- ""
+      result$selectAnaID <- NULL
       result$selectPortfolioID = ""
     }
   })
@@ -65,15 +63,13 @@ visualizationCBR <- function(input, output, session,
     defineID,
     id = "defineID-1",
     preselAnaId = preselAnaId,
-    anaID =  anaID,
-    logMessage = logMessage)
+    anaID =  anaID)
 
   sub_modules$defineID2 <- callModule(
     defineID,
     id = "defineID-2",
     preselAnaId = preselAnaId,
-    anaID =  anaID,
-    logMessage = logMessage)
+    anaID =  anaID)
 
 
   # Go to Configure Output button ----------------------------------------------
@@ -95,16 +91,14 @@ visualizationCBR <- function(input, output, session,
     portfolioID1 = reactive(sub_modules$defineID1$selectPortfolioID()),
     portfolioID2 = reactive(sub_modules$defineID2$selectPortfolioID()),
     compare = TRUE,
-    active = reactive({active() && input$tabsCBR == ns("tabsummary")}),
-    logMessage = logMessage)
+    active = reactive({active() && input$tabsCBR == ns("tabsummary")}))
 
 
   # Extract Output files for given anaID----------------------------------------
   observeEvent( {
     sub_modules$defineID1$selectAnaID()
     sub_modules$defineID2$selectAnaID()}, {
-      if (!is.na(sub_modules$defineID1$selectAnaID()) && sub_modules$defineID1$selectAnaID() != "" &&
-          !is.na(sub_modules$defineID2$selectAnaID()) && sub_modules$defineID2$selectAnaID() != "") {
+      if (!is.null(sub_modules$defineID1$selectAnaID()) && !is.null(sub_modules$defineID2$selectAnaID())) {
         tbl_filesListDataana1 <- return_analyses_output_file_df(sub_modules$defineID1$selectAnaID())
         analysis_settings1 <- return_analyses_settings_file_list(sub_modules$defineID1$selectAnaID())
         result$tbl_filesListDataana <- cbind(tbl_filesListDataana1,
@@ -142,8 +136,7 @@ visualizationCBR <- function(input, output, session,
     selectAnaID = reactive(sub_modules$defineID1$selectAnaID()),
     filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    active = reactive({active() && input$tabsCBR == ns("tabplots")}),
-    logMessage = logMessage)
+    active = reactive({active() && input$tabsCBR == ns("tabplots")}))
 
 
   # Helper functions -----------------------------------------------------------

@@ -106,11 +106,10 @@ modeldetails <- function(input,
       datatable(
         result$tbl_modelsDetails[[1]] %>% capitalize_names_df(),
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         filter = "none",
         escape = FALSE,
         selection = "none",
-        colnames = c('row number' = 1),
         options = getTableOptions()
       )
     } else {
@@ -124,11 +123,10 @@ modeldetails <- function(input,
       datatable(
         result$tbl_modelsDetails[[2]],
         class = "flamingo-table display",
-        rownames = TRUE,
+        rownames = FALSE,
         filter = "none",
         escape = FALSE,
         selection = "none",
-        colnames = c('row number' = 1),
         options = getTableOptions()
       )
     } else {

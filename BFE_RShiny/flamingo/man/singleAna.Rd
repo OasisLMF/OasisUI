@@ -6,8 +6,8 @@
 \title{singleAna}
 \usage{
 singleAna(input, output, session, active = reactive(TRUE),
-  logMessage = message, selectAnaID = reactive(""),
-  selectPortfolioID = reactive(""), preselPanel = reactive(1))
+  selectAnaID = reactive(NULL), selectPortfolioID = reactive(""),
+  preselPanel = reactive(1))
 
 singleAnaUI(id)
 }
@@ -15,8 +15,6 @@ singleAnaUI(id)
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{selectAnaID}{id of selected analysis as returned from \link{visualizationSBR}}
 

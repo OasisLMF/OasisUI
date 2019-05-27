@@ -46,7 +46,7 @@ outputfilesUI <- function(id) {
 #' @export
 outputfiles <- function(input, output, session,
                         tbl_filesListDataana = reactive(NULL),
-                        anaId = reactive(""),
+                        anaId = reactive(NULL),
                         active = reactive(TRUE)) {
 
   ns <- session$ns

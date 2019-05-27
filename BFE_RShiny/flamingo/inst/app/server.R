@@ -47,7 +47,6 @@ server <- function(input, output, session) {
 
   loginDialogModule <- callModule(
     loginDialog, "login",
-    logMessage = logMessage,
     logout = reactive(auth_modules$pageheader$logout())
   )
 
@@ -61,19 +60,16 @@ server <- function(input, output, session) {
   auth_modules$pageheader <- callModule(
     pageheader, "pageheader",
     user = reactive(result$user),
-    logMessage = logMessage,
     active = reactive(authenticated())
   )
 
   auth_modules$pagestructure <- callModule(
     pagestructure, "pagestructure",
-    logMessage = logMessage,
     active = reactive(authenticated())
   )
 
   auth_modules$landingPage <- callModule(
     landingPage, "landingPage",
-    logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "LP")
   )
 
@@ -83,41 +79,36 @@ server <- function(input, output, session) {
     preselPanel = reactive(result$preselPanel),
     selectAnaID = auth_modules$visualizationSBR$selectAnaID,
     selectPortfolioID = auth_modules$visualizationSBR$selectPortfolioID,
-    logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "SA")
   )
 
   auth_modules$batchAna <- callModule(
     batchAna,
     id = "batchAna",
-    logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "BA")
   )
 
   auth_modules$visualizationSBR <- callModule(
     visualizationSBR,
     id = "visualizationSBR",
-    preselAnaId =  auth_modules$landingPage$anaID,
+    preselAnaId = auth_modules$landingPage$anaID,
     anaID = auth_modules$singleAna$anaID,
-    logMessage = logMessage,
     active = reactive(authenticated() && main_visible() == "SBR")
   )
 
   auth_modules$visualizationBBR <- callModule(
     visualizationBBR,
     id = "visualizationBBR",
-    preselAnaId = reactive(-1),
-    anaID = reactive(-1),
-    logMessage = logMessage,
+    preselAnaId = reactive(NULL),
+    anaID = reactive(NULL),
     active = reactive(authenticated() && main_visible() == "BBR")
   )
 
   auth_modules$visualizationCBR <- callModule(
     visualizationCBR,
     id = "visualizationCBR",
-    preselAnaId = reactive(-1),
-    anaID =  reactive(-1),
-    logMessage = logMessage,
+    preselAnaId = reactive(NULL),
+    anaID =  reactive(NULL),
     active = reactive(authenticated() && main_visible() == "CBR")
   )
 

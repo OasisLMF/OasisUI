@@ -8,9 +8,8 @@
 flamingoTableUI(id)
 
 flamingoTable(input, output, session, data, selection = "none",
-  escape = TRUE, filter = FALSE, rownames = FALSE, colnames = TRUE,
-  preselRow = reactive({     NULL }), maxrowsperpage = 10,
-  logMessage = message)
+  escape = TRUE, filter = FALSE, rownames = TRUE,
+  preselRow = reactive({     NULL }), maxrowsperpage = 10)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -25,15 +24,11 @@ flamingoTable(input, output, session, data, selection = "none",
 
 \item{filter}{param of datatable, default FALSE.}
 
-\item{rownames}{param of datatable, default FALSE.}
-
-\item{colnames}{param of datatable, default TRUE.}
+\item{rownames}{param of datatable, default TRUE.}
 
 \item{preselRow}{reactive of preselected row default reactive({NULL}).}
 
 \item{maxrowsperpage}{param of datatable, default 10.}
-
-\item{logMessage}{function that will be passed info messages.}
 }
 \value{
 List of tags.
