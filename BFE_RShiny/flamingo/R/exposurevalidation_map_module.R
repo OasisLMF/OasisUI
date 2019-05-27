@@ -21,11 +21,11 @@ exposurevalidationmapUI <- function(id) {
     fluidRow(
       column(1,
              checkboxGroupInput(inputId =ns("chkgrp_perils"), label = "Pick peril", choices = c("WTC"))
-             ),
+      ),
       column(11,
              leafletOutput(ns("exposure_map")),
              hidden(div(id = ns("div_abuttonviewtbl"), flamingoButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;")))
-             )
+      )
     )
   )
 }
@@ -52,6 +52,7 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
 #' @importFrom DT styleEqual
+#' @importFrom htmlwidgets onRender
 #' @importFrom leaflet leaflet
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet addAwesomeMarkers
@@ -94,22 +95,20 @@ exposurevalidationmap <- function(input,
   })
 
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
-    if (any(input$chkgrp_perils != "")) {
+    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
         left_join(
           data.frame(
             LocNumber = unique( result$uploaded_locs_check$LocNumber),
-            modelled = sapply(unique( result$uploaded_locs_check$LocNumber), function(x){
+            modeled = sapply(unique( result$uploaded_locs_check$LocNumber), function(x){
               curr_loc <- result$uploaded_locs_check %>%
                 filter(LocNumber == x)
-              any(curr_loc$peril_id %in% "WSS")#input$chkgrp_perils)
+              any(curr_loc$peril_id %in% input$chkgrp_perils)
             })
           )
         ) %>%
-      select(-peril_id) %>%
+        select(-peril_id) %>%
         distinct()
-    } else {
-      result$uploaded_locs_check_peril <- NULL
     }
   })
 
@@ -158,7 +157,8 @@ exposurevalidationmap <- function(input,
     if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
       datatable(
         result$uploaded_locs_check_peril %>%
-          capitalize_names_df(),
+          capitalize_names_df() %>%
+          mutate(Modeled = as.character(Modeled)),
         class = "flamingo-table display",
         rownames = FALSE,
         escape = FALSE,
@@ -167,7 +167,7 @@ exposurevalidationmap <- function(input,
       ) %>% formatStyle(
         'Modeled',
         target = 'row',
-        backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
+        backgroundColor = styleEqual(levels = c("TRUE", "FALSE"), values = c('#D4EFDF', '#FADBD8')) # #D4EFDF - limegreen; #FADBD8 - red
       )
     } else {
       nothingToShowTable("Generated inputs not found")
@@ -202,8 +202,7 @@ exposurevalidationmap <- function(input,
 
     logMessage(".reloadExposureValidation called")
 
-    uploaded_locs_check <- check_loc(analysisID()) %>%
-      distinct()
+    uploaded_locs_check <- check_loc(analysisID())
 
     #updating reactive only when needed
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
@@ -236,14 +235,59 @@ exposurevalidationmap <- function(input,
       markerColor =  marker_colors[df$modeled]
     )
 
+    # color clusters red if any mark is red, and green in fall marks are green.
+    # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
     leaflet(df) %>%
       addTiles() %>%
       addAwesomeMarkers(
         lng = ~Longitude,
         lat = ~Latitude,
         icon = icon_map,
-        clusterOptions = TRUE,
-        popup = toString(popupData))
+        clusterOptions = markerClusterOptions(),
+        group = "clustered",
+        clusterId = "cluster",
+        popup = toString(popupData)) %>%
+      onRender("function(el,x) {
+                            map = this;
+
+                            var style = document.createElement('style');
+                            style.type = 'text/css';
+                            style.innerHTML = '.red, .red div { background-color: rgba(255,0,0,0.6); }'; // set both at the same time
+                            document.getElementsByTagName('head')[0].appendChild(style);
+
+
+                            var cluster = map.layerManager.getLayer('cluster','cluster');
+                            cluster.options.iconCreateFunction = function(c) {
+                            var markers = c.getAllChildMarkers();
+                            var priority = {
+                            'green': 0,
+                            'red': 1,
+                            'red': 2
+                            };
+                            var highestRank = 0; // defaults to the lowest level to start
+
+                            markers.forEach(function(m) {
+                            var color = m.options.icon.options.markerColor;
+
+                            // check each marker to see if it is the highest value
+                            if(priority[color] > highestRank) {
+                            highestRank = priority[color];
+                            }
+                            })
+
+                            var styles = [
+                            'marker-cluster-small', // green
+                            'marker-cluster-large',  // red
+                            'red' // red
+                            ]
+
+                            var style = styles[highestRank];
+                            var count = markers.length;
+
+                            return L.divIcon({ html: '<div><span>'+count+'</span></div>', className: 'marker-cluster ' + style, iconSize: new L.Point(40, 40) });
+                            }
+  }")
+
   }
 
 }

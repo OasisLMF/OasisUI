@@ -45,6 +45,7 @@ analysis_detailsUI <- function(id) {
 #'
 #' @template params-module-ui
 #' @param analysisID Selected analysis ID.
+#' @param portfolioID Selected Portfolio ID.
 #' @param reload_generated Imports function to reload Generated Inputs table.
 #'
 #' @template params-module-ui
@@ -54,6 +55,7 @@ analysis_details <- function(input,
                              output,
                              session,
                              analysisID,
+                             portfolioID,
                              counter) {
 
   ns <- session$ns

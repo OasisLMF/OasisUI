@@ -420,6 +420,7 @@ step2_chooseAnalysis <- function(input, output, session,
     analysis_details,
     id = "analysis_details",
     analysisID = reactive({result$analysisID}),
+    portfolioID = reactive({result$portfolioID}),
     counter = reactive({input$abuttonshowanadetails})
   )
 
