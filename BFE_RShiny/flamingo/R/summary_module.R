@@ -179,7 +179,6 @@ summarytab <- function(input, output, session,
     scrollX = FALSE,
     filter = FALSE,
     rownames = FALSE,
-    colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
 
@@ -206,7 +205,6 @@ summarytab <- function(input, output, session,
     scrollX = FALSE,
     filter = FALSE,
     rownames = FALSE,
-    colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
 
@@ -235,7 +233,6 @@ summarytab <- function(input, output, session,
     escape = TRUE,
     scrollX = FALSE,
     rownames = FALSE,
-    colnames = TRUE,
     maxrowsperpage = 10,
     logMessage = logMessage)
 
