@@ -34,7 +34,7 @@ flamingoTableUI <-  function(id){
 #' @param escape param of datatable, default TRUE.
 #' @param scrollX param of datatable, default FALSE.
 #' @param filter param of datatable, default FALSE.
-#' @param rownames param of datatable, default FALSE.
+#' @param rownames param of datatable, default TRUE.
 #' @param colnames param of datatable, default TRUE.
 #' @param preselRow reactive of preselected row default reactive({NULL}).
 #' @param maxrowsperpage param of datatable, default 10.
@@ -54,7 +54,7 @@ flamingoTable <- function(input, output, session,
                           escape = TRUE,
                           scrollX = FALSE,
                           filter = FALSE,
-                          rownames = FALSE,
+                          rownames = TRUE,
                           colnames = TRUE,
                           preselRow = reactive({NULL}),
                           maxrowsperpage = 10,
@@ -73,9 +73,9 @@ flamingoTable <- function(input, output, session,
       colnamesToUse <- ""
       if (colnames) {
         colnamesToUse <- names(tbl_flamingoTable)
-        if (rownames) {
-          colnamesToUse <- c('Row Number', colnamesToUse)
-        }
+        # if (rownames) {
+        #   colnamesToUse <- c('Row Number', colnamesToUse)
+        # }
       }
 
       datatable(
