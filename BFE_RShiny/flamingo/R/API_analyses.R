@@ -295,7 +295,6 @@ return_tbl_analysesData_nice <- function(tbl_analysesData) {
     unite("model_version", c(tbl_modelsDataNames$model_id, tbl_modelsDataNames$version_id), sep = ", version ") %>%
     left_join(tbl_portfoliosData, by = c("portfolio" = "id"))
 
-
  if (admin_mode == "admin") {
    tbl_analysesData <- tbl_analysesData %>%
      select(!! sym(tbl_analysesDataNames$id),
