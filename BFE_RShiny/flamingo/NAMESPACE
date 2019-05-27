@@ -2,6 +2,7 @@
 
 export("%>%")
 export("%notin%")
+export(APIHub)
 export(APIgetenv)
 export(DataHub)
 export(FLAMINGO_GUEST_ID)

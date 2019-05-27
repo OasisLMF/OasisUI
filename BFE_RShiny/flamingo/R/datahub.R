@@ -4,16 +4,6 @@
 # library(R6)
 # library(flamingo)
 
-# Questions:
-# * How to write tests for a class?
-
-# Params:
-# id                  : Portfolio Id | Model Id | Analysis Id
-# type                : Identifier for Analysis Id: inputs / outputs
-# dataset_identifier  : Identifier:
-#                       * file path for Analysis Id
-#                       * api call for Portfolio Id and Model Id
-
 ### R6 Class for OasisUI Data Hub ----
 
 #' DataHub
@@ -40,6 +30,7 @@
 #' \item{user}{string identifying the user.}
 #' \item{destdir = tempdir()}{user specific destdir.}
 #' }
+#'
 #' @section Methods:
 #' \describe{
 #'

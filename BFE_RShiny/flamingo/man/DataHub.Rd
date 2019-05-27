@@ -23,9 +23,21 @@ R6 Class for OasisUI Data Hub.
 }
 }
 
+\section{Privates}{
+
+\describe{
+\item{user}{string identifying the user.}
+\item{destdir = tempdir()}{user specific destdir.}
+}
+}
+
 \section{Methods}{
 
 \describe{
+
+Initialize
+ \item{\code{create_destdir(user, destir)}}{create and return path of user specific foder}
+
 LISTS
 
 > Portfolio

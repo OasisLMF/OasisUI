@@ -17,6 +17,9 @@ server <- function(input, output, session) {
   #clean up folder upon login
   clean_downloadedData()
 
+  #set api
+  session$userData$api_hub <- APIHub$new(host = APISettings$server, port = APISettings$port)
+
 
   # active main panel based on the reactive navigation state
   navigation_state <- reactiveNavigation("LP")

@@ -4,12 +4,14 @@
 \alias{check_loc}
 \title{check_loc}
 \usage{
-check_loc(analysisID, portfolioID)
+check_loc(analysisID, portfolioID, data_hub)
 }
 \arguments{
 \item{analysisID}{Selected analysis id.}
 
 \item{portfolioID}{selected portfolio ID.}
+
+\item{data_hub}{data hub stored in session$userData$data_hub}
 }
 \description{
 Compares uploaded and modeled locations.
