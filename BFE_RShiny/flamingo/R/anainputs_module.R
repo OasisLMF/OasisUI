@@ -29,7 +29,6 @@ anainputsUI <- function(id,
       escape = FALSE,
       filter = "none",
       rownames = TRUE,
-      colnames = c('row number' = 1),
       id = ns("panel_anainputs"),
       div(id = ns("refresh_ana"), flamingoRefreshButton(ns("abuttonanainputrefresh"))),
       ViewFilesInTableUI(id  = ns("ViewIGFiles"), includechkbox = TRUE)

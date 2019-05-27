@@ -141,7 +141,6 @@ ViewFilesInTable <- function(input, output, session,
         rownames = FALSE,
         escape = FALSE,
         selection =  selectionUsed,
-        #colnames = c('Row Number' = 1),
         options = getTableOptions(maxrowsperpage = maxrowsperpage, escape = FALSE)
       )
     } else {
@@ -305,7 +304,6 @@ ViewFilesInTable <- function(input, output, session,
         rownames = FALSE,
         selection = "none",
         filter = 'bottom',
-        #colnames = c("Row Number" = 1),
         width = "100%",
         options = getTableOptions()
       )
