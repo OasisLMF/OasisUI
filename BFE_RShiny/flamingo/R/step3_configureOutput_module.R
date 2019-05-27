@@ -564,7 +564,6 @@ step3_configureOutput <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = index),
         escape = FALSE,
-        #colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = getTableOptions(maxrowsperpage = pageLength)
       )
@@ -872,7 +871,6 @@ step3_configureOutput <- function(input, output, session,
           rownames = TRUE,
           selection = "none",
           escape = FALSE,
-          # colnames = c('Row Number' = 1),
           filter = 'bottom',
           options = getTableOptions(maxrowsperpage = pageLength)
         )

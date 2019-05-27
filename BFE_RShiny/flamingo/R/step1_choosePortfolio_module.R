@@ -340,7 +340,6 @@ step1_choosePortfolio <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = rowToSelect,
                          target = 'row'),
-        #colnames = c('row number' = 1),
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {

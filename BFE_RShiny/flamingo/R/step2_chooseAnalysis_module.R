@@ -277,7 +277,6 @@ step2_chooseAnalysis <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = index),
         escape = FALSE,
-        #colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = getTableOptions(maxrowsperpage = pageLength)
       )
@@ -482,7 +481,6 @@ step2_chooseAnalysis <- function(input, output, session,
         filter = "none",
         escape = FALSE,
         selection = list(mode = 'none'),
-        #colnames = c('Row Number' = 1),
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
@@ -537,7 +535,6 @@ step2_chooseAnalysis <- function(input, output, session,
         escape = FALSE,
         selection = list(mode = 'single',
                          selected = 1),
-        #colnames = c('Row Number' = 1),
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {

@@ -110,7 +110,6 @@ modeldetails <- function(input,
         filter = "none",
         escape = FALSE,
         selection = "none",
-        colnames = c('row number' = 1),
         options = getTableOptions()
       )
     } else {
@@ -128,7 +127,6 @@ modeldetails <- function(input,
         filter = "none",
         escape = FALSE,
         selection = "none",
-        colnames = c('row number' = 1),
         options = getTableOptions()
       )
     } else {
