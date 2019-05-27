@@ -6,7 +6,6 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param preselPanel selectedstep to visualize as returned from either
@@ -21,10 +20,10 @@
 #'
 #' @export
 singleAna <- function(input, output, session,
-                     active = reactive(TRUE), logMessage = message,
-                     selectAnaID = reactive(""),
-                     selectPortfolioID = reactive(""),
-                     preselPanel = reactive(1)) {
+                      active = reactive(TRUE),
+                      selectAnaID = reactive(NULL),
+                      selectPortfolioID = reactive(""),
+                      preselPanel = reactive(1)) {
 
   ns <- session$ns
 
@@ -38,9 +37,9 @@ singleAna <- function(input, output, session,
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
     # Id of the analysis to use in dashboard
-    dashboardanaID = -1,
+    dashboardanaID = NULL,
     # Id of analysis
-    anaID = "",
+    anaID = NULL,
     # Id of the portfolio
     portfolioID = "",
     # Portfolio table
@@ -64,7 +63,7 @@ singleAna <- function(input, output, session,
   # and to panel 3 if coming from Browse
   observe(if (active()) {
     workflowSteps$update(analysisWorkflowSteps[[preselPanel()]])
-    result$dashboardanaID <- -1
+    result$dashboardanaID <- NULL
   })
 
   observeEvent(workflowSteps$step(), ignoreInit = TRUE, {
@@ -92,7 +91,6 @@ singleAna <- function(input, output, session,
     step1_choosePortfolio,
     id = "step1_choosePortfolio",
     active = reactive({active() && workflowSteps$step() == 1}),
-    logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID = reactive(result$portfolioID)
   )
@@ -101,7 +99,6 @@ singleAna <- function(input, output, session,
     step2_chooseAnalysis,
     id = "step2_chooseAnalysis",
     active = reactive({active() && workflowSteps$step() == 2}),
-    logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID = reactive(input$portfolioID),
     pfName = reactive({result$pfName}),
@@ -112,7 +109,6 @@ singleAna <- function(input, output, session,
     step3_configureOutput,
     id = "step3_configureOutput",
     active = reactive({active() && workflowSteps$step() == 3}),
-    logMessage = logMessage,
     currstep = reactive(workflowSteps$step()),
     portfolioID =  reactive({input$portfolioID}),
     pfName = reactive({result$pfName}),
@@ -136,31 +132,19 @@ singleAna <- function(input, output, session,
   })
 
   # > AnaId --------------------------------------------------------------------
-  observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), ignoreInit = TRUE, {
-    anaID <- submodulesList$step3_configureOutput$dashboardAnaID()
-    #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != -1) {
-      logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", anaID ))
-      result$dashboardanaID <- anaID
-    }
+  observeEvent(submodulesList$step3_configureOutput$dashboardAnaID(), {
+    result$dashboardanaID <- submodulesList$step3_configureOutput$dashboardAnaID()
+    logMessage(paste0("updating result$anaID because submodulesList$step3_configureOutput$dashboardAnaID() changed to: ", result$dashboardanaID))
   })
 
-  observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), ignoreInit = TRUE, {
-    anaID <- submodulesList$step2_chooseAnalysis$analysisID()
-    #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
-      logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", anaID ))
-      result$anaID <- anaID
-    }
+  observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), {
+    result$anaID <- submodulesList$step2_chooseAnalysis$analysisID()
+    logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", result$anaID))
   })
 
-  observeEvent(selectAnaID(), ignoreInit = TRUE, {
-    anaID <- selectAnaID()
-    #Avoid updating input if not necessary
-    if (!is.null(anaID) && !is.na(anaID) && anaID != "" && anaID != result$anaID) {
-      logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", anaID ))
-      result$anaID <- anaID
-    }
+  observeEvent(selectAnaID(), {
+    result$anaID <- selectAnaID()
+    logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", result$anaID))
   })
 
   # > portfolioID --------------------------------------------------------------

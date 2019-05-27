@@ -176,7 +176,6 @@ panelModelTable <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param currstep current selected step.
@@ -203,7 +202,6 @@ panelModelTable <- function(id) {
 #' @export
 step2_chooseAnalysis <- function(input, output, session,
                                  active = reactive(TRUE),
-                                 logMessage = message,
                                  currstep = reactive(-1),
                                  portfolioID = reactive({""}),
                                  pfName = reactive({""}),
@@ -234,7 +232,7 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis log
     tbl_analysislog = NULL,
     #analysis ID
-    analysisID = ""
+    analysisID = NULL
   )
 
   #Set Params
@@ -252,7 +250,7 @@ step2_chooseAnalysis <- function(input, output, session,
     currstep()
     portfolioID()}, {
       .hideDivs()
-      if (currstep() == 2 ) {
+      if (currstep() == 2) {
         .defaultAssociateModel()
         .reloadAnaData()
         .reloadtbl_modelsData()
@@ -310,7 +308,7 @@ step2_chooseAnalysis <- function(input, output, session,
       if (!is.null(input$dt_analyses_rows_selected)) {
         result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
       } else {
-        result$analysisID <- ""
+        result$analysisID <- NULL
       }
     })
 
@@ -493,7 +491,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   #  panelAnalysisLog Table title
   output$paneltitle_panelAnalysisLog <- renderUI({
-    if (result$analysisID != "") {
+    if (!is.null(result$analysisID)) {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       paste0('Input generation Logs of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
@@ -503,7 +501,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   #  analysis_details Table title
   output$paneltitle_analysis_details <- renderUI({
-    if (result$analysisID != "") {
+    if (!is.null(result$analysisID)) {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
       analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
       paste0('Details of analysis id ', toString(analysisID), ' ', anaName)
@@ -610,7 +608,7 @@ step2_chooseAnalysis <- function(input, output, session,
   #Make submit button dependent of analysis name
   observeEvent({
     input$dt_models_rows_selected
-    input$anaName}, ignoreNULL = TRUE, ignoreInit = TRUE, {
+    input$anaName}, ignoreInit = TRUE, {
       if (length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
         enable("abuttonsubmit")
       } else {
@@ -718,7 +716,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Reload Analysis Log table
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
-    if (!is.null(result$analysisID) && result$analysisID != "") {
+    if (!is.null(result$analysisID)) {
       result$tbl_analysislog <- return_file_df(api_get_analyses_input_generation_traceback_file, result$analysisID)
     } else {
       result$tbl_analysislog <-  NULL

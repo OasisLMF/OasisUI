@@ -6,9 +6,8 @@
 \alias{visualizationBBRUI}
 \title{visualizationBBR}
 \usage{
-visualizationBBR(input, output, session, preselAnaId = reactive(-1),
-  anaID = reactive(-1), active = reactive(TRUE),
-  logMessage = message)
+visualizationBBR(input, output, session, preselAnaId = reactive(NULL),
+  anaID = reactive(NULL), active = reactive(TRUE))
 
 visualizationBBRUI(id)
 }
@@ -20,8 +19,6 @@ visualizationBBRUI(id)
 \item{anaID}{reactive string expression for reselected run id from \link{step3_configureOutput}.}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{logMessage}{function that will be passed info messages.}
 
 \item{id}{Namespace ID for the module.}
 }

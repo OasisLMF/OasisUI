@@ -38,6 +38,7 @@ portfolio_detailsUI <- function(id) {
 #' @template params-module
 #' @param refresh_opt Option to hide/show refresh button.
 #' @param portfolioID selected portfolio ID.
+#' @param portfolioName selected portfolio Name.
 #' @param counter Reactive value storing actionButton status.
 #'
 #' @importFrom shinyjs hide
@@ -48,6 +49,7 @@ portfolio_details <- function(input,
                               session,
                               refresh_opt = TRUE,
                               portfolioID,
+                              portfolioName,
                               counter = reactive(NULL),
                               active = reactive(TRUE)) {
 
@@ -84,10 +86,8 @@ portfolio_details <- function(input,
 
   # Title Portfolio Details Panel ----------------------------------------------
   output$paneltitle_pfDetails <- renderUI({
-    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
-    pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
-    pfName <- ifelse(pfName == " ", "", paste0('"', pfName, '"'))
-    paste0(' ', pfId, ' ', pfName)
+    pfId <- portfolioID()
+    paste0(' ', portfolioID(), ' ', portfolioName())
   })
 
   # reload Uploaded Inputs table-----------------------------------------------

@@ -22,7 +22,6 @@ pagestructureUI <- function(id) {
 #' @rdname pagestructure
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @return collapsed status of panel.
@@ -31,7 +30,6 @@ pagestructureUI <- function(id) {
 #'
 #' @export
 pagestructure <- function(input, output, session,
-                          logMessage = message,
                           active = reactive(TRUE)) {
 
   ns <- session$ns

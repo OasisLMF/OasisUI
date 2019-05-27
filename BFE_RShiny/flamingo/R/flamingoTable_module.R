@@ -27,14 +27,12 @@ flamingoTableUI <-  function(id){
 #' @description Server logic to show the flamingo table output
 #'
 #' @template params-module
-#' @template params-logMessage
 #'
 #' @param data dataframe to show in table.
 #' @param selection param of datatable, default"none".
 #' @param escape param of datatable, default TRUE.
 #' @param filter param of datatable, default FALSE.
-#' @param rownames param of datatable, default FALSE.
-#' @param colnames param of datatable, default TRUE.
+#' @param rownames param of datatable, default TRUE.
 #' @param preselRow reactive of preselected row default reactive({NULL}).
 #' @param maxrowsperpage param of datatable, default 10.
 #'
@@ -52,11 +50,9 @@ flamingoTable <- function(input, output, session,
                           selection = "none",
                           escape = TRUE,
                           filter = FALSE,
-                          rownames = FALSE,
-                          colnames = TRUE,
+                          rownames = TRUE,
                           preselRow = reactive({NULL}),
-                          maxrowsperpage = 10,
-                          logMessage = message ) {
+                          maxrowsperpage = 10) {
 
   ns <- session$ns
 
@@ -68,14 +64,6 @@ flamingoTable <- function(input, output, session,
         tbl_flamingoTable <- data.frame(content = "nothing to show")
       }
 
-      colnamesToUse <- ""
-      if (colnames) {
-        colnamesToUse <- names(tbl_flamingoTable)
-        if (rownames) {
-          colnamesToUse <- c('Row Number', colnamesToUse)
-        }
-      }
-
       datatable(
         tbl_flamingoTable %>% capitalize_names_df(),
           class = "flamingo-table display",
@@ -84,7 +72,6 @@ flamingoTable <- function(input, output, session,
                            selected = preselRow(),
                            target = 'row'),
           escape = escape,
-          colnames = colnamesToUse,
           options = getTableOptions(maxrowsperpage = maxrowsperpage,
                                     escape = escape)
         )

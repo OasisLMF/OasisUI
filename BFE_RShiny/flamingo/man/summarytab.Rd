@@ -7,10 +7,10 @@
 \usage{
 summarytabUI(id)
 
-summarytab(input, output, session, selectAnaID1 = reactive(""),
-  selectAnaID2 = reactive(""), portfolioID1 = reactive(""),
+summarytab(input, output, session, selectAnaID1 = reactive(NULL),
+  selectAnaID2 = reactive(NULL), portfolioID1 = reactive(""),
   portfolioID2 = reactive(""), tbl_filesListDataana1 = reactive(NULL),
-  compare = FALSE, active, logMessage = message)
+  compare = FALSE, active)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -30,8 +30,6 @@ summarytab(input, output, session, selectAnaID1 = reactive(""),
 \item{compare}{logical indicating comparison}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{logMessage}{function that will be passed info messages.}
 }
 \value{
 list of tags

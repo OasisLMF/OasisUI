@@ -47,7 +47,7 @@ logWarning <- warning
 
 #' @importFrom httr status_code
 #' @importFrom httr content
-api_fetch_response <- function(meth, args, logMessage = message) {
+api_fetch_response <- function(meth, args) {
   response <- do.call(meth, eval(args, envir = sys.parent()))
 
   token_invalid <- status_code(response) == 401L

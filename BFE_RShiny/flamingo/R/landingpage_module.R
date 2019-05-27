@@ -42,7 +42,6 @@ landingPageUI <- function(id) {
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @return anaID id of selected analysis
@@ -54,7 +53,7 @@ landingPageUI <- function(id) {
 #' @importFrom data.table fwrite
 #'
 #' @export
-landingPage <- function(input, output, session, logMessage = message, active = reactive(TRUE)) {
+landingPage <- function(input, output, session, active = reactive(TRUE)) {
 
   # Reactive Values and parameters ---------------------------------------------
 
@@ -66,7 +65,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
 
   result <- reactiveValues(
     tbl_anaInbox = NULL,
-    anaID = -1
+    anaID = NULL
   )
 
   # navigation -----------------------------------------------------------------
@@ -87,7 +86,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
 
   observe(if (active()) {
     # Reset Param
-    result$anaID <- -1
+    result$anaID <- NULL
 
     # invalidate if the refresh button updates
     force(input$abuttonrefreshanaInbox)

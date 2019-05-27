@@ -8,7 +8,6 @@
 #'
 #' @template return-outputNavigation
 #' @template params-module
-#' @template params-logMessage
 #' @template params-active
 #'
 #' @param preselAnaId reactive string expression for reselected analysis id from \link{landingPage}.
@@ -22,9 +21,9 @@
 #'
 #' @export
 visualizationSBR <- function(input, output, session,
-                             preselAnaId = reactive(-1),
-                             anaID  = reactive(-1),
-                             active = reactive(TRUE), logMessage = message) {
+                             preselAnaId = reactive(NULL),
+                             anaID  = reactive(NULL),
+                             active = reactive(TRUE)) {
 
   ns <- session$ns
   # Reactive Values and parameters ------------------------------------------
@@ -37,7 +36,7 @@ visualizationSBR <- function(input, output, session,
     #Panel to select
     preselPanel = 1,
     #id of selected analysis
-    selectAnaID = "",
+    selectAnaID = NULL,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
@@ -53,7 +52,7 @@ visualizationSBR <- function(input, output, session,
   observeEvent(active(), {
     if (active()) {
       result$preselPanel <- 1
-      result$selectAnaID <- ""
+      result$selectAnaID <- NULL
       result$selectPortfolioID = ""
     }
   })
@@ -64,8 +63,7 @@ visualizationSBR <- function(input, output, session,
     id = "defineID",
     preselAnaId = preselAnaId,
     anaID =  anaID,
-    active = active,
-    logMessage = logMessage)
+    active = active)
 
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
@@ -78,7 +76,7 @@ visualizationSBR <- function(input, output, session,
 
   # Extract Output files for given anaID----------------------------------------
   observeEvent(sub_modules$defineID$selectAnaID(), {
-    if (!is.na(sub_modules$defineID$selectAnaID()) && sub_modules$defineID$selectAnaID() != "") {
+    if (!is.null(sub_modules$defineID$selectAnaID())) {
       tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
       analysis_settings <- return_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
       result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
@@ -98,8 +96,7 @@ visualizationSBR <- function(input, output, session,
     selectAnaID1 = reactive(sub_modules$defineID$selectAnaID()),
     portfolioID1 = reactive(sub_modules$defineID$selectPortfolioID()),
     tbl_filesListDataana1 = reactive({result$tbl_filesListDataana}),
-    active = reactive({active() && input$tabsSBR == ns("tabsummary")}),
-    logMessage = logMessage)
+    active = reactive({active() && input$tabsSBR == ns("tabsummary")}))
 
   # Tab Output files -----------------------------------------------------------
   sub_modules$outputfiles <- callModule(
@@ -116,8 +113,7 @@ visualizationSBR <- function(input, output, session,
     selectAnaID = reactive(sub_modules$defineID$selectAnaID()),
     filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
-    active = reactive({active() && input$tabsSBR == ns("tabplots")}),
-    logMessage = logMessage)
+    active = reactive({active() && input$tabsSBR == ns("tabplots")}))
 
 
   # Helper functions -----------------------------------------------------------
