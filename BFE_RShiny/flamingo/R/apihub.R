@@ -65,7 +65,7 @@ APIHub <- R6Class(
       stopifnot(length(host) == 1)
       stopifnot(length(port) == 1)
 
-      private$url <- structure(
+     conn_init <- structure(
         list(
           host = host,
           port = port,
@@ -74,6 +74,8 @@ APIHub <- R6Class(
         ),
         class = c("apisettings")
       )
+
+      private$url <- conn_init$url
     },
     api_handle_response = function(response) {
       # re-route potential warning for logging

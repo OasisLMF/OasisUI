@@ -123,6 +123,7 @@ untar_list <- function(tarfile, to_strip = NULL){
 #' @return nrows rows of the content of dataset_identifier
 #'
 #' @importFrom data.table fread
+#' @importFrom jsonlite read_json
 #'
 #' @export
 
@@ -130,7 +131,14 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
   untar(tarfile, files = dataset_identifier, exdir = destdir)
   data = NULL
   if (file.exists(file.path(destdir, dataset_identifier))) {
-    data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
+    extension <-  strsplit(dataset_identifier, split = "\\.") %>% unlist() %>% tail(n = 1)
+    if (extension == "csv") {
+      data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
+    } else if (extension == "json") {
+      data <- read_json(file.path(destdir, dataset_identifier))
+    } else{
+      data <- scan(file.path(destdir, dataset_identifier), what="", sep="\n")
+    }
     file.remove(file.path(destdir, dataset_identifier)) #remove extracted file after reading
   }
   data

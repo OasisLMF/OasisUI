@@ -31,7 +31,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
         bs_embed_tooltip(title = file_Viewer$FLdownloadzip, placement = "right")
     },
     if (!includechkbox) {
-      downloadButton(ns("FLdownloadexcel"), label = "Export to csv")
+      downloadButton(ns("FLdownloadexcel"), label = "Export")
     }
   )
 }
@@ -70,6 +70,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #' @importFrom data.table fread
 #' @importFrom utils count.fields
 #' @importFrom utils zip
+#' @importFrom jsonlite toJSON
 #'
 #' @export
 ViewFilesInTable <- function(input, output, session,
@@ -182,7 +183,7 @@ ViewFilesInTable <- function(input, output, session,
     }
   )
 
-  # Download to csv ------------------------------------------------------------
+  # Download file-- ------------------------------------------------------------
   # Export to .csv
   output$FLdownloadexcel <- downloadHandler(
     filename = "file.csv",
@@ -263,7 +264,7 @@ ViewFilesInTable <- function(input, output, session,
       fluidRow(
         flamingoButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(flamingoButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
-        downloadButton(ns("FVEdownloadexcel"), label = "Export to csv"),
+        downloadButton(ns("FVEdownloadexcel"), label = "Export"),
         style = "display: inline"),
 
       hidden(flamingoPanel(
@@ -272,7 +273,7 @@ ViewFilesInTable <- function(input, output, session,
         heading =  tagAppendChildren(
           h4("File content"),
           actionButton(inputId = ns("abuttonhidedFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
-        DTOutput(ns("dt_FVExposureSelected")))),
+        uiOutput(ns("FVExposureSelected")))),
 
       hidden(flamingoPanel(
         id = ns("flamingoPanelmapFVExposureSelected"),
@@ -294,10 +295,29 @@ ViewFilesInTable <- function(input, output, session,
   })
 
   # Exposure table
+  output$FVExposureSelected <- renderUI({
+    extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
+    if (extension == "csv") {
+      DTOutput(ns("dt_FVExposureSelected"))
+    } else if (extension == "json") {
+      verbatimTextOutput(ns("json_FVExposureSelected"))
+    } else {
+      textOutput(ns("text_FVExposureSelected"))
+    }
+  })
+
+  output$json_FVExposureSelected <- renderText({
+    toJSON(result$tbl_fileData, pretty = TRUE)
+  })
+
+  output$text_FVExposureSelected <- renderText({
+    result$tbl_fileData
+  })
+
   output$dt_FVExposureSelected <- renderDT(
-    if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0 ) {
+    if (!is.null(result$tbl_fileData)) {
       datatable(
-        result$tbl_fileData %>% capitalize_names_df(),
+        result$tbl_fileData %>% capitalize_names_df() %>% as.data.frame(),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = "none",
@@ -315,7 +335,15 @@ ViewFilesInTable <- function(input, output, session,
   output$FVEdownloadexcel <- downloadHandler(
     filename = function(){result$currentFile},
     content = function(file) {
-      fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)}
+      extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
+      if (extension == "csv") {
+        fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)
+      } else if (extension == "json") {
+        write(toJSON(result$tbl_fileData, pretty = TRUE), file)
+      } else{
+        write(result$tbl_fileData, file)
+      }
+    }
   )
 
   # Panel Map
@@ -348,7 +376,7 @@ ViewFilesInTable <- function(input, output, session,
         result$currentFile <- paste0(result$currentFile, ".csv")
         #Show buttons
         if ("latitude" %in% names(result$tbl_fileData) && !is.null(result$tbl_fileData)) {
-            output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
+          output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
           show("abuttonmap")
         } else {
           hide("abuttonmap")
@@ -374,32 +402,32 @@ ViewFilesInTable <- function(input, output, session,
 
     # Extra info table
     output$FVExposureStatisticInfo <- renderUI({
-        tagList(
-          fluidRow(
-            column(2,
-                   h5("File Name")
-            ),
-            column(10,
-                   p(result$currentFile, style = "margin-top: 10px;")
-            )
+      tagList(
+        fluidRow(
+          column(2,
+                 h5("File Name")
           ),
-          fluidRow(
-            column(2,
-                   h5("Number of Rows")
-            ),
-            column(10,
-                   p(filerows, style = "margin-top: 10px;")
-            )
+          column(10,
+                 p(result$currentFile, style = "margin-top: 10px;")
+          )
+        ),
+        fluidRow(
+          column(2,
+                 h5("Number of Rows")
           ),
-          fluidRow(
-            column(2,
-                   h5("Column names")
-            ),
-            column(10,
-                   p(paste0(filecolumns, collapse = ", "), style = "margin-top: 10px;")
-            )
+          column(10,
+                 p(filerows, style = "margin-top: 10px;")
+          )
+        ),
+        fluidRow(
+          column(2,
+                 h5("Column names")
+          ),
+          column(10,
+                 p(paste0(filecolumns, collapse = ", "), style = "margin-top: 10px;")
           )
         )
+      )
     })
   })#end observeEvent
 

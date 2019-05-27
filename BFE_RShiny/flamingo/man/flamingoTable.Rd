@@ -8,7 +8,7 @@
 flamingoTableUI(id)
 
 flamingoTable(input, output, session, data, selection = "none",
-  escape = TRUE, filter = FALSE, rownames = FALSE, colnames = TRUE,
+  escape = TRUE, filter = FALSE, rownames = TRUE,
   preselRow = reactive({     NULL }), maxrowsperpage = 10)
 }
 \arguments{
@@ -24,9 +24,7 @@ flamingoTable(input, output, session, data, selection = "none",
 
 \item{filter}{param of datatable, default FALSE.}
 
-\item{rownames}{param of datatable, default FALSE.}
-
-\item{colnames}{param of datatable, default TRUE.}
+\item{rownames}{param of datatable, default TRUE.}
 
 \item{preselRow}{reactive of preselected row default reactive({NULL}).}
 

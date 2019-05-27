@@ -173,7 +173,6 @@ summarytab <- function(input, output, session,
     escape = TRUE,
     filter = FALSE,
     rownames = FALSE,
-    colnames = TRUE,
     maxrowsperpage = 10)
 
   dt_dataParam <- reactive({
@@ -198,7 +197,6 @@ summarytab <- function(input, output, session,
     escape = TRUE,
     filter = FALSE,
     rownames = FALSE,
-    colnames = TRUE,
     maxrowsperpage = 10)
 
   dt_dataOutput <- reactive({
@@ -225,7 +223,6 @@ summarytab <- function(input, output, session,
     selection = "none",
     escape = TRUE,
     rownames = FALSE,
-    colnames = TRUE,
     maxrowsperpage = 10)
 
 
