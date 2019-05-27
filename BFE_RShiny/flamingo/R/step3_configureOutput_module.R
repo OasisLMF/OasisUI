@@ -568,7 +568,6 @@ step3_configureOutput <- function(input, output, session,
         selection = list(mode = 'single',
                          selected = index),
         escape = FALSE,
-        #colnames = c('Row Number' = 1),
         filter = 'bottom',
         options = .getPRTableOptions()
       )

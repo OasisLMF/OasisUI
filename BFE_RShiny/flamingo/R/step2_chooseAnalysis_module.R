@@ -651,7 +651,6 @@ step2_chooseAnalysis <- function(input, output, session,
         filter = "none",
         escape = FALSE,
         selection = "none",
-        #colnames = c('Row Number' = 1),
         options = .getPRTableOptions()
       )
     } else {
