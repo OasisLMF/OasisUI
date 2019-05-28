@@ -171,7 +171,7 @@ ViewFilesInTable <- function(input, output, session,
       fs <- c()
       g <- input$dt_outputFL_rows_selected
       for (f in g) {
-        filename <- result$tbl_filesListData_wButtons[f, file_column]
+        filename <- result$tbl_filesListData_wButtons[f, file_column] %>% as.character()
 
         # Get dataframe
         currNamespace <- ls("package:flamingo")
@@ -183,14 +183,30 @@ ViewFilesInTable <- function(input, output, session,
         } else {
           extractFolder <- set_extractFolder(id = param(), label = folderpath)
           currfilepath <- set_extractFilePath(extractFolder, filename)
-          fileData <- fread(currfilepath)
+          extension <-  strsplit(filename, split = "\\.") %>% unlist() %>% tail(n = 1)
+          if (extension == "csv") {
+            fileData <- fread(currfilepath)
+          } else if (extension == "json") {
+            fileData <- read_json(currfilepath)
+          } else{
+            fileData <- scan(currfilepath, what = "", sep = "\n")
+          }
+          fileData
         }
 
-        if (nrow(fileData) > 0) {
+        if (!is.null(fileData)) {
           fpath <- file.path(currfolder, filename)
-          fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
+          extension <-  strsplit(fpath, split = "\\.") %>% unlist() %>% tail(n = 1)
+          if (extension == "csv") {
+            fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
+          } else if (extension == "json") {
+            write(toJSON(fileData, pretty = TRUE), fpath)
+          } else{
+            write(fileData, fpath)
+          }
           fs <- c(fs, fpath)
         }
+
       }
       zip(zipfile = fname, files = fs)
       if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
@@ -427,7 +443,6 @@ ViewFilesInTable <- function(input, output, session,
         extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
         if (extension == "csv") {
           result$tbl_fileData <- fread(result$currfilepath)
-          # filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
           filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", ")
         } else if (extension == "json") {
           result$tbl_fileData <- read_json(result$currfilepath)
