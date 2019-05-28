@@ -198,7 +198,7 @@ landingPage <- function(input, output, session, logMessage = message, active = r
       data.frame(content = contentMessage),
       class = "flamingo-table display",
       selection = "none",
-      rownames = TRUE,
+      rownames = FALSE,
       #filter = 'bottom',
       colnames = c(""),
       escape = FALSE,
