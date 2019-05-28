@@ -50,9 +50,9 @@ loginDialog <- function(input, output, session, logout) {
       res <- session$userData$api_hub$api_access_token(user, pwd)
       session$userData$api_hub$set_access_token(user, pwd)
       session$userData$api_hub$set_refresh_token(user, pwd)
-      if (!is.null(session$userData$api_hub$get_access_tocken())){
+      if (!is.null(session$userData$api_hub$get_access_token())){
         result$user <- user
-        session$userData$data_hub <- DataHub$new(user =  session$userData$api_hub$get_access_tocken(), destdir = getOption("flamingo.settings.api.share_filepath"))
+        session$userData$data_hub <- DataHub$new(user =  session$userData$api_hub$get_access_token(), destdir = getOption("flamingo.settings.api.share_filepath"))
       } else {
         result$user = FLAMINGO_GUEST_ID
       }

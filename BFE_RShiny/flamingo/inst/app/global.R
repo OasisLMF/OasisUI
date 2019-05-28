@@ -60,12 +60,3 @@ options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
 options(flamingo.settings.admin.mode = Sys.getenv("ADMIN_MODE"))
 
 options(flamingo.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))
-
-#health check
-loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
-tryCatch({
-  invisible(api_get_healthcheck())
-}, error = function(e) {
-  logerror(e$message, logger = "flamingo.module")
-})
-

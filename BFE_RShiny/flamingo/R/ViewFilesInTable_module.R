@@ -172,14 +172,13 @@ ViewFilesInTable <- function(input, output, session,
         } else {
           fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
         }
-        if (nrow(fileData) > 0) {
-          fpath <- file.path(currfolder, filename)
-          fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
+        if (!is.null(fileData)) {
+          fpath <- session$userData$data_hub$write_file(data = fileData, dataset_identifier = filename)
           fs <- c(fs, fpath)
         }
       }
       zip(zipfile = fname, files = fs)
-      if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
+      # if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
     }
   )
 
@@ -188,7 +187,8 @@ ViewFilesInTable <- function(input, output, session,
   output$FLdownloadexcel <- downloadHandler(
     filename = "file.csv",
     content = function(file) {
-      fwrite(result$tbl_filesListData_wButtons, file, row.names = TRUE, quote = TRUE)}
+      session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename, file_towrite = file)
+      }
   )
 
   # Selected Row ---------------------------------------------------------------
@@ -335,14 +335,7 @@ ViewFilesInTable <- function(input, output, session,
   output$FVEdownloadexcel <- downloadHandler(
     filename = function(){result$currentFile},
     content = function(file) {
-      extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
-      if (extension == "csv") {
-        fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)
-      } else if (extension == "json") {
-        write(toJSON(result$tbl_fileData, pretty = TRUE), file)
-      } else{
-        write(result$tbl_fileData, file)
-      }
+      session$userData$data_hub$write_file(data = result$currentFile, dataset_identifier = result$currentFile, file_towrite = file)
     }
   )
 

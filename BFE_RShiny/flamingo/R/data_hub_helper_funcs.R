@@ -113,7 +113,7 @@ untar_list <- function(tarfile, to_strip = NULL){
 #'
 #' @rdname read_file_from_tar
 #'
-#' @description Returns list of files in a tar bundle.
+#' @description Returns content of a file in a tar bundle.
 #'
 #' @param tarfile path to tar bundle.
 #' @param dataset_identifier name and relative path of file to untar.
@@ -137,12 +137,43 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
     } else if (extension == "json") {
       data <- read_json(file.path(destdir, dataset_identifier))
     } else{
-      data <- scan(file.path(destdir, dataset_identifier), what="", sep="\n")
+      data <- scan(file.path(destdir, dataset_identifier), what="", sep = "\n")
     }
     file.remove(file.path(destdir, dataset_identifier)) #remove extracted file after reading
   }
   data
 }
+
+#' write file
+#'
+#' @rdname write_file
+#'
+#' @description Writes ojbect in the correct format.
+#'
+#' @param data object to write.
+#' @param dataset_identifier name and relative path of file to write
+#' @param destdir path where to write file.
+#'
+#' @importFrom data.table fread
+#' @importFrom jsonlite read_json
+#'
+#' @export
+
+write_file <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL){
+  if (is.null(file_towrite)) {
+    file_towrite <- file.path(destdir, dataset_identifier)
+  }
+  extension <-  strsplit(dataset_identifier, split = "\\.") %>% unlist() %>% tail(n = 1)
+  if (extension == "csv") {
+    fwrite(data, file_towrite, row.names = TRUE, quote = TRUE)
+  } else if (extension == "json") {
+    write(toJSON(data, pretty = TRUE), file_towrite)
+  } else{
+    write(data, file_towrite)
+  }
+  file_towrite
+}
+
 
 #' simplify_path
 #'

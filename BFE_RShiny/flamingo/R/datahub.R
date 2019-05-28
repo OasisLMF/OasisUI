@@ -84,6 +84,8 @@
 #' \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
 #' \item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
 #' \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
+#' # > Write file
+#' \item{\code{write_file}{Write data into a file file_towrite)}
 #' }
 #'
 #' @section Usage:
@@ -372,6 +374,11 @@ DataHub <- R6Class(
       invisible()
       self$invalidate_ana_dataset_header(id, dataset_identifier, type, ...)
       self$invalidate_ana_dataset_row(id, dataset_identifier, type, ...)
+    },
+    # > Write file ----
+    write_file = function(data, dataset_identifier, file_towrite = NULL, ...){
+      fs <- write_file(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
+      fs
     }
   ),
   # Private ----

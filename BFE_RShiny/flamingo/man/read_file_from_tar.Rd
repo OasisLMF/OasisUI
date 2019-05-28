@@ -20,5 +20,5 @@ read_file_from_tar(tarfile, dataset_identifier, destdir = tempdir(),
 nrows rows of the content of dataset_identifier
 }
 \description{
-Returns list of files in a tar bundle.
+Returns content of a file in a tar bundle.
 }
