@@ -31,7 +31,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
         bs_embed_tooltip(title = file_Viewer$FLdownloadzip, placement = "right")
     },
     if (!includechkbox) {
-      downloadButton(ns("FLdownloadexcel"), label = "Export file")
+      downloadButton(ns("FLdownloadexcel"), label = "Export")
     }
   )
 }
