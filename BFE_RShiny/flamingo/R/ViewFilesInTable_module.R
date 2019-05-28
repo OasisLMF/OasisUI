@@ -430,7 +430,7 @@ ViewFilesInTable <- function(input, output, session,
           filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
         } else if (extension == "json") {
           result$tbl_fileData <- read_json(result$currfilepath)
-          filecolumns <- paste(tolower(colnames(do.call(rbind, result$tbl_fileData))),
+          filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", "),
                                collapse = ", ")
         } else{
           result$tbl_fileData <- scan(result$currfilepath, what="", sep="\n")
