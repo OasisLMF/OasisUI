@@ -327,7 +327,7 @@ ViewFilesInTable <- function(input, output, session,
   output$dt_FVExposureSelected <- renderDT(
     if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0) {
       datatable(
-        result$tbl_fileData %>% capitalize_names_df() %>% as.data.frame(),
+        result$tbl_fileData %>% capitalize_names_df(),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = "none",
@@ -337,7 +337,7 @@ ViewFilesInTable <- function(input, output, session,
                        scrollX = TRUE)
       )
     } else {
-      .nothingToShowTable("Nothing to show")
+      nothingToShowTable("Nothing to show")
     }
   )
 
