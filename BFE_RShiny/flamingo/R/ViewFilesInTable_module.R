@@ -278,7 +278,7 @@ ViewFilesInTable <- function(input, output, session,
       fluidRow(
         flamingoButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(flamingoButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
-        downloadButton(ns("FVEdownloadexcel"), label = "Export file"),
+        downloadButton(ns("FVEdownloadexcel"), label = "Export"),
         style = "display: inline"),
 
       hidden(flamingoPanel(
