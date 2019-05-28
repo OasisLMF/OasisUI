@@ -31,7 +31,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
         bs_embed_tooltip(title = file_Viewer$FLdownloadzip, placement = "right")
     },
     if (!includechkbox) {
-      downloadButton(ns("FLdownloadexcel"), label = "Export to csv")
+      downloadButton(ns("FLdownloadexcel"), label = "Export")
     }
   )
 }
@@ -70,6 +70,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #' @importFrom data.table fread
 #' @importFrom utils count.fields
 #' @importFrom utils zip
+#' @importFrom jsonlite toJSON
 #'
 #' @export
 ViewFilesInTable <- function(input, output, session,
@@ -167,17 +168,34 @@ ViewFilesInTable <- function(input, output, session,
         if (length(returnfunc) != 0) {
           func <- get(returnfunc)
           fileData <- return_file_df(func, param())
+          filename <- paste0(filename, ".csv")
         } else {
           extractFolder <- set_extractFolder(id = param(), label = folderpath)
           currfilepath <- set_extractFilePath(extractFolder, filename)
-          fileData <- fread(currfilepath)
+          extension <-  strsplit(filename, split = "\\.") %>% unlist() %>% tail(n = 1)
+          if (extension == "csv") {
+            fileData <- fread(currfilepath)
+          } else if (extension == "json") {
+            fileData <- read_json(currfilepath)
+          } else{
+            fileData <- scan(currfilepath, what = "", sep = "\n")
+          }
+          fileData
         }
 
-        if (nrow(fileData) > 0) {
+        if (!is.null(fileData)) {
           fpath <- file.path(currfolder, filename)
-          fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
+          extension <-  strsplit(fpath, split = "\\.") %>% unlist() %>% tail(n = 1)
+          if (extension == "csv") {
+            fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
+          } else if (extension == "json") {
+            write(toJSON(fileData, pretty = TRUE), fpath)
+          } else{
+            write(fileData, fpath)
+          }
           fs <- c(fs, fpath)
         }
+
       }
       zip(zipfile = fname, files = fs)
       if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
@@ -265,7 +283,7 @@ ViewFilesInTable <- function(input, output, session,
       fluidRow(
         flamingoButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(flamingoButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
-        downloadButton(ns("FVEdownloadexcel"), label = "Export to csv"),
+        downloadButton(ns("FVEdownloadexcel"), label = "Export"),
         style = "display: inline"),
 
       hidden(flamingoPanel(
@@ -274,7 +292,7 @@ ViewFilesInTable <- function(input, output, session,
         heading =  tagAppendChildren(
           h4("File content"),
           actionButton(inputId = ns("abuttonhidedFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
-        DTOutput(ns("dt_FVExposureSelected")))),
+        uiOutput(ns("FVExposureSelected")))),
 
       hidden(flamingoPanel(
         id = ns("flamingoPanelmapFVExposureSelected"),
@@ -296,8 +314,19 @@ ViewFilesInTable <- function(input, output, session,
   })
 
   # Exposure table
+  output$FVExposureSelected <- renderUI({
+    extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
+    if (extension == "csv") {
+      DTOutput(ns("dt_FVExposureSelected"))
+    } else if (extension == "json") {
+      verbatimTextOutput(ns("json_FVExposureSelected"))
+    } else {
+      textOutput(ns("text_FVExposureSelected"))
+    }
+  })
+
   output$dt_FVExposureSelected <- renderDT(
-    if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0 ) {
+    if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0) {
       datatable(
         result$tbl_fileData %>% capitalize_names_df(),
         class = "flamingo-table display",
@@ -305,18 +334,37 @@ ViewFilesInTable <- function(input, output, session,
         selection = "none",
         filter = 'bottom',
         width = "100%",
-        options = getTableOptions()
+        options = list(searchHighlight = TRUE,
+                       scrollX = TRUE)
       )
     } else {
       nothingToShowTable("Nothing to show")
     }
   )
 
+  output$json_FVExposureSelected <- renderText({
+    if (!is.null(result$tbl_fileData)) {
+      toJSON(result$tbl_fileData, pretty = TRUE)
+    }
+  })
+
+  output$text_FVExposureSelected <- renderText({
+    result$tbl_fileData
+  })
+
   # Export to .csv
   output$FVEdownloadexcel <- downloadHandler(
     filename = function(){result$currentFile},
     content = function(file) {
-      fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)}
+      extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
+      if (extension == "csv") {
+        fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)
+      } else if (extension == "json") {
+        write(toJSON(result$tbl_fileData, pretty = TRUE), file)
+      } else{
+        write(result$tbl_fileData, file)
+      }
+    }
   )
 
   # Panel Map
@@ -372,11 +420,21 @@ ViewFilesInTable <- function(input, output, session,
         hide("abuttonmap")
 
       } else {
-        result$tbl_fileData <- fread(result$currfilepath)
+        extension <- strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
+        if (extension == "csv") {
+          result$tbl_fileData <- fread(result$currfilepath)
+          filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", ")
+        } else if (extension == "json") {
+          result$tbl_fileData <- read_json(result$currfilepath)
+          filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", ")
+        } else{
+          result$tbl_fileData <- scan(result$currfilepath, what="", sep="\n")
+          filecolumns <- ""
+        }
         if (!is.null(result$tbl_fileData)) {
           names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         }
-        filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
+
         filerows <- length(count.fields(result$currfilepath, skip = 1))
 
         #Show buttons
