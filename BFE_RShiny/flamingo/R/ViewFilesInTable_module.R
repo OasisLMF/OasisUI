@@ -168,6 +168,7 @@ ViewFilesInTable <- function(input, output, session,
         if (length(returnfunc) != 0) {
           func <- get(returnfunc)
           fileData <- return_file_df(func, param())
+          filename <- paste0(filename, ".csv")
         } else {
           extractFolder <- set_extractFolder(id = param(), label = folderpath)
           currfilepath <- set_extractFilePath(extractFolder, filename)
@@ -391,6 +392,7 @@ ViewFilesInTable <- function(input, output, session,
     if (length(returnfunc) != 0) {
       func <- get(returnfunc)
       result$tbl_fileData <- return_file_df(func,param())
+      result$currentFile <- paste0( result$currentFile, ".csv")
       if (!is.null(result$tbl_fileData)) {
         names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
