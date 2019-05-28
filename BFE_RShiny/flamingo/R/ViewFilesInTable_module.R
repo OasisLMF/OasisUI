@@ -434,6 +434,7 @@ ViewFilesInTable <- function(input, output, session,
                                collapse = ", ")
         } else{
           result$tbl_fileData <- scan(result$currfilepath, what="", sep="\n")
+          filecolumns <- ""
         }
         if (!is.null(result$tbl_fileData)) {
           names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
