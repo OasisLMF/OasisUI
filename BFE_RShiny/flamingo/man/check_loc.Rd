@@ -4,12 +4,10 @@
 \alias{check_loc}
 \title{check_loc}
 \usage{
-check_loc(analysisID, portfolioID)
+check_loc(analysisID)
 }
 \arguments{
 \item{analysisID}{Selected analysis id.}
-
-\item{portfolioID}{selected portfolio ID.}
 }
 \description{
 Compares uploaded and modeled locations.

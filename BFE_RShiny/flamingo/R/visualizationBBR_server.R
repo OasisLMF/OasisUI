@@ -108,7 +108,6 @@ visualizationBBR <- function(input, output, session,
     id = "outputfiles",
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
     anaId = sub_modules$defineID$selectAnaID,
-    portfolioId = sub_modules$defineID$selectPortfolioID,
     active = reactive({active() && input$tabsBBR == ns("taboutputfiles")}))
 
 

@@ -8,8 +8,8 @@
 exposurevalidationmapUI(id)
 
 exposurevalidationmap(input, output, session,
-  analysisID = reactive(NULL), portfolioID = "",
-  counter = reactive(NULL), active = reactive(TRUE))
+  analysisID = reactive(NULL), counter = reactive(NULL),
+  active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -17,8 +17,6 @@ exposurevalidationmap(input, output, session,
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{analysisID}{Selected analysis id.}
-
-\item{portfolioID}{Selected portfolio ID.}
 
 \item{counter}{Reactive value to trigger inputs download.}
 

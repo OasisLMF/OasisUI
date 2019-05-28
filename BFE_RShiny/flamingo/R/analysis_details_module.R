@@ -45,8 +45,8 @@ analysis_detailsUI <- function(id) {
 #'
 #' @template params-module-ui
 #' @param analysisID Selected analysis ID.
+#' @param portfolioID Selected Portfolio ID.
 #' @param reload_generated Imports function to reload Generated Inputs table.
-#' @param portfolioID Selected portfolio ID.
 #'
 #' @template params-module-ui
 #'
@@ -84,7 +84,6 @@ analysis_details <- function(input,
     exposurevalidationsummary,
     id = "exposurevalidationsummary",
     analysisID = analysisID,
-    portfolioID = portfolioID,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabvalidationsummary")})
   )
@@ -93,7 +92,6 @@ analysis_details <- function(input,
     exposurevalidationmap,
     id = "exposurevalidationmap",
     analysisID = analysisID,
-    portfolioID = portfolioID,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabvalidationmap")})
   )
@@ -103,7 +101,6 @@ analysis_details <- function(input,
     anainputs,
     id = "anainputs",
     analysisID = analysisID,
-    portfolioID = portfolioID,
     refresh_opt = TRUE,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabanainputs")})

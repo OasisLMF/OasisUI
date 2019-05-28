@@ -14,7 +14,7 @@ analysis_details(input, output, session, analysisID, portfolioID, counter)
 
 \item{analysisID}{Selected analysis ID.}
 
-\item{portfolioID}{Selected portfolio ID.}
+\item{portfolioID}{Selected Portfolio ID.}
 
 \item{id}{module id}
 

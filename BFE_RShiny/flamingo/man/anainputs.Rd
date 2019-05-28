@@ -7,9 +7,8 @@
 \usage{
 anainputsUI(id, heading = NULL, collapsible = FALSE, show = FALSE)
 
-anainputs(input, output, session, analysisID, portfolioID,
-  refresh_opt = TRUE, counter = reactive(NULL),
-  active = reactive(TRUE))
+anainputs(input, output, session, analysisID, refresh_opt = TRUE,
+  counter = reactive(NULL), active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -23,8 +22,6 @@ anainputs(input, output, session, analysisID, portfolioID,
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{analysisID}{Selected analysis ID.}
-
-\item{portfolioID}{Selected portfolio ID.}
 
 \item{refresh_opt}{Option to hide/show refresh button.}
 
