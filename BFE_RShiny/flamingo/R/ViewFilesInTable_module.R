@@ -171,7 +171,7 @@ ViewFilesInTable <- function(input, output, session,
       fs <- c()
       g <- input$dt_outputFL_rows_selected
       for (f in g) {
-        filename <- result$tbl_filesListData_wButtons[f, file_column]
+        filename <- result$tbl_filesListData_wButtons[f, file_column] %>% as.character()
 
         # Get dataframe
         currNamespace <- ls("package:flamingo")
