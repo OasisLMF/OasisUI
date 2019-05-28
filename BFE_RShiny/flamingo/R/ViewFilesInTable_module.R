@@ -31,7 +31,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
         bs_embed_tooltip(title = file_Viewer$FLdownloadzip, placement = "right")
     },
     if (!includechkbox) {
-      downloadButton(ns("FLdownloadexcel"), label = "Export to csv")
+      downloadButton(ns("FLdownloadexcel"), label = "Export file")
     }
   )
 }
@@ -71,6 +71,8 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #' @importFrom data.table fread
 #' @importFrom utils count.fields
 #' @importFrom utils zip
+#' @importFrom jsonlite toJSON
+#' @importFrom jsonlite read_json
 #'
 #' @export
 ViewFilesInTable <- function(input, output, session,
@@ -276,7 +278,7 @@ ViewFilesInTable <- function(input, output, session,
       fluidRow(
         flamingoButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(flamingoButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
-        downloadButton(ns("FVEdownloadexcel"), label = "Export to csv"),
+        downloadButton(ns("FVEdownloadexcel"), label = "Export file"),
         style = "display: inline"),
 
       hidden(flamingoPanel(
@@ -285,13 +287,13 @@ ViewFilesInTable <- function(input, output, session,
         heading =  tagAppendChildren(
           h4("File content"),
           actionButton(inputId = ns("abuttonhidedFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
-        DTOutput(ns("dt_FVExposureSelected")))),
+        uiOutput(ns("FVExposureSelected")))),
 
       hidden(flamingoPanel(
         id = ns("flamingoPanelmapFVExposureSelected"),
         collapsible = FALSE,
         heading = tagAppendChildren(
-          h4("Map "),
+          h4("Map"),
           actionButton(inputId = ns("abuttonhidemapFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
         leafletOutput(ns("plainmap"))))
     )
@@ -307,10 +309,21 @@ ViewFilesInTable <- function(input, output, session,
   })
 
   # Exposure table
+  output$FVExposureSelected <- renderUI({
+    extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
+    if (extension == "csv") {
+      DTOutput(ns("dt_FVExposureSelected"))
+    } else if (extension == "json") {
+      verbatimTextOutput(ns("json_FVExposureSelected"))
+    } else {
+      textOutput(ns("text_FVExposureSelected"))
+    }
+  })
+
   output$dt_FVExposureSelected <- renderDT(
-    if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0 ) {
+    if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0) {
       datatable(
-        result$tbl_fileData %>% capitalize_names_df(),
+        result$tbl_fileData %>% capitalize_names_df() %>% as.data.frame(),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = "none",
@@ -318,26 +331,36 @@ ViewFilesInTable <- function(input, output, session,
         #colnames = c("Row Number" = 1),
         width = "100%",
         options = list(searchHighlight = TRUE,
-                       scrollX = TRUE))
+                       scrollX = TRUE)
+      )
     } else {
-      datatable(
-        data.frame(content = "nothing to show"),
-        class = "flamingo-table display",
-        selection = "none",
-        rownames = TRUE,
-        filter = 'bottom',
-        colnames = c(""),
-        width = "100%",
-        options = list(searchHighlight = TRUE,
-                       scrollX = TRUE))
+      .nothingToShowTable("Nothing to show")
     }
   )
+
+  output$json_FVExposureSelected <- renderText({
+    if (!is.null(result$tbl_fileData)) {
+      toJSON(result$tbl_fileData, pretty = TRUE)
+    }
+  })
+
+  output$text_FVExposureSelected <- renderText({
+    result$tbl_fileData
+  })
 
   # Export to .csv
   output$FVEdownloadexcel <- downloadHandler(
     filename = function(){result$currentFile},
     content = function(file) {
-      fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)}
+      extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
+      if (extension == "csv") {
+        fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)
+      } else if (extension == "json") {
+        write(toJSON(result$tbl_fileData, pretty = TRUE), file)
+      } else{
+        write(result$tbl_fileData, file)
+      }
+    }
   )
 
   # Panel Map
@@ -401,11 +424,20 @@ ViewFilesInTable <- function(input, output, session,
           )
         })
       } else {
-        result$tbl_fileData <- fread(result$currfilepath)
+        extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
+        if (extension == "csv") {
+          result$tbl_fileData <- fread(result$currfilepath)
+          filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
+        } else if (extension == "json") {
+          result$tbl_fileData <- read_json(result$currfilepath)
+          filecolumns <- paste(tolower(colnames(do.call(rbind, result$tbl_fileData))),
+                               collapse = ", ")
+        } else{
+          result$tbl_fileData <- scan(result$currfilepath, what="", sep="\n")
+        }
         if (!is.null(result$tbl_fileData)) {
           names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
         }
-        filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
         filerows <- length(count.fields(result$currfilepath, skip = 1))
 
         #Show buttons
@@ -466,6 +498,20 @@ ViewFilesInTable <- function(input, output, session,
       drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
     )
     return(options)
+  }
+
+  #empty table
+  .nothingToShowTable <- function(contentMessage){
+    datatable(
+      data.frame(content = contentMessage),
+      class = "flamingo-table display",
+      selection = "none",
+      rownames = TRUE,
+      #filter = 'bottom',
+      colnames = c(""),
+      escape = FALSE,
+      options = list(searchHighlight = TRUE)
+    )
   }
 
   # utility function to add to buttons in table
