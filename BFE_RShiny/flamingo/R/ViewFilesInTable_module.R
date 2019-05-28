@@ -321,7 +321,7 @@ ViewFilesInTable <- function(input, output, session,
   })
 
   output$dt_FVExposureSelected <- renderDT(
-    if (!is.null(result$tbl_fileData)) {
+    if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0) {
       datatable(
         result$tbl_fileData %>% capitalize_names_df() %>% as.data.frame(),
         class = "flamingo-table display",
@@ -427,11 +427,11 @@ ViewFilesInTable <- function(input, output, session,
         extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
         if (extension == "csv") {
           result$tbl_fileData <- fread(result$currfilepath)
-          filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
+          # filecolumns <- paste(tolower(unlist(strsplit(readLines(result$currfilepath, n = 1), ","))), collapse = ", ")
+          filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", ")
         } else if (extension == "json") {
           result$tbl_fileData <- read_json(result$currfilepath)
-          filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", "),
-                               collapse = ", ")
+          filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", ")
         } else{
           result$tbl_fileData <- scan(result$currfilepath, what="", sep="\n")
           filecolumns <- ""
