@@ -183,7 +183,7 @@ ViewFilesInTable <- function(input, output, session,
         } else {
           extractFolder <- set_extractFolder(id = param(), label = folderpath)
           currfilepath <- set_extractFilePath(extractFolder, filename)
-          extension <-  strsplit(currfilepath, split = "\\.") %>% unlist() %>% tail(n = 1)
+          extension <-  strsplit(filename, split = "\\.") %>% unlist() %>% tail(n = 1)
           if (extension == "csv") {
             fileData <- fread(currfilepath)
           } else if (extension == "json") {
