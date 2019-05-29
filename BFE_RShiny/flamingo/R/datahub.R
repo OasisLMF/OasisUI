@@ -85,7 +85,7 @@
 #' \item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
 #' \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
 #' # > Write file
-#' \item{\code{write_file}{Write data into a file file_towrite)}
+#' \item{\code{write_file}}{Write data into a file file_towrite)}
 #' }
 #'
 #' @section Usage:

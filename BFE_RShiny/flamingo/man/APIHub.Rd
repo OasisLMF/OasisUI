@@ -25,7 +25,11 @@ R6 Class for OasisUI API Hub.
 \section{Privates}{
 
 \describe{
-\item{yyyy}{yyyy.}
+\item{httptype}{Type of connection (application/json); default is NULL.}
+\item{url}{url to connect with API; default is NULL.}
+\item{access_token}{String for API log in; default is NULL.}
+\item{refresh_token}{String for API access token refresh; default is NULL.}
+\item{version}{Parameter for API connection; default is NULL.}
 }
 }
 
@@ -34,8 +38,34 @@ R6 Class for OasisUI API Hub.
 \describe{
 
 Initialize
- \item{\code{method(arg1,arg2)}}{dddd.}
-}
+ \item{\code{set_httptype(httptype)}}{Set httptype private.}
+ \item{\code{api_init(host, port)}}{Initialize api and set url private.}
+ \item{\code{set_version(version)}}{Set version private.}
+ \item{\code{get_url()}}{Return private url.}
+ api response
+ \item{\code{api_handle_response(response)}}{Handles api response.}
+ \item{\code{api_fetch_response(meth, args, logMessage = print)}}{Fetches api response.}
+ access token
+ \item{\code{api_access_token(user, pwd)}}{Returns response of api access token.}
+ \item{\code{set_access_token(user, pwd)}}{Set private access token.}
+ \item{\code{get_access_token()}}{Return private access token.}
+ refresh token
+ \item{\code{api_refresh_token(user, pwd)}}{Returns response of api refresh token.
+ Passing the `refresh_token` through the authorization header does
+  not seem to be standard oauth2 as described in
+  <https://tools.ietf.org/html/rfc6749>. This also makes it impossible to use
+  `httr`'s built-in oauth2 mechanisms, which would provide automatic token
+  refreshing within [httr::POST()], [httr::GET()], etc. Instead we have to
+  check outside [httr::POST()] / [httr::GET()] and if necessary, refresh and
+  redo the request. See also the unexported `api_fetch_response()`.}
+ \item{\code{set_refresh_token(user, pwd)}}{Set private refresh token.}
+ \item{\code{get_refresh_token()}}{Return private refresh token.}
+ version
+ \item{\code{set_version()}}{Set private version.}
+ \item{\code{get_version()}}{Return private version.}
+ healtcheck
+ \item{\code{api_get_healthcheck()}}{Perform api healthcheck.}
+ }
 }
 
 \section{Usage}{

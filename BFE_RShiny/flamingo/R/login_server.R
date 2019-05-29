@@ -46,7 +46,6 @@ loginDialog <- function(input, output, session, logout) {
     if (input$abuttonloginbutton > 0) {
       user <- isolate(input$user)
       pwd <- isolate(input$password)
-      # res <- api_access_token(user, pwd)
       res <- session$userData$api_hub$api_access_token(user, pwd)
       session$userData$api_hub$set_access_token(user, pwd)
       session$userData$api_hub$set_refresh_token(user, pwd)

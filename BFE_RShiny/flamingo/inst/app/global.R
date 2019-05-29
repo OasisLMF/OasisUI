@@ -52,7 +52,7 @@ APISettings <- APIgetenv(
 )
 
 # options(flamingo.settings.api = api_init("localhost", "8000"))
-options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
+# options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
 options(flamingo.settings.api.httptype = "application/json")
 options(flamingo.settings.api.version = APISettings$version)
 options(flamingo.settings.api.share_filepath = APISettings$share_filepath)

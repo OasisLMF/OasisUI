@@ -27,15 +27,45 @@
 #'
 #' @section Privates:
 #' \describe{
-#' \item{yyyy}{yyyy.}
+#' \item{httptype}{Type of connection (application/json); default is NULL.}
+#' \item{url}{url to connect with API; default is NULL.}
+#' \item{access_token}{String for API log in; default is NULL.}
+#' \item{refresh_token}{String for API access token refresh; default is NULL.}
+#' \item{version}{Parameter for API connection; default is NULL.}
 #' }
 #'
 #' @section Methods:
 #' \describe{
 #'
 #' Initialize
-#'  \item{\code{method(arg1,arg2)}}{dddd.}
-#'}
+#'  \item{\code{set_httptype(httptype)}}{Set httptype private.}
+#'  \item{\code{api_init(host, port)}}{Initialize api and set url private.}
+#'  \item{\code{set_version(version)}}{Set version private.}
+#'  \item{\code{get_url()}}{Return private url.}
+#'  api response
+#'  \item{\code{api_handle_response(response)}}{Handles api response.}
+#'  \item{\code{api_fetch_response(meth, args, logMessage = print)}}{Fetches api response.}
+#'  access token
+#'  \item{\code{api_access_token(user, pwd)}}{Returns response of api access token.}
+#'  \item{\code{set_access_token(user, pwd)}}{Set private access token.}
+#'  \item{\code{get_access_token()}}{Return private access token.}
+#'  refresh token
+#'  \item{\code{api_refresh_token(user, pwd)}}{Returns response of api refresh token.
+#'  Passing the `refresh_token` through the authorization header does
+#'   not seem to be standard oauth2 as described in
+#'   <https://tools.ietf.org/html/rfc6749>. This also makes it impossible to use
+#'   `httr`'s built-in oauth2 mechanisms, which would provide automatic token
+#'   refreshing within [httr::POST()], [httr::GET()], etc. Instead we have to
+#'   check outside [httr::POST()] / [httr::GET()] and if necessary, refresh and
+#'   redo the request. See also the unexported `api_fetch_response()`.}
+#'  \item{\code{set_refresh_token(user, pwd)}}{Set private refresh token.}
+#'  \item{\code{get_refresh_token()}}{Return private refresh token.}
+#'  version
+#'  \item{\code{set_version()}}{Set private version.}
+#'  \item{\code{get_version()}}{Return private version.}
+#'  healtcheck
+#'  \item{\code{api_get_healthcheck()}}{Perform api healthcheck.}
+#'  }
 #'
 #' @section Usage:
 #' \preformatted{api_hub <- APIHub$new()
@@ -58,15 +88,15 @@ APIHub <- R6Class(
   # Public ----
   public = list(
     # > Initialize ----
-    initialize = function(httptype = "application/json", host, port, version){
+    initialize = function(httptype = "application/json", host, port, version, ...){
       self$set_httptype(httptype)
       self$api_init(host, port)
       self$set_version(version)
     },
-    set_httptype = function(httptype){
+    set_httptype = function(httptype, ...){
       private$httptype <- httptype
     },
-    api_init = function(host, port, scheme = c("http", "https")) {
+    api_init = function(host, port, scheme = c("http", "https"), ...) {
       stopifnot(length(host) == 1)
       stopifnot(length(port) == 1)
      conn_init <- structure(
@@ -85,7 +115,7 @@ APIHub <- R6Class(
       private$url
     },
     # > api response ----
-    api_handle_response = function(response) {
+    api_handle_response = function(response, ...) {
       # re-route potential warning for logging
       tryCatch(warn_for_status(response),
                warning = function(w) logWarning(w$message))
@@ -97,7 +127,7 @@ APIHub <- R6Class(
         class = c("apiresponse")
       )
     },
-    api_fetch_response = function(meth, args, logMessage = print) {
+    api_fetch_response = function(meth, args, logMessage = print, ...) {
       response <- do.call(meth, eval(args, envir = sys.parent()))
       token_invalid <- status_code(response) == 401L
       # probably expired
@@ -114,7 +144,7 @@ APIHub <- R6Class(
       response
     },
     # > access token ----
-    api_access_token = function(user, pwd) {
+    api_access_token = function(user, pwd, ...) {
       response <- POST(
         private$url,
         config = add_headers(
@@ -127,7 +157,7 @@ APIHub <- R6Class(
 
       self$api_handle_response(response)
     },
-    set_access_token = function(user, pwd){
+    set_access_token = function(user, pwd, ...){
       res <- self$api_access_token(user, pwd)
       if (res$status == "Success") {
         res <- content(res$result)
@@ -140,7 +170,7 @@ APIHub <- R6Class(
       private$access_token
     },
     # > refresh token ----
-    api_refresh_token = function() {
+    api_refresh_token = function(...) {
       response <- POST(
         private$url,
         config = add_headers(
@@ -152,7 +182,7 @@ APIHub <- R6Class(
       )
       self$api_handle_response(response)
     },
-    set_refresh_token = function(user, pwd){
+    set_refresh_token = function(user, pwd, ...){
       res <- self$api_access_token(user, pwd)
       if (res$status == "Success") {
         res <- content(res$result)
@@ -172,7 +202,7 @@ APIHub <- R6Class(
       private$version <- version
     },
     # > healtcheck ----
-    api_get_healthcheck = function() {
+    api_get_healthcheck = function(...) {
       tryCatch(
         response <- GET(
           private$url,
