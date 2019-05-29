@@ -1183,8 +1183,8 @@ step3_configureOutput <- function(input, output, session,
       "source_tag" = getOption("flamingo.settings.oasis_environment"), # potential new tag environment_tag,
       #modelSettingsMapping
       "event_set" = input$sinputeventset,
-      "demand_surge" = input$chkinputdsurge,
-      "leakage_factor" = input$sliderleakagefac,
+      #"demand_surge" = input$chkinputdsurge,
+      #"leakage_factor" = input$sliderleakagefac,
       "event_occurrence_id" =  as.integer(input$sinputeventocc),
       #outoutSettingsMappings
       "gul_output" = input$chkinputGUL,
