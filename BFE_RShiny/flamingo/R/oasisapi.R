@@ -65,6 +65,11 @@
 #'  \item{\code{get_version()}}{Return private version.}
 #'  healtcheck
 #'  \item{\code{api_get_healthcheck()}}{Perform api healthcheck.}
+#'  api query
+#'  \item{\code{api_query(uery_path, query_list, query_method, ...)}}{Construct query to the api.}
+#'  \item{\code{api_get_query(uery_path, query_list, ...)}}{Construct GET query to the api.}
+#'  \item{\code{api_post_query(uery_path, query_list, ...)}}{Construct POST query to the api.}
+#'  \item{\code{api_delete_query(uery_path, query_list, ...)}}{Construct DELETE query to the api.}
 #'  }
 #'
 #' @section Usage:
@@ -75,6 +80,7 @@
 #' @importFrom R6 R6Class
 #' @importFrom httr GET
 #' @importFrom httr POST
+#' @importFrom httr DELETE
 #' @importFrom httr add_headers
 #' @importFrom httr warn_for_status
 #' @importFrom httr http_status
@@ -219,6 +225,29 @@ OasisAPI <- R6Class(
         stop(paste("Health check failed with:", response$message))
       }
       return(status_code(response))
+    },
+    # > api query -----
+    api_query = function(query_path, query_list, query_method, ...){
+      request_list <- expression(list(
+        private$url,
+        config = add_headers(
+          Accept = private$http_type,
+          Authorization = sprintf("Bearer %s", private$access_token)
+        ),
+        path = paste(private$version, query_path, "", sep = "/"),
+        query = query_list
+      ))
+      response <- self$api_fetch_response(query_method, request_list)
+      self$api_handle_response(response)
+    },
+    api_get_query = function(query_path, query_list, ...){
+      self$api_query(query_path, query_list, "GET", ...)
+    },
+    api_post_query = function(query_path, query_list, ...){
+      self$api_query(query_path, query_list, "POST", ...)
+    },
+    api_delete_query = function(query_path, query_list, ...){
+      self$api_query(query_path, query_list, "DELETE", ...)
     }
   ),
   # Private ----
