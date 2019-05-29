@@ -34,7 +34,7 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 loginDialog <- function(input, output, session, logout) {
 
   result <- reactiveValues(
-      user = FLAMINGO_GUEST_ID
+    user = FLAMINGO_GUEST_ID
   )
 
   observeEvent(logout(), {
@@ -49,24 +49,11 @@ loginDialog <- function(input, output, session, logout) {
       res <- session$userData$api_hub$api_access_token(user, pwd)
       session$userData$api_hub$set_access_token(user, pwd)
       session$userData$api_hub$set_refresh_token(user, pwd)
-      if (!is.null(session$userData$api_hub$get_access_token())){
+      if (!is.null(session$userData$api_hub$get_access_token())) {
         result$user <- user
         session$userData$data_hub <- DataHub$new(user =  session$userData$api_hub$get_access_token(), destdir = getOption("flamingo.settings.api.share_filepath"))
       } else {
         result$user = FLAMINGO_GUEST_ID
-      }
-      #remove if claise to switch on api_hub
-      if (res$status == "Success") {
-        result$user <- user # for later
-        res <- content(res$result)
-        options(flamingo.settings.api.token = res$access_token)
-        options(flamingo.settings.api.refresh = res$refresh_token)
-        # Data Hub
-        session$userData$data_hub <- DataHub$new(user = res$access_token, destdir = getOption("flamingo.settings.api.share_filepath"))
-      } else {
-        options(flamingo.settings.api.token = NULL)
-        flamingoNotification(type = "error",
-                             "Login Failed, please check your credentials.")
       }
     }
     logMessage(paste("In Login User: ", result$user))

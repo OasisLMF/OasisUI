@@ -18,7 +18,7 @@ server <- function(input, output, session) {
   clean_downloadedData()
 
   #set api
-  session$userData$api_hub <- APIHub$new(host = APISettings$server, port = APISettings$port, version = APISettings$version)
+  session$userData$api_hub <- OasisAPI$new(host = APISettings$server, port = APISettings$port, version = APISettings$version)
 
   #health check
   loginfo(paste("flamingo API server:", session$userData$api_hub $get_url()), logger = "flamingo.module")

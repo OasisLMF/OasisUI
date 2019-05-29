@@ -7,9 +7,9 @@
 
 ### R6 Class for OasisUI API Hub ----
 
-#' APIHub
+#' OasisAPI
 #'
-#' @rdname APIHub
+#' @rdname OasisAPI
 #'
 #' @description R6 Class for OasisUI API Hub.
 #'
@@ -68,7 +68,7 @@
 #'  }
 #'
 #' @section Usage:
-#' \preformatted{api_hub <- APIHub$new()
+#' \preformatted{api_hub <- OasisAPI$new()
 #' api_hub$method(arg)
 #' }
 #'
@@ -82,9 +82,9 @@
 #' @importFrom httr content
 #'
 #' @export
-# APIHub ----
-APIHub <- R6Class(
-  "APIHub",
+# OasisAPI ----
+OasisAPI <- R6Class(
+  "OasisAPI",
   # Public ----
   public = list(
     # > Initialize ----
