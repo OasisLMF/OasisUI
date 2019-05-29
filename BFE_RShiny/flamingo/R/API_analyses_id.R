@@ -269,14 +269,14 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
       "path" = "model_settings",
       "value" =  inputsettings$event_set
     ),
-    "leakage_factor" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$leakage_factor
-    ),
-    "demand_surge" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$demand_surge
-    ),
+    #"leakage_factor" = list(
+    #  "path" = "model_settings",
+    #  "value" =  inputsettings$leakage_factor
+    #),
+    #"demand_surge" = list(
+    #  "path" = "model_settings",
+    #  "value" =  inputsettings$demand_surge
+    #),
     "event_occurrence_id" = list(
       "path" = "model_settings",
       "value" =  inputsettings$event_occurrence_id
