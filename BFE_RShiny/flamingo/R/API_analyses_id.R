@@ -220,6 +220,8 @@ return_analyses_settings_file_list <- function(id) {
 #' @export
 construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
 
+  fixed_settings <- c("event_set", "event_occurrence_id")
+
   analysisSettingsMapping <- list(
     "analysis_tag" = list(
       "path" = "analysis_settings",
@@ -264,14 +266,19 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
   }) %>%
     setNames(perils)
 
+  model_params <- names(inputsettings)[names(inputsettings) %notin% c(fixed_settings, perils)]
+  model_params_lst_mapping <- lapply(model_params, function(p){
+    list(
+      "path" = "model_settings",
+      "value" =  inputsettings[[p]]
+    )
+  }) %>%
+    setNames(model_params)
+
   modelSettingsMapping <- list(
     "event_set" = list(
       "path" = "model_settings",
       "value" =  inputsettings$event_set
-    ),
-    "leakage_factor" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$leakage_factor
     ),
     "demand_surge" = list(
       "path" = "model_settings",
@@ -282,7 +289,8 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
       "value" =  inputsettings$event_occurrence_id
     )
   ) %>%
-    c(perils_lst_mapping)
+    c(perils_lst_mapping) %>%
+    c(model_params_lst_mapping)
 
   outoutSettingsMappings <- list(
     "gul_output" = list(

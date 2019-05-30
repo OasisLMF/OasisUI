@@ -394,15 +394,14 @@ summarytab <- function(input, output, session,
     event_set <- model_settings[["event_set"]]
     event_set <- ifelse(is.null(event_set), FALSE, event_set)
 
-    demand_surge <- model_settings[["demand_surge"]]
-    demand_surge <- ifelse(is.null(demand_surge), FALSE, demand_surge)
-    leakage_factor <- model_settings[["leakage_factor"]]
-    leakage_factor <- ifelse(is.null(leakage_factor), FALSE, leakage_factor)
+    fixed_settings <- c("event_set", "event_occurrence_id")
+    model_params_settings <- names(model_settings)[names(model_settings) %notin% c(fixed_settings, perils_in_model)]
+    model_params_lst <- sapply(model_params_settings, function(i){ana_settings[["model_settings"]][[i]]})
 
     #summary DF
-    SpecificationRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", perils_in_model , "demand_surge", "leakage_factor")
-    ValueRows <- unlist(c(locnum, tiv, gul_threshold, number_of_samples, event_set, perils_in_ana_lst, demand_surge, leakage_factor))
-    TypeRows <- c("input", "input", "param", "param", "param", rep("param", length(perils_in_model)), "param", "param")
+    SpecificationRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", perils_in_model , model_params_settings)
+    ValueRows <- unlist(c(locnum, tiv, gul_threshold, number_of_samples, event_set, perils_in_ana_lst,model_params_lst))
+    TypeRows <- c("input", "input", "param", "param", "param", rep("param", length(perils_in_model)), rep("param", length(model_params_lst)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 

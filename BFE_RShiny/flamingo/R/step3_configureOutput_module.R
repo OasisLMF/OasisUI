@@ -165,8 +165,8 @@ panelDefineOutputsDetails <- function(id) {
                  textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
                  checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
-                 hidden(checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = FALSE)),
-                 hidden(sliderInput(ns("sliderleakagefac"), label = "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5))))
+                 uiOutput(ns("model_param"))
+                 ))
     )
   )
 }
@@ -1013,7 +1013,6 @@ step3_configureOutput <- function(input, output, session,
   .clearotherparams <- function() {
     logMessage(".clearotherparams called")
     .clearOutputOptions()
-    updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelID <- ifelse(modelID == "", -1, modelID)
     tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
@@ -1025,7 +1024,9 @@ step3_configureOutput <- function(input, output, session,
         names_settings[names(model_settings[[i]])] <- i
       }
 
-      event_set_id <- names_settings[names(names_settings) == "event_set"]$event_set
+      fixed_settings <- c("event_set", "event_occurrence_id")
+
+      event_set_id <- names_settings[names(names_settings) == fixed_settings[1]]$event_set
       if (!is.null(event_set_id)) {
         event_set_list <- model_settings[[event_set_id]]$event_set
         event_set_default <- event_set_list$default
@@ -1038,7 +1039,7 @@ step3_configureOutput <- function(input, output, session,
         }
       }
 
-      occurrence_set_id <- names_settings[names(names_settings) == "event_occurrence_id"]$event_occurrence_id
+      occurrence_set_id <- names_settings[names(names_settings) == fixed_settings[2]]$event_occurrence_id
       if (!is.null(occurrence_set_id)) {
         occurrence_set_list <- model_settings[[occurrence_set_id]]$event_occurrence_id
         occurrence_set_default <- occurrence_set_list$default
@@ -1062,14 +1063,20 @@ step3_configureOutput <- function(input, output, session,
 
       output$chkinputsperils <- renderUI(ui_perils)
 
-      leakage_id <- names_settings[names(names_settings) == "leakage_factor"][["leakage_factor"]]
-      leakage_list <- model_settings[[leakage_id]]$leakage_factor
-      leakage_default <- leakage_list$default
-      leakage_max <- leakage_list$max
-      leakage_min <- leakage_list$min
-      show("sliderleakagefac")
-      updateSliderInput(session, "sliderleakagefac", value = leakage_default,
-                        min = leakage_min <- leakage_list$min, max = leakage_min <- leakage_list$max)
+      model_params <- names(names_settings)[names(names_settings) %notin% c(fixed_settings, model_perils)]
+      if (length(model_params) > 0 ) {
+        ui_model_param <- lapply(model_params, function(p){
+          curr_param_id <- names_settings[names(names_settings) == p][[p]]
+          curr_param_lst <- model_settings[[curr_param_id]][[p]]
+          curr_param_name <- capitalize_first_letter(gsub("_", ": ", p))
+          curr_param_default <- curr_param_lst$default
+          curr_param_max <- curr_param_lst$max
+          curr_param_min <- curr_param_lst$min
+          sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, min = curr_param_min, max = curr_param_max, value = curr_param_default)
+        })
+        output$model_param <- renderUI(ui_model_param)
+      }
+
     }
   }
 
@@ -1162,6 +1169,8 @@ step3_configureOutput <- function(input, output, session,
 
     logMessage(".gen_analysis_settings called")
 
+    fixed_settings <- c("event_set", "event_occurrence_id")
+
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelData <- return_tbl_modelData(modelID)
     tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
@@ -1170,6 +1179,9 @@ step3_configureOutput <- function(input, output, session,
     model_perils <- names(model_settings)[grepl("peril", names(model_settings))]
     perils_lst <- lapply(model_perils, function(p){input[[paste0("chkinput_", p)]]}) %>%
       setNames(model_perils)
+    model_params <- names(model_settings)[names(model_settings) %notin% c(fixed_settings, model_perils)]
+    model_params_lst <- lapply(model_params, function(p){input[[paste0("model_params_", p)]]}) %>%
+      setNames(model_params)
 
     inputsettings <- list(
       #analysisSettingsMapping
@@ -1183,8 +1195,6 @@ step3_configureOutput <- function(input, output, session,
       "source_tag" = getOption("flamingo.settings.oasis_environment"), # potential new tag environment_tag,
       #modelSettingsMapping
       "event_set" = input$sinputeventset,
-      "demand_surge" = input$chkinputdsurge,
-      "leakage_factor" = input$sliderleakagefac,
       "event_occurrence_id" =  as.integer(input$sinputeventocc),
       #outoutSettingsMappings
       "gul_output" = input$chkinputGUL,
@@ -1192,7 +1202,8 @@ step3_configureOutput <- function(input, output, session,
       "ri_output" = input$chkinputRI,
       "return_period_file" = TRUE  # currenlty hardcoded
     ) %>%
-      c(perils_lst)
+      c(perils_lst) %>%
+      c(model_params_lst)
 
     outputsLossTypes <- list(
       "gul_output" = list("prog" = input$chkgulprog, "policy" = input$chkgulpolicy, "state" = input$chkgulstate, "county" = input$chkgulcounty, "location" = input$chkgulloc, "lob" = input$chkgullob),
