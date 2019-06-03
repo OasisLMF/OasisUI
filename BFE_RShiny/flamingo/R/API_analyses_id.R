@@ -66,24 +66,24 @@ return_analyses_input_file_wicons_df <- function(id) {
   analyses_input_file_df <- list.files(extractFolder, recursive = TRUE) %>% as.data.frame(stringsAsFactors = FALSE) %>% setNames("files")
 
   if (nrow(analyses_input_file_df) > 0) {
-  fnames <- analyses_input_file_df$files
-  fnum <- length(fnames)
-  status <- data.frame(status = rep(status_code_notfound, fnum))
-  for (i in seq(fnum) ) {
-    fname <- as.character(fnames[i])
-    filePath <- set_extractFilePath(extractFolder, fname)
-    info <- file.info(filePath)
+    fnames <- analyses_input_file_df$files
+    fnum <- length(fnames)
+    status <- data.frame(status = rep(status_code_notfound, fnum))
+    for (i in seq(fnum) ) {
+      fname <- as.character(fnames[i])
+      filePath <- set_extractFilePath(extractFolder, fname)
+      info <- file.info(filePath)
 
-    if (is.na(info$size)) {
-      status[i, "status"] <- Status$Processing
-    } else if (info$size == 0) {
-      status[i, "status"] <- Status$Failed
-    } else {
-      status[i, "status"] <- Status$Completed
+      if (is.na(info$size)) {
+        status[i, "status"] <- Status$Processing
+      } else if (info$size == 0) {
+        status[i, "status"] <- Status$Failed
+      } else {
+        status[i, "status"] <- Status$Completed
+      }
     }
-  }
-  analyses_input_file_df <- cbind(analyses_input_file_df, status) %>%
-    as.data.frame()
+    analyses_input_file_df <- cbind(analyses_input_file_df, status) %>%
+      as.data.frame()
   } else {
     analyses_input_file_df <- NULL
   }
@@ -222,52 +222,27 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
 
   fixed_settings <- c("event_set", "event_occurrence_id")
 
-  analysisSettingsMapping <- list(
-    "analysis_tag" = list(
-      "path" = "analysis_settings",
-      "value" = inputsettings$analysis_tag
-    ),
-    "exposure_location" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$exposure_location
-    ),
-    "gul_threshold" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$gul_threshold
-    ),
-    "model_version_id"  = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$model_version_id
-    ),
-    "module_supplier_id" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$module_supplier_id
-    ),
-    "number_of_samples" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$number_of_samples
-    ),
-    "prog_id" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$prog_id
-    ),
-    "source_tag" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$source_tag
-    )
-  )
+  analysis_settings_names <- c("analysis_tag", "gul_threshold", "model_version_id",  "module_supplier_id", "number_of_samples", "prog_id", "source_tag")
 
-  perils <- names(inputsettings)[grepl("peril", names(inputsettings))]
-  perils_lst_mapping <- lapply(perils, function(p){
+  analysisSettingsMapping <- lapply(analysis_settings_names, function(p){
     list(
-      "path" = "model_settings",
+      "path" = "analysis_settings",
       "value" =  inputsettings[[p]]
     )
   }) %>%
-    setNames(perils)
+    setNames(analysis_settings_names)
 
-  model_params <- names(inputsettings)[names(inputsettings) %notin% c(fixed_settings, perils)]
-  model_params_lst_mapping <- lapply(model_params, function(p){
+  output_settings_names <- c("gul_output", "il_output", "ri_output")
+  outoutSettingsMappings <- lapply(output_settings_names, function(p){
+    list(
+      "path" = "analysis_settings",
+      "value" =  inputsettings[[p]]
+    )
+  }) %>%
+    setNames(output_settings_names)
+
+  model_params <- names(inputsettings)[names(inputsettings) %notin% c(analysis_settings_names, output_settings_names)]
+  modelSettingsMapping <- lapply(model_params, function(p){
     list(
       "path" = "model_settings",
       "value" =  inputsettings[[p]]
@@ -275,37 +250,6 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
   }) %>%
     setNames(model_params)
 
-  modelSettingsMapping <- list(
-    "event_set" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$event_set
-    ),
-    "demand_surge" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$demand_surge
-    ),
-    "event_occurrence_id" = list(
-      "path" = "model_settings",
-      "value" =  inputsettings$event_occurrence_id
-    )
-  ) %>%
-    c(perils_lst_mapping) %>%
-    c(model_params_lst_mapping)
-
-  outoutSettingsMappings <- list(
-    "gul_output" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$gul_output
-    ),
-    "il_output" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$il_output
-    ),
-    "ri_output" = list(
-      "path" = "analysis_settings",
-      "value" =  inputsettings$ri_output
-    )
-  )
 
   analysis_settings <- list(
     "analysis_settings" = list(

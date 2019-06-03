@@ -382,26 +382,12 @@ summarytab <- function(input, output, session,
 
     ana_settings <- analysis_settings[["analysis_settings"]]
     model_settings <- analysis_settings[["analysis_settings"]][["model_settings"]]
-
-    perils_in_model <- names(model_settings)[grepl("peril", names(model_settings))]
-    perils_in_ana <- names(ana_settings[["model_settings"]])[grepl("peril", names(ana_settings[["model_settings"]]))]
-    perils_in_ana_lst <- sapply(perils_in_ana, function(i){ana_settings[["model_settings"]][[i]]})
-
-    gul_threshold <- ana_settings[["gul_threshold"]]
-    gul_threshold <- ifelse(is.null(gul_threshold), 0, gul_threshold)
-    number_of_samples <- ana_settings[["number_of_samples"]]
-    number_of_samples <- ifelse(is.null(number_of_samples), 0, number_of_samples)
-    event_set <- model_settings[["event_set"]]
-    event_set <- ifelse(is.null(event_set), FALSE, event_set)
-
-    fixed_settings <- c("event_set", "event_occurrence_id")
-    model_params_settings <- names(model_settings)[names(model_settings) %notin% c(fixed_settings, perils_in_model)]
-    model_params_lst <- sapply(model_params_settings, function(i){ana_settings[["model_settings"]][[i]]})
+    model_params_lst <-  sapply(names(model_settings), function(i){model_settings[[i]]})
 
     #summary DF
-    SpecificationRows <- c("exposure location count", "exposure TIV", "gul threshold", "number of samples", "event set", perils_in_model , model_params_settings)
-    ValueRows <- unlist(c(locnum, tiv, gul_threshold, number_of_samples, event_set, perils_in_ana_lst,model_params_lst))
-    TypeRows <- c("input", "input", "param", "param", "param", rep("param", length(perils_in_model)), rep("param", length(model_params_lst)))
+    SpecificationRows <- c("exposure location count", "exposure TIV", names(model_params_lst))
+    ValueRows <- unlist(c(locnum, tiv, model_params_lst))
+    TypeRows <- c("input", "input", rep("param", length(model_params_lst)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 
