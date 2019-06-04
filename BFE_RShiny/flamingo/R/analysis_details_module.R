@@ -65,7 +65,8 @@ analysis_details <- function(input,
     counter()
   }, {
     if (length(counter()) > 0 && counter() > 0) {
-      if (!is.null(analysisID()) && !is.na(analysisID()) && analysisID() != "") {
+      if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
+          (!is.null(analysisID()))) {
         extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
         if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
           withModalSpinner(

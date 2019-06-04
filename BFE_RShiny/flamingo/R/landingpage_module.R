@@ -101,7 +101,6 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
       class = "flamingo-table display",
       rownames = FALSE,
       selection = "single",
-      #colnames = c("Row Number" = 1),
       filter = 'bottom',
       escape = FALSE,
       plugins = 'natural',

@@ -142,7 +142,6 @@ ViewFilesInTable <- function(input, output, session,
         rownames = FALSE,
         escape = FALSE,
         selection =  selectionUsed,
-        #colnames = c('Row Number' = 1),
         options = getTableOptions(maxrowsperpage = maxrowsperpage, escape = FALSE)
       )
     } else {
@@ -176,6 +175,7 @@ ViewFilesInTable <- function(input, output, session,
           fpath <- session$userData$data_hub$write_file(data = fileData, dataset_identifier = filename)
           fs <- c(fs, fpath)
         }
+
       }
       zip(zipfile = fname, files = fs)
       # if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
@@ -315,14 +315,13 @@ ViewFilesInTable <- function(input, output, session,
   })
 
   output$dt_FVExposureSelected <- renderDT(
-    if (!is.null(result$tbl_fileData)) {
+    if (!is.null(result$tbl_fileData )) {
       datatable(
         result$tbl_fileData %>% capitalize_names_df() %>% as.data.frame(),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = "none",
         filter = 'bottom',
-        #colnames = c("Row Number" = 1),
         width = "100%",
         options = getTableOptions()
       )

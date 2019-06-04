@@ -91,7 +91,7 @@ visualizationSBR <- function(input, output, session,
     outputfiles,
     id = "outputfiles",
     tbl_filesListDataana =  reactive(result$tbl_filesListDataana),
-    anaId = sub_modules$defineID$selectAnaID,
+    anaId = reactive(sub_modules$defineID$selectAnaID()),
     active = reactive({active() && input$tabsSBR == ns("taboutputfiles")}))
 
   # Tab Output Plots -----------------------------------------------------------
