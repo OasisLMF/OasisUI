@@ -1157,8 +1157,6 @@ step3_configureOutput <- function(input, output, session,
 
     logMessage(".gen_analysis_settings called")
 
-    fixed_settings <- c("event_set", "event_occurrence_id")
-
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelData <- return_tbl_modelData(modelID)
     tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
