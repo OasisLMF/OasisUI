@@ -156,17 +156,15 @@ panelDefineOutputsDetails <- function(id) {
       ns("panel_defAnaOutputDetails"),
       heading = h4("Model parameters"),
       div(id = ns("basic"), style = "width:100%; margin: 0 auto;",
-          hidden(selectInput(ns("sinputeventset"), label = "Event Set:", choices = "")),
-          hidden(selectInput(ns("sinputeventocc"), label = "Event Occurrence Set:", choices = "")),
-          h5("Available Perils"),
+          uiOutput(ns("basic_model_param")),
           uiOutput(ns("chkinputsperils"))
       ),
       hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
                  textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
                  checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
-                 hidden(checkboxInput(ns("chkinputdsurge"), label = "Demand Surge", value = FALSE)),
-                 hidden(sliderInput(ns("sliderleakagefac"), label = "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5))))
+                 uiOutput(ns("advanced_model_param"))
+      ))
     )
   )
 }
@@ -1013,63 +1011,62 @@ step3_configureOutput <- function(input, output, session,
   .clearotherparams <- function() {
     logMessage(".clearotherparams called")
     .clearOutputOptions()
-    updateSliderInput(session, "sliderleakagefac", "Leakage factor:", min = 0, max = 100, value = 0.5, step = 0.5)
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelID <- ifelse(modelID == "", -1, modelID)
     tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
     if (modelID != -1 && !is.null(tbl_modelsDetails)) {
-      model_settings <- tbl_modelsDetails$model_settings
+      model_settings <- tbl_modelsDetails$model_settings %>%
+        unlist(recursive = FALSE)
+      names_settings_type <- lapply(names(model_settings), function(i) {model_settings[[i]][["type"]]}) %>%
+        setNames(names(model_settings))
 
-      names_settings <- list()
-      for (i in 1:length(model_settings)) {# i <- 1
-        names_settings[names(model_settings[[i]])] <- i
-      }
+      if (length(names(model_settings)) > 0 ) {
 
-      event_set_id <- names_settings[names(names_settings) == "event_set"]$event_set
-      if (!is.null(event_set_id)) {
-        event_set_list <- model_settings[[event_set_id]]$event_set
-        event_set_default <- event_set_list$default
-        eventSetChoices <- .SwapNamesValueInList(event_set_list$values)
-        updateSelectInput(session, "sinputeventset",
-                          selected = event_set_default,
-                          choices = eventSetChoices)
-        if (length(event_set_list$values) > 1) {
-          show("sinputeventset")
+        fixed_settings <- c("event_set", "event_occurrence_id")
+
+        basic_model_params <- names(model_settings)[names(model_settings) %in% fixed_settings]
+        ui_basic_model_param <- lapply(basic_model_params, function(p){
+          curr_param_lst <- model_settings[[p]]
+          curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+          if (curr_param_lst$type == "boolean") {
+            checkboxInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, value = curr_param_lst$default)
+          } else if (curr_param_lst$type == "dictionary") {
+            selectInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        choices = .SwapNamesValueInList(curr_param_lst$values), selected =  curr_param_lst$default)
+          } else if (curr_param_lst$type == "float") {
+            sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        min = curr_param_lst$min, max = curr_param_lst$max, value =  curr_param_lst$default)
+          }
+        })
+        output$basic_model_param <- renderUI(ui_basic_model_param)
+
+        model_perils <- names(model_settings)[grepl("peril_", names(model_settings))]
+        if (length(model_perils) > 0 ) {
+          ui_perils <- lapply(model_perils, function(p){
+            curr_param_lst <- model_settings[[p]]
+            curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+            checkboxInput(ns(paste0("model_params_", p)), label = curr_param_lst$name, value = curr_param_lst$default)
+          })
+          output$chkinputsperils <- renderUI(list(h5("Available Perils"),ui_perils))
         }
+
+        advanced_model_param <- names(model_settings)[ names(model_settings) %notin% c(basic_model_params, model_perils)]
+        ui_advanced_model_param <- lapply(advanced_model_param, function(p){
+          curr_param_lst <- model_settings[[p]]
+          curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+          if (curr_param_lst$type == "boolean") {
+            checkboxInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, value = curr_param_lst$default)
+          } else if (curr_param_lst$type == "dictionary") {
+            selectInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        choices = .SwapNamesValueInList(curr_param_lst$values), selected =  curr_param_lst$default)
+          } else if (curr_param_lst$type == "float") {
+            sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        min = curr_param_lst$min, max = curr_param_lst$max, value =  curr_param_lst$default)
+          }
+        })
+        output$advanced_model_param <- renderUI(ui_advanced_model_param)
       }
 
-      occurrence_set_id <- names_settings[names(names_settings) == "event_occurrence_id"]$event_occurrence_id
-      if (!is.null(occurrence_set_id)) {
-        occurrence_set_list <- model_settings[[occurrence_set_id]]$event_occurrence_id
-        occurrence_set_default <- occurrence_set_list$default
-        occurrenceSetChoices <- .SwapNamesValueInList(occurrence_set_list$values)
-        updateSelectInput(session, "sinputeventocc",
-                          selected = occurrence_set_default,
-                          choices = occurrenceSetChoices)
-        if (length(occurrence_set_list$values) > 1) {
-          show("sinputeventocc")
-        }
-      }
-
-      model_perils <- names(names_settings)[grepl("peril", names(names_settings))]
-
-      ui_perils <- lapply(model_perils, function(p){
-        curr_peril_lst <- model_settings[[names_settings[[p]]]][[p]]
-        peril_label <- curr_peril_lst$name #capitalize_first_letter(gsub("_", ": ", p))
-        peril_val <-  curr_peril_lst$default
-        checkboxInput(ns(paste0("chkinput_", p)), label = peril_label, value = peril_val)
-      })
-
-      output$chkinputsperils <- renderUI(ui_perils)
-
-      leakage_id <- names_settings[names(names_settings) == "leakage_factor"][["leakage_factor"]]
-      leakage_list <- model_settings[[leakage_id]]$leakage_factor
-      leakage_default <- leakage_list$default
-      leakage_max <- leakage_list$max
-      leakage_min <- leakage_list$min
-      show("sliderleakagefac")
-      updateSliderInput(session, "sliderleakagefac", value = leakage_default,
-                        min = leakage_min <- leakage_list$min, max = leakage_min <- leakage_list$max)
     }
   }
 
@@ -1128,7 +1125,6 @@ step3_configureOutput <- function(input, output, session,
     show("configureAnaParamsAdvanced")
     show("abuttonbasic")
     hide("abuttonadvanced")
-    # show("abuttonsaveoutput")
     show("abuttonclroutopt")
   }
 
@@ -1140,7 +1136,6 @@ step3_configureOutput <- function(input, output, session,
     hide("configureAnaParamsAdvanced")
     hide("abuttonbasic")
     show("abuttonadvanced")
-    # hide("abuttonsaveoutput")
     hide("abuttonclroutopt")
   }
 
@@ -1167,32 +1162,28 @@ step3_configureOutput <- function(input, output, session,
     tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
     model_settings <- tbl_modelsDetails$model_settings %>%
       unlist(recursive = FALSE)
-    model_perils <- names(model_settings)[grepl("peril", names(model_settings))]
-    perils_lst <- lapply(model_perils, function(p){input[[paste0("chkinput_", p)]]}) %>%
-      setNames(model_perils)
+    model_params_lst <- lapply(names(model_settings), function(i){
+      ifelse( is.null(input[[paste0("model_params_", i)]]),model_settings[[i]]$default,input[[paste0("model_params_", i)]])
+      }) %>%
+      setNames(names(model_settings))
+
 
     inputsettings <- list(
       #analysisSettingsMapping
       "analysis_tag" = as.integer(result$anaID), #potential new tag analysis_id
-      "exposure_location" = "L:", # hardcoded as depricated
       "gul_threshold" = as.integer(input$tinputthreshold),
       "model_version_id" = modelData[[tbl_modelsDataNames$model_id]], # potential new tag model_id
       "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]], # potential new tag model_supplier_id
       "number_of_samples" = as.integer(input$tinputnoofsample),
       "prog_id" = as.integer(portfolioID()), # potential new tag `portfolio_id`
       "source_tag" = getOption("flamingo.settings.oasis_environment"), # potential new tag environment_tag,
-      #modelSettingsMapping
-      "event_set" = input$sinputeventset,
-      "demand_surge" = input$chkinputdsurge,
-      "leakage_factor" = input$sliderleakagefac,
-      "event_occurrence_id" =  as.integer(input$sinputeventocc),
       #outoutSettingsMappings
       "gul_output" = input$chkinputGUL,
       "il_output" = input$chkinputIL,
       "ri_output" = input$chkinputRI,
       "return_period_file" = TRUE  # currenlty hardcoded
     ) %>%
-      c(perils_lst)
+      c(model_params_lst)
 
     outputsLossTypes <- list(
       "gul_output" = list("prog" = input$chkgulprog, "policy" = input$chkgulpolicy, "state" = input$chkgulstate, "county" = input$chkgulcounty, "location" = input$chkgulloc, "lob" = input$chkgullob),
