@@ -86,6 +86,7 @@
 #' @importFrom httr http_status
 #' @importFrom httr status_code
 #' @importFrom httr content
+#' @importFrom dplyr bind_rows
 #'
 #' @export
 # OasisAPI ----
@@ -248,6 +249,19 @@ OasisAPI <- R6Class(
     },
     api_delete_query = function(query_path, query_list, ...){
       self$api_query(query_path, query_list, "DELETE", ...)
+    },
+    # > return from query ----
+    return_df = function(query_path, api_param = "") {
+      content_lst <- content(self$api_get_query(query_path, api_param)$result)
+      if (is.null(names(content_lst))) {
+        df <- strsplit(content_lst, split = "\n") %>%
+          as.data.frame(stringsAsFactors = FALSE)
+        colnames(df) <- df[1, ]
+      } else {
+        df <- bind_rows(content_lst) %>%
+          as.data.frame()
+      }
+      df
     }
   ),
   # Private ----
