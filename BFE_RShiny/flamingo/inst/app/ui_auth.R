@@ -90,7 +90,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
 
     # Footer ----
     fillRow(
-      em("Flamingo 1.1 Oasis Business Front End",
+      em("OasisUI 1.1 Oasis Business Front End",
          class = "flamingo-footer"),
       a(href = "https://shiny.rstudio.com/",
         em("Powered by RShiny",
