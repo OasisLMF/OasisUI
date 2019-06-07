@@ -73,8 +73,8 @@
 #'  }
 #'
 #' @section Usage:
-#' \preformatted{api_hub <- OasisAPI$new()
-#' api_hub$method(arg)
+#' \preformatted{oasisapi <- OasisAPI$new()
+#' oasisapi$method(arg)
 #' }
 #'
 #' @importFrom R6 R6Class
@@ -249,6 +249,17 @@ OasisAPI <- R6Class(
     },
     api_delete_query = function(query_path, query_list, ...){
       self$api_query(query_path, query_list, "DELETE", ...)
+    },
+    api_write_tar_query = function(id, query_path, label, dest = tempfile(fileext = ".tar"), ...){
+      request_list <- expression(list(
+        private$url,
+        config = add_headers(
+          Accept = private$http_type,
+          Authorization = sprintf("Bearer %s", private$access_token)
+        ),
+        path = paste(oasisapi$get_version, query_path, id, label, "", sep = "/"),
+        write_disk(dest, overwrite = TRUE)
+      ))
     },
     # > return from query ----
     return_df = function(query_path, api_param = "") {

@@ -46,8 +46,8 @@
 #' \item{\code{get_model_data_list(id)}}{return list of model resources}
 #' \item{\code{invalidate_model_data_list(id)}}{invalidate list of model resources}
 #' > Analysis
-#' \item{\code{get_ana_inputs_data_list(id)}}{return list of analysis inputs}
-#' \item{\code{get_ana_outputs_data_list(id)}}{return list of analysis outputs}
+#' \item{\code{get_ana_inputs_data_list(id, oasisapi)}}{return list of analysis inputs}
+#' \item{\code{get_ana_outputs_data_list(id, oasisapi)}}{return list of analysis outputs}
 #' \item{\code{invalidate_ana_inputs_data_list(id)}}{invalidate list of analysis inputs}
 #' \item{\code{invalidate_ana_outputs_data_list(id)}}{invalidate list of analysis outputs}
 #'
@@ -70,19 +70,19 @@
 #' > Analysis
 #' \item{\code{get_ana_dataset_content(id, dataset_identifier, type)}}{extract a input/output file content given an analysis id}
 #' \item{\code{invalidate_ana_dataset_content(id, dataset_identifier, type)}}{invalidate a input/output file content given an analysis id}
-#' \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)}}{extract a inputs file content given an analysis id}
+#' \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier), oasisapi}}{extract a inputs file content given an analysis id}
 #' \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)}}{invalidate a inputs file content given an analysis id}
-#' \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)}}{extract a outputs file content given an analysis id}
+#' \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier, oasisapi)}}{extract a outputs file content given an analysis id}
 #' \item{\code{invalidate_ana_outputs_dataset_content(id,  dataset_identifier)}}{invalidate a outputs file content given an analysis id}
-#' \item{\code{get_ana_dataset_header(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
+#' \item{\code{get_ana_dataset_header(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file nrow given an analysis id}
 #' \item{\code{invalidate_ana_dataset_header(id, type, dataset_identifier)}}{invalidate a inputs/outputs file header given an analysis id}
-#' \item{\code{get_ana_dataset_nrow(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
+#' \item{\code{get_ana_dataset_nrow(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file nrow given an analysis id}
 #' \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
-#' \item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
+#' \item{\code{get_ana_dataset_size(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file size given an analysis id}
 #' \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
 #' \item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
 #' \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
-#' \item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
+#' \item{\code{get_ana_validation_summary_content(id, oasisapi)}}{extract analysis validation summary content}
 #' \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
 #' # > Write file
 #' \item{\code{write_file}}{Write data into a file file_towrite)}
@@ -135,8 +135,8 @@ DataHub <- R6Class(
     },
     # > Analysis ----
     #return list of analysis resources
-    get_ana_inputs_data_list = function(id, ...){
-      tarfile <- get_analyses_inputs_tar(id,  destdir = private$user_destdir)
+    get_ana_inputs_data_list = function(id, oasisapi, ...){
+      tarfile <- get_analyses_inputs_tar(id,  destdir = private$user_destdir, oasisapi)
       data_list <- untar_list(tarfile)
       if (length(data_list) > 0) {
         data_list <- data_list %>%
@@ -148,7 +148,7 @@ DataHub <- R6Class(
       data_list
     },
     get_ana_outputs_data_list = function(id, ...){
-      tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir)
+      tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir, oasisapi)
       data_list <- NULL
       if (file.exists(tarfile)) {
         data_list <- untar_list(tarfile, to_strip = "output")
@@ -250,11 +250,11 @@ DataHub <- R6Class(
 
     # > ANALYSIS METHODS ----
     #extract a input/output file given an analysis id
-    get_ana_dataset_content = function(id, dataset_identifier, type, ...){
+    get_ana_dataset_content = function(id, dataset_identifier, type, oasisapi, ...){
       if (type == "input") {
-        dataset_content <- self$get_ana_inputs_dataset_content(id, dataset_identifier)
+        dataset_content <- self$get_ana_inputs_dataset_content(id, dataset_identifier, oasisapi)
       } else if (type == "output") {
-        dataset_content <- self$get_ana_outputs_dataset_content(id, dataset_identifier)
+        dataset_content <- self$get_ana_outputs_dataset_content(id, dataset_identifier, oasisapi)
       } else {
         dataset_content <- NULL
       }
@@ -267,8 +267,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a inputs file content given an analysis id
-    get_ana_inputs_dataset_content = function(id, dataset_identifier, ...){
-      tarfile <- get_analyses_inputs_tar(id, destdir =  private$user_destdir)
+    get_ana_inputs_dataset_content = function(id, dataset_identifier, oasisapi, ...){
+      tarfile <- get_analyses_inputs_tar(id, destdir =  private$user_destdir, oasisapi)
       dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir =  private$user_destdir)
       dataset_content
     },
@@ -279,8 +279,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a outputs file content given an analysis id
-    get_ana_outputs_dataset_content = function(id, dataset_identifier, ...){
-      tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir)
+    get_ana_outputs_dataset_content = function(id, dataset_identifier, oasisapi, ...){
+      tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir,oasisapi)
       #necessary step because outputs comes with subfolder
       dataset_identifier <- file.path("output", dataset_identifier)
       dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir =  private$user_destdir)
@@ -293,8 +293,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a inputs/outputs file header given an analysis id
-    get_ana_dataset_header = function(id, type, dataset_identifier, ...){
-      tarfile <- get_analyses_tar(id, label = type, destdir =  private$user_destdir)
+    get_ana_dataset_header = function(id, type, dataset_identifier, oasisapi, ...){
+      tarfile <- get_analyses_tar(id, label = type, destdir =  private$user_destdir, oasisapi)
       #necessary step because outputs comes with subfolder
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
@@ -308,9 +308,9 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a inputs/outputs file nrow given an analysis id
-    get_ana_dataset_nrow = function(id, type, dataset_identifier, ...){
+    get_ana_dataset_nrow = function(id, type, dataset_identifier, oasisapi, ...){
       destdir =   private$user_destdir
-      tarfile <- get_analyses_tar(id, label = type, destdir = destdir)
+      tarfile <- get_analyses_tar(id, label = type, destdir = destdir, oasisapi)
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
@@ -324,9 +324,9 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a inputs/outputs file size given an analysis id
-    get_ana_dataset_size = function(id, type, dataset_identifier, ...){
+    get_ana_dataset_size = function(id, type, dataset_identifier, oasisapi, ...){
       destdir =   private$user_destdir
-      tarfile <- get_analyses_tar(id, label = type, destdir = destdir)
+      tarfile <- get_analyses_tar(id, label = type, destdir = destdir, oasisapi)
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
@@ -349,24 +349,23 @@ DataHub <- R6Class(
       invisible()
     },
     #extract analysis validation summary content
-    get_ana_validation_summary_content = function(id, ...){
-      #missing api function for the time being
-      forig <- system.file( "app", "www", "exposure_summary_report.json", package = "flamingo", mustWork = TRUE)
-      json_lst <- jsonlite::read_json(forig, simplifyVector = TRUE)
-
-      dataset_content <- unlist(json_lst) %>%
-        as.data.frame(stringsAsFactors = FALSE)  %>%
-        setNames("vals") %>%
-        mutate(rowname = rownames(.)) %>%
-        separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
-        mutate(type2 = case_when(
-          is.na(type2) ~ "",
-          TRUE ~ paste0(": ", type2)
-        )) %>%
-        unite("type", c("type", "type2"), sep = "") %>%
-        mutate(type = gsub(pattern = "_", replacement = " ", type)) %>%
-        spread(key, 1, convert = TRUE)
-
+    get_ana_validation_summary_content = function(id, oasisapi, ...){
+      json_lst <- self$get_ana_inputs_dataset_content(id, dataset_identifier = "exposure_summary_report.json", oasisapi, ...)
+      dataset_content <- NULL
+      if (!is.null(json_lst)){
+        dataset_content <- unlist(json_lst) %>%
+          as.data.frame(stringsAsFactors = FALSE)  %>%
+          setNames("vals") %>%
+          mutate(rowname = rownames(.)) %>%
+          separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
+          mutate(type2 = case_when(
+            is.na(type2) ~ "",
+            TRUE ~ paste0(": ", type2)
+          )) %>%
+          unite("type", c("type", "type2"), sep = "") %>%
+          mutate(type = gsub(pattern = "_", replacement = " ", type)) %>%
+          spread(key, 1, convert = TRUE)
+      }
       dataset_content
     },
     #invalidate analysis validation summary content

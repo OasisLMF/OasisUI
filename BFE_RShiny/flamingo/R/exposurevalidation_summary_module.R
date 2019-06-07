@@ -103,7 +103,7 @@ exposurevalidationsummary <- function(input,
     counter()
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
-      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID())
+      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID(), session$userData$oasisapi)
       result$perils <- unique(result$summary_tbl$peril)
       updateSelectInput(session, inputId = "input_peril", choices = ifelse(!is.null(result$perils), result$perils, "no perils available for summary"))
     }
@@ -192,42 +192,6 @@ exposurevalidationsummary <- function(input,
       scale_y_continuous(breaks = brks, labels = lbs) +
       facet_wrap(df$peril, ncol = n_plots_row)
     p
-  }
-
-  # dummy read summary.json
-  .read_summary <- function(anaID){
-
-    logMessage(".read_summary called")
-
-    # forig <- "./www/exposure_summary_report.json"
-    # json_lst <- jsonlite::read_json(forig, simplifyVector = TRUE)
-
-    extractFolder <- set_extractFolder(anaID, label = "_inputs/")
-    exposure_summary_report_filepath <- paste0(extractFolder, "exposure_summary_report.json")
-
-    df <- NULL
-
-    if (file.exists(exposure_summary_report_filepath)) {
-      json_lst <- read_json(exposure_summary_report_filepath, simplifyVector = TRUE)
-
-      reg_expr_dot <- "^([^.]+)[.](.+)[.](.+)$"
-
-      df <- unlist(json_lst) %>%
-        as.data.frame(stringsAsFactors = FALSE)  %>%
-        setNames("vals") %>%
-        mutate(rowname = rownames(.)) %>%
-        separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
-        mutate(type2 = case_when(
-          is.na(type2) ~ "",
-          TRUE ~ paste0(": ", type2)
-        )) %>%
-        unite("type", c("type", "type2"), sep = "") %>%
-        mutate(type = gsub(pattern = "_", replacement = " ", type)) %>%
-        spread(key, 1, convert = TRUE)
-    }
-
-    df
-
   }
 
   # reload dataframes

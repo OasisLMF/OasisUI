@@ -10,6 +10,7 @@
 #' @param id A unique integer value identifying this analysis.
 #' @param dest path where to download tar file.
 #' @param label input/output
+#' @param oasisapi as stored in session$userData$oasisapi
 #'
 #' @return API respone.
 #'
@@ -18,7 +19,22 @@
 #' @importFrom httr write_disk
 #'
 #' @export
-api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar")) {
+api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar"), oasisapi) {
+
+  # request_list <- oasisapi$api_write_tar_query(id, "analyses", label, dest)
+
+  # request_list <- expression(list(
+  #   oasisapi$get_url,
+  #   config = add_headers(
+  #     Accept = oasisapi$get_http_type,
+  #     Authorization = sprintf("Bearer %s", oasisapi$get_token)
+  #   ),
+  #   path = paste(oasisapi$get_version, "analyses", id, label, "", sep = "/"),
+  #   write_disk(dest, overwrite = TRUE)
+  # ))
+  # response <- oasisapi$api_fetch_response("GET", request_list)
+  #response needed to place icon
+  # oasisapi$api_handle_response(response)
 
   request_list <- expression(list(
     get_url(),
@@ -34,6 +50,7 @@ api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar")) {
 
   #response needed to place icon
   api_handle_response(response)
+
 }
 
 
@@ -50,9 +67,9 @@ api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar")) {
 #' @return Path to file downloaded.
 #'
 #' @export
-get_analyses_tar <- function(id, label, destdir = tempdir()) {
+get_analyses_tar <- function(id, label, destdir = tempdir(), oasisapi) {
   dest <- tempfile(tmpdir = destdir, fileext = ".tar")
-  response <- api_get_analyses_tar(id, paste0(label, "_file"), dest)
+  response <- api_get_analyses_tar(id, paste0(label, "_file"), dest, oasisapi)
 
   dest
 }
@@ -65,13 +82,14 @@ get_analyses_tar <- function(id, label, destdir = tempdir()) {
 #'
 #' @param id A unique integer value identifying this analysis.
 #' @param destdir path where to download tar file.
+#' @param oasisapi as stored in session$userData$oasisapi.
 #'
 #' @return Path to file downloaded.
 #'
 #' @export
 
-get_analyses_inputs_tar <- function(id, destdir = tempdir()) {
-  get_analyses_tar(id, label = "input", destdir)
+get_analyses_inputs_tar <- function(id, destdir = tempdir(), oasisapi) {
+  get_analyses_tar(id, label = "input", destdir, oasisapi)
 }
 
 #' Get analysis outputs tar path
@@ -87,7 +105,7 @@ get_analyses_inputs_tar <- function(id, destdir = tempdir()) {
 #'
 #' @export
 get_analyses_outputs_tar <- function(id, destdir = tempdir()) {
-  get_analyses_tar(id, label = "output", destdir)
+  get_analyses_tar(id, label = "output", destdir, oasisapi)
 }
 
 #' untar list

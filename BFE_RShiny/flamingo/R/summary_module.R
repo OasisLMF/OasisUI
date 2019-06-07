@@ -317,7 +317,7 @@ summarytab <- function(input, output, session,
           filter(report == variable) %>%
           select(files)
         if (length(fileName$files) > 0) {
-          output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files %>% as.character())
+          output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files %>% as.character(), session$userData$oasisapi)
           if (!is.null(output_file_df)) {
             c <- length(DFList) + 1
             splitvar <- unlist(strsplit(variable, " "))
