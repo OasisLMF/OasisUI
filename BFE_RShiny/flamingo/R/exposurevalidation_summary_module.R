@@ -57,6 +57,7 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT DTOutput
+#' @importFrom jsonlite read_json
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' @importFrom ggplot2 ggplot
@@ -104,7 +105,7 @@ exposurevalidationsummary <- function(input,
     if (length(active()) > 0 && active() && counter() > 0) {
       result$summary_tbl <- .read_summary(analysisID())
       result$perils <- unique(result$summary_tbl$peril)
-      updateSelectInput(session, inputId = "input_peril", choices = result$perils)
+      updateSelectInput(session, inputId = "input_peril", choices = ifelse(!is.null(result$perils), result$perils, "no perils available for summary"))
     }
   })
 
@@ -198,23 +199,32 @@ exposurevalidationsummary <- function(input,
 
     logMessage(".read_summary called")
 
-    forig <- "./www/exposure_summary_report.json"
-    json_lst <- jsonlite::read_json(forig, simplifyVector = TRUE)
+    # forig <- "./www/exposure_summary_report.json"
+    # json_lst <- jsonlite::read_json(forig, simplifyVector = TRUE)
 
-    reg_expr_dot <- "^([^.]+)[.](.+)[.](.+)$"
+    extractFolder <- set_extractFolder(anaID, label = "_inputs/")
+    exposure_summary_report_filepath <- paste0(extractFolder, "exposure_summary_report.json")
 
-    df <- unlist(json_lst) %>%
-      as.data.frame(stringsAsFactors = FALSE)  %>%
-      setNames("vals") %>%
-      mutate(rowname = rownames(.)) %>%
-      separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
-      mutate(type2 = case_when(
-        is.na(type2) ~ "",
-        TRUE ~ paste0(": ", type2)
-      )) %>%
-      unite("type", c("type", "type2"), sep = "") %>%
-      mutate(type = gsub(pattern = "_", replacement = " ", type)) %>%
-      spread(key, 1, convert = TRUE)
+    df <- NULL
+
+    if (file.exists(exposure_summary_report_filepath)) {
+      json_lst <- read_json(exposure_summary_report_filepath, simplifyVector = TRUE)
+
+      reg_expr_dot <- "^([^.]+)[.](.+)[.](.+)$"
+
+      df <- unlist(json_lst) %>%
+        as.data.frame(stringsAsFactors = FALSE)  %>%
+        setNames("vals") %>%
+        mutate(rowname = rownames(.)) %>%
+        separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
+        mutate(type2 = case_when(
+          is.na(type2) ~ "",
+          TRUE ~ paste0(": ", type2)
+        )) %>%
+        unite("type", c("type", "type2"), sep = "") %>%
+        mutate(type = gsub(pattern = "_", replacement = " ", type)) %>%
+        spread(key, 1, convert = TRUE)
+    }
 
     df
 
