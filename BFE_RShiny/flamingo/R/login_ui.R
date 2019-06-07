@@ -14,7 +14,7 @@ loginDialogUI <- function(id) {
   tagList(
 
     tags$div(align = "center", class = "login-dialog",
-             img(src = "img/OASIS_LMF_COLOUR.png", width = "40%",  style = "margin-top:30%" ),
+             img(src = "img/OASIS_LMF_COLOUR.png", width = "40%",  style = "margin-top:20%; max-width:400px;" ),
              tags$input(id = ns("user"), type = "text",
                         placeholder = "username", size = 15),
              tags$input(id = ns("password"), type = "password",
