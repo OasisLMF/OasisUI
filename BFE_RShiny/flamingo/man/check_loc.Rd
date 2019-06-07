@@ -4,7 +4,7 @@
 \alias{check_loc}
 \title{check_loc}
 \usage{
-check_loc(analysisID, portfolioID, data_hub)
+check_loc(analysisID, portfolioID, data_hub, oasisapi)
 }
 \arguments{
 \item{analysisID}{Selected analysis id.}
@@ -12,6 +12,8 @@ check_loc(analysisID, portfolioID, data_hub)
 \item{portfolioID}{selected portfolio ID.}
 
 \item{data_hub}{data hub stored in session$userData$data_hub}
+
+\item{oasisapi}{api stored in session$userData$oasisapi}
 }
 \description{
 Compares uploaded and modeled locations.

@@ -4,7 +4,8 @@
 \alias{api_get_analyses_tar}
 \title{Get analysis tar}
 \usage{
-api_get_analyses_tar(id, label, dest = tempfile(fileext = ".tar"))
+api_get_analyses_tar(id, label, dest = tempfile(fileext = ".tar"),
+  oasisapi)
 }
 \arguments{
 \item{id}{A unique integer value identifying this analysis.}
@@ -12,6 +13,8 @@ api_get_analyses_tar(id, label, dest = tempfile(fileext = ".tar"))
 \item{label}{input/output}
 
 \item{dest}{path where to download tar file.}
+
+\item{oasisapi}{as stored in session$userData$oasisapi}
 }
 \value{
 API respone.

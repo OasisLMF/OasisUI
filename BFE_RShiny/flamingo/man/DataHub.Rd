@@ -47,8 +47,8 @@ LISTS
 \item{\code{get_model_data_list(id)}}{return list of model resources}
 \item{\code{invalidate_model_data_list(id)}}{invalidate list of model resources}
 > Analysis
-\item{\code{get_ana_inputs_data_list(id)}}{return list of analysis inputs}
-\item{\code{get_ana_outputs_data_list(id)}}{return list of analysis outputs}
+\item{\code{get_ana_inputs_data_list(id, oasisapi)}}{return list of analysis inputs}
+\item{\code{get_ana_outputs_data_list(id, oasisapi)}}{return list of analysis outputs}
 \item{\code{invalidate_ana_inputs_data_list(id)}}{invalidate list of analysis inputs}
 \item{\code{invalidate_ana_outputs_data_list(id)}}{invalidate list of analysis outputs}
 
@@ -71,19 +71,19 @@ DATASETS
 > Analysis
 \item{\code{get_ana_dataset_content(id, dataset_identifier, type)}}{extract a input/output file content given an analysis id}
 \item{\code{invalidate_ana_dataset_content(id, dataset_identifier, type)}}{invalidate a input/output file content given an analysis id}
-\item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)}}{extract a inputs file content given an analysis id}
+\item{\code{get_ana_inputs_dataset_content(id, dataset_identifier), oasisapi}}{extract a inputs file content given an analysis id}
 \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)}}{invalidate a inputs file content given an analysis id}
-\item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)}}{extract a outputs file content given an analysis id}
+\item{\code{get_ana_outputs_dataset_content(id, dataset_identifier, oasisapi)}}{extract a outputs file content given an analysis id}
 \item{\code{invalidate_ana_outputs_dataset_content(id,  dataset_identifier)}}{invalidate a outputs file content given an analysis id}
-\item{\code{get_ana_dataset_header(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
+\item{\code{get_ana_dataset_header(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file nrow given an analysis id}
 \item{\code{invalidate_ana_dataset_header(id, type, dataset_identifier)}}{invalidate a inputs/outputs file header given an analysis id}
-\item{\code{get_ana_dataset_nrow(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
+\item{\code{get_ana_dataset_nrow(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file nrow given an analysis id}
 \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
-\item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
+\item{\code{get_ana_dataset_size(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file size given an analysis id}
 \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
 \item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
 \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
-\item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
+\item{\code{get_ana_validation_summary_content(id, oasisapi)}}{extract analysis validation summary content}
 \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
 # > Write file
 \item{\code{write_file}}{Write data into a file file_towrite)}

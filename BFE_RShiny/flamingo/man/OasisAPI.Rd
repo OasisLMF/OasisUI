@@ -75,8 +75,8 @@ Initialize
 
 \section{Usage}{
 
-\preformatted{api_hub <- OasisAPI$new()
-api_hub$method(arg)
+\preformatted{oasisapi <- OasisAPI$new()
+oasisapi$method(arg)
 }
 }
 

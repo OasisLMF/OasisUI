@@ -4,7 +4,7 @@
 \alias{get_analyses_tar}
 \title{Get analysis tar path}
 \usage{
-get_analyses_tar(id, label, destdir = tempdir())
+get_analyses_tar(id, label, destdir = tempdir(), oasisapi)
 }
 \arguments{
 \item{id}{A unique integer value identifying this analysis.}
