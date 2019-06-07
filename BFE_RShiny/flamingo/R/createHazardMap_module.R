@@ -67,10 +67,12 @@ createHazardMap <- function(input, output, session,
       markerColor =  'blue'
     )
 
+    names(file_pins) <- tolower(names(file_pins))
+
     popupData <- tagList(
-      strong("Location ID: "), file_pins$LocNumber,
-      br(), strong("Latitude: "), file_pins$Latitude,
-      br(), strong("Longitude: "), file_pins$Longitude)
+      strong("Location ID: "), file_pins$locnumber,
+      br(), strong("Latitude: "), file_pins$latitude,
+      br(), strong("Longitude: "), file_pins$longitude)
 
     withModalSpinner(
       hazardmap <- leaflet(file_map) %>%
@@ -81,8 +83,8 @@ createHazardMap <- function(input, output, session,
         addLegend(position = "topright",
                   pal = pal,
                   values = file_map$ReturnLevel) %>%
-        addAwesomeMarkers(lng = file_pins$Longitude,
-                          lat = file_pins$Latitude,
+        addAwesomeMarkers(lng = file_pins$longitude,
+                          lat = file_pins$latitude,
                           icon = icon_map,
                           clusterOptions = TRUE,
                           popup = popupData),
