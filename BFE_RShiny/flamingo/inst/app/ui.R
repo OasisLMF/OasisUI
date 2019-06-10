@@ -18,13 +18,13 @@ ui <- function(request) {
       tags$link(rel = "stylesheet", type = "text/css", href = "css/bootstrap.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "css/flamingo-tweaks.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "css/flamingo-table.css"),
-      tags$link(rel = "icon", type = "image/x-icon", href = "img/favicon.png"),
+      tags$link(rel = "icon", type = "image/x-icon", href = "img/favicon_oasis.png"),
       bsplus::use_bs_tooltip()
     ),
     shinyjs::useShinyjs(),
     shinyjs::extendShinyjs(script = system.file("app", "www", "js", "flamingo.js", package = "flamingo")),
 
-    title = "Flamingo",
+    title = "OasisUI",
 
     reactiveConditionalPanelsUI(
       "appUI",
