@@ -37,12 +37,12 @@ api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar"), o
   # oasisapi$api_handle_response(response, warning)
 
   request_list <- expression(list(
-    get_url(),
+    oasisapi$get_url(), # get_url(),
     config = add_headers(
-      Accept = get_http_type(),
+      Accept = oasisapi$get_http_type(), #get_http_type(),
       Authorization = sprintf("Bearer %s", oasisapi$get_token)
     ),
-    path = paste(get_version(), "analyses", id, label, "", sep = "/"),
+    path = paste(oasisapi$get_version(), "analyses", id, label, "", sep = "/"), #paste(get_version(), "analyses", id, label, "", sep = "/"),
     write_disk(dest, overwrite = TRUE)
   ))
 

@@ -4,7 +4,7 @@
 \alias{get_token}
 \title{Get token}
 \usage{
-get_token()
+get_token(oasisapi)
 }
 \value{
 Access token.

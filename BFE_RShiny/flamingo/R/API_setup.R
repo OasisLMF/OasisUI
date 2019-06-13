@@ -106,38 +106,3 @@ get_token <- function(oasisapi) {
 get_http_type <- function() {
   getOption("flamingo.settings.api.httptype")
 }
-
-#' Perform healthcheck
-#'
-#' Gets the current status of the api.
-#'
-#' @rdname api_get_healthcheck
-#'
-#' @return Response containing status of API connection.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#' @importFrom httr status_code
-#'
-#' @export
-api_get_healthcheck <- function() {
-
-  tryCatch(
-    response <- GET(
-      get_url(),
-      config = add_headers(
-        Accept = get_http_type()
-      ),
-      path = "healthcheck/"
-    ),
-    error = function(e) {
-      stop(paste("Health check failed:", e$message))
-    }
-  )
-
-  if (status_code(response) != 200) {
-    stop(paste("Health check failed with:", response$message))
-  }
-
-  return(status_code(response))
-}
