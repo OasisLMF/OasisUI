@@ -26,12 +26,12 @@ api_fetch_response <- function(meth, args, logMessage = message) {
   # probably expired
   if (token_invalid) {
     logMessage("api: refreshing stale OAuth token")
-    res <- api_refresh_token()
-    if (res$status == "Success") {
-      options(flamingo.settings.api.token = content(res$result)$access_token)
-    } else {
+    # res <- api_refresh_token()
+    # if (res$status == "Success") {
+    #   options(flamingo.settings.api.token = content(res$result)$access_token)
+    # } else {
       options(flamingo.settings.api.token = NULL)
-    }
+    # }
     response <- do.call(meth, eval(args, envir = sys.parent()))
   }
   response
@@ -42,7 +42,7 @@ api_fetch_response <- function(meth, args, logMessage = message) {
 api_handle_response <- function(response) {
   # re-route potential warning for logging
   tryCatch(warn_for_status(response),
-           warning = function(w) logWarning(w$message))
+           warning = function(w) warning(w$message))
 
   structure(
     list(
@@ -88,22 +88,11 @@ get_url <- function() {
 #' @return Access token.
 #'
 #' @export
-get_token <- function() {
-  getOption("flamingo.settings.api.token")
+get_token <- function(oasisapi) {
+ # oasisapi$get_access_token()
+ getOption("flamingo.settings.api.token")
 }
 
-#' Get refresh token
-#'
-#' Gets refresh token.
-#'
-#' @rdname get_refresh_token
-#'
-#' @return Refresh token.
-#'
-#' @export
-get_refresh_token <- function() {
-  getOption("flamingo.settings.api.refresh")
-}
 
 #' Get http type
 #'
@@ -117,44 +106,6 @@ get_refresh_token <- function() {
 get_http_type <- function() {
   getOption("flamingo.settings.api.httptype")
 }
-
-#' Post refresh token
-#'
-#' Fetches a new access token from an existing refresh token.
-#'
-#' @rdname api_refresh_token
-#'
-#' @details Passing the `refresh_token` through the authorization header does
-#'   not seem to be standard oauth2 as described in
-#'   <https://tools.ietf.org/html/rfc6749>. This also makes it impossible to use
-#'   `httr`'s built-in oauth2 mechanisms, which would provide automatic token
-#'   refreshing within [httr::POST()], [httr::GET()], etc. Instead we have to
-#'   check outside [httr::POST()] / [httr::GET()] and if necessary, refresh and
-#'   redo the request. See also the unexported `api_fetch_response()`.
-#'
-#' @return List with API return status and response containing the new token.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-#'
-#' @md
-api_refresh_token <- function() {
-
-  response <- POST(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_refresh_token())
-    ),
-    encode = "json",
-    path = "refresh_token/"
-  )
-
-  api_handle_response(response)
-}
-
 
 #' Perform healthcheck
 #'

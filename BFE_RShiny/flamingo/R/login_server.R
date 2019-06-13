@@ -54,7 +54,10 @@ loginDialog <- function(input, output, session, logout) {
         session$userData$data_hub <- DataHub$new(user =  session$userData$oasisapi$get_access_token(), destdir = getOption("flamingo.settings.api.share_filepath"))
       } else {
         result$user = FLAMINGO_GUEST_ID
+        flamingoNotification("Login Failed, please check your credentials.", type = "error")
       }
+      options(flamingo.settings.api.token = session$userData$oasisapi$get_access_token())
+      options(flamingo.settings.api.refresh = session$userData$oasisapi$get_refresh_token())
     }
     logMessage(paste("In Login User: ", result$user))
   })
