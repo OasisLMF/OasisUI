@@ -15,35 +15,7 @@ APIgetenv <- function(...) {
   lapply(list(...), Sys.getenv)
 }
 
-#' API initialization
-#'
-#' Builds API URL.
-#'
-#' @rdname api_init
-#'
-#' @param host Host name.
-#' @param port Host port.
-#' @param scheme Communication scheme.
-#'
-#' @return List containing base API URL and parts.
-#'
-#' @export
-api_init <- function(host, port, scheme = c("http", "https")) {
-  stopifnot(length(host) == 1)
-  stopifnot(length(port) == 1)
 
-  structure(
-    list(
-      host = host,
-      port = port,
-      scheme = scheme[1],
-      url = paste0(scheme[1], "://", host, ":", port)
-    ),
-    class = c("apisettings")
-  )
-}
-
-logWarning <- warning
 
 #' @importFrom httr status_code
 #' @importFrom httr content
@@ -183,35 +155,6 @@ api_refresh_token <- function() {
   api_handle_response(response)
 }
 
-#' Post access token
-#'
-#' Fetches a new access token from a username and password.
-#'
-#' @rdname api_access_token
-#'
-#' @param user Username.
-#' @param pwd Password.
-#'
-#' @return List with API return status and response containing the new token.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-api_access_token <- function(user, pwd) {
-
-  response <- POST(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type()
-    ),
-    body = list(username = user, password = pwd),
-    encode = "json",
-    path = "access_token/"
-  )
-
-  api_handle_response(response)
-}
 
 #' Perform healthcheck
 #'

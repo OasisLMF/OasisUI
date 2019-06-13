@@ -122,10 +122,10 @@ OasisAPI <- R6Class(
       private$url
     },
     # > api response ----
-    api_handle_response = function(response, ...) {
+    api_handle_response = function(response, logerror = print, ...) {
       # re-route potential warning for logging
       tryCatch(warn_for_status(response),
-               warning = function(w) logWarning(w$message))
+               warning = function(w) logerror(w$message))
       structure(
         list(
           status = http_status(response)$category,
