@@ -205,6 +205,14 @@ em.rshiny-footer {
   float: right;
 }
 
+
+/*Force font awesome 5 for all icons (notice leaflet 2.0.2 imports font awesome 4.7.0) */
+i.fa {
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900 !important;
+}
+
+
 .collapsebtn.collapsed:after {
   content: "\f31e";
 }
