@@ -1,35 +1,5 @@
 # Analyses API Calls -----------------------------------------------------------
 
-#' Get analyses id
-#'
-#' Returns the specific analysis entry.
-#'
-#' @rdname api_get_analyses_id
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Previously posted analyses id.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_analyses_id <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "", sep = "/")
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-}
-
 #' Delete analyses id
 #'
 #' Removes an analysis.
@@ -60,39 +30,6 @@ api_delete_analyses_id <- function(id) {
   api_handle_response(response)
 }
 
-#' Post analyses
-#'
-#' Creates an analysis based on the input data.
-#'
-#' @rdname api_post_analyses
-#'
-#' @param name The name of the analysis.
-#' @param portfolio The id of the portfolio.
-#' @param model The id of the model.
-#'
-#' @return The posted analysis.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-api_post_analyses <- function(name, portfolio, model) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept =  get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(name = name, portfolio = portfolio, model = model),
-    encode = "json",
-    path = paste(get_version(), "analyses", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
-}
 
 # R functions calling Analyses API Calls ---------------------------------------
 
