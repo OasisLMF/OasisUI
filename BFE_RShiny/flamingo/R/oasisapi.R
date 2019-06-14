@@ -44,6 +44,7 @@
 #'  \item{\code{set_version(version)}}{Set version private.}
 #'  \item{\code{get_url()}}{Return private url.}
 #'  \item{\code{get_conn_init()}}{Return conn_init.}
+#'  \item{\code{get_http_type()}}{Return http_type.}
 #'  api response
 #'  \item{\code{api_handle_response(response)}}{Handles api response.}
 #'  \item{\code{api_fetch_response(meth, args, logMessage = print)}}{Fetches api response.}
@@ -62,6 +63,7 @@
 #'   redo the request. See also the unexported `api_fetch_response()`.}
 #'  \item{\code{set_refresh_token(user, pwd)}}{Set private refresh token.}
 #'  \item{\code{get_refresh_token()}}{Return private refresh token.}
+#'  \item{\code{post_refresh_token()}}{Post refresh token.}
 #'  version
 #'  \item{\code{set_version()}}{Set private version.}
 #'  \item{\code{get_version()}}{Return private version.}
@@ -105,6 +107,9 @@ OasisAPI <- R6Class(
     set_httptype = function(httptype, ...){
       private$httptype <- httptype
     },
+    get_http_type = function(){
+      private$httptype
+    },
     api_init = function(host, port, scheme = c("http", "https"), ...) {
       stopifnot(length(host) == 1)
       stopifnot(length(port) == 1)
@@ -147,7 +152,7 @@ OasisAPI <- R6Class(
       # probably expired
       if (token_invalid) {
         logMessage("api: refreshing stale OAuth token")
-        res <- self$get_refresh_token()
+        res <- self$post_refresh_token()
         if (res$status == "Success") {
           private$access_token <- content(res$result)$access_token
         } else {
@@ -207,6 +212,19 @@ OasisAPI <- R6Class(
     },
     get_refresh_token = function(){
       private$refresh_token
+    },
+    post_refresh_token = function(){
+      response <- POST(
+        self$get_url(),
+        config = add_headers(
+          Accept = self$get_http_type(),
+          Authorization = sprintf("Bearer %s", self$get_refresh_token())
+        ),
+        encode = "json",
+        path = "refresh_token/"
+      )
+
+      self$api_handle_response(response)
     },
     # > version ----
     get_version = function(){

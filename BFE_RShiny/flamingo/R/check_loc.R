@@ -25,7 +25,6 @@ check_loc <- function(analysisID, portfolioID, data_hub, oasisapi){
 
   uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID) %>%
     mutate(loc_idx = seq(nrow(.)) - 1)
-
   modelled_locs <-  data_hub$get_ana_inputs_dataset_content(analysisID, dataset_identifier = "gul_summary_map.csv", oasisapi)
 
   #dummy to test validation

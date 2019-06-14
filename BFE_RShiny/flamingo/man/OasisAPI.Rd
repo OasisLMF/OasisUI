@@ -44,6 +44,7 @@ Initialize
  \item{\code{set_version(version)}}{Set version private.}
  \item{\code{get_url()}}{Return private url.}
  \item{\code{get_conn_init()}}{Return conn_init.}
+ \item{\code{get_http_type()}}{Return http_type.}
  api response
  \item{\code{api_handle_response(response)}}{Handles api response.}
  \item{\code{api_fetch_response(meth, args, logMessage = print)}}{Fetches api response.}
@@ -62,6 +63,7 @@ Initialize
   redo the request. See also the unexported `api_fetch_response()`.}
  \item{\code{set_refresh_token(user, pwd)}}{Set private refresh token.}
  \item{\code{get_refresh_token()}}{Return private refresh token.}
+ \item{\code{post_refresh_token()}}{Post refresh token.}
  version
  \item{\code{set_version()}}{Set private version.}
  \item{\code{get_version()}}{Return private version.}

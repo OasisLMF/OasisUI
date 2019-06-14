@@ -21,7 +21,7 @@ server <- function(input, output, session) {
   session$userData$oasisapi <- OasisAPI$new(host = APISettings$server, port = APISettings$port, version = APISettings$version)
 
   #health check
-  loginfo(paste("flamingo API server:", session$userData$oasisapi $get_url()), logger = "flamingo.module")
+  loginfo(paste("flamingo API server:", session$userData$oasisapi$get_url()), logger = "flamingo.module")
   tryCatch({
     invisible(session$userData$oasisapi$api_get_healthcheck())
   }, error = function(e) {

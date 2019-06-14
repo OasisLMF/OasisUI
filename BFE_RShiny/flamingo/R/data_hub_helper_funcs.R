@@ -33,10 +33,12 @@ api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar"), o
     write_disk(dest, overwrite = TRUE)
   ))
 
-  response <- api_fetch_response("GET", request_list) # oasisapi$api_fetch_response("GET", request_list)
+   # response <- api_fetch_response("GET", request_list) # oasisapi$api_fetch_response("GET", request_list)
+  response <- oasisapi$api_fetch_response("GET", request_list)
 
   #response needed to place icon
-  api_handle_response(response)  # oasisapi$api_handle_response(response, warning)
+  # api_handle_response(response)  #
+  oasisapi$api_handle_response(response, warning)
 
 }
 
@@ -87,11 +89,12 @@ get_analyses_inputs_tar <- function(id, destdir = tempdir(), oasisapi) {
 #'
 #' @param id A unique integer value identifying this analysis.
 #' @param destdir path where to download tar file.
+#' @param oasisapi as stored in session$userData$oasisapi.
 #'
 #' @return Path to file downloaded.
 #'
 #' @export
-get_analyses_outputs_tar <- function(id, destdir = tempdir()) {
+get_analyses_outputs_tar <- function(id, destdir = tempdir(),oasisapi) {
   get_analyses_tar(id, label = "output", destdir, oasisapi)
 }
 

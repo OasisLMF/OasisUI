@@ -4,12 +4,14 @@
 \alias{get_analyses_outputs_tar}
 \title{Get analysis outputs tar path}
 \usage{
-get_analyses_outputs_tar(id, destdir = tempdir())
+get_analyses_outputs_tar(id, destdir = tempdir(), oasisapi)
 }
 \arguments{
 \item{id}{A unique integer value identifying this analysis.}
 
 \item{destdir}{path where to download tar file.}
+
+\item{oasisapi}{as stored in session$userData$oasisapi.}
 }
 \value{
 Path to file downloaded.

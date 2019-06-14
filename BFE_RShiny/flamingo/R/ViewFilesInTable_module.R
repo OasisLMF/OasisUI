@@ -169,7 +169,7 @@ ViewFilesInTable <- function(input, output, session,
           func <- get(returnfunc)
           fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename)
         } else {
-          fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
+          fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath, oasisapi = session$userData$oasisapi)
         }
         if (!is.null(fileData)) {
           fpath <- session$userData$data_hub$write_file(data = fileData, dataset_identifier = filename)
@@ -375,7 +375,7 @@ ViewFilesInTable <- function(input, output, session,
         }
       }
     } else {
-      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath, oasisapi = session$userData$oasisapi)
       if (!is.null(result$tbl_fileData)) {
         filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath, session$userData$oasisapi)
         filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath, session$userData$oasisapi)
