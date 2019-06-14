@@ -32,6 +32,7 @@
 #' \item{access_token}{String for API log in; default is NULL.}
 #' \item{refresh_token}{String for API access token refresh; default is NULL.}
 #' \item{version}{Parameter for API connection; default is NULL.}
+#' \item{conn_init}{Structure with the api connection info; default is NULL.}
 #' }
 #'
 #' @section Methods:
@@ -42,6 +43,7 @@
 #'  \item{\code{api_init(host, port)}}{Initialize api and set url private.}
 #'  \item{\code{set_version(version)}}{Set version private.}
 #'  \item{\code{get_url()}}{Return private url.}
+#'  \item{\code{get_conn_init()}}{Return conn_init.}
 #'  api response
 #'  \item{\code{api_handle_response(response)}}{Handles api response.}
 #'  \item{\code{api_fetch_response(meth, args, logMessage = print)}}{Fetches api response.}
@@ -116,6 +118,11 @@ OasisAPI <- R6Class(
         class = c("apisettings")
       )
       private$url <- conn_init$url
+      private$conn_init <- conn_init
+    },
+    # > get conn_init ----
+    get_conn_init = function(){
+      private$conn_init
     },
     # > get url ----
     get_url = function(){
@@ -281,6 +288,7 @@ OasisAPI <- R6Class(
     url = NULL,
     access_token = NULL,
     refresh_token = NULL,
-    version = NULL
+    version = NULL,
+    conn_init = NULL
   )
 )

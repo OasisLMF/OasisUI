@@ -30,6 +30,7 @@ R6 Class for OasisUI API Hub.
 \item{access_token}{String for API log in; default is NULL.}
 \item{refresh_token}{String for API access token refresh; default is NULL.}
 \item{version}{Parameter for API connection; default is NULL.}
+\item{conn_init}{Structure with the api connection info; default is NULL.}
 }
 }
 
@@ -42,6 +43,7 @@ Initialize
  \item{\code{api_init(host, port)}}{Initialize api and set url private.}
  \item{\code{set_version(version)}}{Set version private.}
  \item{\code{get_url()}}{Return private url.}
+ \item{\code{get_conn_init()}}{Return conn_init.}
  api response
  \item{\code{api_handle_response(response)}}{Handles api response.}
  \item{\code{api_fetch_response(meth, args, logMessage = print)}}{Fetches api response.}
