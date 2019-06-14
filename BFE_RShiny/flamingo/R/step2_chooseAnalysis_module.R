@@ -683,7 +683,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
     if (!is.null(portfolioID()) && portfolioID()  != "") {
-      tbl_analysesData  <- return_tbl_analysesData()
+      tbl_analysesData  <- return_tbl_analysesData(oasisapi =  session$userData$oasisapi)
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
         result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
       }

@@ -229,7 +229,7 @@ defineID <- function(input, output, session,
 
 
   .reload_tbl_analysesData <- function(){
-    tbl_analysesData <- return_tbl_analysesData()
+    tbl_analysesData <- return_tbl_analysesData(oasisapi =  session$userData$oasisapi)
     if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
       result$tbl_analysesData <- tbl_analysesData  %>%
         filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)

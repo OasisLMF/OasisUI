@@ -949,7 +949,7 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
     if (portfolioID()  != "") {
-      tbl_analysesData  <- return_tbl_analysesData()
+      tbl_analysesData  <- return_tbl_analysesData(oasisapi =  session$userData$oasisapi)
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
         tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
         result$tbl_analysesData <- tbl_analysesData
@@ -991,7 +991,7 @@ step3_configureOutput <- function(input, output, session,
   # Clear Custom Configuration option
   .clearOutputOptions <- function() {
     logMessage(".clearOutputOptions called")
-    tbl_analysesData  <- return_tbl_analysesData()
+    tbl_analysesData  <- return_tbl_analysesData(oasisapi =  session$userData$oasisapi)
     tbl_analysesData <- tbl_analysesData %>% filter(status != Status$Processing & status != Status$Ready)
     namesList <- tbl_analysesData[,tbl_analysesDataNames$name]
     idList <- tbl_analysesData[,tbl_analysesDataNames$id]

@@ -270,15 +270,24 @@ OasisAPI <- R6Class(
     },
     # > return from query ----
     return_df = function(query_path, api_param = "") {
-      content_lst <- content(self$api_get_query(query_path, api_param)$result)
-      if (is.null(names(content_lst))) {
-        df <- strsplit(content_lst, split = "\n") %>%
-          as.data.frame(stringsAsFactors = FALSE)
-        colnames(df) <- df[1, ]
+      content_lst <- content(self$api_get_query(query_path, query_list = api_param)$result)
+
+      if (length(content_lst) > 0) {
+        if (length(content_lst[[1]]) > 1) {
+          content_lst <- lapply(content_lst, function(x) {lapply(x, showname)})
+        } else {
+          content_lst <- lapply(content_lst, showname)
+        }
+        if (length(content_lst) > 1 || length(content_lst[[1]]) > 1) {
+          df <- bind_rows(content_lst) %>%
+            as.data.frame()
+        } else {
+          df <- NULL
+        }
       } else {
-        df <- bind_rows(content_lst) %>%
-          as.data.frame()
+        df <- NULL
       }
+
       df
     }
   ),

@@ -23,19 +23,6 @@ api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar"), o
 
   # request_list <- oasisapi$api_write_tar_query(id, "analyses", label, dest)
 
-  # request_list <- expression(list(
-  #   oasisapi$get_url,
-  #   config = add_headers(
-  #     Accept = oasisapi$get_http_type,
-  #     Authorization = sprintf("Bearer %s", oasisapi$get_token)
-  #   ),
-  #   path = paste(oasisapi$get_version, "analyses", id, label, "", sep = "/"),
-  #   write_disk(dest, overwrite = TRUE)
-  # ))
-  # response <- oasisapi$api_fetch_response("GET", request_list)
-  #response needed to place icon
-  # oasisapi$api_handle_response(response, warning)
-
   request_list <- expression(list(
     oasisapi$get_url(), # get_url(),
     config = add_headers(
@@ -46,10 +33,10 @@ api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar"), o
     write_disk(dest, overwrite = TRUE)
   ))
 
-  response <- api_fetch_response("GET", request_list)
+  response <- api_fetch_response("GET", request_list) # oasisapi$api_fetch_response("GET", request_list)
 
   #response needed to place icon
-  api_handle_response(response)
+  api_handle_response(response)  # oasisapi$api_handle_response(response, warning)
 
 }
 

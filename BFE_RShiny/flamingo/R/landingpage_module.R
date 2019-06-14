@@ -79,7 +79,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
   # Reload Process Runs table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
-    result$tbl_anaInbox <- return_tbl_analysesData()
+    result$tbl_anaInbox <- return_tbl_analysesData(oasisapi =  session$userData$oasisapi)
     logMessage("analyses table refreshed")
     invisible()
   }

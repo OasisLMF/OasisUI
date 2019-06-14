@@ -4,10 +4,12 @@
 \alias{return_tbl_analysesData}
 \title{Return analyses data for DT}
 \usage{
-return_tbl_analysesData(name = "")
+return_tbl_analysesData(name = "", oasisapi)
 }
 \arguments{
 \item{name}{Name of the analyses.}
+
+\item{oasisapi}{as stored in session$userData$oasisapi}
 }
 \value{
 Dataframe of previously posted analyses. Default empty string returns all analyses.

@@ -1,36 +1,5 @@
 # Analyses API Calls -----------------------------------------------------------
 
-#' Get analyses
-#'
-#' Returns a list of analysis objects.
-#'
-#' @rdname api_get_analyses
-#'
-#' @param name The name of the analysis. Default empty string returns all analyses.
-#'
-#' @return Previously posted analyses.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_analyses <- function(name = "") {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", "", sep = "/"),
-    query = list(name = name)
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-}
-
 #' Get analyses id
 #'
 #' Returns the specific analysis entry.
@@ -129,11 +98,12 @@ api_post_analyses <- function(name, portfolio, model) {
 
 #' Return analyses data for DT
 #'
-#' @rdname return_tbl_analysisData
+#' @rdname return_tbl_analysesData
 #'
 #' @description Returns a dataframe of analyses ready for being rendered as a data table.
 #'
 #' @param name Name of the analyses.
+#' @param oasisapi as stored in session$userData$oasisapi
 #'
 #' @return Dataframe of previously posted analyses. Default empty string returns all analyses.
 #'
@@ -146,7 +116,7 @@ api_post_analyses <- function(name, portfolio, model) {
 #' @importFrom dplyr case_when
 #'
 #' @export
-return_tbl_analysesData <- function(name = "") {
+return_tbl_analysesData <- function(name = "", oasisapi) {
 
   .addIcons <- function(df) {
     StatusGood <- "RUN_COMPLETED"
@@ -166,8 +136,7 @@ return_tbl_analysesData <- function(name = "") {
     df
   }
 
-  tbl_analysesData <- return_df(api_get_analyses, name)
-
+  tbl_analysesData <- oasisapi$return_df("analyses", list(name = name))
   if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0 && is.null(tbl_analysesData$detail)) {
     tbl_analysesData <- tbl_analysesData %>%
       select(-contains("file")) %>%
