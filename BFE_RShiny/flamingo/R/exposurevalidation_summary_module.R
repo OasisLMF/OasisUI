@@ -147,7 +147,7 @@ exposurevalidationsummary <- function(input,
   onclick("abuttonexposurerefresh", {
     # Get modeled locations
     withModalSpinner(
-      api_get_analyses_input_file(analysisID()),
+      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID(), session$userData$oasisapi),
       "Refreshing...",
       size = "s"
     )

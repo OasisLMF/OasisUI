@@ -323,39 +323,6 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
   return(analysis_settings)
 }
 
-# Input errors file ------------------------------------------------------------
-
-#' Get analysis input_errors file
-#'
-#' Gets the analysis input_errors_file contents.
-#'
-#' @rdname api_get_analyses_input_errors_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Previously produced analysis input_errors file.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_analyses_input_errors_file <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "input_errors_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-
-}
-
 # Analysis input generation ----------------------------------------------------
 
 #' Post analysis input generation

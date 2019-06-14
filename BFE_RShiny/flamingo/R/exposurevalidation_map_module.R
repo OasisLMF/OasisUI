@@ -190,11 +190,10 @@ exposurevalidationmap <- function(input,
   onclick("abuttonexposurerefresh", {
     # Get modeled locations
     withModalSpinner(
-      api_get_analyses_input_file(analysisID()),
+      .reloadExposureValidation(),
       "Refreshing...",
       size = "s"
     )
-    .reloadExposureValidation()
   })
 
   # Utils functions ------------------------------------------------------------
