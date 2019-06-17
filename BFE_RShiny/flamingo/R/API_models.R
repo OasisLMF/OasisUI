@@ -1,65 +1,3 @@
-# Models API Calls -------------------------------------------------------------
-#' Get models
-#'
-#' Returns a list of model objects.
-#'
-#' @rdname api_get_models
-#'
-#' @param supplier_id The supplier ID for the model. Default is empty string.
-#'
-#' @return Previously posted models. Default empty string returns all models.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_models <- function(supplier_id = "") {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "models", "", sep = "/"),
-    query = list(`supplier_id` = supplier_id)
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-}
-
-#' Get models id
-#'
-#' Returns the specific model entry.
-#'
-#' @rdname api_get_models_id
-#'
-#' @param id A unique integer value identifying a model.
-#'
-#' @return Previously posted models id.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_models_id <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "models", id, "", sep = "/")
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-}
-
 # R functions calling Models API Calls -----------------------------------------
 #' Return models data for DT
 #'
@@ -68,6 +6,7 @@ api_get_models_id <- function(id) {
 #' @description Returns a dataframe of models ready for being rendered as a data table.
 #'
 #' @param supplier_id The supplier ID for the model. Default is empty string.
+#' @param oasisapi as stored in session$userData$oasisapi
 #'
 #' @return Dataframe of previously posted models. Default empty string returns all models.
 #'
@@ -76,9 +15,8 @@ api_get_models_id <- function(id) {
 #' @importFrom dplyr desc
 #'
 #' @export
-return_tbl_modelsData <- function(supplier_id = "") {
-  tbl_modelsData <- return_df(api_get_models, supplier_id)
-
+return_tbl_modelsData <- function(oasisapi, supplier_id = "") {
+  tbl_modelsData <-  oasisapi$return_df("models", api_param = list(`supplier_id` = supplier_id))
   if (!is.null(tbl_modelsData) && nrow(tbl_modelsData) > 0 && is.null(tbl_modelsData$detail)) {
     tbl_modelsData <- convert_created_modified(tbl_modelsData)
     tbl_modelsData <- tbl_modelsData %>%
@@ -102,7 +40,7 @@ return_tbl_modelsData <- function(supplier_id = "") {
 #'
 #' @export
 return_tbl_modelData <- function(id) {
-  tbl_modelData <- return_df(api_get_models_id, id)
+  tbl_modelsData <-  oasisapi$return_df(paste("models", id,  sep = "/"))
 
   if (!is.null(tbl_modelData) && nrow(tbl_modelData) > 0  && is.null(tbl_modelData$detail)) {
     tbl_modelData <- convert_created_modified(tbl_modelData)

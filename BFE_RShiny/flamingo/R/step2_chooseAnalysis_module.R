@@ -259,7 +259,7 @@ step2_chooseAnalysis <- function(input, output, session,
       index <- 1
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData %>% return_tbl_analysesData_nice(),
+        result$tbl_analysesData %>% return_tbl_analysesData_nice(oasisapi = session$userData$oasisapi),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = list(mode = 'single',
@@ -712,7 +712,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadtbl_modelsData <- function() {
     logMessage(".reloadtbl_modelsData called")
     if (!is.null(portfolioID()) && portfolioID() != "") {
-      result$tbl_modelsData <- return_tbl_modelsData()
+      result$tbl_modelsData <- return_tbl_modelsData(oasisapi = session$userData$oasisapi)
       logMessage("models table refreshed")
     } else {
       result$tbl_modelsData <- NULL

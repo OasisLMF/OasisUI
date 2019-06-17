@@ -4,10 +4,12 @@
 \alias{return_tbl_analysesData_nice}
 \title{Return analysis table in nice format for DT}
 \usage{
-return_tbl_analysesData_nice(tbl_analysesData)
+return_tbl_analysesData_nice(tbl_analysesData, oasisapi)
 }
 \arguments{
 \item{tbl_analysesData}{dataframe of analyses}
+
+\item{oasisapi}{as stored in session$userData$oasisapi}
 }
 \value{
 Dataframe of analyses

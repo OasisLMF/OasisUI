@@ -4,9 +4,11 @@
 \alias{return_tbl_modelsData}
 \title{Return models data for DT}
 \usage{
-return_tbl_modelsData(supplier_id = "")
+return_tbl_modelsData(oasisapi, supplier_id = "")
 }
 \arguments{
+\item{oasisapi}{as stored in session$userData$oasisapi}
+
 \item{supplier_id}{The supplier ID for the model. Default is empty string.}
 }
 \value{

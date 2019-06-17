@@ -71,6 +71,7 @@ return_tbl_analysesData <- function(name = "", oasisapi) {
 #' @description Returns a dataframe of analyses prettified for being rendered as a data table.
 #'
 #' @param tbl_analysesData dataframe of analyses
+#' @param oasisapi as stored in session$userData$oasisapi
 #'
 #' @return Dataframe of analyses
 #'
@@ -80,9 +81,9 @@ return_tbl_analysesData <- function(name = "", oasisapi) {
 #' @importFrom dplyr sym
 #'
 #' @export
-return_tbl_analysesData_nice <- function(tbl_analysesData) {
+return_tbl_analysesData_nice <- function(tbl_analysesData, oasisapi) {
   # fetch model data to merge in table
-    tbl_modelsData <- return_tbl_modelsData() %>%
+    tbl_modelsData <- return_tbl_modelsData(oasisapi) %>%
       mutate(supplier = !! sym(tbl_modelsDataNames$supplier_id)) %>%
       select(!! sym(tbl_modelsDataNames$id), !! sym(tbl_modelsDataNames$model_id), supplier, !! sym(tbl_modelsDataNames$version_id))
   # fetch portfolio data to merge in table

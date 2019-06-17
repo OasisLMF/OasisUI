@@ -97,7 +97,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
 
   output$dt_anaInbox <- renderDT(if (!is.null(result$tbl_anaInbox)) {
     datatable(
-      result$tbl_anaInbox %>% return_tbl_analysesData_nice(),
+      result$tbl_anaInbox %>% return_tbl_analysesData_nice(oasisapi = session$userData$oasisapi),
       class = "flamingo-table display",
       rownames = FALSE,
       selection = "single",

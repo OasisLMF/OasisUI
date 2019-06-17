@@ -556,7 +556,7 @@ step3_configureOutput <- function(input, output, session,
       }
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData %>% return_tbl_analysesData_nice(),
+        result$tbl_analysesData %>% return_tbl_analysesData_nice(oasisapi = session$userData$oasisapi),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = list(mode = 'single',
