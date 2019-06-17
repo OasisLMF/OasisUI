@@ -149,7 +149,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
   observeEvent(input$abuttonConfirmDelAna, {
     removeModal()
     analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
-    delete_analyses_id <- api_delete_analyses_id(analysisID)
+    delete_analyses_id <- session$userData$oasisapi$api_delete_query(query_path = paste("analyses", analysisID, sep = "/"))# api_delete_analyses_id(analysisID)
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis id ", analysisID, " deleted."))

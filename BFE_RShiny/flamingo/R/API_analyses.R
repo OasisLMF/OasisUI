@@ -1,37 +1,4 @@
-# Analyses API Calls -----------------------------------------------------------
-
-#' Delete analyses id
-#'
-#' Removes an analysis.
-#'
-#' @rdname api_delete_analyses_id
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Response to analysis deletion.
-#'
-#' @importFrom httr DELETE
-#' @importFrom httr add_headers
-#'
-#' @export
-api_delete_analyses_id <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "", sep = "/")
-  ))
-
-  response <- api_fetch_response("DELETE", request_list)
-
-  api_handle_response(response)
-}
-
-
-# R functions calling Analyses API Calls ---------------------------------------
+# R functions calling Analyses OasisAPI Calls ----------------------------------
 
 #' Return analyses data for DT
 #'

@@ -113,7 +113,7 @@ OasisAPI <- R6Class(
     api_init = function(host, port, scheme = c("http", "https"), ...) {
       stopifnot(length(host) == 1)
       stopifnot(length(port) == 1)
-     conn_init <- structure(
+      conn_init <- structure(
         list(
           host = host,
           port = port,
@@ -167,7 +167,7 @@ OasisAPI <- R6Class(
       response <- POST(
         private$url,
         config = add_headers(
-          Accept = private$http_type
+          Accept = private$httptype
         ),
         body = list(username = user, password = pwd),
         encode = "json",
@@ -193,7 +193,7 @@ OasisAPI <- R6Class(
       response <- POST(
         private$url,
         config = add_headers(
-          Accept = private$http_type,
+          Accept = private$httptype,
           Authorization = sprintf("Bearer %s", private$refresh_token)
         ),
         encode = "json",
@@ -239,7 +239,7 @@ OasisAPI <- R6Class(
         response <- GET(
           private$url,
           config = add_headers(
-            Accept = private$http_type
+            Accept = private$httptype
           ),
           path = "healthcheck/"
         ),
@@ -253,26 +253,28 @@ OasisAPI <- R6Class(
       return(status_code(response))
     },
     # > api query -----
-    api_query = function(query_path, query_list, query_method, ...){
+    api_query = function(query_path, query_list = NULL, query_method, ...){
+
       request_list <- expression(list(
         private$url,
         config = add_headers(
-          Accept = private$http_type,
+          Accept = private$httptype,
           Authorization = sprintf("Bearer %s", private$access_token)
         ),
         path = paste(private$version, query_path, "", sep = "/"),
         query = query_list
       ))
+
       response <- self$api_fetch_response(query_method, request_list)
       self$api_handle_response(response)
     },
-    api_get_query = function(query_path, query_list, ...){
+    api_get_query = function(query_path, query_list = NULL, ...){
       self$api_query(query_path, query_list, "GET", ...)
     },
-    api_post_query = function(query_path, query_list, ...){
+    api_post_query = function(query_path, query_list = NULL, ...){
       self$api_query(query_path, query_list, "POST", ...)
     },
-    api_delete_query = function(query_path, query_list, ...){
+    api_delete_query = function(query_path, query_list = NULL, ...){
       self$api_query(query_path, query_list, "DELETE", ...)
     },
 
