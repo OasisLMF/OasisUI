@@ -282,7 +282,7 @@ OasisAPI <- R6Class(
           Accept = private$http_type,
           Authorization = sprintf("Bearer %s", private$access_token)
         ),
-        path = paste(oasisapi$get_version, query_path, id, label, "", sep = "/"),
+        path = paste(self$get_version, query_path, id, label, "", sep = "/"),
         write_disk(dest, overwrite = TRUE)
       ))
     },
