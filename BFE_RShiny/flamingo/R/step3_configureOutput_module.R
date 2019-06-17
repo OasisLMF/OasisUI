@@ -1014,7 +1014,7 @@ step3_configureOutput <- function(input, output, session,
     .clearOutputOptions()
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelID <- ifelse(modelID == "", -1, modelID)
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
+    tbl_modelsDetails <- session$userData$data_hub$get_model_resource_dataset_content(id = modelID, oasisapi = session$userData$oasisapi)
     if (modelID != -1 && !is.null(tbl_modelsDetails)) {
       model_settings <- tbl_modelsDetails$model_settings %>%
         unlist(recursive = FALSE)
@@ -1160,7 +1160,7 @@ step3_configureOutput <- function(input, output, session,
 
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelData <- return_tbl_modelData(modelID)
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
+    tbl_modelsDetails <- session$userData$data_hub$get_model_resource_dataset_content(id = modelID, oasisapi = session$userData$oasisapi)
     model_settings <- tbl_modelsDetails$model_settings %>%
       unlist(recursive = FALSE)
     model_params_lst <- lapply(names(model_settings), function(i){
