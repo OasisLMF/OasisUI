@@ -82,7 +82,7 @@ DATASETS
 \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
 \item{\code{get_ana_dataset_size(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file size given an analysis id}
 \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
-\item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
+\item{\code{get_ana_settings_content(id, oasisapi)}}{extract analysis settings content}
 \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
 \item{\code{get_ana_validation_summary_content(id, oasisapi)}}{extract analysis validation summary content}
 \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}

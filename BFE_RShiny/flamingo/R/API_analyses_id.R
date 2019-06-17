@@ -44,41 +44,6 @@ return_analyses_input_file_wicons_df <- function(id, data_hub, oasisapi) {
 
 # Settings File ----------------------------------------------------------------
 
-#' Post analysis settings file
-#'
-#' Sets the analysis settings_file contents.
-#'
-#' @rdname api_post_analyses_settings_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#' @param filepath_settings Path to the settings file.
-#'
-#' @return The posted analysis settings file.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#' @importFrom httr upload_file
-#'
-#' @export
-api_post_analyses_settings_file <- function(id, filepath_settings) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(file = upload_file(filepath_settings)),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "settings_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
-}
-
-
 #' Construct analysis settings
 #'
 #' @rdname construct_analysis_settings
@@ -231,33 +196,3 @@ set_extractFilePath <- function(extractFolder, fileName) {
   filePath <- file.path(extractFolder, fileName)
 }
 
-# Run --------------------------------------------------------------------------
-#' Run analyses id
-#'
-#' Returns the analysis status.
-#'
-#' @rdname api_post_analyses_run
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Analysis status.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-api_post_analyses_run <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "run","", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
-}

@@ -651,7 +651,7 @@ step3_configureOutput <- function(input, output, session,
         show("panelDefineOutputs")
         logMessage("showing panelDefineOutputs")
         result$ana_flag <- "R"
-        analysis_settings <- session$userData$data_hub$get_ana_settings_content(result$anaID)
+        analysis_settings <- session$userData$data_hub$get_ana_settings_content(result$anaID, oasisapi = session$userData$oasisapi)
         analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
         if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
           flamingoNotification(type = "error",
@@ -753,7 +753,7 @@ step3_configureOutput <- function(input, output, session,
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
       anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
       anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
-      analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID)
+      analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
       if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
         flamingoNotification(type = "error",
                              paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
@@ -798,8 +798,7 @@ step3_configureOutput <- function(input, output, session,
       flamingoNotification(type = "message",
                            paste0("Analysis settings posted to ", result$anaID ,"."))
 
-      analyses_run <- return_df(api_post_analyses_run,result$anaID)
-
+      analyses_run <-  session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run", sep = "/"), query_method = "POST")
 
       if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
 

@@ -295,8 +295,9 @@ OasisAPI <- R6Class(
     },
 
     # > return from query ----
-    return_df = function(query_path, api_param = "") {
-      content_lst <- content(self$api_get_query(query_path, query_list = api_param)$result)
+    return_df = function(query_path, api_param = "", query_method = "GET") {
+      content_lst <- content(self$api_query(query_path, query_list = api_param,  query_method)$result)
+
       if (length(content_lst) > 0) {
         if (length(content_lst[[1]]) > 1) {
           content_lst <- lapply(content_lst, function(x) {lapply(x, showname)})

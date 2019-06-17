@@ -335,7 +335,7 @@ summarytab <- function(input, output, session,
 
   .getSummary <- function(selectAnaID, portfolioID) {
     #analyses settings
-    analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
+    analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID, oasisapi = session$userData$oasisapi)
     #read aal files
     AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
     if (!is.null(AAL)) {
