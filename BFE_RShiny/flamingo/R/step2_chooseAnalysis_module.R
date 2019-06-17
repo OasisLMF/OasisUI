@@ -702,7 +702,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
     if (!is.null(result$analysisID)) {
-      result$tbl_analysislog <- return_file_df(api_get_analyses_input_generation_traceback_file, result$analysisID)
+      result$tbl_analysislog <- session$userData$oasisapi$return_df(paste( "analyses", result$analysisID, "input_generation_traceback_file", sep = "/"))
     } else {
       result$tbl_analysislog <-  NULL
     }

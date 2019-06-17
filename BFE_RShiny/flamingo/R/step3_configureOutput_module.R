@@ -786,12 +786,13 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonexecuteanarun", {
     analysis_settingsList <- .gen_analysis_settings()
     #write out file to be uploades
-    currfolder <- getOption("flamingo.settings.api.share_filepath")
+    currfolder <- session$userData$data_hub$get_user_destdir()
     dest <- file.path(currfolder, "analysis_settings.json")
     write_json(analysis_settingsList, dest, pretty = TRUE, auto_unbox = TRUE)
 
     #post analysis settings
-    post_analysis_settings_file <- api_post_analyses_settings_file(result$anaID, dest)
+    post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(query_path = paste("analyses",result$anaID, "settings_file", sep = "/"), query_body = dest, query_encode = "multipart")
+
 
     if (post_analysis_settings_file$status == "Success") {
       flamingoNotification(type = "message",
@@ -966,7 +967,7 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
     if (!is.null(result$anaID)) {
-      result$tbl_analysisrunlog <- return_file_df(api_get_analyses_run_traceback_file, result$anaID)
+      session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run_traceback_file", sep = "/"))
     } else {
       result$tbl_analysisrunlog <-  NULL
     }

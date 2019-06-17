@@ -43,35 +43,6 @@ return_analyses_input_file_wicons_df <- function(id, data_hub, oasisapi) {
 }
 
 # Settings File ----------------------------------------------------------------
-#' Get analysis settings file
-#'
-#' Gets the analysis settings_file contents.
-#'
-#' @rdname api_get_analyses_settings_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Previously posted analysis settings file.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_analyses_settings_file <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "settings_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-}
 
 #' Post analysis settings file
 #'
@@ -107,22 +78,6 @@ api_post_analyses_settings_file <- function(id, filepath_settings) {
   api_handle_response(response)
 }
 
-#' Return analyses_settings_file list
-#'
-#' @rdname return_analyses_settings_file_list
-#'
-#' @description Returns a list of analyses_settings.
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return List of analyses_settings_file.
-#'
-#' @importFrom httr content
-#'
-#' @export
-return_analyses_settings_file_list <- function(id) {
-  content(api_get_analyses_settings_file(id)$result)
-}
 
 #' Construct analysis settings
 #'
@@ -241,40 +196,6 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
   return(analysis_settings)
 }
 
-
-# Input generation traceback file ----------------------------------------------
-
-#' Get analysis input_generation_traceback file
-#'
-#' Gets the analysis input_generation_traceback_file contents.
-#'
-#' @rdname api_get_analyses_input_generation_traceback_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Previously produced analysis input_generation_traceback file.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_analyses_input_generation_traceback_file <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "input_generation_traceback_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-
-}
-
 # Output file ------------------------------------------------------------------
 
 #' Define Extract Folder Path
@@ -308,38 +229,6 @@ set_extractFolder <- function(id, label) {
 #' @export
 set_extractFilePath <- function(extractFolder, fileName) {
   filePath <- file.path(extractFolder, fileName)
-}
-
-# Run traceback file -----------------------------------------------------------
-#' Get analysis run_traceback file
-#'
-#' Gets the analysis run_traceback_file contents.
-#'
-#' @rdname api_get_analyses_run_traceback_file
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Previously produced analysis run_traceback file.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_analyses_run_traceback_file <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "run_traceback_file", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-
 }
 
 # Run --------------------------------------------------------------------------

@@ -74,6 +74,7 @@
 #'  \item{\code{api_get_query(uery_path, query_list, ...)}}{Construct GET query to the api.}
 #'  \item{\code{api_post_query(uery_path, query_list, ...)}}{Construct POST query to the api.}
 #'  \item{\code{api_delete_query(uery_path, query_list, ...)}}{Construct DELETE query to the api.}
+#'  \item{\code{api_post_file_query(query_path, query_list = NULL, query_body = NULL, ...)}}{POST file query to the api.}
 #'  }
 #'
 #' @section Usage:
@@ -90,6 +91,7 @@
 #' @importFrom httr http_status
 #' @importFrom httr status_code
 #' @importFrom httr content
+#' @importFrom httr upload_file
 #' @importFrom dplyr bind_rows
 #'
 #' @export
@@ -277,11 +279,24 @@ OasisAPI <- R6Class(
     api_delete_query = function(query_path, query_list = NULL, ...){
       self$api_query(query_path, query_list, "DELETE", ...)
     },
+    api_post_file_query = function(query_path,  query_body = NULL,  ...){
+      request_list <- expression(list(
+        private$url,
+        config = add_headers(
+          Accept = private$httptype,
+          Authorization = sprintf("Bearer %s", private$access_token)
+        ),
+        body = list(file = upload_file(query_body)),
+        encode = "multipart",
+        path = paste(private$version, query_path, "", sep = "/")
+      ))
+      response <- self$api_fetch_response("POST", request_list)
+      self$api_handle_response(response)
+    },
 
     # > return from query ----
     return_df = function(query_path, api_param = "") {
       content_lst <- content(self$api_get_query(query_path, query_list = api_param)$result)
-
       if (length(content_lst) > 0) {
         if (length(content_lst[[1]]) > 1) {
           content_lst <- lapply(content_lst, function(x) {lapply(x, showname)})

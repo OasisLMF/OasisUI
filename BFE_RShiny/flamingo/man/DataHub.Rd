@@ -36,7 +36,8 @@ R6 Class for OasisUI Data Hub.
 \describe{
 
 Initialize
- \item{\code{create_destdir(user, destir)}}{create and return path of user specific foder}
+\item{\code{create_destdir(user, destir)}}{create and return path of user specific foder}
+\item{\code{get_user_destdir()}}{return path of user specific foder}
 
 LISTS
 

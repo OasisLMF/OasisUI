@@ -35,7 +35,8 @@
 #' \describe{
 #'
 #' Initialize
-#'  \item{\code{create_destdir(user, destir)}}{create and return path of user specific foder}
+#' \item{\code{create_destdir(user, destir)}}{create and return path of user specific foder}
+#' \item{\code{get_user_destdir()}}{return path of user specific foder}
 #'
 #' LISTS
 #'
@@ -111,6 +112,9 @@ DataHub <- R6Class(
       private$user <- user
       private$user_destdir <- file.path(destdir, private$user)
       dir.create(private$user_destdir, showWarnings = FALSE)
+    },
+    get_user_destdir = function(){
+      private$user_destdir
     },
     # LISTS ----
     # > Portfolio ----
@@ -340,8 +344,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract analysis settings content
-    get_ana_settings_content = function(id, ...){
-      dataset_content <- return_analyses_settings_file_list(id)
+    get_ana_settings_content = function(id, oasisapi, ...){
+      dataset_content <- oasisapi$api_get_query(query_path = paste("analyses", id, "settings_file",  sep = "/"))
       dataset_content
     },
     #invalidate analysis settings content

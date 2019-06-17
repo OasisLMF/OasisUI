@@ -74,6 +74,7 @@ Initialize
  \item{\code{api_get_query(uery_path, query_list, ...)}}{Construct GET query to the api.}
  \item{\code{api_post_query(uery_path, query_list, ...)}}{Construct POST query to the api.}
  \item{\code{api_delete_query(uery_path, query_list, ...)}}{Construct DELETE query to the api.}
+ \item{\code{api_post_file_query(query_path, query_list = NULL, query_body = NULL, ...)}}{POST file query to the api.}
  }
 }
 
