@@ -4,10 +4,14 @@
 \alias{return_analyses_input_file_wicons_df}
 \title{Return analyses input files dataframe with icons}
 \usage{
-return_analyses_input_file_wicons_df(id)
+return_analyses_input_file_wicons_df(id, data_hub, oasisapi)
 }
 \arguments{
 \item{id}{A unique integer value identifying this analysis.}
+
+\item{oasisapi}{as stored in session$userData$oasisapi.}
+
+\item{datahub}{as stored in session$userData$datahub}
 }
 \value{
 Dataframe of input files with icons.

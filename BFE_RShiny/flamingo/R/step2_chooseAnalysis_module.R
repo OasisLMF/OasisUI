@@ -321,8 +321,7 @@ step2_chooseAnalysis <- function(input, output, session,
       hide("panelModelTable")
       hide("panelAnalysisGenInputs")
       hide("panelModelDetails")
-      input_generation_id <- api_post_analyses_generate_inputs(result$analysisID)
-
+      input_generation_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
       if (input_generation_id$status == "Success") {
         flamingoNotification(type = "message",
                              paste0("Input generation for analysis id ", result$analysisID, " started."))
@@ -375,7 +374,7 @@ step2_chooseAnalysis <- function(input, output, session,
     removeModal()
 
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-    delete_analyses_id <- api_post_analyses_cancel_generate_inputs(analysisID)
+    delete_analyses_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", analysisID, "cancel_generate_inputs",  sep = "/"))
 
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",

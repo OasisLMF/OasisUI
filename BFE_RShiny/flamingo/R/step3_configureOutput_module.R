@@ -599,7 +599,8 @@ step3_configureOutput <- function(input, output, session,
 
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     #should use /v1/analyses/{id}/cancel/
-    delete_analyses_id <- api_post_analyses_cancel(analysisID)
+    delete_analyses_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", analsisID, "cancel",  sep = "/"))
+
 
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",

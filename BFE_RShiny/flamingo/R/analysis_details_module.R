@@ -60,25 +60,6 @@ analysis_details <- function(input,
 
   ns <- session$ns
 
-  # Download inputs ------------------------------------------------------------
-  observeEvent({
-    counter()
-  }, {
-    if (length(counter()) > 0 && counter() > 0) {
-      if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
-          (!is.null(analysisID()))) {
-        extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
-        if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
-          withModalSpinner(
-            api_get_analyses_input_file(analysisID()),
-            "Loading...",
-            size = "s"
-          )
-        }
-      }
-    }
-  })
-
   # Tab Exposure Validation ----------------------------------------------------
   callModule(
     exposurevalidationsummary,

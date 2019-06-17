@@ -1,52 +1,4 @@
 # Input File -------------------------------------------------------------------
-#' Get analysis input file
-#'
-#' @rdname api_get_analyses_input_file
-#'
-#' @description Downloads the analysis input files.
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return Previously posted analysis input file.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#' @importFrom httr write_disk
-#' @importFrom utils untar
-#'
-#' @export
-api_get_analyses_input_file <- function(id) {
-
-  currfolder <- getOption("flamingo.settings.api.share_filepath")
-  dest <- file.path(currfolder, paste0(id, "_inputs.tar"))
-  extractFolder <- set_extractFolder(id, label = "_inputs/")
-  dir.create(extractFolder, showWarnings = FALSE)
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "analyses", id, "input_file", "", sep = "/"),
-    write_disk(dest, overwrite = TRUE)
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  untar(tarfile = dest, exdir = extractFolder)
-
-  # wait for untar to finish
-  oldfileList <- NULL
-  while (all.equal(oldfileList, list.files(extractFolder)) != TRUE) {
-    oldfileList <- list.files(extractFolder)
-    Sys.sleep(2)
-  }
-
-  #response needed in step2 to place icon
-  api_handle_response(response)
-}
-
 #' Return analyses input files dataframe with icons
 #'
 #' @rdname return_analyses_input_file_wicons_df
@@ -54,74 +6,40 @@ api_get_analyses_input_file <- function(id) {
 #' @description Returns a dataframe of input files with icons.
 #'
 #' @param id A unique integer value identifying this analysis.
+#' @param datahub as stored in session$userData$datahub
+#' @param oasisapi as stored in session$userData$oasisapi.
 #'
 #' @return Dataframe of input files with icons.
 #'
+#' @importFrom dplyr mutate
+#'
 #' @export
-return_analyses_input_file_wicons_df <- function(id) {
+return_analyses_input_file_wicons_df <- function(id, data_hub, oasisapi) {
 
-  extractFolder <- set_extractFolder(id, label = "_inputs/")
   status_code_notfound <- 404
 
-  analyses_input_file_df <- list.files(extractFolder, recursive = TRUE) %>% as.data.frame(stringsAsFactors = FALSE) %>% setNames("files")
+  analyses_input_file_df <- data_hub$get_ana_inputs_data_list(id, oasisapi) %>%
+    mutate(status = status_code_notfound) %>%
+    as.data.frame()
 
   if (nrow(analyses_input_file_df) > 0) {
-    fnames <- analyses_input_file_df$files
-    fnum <- length(fnames)
-    status <- data.frame(status = rep(status_code_notfound, fnum))
-    for (i in seq(fnum) ) {
-      fname <- as.character(fnames[i])
-      filePath <- set_extractFilePath(extractFolder, fname)
-      info <- file.info(filePath)
-
-      if (is.na(info$size)) {
-        status[i, "status"] <- Status$Processing
-      } else if (info$size == 0) {
-        status[i, "status"] <- Status$Failed
+    analyses_input_file_df$status <- sapply(analyses_input_file_df$files, function(fname){
+      size <- data_hub$get_ana_dataset_size(id, type = "input", dataset_identifier = fname, oasisapi)
+      if (is.na(size)) {
+        status <- Status$Processing
+      } else if (size == 0) {
+        status <- Status$Failed
       } else {
-        status[i, "status"] <- Status$Completed
+        status <- Status$Completed
       }
-    }
-    analyses_input_file_df <- cbind(analyses_input_file_df, status) %>%
-      as.data.frame()
-  } else {
+      status
+    })
+  } else{
     analyses_input_file_df <- NULL
   }
+
+
   analyses_input_file_df
-}
-
-# Cancel analysis --------------------------------------------------------------
-
-#' Cancel analysis
-#'
-#' Cancel the selected analysis.
-#'
-#' @rdname api_post_analyses_cancel
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return The cancelled analysis.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-api_post_analyses_cancel <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(id = id),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "cancel", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
 }
 
 # Settings File ----------------------------------------------------------------
@@ -323,71 +241,6 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
   return(analysis_settings)
 }
 
-# Analysis input generation ----------------------------------------------------
-
-#' Post analysis input generation
-#'
-#' Sets the analysis generate_inputs contents.
-#'
-#' @rdname api_post_analyses_generate_inputs
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return The posted analysis input generation.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-api_post_analyses_generate_inputs <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(id = id),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "generate_inputs", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
-}
-
-#' Cancel analysis input generation
-#'
-#' Cancel the input generation process for the analysis.
-#'
-#' @rdname api_post_analyses_cancel_generate_inputs
-#'
-#' @param id A unique integer value identifying this analysis.
-#'
-#' @return The cancelled analysis input generation.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-api_post_analyses_cancel_generate_inputs <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(id = id),
-    encode = "multipart",
-    path = paste(get_version(), "analyses", id, "cancel_generate_inputs", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
-}
 
 # Input generation traceback file ----------------------------------------------
 

@@ -89,14 +89,6 @@ anainputs <- function(input,
       if (!refresh_opt) {
         hide("refresh_ana")
       }
-      extractFolder <- set_extractFolder(id = analysisID(), label = "_inputs/")
-      if (!dir.exists(extractFolder) || is.na(file.size(extractFolder))) {
-        withModalSpinner(
-          api_get_analyses_input_file(analysisID()),
-          "Loading...",
-          size = "s"
-        )
-      }
       .reloadInputs()
     }
   })
@@ -112,11 +104,6 @@ anainputs <- function(input,
 
   # reload Generated Inputs table-----------------------------------------------
   onclick("abuttonanainputrefresh", {
-    withModalSpinner(
-      api_get_analyses_input_file(analysisID()),
-      "Refreshing...",
-      size = "s"
-    )
     .reloadInputs()
   })
 
@@ -124,7 +111,13 @@ anainputs <- function(input,
   .reloadInputs <- function(){
     logMessage(".reloadInputs called")
     if (!is.null(analysisID())) {
-      dt_generated <- return_analyses_input_file_wicons_df(analysisID())
+      withModalSpinner(
+        dt_generated <- return_analyses_input_file_wicons_df(analysisID(), session$userData$data_hub,  session$userData$oasisapi),
+        "Loading...",
+        size = "s"
+      )
+
+
     } else {
       dt_generated <-  NULL
     }
