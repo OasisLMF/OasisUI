@@ -96,8 +96,8 @@ visualizationCBR <- function(input, output, session,
   observeEvent( {
     sub_modules$defineID1$selectAnaID()
     sub_modules$defineID2$selectAnaID()}, {
-      result$tbl_filesListDataana1 <- session$userData$data_hub$get_ana_outputs_data_list(sub_modules$defineID1$selectAnaID())
-      result$tbl_filesListDataana2 <- session$userData$data_hub$get_ana_outputs_data_list(sub_modules$defineID2$selectAnaID())
+      result$tbl_filesListDataana1 <- session$userData$data_hub$get_ana_outputs_data_list(sub_modules$defineID1$selectAnaID(), oasisapi = session$userData$oasisapi)
+      result$tbl_filesListDataana2 <- session$userData$data_hub$get_ana_outputs_data_list(sub_modules$defineID2$selectAnaID(), oasisapi = session$userData$oasisapi)
     })
 
   # Tab Output files -----------------------------------------------------------

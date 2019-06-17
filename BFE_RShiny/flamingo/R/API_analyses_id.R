@@ -160,39 +160,3 @@ construct_analysis_settings <- function(inputsettings, outputsLossTypes) {
 
   return(analysis_settings)
 }
-
-# Output file ------------------------------------------------------------------
-
-#' Define Extract Folder Path
-#'
-#' @rdname set_extractFolder
-#'
-#' @description constructs the path to the folder where to extract files
-#'
-#' @return extractFolder
-#'
-#' @param id A unique integer value identifying this analysis.
-#' @param label either input or output
-#'
-#' @export
-set_extractFolder <- function(id, label) {
-  currfolder <- getOption("flamingo.settings.api.share_filepath")
-  extractFolder <- file.path(currfolder, paste0(id, label))
-}
-
-#' Define File to extract Path
-#'
-#' @rdname set_extractFilePath
-#'
-#' @description constructs the path to the file to extract
-#'
-#' @return filePath
-#'
-#' @param extractFolder path to the folder where the file is placed
-#' @param fileName name of the file
-#'
-#' @export
-set_extractFilePath <- function(extractFolder, fileName) {
-  filePath <- file.path(extractFolder, fileName)
-}
-

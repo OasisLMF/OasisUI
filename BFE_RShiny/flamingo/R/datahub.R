@@ -151,7 +151,7 @@ DataHub <- R6Class(
       }
       data_list
     },
-    get_ana_outputs_data_list = function(id, ...){
+    get_ana_outputs_data_list = function(id, oasisapi, ...){
       tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir, oasisapi)
       data_list <- NULL
       if (file.exists(tarfile)) {
@@ -160,7 +160,7 @@ DataHub <- R6Class(
           data_list <- data_list %>%
             as.data.frame() %>%
             setNames("files")
-          analysis_settings <- self$get_ana_settings_content(id, oasisapi)
+          analysis_settings <-self$get_ana_settings_content(id, oasisapi)
           data_list <- cbind(data_list,
                              do.call(rbind.data.frame,
                                      lapply(data_list$files,
@@ -346,7 +346,7 @@ DataHub <- R6Class(
     #extract analysis settings content
     get_ana_settings_content = function(id, oasisapi, ...){
       dataset_content <- oasisapi$api_get_query(query_path = paste("analyses", id, "settings_file",  sep = "/"))
-      dataset_content
+      content(dataset_content$result)
     },
     #invalidate analysis settings content
     invalidate_ana_settings_content = function(id, ...){

@@ -367,7 +367,7 @@ ViewFilesInTable <- function(input, output, session,
         filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
         result$currentFile <- paste0(result$currentFile, ".csv")
         #Show buttons
-        if ("latitude" %in% names(result$tbl_fileData) && !is.null(result$tbl_fileData)) {
+        if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
           output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
           show("abuttonmap")
         } else {
@@ -382,7 +382,7 @@ ViewFilesInTable <- function(input, output, session,
       }
 
       #Show buttons
-      if ("latitude" %in% names(result$tbl_fileData)) {
+      if ("latitude" %in% tolower(names(result$tbl_fileData))) {
         if (!is.null(result$tbl_fileData)) {
           output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
         }

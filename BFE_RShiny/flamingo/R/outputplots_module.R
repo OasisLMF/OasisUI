@@ -386,11 +386,6 @@ panelOutputModule <- function(input, output, session,
     # > read files to plot -----------------------------------------------------
     if (!is.null(filesToPlot)) {
       for (i in seq(nrow(filesToPlot))) { # i<- 1
-        # extractFolder <- set_extractFolder(id = anaID(), label = "_outputs/output")
-        # fileName <- set_extractFilePath(extractFolder, filesToPlot$files[i])
-        #   oasisBasePath <- "/home/mirai/Desktop/Rprojects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
         currfileData <- .readFile(filesToPlot$files[i])
         if (nrow(currfileData) > 0) {
           #Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
