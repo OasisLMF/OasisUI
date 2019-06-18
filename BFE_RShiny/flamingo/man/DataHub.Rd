@@ -42,7 +42,7 @@ Initialize
 LISTS
 
 > Portfolio
-\item{\code{get_pf_data_list(id)}}{return list of portfolio source files}
+\item{\code{get_pf_data_list(id, oasisapi)}}{return list of portfolio source files}
 \item{\code{invalidate_pf_data_list(id)}}{invalidate list of portfolio source files}
 > Model
 \item{\code{get_model_data_list(id)}}{return list of model resources}
@@ -62,7 +62,7 @@ DATASETS
 \item{\code{invalidate_pf_location_content(id)}}{invalidate a source file (location/account...) content given a portfolio id}
 \item{\code{get_pf_dataset_header(id, dataset_identifier)}}{extract a source file (location/account...) header given a portfolio id}
 \item{\code{invalidate_pf_dataset_header(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
-\item{\code{get_pf_dataset_nrow(id, dataset_identifier)}}{extract a source file (location/account...) nrow given a portfolio id}
+\item{\code{get_pf_dataset_nrow(id, dataset_identifier, oasisapi)}}{extract a source file (location/account...) nrow given a portfolio id}
 \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
 > Model
 \item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
@@ -94,7 +94,7 @@ DATASETS
 \section{Usage}{
 
 \preformatted{data_hub <- DataHub$new()
-data_hub$get_pf_data_list(id)
+data_hub$get_pf_data_list(id, oasisapi)
 }
 }
 

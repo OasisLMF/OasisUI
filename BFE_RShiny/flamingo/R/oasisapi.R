@@ -74,8 +74,9 @@
 #'  \item{\code{api_get_query(uery_path, query_list, ...)}}{Construct GET query to the api.}
 #'  \item{\code{api_post_query(uery_path, query_list, ...)}}{Construct POST query to the api.}
 #'  \item{\code{api_delete_query(uery_path, query_list, ...)}}{Construct DELETE query to the api.}
-#'  \item{\code{api_post_file_query(query_path, query_list = NULL, query_body = NULL, ...)}}{POST file query to the api.}
-#'  }
+#'  \item{\code{api_post_file_query(query_path, query_body = NULL, ...)}}{POST file query to the api.}
+#'  \item{\code{api_body_query(query_path, query_body = NULL, query_method = "POST", ...)}}{PUT/POST query with body field to the api.}
+#' }
 #'
 #' @section Usage:
 #' \preformatted{oasisapi <- OasisAPI$new()
@@ -86,6 +87,7 @@
 #' @importFrom httr GET
 #' @importFrom httr POST
 #' @importFrom httr DELETE
+#' @importFrom httr PUT
 #' @importFrom httr add_headers
 #' @importFrom httr warn_for_status
 #' @importFrom httr http_status
@@ -291,6 +293,20 @@ OasisAPI <- R6Class(
         path = paste(private$version, query_path, "", sep = "/")
       ))
       response <- self$api_fetch_response("POST", request_list)
+      self$api_handle_response(response)
+    },
+    api_body_query = function(query_path,  query_body = NULL, query_method = "POST", ...){
+      request_list <- expression(list(
+        private$url,
+        config = add_headers(
+          Accept = private$httptype,
+          Authorization = sprintf("Bearer %s", private$access_token)
+        ),
+        body = query_body,
+        encode = "json",
+        path = paste(private$version, query_path, "", sep = "/")
+      ))
+      response <- self$api_fetch_response(query_method, request_list)
       self$api_handle_response(response)
     },
 

@@ -199,7 +199,7 @@ singleAna <- function(input, output, session,
   # > prog Table reactives -----------------------------------------------------
   observeEvent(submodulesList$step1_choosePortfolio$tbl_portfoliosData(), ignoreInit = TRUE,{
     if (is.null(submodulesList$step1_choosePortfolio$tbl_portfoliosData()) || nrow(submodulesList$step1_choosePortfolio$tbl_portfoliosData()) == 0) {
-      result$tbl_portfoliosData <- return_tbl_portfoliosData()
+      result$tbl_portfoliosData <- return_tbl_portfoliosData(oasisapi = session$userData$oasisapi)
     } else {
       result$tbl_portfoliosData <- submodulesList$step1_choosePortfolio$tbl_portfoliosData()
     }

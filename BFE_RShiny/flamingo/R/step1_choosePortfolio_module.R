@@ -434,7 +434,7 @@ step1_choosePortfolio <- function(input, output, session,
     idxSel <- 1
     pageSel <- 1
     if (result$portfolio_flag == "C") {
-      post_portfolios <- api_post_portfolios(input$tinputpfName)
+      post_portfolios <- session$userData$oasisapi$api_body_query(query_path = "portfolios", query_body = list(name = input$tinputpfName), query_method = "POST")
       if (post_portfolios$status == "Success") {
         flamingoNotification(type = "message",
                              paste0("Portfolio ", input$tinputpfName, " created."))
@@ -448,7 +448,7 @@ step1_choosePortfolio <- function(input, output, session,
       idxSel <- input$dt_Portfolios_rows_selected
       pageSel <- ceiling(input$dt_Portfolios_rows_selected/pageLength)
       pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
-      put_portfolios_id <- api_put_portfolios_id(id = pfId, name = input$tinputpfName)
+      put_portfolios_id <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", pfId, sep = "/"), query_body = list(name = input$tinputpfName), query_method = "PUT")
       if (put_portfolios_id$status == "Success") {
         flamingoNotification(type = "message",
                              paste0("Portfolio ", pfId, " updated."))
@@ -504,7 +504,7 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelLinkFiles")
     pfid <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
-    delete_portfolios_id <- api_delete_portfolios_id(pfid)
+    delete_portfolios_id <- session$userData$oasisapi$api_delete_query(query_path = paste("portfolios", pfid, sep = "/"))
     if (delete_portfolios_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Portfolio ", pfName, "deleted."))
@@ -569,7 +569,7 @@ step1_choosePortfolio <- function(input, output, session,
   }
 
   # Upload Location/Account File
-  .uploadSourceFile <- function(inFile, APIfunction){
+  .uploadSourceFile <- function(inFile, query_path ){
     logMessage(paste0("Uploading file ", inFile$datapath))
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     if (!is.null(inFile$datapath)) {
@@ -578,7 +578,7 @@ step1_choosePortfolio <- function(input, output, session,
       newfile <- paste0(datapath, inFile$name)
       file.rename(inFile$datapath, newfile)
       withModalSpinner(
-        post_file <- APIfunction(pfId, newfile),
+        post_file <- session$userData$oasisapi$api_post_file_query( paste("portfolios", pfId, query_path, sep = "/"),  query_body = newfile),
         "Linking...",
         size = "s"
       )
@@ -598,7 +598,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   onclick("abuttonSLFileUpload", {
-    .uploadSourceFile(inFile = result$SLFile, api_post_portfolios_location_file)
+    .uploadSourceFile(inFile = result$SLFile, query_path = "location_file")
   })
 
   observeEvent(input$SAFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -606,7 +606,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   onclick("abuttonSAFileUpload", {
-    .uploadSourceFile(inFile = result$SAFile, api_post_portfolios_accounts_file)
+    .uploadSourceFile(inFile = result$SAFile, query_path = "accounts_file")
   })
 
   observeEvent(input$SRFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -614,7 +614,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   onclick("abuttonSRFileUpload", {
-    .uploadSourceFile(inFile = result$SRFile, api_post_portfolios_reinsurance_info_file)
+    .uploadSourceFile(inFile = result$SRFile, query_path = "reinsurance_info_file")
   })
 
   observeEvent(input$SRSFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -622,7 +622,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   onclick("abuttonSRSFileUpload", {
-    .uploadSourceFile(inFile = result$SRSFile, api_post_portfolios_reinsurance_source_file)
+    .uploadSourceFile(inFile = result$SRSFile, query_path = "reinsurance_source_file")
   })
 
   # Define portfolioID ---------------------------------------------------------
@@ -737,7 +737,7 @@ step1_choosePortfolio <- function(input, output, session,
   # Reload portfolio table
   .reloadtbl_portfoliosData <- function() {
     logMessage(".reloadtbl_portfoliosData called")
-    result$tbl_portfoliosData <- return_tbl_portfoliosData()
+    result$tbl_portfoliosData <- return_tbl_portfoliosData(oasisapi = session$userData$oasisapi)
     logMessage("portfolio table refreshed")
     invisible()
   }

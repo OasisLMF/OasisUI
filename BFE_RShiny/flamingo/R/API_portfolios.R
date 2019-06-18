@@ -1,196 +1,3 @@
-# Portfolio API calls ----------------------------------------------------------
-
-#' Get portfolios
-#'
-#' Returns a list of portfolio objects.
-#'
-#' @rdname api_get_portfolios
-#'
-#' @param name Name of the portfolio. Default empty string returns all portfolios.
-#'
-#' @return Previously posted portfolios.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_portfolios <- function(name = "") {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "portfolios", "", sep = "/"),
-    query = list(name = name)
-  ))
-
-  response <- api_fetch_response("GET", request_list)
-
-  api_handle_response(response)
-}
-
-#' Post portfolios
-#'
-#' Creates a portfolio based on the input data.
-#'
-#' @rdname api_post_portfolios
-#'
-#' @param name Name of the portfolio.
-#'
-#' @return The posted portfolio.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-api_post_portfolios <- function(name) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(name = name),
-    encode = "json",
-    path = paste(get_version(), "portfolios", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
-}
-
-#' Put portfolios id
-#'
-#' Updates the specified analysis.
-#'
-#' @rdname api_put_portfolios_id
-#'
-#' @param name Name of the portfolio.
-#' @param id A unique integer value identifying this portfolio.
-#'
-#' @return The updated analysis.
-#'
-#' @importFrom httr PUT
-#' @importFrom httr add_headers
-#'
-#' @export
-api_put_portfolios_id <- function(id, name) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())#,
-    ),
-    body = list(name = name),
-    encode = "json",
-    path = paste(get_version(), "portfolios", id, "", sep = "/")
-  ))
-
-  response <- api_fetch_response("PUT", request_list)
-
-  api_handle_response(response)
-}
-
-#' Get portfolios info by id
-#'
-#' Returns the specific portfolio entry.
-#'
-#' @rdname api_get_portfolios_id
-#'
-#' @param id A unique integer value identifying this portfolio.
-#'
-#' @return Previously posted portfolios id.
-#'
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#'
-#' @export
-api_get_portfolios_id <- function(id) {
-
-  if (!is.null(id)){
-    request_list <- expression(list(
-      get_url(),
-      config = add_headers(
-        Accept = get_http_type(),
-        Authorization = sprintf("Bearer %s", get_token())
-      ),
-      path = paste(get_version(), "portfolios", id, "", sep = "/")
-    ))
-
-    response <- api_fetch_response("GET", request_list)
-
-    res <- api_handle_response(response)
-  } else {
-    res <- NULL
-  }
-
-}
-
-#' Delete portfolios by id
-#'
-#' @rdname api_delete_portfolios_id
-#'
-#' @param id A unique integer value identifying this portfolio.
-#'
-#' @importFrom httr DELETE
-#' @importFrom httr add_headers
-#'
-#' @export
-api_delete_portfolios_id <- function(id) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    path = paste(get_version(), "portfolios", id, "", sep = "/")
-  ))
-
-  response <- api_fetch_response("DELETE", request_list)
-
-  api_handle_response(response)
-}
-
-#' Post portfolios create analysis
-#'
-#' Creates an analysis object from the portfolio.
-#'
-#' @rdname api_post_portfolios_create_analysis
-#'
-#' @param name Name of the portfolio.
-#' @param id A unique integer value identifying this analysis.
-#' @param model Id of the model.
-#'
-#' @return The posted portfolio analysis created.
-#'
-#' @importFrom httr POST
-#' @importFrom httr add_headers
-#'
-#' @export
-api_post_portfolios_create_analysis <- function(id, name, model) {
-
-  request_list <- expression(list(
-    get_url(),
-    config = add_headers(
-      Accept = get_http_type(),
-      Authorization = sprintf("Bearer %s", get_token())
-    ),
-    body = list(name = name, model = model),
-    encode = "json",
-    path = paste(get_version(), "portfolios", id, "create_analysis", "", sep = "/")
-  ))
-
-  response <- api_fetch_response("POST", request_list)
-
-  api_handle_response(response)
-}
-
 # R functions calling Portfolio API functions and manipulating the output ------
 
 #' Return portfolios data for DT
@@ -200,6 +7,7 @@ api_post_portfolios_create_analysis <- function(id, name, model) {
 #' @description Returns a dataframe of portfolios ready for being rendered as a data table.
 #'
 #' @param name Name of the portfolio.
+#' @param oasisapi as stored in session$userData$oasisapi
 #'
 #' @return Dataframe of previously posted portfolios. Default empty string returns all portfolios.
 #'
@@ -210,9 +18,9 @@ api_post_portfolios_create_analysis <- function(id, name, model) {
 #' @importFrom dplyr desc
 #'
 #' @export
-return_tbl_portfoliosData <- function(name = "") {
+return_tbl_portfoliosData <- function(name = "", oasisapi) {
 
-  tbl_portfoliosData <- return_df(api_get_portfolios, name)
+  tbl_portfoliosData <-  oasisapi$return_df("portfolios",  api_param = list(name = name))
 
   if (!is.null(tbl_portfoliosData) && nrow(tbl_portfoliosData) > 0 && is.null(tbl_portfoliosData$detail)) {
     tbl_portfoliosData <- cbind(tbl_portfoliosData, data.frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", Status$Processing, Status$Completed)))
@@ -237,6 +45,7 @@ return_tbl_portfoliosData <- function(name = "") {
 #' @description Returns a dataframe of portfolio's details ready for being rendered as a data table.
 #'
 #' @param id Id of the portfolio.
+#' @param oasisapi as stored in session$userData$oasisapi
 #'
 #' @return Dataframe of details of previously posted portfolio.
 #'
@@ -245,9 +54,9 @@ return_tbl_portfoliosData <- function(name = "") {
 #' @importFrom tidyr gather
 #'
 #' @export
-return_tbl_portfolioDetails <- function(id) {
+return_tbl_portfolioDetails <- function(id, oasisapi) {
 
-  tbl_portfolioDetails <- return_df(api_get_portfolios_id, id)
+  tbl_portfolioDetails <- oasisapi$return_df(paste("portfolios", id,  sep = "/"))
 
   if (!is.null(tbl_portfolioDetails) && is.null(tbl_portfolioDetails$detail)) {
     tbl_portfolioDetails <- tbl_portfolioDetails %>%

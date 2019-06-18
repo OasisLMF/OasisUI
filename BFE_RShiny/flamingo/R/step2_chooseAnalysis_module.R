@@ -569,9 +569,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   onclick("abuttonsubmit", {
     if (input$anaName != "") {
-      post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = portfolioID(),
-                                                                             name = input$anaName,
-                                                                             model = result$modelID)
+      post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"), query_body = list(name = input$anaName, model = result$modelID), query_method = "POST")
       logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", portfolioID(),
                         " name ", input$anaName,
                         " model ",  result$modelID))

@@ -4,10 +4,12 @@
 \alias{return_tbl_portfolioDetails}
 \title{Return portfolio details for DT}
 \usage{
-return_tbl_portfolioDetails(id)
+return_tbl_portfolioDetails(id, oasisapi)
 }
 \arguments{
 \item{id}{Id of the portfolio.}
+
+\item{oasisapi}{as stored in session$userData$oasisapi}
 }
 \value{
 Dataframe of details of previously posted portfolio.

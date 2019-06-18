@@ -102,6 +102,6 @@ portfolio_details <- function(input,
   # Reload uploaded inputs table -----------------------------------------------
   .reloadtbl_portfolioDetails <- function() {
     logMessage(".reloadtbl_portfolioDetails called")
-          result$dt_uploaded  <- session$userData$data_hub$get_pf_data_list(portfolioID())
+          result$dt_uploaded  <- session$userData$data_hub$get_pf_data_list(portfolioID(), oasisapi = session$userData$oasisapi)
   }
 }

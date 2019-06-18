@@ -41,7 +41,7 @@
 #' LISTS
 #'
 #' > Portfolio
-#' \item{\code{get_pf_data_list(id)}}{return list of portfolio source files}
+#' \item{\code{get_pf_data_list(id, oasisapi)}}{return list of portfolio source files}
 #' \item{\code{invalidate_pf_data_list(id)}}{invalidate list of portfolio source files}
 #' > Model
 #' \item{\code{get_model_data_list(id)}}{return list of model resources}
@@ -61,7 +61,7 @@
 #' \item{\code{invalidate_pf_location_content(id)}}{invalidate a source file (location/account...) content given a portfolio id}
 #' \item{\code{get_pf_dataset_header(id, dataset_identifier)}}{extract a source file (location/account...) header given a portfolio id}
 #' \item{\code{invalidate_pf_dataset_header(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
-#' \item{\code{get_pf_dataset_nrow(id, dataset_identifier)}}{extract a source file (location/account...) nrow given a portfolio id}
+#' \item{\code{get_pf_dataset_nrow(id, dataset_identifier, oasisapi)}}{extract a source file (location/account...) nrow given a portfolio id}
 #' \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
 #' > Model
 #' \item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
@@ -91,18 +91,25 @@
 #'
 #' @section Usage:
 #' \preformatted{data_hub <- DataHub$new()
-#' data_hub$get_pf_data_list(id)
+#' data_hub$get_pf_data_list(id, oasisapi)
 #' }
 #'
 #' @importFrom R6 R6Class
 #' @importFrom utils untar
 #' @importFrom stats setNames
+#' @importFrom dplyr bind_rows
+#' @importFrom dplyr mutate
+#' @importFrom dplyr case_when
+#' @importFrom httr content
+#' @importFrom tidyr unite
+#' @importFrom tidyr separate
+#' @importFrom tidyr spread
 #'
 #' @export
 
 DataHub <- R6Class(
   "DataHub",
-  public = list (
+  public = list(
     # Initialize ----
     initialize = function(user, destdir = tempdir()){
       self$create_destdir(user, destdir)
@@ -119,8 +126,8 @@ DataHub <- R6Class(
     # LISTS ----
     # > Portfolio ----
     #return list of portfolio source files
-    get_pf_data_list = function(id, ...){
-      data_list <- return_tbl_portfolioDetails(id) #assuming id !is.null(id) && id != "" && id != -1 && !is.na(id)
+    get_pf_data_list = function(id, oasisapi, ...){
+      data_list <- return_tbl_portfolioDetails(id, oasisapi) #assuming id !is.null(id) && id != "" && id != -1 && !is.na(id)
       data_list
     },
     #invalidate list of portfolio source files
@@ -160,7 +167,7 @@ DataHub <- R6Class(
           data_list <- data_list %>%
             as.data.frame() %>%
             setNames("files")
-          analysis_settings <-self$get_ana_settings_content(id, oasisapi)
+          analysis_settings <- self$get_ana_settings_content(id, oasisapi)
           data_list <- cbind(data_list,
                              do.call(rbind.data.frame,
                                      lapply(data_list$files,
@@ -182,14 +189,16 @@ DataHub <- R6Class(
     #extract a source file (location/account...) content given a portfolio id
     #dataset_identifier is location/account/reinsurance_info/reinsurance_source
     #If file does not exists returns df details: Not Found
-    get_pf_dataset_content = function(id, dataset_identifier, ...){
-      currNamespace <- ls("package:flamingo")
-      func_wpattern <- currNamespace[grepl(dataset_identifier, currNamespace)]
-      returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
-      if (length(returnfunc) != 0) {
-        func <- get(returnfunc)
+    get_pf_dataset_content = function(id, dataset_identifier, oasisapi, ...){
+      dataset_content <- content(oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result)
+      if (is.null(names(dataset_content))) {
+        dataset_content <- strsplit(dataset_content, split = "\n") %>%
+          as.data.frame(stringsAsFactors = FALSE)
+        colnames(dataset_content) <- dataset_content[1, ]
+      } else {
+        dataset_content <- bind_rows(dataset_content) %>%
+          as.data.frame()
       }
-      dataset_content <- return_file_df(func, id)
       dataset_content
     },
     #invalidate a source file (location/account...) content given a portfolio id
@@ -200,8 +209,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract location source file content given a portfolio id
-    get_pf_location_content = function(id,  ...){
-      dataset_content <-  self$get_pf_dataset_content(id, dataset_identifier = "location", ...)
+    get_pf_location_content = function(id, oasisapi, ...){
+      dataset_content <-  self$get_pf_dataset_content(id, dataset_identifier = "location_file",  oasisapi, ...)
       dataset_content
     },
     #invalidate a source file (location/account...) content given a portfolio id
@@ -210,8 +219,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a source file (location/account...) header given a portfolio id
-    get_pf_dataset_header = function(id, dataset_identifier, ...){
-      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier,...)
+    get_pf_dataset_header = function(id, dataset_identifier,oasisapi, ...){
+      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier,oasisapi, ...)
       dataset_header <- names(dataset_content)
       dataset_header
     },
@@ -220,8 +229,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a source file (location/account...) nrow given a portfolio id
-    get_pf_dataset_nrow = function(id, dataset_identifier, ...){
-      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier, ...)
+    get_pf_dataset_nrow = function(id, dataset_identifier, oasisapi, ...){
+      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier, oasisapi, ...)
       dataset_nrow <- nrow(dataset_content)
       dataset_nrow
     },
@@ -236,7 +245,7 @@ DataHub <- R6Class(
       #retrieve model resource file from API
       get_response <- oasisapi$api_get_query(query_path = paste( "models", id, "resource_file", sep = "/"))
       modelsIdResourceFileList <- content(get_response$result)
-      if (!is.null(modelsIdResourceFileList)){
+      if (!is.null(modelsIdResourceFileList)) {
         modelsList_names <- names(modelsIdResourceFileList)
         return_list <- lapply(modelsList_names, function(i){
           #extract sublist
@@ -406,7 +415,7 @@ DataHub <- R6Class(
     get_ana_validation_summary_content = function(id, oasisapi, ...){
       json_lst <- self$get_ana_inputs_dataset_content(id, dataset_identifier = "exposure_summary_report.json", oasisapi, ...)
       dataset_content <- NULL
-      if (!is.null(json_lst)){
+      if (!is.null(json_lst)) {
         dataset_content <- unlist(json_lst) %>%
           as.data.frame(stringsAsFactors = FALSE)  %>%
           setNames("vals") %>%
@@ -423,7 +432,7 @@ DataHub <- R6Class(
       dataset_content
     },
     #invalidate analysis validation summary content
-    invalidate_ana_validation_summary_content = function(id, ...){
+    invalidate_ana_validation_summary_content = function(id, dataset_identifier, type, ...){
       invisible()
       self$invalidate_ana_dataset_header(id, dataset_identifier, type, ...)
       self$invalidate_ana_dataset_row(id, dataset_identifier, type, ...)

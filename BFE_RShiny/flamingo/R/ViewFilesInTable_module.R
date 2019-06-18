@@ -355,16 +355,11 @@ ViewFilesInTable <- function(input, output, session,
 
     #Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
-    currNamespace <- ls("package:flamingo")
-    func_wpattern <- currNamespace[grepl(result$currentFile, currNamespace)]
-    returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
-    filerows <- NULL
-    filecolumns <- NULL
-    if (length(returnfunc) != 0) {
-      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
+    if (result$currentFile %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_source_file")) {
+      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile, oasisapi = session$userData$oasisapi)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
-        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
+        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile, oasisapi = session$userData$oasisapi)
+        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile,  oasisapi = session$userData$oasisapi)
         result$currentFile <- paste0(result$currentFile, ".csv")
         #Show buttons
         if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {

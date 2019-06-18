@@ -4,10 +4,12 @@
 \alias{return_tbl_portfoliosData}
 \title{Return portfolios data for DT}
 \usage{
-return_tbl_portfoliosData(name = "")
+return_tbl_portfoliosData(name = "", oasisapi)
 }
 \arguments{
 \item{name}{Name of the portfolio.}
+
+\item{oasisapi}{as stored in session$userData$oasisapi}
 }
 \value{
 Dataframe of previously posted portfolios. Default empty string returns all portfolios.
