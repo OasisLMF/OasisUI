@@ -371,7 +371,7 @@ summarytab <- function(input, output, session,
       plotleccalc <- NULL
     }
     #Location file
-    Location <- session$userData$data_hub$get_pf_location_content(id = portfolioID)
+    Location <- session$userData$data_hub$get_pf_location_content(id = portfolioID, oasisapi = session$userData$oasisapi)
     if (!is.null(Location)) {
       #infer params
       locnum <- length(unique(Location$LOCNUM))

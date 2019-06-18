@@ -56,9 +56,6 @@ loginDialog <- function(input, output, session, logout) {
         result$user = FLAMINGO_GUEST_ID
         flamingoNotification("Login Failed, please check your credentials.", type = "error")
       }
-      options(flamingo.settings.api.token = session$userData$oasisapi$get_access_token())
-      options(flamingo.settings.api.refresh = session$userData$oasisapi$get_refresh_token())
-      options(flamingo.settings.api = session$userData$oasisapi$get_conn_init())
     }
     logMessage(paste("In Login User: ", result$user))
   })

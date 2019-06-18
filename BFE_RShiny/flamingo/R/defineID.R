@@ -223,8 +223,8 @@ defineID <- function(input, output, session,
     result$selectAnaID <- ifelse(is.null(currid), NULL, currid)
     result$selectAnaName <-  ifelse(is.null(currName) || is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) || is.na(currpfId), "", currpfId)
-    logMessage("Extract output files")
-    session$userData$data_hub$get_ana_outputs_data_list(result$selectAnaID, oasisapi = session$userData$oasisapi)
+    # logMessage("Extract output files")
+    # session$userData$data_hub$get_ana_outputs_data_list(result$selectAnaID, oasisapi = session$userData$oasisapi)
   }
 
 
