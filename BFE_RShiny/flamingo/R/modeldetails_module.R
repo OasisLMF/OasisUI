@@ -59,7 +59,10 @@ modeldetailsUI <- function(id) {
 #'
 #' @param modelID Selected model ID.
 #' @param portfolioID Selected portfolio ID.
-#' @template params-module-ui
+#' @param file_pins file with coordiantes of exposure locations
+#' @param counter Reactive value to trigger inputs download.
+#' @template params-module
+#' @template params-active
 #'
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show

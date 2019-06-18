@@ -18,8 +18,6 @@ analysis_details(input, output, session, analysisID, portfolioID, counter)
 
 \item{id}{module id}
 
-\item{reload_generated}{Imports function to reload Generated Inputs table.}
-
 \item{id}{module id}
 }
 \description{

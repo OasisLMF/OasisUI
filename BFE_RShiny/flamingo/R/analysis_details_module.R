@@ -42,13 +42,10 @@ analysis_detailsUI <- function(id) {
 #' @rdname analysis_details
 #'
 #' @description Server side of function wrapping panel to show analyses details table.
-#'
-#' @template params-module-ui
+#'i
 #' @param analysisID Selected analysis ID.
 #' @param portfolioID Selected portfolio ID.
-#' @param reload_generated Imports function to reload Generated Inputs table.
-#'
-#' @template params-module-ui
+#' @template params-module
 #'
 #' @export
 analysis_details <- function(input,

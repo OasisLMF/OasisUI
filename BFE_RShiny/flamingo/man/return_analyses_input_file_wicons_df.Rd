@@ -9,9 +9,9 @@ return_analyses_input_file_wicons_df(id, data_hub, oasisapi)
 \arguments{
 \item{id}{A unique integer value identifying this analysis.}
 
-\item{oasisapi}{as stored in session$userData$oasisapi.}
+\item{data_hub}{as stored in session$userData$datahub.}
 
-\item{datahub}{as stored in session$userData$datahub}
+\item{oasisapi}{as stored in session$userData$oasisapi.}
 }
 \value{
 Dataframe of input files with icons.

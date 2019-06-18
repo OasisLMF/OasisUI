@@ -13,6 +13,8 @@ write_file(data, dataset_identifier = NULL, destdir = tempdir(),
 \item{dataset_identifier}{name and relative path of file to write}
 
 \item{destdir}{path where to write file.}
+
+\item{file_towrite}{name of file where to wirte data.}
 }
 \description{
 Writes ojbect in the correct format.

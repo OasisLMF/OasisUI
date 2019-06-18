@@ -49,6 +49,7 @@ api_get_analyses_tar <- function(id, label, dest = tempfile(fileext = ".tar"), o
 #' @param id A unique integer value identifying this analysis.
 #' @param destdir path where to download tar file.
 #' @param label input/output
+#' @param oasisapi as stored in session$userData$oasisapi.
 #'
 #' @return Path to file downloaded.
 #'
@@ -158,6 +159,7 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
 #' @param data object to write.
 #' @param dataset_identifier name and relative path of file to write
 #' @param destdir path where to write file.
+#' @param file_towrite name of file where to wirte data.
 #'
 #' @importFrom data.table fread
 #' @importFrom jsonlite read_json

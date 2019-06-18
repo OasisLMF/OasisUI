@@ -36,6 +36,7 @@ portfolio_detailsUI <- function(id) {
 #' @description Server logic for portfolio details.
 #'
 #' @template params-module
+#' @template params-active
 #' @param refresh_opt Option to hide/show refresh button.
 #' @param portfolioID selected portfolio ID.
 #' @param portfolioName selected portfolio Name.

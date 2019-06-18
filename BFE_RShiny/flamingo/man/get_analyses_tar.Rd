@@ -12,6 +12,8 @@ get_analyses_tar(id, label, destdir = tempdir(), oasisapi)
 \item{label}{input/output}
 
 \item{destdir}{path where to download tar file.}
+
+\item{oasisapi}{as stored in session$userData$oasisapi.}
 }
 \value{
 Path to file downloaded.

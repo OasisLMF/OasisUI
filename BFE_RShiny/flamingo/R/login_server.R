@@ -16,7 +16,7 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #'
 #' @description Server logic to login an user.
 #'
-#'@template params-module
+#' @template params-module
 #'
 #' @param logout Reactive yielding logout signal.
 #'

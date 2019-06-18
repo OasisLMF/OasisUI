@@ -138,7 +138,7 @@ return_tbl_analysesData_nice <- function(tbl_analysesData, oasisapi) {
 #' @description Returns a dataframe of input files with icons.
 #'
 #' @param id A unique integer value identifying this analysis.
-#' @param datahub as stored in session$userData$datahub
+#' @param data_hub as stored in session$userData$datahub.
 #' @param oasisapi as stored in session$userData$oasisapi.
 #'
 #' @return Dataframe of input files with icons.
