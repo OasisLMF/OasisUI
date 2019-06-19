@@ -196,9 +196,9 @@ api_post_portfolios_reinsurance_info_file <- function(id, filepath_reinsurance_i
 # Reinsurance Source File ------------------------------------------------------
 #' Get portfolios reinsurance source file
 #'
-#' Gets the portfolios reinsurance_source_file contents.
+#' Gets the portfolios reinsurance_scope_file contents.
 #'
-#' @rdname api_get_portfolios_reinsurance_source_file
+#' @rdname api_get_portfolios_reinsurance_scope_file
 #'
 #' @param id A unique integer value identifying this portfolio.
 #'
@@ -208,7 +208,7 @@ api_post_portfolios_reinsurance_info_file <- function(id, filepath_reinsurance_i
 #' @importFrom httr add_headers
 #'
 #' @export
-api_get_portfolios_reinsurance_source_file <- function(id) {
+api_get_portfolios_reinsurance_scope_file <- function(id) {
 
   request_list <- expression(list(
     get_url(),
@@ -216,7 +216,7 @@ api_get_portfolios_reinsurance_source_file <- function(id) {
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
-    path = paste(get_version(), "portfolios", id, "reinsurance_source_file", "", sep = "/")
+    path = paste(get_version(), "portfolios", id, "reinsurance_scope_file", "", sep = "/")
   ))
 
   response <- api_fetch_response("GET", request_list)
@@ -226,12 +226,12 @@ api_get_portfolios_reinsurance_source_file <- function(id) {
 
 #' Post portfolios reinsurance source file
 #'
-#' Sets the portfolios reinsurance_source contents.
+#' Sets the portfolios reinsurance_scope contents.
 #'
-#' @rdname api_post_portfolios_reinsurance_source
+#' @rdname api_post_portfolios_reinsurance_scope
 #'
 #' @param id A unique integer value identifying this portfolio.
-#' @param filepath_reinsurance_source Path to reinsurance source file.
+#' @param filepath_reinsurance_scope Path to reinsurance source file.
 #'
 #' @return the posted portfolio reinsurance source file.
 #'
@@ -240,7 +240,7 @@ api_get_portfolios_reinsurance_source_file <- function(id) {
 #' @importFrom httr upload_file
 #'
 #' @export
-api_post_portfolios_reinsurance_source_file <- function(id, filepath_reinsurance_source) {
+api_post_portfolios_reinsurance_scope_file <- function(id, filepath_reinsurance_scope) {
 
   request_list <- expression(list(
     get_url(),
@@ -248,9 +248,9 @@ api_post_portfolios_reinsurance_source_file <- function(id, filepath_reinsurance
       Accept = get_http_type(),
       Authorization = sprintf("Bearer %s", get_token())
     ),
-    body = list(file = upload_file(filepath_reinsurance_source)),
+    body = list(file = upload_file(filepath_reinsurance_scope)),
     encode = "multipart",
-    path = paste(get_version(), "portfolios", id, "reinsurance_source_file", "", sep = "/")
+    path = paste(get_version(), "portfolios", id, "reinsurance_scope_file", "", sep = "/")
   ))
 
   response <- api_fetch_response("POST", request_list)
@@ -266,7 +266,7 @@ api_post_portfolios_reinsurance_source_file <- function(id, filepath_reinsurance
 #' @rdname return_portfolios_stored_name
 #'
 #' @param id A unique integer value identifying this portfolio.
-#' @param filetype character string indicating the type of file: can be location_file, accounts_file, reinsurance_info_file or reinsurance_source_file.
+#' @param filetype character string indicating the type of file: can be location_file, accounts_file, reinsurance_info_file or reinsurance_scope_file.
 #'
 #' @return The stored name of the file.
 #'

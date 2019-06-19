@@ -9,7 +9,7 @@ return_portfolios_stored_name(id, filetype)
 \arguments{
 \item{id}{A unique integer value identifying this portfolio.}
 
-\item{filetype}{character string indicating the type of file: can be location_file, accounts_file, reinsurance_info_file or reinsurance_source_file.}
+\item{filetype}{character string indicating the type of file: can be location_file, accounts_file, reinsurance_info_file or reinsurance_scope_file.}
 }
 \value{
 The stored name of the file.
