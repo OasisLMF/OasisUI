@@ -605,6 +605,7 @@ step2_chooseAnalysis <- function(input, output, session,
     input$dt_analyses_rows_selected
     result$tbl_modelsData
     input$dt_models_rows_selected
+    result$analysisID
     currstep()}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonshowlog")
       disable("abuttonshowanadetails")
@@ -617,7 +618,6 @@ step2_chooseAnalysis <- function(input, output, session,
         enable("abuttonmodeldetails")
       }
       if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
-        enable("abuttonshowanadetails")
         enable("abuttonshowlog")
         enable("abuttondelana")
         enable("abuttonstartcancIG")
@@ -629,6 +629,11 @@ step2_chooseAnalysis <- function(input, output, session,
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] != Status_details$input_gen_failed ||
             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] != Status_details$input_gen_started) {
           enable("abuttonpgotonextstep")
+        }
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$ready ||
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$run_err ||
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$run_ok) {
+          enable("abuttonshowanadetails")
         }
       }
     })
