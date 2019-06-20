@@ -114,7 +114,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
   output$downloadexcel_ana <- downloadHandler(
     filename = "analyses_inbox.csv",
     content = function(file) {
-      fwrite(result$tbl_anaInbox, file, row.names = TRUE, quote = TRUE)
+      fwrite(result$tbl_anaInbox, file, row.names = FALSE, quote = TRUE)
     }
   )
 

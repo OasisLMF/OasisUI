@@ -160,13 +160,7 @@ ViewFilesInTable <- function(input, output, session,
       g <- input$dt_outputFL_rows_selected
       for (f in g) {
         filename <- result$tbl_filesListData_wButtons[f, file_column]
-
-        # Get dataframe
-        currNamespace <- ls("package:flamingo")
-        func_wpattern <- currNamespace[grepl(filename, currNamespace)]
-        returnfunc <- func_wpattern[grepl("api_get", func_wpattern)]
-        if (length(returnfunc) != 0) {
-          func <- get(returnfunc)
+        if (filename %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
           fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename)
         } else {
           fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
@@ -175,7 +169,6 @@ ViewFilesInTable <- function(input, output, session,
           fpath <- session$userData$data_hub$write_file(data = fileData, dataset_identifier = filename)
           fs <- c(fs, fpath)
         }
-
       }
       zip(zipfile = fname, files = fs)
       # if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
@@ -187,7 +180,7 @@ ViewFilesInTable <- function(input, output, session,
   output$FLdownloadexcel <- downloadHandler(
     filename = "file.csv",
     content = function(file) {
-      session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename, file_towrite = file)
+       session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename, file_towrite = file)
       }
   )
 
@@ -334,7 +327,7 @@ ViewFilesInTable <- function(input, output, session,
   output$FVEdownloadexcel <- downloadHandler(
     filename = function(){result$currentFile},
     content = function(file) {
-      session$userData$data_hub$write_file(data = result$currentFile, dataset_identifier = result$currentFile, file_towrite = file)
+      session$userData$data_hub$write_file(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
     }
   )
 

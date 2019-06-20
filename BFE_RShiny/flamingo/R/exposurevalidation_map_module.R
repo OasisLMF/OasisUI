@@ -151,7 +151,7 @@ exposurevalidationmap <- function(input,
     filename2download <- paste0("exposure_validation_", analysisID(), ".csv"),
     filename = function() {filename2download},
     content = function(file) {
-      fwrite(result$uploaded_locs_check_peril, file, row.names = TRUE, quote = TRUE)}
+      fwrite(result$uploaded_locs_check_peril, file, row.names = FALSE, quote = TRUE)}
   )
 
   # Tabular data ---------------------------------------------------------------

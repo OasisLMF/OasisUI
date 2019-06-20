@@ -76,12 +76,10 @@ write_file <- function(data, dataset_identifier = NULL, destdir = tempdir(), fil
     file_towrite <- file.path(destdir, dataset_identifier)
   }
   extension <-  strsplit(dataset_identifier, split = "\\.") %>% unlist() %>% tail(n = 1)
-  if (extension == "csv") {
-    fwrite(data, file_towrite, row.names = TRUE, quote = TRUE)
-  } else if (extension == "json") {
+  if (extension == "json") {
     write(toJSON(data, pretty = TRUE), file_towrite)
-  } else{
-    write(data, file_towrite)
+  } else {
+    fwrite(data, file_towrite, row.names = FALSE, quote = TRUE)
   }
   file_towrite
 }
