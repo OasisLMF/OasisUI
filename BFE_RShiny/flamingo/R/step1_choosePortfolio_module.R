@@ -622,7 +622,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   onclick("abuttonSRSFileUpload", {
-    .uploadSourceFile(inFile = result$SRSFile, api_post_portfolios_reinsurance_source_file)
+    .uploadSourceFile(inFile = result$SRSFile, api_post_portfolios_reinsurance_scope_file)
   })
 
   # Define portfolioID ---------------------------------------------------------
