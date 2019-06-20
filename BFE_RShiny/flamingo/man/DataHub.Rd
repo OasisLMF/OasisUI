@@ -23,33 +23,22 @@ R6 Class for OasisUI Data Hub.
 }
 }
 
-\section{Privates}{
-
-\describe{
-\item{user}{string identifying the user.}
-\item{destdir = tempdir()}{user specific destdir.}
-}
-}
-
 \section{Methods}{
 
 \describe{
 
-Initialize
-\item{\code{create_destdir(user, destir)}}{create and return path of user specific foder}
+GENERAL
+
 \item{\code{get_user_destdir()}}{return path of user specific foder}
 
 LISTS
 
 > Portfolio
-\item{\code{get_pf_data_list(id, oasisapi)}}{return list of portfolio source files}
+\item{\code{get_pf_data_list(id)}}{return list of portfolio source files}
 \item{\code{invalidate_pf_data_list(id)}}{invalidate list of portfolio source files}
-> Model
-\item{\code{get_model_data_list(id)}}{return list of model resources}
-\item{\code{invalidate_model_data_list(id)}}{invalidate list of model resources}
 > Analysis
-\item{\code{get_ana_inputs_data_list(id, oasisapi)}}{return list of analysis inputs}
-\item{\code{get_ana_outputs_data_list(id, oasisapi)}}{return list of analysis outputs}
+\item{\code{get_ana_inputs_data_list(id)}}{return list of analysis inputs}
+\item{\code{get_ana_outputs_data_list(id)}}{return list of analysis outputs}
 \item{\code{invalidate_ana_inputs_data_list(id)}}{invalidate list of analysis inputs}
 \item{\code{invalidate_ana_outputs_data_list(id)}}{invalidate list of analysis outputs}
 
@@ -62,7 +51,7 @@ DATASETS
 \item{\code{invalidate_pf_location_content(id)}}{invalidate a source file (location/account...) content given a portfolio id}
 \item{\code{get_pf_dataset_header(id, dataset_identifier)}}{extract a source file (location/account...) header given a portfolio id}
 \item{\code{invalidate_pf_dataset_header(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
-\item{\code{get_pf_dataset_nrow(id, dataset_identifier, oasisapi)}}{extract a source file (location/account...) nrow given a portfolio id}
+\item{\code{get_pf_dataset_nrow(id, dataset_identifier)}}{extract a source file (location/account...) nrow given a portfolio id}
 \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
 > Model
 \item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
@@ -72,29 +61,44 @@ DATASETS
 > Analysis
 \item{\code{get_ana_dataset_content(id, dataset_identifier, type)}}{extract a input/output file content given an analysis id}
 \item{\code{invalidate_ana_dataset_content(id, dataset_identifier, type)}}{invalidate a input/output file content given an analysis id}
-\item{\code{get_ana_inputs_dataset_content(id, dataset_identifier), oasisapi}}{extract a inputs file content given an analysis id}
+\item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)}}{extract a inputs file content given an analysis id}
 \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)}}{invalidate a inputs file content given an analysis id}
-\item{\code{get_ana_outputs_dataset_content(id, dataset_identifier, oasisapi)}}{extract a outputs file content given an analysis id}
+\item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)}}{extract a outputs file content given an analysis id}
 \item{\code{invalidate_ana_outputs_dataset_content(id,  dataset_identifier)}}{invalidate a outputs file content given an analysis id}
-\item{\code{get_ana_dataset_header(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file nrow given an analysis id}
+\item{\code{get_ana_dataset_header(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
 \item{\code{invalidate_ana_dataset_header(id, type, dataset_identifier)}}{invalidate a inputs/outputs file header given an analysis id}
-\item{\code{get_ana_dataset_nrow(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file nrow given an analysis id}
+\item{\code{get_ana_dataset_nrow(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
 \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
-\item{\code{get_ana_dataset_size(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file size given an analysis id}
+\item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
 \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
-\item{\code{get_ana_settings_content(id, oasisapi)}}{extract analysis settings content}
+\item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
 \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
-\item{\code{get_ana_validation_summary_content(id, oasisapi)}}{extract analysis validation summary content}
+\item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
 \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
-# > Write file
-\item{\code{write_file}}{Write data into a file file_towrite)}
+> Write file
+\item{\code{write_file()}}{Write data into a file file_towrite}
+> Helper methods ----
+\item{\code{get_analyses_tar(id, label, destdir = tempdir())}}{Extract input/output tar.}
+\item{\code{get_analyses_inputs_tar(id, destdir = tempdir())}}{Extract input tar.}
+\item{\code{get_analyses_outputs_tar(id, destdir = tempdir())}}{Extract output tar.}
+> Return manipulated tables methods ----
+# Portfolios
+\item{\code{return_tbl_portfolioDetails(id)}}{Return dataframe of portfolio details.}
+\item{\code{return_tbl_portfoliosData (name = "", Status, tbl_portfoliosDataNames)}}{Return data frame of portfolio data.}
+# Models
+\item{\code{return_tbl_modelsData(supplier_id = "", tbl_modelsDataNames)}}{Return data frame of models.}
+\item{\code{return_tbl_modelData(id)}}{Return data frame of model data.}
+# Analyses
+\item{\code{return_analyses_input_file_wicons_df(id, Status)}}{Return analysis table with icons.}
+\item{\code{return_tbl_analysesData_nice(tbl_analysesData, admin_mode, Status, tbl_modelsDataNames, tbl_portfoliosDataNames, tbl_analysesDataNames)}}{Return analysis table prettified.}
+\item{\code{return_tbl_analysesData(name = "", Status, tbl_analysesDataNames)}}{Return dataframe of analyses.}
 }
 }
 
 \section{Usage}{
 
 \preformatted{data_hub <- DataHub$new()
-data_hub$get_pf_data_list(id, oasisapi)
+data_hub$get_pf_data_list(id)
 }
 }
 

@@ -5,7 +5,6 @@
 #' @param analysisID Selected analysis id.
 #' @param portfolioID selected portfolio ID.
 #' @param data_hub data hub stored in session$userData$data_hub
-#' @param oasisapi api stored in session$userData$oasisapi
 #'
 #' @importFrom data.table fread
 #' @importFrom dplyr full_join
@@ -14,7 +13,7 @@
 #' @importFrom dplyr select
 #'
 #' @export
-check_loc <- function(analysisID, portfolioID, data_hub, oasisapi){
+check_loc <- function(analysisID, portfolioID, data_hub){
 
   logMessage(".check_loc called")
 
@@ -25,7 +24,7 @@ check_loc <- function(analysisID, portfolioID, data_hub, oasisapi){
 
   uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID) %>%
     mutate(loc_idx = seq(nrow(.)) - 1)
-  modelled_locs <-  data_hub$get_ana_inputs_dataset_content(analysisID, dataset_identifier = "gul_summary_map.csv", oasisapi)
+  modelled_locs <-  data_hub$get_ana_inputs_dataset_content(analysisID, dataset_identifier = "gul_summary_map.csv")
 
   #dummy to test validation
   #modelled_locs <- modelled_locs[1:30,]

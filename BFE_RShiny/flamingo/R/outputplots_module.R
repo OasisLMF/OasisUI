@@ -488,7 +488,7 @@ panelOutputModule <- function(input, output, session,
     if (!is.na(fileName)) {
       logMessage(paste0("Reading file ", fileName))
       tryCatch({
-        fileData <- session$userData$data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = fileName, session$userData$oasisapi)
+        fileData <- session$userData$data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = fileName)
       }, error = function(e) {
         flamingoNotification(type = "error",
                              paste0("Could not read file: ", e$message, "."))

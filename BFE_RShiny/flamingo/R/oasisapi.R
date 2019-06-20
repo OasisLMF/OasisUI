@@ -25,23 +25,11 @@
 #' \item{pwd}{string for user password.}
 #' }
 #'
-#' @section Privates:
-#' \describe{
-#' \item{httptype}{Type of connection (application/json); default is NULL.}
-#' \item{url}{url to connect with API; default is NULL.}
-#' \item{access_token}{String for API log in; default is NULL.}
-#' \item{refresh_token}{String for API access token refresh; default is NULL.}
-#' \item{version}{Parameter for API connection; default is NULL.}
-#' \item{conn_init}{Structure with the api connection info; default is NULL.}
-#' }
-#'
 #' @section Methods:
 #' \describe{
 #'
 #' Initialize
-#'  \item{\code{set_httptype(httptype)}}{Set httptype private.}
 #'  \item{\code{api_init(host, port)}}{Initialize api and set url private.}
-#'  \item{\code{set_version(version)}}{Set version private.}
 #'  \item{\code{get_url()}}{Return private url.}
 #'  \item{\code{get_conn_init()}}{Return conn_init.}
 #'  \item{\code{get_http_type()}}{Return http_type.}
@@ -76,6 +64,11 @@
 #'  \item{\code{api_delete_query(uery_path, query_list, ...)}}{Construct DELETE query to the api.}
 #'  \item{\code{api_post_file_query(query_path, query_body = NULL, ...)}}{POST file query to the api.}
 #'  \item{\code{api_body_query(query_path, query_body = NULL, query_method = "POST", ...)}}{PUT/POST query with body field to the api.}
+#'  \item{\code{api_return_query_res(query_path, query_list = NULL, query_method, ...)}}{PUT/POST query with body field to the api.}
+#'  return from query
+#'  \item{\code{return_df(query_path, api_param = "", query_method = "GET"))}}{MAnipulate data returned from GET query.}
+#'  write to disk
+#'  \item{\code{api_get_analyses_tar(id, label, dest = tempfile(fileext = ".tar"))}}{GET files and write to disk tar bundle.}
 #' }
 #'
 #' @section Usage:
@@ -94,22 +87,29 @@
 #' @importFrom httr status_code
 #' @importFrom httr content
 #' @importFrom httr upload_file
+#' @importFrom httr write_disk
 #' @importFrom dplyr bind_rows
 #'
 #' @export
 # OasisAPI ----
 OasisAPI <- R6Class(
   "OasisAPI",
+  # Private ----
+  private = list(
+    httptype = NULL, #Type of connection (application/json); default is NULL
+    url = NULL, # url to connect with API; default is NULL
+    access_token = NULL, # String for API log in; default is NULL
+    refresh_token = NULL, # String for API access token refresh; default is NULL
+    version = NULL, # Parameter for API connection; default is NULL
+    conn_init = NULL # Structure with the api connection info; default is NULL
+  ),
   # Public ----
   public = list(
     # > Initialize ----
     initialize = function(httptype = "application/json", host, port, version, ...){
-      self$set_httptype(httptype)
-      self$api_init(host, port)
-      self$set_version(version)
-    },
-    set_httptype = function(httptype, ...){
       private$httptype <- httptype
+      self$api_init(host, port)
+      private$version <- version
     },
     get_http_type = function(){
       private$httptype
@@ -136,6 +136,25 @@ OasisAPI <- R6Class(
     # > get url ----
     get_url = function(){
       private$url
+    },
+    # > healtcheck ----
+    api_get_healthcheck = function(...) {
+      tryCatch(
+        response <- GET(
+          private$url,
+          config = add_headers(
+            Accept = private$httptype
+          ),
+          path = "healthcheck/"
+        ),
+        error = function(e) {
+          stop(paste("Health check failed:", e$message))
+        }
+      )
+      if (status_code(response) != 200) {
+        stop(paste("Health check failed with:", response$message))
+      }
+      return(status_code(response))
     },
     # > api response ----
     api_handle_response = function(response, ...) {
@@ -234,28 +253,6 @@ OasisAPI <- R6Class(
     get_version = function(){
       private$version
     },
-    set_version = function(version){
-      private$version <- version
-    },
-    # > healtcheck ----
-    api_get_healthcheck = function(...) {
-      tryCatch(
-        response <- GET(
-          private$url,
-          config = add_headers(
-            Accept = private$httptype
-          ),
-          path = "healthcheck/"
-        ),
-        error = function(e) {
-          stop(paste("Health check failed:", e$message))
-        }
-      )
-      if (status_code(response) != 200) {
-        stop(paste("Health check failed with:", response$message))
-      }
-      return(status_code(response))
-    },
     # > api query -----
     api_query = function(query_path, query_list = NULL, query_method, ...){
 
@@ -268,7 +265,6 @@ OasisAPI <- R6Class(
         path = paste(private$version, query_path, "", sep = "/"),
         query = query_list
       ))
-
       response <- self$api_fetch_response(query_method, request_list)
       self$api_handle_response(response)
     },
@@ -309,11 +305,13 @@ OasisAPI <- R6Class(
       response <- self$api_fetch_response(query_method, request_list)
       self$api_handle_response(response)
     },
-
+    api_return_query_res = function(query_path, query_list = NULL, query_method, ...){
+      response <- self$api_query(query_path, query_list = NULL, query_method)
+      content(response$result)
+    },
     # > return from query ----
     return_df = function(query_path, api_param = "", query_method = "GET") {
       content_lst <- content(self$api_query(query_path, query_list = api_param,  query_method)$result)
-
       if (length(content_lst) > 0) {
         if (length(content_lst[[1]]) > 1) {
           content_lst <- lapply(content_lst, function(x) {lapply(x, showname)})
@@ -329,17 +327,23 @@ OasisAPI <- R6Class(
       } else {
         df <- NULL
       }
-
       df
+    },
+    # > write to disk ----
+    api_get_analyses_tar = function(id, label, dest = tempfile(fileext = ".tar")) {
+      request_list <- expression(list(
+        self$get_url(),
+        config = add_headers(
+          Accept = self$get_http_type(),
+          Authorization = sprintf("Bearer %s",self$get_access_token())
+        ),
+        path = paste(self$get_version(), "analyses", id, label, "", sep = "/"),
+        write_disk(dest, overwrite = TRUE)
+      ))
+      response <- self$api_fetch_response("GET", request_list)
+      #response needed to place icon
+      self$api_handle_response(response, warning)
+
     }
-  ),
-  # Private ----
-  private = list(
-    httptype = NULL,
-    url = NULL,
-    access_token = NULL,
-    refresh_token = NULL,
-    version = NULL,
-    conn_init = NULL
   )
 )

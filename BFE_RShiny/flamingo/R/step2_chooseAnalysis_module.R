@@ -259,7 +259,7 @@ step2_chooseAnalysis <- function(input, output, session,
       index <- 1
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData %>% return_tbl_analysesData_nice(oasisapi = session$userData$oasisapi),
+        result$tbl_analysesData %>%session$userData$data_hub$return_tbl_analysesData_nice(admin_mode = getOption("flamingo.settings.admin.mode"), Status = Status, tbl_modelsDataNames = tbl_modelsDataNames, tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = list(mode = 'single',
@@ -680,7 +680,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
     if (!is.null(portfolioID()) && portfolioID()  != "") {
-      tbl_analysesData  <- return_tbl_analysesData(oasisapi =  session$userData$oasisapi)
+      tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
         result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
       }
@@ -710,7 +710,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadtbl_modelsData <- function() {
     logMessage(".reloadtbl_modelsData called")
     if (!is.null(portfolioID()) && portfolioID() != "") {
-      result$tbl_modelsData <- return_tbl_modelsData(oasisapi = session$userData$oasisapi)
+      result$tbl_modelsData <- session$userData$data_hub$return_tbl_modelsData(tbl_modelsDataNames = tbl_modelsDataNames)
       logMessage("models table refreshed")
     } else {
       result$tbl_modelsData <- NULL

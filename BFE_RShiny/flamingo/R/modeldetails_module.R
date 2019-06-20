@@ -183,7 +183,7 @@ modeldetails <- function(input,
   # Reload Programme Model Details table
   .reloadtbl_modelsDetails <- function() {
     logMessage(".reloadtbl_modelsDetails called")
-    tbl_modelsDetails <- session$userData$data_hub$get_model_resource_dataset_content(modelID(),session$userData$oasisapi)
+    tbl_modelsDetails <- session$userData$data_hub$get_model_resource_dataset_content(modelID())
     if (!is.null(tbl_modelsDetails)) {
       result$tbl_modelsDetails <- tbl_modelsDetails
       logMessage("model resources table refreshed")

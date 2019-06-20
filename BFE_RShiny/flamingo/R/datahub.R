@@ -25,30 +25,21 @@
 #' \item{dataset_identifier}{Identifier:  file name for Analysis Id |  api call for Portfolio Id and Model Id}
 #' }
 #'
-#' @section Privates:
-#' \describe{
-#' \item{user}{string identifying the user.}
-#' \item{destdir = tempdir()}{user specific destdir.}
-#' }
-#'
 #' @section Methods:
 #' \describe{
 #'
-#' Initialize
-#' \item{\code{create_destdir(user, destir)}}{create and return path of user specific foder}
+#' GENERAL
+#'
 #' \item{\code{get_user_destdir()}}{return path of user specific foder}
 #'
 #' LISTS
 #'
 #' > Portfolio
-#' \item{\code{get_pf_data_list(id, oasisapi)}}{return list of portfolio source files}
+#' \item{\code{get_pf_data_list(id)}}{return list of portfolio source files}
 #' \item{\code{invalidate_pf_data_list(id)}}{invalidate list of portfolio source files}
-#' > Model
-#' \item{\code{get_model_data_list(id)}}{return list of model resources}
-#' \item{\code{invalidate_model_data_list(id)}}{invalidate list of model resources}
 #' > Analysis
-#' \item{\code{get_ana_inputs_data_list(id, oasisapi)}}{return list of analysis inputs}
-#' \item{\code{get_ana_outputs_data_list(id, oasisapi)}}{return list of analysis outputs}
+#' \item{\code{get_ana_inputs_data_list(id)}}{return list of analysis inputs}
+#' \item{\code{get_ana_outputs_data_list(id)}}{return list of analysis outputs}
 #' \item{\code{invalidate_ana_inputs_data_list(id)}}{invalidate list of analysis inputs}
 #' \item{\code{invalidate_ana_outputs_data_list(id)}}{invalidate list of analysis outputs}
 #'
@@ -61,7 +52,7 @@
 #' \item{\code{invalidate_pf_location_content(id)}}{invalidate a source file (location/account...) content given a portfolio id}
 #' \item{\code{get_pf_dataset_header(id, dataset_identifier)}}{extract a source file (location/account...) header given a portfolio id}
 #' \item{\code{invalidate_pf_dataset_header(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
-#' \item{\code{get_pf_dataset_nrow(id, dataset_identifier, oasisapi)}}{extract a source file (location/account...) nrow given a portfolio id}
+#' \item{\code{get_pf_dataset_nrow(id, dataset_identifier)}}{extract a source file (location/account...) nrow given a portfolio id}
 #' \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
 #' > Model
 #' \item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
@@ -71,27 +62,42 @@
 #' > Analysis
 #' \item{\code{get_ana_dataset_content(id, dataset_identifier, type)}}{extract a input/output file content given an analysis id}
 #' \item{\code{invalidate_ana_dataset_content(id, dataset_identifier, type)}}{invalidate a input/output file content given an analysis id}
-#' \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier), oasisapi}}{extract a inputs file content given an analysis id}
+#' \item{\code{get_ana_inputs_dataset_content(id, dataset_identifier)}}{extract a inputs file content given an analysis id}
 #' \item{\code{invalidate_ana_inputs_dataset_content(id,  dataset_identifier)}}{invalidate a inputs file content given an analysis id}
-#' \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier, oasisapi)}}{extract a outputs file content given an analysis id}
+#' \item{\code{get_ana_outputs_dataset_content(id, dataset_identifier)}}{extract a outputs file content given an analysis id}
 #' \item{\code{invalidate_ana_outputs_dataset_content(id,  dataset_identifier)}}{invalidate a outputs file content given an analysis id}
-#' \item{\code{get_ana_dataset_header(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file nrow given an analysis id}
+#' \item{\code{get_ana_dataset_header(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
 #' \item{\code{invalidate_ana_dataset_header(id, type, dataset_identifier)}}{invalidate a inputs/outputs file header given an analysis id}
-#' \item{\code{get_ana_dataset_nrow(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file nrow given an analysis id}
+#' \item{\code{get_ana_dataset_nrow(id, type, dataset_identifier)}}{extract a inputs/outputs file nrow given an analysis id}
 #' \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
-#' \item{\code{get_ana_dataset_size(id, type, dataset_identifier, oasisapi)}}{extract a inputs/outputs file size given an analysis id}
+#' \item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
 #' \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
-#' \item{\code{get_ana_settings_content(id, oasisapi)}}{extract analysis settings content}
+#' \item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
 #' \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
-#' \item{\code{get_ana_validation_summary_content(id, oasisapi)}}{extract analysis validation summary content}
+#' \item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
 #' \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
-#' # > Write file
-#' \item{\code{write_file}}{Write data into a file file_towrite)}
+#' > Write file
+#' \item{\code{write_file()}}{Write data into a file file_towrite}
+#' > Helper methods ----
+#' \item{\code{get_analyses_tar(id, label, destdir = tempdir())}}{Extract input/output tar.}
+#' \item{\code{get_analyses_inputs_tar(id, destdir = tempdir())}}{Extract input tar.}
+#' \item{\code{get_analyses_outputs_tar(id, destdir = tempdir())}}{Extract output tar.}
+#' > Return manipulated tables methods ----
+#' # Portfolios
+#' \item{\code{return_tbl_portfolioDetails(id)}}{Return dataframe of portfolio details.}
+#' \item{\code{return_tbl_portfoliosData (name = "", Status, tbl_portfoliosDataNames)}}{Return data frame of portfolio data.}
+#' # Models
+#' \item{\code{return_tbl_modelsData(supplier_id = "", tbl_modelsDataNames)}}{Return data frame of models.}
+#' \item{\code{return_tbl_modelData(id)}}{Return data frame of model data.}
+#' # Analyses
+#' \item{\code{return_analyses_input_file_wicons_df(id, Status)}}{Return analysis table with icons.}
+#' \item{\code{return_tbl_analysesData_nice(tbl_analysesData, admin_mode, Status, tbl_modelsDataNames, tbl_portfoliosDataNames, tbl_analysesDataNames)}}{Return analysis table prettified.}
+#' \item{\code{return_tbl_analysesData(name = "", Status, tbl_analysesDataNames)}}{Return dataframe of analyses.}
 #' }
 #'
 #' @section Usage:
 #' \preformatted{data_hub <- DataHub$new()
-#' data_hub$get_pf_data_list(id, oasisapi)
+#' data_hub$get_pf_data_list(id)
 #' }
 #'
 #' @importFrom R6 R6Class
@@ -100,54 +106,62 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
+#' @importFrom dplyr rename
+#' @importFrom dplyr left_join
+#' @importFrom dplyr sym
+#' @importFrom dplyr arrange
+#' @importFrom dplyr desc
+#' @importFrom dplyr select
+#' @importFrom dplyr contains
+#' @importFrom dplyr desc
 #' @importFrom httr content
 #' @importFrom tidyr unite
 #' @importFrom tidyr separate
 #' @importFrom tidyr spread
+#' @importFrom tidyr gather
 #'
 #' @export
 
 DataHub <- R6Class(
   "DataHub",
+  # Private ----
+  private = list(
+    user = "", # string identifying the user
+    user_destdir = "", # user specific destdir
+    oasisapi = NULL # oasisapi as stored in session$userData$oasisapi
+  ),
   public = list(
     # Initialize ----
-    initialize = function(user, destdir = tempdir()){
-      self$create_destdir(user, destdir)
-    },
-    #create dest dir for user
-    create_destdir = function(user, destdir){
+    initialize = function(user, destdir = tempdir(), oasisapi){
       private$user <- user
-      private$user_destdir <- file.path(destdir, private$user)
-      dir.create(private$user_destdir, showWarnings = FALSE)
+      private$user_destdir <- file.path(destdir)
+      # if (dir.exists(private$user_destdir)) stop()
+      dir.create(private$user_destdir, showWarnings = FALSE, recursive = TRUE)
+      private$oasisapi <- oasisapi
     },
+    # Terminate ----
+    terminate = function(){
+      unlink(private$user_destdir, TRUE)
+    },
+    # GENERAL ----
     get_user_destdir = function(){
       private$user_destdir
     },
     # LISTS ----
     # > Portfolio ----
     #return list of portfolio source files
-    get_pf_data_list = function(id, oasisapi, ...){
-      data_list <- return_tbl_portfolioDetails(id, oasisapi) #assuming id !is.null(id) && id != "" && id != -1 && !is.na(id)
+    get_pf_data_list = function(id, ...){
+      data_list <- self$return_tbl_portfolioDetails(id) #assuming id !is.null(id) && id != "" && id != -1 && !is.na(id)
       data_list
     },
     #invalidate list of portfolio source files
     invalidate_pf_data_list = function(id, ...){
       invisible()
     },
-    # > Model ----
-    #return list of model resources
-    get_model_data_list = function(id, ...){
-      data_list <- NULL #assuming id !is.null(id) && id != "" && id != -1 && !is.na(id)
-      data_list
-    },
-    #invalidate list of model resources
-    invalidate_model_data_list = function(id, ...){
-      invisible()
-    },
     # > Analysis ----
     #return list of analysis resources
-    get_ana_inputs_data_list = function(id, oasisapi, ...){
-      tarfile <- get_analyses_inputs_tar(id,  destdir = private$user_destdir, oasisapi)
+    get_ana_inputs_data_list = function(id, ...){
+      tarfile <- self$get_analyses_inputs_tar(id,  destdir = private$user_destdir)
       data_list <- untar_list(tarfile)
       if (length(data_list) > 0) {
         data_list <- data_list %>%
@@ -158,8 +172,8 @@ DataHub <- R6Class(
       }
       data_list
     },
-    get_ana_outputs_data_list = function(id, oasisapi, ...){
-      tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir, oasisapi)
+    get_ana_outputs_data_list = function(id, ...){
+      tarfile <- self$get_analyses_outputs_tar(id, destdir =  private$user_destdir)
       data_list <- NULL
       if (file.exists(tarfile)) {
         data_list <- untar_list(tarfile, to_strip = "output")
@@ -167,7 +181,7 @@ DataHub <- R6Class(
           data_list <- data_list %>%
             as.data.frame() %>%
             setNames("files")
-          analysis_settings <- self$get_ana_settings_content(id, oasisapi)
+          analysis_settings <- self$get_ana_settings_content(id)
           data_list <- cbind(data_list,
                              do.call(rbind.data.frame,
                                      lapply(data_list$files,
@@ -189,8 +203,8 @@ DataHub <- R6Class(
     #extract a source file (location/account...) content given a portfolio id
     #dataset_identifier is location/account/reinsurance_info/reinsurance_source
     #If file does not exists returns df details: Not Found
-    get_pf_dataset_content = function(id, dataset_identifier, oasisapi, ...){
-      dataset_content <- content(oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result)
+    get_pf_dataset_content = function(id, dataset_identifier, ...){
+      dataset_content <- content(private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result)
       if (is.null(names(dataset_content))) {
         dataset_content <- strsplit(dataset_content, split = "\n") %>%
           as.data.frame(stringsAsFactors = FALSE)
@@ -209,8 +223,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract location source file content given a portfolio id
-    get_pf_location_content = function(id, oasisapi, ...){
-      dataset_content <-  self$get_pf_dataset_content(id, dataset_identifier = "location_file",  oasisapi, ...)
+    get_pf_location_content = function(id, ...){
+      dataset_content <-  self$get_pf_dataset_content(id, dataset_identifier = "location_file", ...)
       dataset_content
     },
     #invalidate a source file (location/account...) content given a portfolio id
@@ -219,8 +233,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a source file (location/account...) header given a portfolio id
-    get_pf_dataset_header = function(id, dataset_identifier,oasisapi, ...){
-      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier,oasisapi, ...)
+    get_pf_dataset_header = function(id, dataset_identifier, ...){
+      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier, ...)
       dataset_header <- names(dataset_content)
       dataset_header
     },
@@ -229,8 +243,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a source file (location/account...) nrow given a portfolio id
-    get_pf_dataset_nrow = function(id, dataset_identifier, oasisapi, ...){
-      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier, oasisapi, ...)
+    get_pf_dataset_nrow = function(id, dataset_identifier, ...){
+      dataset_content <- self$get_pf_dataset_content(id, dataset_identifier, ...)
       dataset_nrow <- nrow(dataset_content)
       dataset_nrow
     },
@@ -241,9 +255,9 @@ DataHub <- R6Class(
 
     # > MODEL METHODS ----
     #extract model resource file given model id
-    get_model_resource_dataset_content = function(id, oasisapi, ...){
+    get_model_resource_dataset_content = function(id, ...){
       #retrieve model resource file from API
-      get_response <- oasisapi$api_get_query(query_path = paste( "models", id, "resource_file", sep = "/"))
+      get_response <- private$oasisapi$api_get_query(query_path = paste( "models", id, "resource_file", sep = "/"))
       modelsIdResourceFileList <- content(get_response$result)
       if (!is.null(modelsIdResourceFileList)) {
         modelsList_names <- names(modelsIdResourceFileList)
@@ -313,11 +327,11 @@ DataHub <- R6Class(
 
     # > ANALYSIS METHODS ----
     #extract a input/output file given an analysis id
-    get_ana_dataset_content = function(id, dataset_identifier, type, oasisapi, ...){
+    get_ana_dataset_content = function(id, dataset_identifier, type, ...){
       if (type == "input") {
-        dataset_content <- self$get_ana_inputs_dataset_content(id, dataset_identifier, oasisapi)
+        dataset_content <- self$get_ana_inputs_dataset_content(id, dataset_identifier)
       } else if (type == "output") {
-        dataset_content <- self$get_ana_outputs_dataset_content(id, dataset_identifier, oasisapi)
+        dataset_content <- self$get_ana_outputs_dataset_content(id, dataset_identifier)
       } else {
         dataset_content <- NULL
       }
@@ -330,9 +344,12 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a inputs file content given an analysis id
-    get_ana_inputs_dataset_content = function(id, dataset_identifier, oasisapi, ...){
-      tarfile <- get_analyses_inputs_tar(id, destdir =  private$user_destdir, oasisapi)
-      dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir =  private$user_destdir)
+    get_ana_inputs_dataset_content = function(id, dataset_identifier, ...){
+      tarfile <- self$get_analyses_inputs_tar(id, destdir =  private$user_destdir)
+      dataset_content = NULL
+      if (file.exists(tarfile)) {
+        dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir =  private$user_destdir)
+      }
       dataset_content
     },
     #invalidate a inputs file content given an analysis id
@@ -342,11 +359,14 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a outputs file content given an analysis id
-    get_ana_outputs_dataset_content = function(id, dataset_identifier, oasisapi, ...){
-      tarfile <- get_analyses_outputs_tar(id, destdir =  private$user_destdir,oasisapi)
+    get_ana_outputs_dataset_content = function(id, dataset_identifier, ...){
+      tarfile <- self$get_analyses_outputs_tar(id, destdir =  private$user_destdir)
       #necessary step because outputs comes with subfolder
       dataset_identifier <- file.path("output", dataset_identifier)
-      dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir =  private$user_destdir)
+      dataset_content = NULL
+      if (file.exists(tarfile)) {
+        dataset_content <- read_file_from_tar(tarfile, dataset_identifier, destdir =  private$user_destdir)
+      }
       dataset_content
     },
     #invalidate a outputs file content given an analysis id
@@ -356,8 +376,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a inputs/outputs file header given an analysis id
-    get_ana_dataset_header = function(id, type, dataset_identifier, oasisapi, ...){
-      tarfile <- get_analyses_tar(id, label = type, destdir =  private$user_destdir, oasisapi)
+    get_ana_dataset_header = function(id, type, dataset_identifier, ...){
+      tarfile <- self$get_analyses_tar(id, label = type, destdir =  private$user_destdir)
       #necessary step because outputs comes with subfolder
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
@@ -371,9 +391,9 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a inputs/outputs file nrow given an analysis id
-    get_ana_dataset_nrow = function(id, type, dataset_identifier, oasisapi, ...){
+    get_ana_dataset_nrow = function(id, type, dataset_identifier, ...){
       destdir =   private$user_destdir
-      tarfile <- get_analyses_tar(id, label = type, destdir = destdir, oasisapi)
+      tarfile <- self$get_analyses_tar(id, label = type, destdir = destdir)
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
@@ -387,9 +407,9 @@ DataHub <- R6Class(
       invisible()
     },
     #extract a inputs/outputs file size given an analysis id
-    get_ana_dataset_size = function(id, type, dataset_identifier, oasisapi, ...){
+    get_ana_dataset_size = function(id, type, dataset_identifier,...){
       destdir =   private$user_destdir
-      tarfile <- get_analyses_tar(id, label = type, destdir = destdir, oasisapi)
+      tarfile <- self$get_analyses_tar(id, label = type, destdir = destdir)
       if (any(grepl(paste0(type, "/"),  untar(tarfile, list = TRUE)))) {
         dataset_identifier <- file.path(type, dataset_identifier)
       }
@@ -403,8 +423,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract analysis settings content
-    get_ana_settings_content = function(id, oasisapi, ...){
-      dataset_content <- oasisapi$api_get_query(query_path = paste("analyses", id, "settings_file",  sep = "/"))
+    get_ana_settings_content = function(id,  ...){
+      dataset_content <- private$oasisapi$api_get_query(query_path = paste("analyses", id, "settings_file",  sep = "/"))
       content(dataset_content$result)
     },
     #invalidate analysis settings content
@@ -412,8 +432,8 @@ DataHub <- R6Class(
       invisible()
     },
     #extract analysis validation summary content
-    get_ana_validation_summary_content = function(id, oasisapi, ...){
-      json_lst <- self$get_ana_inputs_dataset_content(id, dataset_identifier = "exposure_summary_report.json", oasisapi, ...)
+    get_ana_validation_summary_content = function(id,  ...){
+      json_lst <- self$get_ana_inputs_dataset_content(id, dataset_identifier = "exposure_summary_report.json", ...)
       dataset_content <- NULL
       if (!is.null(json_lst)) {
         dataset_content <- unlist(json_lst) %>%
@@ -441,12 +461,156 @@ DataHub <- R6Class(
     write_file = function(data, dataset_identifier, file_towrite = NULL, ...){
       fs <- write_file(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
       fs
+    },
+    # > Helper methods ----
+    get_analyses_tar = function(id, label, destdir = tempdir()) {
+      dest <- tempfile(tmpdir = destdir, fileext = ".tar")
+      response <- private$oasisapi$api_get_analyses_tar(id, paste0(label, "_file"), dest)
+      dest
+    },
+    get_analyses_inputs_tar = function(id, destdir = tempdir()) {
+      self$get_analyses_tar(id, label = "input", destdir)
+    },
+    get_analyses_outputs_tar = function(id, destdir = tempdir()) {
+      self$get_analyses_tar(id, label = "output", destdir)
+    },
+    # > Return manipulated tables methods ----
+    # Portfolios
+    return_tbl_portfolioDetails = function(id) {
+      tbl_portfolioDetails <- private$oasisapi$return_df(paste("portfolios", id,  sep = "/"))
+      if (!is.null(tbl_portfolioDetails) && is.null(tbl_portfolioDetails$detail)) {
+        tbl_portfolioDetails <- tbl_portfolioDetails %>%
+          select(contains("file")) %>%
+          as.data.frame()
+        # reshape df
+        tbl_portfolioDetails <- gather(tbl_portfolioDetails,  key = "files", value = "name") %>%
+          as.data.frame()
+      }
+      tbl_portfolioDetails
+    },
+    return_tbl_portfoliosData = function(name = "", Status, tbl_portfoliosDataNames) {
+      tbl_portfoliosData <-  private$oasisapi$return_df("portfolios",  api_param = list(name = name))
+      if (!is.null(tbl_portfoliosData) && nrow(tbl_portfoliosData) > 0 && is.null(tbl_portfoliosData$detail)) {
+        tbl_portfoliosData <- cbind(tbl_portfoliosData, data.frame(status = ifelse(tbl_portfoliosData$location_file == "Not Available", Status$Processing, Status$Completed)))
+        tbl_portfoliosData <- convert_created_modified(tbl_portfoliosData)
+        tbl_portfoliosDetailsStatus <- tbl_portfoliosData  %>%
+          select(-contains("file") ) %>%
+          arrange(desc(!! sym(tbl_portfoliosDataNames$id))) %>%
+          as.data.frame()
+      } else {
+        tbl_portfoliosDetailsStatus <- NULL
+      }
+      tbl_portfoliosDetailsStatus
+    },
+    # Models
+    return_tbl_modelsData = function(supplier_id = "", tbl_modelsDataNames) {
+      tbl_modelsData <-  private$oasisapi$return_df("models", api_param = list(`supplier_id` = supplier_id))
+      if (!is.null(tbl_modelsData) && nrow(tbl_modelsData) > 0 && is.null(tbl_modelsData$detail)) {
+        tbl_modelsData <- convert_created_modified(tbl_modelsData)
+        tbl_modelsData <- tbl_modelsData %>%
+          arrange(desc(!! sym(tbl_modelsDataNames$id)))
+      } else {
+        tbl_modelsData <- NULL
+      }
+      tbl_modelsData
+    },
+    return_tbl_modelData = function(id) {
+      tbl_modelData <-  private$oasisapi$return_df(paste("models", id,  sep = "/"))
+      if (!is.null(tbl_modelData) && nrow(tbl_modelData) > 0  && is.null(tbl_modelData$detail)) {
+        tbl_modelData <- convert_created_modified(tbl_modelData)
+      } else {
+        tbl_modelData <- NULL
+      }
+      tbl_modelData
+    },
+    # Analyses
+    return_analyses_input_file_wicons_df = function(id, Status) {
+      status_code_notfound <- 404
+      analyses_input_file_df <- self$get_ana_inputs_data_list(id) %>%
+        mutate(status = status_code_notfound) %>%
+        as.data.frame()
+      if (nrow(analyses_input_file_df) > 0) {
+        analyses_input_file_df$status <- sapply(analyses_input_file_df$files, function(fname){
+          size <- self$get_ana_dataset_size(id, type = "input", dataset_identifier = fname)
+          if (is.na(size)) {
+            status <- Status$Processing
+          } else if (size == 0) {
+            status <- Status$Failed
+          } else {
+            status <- Status$Completed
+          }
+          status
+        })
+      } else{
+        analyses_input_file_df <- NULL
+      }
+      analyses_input_file_df
+    },
+    return_tbl_analysesData_nice = function(tbl_analysesData, admin_mode, Status, tbl_modelsDataNames, tbl_portfoliosDataNames, tbl_analysesDataNames) {
+      # fetch model data to merge in table
+      tbl_modelsData <- self$return_tbl_modelsData(tbl_modelsDataNames = tbl_modelsDataNames) %>%
+        mutate(supplier = !! sym(tbl_modelsDataNames$supplier_id)) %>%
+        select(!! sym(tbl_modelsDataNames$id), !! sym(tbl_modelsDataNames$model_id), supplier, !! sym(tbl_modelsDataNames$version_id))
+      # fetch portfolio data to merge in table
+      tbl_portfoliosData <-self$return_tbl_portfoliosData(Status = Status, tbl_portfoliosDataNames = tbl_portfoliosDataNames) %>%
+        select(!! sym(tbl_portfoliosDataNames$id), !! sym(tbl_portfoliosDataNames$name)) %>%
+        rename("portfolio_name" = tbl_portfoliosDataNames$name)
+      tbl_analysesData <- tbl_analysesData %>%
+        left_join(tbl_modelsData, by = c("model" = "id")) %>%
+        unite("model_version", c(tbl_modelsDataNames$model_id, tbl_modelsDataNames$version_id), sep = ", version ") %>%
+        left_join(tbl_portfoliosData, by = c("portfolio" = "id"))
+      if (admin_mode == "admin") {
+        tbl_analysesData <- tbl_analysesData %>%
+          select(!! sym(tbl_analysesDataNames$id),
+                 !! sym(tbl_analysesDataNames$name),
+                 !! sym(tbl_analysesDataNames$portfolio),
+                 portfolio_name,
+                 !! sym(tbl_analysesDataNames$model),
+                 model_version,
+                 supplier,
+                 !! sym(tbl_analysesDataNames$created),
+                 !! sym(tbl_analysesDataNames$modified),
+                 !! sym(tbl_analysesDataNames$status_detailed),
+                 !! sym(tbl_analysesDataNames$status)) %>%
+          rename("portfolio_id" = tbl_analysesDataNames$portfolio) %>%
+          rename("model_id" = tbl_analysesDataNames$model)
+      } else {
+        tbl_analysesData <- tbl_analysesData %>%
+          select(!! sym(tbl_analysesDataNames$id),
+                 !! sym(tbl_analysesDataNames$name),
+                 portfolio_name,
+                 model_version,
+                 supplier,
+                 !! sym(tbl_analysesDataNames$created),
+                 !! sym(tbl_analysesDataNames$modified),
+                 !! sym(tbl_analysesDataNames$status_detailed),
+                 !! sym(tbl_analysesDataNames$status))
+      }
+      tbl_analysesData <- tbl_analysesData %>%
+        capitalize_names_df()
+      tbl_analysesData
+    },
+    return_tbl_analysesData = function(name = "", Status, tbl_analysesDataNames) {
+      tbl_analysesData <- private$oasisapi$return_df("analyses", list(name = name))
+      if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0 && is.null(tbl_analysesData$detail)) {
+        tbl_analysesData <- tbl_analysesData %>%
+          select(-contains("file")) %>%
+          as.data.frame()
+        tbl_analysesData <- convert_created_modified(tbl_analysesData)
+        tbl_analysesData <- tbl_analysesData %>%
+          mutate(status_detailed = tolower(gsub(pattern = "_", " ", tbl_analysesData[, tbl_analysesDataNames$status]))) %>%
+          arrange(desc(!! sym(tbl_analysesDataNames$id))) %>%
+          .addIcons(Status = Status) %>%
+          select(c(!! sym(tbl_analysesDataNames$id), !! sym(tbl_analysesDataNames$name),
+                   !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
+                   !! sym(tbl_analysesDataNames$modified), !! sym(tbl_analysesDataNames$created),
+                   !! sym(tbl_analysesDataNames$status_detailed), !! sym(tbl_analysesDataNames$status)))
+
+      } else {
+        tbl_analysesData <- NULL
+      }
+      tbl_analysesData
     }
-  ),
-  # Private ----
-  private = list(
-    user = "",
-    user_destdir = ""
   )
 )
 
@@ -462,4 +626,21 @@ DataHub <- R6Class(
   g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
   g <- granToOed[granToOed$oed == g_oed, "gran"]
   z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = reportToVar(varsdf)[[ report ]], stringsAsFactors = FALSE)
+}
+
+.addIcons <- function(df, Status) {
+  StatusGood <- "RUN_COMPLETED"
+  StatusBad <- c("INPUTS_GENERATION_ERROR", "RUN_ERROR", NA_character_)
+  StatusAvailable <- "READY"
+  # replace status in df
+  if (!is.null(df)) {
+    logMessage(paste0("replacing icons"))
+    df <- df %>%
+      mutate(status = case_when(status %in% StatusGood ~ Status$Completed,
+                                status %in% StatusBad ~ Status$Failed,
+                                status %in% StatusAvailable ~ Status$Ready,
+                                status %notin% c(StatusBad, StatusGood, StatusAvailable) ~ Status$Processing)) %>%
+      as.data.frame()
+  }
+  df
 }

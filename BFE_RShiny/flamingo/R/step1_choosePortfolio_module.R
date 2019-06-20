@@ -622,7 +622,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   onclick("abuttonSRSFileUpload", {
-    .uploadSourceFile(inFile = result$SRSFile, query_path = "reinsurance_source_file")
+    .uploadSourceFile(inFile = result$SRSFile, query_path = "reinsurance_scope_file")
   })
 
   # Define portfolioID ---------------------------------------------------------
@@ -737,7 +737,7 @@ step1_choosePortfolio <- function(input, output, session,
   # Reload portfolio table
   .reloadtbl_portfoliosData <- function() {
     logMessage(".reloadtbl_portfoliosData called")
-    result$tbl_portfoliosData <- return_tbl_portfoliosData(oasisapi = session$userData$oasisapi)
+    result$tbl_portfoliosData <- session$userData$data_hub$return_tbl_portfoliosData(Status = Status, tbl_portfoliosDataNames = tbl_portfoliosDataNames)
     logMessage("portfolio table refreshed")
     invisible()
   }

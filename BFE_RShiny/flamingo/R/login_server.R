@@ -40,6 +40,7 @@ loginDialog <- function(input, output, session, logout) {
   observeEvent(logout(), {
     js$reset()
     result$user <- FLAMINGO_GUEST_ID
+    session$userData$data_hub <-  NULL
   })
 
   observeEvent(input$abuttonloginbutton, {
@@ -51,7 +52,7 @@ loginDialog <- function(input, output, session, logout) {
       session$userData$oasisapi$set_refresh_token(user, pwd)
       if (!is.null(session$userData$oasisapi$get_access_token())) {
         result$user <- user
-        session$userData$data_hub <- DataHub$new(user =  session$userData$oasisapi$get_access_token(), destdir = getOption("flamingo.settings.api.share_filepath"))
+        session$userData$data_hub <- DataHub$new(user =  session$userData$oasisapi$get_access_token(), destdir = getOption("flamingo.settings.api.share_filepath"), oasisapi = session$userData$oasisapi)
       } else {
         result$user = FLAMINGO_GUEST_ID
         flamingoNotification("Login Failed, please check your credentials.", type = "error")

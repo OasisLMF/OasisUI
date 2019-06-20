@@ -203,7 +203,7 @@ exposurevalidationmap <- function(input,
 
     logMessage(".reloadExposureValidation called")
 
-    uploaded_locs_check <- check_loc(analysisID(), portfolioID(), data_hub = session$userData$data_hub, oasisapi = session$userData$oasisapi)
+    uploaded_locs_check <- check_loc(analysisID(), portfolioID(), data_hub = session$userData$data_hub)
 
     #updating reactive only when needed
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {

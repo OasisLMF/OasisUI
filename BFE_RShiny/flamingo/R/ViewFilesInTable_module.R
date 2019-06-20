@@ -169,7 +169,7 @@ ViewFilesInTable <- function(input, output, session,
           func <- get(returnfunc)
           fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename)
         } else {
-          fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath, oasisapi = session$userData$oasisapi)
+          fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
         }
         if (!is.null(fileData)) {
           fpath <- session$userData$data_hub$write_file(data = fileData, dataset_identifier = filename)
@@ -355,11 +355,11 @@ ViewFilesInTable <- function(input, output, session,
 
     #Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
-    if (result$currentFile %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_source_file")) {
-      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile, oasisapi = session$userData$oasisapi)
+    if (result$currentFile %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
+      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile, oasisapi = session$userData$oasisapi)
-        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile,  oasisapi = session$userData$oasisapi)
+        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
+        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
         result$currentFile <- paste0(result$currentFile, ".csv")
         #Show buttons
         if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
@@ -370,10 +370,10 @@ ViewFilesInTable <- function(input, output, session,
         }
       }
     } else {
-      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath, oasisapi = session$userData$oasisapi)
+      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath, session$userData$oasisapi)
-        filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath, session$userData$oasisapi)
+        filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+        filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
       }
 
       #Show buttons

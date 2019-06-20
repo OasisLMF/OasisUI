@@ -2,6 +2,8 @@
 
 # UI content that is rendered once the user has authenticated
 source(file.path(".", "ui_auth.R"), local = TRUE)$value
+#clean up folder upon login
+clean_downloadedData()
 
 #' server
 #'
@@ -13,9 +15,6 @@ source(file.path(".", "ui_auth.R"), local = TRUE)$value
 #' @export
 
 server <- function(input, output, session) {
-
-  #clean up folder upon login
-  clean_downloadedData()
 
   #set api
   session$userData$oasisapi <- OasisAPI$new(host = APISettings$server, port = APISettings$port, version = APISettings$version)

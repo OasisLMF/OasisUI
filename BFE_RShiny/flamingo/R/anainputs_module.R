@@ -112,7 +112,7 @@ anainputs <- function(input,
     logMessage(".reloadInputs called")
     if (!is.null(analysisID())) {
       withModalSpinner(
-        dt_generated <- return_analyses_input_file_wicons_df(analysisID(), session$userData$data_hub,  session$userData$oasisapi),
+        dt_generated <- session$userData$data_hub$return_analyses_input_file_wicons_df(analysisID(),Status),
         "Loading...",
         size = "s"
       )

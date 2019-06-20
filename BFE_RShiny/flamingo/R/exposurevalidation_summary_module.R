@@ -103,7 +103,7 @@ exposurevalidationsummary <- function(input,
     counter()
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
-      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID(), session$userData$oasisapi)
+      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID())
       result$perils <- unique(result$summary_tbl$peril)
       updateSelectInput(session, inputId = "input_peril", choices = ifelse(!is.null(result$perils), result$perils, "no perils available for summary"))
     }
@@ -147,7 +147,7 @@ exposurevalidationsummary <- function(input,
   onclick("abuttonexposurerefresh", {
     # Get modeled locations
     withModalSpinner(
-      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID(), session$userData$oasisapi),
+      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID()),
       "Refreshing...",
       size = "s"
     )

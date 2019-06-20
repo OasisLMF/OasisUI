@@ -79,7 +79,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
   # Reload Process Runs table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
-    result$tbl_anaInbox <- return_tbl_analysesData(oasisapi =  session$userData$oasisapi)
+    result$tbl_anaInbox <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
     logMessage("analyses table refreshed")
     invisible()
   }
@@ -97,7 +97,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
 
   output$dt_anaInbox <- renderDT(if (!is.null(result$tbl_anaInbox)) {
     datatable(
-      result$tbl_anaInbox %>% return_tbl_analysesData_nice(oasisapi = session$userData$oasisapi),
+      result$tbl_anaInbox %>% session$userData$data_hub$return_tbl_analysesData_nice(admin_mode = getOption("flamingo.settings.admin.mode"), Status = Status, tbl_modelsDataNames = tbl_modelsDataNames, tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames),
       class = "flamingo-table display",
       rownames = FALSE,
       selection = "single",

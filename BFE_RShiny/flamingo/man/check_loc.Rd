@@ -12,8 +12,6 @@ check_loc(analysisID, portfolioID, data_hub, oasisapi)
 \item{portfolioID}{selected portfolio ID.}
 
 \item{data_hub}{data hub stored in session$userData$data_hub}
-
-\item{oasisapi}{api stored in session$userData$oasisapi}
 }
 \description{
 Compares uploaded and modeled locations.
