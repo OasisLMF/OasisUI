@@ -62,6 +62,7 @@ Initialize
  \item{\code{api_delete_query(uery_path, query_list, ...)}}{Construct DELETE query to the api.}
  \item{\code{api_post_file_query(query_path, query_body = NULL, ...)}}{POST file query to the api.}
  \item{\code{api_body_query(query_path, query_body = NULL, query_method = "POST", ...)}}{PUT/POST query with body field to the api.}
+ \item{\code{api_return_query_res(query_path, query_list = NULL, query_method, ...)}}{PUT/POST query with body field to the api.}
  return from query
  \item{\code{return_df(query_path, api_param = "", query_method = "GET"))}}{MAnipulate data returned from GET query.}
  write to disk

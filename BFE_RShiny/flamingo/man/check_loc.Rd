@@ -4,7 +4,7 @@
 \alias{check_loc}
 \title{check_loc}
 \usage{
-check_loc(analysisID, portfolioID, data_hub, oasisapi)
+check_loc(analysisID, portfolioID, data_hub)
 }
 \arguments{
 \item{analysisID}{Selected analysis id.}
