@@ -90,7 +90,6 @@ anainputs <- function(input,
     result$counter
     analysisID()
   }, ignoreInit = TRUE, {
-    browser()
     print(paste0("result$counter ", result$counter))
     if (length(active()) > 0 && active() && !is.null(analysisID()) && !is.na(result$counter) &&  result$counter != "" &&  result$counter != 0 && !is.null(result$counter)) {
       if (!refresh_opt) {
