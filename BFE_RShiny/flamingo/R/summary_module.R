@@ -75,6 +75,7 @@ summarytabUI <- function(id) {
 #' @importFrom dplyr left_join
 #' @importFrom dplyr mutate
 #' @importFrom dplyr mutate_if
+#' @importFrom dplyr case_when
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' @importFrom tidyr gather
@@ -342,9 +343,15 @@ summarytab <- function(input, output, session,
       #infer params
       tiv <- AAL %>%
         filter(grepl("exposure_value", variable)) %>%
-        select(value) %>%
-        unique() %>%
-        as.character()
+        separate(variable, into = c("variables", "report", "perspective"), sep = "\\.") %>%
+        mutate(type = case_when(as.character(type) == "1" ~ " (NI)",
+                                as.character(type) == "2" ~ " (Sample)",
+                                TRUE ~ as.character(type)),
+               value = as.character(value),
+               variables = case_when(variables == "exposure_value" ~ paste0("exposure TIV ", perspective, type),
+                                     TRUE ~ variables)) %>%
+        select(variables, value) %>%
+        unique()
       #AAL output
       outputsAALtmp <- AAL %>%
         select(-c("summary_id")) %>%
@@ -357,7 +364,7 @@ summarytab <- function(input, output, session,
       # AAL plot
       plotAALtmp <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
     } else {
-      tiv <- 0
+      tiv <- NULL
       outputsAAL <- NULL
       plotAALtmp <- NULL
     }
@@ -374,7 +381,7 @@ summarytab <- function(input, output, session,
     Location <- session$userData$data_hub$get_pf_location_content(id = portfolioID)
     if (!is.null(Location)) {
       #infer params
-      locnum <- length(unique(Location$LOCNUM))
+      locnum <- length(unique(Location$LocNumber))
     } else {
       locnum <- 0
     }
@@ -384,9 +391,9 @@ summarytab <- function(input, output, session,
     model_params_lst <-  sapply(names(model_settings), function(i){model_settings[[i]]})
 
     #summary DF
-    SpecificationRows <- c("exposure location count", "exposure TIV", names(model_params_lst))
-    ValueRows <- unlist(c(locnum, tiv, model_params_lst))
-    TypeRows <- c("input", "input", rep("param", length(model_params_lst)))
+    SpecificationRows <- c("exposure location count", tiv$variables, names(model_params_lst))
+    ValueRows <- unlist(c(locnum, tiv$value, model_params_lst))
+    TypeRows <- c("input", rep("input", nrow(tiv)), rep("param", length(model_params_lst)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 
