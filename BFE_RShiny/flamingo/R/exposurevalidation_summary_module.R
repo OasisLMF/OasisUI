@@ -101,8 +101,9 @@ exposurevalidationsummary <- function(input,
   observeEvent({
     active()
     counter()
+    analysisID()
   }, {
-    if (length(active()) > 0 && active() && counter() > 0) {
+    if (length(active()) > 0 && active() && !is.null(analysisID())) {
       result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID())
       result$perils <- unique(result$summary_tbl$peril)
       updateSelectInput(session, inputId = "input_peril", choices = ifelse(!is.null(result$perils), result$perils, "no perils available for summary"))

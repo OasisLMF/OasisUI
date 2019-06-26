@@ -87,7 +87,7 @@ exposurevalidationmap <- function(input,
     counter()
     active()
   }, {
-    if (length(active()) > 0 && active() && counter() > 0) {
+    if (length(active()) > 0 && active() && !is.null(analysisID())) {
       .reloadExposureValidation()
       perils <- result$uploaded_locs_check$peril[!is.na(result$uploaded_locs_check$peril)] %>%
         unique()

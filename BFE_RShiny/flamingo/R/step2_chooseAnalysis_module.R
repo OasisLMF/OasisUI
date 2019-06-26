@@ -246,7 +246,6 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
-    hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
@@ -402,6 +401,7 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
   })
+
 
   sub_modules$analysis_details <- callModule(
     analysis_details,
@@ -634,6 +634,7 @@ step2_chooseAnalysis <- function(input, output, session,
             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$run_err ||
             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$run_ok) {
           enable("abuttonshowanadetails")
+          show("panelAnalysisDetails")
         }
       }
     })
