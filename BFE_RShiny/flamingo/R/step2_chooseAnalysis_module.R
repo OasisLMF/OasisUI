@@ -501,6 +501,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
+    hide("panelAnalysisDetails")
     logMessage("showing panelModelTable")
     show("panelModelTable")
     .reloadtbl_modelsData()
