@@ -70,7 +70,7 @@ node {
                                 sh "git checkout $CHANGE_TARGET"
                                 sh "git merge $BRANCH_NAME"
                                 app_branch = CHANGE_BRANCH
-                                // WARNING: this will fail for external pull requests 
+                                // WARNING: this will fail for external pull requests
 
                             } else {
                                 // Checkout branch
@@ -102,7 +102,7 @@ node {
         )
 
         // ToDO add testing here
-        //stage('Run Flamingo') {
+        //stage('Run Oasisui') {
         //    dir('oasis_build') {
         //        sh PIPELINE + " run_ui"
         //    }

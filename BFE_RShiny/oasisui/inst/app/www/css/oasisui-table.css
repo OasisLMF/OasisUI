@@ -1,0 +1,18 @@
+/*** Oasisui Data Tables ***/
+
+.oasisui-table {
+	width: 100%;
+}
+
+.oasisui-table-narrow {
+	max-width: 1400px;
+}
+
+.oasisui-table th {
+	text-align: center;
+}
+
+.oasisui-table td {
+	font-size: 12px;
+	text-align: center
+}
