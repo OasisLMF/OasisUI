@@ -24,7 +24,7 @@ check_loc <- function(analysisID, portfolioID, data_hub){
 
   uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID) %>%
     mutate(loc_idx = seq(nrow(.)) - 1)
-  modelled_locs <-  data_hub$get_ana_inputs_dataset_content(analysisID, dataset_identifier = "gul_summary_map.csv")
+  modelled_locs <-  data_hub$get_ana_dataset_content(id = analysisID, dataset_identifier = "lookup_success_file") #data_hub$get_ana_inputs_dataset_content(analysisID, dataset_identifier = "gul_summary_map.csv")
 
   #dummy to test validation
   #modelled_locs <- modelled_locs[1:30,]

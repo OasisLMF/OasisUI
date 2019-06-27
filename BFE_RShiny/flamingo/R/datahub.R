@@ -327,13 +327,14 @@ DataHub <- R6Class(
 
     # > ANALYSIS METHODS ----
     #extract a input/output file given an analysis id
-    get_ana_dataset_content = function(id, dataset_identifier, type, ...){
+    get_ana_dataset_content = function(id, dataset_identifier, type = "", ...){
       if (type == "input") {
         dataset_content <- self$get_ana_inputs_dataset_content(id, dataset_identifier)
       } else if (type == "output") {
         dataset_content <- self$get_ana_outputs_dataset_content(id, dataset_identifier)
       } else {
-        dataset_content <- NULL
+        query_response <- private$oasisapi$api_get_query(query_path = paste("analyses", id, dataset_identifier,  sep = "/"))
+        dataset_content <- content(query_response$result)
       }
       dataset_content
     },
@@ -433,7 +434,8 @@ DataHub <- R6Class(
     },
     #extract analysis validation summary content
     get_ana_validation_summary_content = function(id,  ...){
-      json_lst <- self$get_ana_inputs_dataset_content(id, dataset_identifier = "exposure_summary_report.json", ...)
+      query_response <- private$oasisapi$api_get_query(query_path = paste("analyses", id, "lookup_validation_file",  sep = "/"))
+      json_lst <- content(query_response$result)
       dataset_content <- NULL
       if (!is.null(json_lst)) {
         dataset_content <- unlist(json_lst) %>%
