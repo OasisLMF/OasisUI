@@ -95,7 +95,7 @@ panelPortfolioTable <- function(id) {
 #' @export
 panelPortfolioDetails <- function(id) {
   ns <- NS(id)
-    portfolio_detailsUI(ns("portfolio_details"))
+  portfolio_detailsUI(ns("portfolio_details"))
 }
 
 #' panelDefinePortfolio
@@ -159,31 +159,20 @@ panelLinkFiles <- function(id) {
       # Source Location File
       column(3,
              fileInput(inputId = ns("SLFile"), label = 'Location file:', accept = c('csv', 'comma-separated-values', '.csv'))),
-      column(2,
-             flamingoButton(inputId = ns("abuttonSLFileUpload"), label = "Link File", align = "left", enable = FALSE, style = "margin-top: 25px;display-inline: true;")),
       # Source Account File
       column(3,
              fileInput(inputId = ns("SAFile"), label = 'Account file:',
                        accept = c('csv', 'comma-separated-values', '.csv'))),
-      column(2,
-             flamingoButton(inputId = ns("abuttonSAFileUpload"), label = "Link File", align = "left",
-                            style = "margin-top: 25px;display-inline: true;"))),
 
-    fluidRow(
       # Source Reinsurance File
       column(3,
              fileInput(inputId = ns("SRFile"), label = 'RI info file:',
                        accept = c('csv', 'comma-separated-values', '.csv'))),
-      column(2,
-             flamingoButton(inputId = ns("abuttonSRFileUpload"), label = "Link File", align = "left",
-                            style = "margin-top: 25px;display-inline: true;")),
       # Source Reinsurance Scope File
       column(3,
              fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
-                       accept = c('csv', 'comma-separated-values', '.csv'))),
-      column(2,
-             flamingoButton(inputId = ns("abuttonSRSFileUpload"), label = "Link File", align = "left",
-                            style = "margin-top: 25px;display-inline: true;"))),
+                       accept = c('csv', 'comma-separated-values', '.csv')))
+    ),
     fluidRow(
       column(12,
              actionButton(inputId = ns("abuttonpfclear"), label = "Clear", style = "inline: true;float:right;")))
@@ -279,26 +268,6 @@ step1_choosePortfolio <- function(input, output, session,
   # Enable/ Disable buttons ----------------------------------------------------
 
   # Enable and disable link files buttons
-  #Location file
-  observeEvent(result$SLFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    .enablingLinkButton(inFileId = "SLFile", abuttonId = "abuttonSLFileUpload")
-  })
-
-  #Account file
-  observeEvent(result$SAFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    .enablingLinkButton(inFileId = "SAFile", abuttonId = "abuttonSAFileUpload")
-  })
-
-  #RI file
-  observeEvent(result$SRFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    .enablingLinkButton(inFileId = "SRFile", abuttonId = "abuttonSRFileUpload")
-  })
-
-  #Reinsurance Scope file
-  observeEvent(result$SRSFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
-    .enablingLinkButton(inFileId = "SRSFile", abuttonId = "abuttonSRSFileUpload")
-  })
-
 
   # Enable and disable buttons
   observeEvent({
@@ -558,16 +527,6 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelLinkFiles")
   })
 
-  # disable link files action button if input file widget is empty
-  .enablingLinkButton <- function(inFileId, abuttonId) {
-    inFile <- result[[inFileId]]
-    if (is.null(inFile) || inFile == "") {
-      disable(abuttonId)
-    } else {
-      enable(abuttonId)
-    }
-  }
-
   # Upload Location/Account File
   .uploadSourceFile <- function(inFile, query_path ){
     logMessage(paste0("Uploading file ", inFile$datapath))
@@ -595,33 +554,25 @@ step1_choosePortfolio <- function(input, output, session,
 
   observeEvent(input$SLFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
     result$SLFile <- input$SLFile
-  })
-
-  onclick("abuttonSLFileUpload", {
     .uploadSourceFile(inFile = result$SLFile, query_path = "location_file")
   })
 
+  # onclick("abuttonSLFileUpload", {
+  #   .uploadSourceFile(inFile = result$SLFile, query_path = "location_file")
+  # })
+
   observeEvent(input$SAFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
     result$SAFile <- input$SAFile
-  })
-
-  onclick("abuttonSAFileUpload", {
     .uploadSourceFile(inFile = result$SAFile, query_path = "accounts_file")
   })
 
   observeEvent(input$SRFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
     result$SRFile <- input$SRFile
-  })
-
-  onclick("abuttonSRFileUpload", {
     .uploadSourceFile(inFile = result$SRFile, query_path = "reinsurance_info_file")
   })
 
   observeEvent(input$SRSFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
     result$SRSFile <- input$SRSFile
-  })
-
-  onclick("abuttonSRSFileUpload", {
     .uploadSourceFile(inFile = result$SRSFile, query_path = "reinsurance_scope_file")
   })
 
