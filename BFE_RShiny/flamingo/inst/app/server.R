@@ -2,7 +2,7 @@
 
 # UI content that is rendered once the user has authenticated
 source(file.path(".", "ui_auth.R"), local = TRUE)$value
-#clean up folder upon app launch
+#clean up API_SHARE_FILEPATH folder upon app launch
 clean_downloadedData()
 
 #' server
