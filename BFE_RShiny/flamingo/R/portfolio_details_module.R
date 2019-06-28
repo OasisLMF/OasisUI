@@ -36,6 +36,7 @@ portfolio_detailsUI <- function(id) {
 #' @description Server logic for portfolio details.
 #'
 #' @template params-module
+#' @template params-active
 #' @param refresh_opt Option to hide/show refresh button.
 #' @param portfolioID selected portfolio ID.
 #' @param portfolioName selected portfolio Name.
@@ -102,10 +103,6 @@ portfolio_details <- function(input,
   # Reload uploaded inputs table -----------------------------------------------
   .reloadtbl_portfolioDetails <- function() {
     logMessage(".reloadtbl_portfolioDetails called")
-    if (!is.null(portfolioID()) && portfolioID() != "") {
-      result$dt_uploaded  <- return_tbl_portfolioDetails(portfolioID())
-    } else {
-      result$dt_uploaded  <- NULL
-    }
+          result$dt_uploaded  <- session$userData$data_hub$get_pf_data_list(portfolioID())
   }
 }

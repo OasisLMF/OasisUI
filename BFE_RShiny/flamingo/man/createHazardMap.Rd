@@ -10,11 +10,15 @@ createHazardMapUI(id)
 createHazardMap(input, output, session, file_map, file_pins)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
+
+\item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{file_map}{File to plot as map.}
 
 \item{file_pins}{File to plot pins.}
+
+\item{id}{module id}
 }
 \value{
 Leaflet map.

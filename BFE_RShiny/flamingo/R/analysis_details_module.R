@@ -42,13 +42,10 @@ analysis_detailsUI <- function(id) {
 #' @rdname analysis_details
 #'
 #' @description Server side of function wrapping panel to show analyses details table.
-#'
-#' @template params-module-ui
+#'i
 #' @param analysisID Selected analysis ID.
-#' @param portfolioID Selected Portfolio ID.
-#' @param reload_generated Imports function to reload Generated Inputs table.
-#'
-#' @template params-module-ui
+#' @param portfolioID Selected portfolio ID.
+#' @template params-module
 #'
 #' @export
 analysis_details <- function(input,
@@ -59,25 +56,6 @@ analysis_details <- function(input,
                              counter) {
 
   ns <- session$ns
-
-  # Download inputs ------------------------------------------------------------
-  observeEvent({
-    counter()
-  }, {
-    if (length(counter()) > 0 && counter() > 0) {
-      if ((!is.null(portfolioID()) && !is.na(portfolioID()) && portfolioID() != "") &&
-          (!is.null(analysisID()))) {
-        extractFolder <- set_extractFolder(analysisID(), label = "_inputs/")
-        if (!file.exists(extractFolder) && is.na(file.size(extractFolder))) {
-          withModalSpinner(
-            api_get_analyses_input_file(analysisID()),
-            "Loading...",
-            size = "s"
-          )
-        }
-      }
-    }
-  })
 
   # Tab Exposure Validation ----------------------------------------------------
   callModule(
@@ -92,6 +70,7 @@ analysis_details <- function(input,
     exposurevalidationmap,
     id = "exposurevalidationmap",
     analysisID = analysisID,
+    portfolioID = portfolioID,
     counter = counter,
     active = reactive({input$tabsDetails == ns("tabvalidationmap")})
   )

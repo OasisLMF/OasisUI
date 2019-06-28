@@ -77,7 +77,7 @@ ViewFilesInTable <- function(input, output, session,
                              tbl_filesListData,
                              param = NULL,
                              file_column = "files",
-                             folderpath = "_outputs/output",
+                             folderpath = "output",
                              includechkbox = FALSE) {
 
   ns <- session$ns
@@ -160,54 +160,28 @@ ViewFilesInTable <- function(input, output, session,
       g <- input$dt_outputFL_rows_selected
       for (f in g) {
         filename <- result$tbl_filesListData_wButtons[f, file_column]
-
-        # Get dataframe
-        currNamespace <- ls("package:flamingo")
-        func_wpattern <- currNamespace[grepl(filename, currNamespace)]
-        returnfunc <- func_wpattern[grepl("api_get", func_wpattern)]
-        if (length(returnfunc) != 0) {
-          func <- get(returnfunc)
-          fileData <- return_file_df(func, param())
-          filename <- paste0(filename, ".csv")
+        if (filename %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
+          fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename)
         } else {
-          extractFolder <- set_extractFolder(id = param(), label = folderpath)
-          currfilepath <- set_extractFilePath(extractFolder, filename)
-          extension <-  strsplit(filename, split = "\\.") %>% unlist() %>% tail(n = 1)
-          if (extension == "csv") {
-            fileData <- fread(currfilepath)
-          } else if (extension == "json") {
-            fileData <- read_json(currfilepath)
-          } else{
-            fileData <- scan(currfilepath, what = "", sep = "\n")
-          }
-          fileData
+          fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
         }
-
         if (!is.null(fileData)) {
-          fpath <- file.path(currfolder, filename)
-          extension <-  strsplit(fpath, split = "\\.") %>% unlist() %>% tail(n = 1)
-          if (extension == "csv") {
-            fwrite(x = fileData, file = fpath, row.names = TRUE, quote = TRUE)
-          } else if (extension == "json") {
-            write(toJSON(fileData, pretty = TRUE), fpath)
-          } else{
-            write(fileData, fpath)
-          }
+          fpath <- session$userData$data_hub$write_file(data = fileData, dataset_identifier = filename)
           fs <- c(fs, fpath)
         }
-
       }
       zip(zipfile = fname, files = fs)
-      if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
+      # if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
     }
   )
 
-  # Download to csv ------------------------------------------------------------
+  # Download file-- ------------------------------------------------------------
   # Export to .csv
   output$FLdownloadexcel <- downloadHandler(
     filename = "file.csv",
     content = function(file) {
-      fwrite(result$tbl_filesListData_wButtons, file, row.names = TRUE, quote = TRUE)}
+       session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename, file_towrite = file)
+      }
   )
 
   # Selected Row ---------------------------------------------------------------
@@ -325,45 +299,35 @@ ViewFilesInTable <- function(input, output, session,
     }
   })
 
-  output$dt_FVExposureSelected <- renderDT(
-    if (!is.null(result$tbl_fileData) && nrow(result$tbl_fileData) > 0) {
-      datatable(
-        result$tbl_fileData %>% capitalize_names_df(),
-        class = "flamingo-table display",
-        rownames = FALSE,
-        selection = "none",
-        filter = 'bottom',
-        width = "100%",
-        options = list(searchHighlight = TRUE,
-                       scrollX = TRUE)
-      )
-    } else {
-      nothingToShowTable("Nothing to show")
-    }
-  )
-
   output$json_FVExposureSelected <- renderText({
-    if (!is.null(result$tbl_fileData)) {
-      toJSON(result$tbl_fileData, pretty = TRUE)
-    }
+    toJSON(result$tbl_fileData, pretty = TRUE)
   })
 
   output$text_FVExposureSelected <- renderText({
     result$tbl_fileData
   })
 
+  output$dt_FVExposureSelected <- renderDT(
+    if (!is.null(result$tbl_fileData )) {
+      datatable(
+        result$tbl_fileData %>% capitalize_names_df() %>% as.data.frame(),
+        class = "flamingo-table display",
+        rownames = FALSE,
+        selection = "none",
+        filter = 'bottom',
+        width = "100%",
+        options = getTableOptions()
+      )
+    } else {
+      nothingToShowTable("Nothing to show")
+    }
+  )
+
   # Export to .csv
   output$FVEdownloadexcel <- downloadHandler(
     filename = function(){result$currentFile},
     content = function(file) {
-      extension <-  strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
-      if (extension == "csv") {
-        fwrite(result$tbl_fileData, file, row.names = TRUE, quote = TRUE)
-      } else if (extension == "json") {
-        write(toJSON(result$tbl_fileData, pretty = TRUE), file)
-      } else{
-        write(result$tbl_fileData, file)
-      }
+      session$userData$data_hub$write_file(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
     }
   )
 
@@ -384,119 +348,66 @@ ViewFilesInTable <- function(input, output, session,
 
     #Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
-    currNamespace <- ls("package:flamingo")
-    func_wpattern <- currNamespace[grepl(result$currentFile, currNamespace)]
-    returnfunc <- func_wpattern[grepl("api_get",func_wpattern)]
-    filerows <- NULL
-    filecolumns <- NULL
-    if (length(returnfunc) != 0) {
-      func <- get(returnfunc)
-      result$tbl_fileData <- return_file_df(func,param())
+    if (result$currentFile %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
+      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
       if (!is.null(result$tbl_fileData)) {
-        names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
-        filecolumns <- paste(names(result$tbl_fileData), collapse = ", ")
-        filerows <- nrow(result$tbl_fileData)
+        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
+        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
         result$currentFile <- paste0(result$currentFile, ".csv")
-
         #Show buttons
-        if ("latitude" %in% names(result$tbl_fileData)) {
-          if (!is.null(result$tbl_fileData)) {
-            output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
-          }
+        if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
+          output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
           show("abuttonmap")
         } else {
           hide("abuttonmap")
         }
       }
     } else {
-      extractFolder <- set_extractFolder(id = param(), label = folderpath)
-      result$currfilepath <- set_extractFilePath(extractFolder, result$currentFile)
-      if (dir.exists(result$currfilepath)) {
-        result$tbl_fileData <- list.files(result$currfilepath, recursive = TRUE) %>%
-          as.data.frame() %>%
-          setNames("files")
-        filecolumns <- ""
-        filerows <- length(result$tbl_fileData)
-        hide("abuttonmap")
+      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+      if (!is.null(result$tbl_fileData)) {
+        filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+        filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+      }
 
-      } else {
-        extension <- strsplit(result$currentFile, split = "\\.") %>% unlist() %>% tail(n = 1)
-        if (extension == "csv") {
-          result$tbl_fileData <- fread(result$currfilepath)
-          filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", ")
-        } else if (extension == "json") {
-          result$tbl_fileData <- read_json(result$currfilepath)
-          filecolumns <- paste(tolower(names(result$tbl_fileData)), collapse = ", ")
-        } else{
-          result$tbl_fileData <- scan(result$currfilepath, what="", sep="\n")
-          filecolumns <- ""
-        }
+      #Show buttons
+      if ("latitude" %in% tolower(names(result$tbl_fileData))) {
         if (!is.null(result$tbl_fileData)) {
-          names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
+          output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
         }
-
-        filerows <- length(count.fields(result$currfilepath, skip = 1))
-
-        #Show buttons
-        if ("latitude" %in% names(result$tbl_fileData)) {
-          if (!is.null(result$tbl_fileData)) {
-            output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
-          }
-          show("abuttonmap")
-        } else {
-          hide("abuttonmap")
-        }
+        show("abuttonmap")
+      } else {
+        hide("abuttonmap")
       }
     }
+
     # Extra info table
     output$FVExposureStatisticInfo <- renderUI({
-      if (filecolumns == "") {
-        tagList(
-          fluidRow(
-            column(2,
-                   h5("Dir Name:")
-            ),
-            column(10,
-                   p(result$currentFile, style = "margin-top: 10px;")
-            )
+      tagList(
+        fluidRow(
+          column(2,
+                 h5("File Name")
           ),
-          fluidRow(
-            column(2,
-                   h5("Number of Files")
-            ),
-            column(10,
-                   p(filerows, style = "margin-top: 10px;")
-            )
+          column(10,
+                 p(result$currentFile, style = "margin-top: 10px;")
+          )
+        ),
+        fluidRow(
+          column(2,
+                 h5("Number of Rows")
+          ),
+          column(10,
+                 p(filerows, style = "margin-top: 10px;")
+          )
+        ),
+        fluidRow(
+          column(2,
+                 h5("Column names")
+          ),
+          column(10,
+                 p(paste0(filecolumns, collapse = ", "), style = "margin-top: 10px;")
           )
         )
-      } else {
-        tagList(
-          fluidRow(
-            column(2,
-                   h5("File Name")
-            ),
-            column(10,
-                   p(result$currentFile, style = "margin-top: 10px;")
-            )
-          ),
-          fluidRow(
-            column(2,
-                   h5("Number of Rows")
-            ),
-            column(10,
-                   p(filerows, style = "margin-top: 10px;")
-            )
-          ),
-          fluidRow(
-            column(2,
-                   h5("Column names")
-            ),
-            column(10,
-                   p(filecolumns, style = "margin-top: 10px;")
-            )
-          )
-        )
-      }
+      )
     })
   })#end observeEvent
 

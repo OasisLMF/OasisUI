@@ -556,7 +556,7 @@ step3_configureOutput <- function(input, output, session,
       }
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData %>% return_tbl_analysesData_nice(),
+        result$tbl_analysesData %>% session$userData$data_hub$return_tbl_analysesData_nice(admin_mode = getOption("flamingo.settings.admin.mode"), Status = Status, tbl_modelsDataNames = tbl_modelsDataNames, tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = list(mode = 'single',
@@ -599,7 +599,8 @@ step3_configureOutput <- function(input, output, session,
 
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     #should use /v1/analyses/{id}/cancel/
-    delete_analyses_id <- api_post_analyses_cancel(analysisID)
+    delete_analyses_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", analsisID, "cancel",  sep = "/"))
+
 
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
@@ -650,7 +651,7 @@ step3_configureOutput <- function(input, output, session,
         show("panelDefineOutputs")
         logMessage("showing panelDefineOutputs")
         result$ana_flag <- "R"
-        analysis_settings <- return_analyses_settings_file_list(result$anaID)
+        analysis_settings <- session$userData$data_hub$get_ana_settings_content(result$anaID, oasisapi = session$userData$oasisapi)
         analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
         if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
           flamingoNotification(type = "error",
@@ -752,7 +753,7 @@ step3_configureOutput <- function(input, output, session,
     if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
       anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
       anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
-      analysis_settings <-  return_analyses_settings_file_list(anaID)
+      analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
       if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
         flamingoNotification(type = "error",
                              paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
@@ -785,19 +786,19 @@ step3_configureOutput <- function(input, output, session,
   onclick("abuttonexecuteanarun", {
     analysis_settingsList <- .gen_analysis_settings()
     #write out file to be uploades
-    currfolder <- getOption("flamingo.settings.api.share_filepath")
+    currfolder <- session$userData$data_hub$get_user_destdir()
     dest <- file.path(currfolder, "analysis_settings.json")
     write_json(analysis_settingsList, dest, pretty = TRUE, auto_unbox = TRUE)
 
     #post analysis settings
-    post_analysis_settings_file <- api_post_analyses_settings_file(result$anaID, dest)
+    post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(query_path = paste("analyses",result$anaID, "settings_file", sep = "/"), query_body = dest, query_encode = "multipart")
+
 
     if (post_analysis_settings_file$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis settings posted to ", result$anaID ,"."))
 
-      analyses_run <- return_df(api_post_analyses_run,result$anaID)
-
+      analyses_run <-  session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run", sep = "/"), query_method = "POST")
 
       if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
 
@@ -949,7 +950,7 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
     if (portfolioID()  != "") {
-      tbl_analysesData  <- return_tbl_analysesData()
+      tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
         tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
         result$tbl_analysesData <- tbl_analysesData
@@ -965,7 +966,7 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
     if (!is.null(result$anaID)) {
-      result$tbl_analysisrunlog <- return_file_df(api_get_analyses_run_traceback_file, result$anaID)
+      session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run_traceback_file", sep = "/"))
     } else {
       result$tbl_analysisrunlog <-  NULL
     }
@@ -991,7 +992,7 @@ step3_configureOutput <- function(input, output, session,
   # Clear Custom Configuration option
   .clearOutputOptions <- function() {
     logMessage(".clearOutputOptions called")
-    tbl_analysesData  <- return_tbl_analysesData()
+    tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
     tbl_analysesData <- tbl_analysesData %>% filter(status != Status$Processing & status != Status$Ready)
     namesList <- tbl_analysesData[,tbl_analysesDataNames$name]
     idList <- tbl_analysesData[,tbl_analysesDataNames$id]
@@ -1013,10 +1014,9 @@ step3_configureOutput <- function(input, output, session,
     .clearOutputOptions()
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
     modelID <- ifelse(modelID == "", -1, modelID)
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
+    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(query_path = paste( "models", modelID, "resource_file", sep = "/"), query_method = "GET")
     if (modelID != -1 && !is.null(tbl_modelsDetails)) {
-      model_settings <- tbl_modelsDetails$model_settings %>%
-        unlist(recursive = FALSE)
+      model_settings <- tbl_modelsDetails$model_settings #%>% unlist(recursive = FALSE)
       names_settings_type <- lapply(names(model_settings), function(i) {model_settings[[i]][["type"]]}) %>%
         setNames(names(model_settings))
 
@@ -1158,8 +1158,8 @@ step3_configureOutput <- function(input, output, session,
     logMessage(".gen_analysis_settings called")
 
     modelID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$model]
-    modelData <- return_tbl_modelData(modelID)
-    tbl_modelsDetails <- return_response(api_get_models_id_resource_file, modelID)
+    modelData <- session$userData$data_hub$return_tbl_modelData(modelID)
+    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(query_path = paste( "models", modelID, "resource_file", sep = "/"), query_method = "GET")
     model_settings <- tbl_modelsDetails$model_settings %>%
       unlist(recursive = FALSE)
     model_params_lst <- lapply(names(model_settings), function(i){

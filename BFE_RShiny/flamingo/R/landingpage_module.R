@@ -79,7 +79,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
   # Reload Process Runs table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
-    result$tbl_anaInbox <- return_tbl_analysesData()
+    result$tbl_anaInbox <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
     logMessage("analyses table refreshed")
     invisible()
   }
@@ -91,16 +91,13 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
     # invalidate if the refresh button updates
     force(input$abuttonrefreshanaInbox)
 
-    # reload automatically every so often
-    invalidateLater(reloadMillis)
-
     #refesh table
     .reloadAnaData()
   })
 
   output$dt_anaInbox <- renderDT(if (!is.null(result$tbl_anaInbox)) {
     datatable(
-      result$tbl_anaInbox %>% return_tbl_analysesData_nice(),
+      result$tbl_anaInbox %>% session$userData$data_hub$return_tbl_analysesData_nice(admin_mode = getOption("flamingo.settings.admin.mode"), Status = Status, tbl_modelsDataNames = tbl_modelsDataNames, tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames),
       class = "flamingo-table display",
       rownames = FALSE,
       selection = "single",
@@ -117,7 +114,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
   output$downloadexcel_ana <- downloadHandler(
     filename = "analyses_inbox.csv",
     content = function(file) {
-      fwrite(result$tbl_anaInbox, file, row.names = TRUE, quote = TRUE)
+      fwrite(result$tbl_anaInbox, file, row.names = FALSE, quote = TRUE)
     }
   )
 
@@ -152,7 +149,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
   observeEvent(input$abuttonConfirmDelAna, {
     removeModal()
     analysisID <- result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$id]
-    delete_analyses_id <- api_delete_analyses_id(analysisID)
+    delete_analyses_id <- session$userData$oasisapi$api_delete_query(query_path = paste("analyses", analysisID, sep = "/"))# api_delete_analyses_id(analysisID)
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
                            paste0("Analysis id ", analysisID, " deleted."))
@@ -163,9 +160,15 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
     }
   })
 
+  # Refresh button -------------------------------------------------------------
+  observeEvent(input$abuttonrefreshanaInbox, {
+    .reloadAnaData()
+  })
+
   # Enable /Disable buttons ----------------------------------------------------
   observeEvent(input$dt_anaInbox_rows_selected, ignoreNULL = FALSE, {
     if (length(input$dt_anaInbox_rows_selected) > 0) {
+
       enable("abuttondelana")
       if (result$tbl_anaInbox[input$dt_anaInbox_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
         enable("abuttongotoana")

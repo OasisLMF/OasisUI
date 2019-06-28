@@ -221,8 +221,6 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
-    # reactive for portfolioID
-    portfolioID = "",
     # reactive for modelID
     modelID = "",
     # reactive value for model table
@@ -234,16 +232,6 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis ID
     analysisID = NULL
   )
-
-  #Set Params
-  observeEvent(portfolioID(), {
-    if (!is.null(portfolioID())) {
-      result$portfolioID <- portfolioID()
-    } else {
-      result$portfolioID <- ""
-    }
-  })
-
 
   # Panels Visualization -------------------------------------------------------
   observeEvent({
@@ -271,7 +259,7 @@ step2_chooseAnalysis <- function(input, output, session,
       index <- 1
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData %>% return_tbl_analysesData_nice(),
+        result$tbl_analysesData %>%session$userData$data_hub$return_tbl_analysesData_nice(admin_mode = getOption("flamingo.settings.admin.mode"), Status = Status, tbl_modelsDataNames = tbl_modelsDataNames, tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames),
         class = "flamingo-table display",
         rownames = FALSE,
         selection = list(mode = 'single',
@@ -286,15 +274,15 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Create Analyses Table  Title
   output$paneltitle_CreateAnalysesTable <- renderUI({
-    if (result$portfolioID != "") {
+    if (!is.null(portfolioID()) && portfolioID() != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
-      paste0('Analyses associated with portfolio ', pfName, ', id ', toString(result$portfolioID))
+      paste0('Analyses associated with portfolio ', pfName, ', id ', toString(portfolioID()))
     } else {
       paste0('Analyses')
     }
   })
 
-  observeEvent(result$portfolioID, {
+  observeEvent(portfolioID(), {
     .reloadAnaData()
   })
 
@@ -303,7 +291,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   observeEvent({
     input$dt_analyses_rows_selected
-    result$portfolioID}, ignoreNULL = FALSE, {
+    portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_analyses_rows_selected)) {
         result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
       } else {
@@ -315,7 +303,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   observeEvent({
     input$dt_models_rows_selected
-    result$portfolioID}, ignoreNULL = FALSE, {
+    portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_models_rows_selected)) {
         result$modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
       } else {
@@ -333,8 +321,7 @@ step2_chooseAnalysis <- function(input, output, session,
       hide("panelModelTable")
       hide("panelAnalysisGenInputs")
       hide("panelModelDetails")
-      input_generation_id <- api_post_analyses_generate_inputs(result$analysisID)
-
+      input_generation_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
       if (input_generation_id$status == "Success") {
         flamingoNotification(type = "message",
                              paste0("Input generation for analysis id ", result$analysisID, " started."))
@@ -387,7 +374,7 @@ step2_chooseAnalysis <- function(input, output, session,
     removeModal()
 
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-    delete_analyses_id <- api_post_analyses_cancel_generate_inputs(analysisID)
+    delete_analyses_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", analysisID, "cancel_generate_inputs",  sep = "/"))
 
     if (delete_analyses_id$status == "Success") {
       flamingoNotification(type = "message",
@@ -420,7 +407,7 @@ step2_chooseAnalysis <- function(input, output, session,
     analysis_details,
     id = "analysis_details",
     analysisID = reactive({result$analysisID}),
-    portfolioID = reactive({result$portfolioID}),
+    portfolioID = portfolioID,
     counter = reactive({input$abuttonshowanadetails})
   )
 
@@ -538,13 +525,13 @@ step2_chooseAnalysis <- function(input, output, session,
         options = getTableOptions(maxrowsperpage = pageLength)
       )
     } else {
-      nothingToShowTable(paste0("No models associated with Portfolio ID ", result$portfolioID))
+      nothingToShowTable(paste0("No models associated with Portfolio ID ", portfolioID()))
     }
   )
 
   # Model Table title
   output$paneltitle_ModelTable <- renderUI({
-    if (result$portfolioID != "") {
+    if (!is.null(portfolioID()) && portfolioID() != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
       paste0('Pick a model and choose an analysis name')
     } else {
@@ -573,7 +560,7 @@ step2_chooseAnalysis <- function(input, output, session,
     modeldetails,
     id = "modeldetails",
     modelID = reactive({result$modelID}),
-    portfolioID = reactive({result$portfolioID}),
+    portfolioID = portfolioID,
     counter = reactive({input$abuttonmodeldetails}),
     active = reactive(TRUE)
   )
@@ -582,10 +569,8 @@ step2_chooseAnalysis <- function(input, output, session,
 
   onclick("abuttonsubmit", {
     if (input$anaName != "") {
-      post_portfolios_create_analysis <- api_post_portfolios_create_analysis(id = result$portfolioID,
-                                                                             name = input$anaName,
-                                                                             model = result$modelID)
-      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", result$portfolioID,
+      post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"), query_body = list(name = input$anaName, model = result$modelID), query_method = "POST")
+      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", portfolioID(),
                         " name ", input$anaName,
                         " model ",  result$modelID))
       if (post_portfolios_create_analysis$status == "Success") {
@@ -620,6 +605,7 @@ step2_chooseAnalysis <- function(input, output, session,
     input$dt_analyses_rows_selected
     result$tbl_modelsData
     input$dt_models_rows_selected
+    result$analysisID
     currstep()}, ignoreNULL = FALSE, ignoreInit = TRUE, {
       disable("abuttonshowlog")
       disable("abuttonshowanadetails")
@@ -632,7 +618,6 @@ step2_chooseAnalysis <- function(input, output, session,
         enable("abuttonmodeldetails")
       }
       if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
-        enable("abuttonshowanadetails")
         enable("abuttonshowlog")
         enable("abuttondelana")
         enable("abuttonstartcancIG")
@@ -645,12 +630,17 @@ step2_chooseAnalysis <- function(input, output, session,
             result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] != Status_details$input_gen_started) {
           enable("abuttonpgotonextstep")
         }
+        if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$ready ||
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$run_err ||
+            result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$run_ok) {
+          enable("abuttonshowanadetails")
+        }
       }
     })
 
   #Not allowed creation of an analysis for an incomplete portfolio
   observeEvent({
-    result$portfolioID
+    portfolioID()
     pfstatus()}, {
       if (pfstatus() == "- Status: Completed") {
         enable("abuttoncreateana")
@@ -694,10 +684,10 @@ step2_chooseAnalysis <- function(input, output, session,
   # Reload Analysis table
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData called")
-    if (result$portfolioID  != "") {
-      tbl_analysesData  <- return_tbl_analysesData()
+    if (!is.null(portfolioID()) && portfolioID()  != "") {
+      tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
-        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == result$portfolioID)
+        result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
       }
       logMessage("analyses table refreshed")
     }  else {
@@ -715,7 +705,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
     if (!is.null(result$analysisID)) {
-      result$tbl_analysislog <- return_file_df(api_get_analyses_input_generation_traceback_file, result$analysisID)
+      result$tbl_analysislog <- session$userData$oasisapi$return_df(paste( "analyses", result$analysisID, "input_generation_traceback_file", sep = "/"))
     } else {
       result$tbl_analysislog <-  NULL
     }
@@ -724,8 +714,8 @@ step2_chooseAnalysis <- function(input, output, session,
   # Reload Programme Model table
   .reloadtbl_modelsData <- function() {
     logMessage(".reloadtbl_modelsData called")
-    if (result$portfolioID != "") {
-      result$tbl_modelsData <- return_tbl_modelsData()
+    if (!is.null(portfolioID()) && portfolioID() != "") {
+      result$tbl_modelsData <- session$userData$data_hub$return_tbl_modelsData(tbl_modelsDataNames = tbl_modelsDataNames)
       logMessage("models table refreshed")
     } else {
       result$tbl_modelsData <- NULL

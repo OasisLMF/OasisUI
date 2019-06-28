@@ -16,7 +16,7 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 #'
 #' @description Server logic to login an user.
 #'
-#'@template params-module
+#' @template params-module
 #'
 #' @param logout Reactive yielding logout signal.
 #'
@@ -34,30 +34,27 @@ FLAMINGO_GUEST_ID <- "unauthorized"
 loginDialog <- function(input, output, session, logout) {
 
   result <- reactiveValues(
-      user = FLAMINGO_GUEST_ID
+    user = FLAMINGO_GUEST_ID
   )
 
   observeEvent(logout(), {
     js$reset()
     result$user <- FLAMINGO_GUEST_ID
-    updateTextInput(session, "user", label = "", value = "")
-    updateTextInput(session, "password", label = "", value = "")
+    session$userData$data_hub <-  NULL
   })
 
   observeEvent(input$abuttonloginbutton, {
     if (input$abuttonloginbutton > 0) {
       user <- isolate(input$user)
       pwd <- isolate(input$password)
-      res <- api_access_token(user, pwd)
-      if (res$status == "Success") {
-        result$user <- user # for later
-        res <- content(res$result)
-        options(flamingo.settings.api.token = res$access_token)
-        options(flamingo.settings.api.refresh = res$refresh_token)
+      session$userData$oasisapi$set_tokens(user, pwd)
+      if (!is.null(session$userData$oasisapi$get_access_token())) {
+        result$user <- user
+        #initialize data_hub R6 class to manage files and files lists in OasisUI
+        session$userData$data_hub <- DataHub$new(user =  session$userData$oasisapi$get_access_token(), destdir = getOption("flamingo.settings.api.share_filepath"), oasisapi = session$userData$oasisapi)
       } else {
-        options(flamingo.settings.api.token = NULL)
-        flamingoNotification(type = "error",
-                             "Login Failed, please check your credentials.")
+        result$user = FLAMINGO_GUEST_ID
+        flamingoNotification("Login Failed, please check your credentials.", type = "error")
       }
     }
     logMessage(paste("In Login User: ", result$user))

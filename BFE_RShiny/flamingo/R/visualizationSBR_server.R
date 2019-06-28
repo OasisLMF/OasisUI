@@ -40,9 +40,7 @@ visualizationSBR <- function(input, output, session,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
-    tbl_filesListDataana = NULL,
-    # df portfolio input files
-    tbl_filesListDatapf = NULL
+    tbl_filesListDataana = NULL
   )
 
   #number of plot output panels
@@ -76,17 +74,7 @@ visualizationSBR <- function(input, output, session,
 
   # Extract Output files for given anaID----------------------------------------
   observeEvent(sub_modules$defineID$selectAnaID(), {
-    if (!is.null(sub_modules$defineID$selectAnaID())) {
-      tbl_filesListDataana <- return_analyses_output_file_df(sub_modules$defineID$selectAnaID())
-      analysis_settings <- return_analyses_settings_file_list(sub_modules$defineID$selectAnaID())
-      result$tbl_filesListDataana <- cbind(tbl_filesListDataana,
-                                           do.call(rbind.data.frame, lapply(tbl_filesListDataana$files,
-                                                                            .addDescription, analysis_settings)))
-      result$tbl_filesListDatapf <- return_tbl_portfolioDetails(sub_modules$defineID$selectPortfolioID())
-    } else {
-      result$tbl_filesListDatapf <- NULL
-      result$tbl_filesListDataana <- NULL
-    }
+    result$tbl_filesListDataana <- session$userData$data_hub$get_ana_outputs_data_list(sub_modules$defineID$selectAnaID())
   })
 
   # Tab Summary ----------------------------------------------------------------
@@ -114,21 +102,6 @@ visualizationSBR <- function(input, output, session,
     filesListData =   reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
     active = reactive({active() && input$tabsSBR == ns("tabplots")}))
-
-
-  # Helper functions -----------------------------------------------------------
-
-  #Add descritption fields to output files
-  .addDescription <- function(x, analysis_settings){
-    x <- as.character(x)
-    x <- strsplit(x, split = "[.]")[[1]][1]
-    y <- unlist(strsplit(x, split = "_"))
-    report <-  paste(y[3:(length(y))], collapse = "_")
-    g_idx <- as.integer(gsub("S", "", y[2]))
-    g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
-    g <- granToOed[granToOed$oed == g_oed, "gran"]
-    z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = reportToVar(varsdf)[[ report ]], stringsAsFactors = FALSE)
-  }
 
   # Module Outout --------------------------------------------------------------
 

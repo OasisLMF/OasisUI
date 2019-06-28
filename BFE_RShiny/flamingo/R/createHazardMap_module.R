@@ -5,6 +5,8 @@
 #'
 #' @rdname createHazardMap
 #'
+#' @template params-module
+#'
 #' @description Creates a hazard map using leaflet.
 #'
 #' @export

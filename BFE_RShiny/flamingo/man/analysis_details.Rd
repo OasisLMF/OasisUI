@@ -12,18 +12,17 @@ analysis_details(input, output, session, analysisID, portfolioID, counter)
 \arguments{
 \item{id}{module id}
 
+\item{input, output, session}{Shiny input, output, and session objects.}
+
 \item{analysisID}{Selected analysis ID.}
 
-\item{portfolioID}{Selected Portfolio ID.}
+\item{portfolioID}{Selected portfolio ID.}
 
-\item{id}{module id}
-
-\item{reload_generated}{Imports function to reload Generated Inputs table.}
-
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 }
 \description{
 UI side of function wrapping panel to show analyses details table.
 
 Server side of function wrapping panel to show analyses details table.
+i
 }

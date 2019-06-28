@@ -386,12 +386,7 @@ panelOutputModule <- function(input, output, session,
     # > read files to plot -----------------------------------------------------
     if (!is.null(filesToPlot)) {
       for (i in seq(nrow(filesToPlot))) { # i<- 1
-        extractFolder <- set_extractFolder(id = anaID(), label = "_outputs/output")
-        fileName <- set_extractFilePath(extractFolder, filesToPlot$files[i])
-        #   oasisBasePath <- "/home/mirai/Desktop/Rprojects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   # oasisBasePath <- "~/GitHubProjects/miscellaneous/oasis/data/FileManagement/oasis-run-58/"
-        #   fileName <- file.path(oasisBasePath, filesToPlot[i, 2])
-        currfileData <- .readFile(fileName)
+        currfileData <- .readFile(filesToPlot$files[i])
         if (nrow(currfileData) > 0) {
           #Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
           nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
@@ -493,7 +488,7 @@ panelOutputModule <- function(input, output, session,
     if (!is.na(fileName)) {
       logMessage(paste0("Reading file ", fileName))
       tryCatch({
-        fileData <- fread(fileName) #read.csv(fileName, header = TRUE, sep = ",", quote = "\"", dec = ".", fill = TRUE, comment.char = "")
+        fileData <- session$userData$data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = fileName)
       }, error = function(e) {
         flamingoNotification(type = "error",
                              paste0("Could not read file: ", e$message, "."))

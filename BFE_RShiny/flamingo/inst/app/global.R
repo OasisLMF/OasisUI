@@ -44,15 +44,14 @@ loginfo("testing logger", logger = "flamingo.module")
 logMessage <- function(msg) loginfo(msg, logger = "flamingo.module")
 
 ### Django API -----------------------------------------------------------------
-APISettings <- APIgetenv(
-  server = "API_IP",
-  port = "API_PORT",
-  version = "API_VERSION",
-  share_filepath = "API_SHARE_FILEPATH"
-)
 
-# options(flamingo.settings.api = api_init("localhost", "8000"))
-options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
+APISettings <- APIgetenv(server = "API_IP",
+                         port = "API_PORT",
+                         version = "API_VERSION",
+                         share_filepath = "API_SHARE_FILEPATH")
+
+options(flamingo.settings.api.server = APISettings$server)
+options(flamingo.settings.api.port = APISettings$port)
 options(flamingo.settings.api.httptype = "application/json")
 options(flamingo.settings.api.version = APISettings$version)
 options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
@@ -60,11 +59,3 @@ options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
 options(flamingo.settings.admin.mode = Sys.getenv("ADMIN_MODE"))
 
 options(flamingo.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))
-
-#health check
-loginfo(paste("flamingo API server:", get_url()), logger = "flamingo.module")
-tryCatch({
-  invisible(api_get_healthcheck())
-}, error = function(e) {
-  logerror(e$message, logger = "flamingo.module")
-})

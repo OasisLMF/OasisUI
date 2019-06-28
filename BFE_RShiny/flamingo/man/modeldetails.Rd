@@ -13,11 +13,19 @@ modeldetails(input, output, session, modelID, portfolioID, file_pins,
 \arguments{
 \item{id}{module id}
 
+\item{input, output, session}{Shiny input, output, and session objects.}
+
 \item{modelID}{Selected model ID.}
 
 \item{portfolioID}{Selected portfolio ID.}
 
-\item{id}{module id}
+\item{file_pins}{file with coordiantes of exposure locations}
+
+\item{counter}{Reactive value to trigger inputs download.}
+
+\item{active}{reactive expression whether the module state should be updated.}
+
+\item{id}{Namespace ID for the module.}
 }
 \description{
 UI side of function wrapping panel to show model details.

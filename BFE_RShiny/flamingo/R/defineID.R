@@ -223,13 +223,11 @@ defineID <- function(input, output, session,
     result$selectAnaID <- ifelse(is.null(currid), NULL, currid)
     result$selectAnaName <-  ifelse(is.null(currName) || is.na(currName), "", currName)
     result$selectportfolioID <- ifelse(is.null(currpfId) || is.na(currpfId), "", currpfId)
-    logMessage("Extract output files")
-    api_get_analyses_output_file(result$selectAnaID)
   }
 
 
   .reload_tbl_analysesData <- function(){
-    tbl_analysesData <- return_tbl_analysesData()
+    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
     if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
       result$tbl_analysesData <- tbl_analysesData  %>%
         filter(!! sym(tbl_analysesDataNames$status) == Status$Completed)

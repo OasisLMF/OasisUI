@@ -42,6 +42,7 @@ exposurevalidationmapUI <- function(id) {
 #' @template params-module
 #' @template params-active
 #' @param analysisID Selected analysis id.
+#' @param portfolioID Selected portfolio ID.
 #' @param counter Reactive value to trigger inputs download.
 #'
 #' @importFrom dplyr mutate
@@ -67,6 +68,7 @@ exposurevalidationmap <- function(input,
                                   output,
                                   session,
                                   analysisID = reactive(NULL),
+                                  portfolioID = reactive(""),
                                   counter = reactive(NULL),
                                   active = reactive(TRUE)) {
 
@@ -149,7 +151,7 @@ exposurevalidationmap <- function(input,
     filename2download <- paste0("exposure_validation_", analysisID(), ".csv"),
     filename = function() {filename2download},
     content = function(file) {
-      fwrite(result$uploaded_locs_check_peril, file, row.names = TRUE, quote = TRUE)}
+      fwrite(result$uploaded_locs_check_peril, file, row.names = FALSE, quote = TRUE)}
   )
 
   # Tabular data ---------------------------------------------------------------
@@ -188,11 +190,10 @@ exposurevalidationmap <- function(input,
   onclick("abuttonexposurerefresh", {
     # Get modeled locations
     withModalSpinner(
-      api_get_analyses_input_file(analysisID()),
+      .reloadExposureValidation(),
       "Refreshing...",
       size = "s"
     )
-    .reloadExposureValidation()
   })
 
   # Utils functions ------------------------------------------------------------
@@ -202,7 +203,7 @@ exposurevalidationmap <- function(input,
 
     logMessage(".reloadExposureValidation called")
 
-    uploaded_locs_check <- check_loc(analysisID())
+    uploaded_locs_check <- check_loc(analysisID(), portfolioID(), data_hub = session$userData$data_hub)
 
     #updating reactive only when needed
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {

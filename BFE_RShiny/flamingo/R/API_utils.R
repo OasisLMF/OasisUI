@@ -22,92 +22,6 @@ showname <- function(x) {
   y
 }
 
-#' Return response from API query
-#'
-#' @rdname return_response
-#'
-#' @description Returns a list of the API response.
-#'
-#' @param api_query Function representing the API query.
-#' @param api_param Parameter for the api_query.
-#'
-#' @return List of the API response.
-#'
-#' @importFrom httr content
-#'
-#' @export
-return_response <- function(api_query, api_param = "") {
-  get_response <- api_query(api_param)
-  responseList <- content(get_response$result)
-  responseList
-}
-
-#' Return dataframe from API response
-#'
-#' @rdname return_df
-#'
-#' @description Returns a dataframe of the API response.
-#'
-#' @param api_query Function representing the API query.
-#' @param api_param Parameter for the api_query.
-#'
-#' @return Dataframe of the API response.
-#'
-#' @importFrom dplyr bind_rows
-#'
-#' @export
-return_df <- function(api_query, api_param = "") {
-
-  responseList <- return_response(api_query, api_param)
-
-  if (length(responseList) > 0) {
-    if (length(responseList[[1]]) > 1) {
-      responseList <- lapply(responseList, function(x) {lapply(x, showname)})
-    } else {
-      responseList <- lapply(responseList, showname)
-    }
-    if (length(responseList) > 1 || length(responseList[[1]]) > 1) {
-      response_df <- bind_rows(responseList) %>%
-        as.data.frame()
-    } else {
-      response_df <- NULL
-    }
-
-  } else {
-    response_df <- NULL
-  }
-
-  response_df
-}
-
-#' Return file as Dataframe
-#'
-#' @rdname return_file_df
-#'
-#' @description Returns a dataframe of a file downloaded from the API.
-#'
-#' @param api_query Function representing the API query.
-#' @param api_param Parameter for the api_query.
-#'
-#' @return Dataframe of a file downloaded from the API.
-#'
-#' @importFrom dplyr bind_rows
-#' @importFrom httr content
-#'
-#' @export
-return_file_df <- function(api_query, api_param = "") {
-  fileList <- content(api_query(api_param)$result)
-  if (is.null(names(fileList))) {
-    file_df <- strsplit(fileList, split = "\n") %>%
-      as.data.frame(stringsAsFactors = FALSE)
-    colnames(file_df) <- file_df[1, ]
-  } else {
-    file_df <- bind_rows(fileList) %>%
-      as.data.frame()
-  }
-  file_df
-}
-
 #' Convert created and modified columns
 #'
 #' @rdname convert_created_modified
@@ -127,4 +41,21 @@ convert_created_modified <- function(tbl_obj) {
     tbl_obj[i, "modified"] <- toString(as.POSIXct(tbl_obj[i, "modified"], format = "%d-%m-%YT%H:%M:%S"))
   }
   tbl_obj
+}
+
+#' Get API env vars
+#'
+#' Fetches values of environment variables and combines them conveniently in a
+#' list.
+#'
+#' @rdname APIgetenv
+#'
+#' @param ... Names of environment variables. If passed as named arguments, the
+#'   returned list will retain the same names.
+#'
+#' @return List of environment variables' values.
+#'
+#' @export
+APIgetenv <- function(...) {
+  lapply(list(...), Sys.getenv)
 }

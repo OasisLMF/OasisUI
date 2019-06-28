@@ -317,7 +317,7 @@ summarytab <- function(input, output, session,
           filter(report == variable) %>%
           select(files)
         if (length(fileName$files) > 0) {
-          output_file_df <- return_analyses_spec_output_file_df(id, fileName$files %>% as.character())
+          output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files %>% as.character())
           if (!is.null(output_file_df)) {
             c <- length(DFList) + 1
             splitvar <- unlist(strsplit(variable, " "))
@@ -335,8 +335,7 @@ summarytab <- function(input, output, session,
 
   .getSummary <- function(selectAnaID, portfolioID) {
     #analyses settings
-    analysis_settings <- return_analyses_settings_file_list(selectAnaID)
-
+    analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
     #read aal files
     AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
     if (!is.null(AAL)) {
@@ -372,7 +371,7 @@ summarytab <- function(input, output, session,
       plotleccalc <- NULL
     }
     #Location file
-    Location <- return_file_df(api_get_portfolios_location_file, portfolioID)
+    Location <- session$userData$data_hub$get_pf_location_content(id = portfolioID)
     if (!is.null(Location)) {
       #infer params
       locnum <- length(unique(Location$LOCNUM))
