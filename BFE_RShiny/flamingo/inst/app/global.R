@@ -44,18 +44,11 @@ loginfo("testing logger", logger = "flamingo.module")
 logMessage <- function(msg) loginfo(msg, logger = "flamingo.module")
 
 ### Django API -----------------------------------------------------------------
-APISettings <- APIgetenv(
-  server = "API_IP",
-  port = "API_PORT",
-  version = "API_VERSION",
-  share_filepath = "API_SHARE_FILEPATH"
-)
-
-# options(flamingo.settings.api = api_init("localhost", "8000"))
-# options(flamingo.settings.api = api_init(APISettings$server, APISettings$port))
+options(flamingo.settings.api.server = Sys.getenv("API_IP"))
+options(flamingo.settings.api.port = Sys.getenv("API_PORT"))
 options(flamingo.settings.api.httptype = "application/json")
-options(flamingo.settings.api.version = APISettings$version)
-options(flamingo.settings.api.share_filepath = APISettings$share_filepath)
+options(flamingo.settings.api.version = Sys.getenv("API_VERSION"))
+options(flamingo.settings.api.share_filepath = Sys.getenv("API_SHARE_FILEPATH"))
 
 options(flamingo.settings.admin.mode = Sys.getenv("ADMIN_MODE"))
 

@@ -2,7 +2,7 @@
 
 # UI content that is rendered once the user has authenticated
 source(file.path(".", "ui_auth.R"), local = TRUE)$value
-#clean up folder upon login
+#clean up folder upon app launch
 clean_downloadedData()
 
 #' server
@@ -16,10 +16,10 @@ clean_downloadedData()
 
 server <- function(input, output, session) {
 
-  #set api
-  session$userData$oasisapi <- OasisAPI$new(host = APISettings$server, port = APISettings$port, version = APISettings$version)
+  #initialize oasisapi R6 classes for managing connection to API in OasisUI
+  session$userData$oasisapi <- OasisAPI$new(host = getOption("flamingo.settings.api.server"), port = getOption("flamingo.settings.api.port"), version = getOption("flamingo.settings.api.version"))
 
-  #health check
+  #per-session health check
   loginfo(paste("flamingo API server:", session$userData$oasisapi$get_url()), logger = "flamingo.module")
   tryCatch({
     invisible(session$userData$oasisapi$api_get_healthcheck())
