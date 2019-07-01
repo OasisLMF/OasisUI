@@ -13,4 +13,4 @@
 #' @export
 APIgetenv <- function(...) {
   lapply(list(...), Sys.getenv)
-}
+} 

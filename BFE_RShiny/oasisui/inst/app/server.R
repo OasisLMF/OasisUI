@@ -2,7 +2,7 @@
 
 # UI content that is rendered once the user has authenticated
 source(file.path(".", "ui_auth.R"), local = TRUE)$value
-#clean up folder upon login
+#clean up API_SHARE_FILEPATH folder upon app launch
 clean_downloadedData()
 
 #' server
@@ -16,10 +16,10 @@ clean_downloadedData()
 
 server <- function(input, output, session) {
 
-  #set api
-  session$userData$oasisapi <- OasisAPI$new(host = APISettings$server, port = APISettings$port, version = APISettings$version)
+  #initialize oasisapi R6 classes for managing connection to API in OasisUI
+  session$userData$oasisapi <- OasisAPI$new(host = getOption("oasisui.settings.api.server"), port = getOption("oasisui.settings.api.port"), version = getOption("oasisui.settings.api.version"))
 
-  #health check
+  #per-session health check
   loginfo(paste("oasisui API server:", session$userData$oasisapi$get_url()), logger = "oasisui.module")
   tryCatch({
     invisible(session$userData$oasisapi$api_get_healthcheck())

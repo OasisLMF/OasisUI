@@ -44,15 +44,14 @@ loginfo("testing logger", logger = "oasisui.module")
 logMessage <- function(msg) loginfo(msg, logger = "oasisui.module")
 
 ### Django API -----------------------------------------------------------------
-APISettings <- APIgetenv(
-  server = "API_IP",
-  port = "API_PORT",
-  version = "API_VERSION",
-  share_filepath = "API_SHARE_FILEPATH"
-)
 
-# options(oasisui.settings.api = api_init("localhost", "8000"))
-# options(oasisui.settings.api = api_init(APISettings$server, APISettings$port))
+APISettings <- APIgetenv(server = "API_IP",
+                         port = "API_PORT",
+                         version = "API_VERSION",
+                         share_filepath = "API_SHARE_FILEPATH")
+
+options(oasisui.settings.api.server = APISettings$server)
+options(oasisui.settings.api.port = APISettings$port)
 options(oasisui.settings.api.httptype = "application/json")
 options(oasisui.settings.api.version = APISettings$version)
 options(oasisui.settings.api.share_filepath = APISettings$share_filepath)

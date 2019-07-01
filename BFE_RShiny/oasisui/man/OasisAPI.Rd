@@ -35,21 +35,12 @@ Initialize
  \item{\code{api_handle_response(response)}}{Handles api response.}
  \item{\code{api_fetch_response(meth, args, logMessage = print)}}{Fetches api response.}
  access token
- \item{\code{api_access_token(user, pwd)}}{Returns response of api access token.}
- \item{\code{set_access_token(user, pwd)}}{Set private access token.}
+ \item{\code{api_post_access_token(user, pwd)}}{Returns response of api access token.}
+ \item{\code{set_tokens(user, pwd)}}{Set private access token and private refresh token.}
  \item{\code{get_access_token()}}{Return private access token.}
  refresh token
- \item{\code{api_refresh_token(user, pwd)}}{Returns response of api refresh token.
- Passing the `refresh_token` through the authorization header does
-  not seem to be standard oauth2 as described in
-  <https://tools.ietf.org/html/rfc6749>. This also makes it impossible to use
-  `httr`'s built-in oauth2 mechanisms, which would provide automatic token
-  refreshing within [httr::POST()], [httr::GET()], etc. Instead we have to
-  check outside [httr::POST()] / [httr::GET()] and if necessary, refresh and
-  redo the request. See also the unexported `api_fetch_response()`.}
- \item{\code{set_refresh_token(user, pwd)}}{Set private refresh token.}
  \item{\code{get_refresh_token()}}{Return private refresh token.}
- \item{\code{post_refresh_token()}}{Post refresh token.}
+ \item{\code{api_post_refresh_token()}}{Post refresh token.}
  version
  \item{\code{set_version()}}{Set private version.}
  \item{\code{get_version()}}{Return private version.}

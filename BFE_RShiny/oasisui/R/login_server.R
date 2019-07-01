@@ -47,11 +47,10 @@ loginDialog <- function(input, output, session, logout) {
     if (input$abuttonloginbutton > 0) {
       user <- isolate(input$user)
       pwd <- isolate(input$password)
-      res <- session$userData$oasisapi$api_access_token(user, pwd)
-      session$userData$oasisapi$set_access_token(user, pwd)
-      session$userData$oasisapi$set_refresh_token(user, pwd)
+      session$userData$oasisapi$set_tokens(user, pwd)
       if (!is.null(session$userData$oasisapi$get_access_token())) {
         result$user <- user
+	#initialize data_hub R6 class to manage files and files lists in OasisUI
         session$userData$data_hub <- DataHub$new(user =  session$userData$oasisapi$get_access_token(), destdir = getOption("oasisui.settings.api.share_filepath"), oasisapi = session$userData$oasisapi)
       } else {
         result$user = OASISUI_GUEST_ID
