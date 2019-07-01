@@ -67,25 +67,31 @@ anainputs <- function(input,
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
     dt_generated = NULL,
-    counter = NULL
+    counter = 0
   )
 
-  observeEvent( input[["panel_anainputs-collapse-button"]], {
+  observeEvent( input[["panel_anainputs-collapse-button"]], ignoreNULL = FALSE, {
     logMessage(paste0("changing result$counter to ", result$counter, " because input[['panel_anainputs-collapse-button']] chanhed to ",  input[["panel_anainputs-collapse-button"]]))
     result$counter <- input[["panel_anainputs-collapse-button"]]
   })
 
-  observeEvent(counter(), {
+  observeEvent(counter(), ignoreNULL = FALSE, ignoreInit = TRUE, {
     logMessage(paste0("changing result$counter to ", result$counter, " because counter() chanhed to ", counter()))
-    result$counter <- counter()
+    if (is.null(input[["panel_anainputs-collapse-button"]])) {
+      result$counter <- -1
+    } else {
+      result$counter <- counter()
+    }
   })
 
   # Create table ---------------------------------------------------------------
   observeEvent({
     active()
     result$counter
+    analysisID()
   }, ignoreInit = TRUE, {
-    if (length(active()) > 0 && active() && !is.null(result$counter) && !is.na(result$counter) &&  result$counter != "" &&  result$counter != 0) {
+    print(paste0("result$counter ", result$counter))
+    if (length(active()) > 0 && active() && !is.null(analysisID()) && !is.na(result$counter) &&  result$counter != "" &&  result$counter != 0 && !is.null(result$counter)) {
       if (!refresh_opt) {
         hide("refresh_ana")
       }

@@ -246,7 +246,6 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   observeEvent(input$dt_analyses_rows_selected, ignoreNULL = FALSE, {
-    hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
@@ -403,6 +402,17 @@ step2_chooseAnalysis <- function(input, output, session,
     show("panelAnalysisDetails")
   })
 
+  observeEvent({input$dt_analyses_rows_selected
+    result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed]}, {
+      curr_status <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed]
+      if (length(curr_status) > 0 && (curr_status == Status_details$ready ||
+          curr_status == Status_details$run_err ||
+          curr_status == Status_details$run_ok)) {
+        show("panelAnalysisDetails")
+      }
+    })
+
+
   sub_modules$analysis_details <- callModule(
     analysis_details,
     id = "analysis_details",
@@ -501,6 +511,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
+    hide("panelAnalysisDetails")
     logMessage("showing panelModelTable")
     show("panelModelTable")
     .reloadtbl_modelsData()
