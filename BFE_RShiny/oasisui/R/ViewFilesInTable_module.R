@@ -169,6 +169,7 @@ ViewFilesInTable <- function(input, output, session,
           fpath <- session$userData$data_hub$write_file(data = fileData, dataset_identifier = filename)
           fs <- c(fs, fpath)
         }
+
       }
       zip(zipfile = fname, files = fs)
       # if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
@@ -272,7 +273,7 @@ ViewFilesInTable <- function(input, output, session,
         id = ns("oasisuiPanelmapFVExposureSelected"),
         collapsible = FALSE,
         heading = tagAppendChildren(
-          h4("Map "),
+          h4("Map"),
           actionButton(inputId = ns("abuttonhidemapFVExposureSelected"), label = NULL, icon = icon("times"), style = "float: right;")),
         leafletOutput(ns("plainmap"))))
     )

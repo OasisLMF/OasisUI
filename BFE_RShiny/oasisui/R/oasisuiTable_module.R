@@ -31,6 +31,7 @@ oasisuiTableUI <-  function(id){
 #' @param data dataframe to show in table.
 #' @param selection param of datatable, default"none".
 #' @param escape param of datatable, default TRUE.
+#' @param scrollX param of datatable, default TRUE
 #' @param filter param of datatable, default FALSE.
 #' @param rownames param of datatable, default TRUE.
 #' @param preselRow reactive of preselected row default reactive({NULL}).
@@ -46,48 +47,49 @@ oasisuiTableUI <-  function(id){
 #'
 #' @export
 oasisuiTable <- function(input, output, session,
-                          data,
-                          selection = "none",
-                          escape = TRUE,
-                          filter = FALSE,
-                          rownames = TRUE,
-                          preselRow = reactive({NULL}),
-                          maxrowsperpage = 10) {
+                         data,
+                         selection = "none",
+                         escape = TRUE,
+                         scrollX = TRUE,
+                         filter = FALSE,
+                         rownames = TRUE,
+                         preselRow = reactive({NULL}),
+                         maxrowsperpage = 10) {
 
   ns <- session$ns
 
-    output$dt_oasisuiTable <- renderDT({
+  output$dt_oasisuiTable <- renderDT({
 
-      if (!is.null(data())) {
-        tbl_oasisuiTable <- data()
-      } else {
-        tbl_oasisuiTable <- data.frame(content = "nothing to show")
-      }
+    if (!is.null(data())) {
+      tbl_oasisuiTable <- data()
+    } else {
+      tbl_oasisuiTable <- data.frame(content = "nothing to show")
+    }
 
-      datatable(
-        tbl_oasisuiTable %>% capitalize_names_df(),
-          class = "oasisui-table display",
-          rownames = rownames,
-          selection = list(mode = selection,
-                           selected = preselRow(),
-                           target = 'row'),
-          escape = escape,
-          options = getTableOptions(maxrowsperpage = maxrowsperpage,
-                                    escape = escape)
-        )
-    })
-
-    observeEvent(data(), ignoreNULL = FALSE, {
-      if (is.null(data()) || length(nrow(data())) == 0) {
-        selectRows(dataTableProxy("dt_oasisuiTable"), NULL)
-      }
-    })
-
-    # Module Outout --------------------------------------------------------------
-    moduleOutput <- c(
-      list(
-        rows_selected = reactive({input$dt_oasisuiTable_rows_selected}),
-        rows_current = reactive({input$dt_oasisuiTable_rows_current})
-      )
+    datatable(
+      tbl_oasisuiTable %>% capitalize_names_df(),
+      class = "oasisui-table display",
+      rownames = rownames,
+      selection = list(mode = selection,
+                       selected = preselRow(),
+                       target = 'row'),
+      escape = escape,
+      options = getTableOptions(scrollX,maxrowsperpage = maxrowsperpage,
+                                escape = escape)
     )
+  })
+
+  observeEvent(data(), ignoreNULL = FALSE, {
+    if (is.null(data()) || length(nrow(data())) == 0) {
+      selectRows(dataTableProxy("dt_oasisuiTable"), NULL)
+    }
+  })
+
+  # Module Outout --------------------------------------------------------------
+  moduleOutput <- c(
+    list(
+      rows_selected = reactive({input$dt_oasisuiTable_rows_selected}),
+      rows_current = reactive({input$dt_oasisuiTable_rows_current})
+    )
+  )
 }

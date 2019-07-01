@@ -95,7 +95,7 @@ node {
             clone_app: {
                 stage('Build: Shiny App') {
                     dir(source_workspace) {
-                        sh "docker build -f ${app_docker} --pull --build-arg REF_BRANCH=${app_branch} -t ${app_image} -t ${app_image}:${env.TAG_RELEASE} ."
+                        sh "docker build --no-cache -f ${app_docker} --pull --build-arg REF_BRANCH=${app_branch} -t ${app_image} -t ${app_image}:${env.TAG_RELEASE} ."
                     }
                 }
             }

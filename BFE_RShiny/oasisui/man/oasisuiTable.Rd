@@ -8,7 +8,7 @@
 oasisuiTableUI(id)
 
 oasisuiTable(input, output, session, data, selection = "none",
-  escape = TRUE, filter = FALSE, rownames = TRUE,
+  escape = TRUE, scrollX = TRUE, filter = FALSE, rownames = TRUE,
   preselRow = reactive({     NULL }), maxrowsperpage = 10)
 }
 \arguments{
@@ -21,6 +21,8 @@ oasisuiTable(input, output, session, data, selection = "none",
 \item{selection}{param of datatable, default"none".}
 
 \item{escape}{param of datatable, default TRUE.}
+
+\item{scrollX}{param of datatable, default TRUE}
 
 \item{filter}{param of datatable, default FALSE.}
 
