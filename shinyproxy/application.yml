@@ -1,6 +1,6 @@
 shiny:
   proxy:
-    title: Oasis Flamingo
+    title: Oasis Oasisui
     #logo-url: http://www.openanalytics.eu/sites/www.openanalytics.eu/themes/oa/logo.png
     #logo-url: https://www.boatoasis.com/uploads/9/2/9/3/92934216/published/boatlogo-nobg.png?1483977780
     landing-page: /
@@ -12,10 +12,10 @@ shiny:
       internal-networking: true
   apps:
   - name: BFE_RShiny
-    display-name: Flamingo
-    docker-cmd: ["R", "-e", "flamingo::runFlamingo()"]
-    #docker-volumes: [ "%FLAMINGO_SHARE_FILEPATH_ON_HOST%:/var/www/oasis/Files" ]
-    docker-image: %UI_DOCKER_IMAGE% 
+    display-name: Oasisui
+    docker-cmd: ["R", "-e", "oasisui::runOasisui()"]
+    #docker-volumes: [ "%OASISUI_SHARE_FILEPATH_ON_HOST%:/var/www/oasis/Files" ]
+    docker-image: %UI_DOCKER_IMAGE%
     docker-env-file: settings.env
     docker-network: shiny-net
 
