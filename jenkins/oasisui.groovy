@@ -70,7 +70,7 @@ node {
                                 sh "git checkout $CHANGE_TARGET"
                                 sh "git merge $BRANCH_NAME"
                                 app_branch = CHANGE_BRANCH
-                                // WARNING: this will fail for external pull requests 
+                                // WARNING: this will fail for external pull requests
 
                             } else {
                                 // Checkout branch
@@ -95,14 +95,14 @@ node {
             clone_app: {
                 stage('Build: Shiny App') {
                     dir(source_workspace) {
-                        sh "docker build -f ${app_docker} --pull --build-arg REF_BRANCH=${app_branch} -t ${app_image} -t ${app_image}:${env.TAG_RELEASE} ."
+                        sh "docker build --no-cache -f ${app_docker} --pull --build-arg REF_BRANCH=${app_branch} -t ${app_image} -t ${app_image}:${env.TAG_RELEASE} ."
                     }
                 }
             }
         )
 
         // ToDO add testing here
-        //stage('Run Flamingo') {
+        //stage('Run Oasisui') {
         //    dir('oasis_build') {
         //        sh PIPELINE + " run_ui"
         //    }
