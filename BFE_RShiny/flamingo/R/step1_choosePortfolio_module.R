@@ -557,10 +557,6 @@ step1_choosePortfolio <- function(input, output, session,
     .uploadSourceFile(inFile = result$SLFile, query_path = "location_file")
   })
 
-  # onclick("abuttonSLFileUpload", {
-  #   .uploadSourceFile(inFile = result$SLFile, query_path = "location_file")
-  # })
-
   observeEvent(input$SAFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
     result$SAFile <- input$SAFile
     .uploadSourceFile(inFile = result$SAFile, query_path = "accounts_file")
