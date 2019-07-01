@@ -40,7 +40,11 @@ visualizationSBR <- function(input, output, session,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
-    tbl_filesListDataana = NULL
+    tbl_filesListDataana = NULL,
+    # analysis id from landing page
+    preselAnaId = NULL,
+    # analysis id from step3
+    anaID  = NULL
   )
 
   #number of plot output panels
@@ -49,6 +53,8 @@ visualizationSBR <- function(input, output, session,
   #clean value
   observeEvent(active(), {
     if (active()) {
+      result$preselAnaId <- preselAnaId()
+      result$anaID  <- anaID()
       result$preselPanel <- 1
       result$selectAnaID <- NULL
       result$selectPortfolioID = ""
@@ -59,13 +65,15 @@ visualizationSBR <- function(input, output, session,
   sub_modules$defineID <- callModule(
     defineID,
     id = "defineID",
-    preselAnaId = preselAnaId,
-    anaID =  anaID,
+    preselAnaId = reactive(result$preselAnaId),
+    anaID =  reactive(result$anaID),
     active = active)
 
   # Go to Configure Output button ----------------------------------------------
   observeEvent(input$abuttongotoconfig, {
     result$preselPanel <- 3
+    result$preselAnaId <- NULL
+    result$anaID <- NULL
     result$selectAnaID <- sub_modules$defineID$selectAnaID()
     result$selectPortfolioID <- sub_modules$defineID$selectPortfolioID()
     logMessage(paste0("Selected analysis id is ", result$selectAnaID, ". Selected portfolio id is ", result$selectPortfolioID))

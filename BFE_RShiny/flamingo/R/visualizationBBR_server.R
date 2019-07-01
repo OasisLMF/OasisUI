@@ -42,7 +42,11 @@ visualizationBBR <- function(input, output, session,
     #portfolio id of selected analysis
     selectPortfolioID = "",
     # df analysis output files
-    tbl_filesListDataana = NULL
+    tbl_filesListDataana = NULL,
+    # analysis id from landing page
+    preselAnaId = NULL,
+    # analysis id from step3
+    anaID  = NULL
   )
 
   #number of plot output panels
@@ -51,6 +55,8 @@ visualizationBBR <- function(input, output, session,
   #clean value
   observeEvent(active(), {
     if (active()) {
+      result$preselAnaId <- preselAnaId()
+      result$anaID  <- anaID()
       result$preselPanel <- 1
       result$selectAnaID <- NULL
       result$selectPortfolioID = ""
@@ -61,8 +67,8 @@ visualizationBBR <- function(input, output, session,
   sub_modules$defineID <- callModule(
     defineID,
     id = "defineID",
-    preselAnaId = preselAnaId,
-    anaID =  anaID,
+    preselAnaId = reactive(result$preselAnaId),
+    anaID =  reactive(result$anaID),
     active = active)
 
   # Go to Configure Output button ----------------------------------------------
