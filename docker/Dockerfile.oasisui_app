@@ -5,8 +5,10 @@ FROM rocker/r-ver:3.5.1
 # -> installs R to /usr/local/lib/R
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libv8-3.14-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils && \
+    apt-get install -y --no-install-recommends libv8-3.14-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils libjq-dev gdal-bin proj-bin libgdal-dev libudunits2-dev && \
     # if desired, add tools such as: sudo, vim, wget, curl, procps
+    # library necessary for dependency of geojsonio
+    apt-get install -y libprotobuf-dev protobuf-compiler  && \
     rm -rf /var/lib/apt/lists/*
 
 # libcairo2-dev and libxt-dev needed for Cairo, e.g. graphics
@@ -14,11 +16,11 @@ RUN apt-get update && \
 # libssl-dev depends on libssl1.1, which in turn depends on libc6
 # (libcurl4-openssl-dev / openssl would depend on libc6 and libssl1.1 as well)
 
-# Install Flamingo with dependencies
+# Install Oasisui with dependencies
 ARG REF_BRANCH
 ENV REF_BRANCH=${REF_BRANCH:-master}
 RUN R -e "install.packages('remotes')" && \
-    R -e "remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/flamingo')" && \
+    R -e "remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
     rm -rf /var/lib/apt/lists/*
 
 # Create the logging directory
@@ -42,5 +44,5 @@ EXPOSE 3838
 # ENV API_SHARE_FILEPATH=./downloads
 # ENV OASIS_ENVIRONMENT=oasis_localhost
 
-# Launch Flamingo
-CMD ["R", "-e", "flamingo::runFlamingo()"]
+# Launch Oasisui
+CMD ["R", "-e", "oasisui::runOasisui()"]
