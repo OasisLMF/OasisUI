@@ -160,6 +160,10 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
     }
   })
 
+  observeEvent(input$btnCancelDelAna, {
+    removeModal()
+  })
+
   # Refresh button -------------------------------------------------------------
   observeEvent(input$abuttonrefreshanaInbox, {
     .reloadAnaData()
