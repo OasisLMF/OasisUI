@@ -69,7 +69,9 @@ outputplots <- function(input, output, session,
     output[[paste0("paneltitle", i)]] <- renderOasisuiPanelHeading(plotsubmodules[[i]]())
   })
 
-  observeEvent(selectAnaID(), {
+  observeEvent({
+    selectAnaID()
+    filesListData()}, {
     plotPanels$remove_all()
   })
 
