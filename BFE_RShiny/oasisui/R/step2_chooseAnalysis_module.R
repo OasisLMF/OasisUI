@@ -230,7 +230,9 @@ step2_chooseAnalysis <- function(input, output, session,
     #analysis log
     tbl_analysislog = NULL,
     #analysis ID
-    analysisID = NULL
+    analysisID = NULL,
+    #exposure_counter
+    exposure_counter = NULL
   )
 
   # Panels Visualization -------------------------------------------------------
@@ -241,6 +243,7 @@ step2_chooseAnalysis <- function(input, output, session,
       if (currstep() == 2) {
         .defaultAssociateModel()
         .reloadAnaData()
+        .defaultAnalysisDetails()
         .reloadtbl_modelsData()
       }
     })
@@ -403,22 +406,25 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
   observeEvent({input$dt_analyses_rows_selected
-    result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed]}, {
-      curr_status <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed]
-      if (length(curr_status) > 0 && (curr_status == Status_details$ready ||
-          curr_status == Status_details$run_err ||
-          curr_status == Status_details$run_ok)) {
-        show("panelAnalysisDetails")
+    result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed]
+    result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]}, {
+      if (currstep() == 2) {
+        .defaultAnalysisDetails()
+      } else {
+        hide("panelAnalysisDetails")
       }
     })
 
+  observeEvent(input$abuttonshowanadetails,{
+    result$exposure_counter <- result$exposure_counter + input$abuttonshowanadetails
+  })
 
   sub_modules$analysis_details <- callModule(
     analysis_details,
     id = "analysis_details",
     analysisID = reactive({result$analysisID}),
     portfolioID = portfolioID,
-    counter = reactive({input$abuttonshowanadetails})
+    counter = reactive({result$exposure_counter})
   )
 
   onclick("buttonhideanadetails", {
@@ -684,6 +690,19 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
+  }
+
+  # show default analysis details
+  .defaultAnalysisDetails <- function(){
+    curr_status <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed]
+    if (length(curr_status) > 0 && !is.na(curr_status) &&  (curr_status == Status_details$ready ||
+                                                            curr_status == Status_details$run_err ||
+                                                            curr_status == Status_details$run_ok)) {
+      show("panelAnalysisDetails")
+      result$exposure_counter <- result$exposure_counter + 1
+    } else {
+      hide("panelAnalysisDetails")
+    }
   }
 
   #show default view for Section "Choose Analysis" = "2"
