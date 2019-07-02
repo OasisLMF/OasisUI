@@ -51,22 +51,37 @@ outputfiles <- function(input, output, session,
 
   ns <- session$ns
 
+  # Reactive Values ------------------------------------------------------------
+  result <- reactiveValues(
+    counter = 0
+  )
+
   # list of sub-modules
   sub_modules <- list()
 
-  sub_modules$ViewOutputFiles <- callModule(
-    ViewFilesInTable,
-    id = "ViewOutputFiles",
-    tbl_filesListData = tbl_filesListDataana,
-    param = anaId,
-    file_column = "files",
-    includechkbox = TRUE)
+  # Counter for Inputs ---------------------------------------------------------
+  observeEvent(tbl_filesListDataana(),{
+      result$counter <- result$counter + 1
+  })
 
-  sub_modules$anainputs <- callModule(
-    anainputs,
-    id = "anainputs",
-    analysisID = anaId,
-    refresh_opt = FALSE,
-    active = reactive({active()})
-  )
+
+  # Submodules -----------------------------------------------------------------
+
+      sub_modules$ViewOutputFiles <- callModule(
+        ViewFilesInTable,
+        id = "ViewOutputFiles",
+        tbl_filesListData = tbl_filesListDataana,
+        param = anaId,
+        file_column = "files",
+        includechkbox = TRUE)
+
+      sub_modules$anainputs <- callModule(
+        anainputs,
+        id = "anainputs",
+        analysisID = anaId,
+        refresh_opt = FALSE,
+        counter = reactive({result$counter}),
+        active = reactive({active()})
+      )
+
 }

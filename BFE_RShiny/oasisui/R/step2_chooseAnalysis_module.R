@@ -405,7 +405,7 @@ step2_chooseAnalysis <- function(input, output, session,
     show("panelAnalysisDetails")
   })
 
-  observeEvent({input$dt_analyses_rows_selected
+  observeEvent({
     result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed]
     result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]}, {
       if (currstep() == 2) {
