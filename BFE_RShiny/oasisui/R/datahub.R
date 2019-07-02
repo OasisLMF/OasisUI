@@ -316,7 +316,6 @@ DataHub <- R6Class(
     #extract model hazard resource file given model id
     get_model_hazard_dataset_content = function(id, dataset_identifier, ...){
       #currently no api function
-      print(dataset_identifier)
       path <- system.file("app", "www", "hazard_files", dataset_identifier, package = "oasisui")
       mapfile <- geojsonio::geojson_read(path, what = "sp") #SLOW!
       mapfile
