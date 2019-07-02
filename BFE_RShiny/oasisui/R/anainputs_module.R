@@ -75,7 +75,7 @@ anainputs <- function(input,
     result$counter <- input[["panel_anainputs-collapse-button"]]
   })
 
-  observeEvent(counter(), ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(counter(), ignoreNULL = FALSE, {
     logMessage(paste0("changing result$counter to ", result$counter, " because counter() chanhed to ", counter()))
     if (is.null(input[["panel_anainputs-collapse-button"]])) {
       result$counter <- -1
@@ -90,7 +90,7 @@ anainputs <- function(input,
     result$counter
     analysisID()
   }, ignoreInit = TRUE, {
-    if (length(active()) > 0 && active() && !is.null(analysisID()) && !is.na(result$counter) &&  result$counter != "" &&  result$counter > 0 && !is.null(result$counter)) {
+    if (length(active()) > 0 && active() && !is.null(analysisID()) && !is.na(result$counter) &&  result$counter != "" &&  result$counter != 0 && !is.null(result$counter)) {
       if (!refresh_opt) {
         hide("refresh_ana")
       }
