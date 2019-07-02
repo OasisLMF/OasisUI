@@ -159,9 +159,10 @@ ViewFilesInTable <- function(input, output, session,
       fs <- c()
       g <- input$dt_outputFL_rows_selected
       for (f in g) {
-        filename <- result$tbl_filesListData_wButtons[f, file_column]
+        filename <- result$tbl_filesListData_wButtons[f, file_column] %>% as.character()
         if (filename %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
           fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = filename)
+          filename <- paste0(filename, ".csv")
         } else {
           fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = filename, type = folderpath)
         }
