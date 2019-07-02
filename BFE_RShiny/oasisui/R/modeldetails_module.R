@@ -144,7 +144,7 @@ modeldetails <- function(input,
     if (!is.null(input$hazard_files)) {
       path <- paste0("./www/hazard_files/", input$hazard_files)
       #geojsonio::geojson_read(path, what = "sp")
-      result$mapfile <- session$userData$data_hub$get_model_hazard_dataset_content(id = modelID())
+      result$mapfile <- session$userData$data_hub$get_model_hazard_dataset_content(id = modelID(), input$hazard_files)
       if (is.null(result$mapfile)) {
         hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
       }

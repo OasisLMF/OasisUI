@@ -81,8 +81,13 @@ visualizationSBR <- function(input, output, session,
   })
 
   # Extract Output files for given anaID----------------------------------------
-  observeEvent(sub_modules$defineID$selectAnaID(), {
-    result$tbl_filesListDataana <- session$userData$data_hub$get_ana_outputs_data_list(sub_modules$defineID$selectAnaID())
+  observeEvent({
+    sub_modules$defineID$selectAnaID()
+    active()}, {
+      if (active() && !is.null(sub_modules$defineID$selectAnaID())) {
+        logMessage("updating ana outputs data list")
+        result$tbl_filesListDataana <- session$userData$data_hub$get_ana_outputs_data_list(sub_modules$defineID$selectAnaID())
+      }
   })
 
   # Tab Summary ----------------------------------------------------------------

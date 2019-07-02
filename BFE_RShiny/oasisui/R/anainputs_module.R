@@ -70,13 +70,14 @@ anainputs <- function(input,
     counter = 0
   )
 
-  observeEvent( input[["panel_anainputs-collapse-button"]], ignoreNULL = FALSE, {
-    logMessage(paste0("changing result$counter to ", result$counter, " because input[['panel_anainputs-collapse-button']] chanhed to ",  input[["panel_anainputs-collapse-button"]]))
-    result$counter <- input[["panel_anainputs-collapse-button"]]
-  })
+  # Commented out untill caching is implemented
+  # observeEvent( input[["panel_anainputs-collapse-button"]], ignoreNULL = FALSE, {
+  #   logMessage(paste0("changing result$counter because input[['panel_anainputs-collapse-button']] changed to ",  input[["panel_anainputs-collapse-button"]]))
+  #   result$counter <- input[["panel_anainputs-collapse-button"]]
+  # })
 
-  observeEvent(counter(), ignoreNULL = FALSE, ignoreInit = TRUE, {
-    logMessage(paste0("changing result$counter to ", result$counter, " because counter() chanhed to ", counter()))
+  observeEvent(counter(), ignoreNULL = FALSE, {
+    logMessage(paste0("changing result$counter because counter() chanhgd to ", counter()))
     if (is.null(input[["panel_anainputs-collapse-button"]])) {
       result$counter <- -1
     } else {
@@ -88,9 +89,7 @@ anainputs <- function(input,
   observeEvent({
     active()
     result$counter
-    analysisID()
   }, ignoreInit = TRUE, {
-    print(paste0("result$counter ", result$counter))
     if (length(active()) > 0 && active() && !is.null(analysisID()) && !is.na(result$counter) &&  result$counter != "" &&  result$counter != 0 && !is.null(result$counter)) {
       if (!refresh_opt) {
         hide("refresh_ana")
@@ -118,7 +117,7 @@ anainputs <- function(input,
     logMessage(".reloadInputs called")
     if (!is.null(analysisID())) {
       withModalSpinner(
-        dt_generated <- session$userData$data_hub$return_analyses_input_file_wicons_df(analysisID(),Status),
+        dt_generated <- session$userData$data_hub$get_ana_inputs_data_list(analysisID()), #session$userData$data_hub$return_analyses_input_file_wicons_df(analysisID(),Status),
         "Loading...",
         size = "s"
       )
