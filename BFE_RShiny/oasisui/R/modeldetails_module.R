@@ -39,7 +39,7 @@ modeldetailsUI <- function(id) {
         title = "Hazard Maps",
         selectInput(inputId = ns("hazard_files"),
                     label = "Choose hazard file",
-                    choices = list.files("./www/hazard_files")
+                    choices = c("Select hazard file")
         ),
         createHazardMapUI(ns("createHazardMap")),
         value = ns("tabmaps")
@@ -86,6 +86,8 @@ modeldetails <- function(input,
   result <- reactiveValues(
     # reactive value for detail of model table
     tbl_modelsDetails = NULL,
+    # list of hazard maps associated to model,
+    mapfiles_lst = NULL,
     #file for hazard map
     mapfile = NULL,
     # file for pins
@@ -99,7 +101,9 @@ modeldetails <- function(input,
     counter()
   }, ignoreInit = TRUE, {
     show("panel_model_details")
-    .reloadtbl_modelsDetails()
+    if (modelID() != "" && !is.null(modelID())) {
+      .reloadtbl_modelsDetails()
+    }
   })
 
   # Tab Resources ------------------------------------------------------------
@@ -137,17 +141,29 @@ modeldetails <- function(input,
     }
   )
 
-  # Tab Hazard Map -----------------------------------------------------------
+  # Tab Hazard Map -------------------------------------------------------------
+
+  observeEvent(input$tabsModelsDetails, {
+    if (input$tabsModelsDetails == ns("tabmaps")) {
+      if (!is.null(result$mapfiles_lst)) {
+        hazard_choices <- unique(result$mapfiles_lst$filename[!is.na(result$mapfiles_lst$filename)])
+        updateSelectInput(session,
+                          inputId = "hazard_files",
+                          label = "Choose hazard file",
+                          choices = hazard_choices,
+                          selected = hazard_choices[1])
+        logMessage("map dropdown refreshed")
+      }
+    }
+  })
 
   # Choose hazard file
-  observeEvent(input$hazard_files, {
-    if (!is.null(input$hazard_files)) {
-      path <- paste0("./www/hazard_files/", input$hazard_files)
+  observeEvent(input$hazard_files, ignoreInit = TRUE, {
+    if (!is.null(input$hazard_files) && input$hazard_files != "" && input$hazard_files != "Select hazard file") {
+      # path <- paste0("./www/hazard_files/", input$hazard_files)
       #geojsonio::geojson_read(path, what = "sp")
-      result$mapfile <- session$userData$data_hub$get_model_hazard_dataset_content(id = modelID(), input$hazard_files)
-      if (is.null(result$mapfile)) {
-        hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
-      }
+      mapfile_id <- result$mapfiles_lst[result$mapfiles_lst$filename == input$hazard_files, "id"]
+      result$mapfile <- session$userData$data_hub$get_model_hazard_dataset_content(id = mapfile_id, filename = input$hazard_files)
     }
   })
 
@@ -187,14 +203,12 @@ modeldetails <- function(input,
     if (!is.null(tbl_modelsDetails)) {
       result$tbl_modelsDetails <- tbl_modelsDetails
       logMessage("model resources table refreshed")
-
       result$uploaded_locs <- session$userData$data_hub$get_pf_location_content(id = portfolioID())
       logMessage("uploaded_locs refreshed")
-      updateSelectInput(session,
-                        inputId = ns("hazard_files"),
-                        label = "Choose hazard file",
-                        choices = list.files("./www/hazard_files"))
-      logMessage("map dropdown refreshed")
+      result$mapfiles_lst <- session$userData$data_hub$get_model_hazard_data_list(modelID())
+      if (is.null(result$mapfiles_lst)) {
+        hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
+      }
     } else {
       result$tbl_modelsDetails <- NULL
     }
