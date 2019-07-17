@@ -171,6 +171,7 @@ DataHub <- R6Class(
       full_lst <- self$get_model_data_list(id)
       #remove nulls
       non_null_full_lst <- lapply(full_lst, Filter, f = Negate(is.null))
+      non_null_full_lst <-  Filter(Negate(is.null), non_null_full_lst)
       full_data_df <- lapply(seq(length(non_null_full_lst)), function(i){
         non_null_full_lst[[i]] %>%
           as.data.frame(stringsAsFactors = FALSE)
@@ -661,6 +662,9 @@ DataHub <- R6Class(
   report <-  paste(y[3:(length(y))], collapse = "_")
   g_idx <- as.integer(gsub("S", "", y[2]))
   g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
+  if (is.null(g_oed)) {
+    g_oed <- granToOed$oed[granToOed$order][g_idx]
+  }
   g <- granToOed[granToOed$oed == g_oed, "gran"]
   z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = reportToVar(varsdf)[[ report ]], stringsAsFactors = FALSE)
 }
