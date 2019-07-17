@@ -119,7 +119,7 @@ panelOutputModuleUI <- function(id){
                  textInput(ns("textinputtitle"), "Title", ""))),
       column(4,
              (checkboxInput(ns("chkboxmillions"), "Y axis in millions", TRUE))),
-      column(3,
+      column(4,
              hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
       oasisuiButton(inputId = ns("abuttondraw"), label = "Draw Plot",  style = "float:right")
     ),
@@ -451,13 +451,11 @@ panelOutputModule <- function(input, output, session,
 
     # > draw plot --------------------------------------------------------------
     if (!is.null(data)) {
+      # >> rescale Y axis to millions
+      if(input$chkboxmillions == TRUE) {
+        data$value <- data$value / 1000000
+      }
       if (plottype == "line") {
-
-        # >> rescale Y axis to millions
-        if(input$chkboxmillions == TRUE) {
-          data$value <- data$value / 1000000
-        }
-
         p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
                          multipleplots = multipleplots)
       } else if (plottype == "bar") {
