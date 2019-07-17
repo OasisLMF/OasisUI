@@ -292,6 +292,7 @@ OasisAPI <- R6Class(
         }
         if (length(content_lst) > 1 || length(content_lst[[1]]) > 1) {
           non_null_content_lst <- lapply(content_lst, Filter, f = Negate(is.null))
+          non_null_content_lst <- Filter(Negate(is.null), non_null_content_lst)
           df <- bind_rows(non_null_content_lst) %>%
             as.data.frame()
         } else {
