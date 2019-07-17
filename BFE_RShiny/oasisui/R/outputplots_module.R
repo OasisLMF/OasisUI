@@ -454,6 +454,7 @@ panelOutputModule <- function(input, output, session,
       # >> rescale Y axis to millions
       if(input$chkboxmillions == TRUE) {
         data$value <- data$value / 1000000
+        ylabel <- paste(ylabel, "in Millions")
       }
       if (plottype == "line") {
         p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
