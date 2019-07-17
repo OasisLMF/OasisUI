@@ -49,7 +49,8 @@
 #'  healtcheck
 #'  \item{\code{api_get_healthcheck()}}{Perform api healthcheck.}
 #'  api query
-#'  \item{\code{api_query(uery_path, query_list, query_method, ...)}}{Construct query to the api.}
+#'  \item{\code{api_basic_query(query_path_basic, query_list, query_method, ...)}}{Construct query without version for the api.}
+#'  \item{\code{api_query(uery_path, query_list, query_method, ...)}}{Construct query with version for the api.}
 #'  \item{\code{api_get_query(uery_path, query_list, ...)}}{Construct GET query to the api.}
 #'  \item{\code{api_post_query(uery_path, query_list, ...)}}{Construct POST query to the api.}
 #'  \item{\code{api_delete_query(uery_path, query_list, ...)}}{Construct DELETE query to the api.}
