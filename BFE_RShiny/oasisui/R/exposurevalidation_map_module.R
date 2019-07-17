@@ -20,7 +20,7 @@ exposurevalidationmapUI <- function(id) {
     fluidRow(div(oasisuiRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
       column(1,
-             checkboxGroupInput(inputId =ns("chkgrp_perils"), label = "Pick peril", choices = c("WTC"))
+             checkboxGroupInput(inputId = ns("chkgrp_perils"), label = "Pick peril")
       ),
       column(11,
              leafletOutput(ns("exposure_map")),
@@ -79,7 +79,11 @@ exposurevalidationmap <- function(input,
     #dataframe of checked exposures
     uploaded_locs_check = NULL,
     #dataframe of checked exposures by perils
-    uploaded_locs_check_peril = NULL
+    uploaded_locs_check_peril = NULL,
+    # peril codes
+    perils_codes = NULL,
+    #perils names
+    perils_names = NULL
   )
 
   # Modeled exposure and uploaded exposure ------------------------------------
@@ -91,8 +95,12 @@ exposurevalidationmap <- function(input,
       .reloadExposureValidation()
       perils <- result$uploaded_locs_check$peril[!is.na(result$uploaded_locs_check$peril)] %>%
         unique()
+      mapping <- session$userData$data_hub$get_oed_peril_codes_mapping()
+      mapped_perils <- lapply(mapping[perils], function(x) {x[["desc"]]})
+      result$perils_names <- unlist(mapped_perils,  use.names = FALSE)
+      result$peril_codes <- names(mapped_perils)
       logMessage("Updating input$chkgrp_perils")
-      updateCheckboxGroupInput(session, inputId = "chkgrp_perils", choices = perils, selected = perils)
+      updateCheckboxGroupInput(session, inputId = "chkgrp_perils", choices = result$perils_names, selected = result$perils_names)
     }
   })
 
@@ -105,7 +113,7 @@ exposurevalidationmap <- function(input,
             modeled = sapply(unique( result$uploaded_locs_check$LocNumber), function(x){
               curr_loc <- result$uploaded_locs_check %>%
                 filter(LocNumber == x)
-              any(curr_loc$peril_id %in% input$chkgrp_perils)
+              any(curr_loc$peril_id %in% result$peril_codes[which(result$perils_names == input$chkgrp_perils)])
             })
           )
         ) %>%

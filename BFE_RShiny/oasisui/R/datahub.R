@@ -31,6 +31,7 @@
 #' GENERAL
 #'
 #' \item{\code{get_user_destdir()}}{return path of user specific foder}
+#' \item{\code{oed_peril_codes()}}{return mapping of OED Peril names and codes.}
 #'
 #' LISTS
 #'
@@ -150,6 +151,10 @@ DataHub <- R6Class(
     # GENERAL ----
     get_user_destdir = function(){
       private$user_destdir
+    },
+    get_oed_peril_codes_mapping = function(){
+      oed_perils_codes_mapping <- content(private$oasisapi$api_basic_query(query_path = "oed_peril_codes", query_method = "GET")$result)
+      oed_perils_codes_mapping$peril_codes
     },
     # LISTS ----
     # > Portfolio ----
