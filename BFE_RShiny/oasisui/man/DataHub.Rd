@@ -30,6 +30,7 @@ R6 Class for OasisUI Data Hub.
 GENERAL
 
 \item{\code{get_user_destdir()}}{return path of user specific foder}
+\item{\code{oed_peril_codes()}}{return mapping of OED Peril names and codes.}
 
 LISTS
 

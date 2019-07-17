@@ -226,8 +226,21 @@ OasisAPI <- R6Class(
       private$version
     },
     # > api query -----
+    api_basic_query = function(query_path_basic, query_list = NULL, query_method, ...){
+      request_list <- expression(list(
+        private$url,
+        config = add_headers(
+          Accept = private$httptype,
+          Authorization = sprintf("Bearer %s", private$access_token)
+        ),
+        path = paste(query_path_basic, "", sep = "/"),
+        query = query_list
+      ))
+      response <- self$api_fetch_response(query_method, request_list)
+      self$api_handle_response(response)
+    },
     api_query = function(query_path, query_list = NULL, query_method, ...){
-
+      # self$api_basic_query(query_path_basic = paste(private$version, query_path, "", sep = "/"), query_list, query_method)
       request_list <- expression(list(
         private$url,
         config = add_headers(
