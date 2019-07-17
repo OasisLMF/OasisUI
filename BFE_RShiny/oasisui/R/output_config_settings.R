@@ -3,7 +3,7 @@
 #' LosstypesChoices
 #' @description List of variables per granularity
 #' @format Named \code{list} of Losstypes Choices. (Name empty)
-#' @export  
+#' @export
 LosstypesChoices <- list(
   " " = "Summary",
   " " = "ELT",
@@ -47,6 +47,7 @@ varsdf <- data.frame(vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEP
 granToOed <- data.frame(oed = c("lob", "location", "county","state", "policy", "prog"),
                         gran = output_options$granularities,
                         outputlosstype = c("lob", "loc", "county","state", "policy", "prog"),
+                        order = c(6,2,3,4,1,5),
                         stringsAsFactors = FALSE)
 
 #' reportToVar
