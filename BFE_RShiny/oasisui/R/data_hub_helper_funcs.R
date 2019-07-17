@@ -71,7 +71,7 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
 #'
 #' @export
 
-write_file <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL){
+writefile <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL){
   if (is.null(file_towrite)) {
     file_towrite <- file.path(destdir, dataset_identifier)
   }

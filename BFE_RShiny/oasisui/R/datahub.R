@@ -37,6 +37,9 @@
 #' > Portfolio
 #' \item{\code{get_pf_data_list(id)}}{return list of portfolio source files}
 #' \item{\code{invalidate_pf_data_list(id)}}{invalidate list of portfolio source files}
+#' > Models
+#' \item{\code{get_model_data_list(id)}}{return lists of model resources}
+#' \item{\code{get_model_hazard_data_list(id)}}{return lists of model hazard resources}
 #' > Analysis
 #' \item{\code{get_ana_inputs_data_list(id)}}{return list of analysis inputs}
 #' \item{\code{get_ana_outputs_data_list(id)}}{return list of analysis outputs}
@@ -57,8 +60,8 @@
 #' > Model
 #' \item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
 #' \item{\code{invalidate_model_resource_dataset_content(id)}}{invalidate model resource file given model id}
-#' \item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file given model id}
-#' \item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file given model id}
+#' \item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file content given file id}
+#' \item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file content given file id}
 #' > Analysis
 #' \item{\code{get_ana_dataset_content(id, dataset_identifier, type)}}{extract a input/output file content given an analysis id}
 #' \item{\code{invalidate_ana_dataset_content(id, dataset_identifier, type)}}{invalidate a input/output file content given an analysis id}
@@ -114,6 +117,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr contains
 #' @importFrom dplyr desc
+#' @importFrom dplyr filter
 #' @importFrom httr content
 #' @importFrom tidyr unite
 #' @importFrom tidyr separate
@@ -157,6 +161,30 @@ DataHub <- R6Class(
     #invalidate list of portfolio source files
     invalidate_pf_data_list = function(id, ...){
       invisible()
+    },
+    # > Models -----
+    get_model_data_list = function(id, ...){
+      full_lst <- content(private$oasisapi$api_get_query(query_path = paste("models", id,"data_files", sep = "/"))$result)
+      full_lst
+    },
+    get_model_hazard_data_list = function(id, ...) {
+      full_lst <- self$get_model_data_list(id)
+      #remove nulls
+      non_null_full_lst <- lapply(full_lst, Filter, f = Negate(is.null))
+      non_null_full_lst <-  Filter(Negate(is.null), non_null_full_lst)
+      full_data_df <- lapply(seq(length(non_null_full_lst)), function(i){
+        non_null_full_lst[[i]] %>%
+          as.data.frame(stringsAsFactors = FALSE)
+      })
+      hazard_data_df <- NULL
+      if (!is.null(full_data_df)) {
+        full_data_df <- full_data_df %>%
+          bind_rows()
+        # hazard files are recognized by the extension
+        hazard_data_df <- full_data_df %>%
+          filter( grepl("geojson", filename))
+      }
+      hazard_data_df
     },
     # > Analysis ----
     #return list of analysis resources
@@ -314,11 +342,19 @@ DataHub <- R6Class(
       invisible()
     },
     #extract model hazard resource file given model id
-    get_model_hazard_dataset_content = function(id, dataset_identifier, ...){
-      #currently no api function
-      path <- system.file("app", "www", "hazard_files", dataset_identifier, package = "oasisui")
-      mapfile <- geojsonio::geojson_read(path, what = "sp") #SLOW!
-      mapfile
+    get_model_hazard_dataset_content = function(id,filename, ...){
+      # #currently no api function
+      # path <- system.file("app", "www", "hazard_files", dataset_identifier, package = "oasisui")
+      # mapfile <- geojsonio::geojson_read(path, what = "sp") #SLOW!
+      # mapfile
+      mapfile_content <- NULL
+      if (!is.null(id)) {
+        mapfile <- private$oasisapi$api_return_query_res(query_path = paste("data_files", id, "content", sep = "/"), query_method = "GET")
+        path_mapfile <- file.path(private$user_destdir,filename)
+        readr::write_file(mapfile, path_mapfile)
+        mapfile_content <- geojsonio::geojson_read(path_mapfile, what = "sp")
+      }
+      mapfile_content
     },
     #invalidate model hazard resource file given model id
     invalidate_model_hazard_dataset_content = function(id,  ...){
@@ -461,7 +497,7 @@ DataHub <- R6Class(
     },
     # > Write file ----
     write_file = function(data, dataset_identifier, file_towrite = NULL, ...){
-      fs <- write_file(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
+      fs <- writefile(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
       fs
     },
     # > Helper methods ----
@@ -506,7 +542,7 @@ DataHub <- R6Class(
     },
     # Models
     return_tbl_modelsData = function(supplier_id = "", tbl_modelsDataNames) {
-      tbl_modelsData <-  private$oasisapi$return_df("models", api_param = list(`supplier_id` = supplier_id))
+      tbl_modelsData <-  private$oasisapi$return_df(query_path = "models", api_param = list(`supplier_id` = supplier_id))
       if (!is.null(tbl_modelsData) && nrow(tbl_modelsData) > 0 && is.null(tbl_modelsData$detail)) {
         tbl_modelsData <- convert_created_modified(tbl_modelsData)
         tbl_modelsData <- tbl_modelsData %>%
@@ -626,6 +662,9 @@ DataHub <- R6Class(
   report <-  paste(y[3:(length(y))], collapse = "_")
   g_idx <- as.integer(gsub("S", "", y[2]))
   g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
+  if (is.null(g_oed)) {
+    g_oed <- granToOed$oed[granToOed$order][g_idx]
+  }
   g <- granToOed[granToOed$oed == g_oed, "gran"]
   z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = reportToVar(varsdf)[[ report ]], stringsAsFactors = FALSE)
 }

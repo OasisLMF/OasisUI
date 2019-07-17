@@ -291,7 +291,9 @@ OasisAPI <- R6Class(
           content_lst <- lapply(content_lst, showname)
         }
         if (length(content_lst) > 1 || length(content_lst[[1]]) > 1) {
-          df <- bind_rows(content_lst) %>%
+          non_null_content_lst <- lapply(content_lst, Filter, f = Negate(is.null))
+          non_null_content_lst <- Filter(Negate(is.null), non_null_content_lst)
+          df <- bind_rows(non_null_content_lst) %>%
             as.data.frame()
         } else {
           df <- NULL
@@ -304,12 +306,12 @@ OasisAPI <- R6Class(
     # > write to disk ----
     api_get_analyses_tar = function(id, label, dest = tempfile(fileext = ".tar")) {
       request_list <- expression(list(
-        self$get_url(),
+        private$url,
         config = add_headers(
-          Accept = self$get_http_type(),
-          Authorization = sprintf("Bearer %s",self$get_access_token())
+          Accept = private$httptype,
+          Authorization = sprintf("Bearer %s",private$access_token)
         ),
-        path = paste(self$get_version(), "analyses", id, label, "", sep = "/"),
+        path = paste(private$version, "analyses", id, label, "", sep = "/"),
         write_disk(dest, overwrite = TRUE)
       ))
       response <- self$api_fetch_response("GET", request_list)

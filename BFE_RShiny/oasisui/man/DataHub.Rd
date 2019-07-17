@@ -36,6 +36,9 @@ LISTS
 > Portfolio
 \item{\code{get_pf_data_list(id)}}{return list of portfolio source files}
 \item{\code{invalidate_pf_data_list(id)}}{invalidate list of portfolio source files}
+> Models
+\item{\code{get_model_data_list(id)}}{return lists of model resources}
+\item{\code{get_model_hazard_data_list(id)}}{return lists of model hazard resources}
 > Analysis
 \item{\code{get_ana_inputs_data_list(id)}}{return list of analysis inputs}
 \item{\code{get_ana_outputs_data_list(id)}}{return list of analysis outputs}
@@ -56,8 +59,8 @@ DATASETS
 > Model
 \item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
 \item{\code{invalidate_model_resource_dataset_content(id)}}{invalidate model resource file given model id}
-\item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file given model id}
-\item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file given model id}
+\item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file content given file id}
+\item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file content given file id}
 > Analysis
 \item{\code{get_ana_dataset_content(id, dataset_identifier, type)}}{extract a input/output file content given an analysis id}
 \item{\code{invalidate_ana_dataset_content(id, dataset_identifier, type)}}{invalidate a input/output file content given an analysis id}
