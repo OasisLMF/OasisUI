@@ -32,6 +32,8 @@
 #'
 #' \item{\code{get_user_destdir()}}{return path of user specific foder}
 #' \item{\code{oed_peril_codes()}}{return mapping of OED Peril names and codes.}
+#' \item{\code{get_oed_summary_levels()}}{return list of oed summary levels by file.}
+#' \item{\code{get_oed_columns_list()}}{return list of oed columns by files.}
 #'
 #' LISTS
 #'
@@ -155,6 +157,12 @@ DataHub <- R6Class(
     get_oed_peril_codes_mapping = function(){
       oed_perils_codes_mapping <- content(private$oasisapi$api_basic_query(query_path = "oed_peril_codes", query_method = "GET")$result)
       oed_perils_codes_mapping$peril_codes
+    },
+    get_oed_summary_levels = function(){
+      oed_summary_levels_lst <- content(private$oasisapi$api_basic_query(query_path = "oed_summary_levels", query_method = "GET")$result)
+    },
+    get_oed_columns_list = function(){
+      oed_columns_lst <- content(private$oasisapi$api_basic_query(query_path = "oed_columns_list", query_method = "GET")$result)
     },
     # LISTS ----
     # > Portfolio ----
