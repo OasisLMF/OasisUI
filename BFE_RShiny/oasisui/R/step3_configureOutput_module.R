@@ -20,7 +20,8 @@ step3_configureOutputUI <- function(id) {
 
   tagList(
     hidden(div(id = ns("panelAnalysisTable"), panelAnalysisTable(id))),
-    hidden(div(id = ns("panelDefineOutputs"), panelDefineOutputs(id))),
+    hidden(div(id = ns("panelDefineOutputs"), defineOutputsUI(ns("defineOutputs")))),
+    # hidden(div(id = ns("panelDefineOutputs"), panelDefineOutputs(id))),
     hidden(div(id = ns("panelAnalysisLogs"), panelAnalysisLogs(id)))
   )
 }
