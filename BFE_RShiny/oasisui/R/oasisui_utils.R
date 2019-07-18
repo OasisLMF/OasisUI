@@ -1,3 +1,20 @@
+#' Swap names and values of a list
+#'
+#' @rdname SwapNamesValueInList
+#'
+#' @description Returns a list with names and values switched with respect to input list.
+#'
+#' @param List list
+#'
+#' @return list
+#'
+#' @export
+SwapNamesValueInList <- function(List) {
+  L <- setNames(names(List), unlist(List) %>% as.vector() ) %>% as.list()
+  return(L)
+}
+
+
 #' Capitalize first letter of all words in a string
 #'
 #' @rdname capitalize_first_letter

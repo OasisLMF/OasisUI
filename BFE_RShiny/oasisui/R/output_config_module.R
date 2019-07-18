@@ -2,7 +2,7 @@
 
 #' modeldetailsUI
 #'
-#' @rdname defineOutputs
+#' @rdname def_out_config
 #'
 #' @description UI side of function wrapping panel to show oputput configuration.
 #'
@@ -11,7 +11,7 @@
 #' @importFrom DT DTOutput
 #'
 #' @export
-defineOutputsUI <- function(id) {
+def_out_configUI <- function(id) {
   ns <- NS(id)
   oasisuiPanel(
     collapsible = FALSE,
@@ -36,32 +36,280 @@ defineOutputsUI <- function(id) {
   )
 }
 
+#' panelModelParams
+#'
+#' @rdname panelModelParams
+#'
+#' @description Function wrapping sub-panel to define model params.
+#'
+#' @template params-module-ui
+#'
+#' @importFrom shinyjs hidden
+#'
+#' @export
+panelModelParams <- function(id) {
+  ns <- NS(id)
+  tagList(
+    oasisuiPanel(
+      collapsible = FALSE,
+      ns("panel_panelModelParams"),
+      heading = h4("Model parameters"),
+      div(id = ns("basic"), style = "width:100%; margin: 0 auto;",
+          uiOutput(ns("basic_model_param")),
+          uiOutput(ns("chkinputsperils"))
+      ),
+      hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
+                 textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
+                 textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
+                 checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
+                 uiOutput(ns("advanced_model_param"))
+      ))
+    )
+  )
+}
+
+
+#' panelOutputParams
+#'
+#' @rdname panelOutputParams
+#'
+#' @description Function wrapping sub-panel to define output params.
+#'
+#' @template params-module-ui
+#'
+#' @importFrom shinyjs hidden
+#'
+#' @export
+panelOutputParams <- function(id) {
+  ns <- NS(id)
+  tagList(
+  )
+}
+
+#' panelOutputParamsDetails
+#'
+#' @rdname panelOutputParamsDetails
+#'
+#' @description Function wrapping sub-panel to define output params details.
+#'
+#' @template params-module-ui
+#'
+#' @importFrom shinyjs hidden
+#'
+#' @export
+panelOutputParamsDetails <- function(id) {
+  ns <- NS(id)
+  tagList()
+}
+
+
 # Define Output Configuration Server -------------------------------------------
 
-#' defineOutputs
+#' def_out_config
 #'
-#' @rdname defineOutputs
+#' @rdname def_out_config
 #'
 #' @description Server side of function wrapping panel to show oputput configuration.
 #'
-#' @param modelID Selected model ID.
+#' @param analysisID Selected analysis ID.
+#' @param analysisName Selected analysis name.
+#' @param ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.
 #' @template params-module
 #' @template params-active
+#'
+#' @return ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.
+#' @return ana_post_status status of posting the analysis.
 #'
 #' @importFrom shinyjs hide
 #'
 #' @export
-defineOutputs <- function(input,
-                          output,
-                          session,
-                          counter,
-                          active = reactive(TRUE)) {
+def_out_config <- function(input,
+                           output,
+                           session,
+                           analysisID = reactive(NULL),
+                           analysisName = reactive(""),
+                           ana_flag = reactive("C"),
+                           counter = reactive(NULL),
+                           active = reactive(TRUE)) {
 
   ns <- session$ns
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
-
+    # flag to know if the user is creating a new output configuration or rerunning an analysis
+    ana_flag = "C",
+    # result of posting RUN_analysis
+    ana_post_status = ""
   )
 
+  # Set up ---------------------------------------------------------------------
+
+  #ana_flag
+  observeEvent(ana_flag(), {
+    if (ana_flag() != result$ana_flag) {
+      result$ana_flag <- ana_flag()
+    }
+  })
+
+  observeEvent(counter(), {
+    .clearOutputOptions()
+  })
+
+  # Panel infos ----------------------------------------------------------------
+
+  # hide panel
+  onclick("abuttonhidepanelconfigureoutput", {
+    hide("panelDefineOutputs")
+    .defaultview()
+    result$ana_flag <- "C"
+  })
+
+  # configuration title
+  output$paneltitle_defAnaConfigOutput <- renderUI({
+    analysisName <- ifelse(analysisName() == " ", "", paste0('"', analysisName(), '"'))
+    if (result$ana_flag  == "R") {
+      paste0('Re-define output configuration for analysis id ', analysisID(), ' ', analysisName)
+    } else {
+      paste0('Define output configuration for analysis id ', analysisID(), ' ', analysisName)
+    }
+  })
+
+  # Preselected Output Configuration -------------------------------------------
+  observeEvent({
+    result$ana_flag
+    analysisID()
+  }, {
+    if (!is.null(analysisID())) {
+      if (result$ana_flag == "R") {
+        analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
+        if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
+          oasisuiNotification(type = "error",
+                              paste0("No output configuration associated to analysis ", analysisName()," id ", analysisID(), "."))
+        } else {
+          logMessage(paste0("appling the output configuration of analysis ", analysisName(), " id ",  analysisID() ))
+          #Set inputs
+          .updateOutputConfig(analysis_settings)
+        }
+      }
+    }
+  })
+
+
+  # Run analysis ---------------------------------------------------------------
+  # Execute analysis
+  onclick("abuttonexecuteanarun", {
+    analysis_settingsList <- .gen_analysis_settings()
+    #write out file to be uploades
+    currfolder <- session$userData$data_hub$get_user_destdir()
+    dest <- file.path(currfolder, "analysis_settings.json")
+    write_json(analysis_settingsList, dest, pretty = TRUE, auto_unbox = TRUE)
+
+    #post analysis settings
+    post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(query_path = paste("analyses", analysisID(), "settings_file", sep = "/"), query_body = dest, query_encode = "multipart")
+
+    result$ana_post_status <- post_analysis_settings_file$status
+  })
+
+
+  # Helper Functions -----------------------------------------------------------
+
+  .updateOutputConfig <- function(analysis_settings){
+
+  }
+
+  .gen_analysis_settings <- function(){
+
+  }
+
+  .clearOutputOptions <- function() {
+    logMessage(".clearOutputOptions called")
+
+    # Predefined params
+    tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    tbl_analysesData <- tbl_analysesData %>% filter(status != Status$Processing & status != Status$Ready)
+    namesList <- tbl_analysesData[,tbl_analysesDataNames$name]
+    idList <- tbl_analysesData[,tbl_analysesDataNames$id]
+    choicesList <- paste(idList, namesList, sep = " / ")
+
+    # Model Params
+    modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(query_path = paste( "models", modelID, "resource_file", sep = "/"), query_method = "GET")
+    if (!is.null(modelID) && !is.null(tbl_modelsDetails)) {
+      model_settings <- tbl_modelsDetails$model_settings #%>% unlist(recursive = FALSE)
+      names_settings_type <- lapply(names(model_settings), function(i) {model_settings[[i]][["type"]]}) %>%
+        setNames(names(model_settings))
+
+      if (length(names(model_settings)) > 0 ) {
+        # Basic model params
+        fixed_settings <- c("event_set", "event_occurrence_id")
+        basic_model_params <- names(model_settings)[names(model_settings) %in% fixed_settings]
+        ui_basic_model_param <- lapply(basic_model_params, function(p){
+          curr_param_lst <- model_settings[[p]]
+          curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+          if (curr_param_lst$type == "boolean") {
+            checkboxInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, value = curr_param_lst$default)
+          } else if (curr_param_lst$type == "dictionary") {
+            selectInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        choices = SwapNamesValueInList(curr_param_lst$values), selected =  curr_param_lst$default)
+          } else if (curr_param_lst$type == "float") {
+            sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        min = curr_param_lst$min, max = curr_param_lst$max, value =  curr_param_lst$default)
+          }
+        })
+        output$basic_model_param <- renderUI(ui_basic_model_param)
+
+        # Perils Settings
+        model_perils <- names(model_settings)[grepl("peril_", names(model_settings))]
+        if (length(model_perils) > 0 ) {
+          ui_perils <- lapply(model_perils, function(p){
+            curr_param_lst <- model_settings[[p]]
+            curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+            checkboxInput(ns(paste0("model_params_", p)), label = curr_param_lst$name, value = curr_param_lst$default)
+          })
+          output$chkinputsperils <- renderUI(list(h5("Available Perils"),ui_perils))
+        }
+
+        # Advanced model params
+        advanced_model_param <- names(model_settings)[ names(model_settings) %notin% c(basic_model_params, model_perils)]
+        ui_advanced_model_param <- lapply(advanced_model_param, function(p){
+          curr_param_lst <- model_settings[[p]]
+          curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+          if (curr_param_lst$type == "boolean") {
+            checkboxInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, value = curr_param_lst$default)
+          } else if (curr_param_lst$type == "dictionary") {
+            selectInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        choices = .SwapNamesValueInList(curr_param_lst$values), selected =  curr_param_lst$default)
+          } else if (curr_param_lst$type == "float") {
+            sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        min = curr_param_lst$min, max = curr_param_lst$max, value =  curr_param_lst$default)
+          }
+        })
+        output$advanced_model_param <- renderUI(ui_advanced_model_param)
+      }
+    }
+  }
+
+  .defaultview <- function(){
+
+  }
+
+  .advancedview <- function(){
+
+  }
+
+  .basicview <- function(){
+
+  }
+
+  # Module Outout --------------------------------------------------------------
+
+  moduleOutput <- c(
+    list(
+      ana_flag = reactive(result$ana_flag),
+      ana_post_status = reactive(result$ana_post_status)
+    )
+  )
+
+
 }
+
