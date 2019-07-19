@@ -7,6 +7,8 @@ file_Viewer <- list(
   #FVFLdownloadexcel = "Download files table"
 )
 
+# LAndingpage ------------------------------------------------------------------
+
 landing_page <- list(
   abuttonanalysis = "Define analysis to run",
   abuttonbrowse = "Visualize outputs",
@@ -22,6 +24,8 @@ landing_page <- list(
   accountDD = "User information",
   abuttonlogout = "Logout the application. You will need to sign back in"
 )
+
+# Define single analysis -------------------------------------------------------
 
 defineSingleAna <- list(
   abuttoncreateana = "Create new analysis",
@@ -40,10 +44,11 @@ defineSingleAna <- list(
   abuttonConfirmDel = "Confirm deleting analysis",
   abuttonstartcancIG = "Start/Cancel input generation for selected analysis",
   abuttonConfirmDelIG = "Confirm interruption input generation",
-  abuttonrunconfig = "Define output configuration and run analysis"
+  abuttonrunconfig = "Define output configuration and run analysis",
+  abuttonchoosetag = "Select tag from a previously used configuration."
 )
 
-### Panel Browse ----
+### Dashboard ------------------------------------------------------------------
 
 dashboard <- list(
   selectAnaID = "Select analysis ID",

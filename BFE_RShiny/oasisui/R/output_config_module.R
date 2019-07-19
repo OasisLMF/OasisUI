@@ -15,7 +15,7 @@ def_out_configUI <- function(id) {
   ns <- NS(id)
   oasisuiPanel(
     collapsible = FALSE,
-    ns("panel_anaoutput"),
+    id = ns("panel_anaoutput"),
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_defAnaConfigOutput"), inline = TRUE),
@@ -52,8 +52,8 @@ panelModelParams <- function(id) {
   tagList(
     oasisuiPanel(
       collapsible = FALSE,
-      ns("panel_panelModelParams"),
-      heading = h4("Model parameters"),
+      id = ns("panel_ModelParams"),
+      heading = h4("Model Parameters"),
       div(id = ns("basic"), style = "width:100%; margin: 0 auto;",
           uiOutput(ns("basic_model_param")),
           uiOutput(ns("chkinputsperils"))
@@ -83,6 +83,27 @@ panelModelParams <- function(id) {
 panelOutputParams <- function(id) {
   ns <- NS(id)
   tagList(
+    oasisuiPanel(
+      collapsible = FALSE,
+      id = ns("panel_OutputParams"),
+      heading = h4("Output Parameters"),
+      fluidRow(
+        column(8,
+               selectInput(inputId = ns("sintag"), label = "Tag", choices = default_tags, selected = default_tags[1])
+        ),
+        column(4,
+               actionButton(ns(paste0("abuttonchoosetag")), label = NULL, icon = icon("list-alt"),
+                            style = " color: rgb(71, 73, 73);
+                               background-color: white;
+                               padding: 0px;
+                               font-size: 24px;
+                               background-image: none;
+                               border: none;
+                                ") %>%
+                 bs_embed_tooltip(title = defineSingleAna$abuttonchoosetag, placement = "right")
+        )
+      )
+    )
   )
 }
 
@@ -99,7 +120,18 @@ panelOutputParams <- function(id) {
 #' @export
 panelOutputParamsDetails <- function(id) {
   ns <- NS(id)
-  tagList()
+  tagList(
+    oasisuiPanel(
+      collapsible = TRUE,
+      show = FALSE,
+      id = ns("panel_OutputParamsDetails"),
+      heading = h4("Output Parameters Details"),
+      uiOutput(ns("perspective_ui")), # checkboxses for all perspectives; available for all tags
+      hidden(div(id = ns("div_summary_levels_reports_ui"),
+                 uiOutput(ns("summary_levels_reports_ui")))), # combinations of summary levels and reports.
+      uiOutput(ns("out_params_review_ui")) # review of output configuration in long format. As a collapsible panel. Available for all tags
+    )
+  )
 }
 
 
@@ -121,6 +153,8 @@ panelOutputParamsDetails <- function(id) {
 #' @return ana_post_status status of posting the analysis.
 #'
 #' @importFrom shinyjs hide
+#' @importFrom shinyjs show
+#' @importFrom dplyr filter
 #'
 #' @export
 def_out_config <- function(input,
@@ -174,25 +208,122 @@ def_out_config <- function(input,
     }
   })
 
+  # Select Tag from another analysis -------------------------------------------
+
+  # Choose Tag
+  observeEvent(input$abuttonchoosetag, {
+    tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    tbl_analysesData <- tbl_analysesData %>% filter(grepl("run", tolower(status_detailed))) #keep all analyses that have been run, i.e. that have an analysis settings associated.
+    namesList <- tbl_analysesData[,tbl_analysesDataNames$name]
+    idList <- tbl_analysesData[,tbl_analysesDataNames$id]
+    choicesList <- paste(idList, namesList, sep = " / ")
+    showModal(AnaList)
+    updateSelectInput(inputId = "sinoutputoptions", choices = choicesList, session = session)
+  })
+
+  # > Modal Dialogue
+  AnaList <- modalDialog(
+    easyClose = TRUE,
+    size = "l",
+    selectInput(ns("sinoutputoptions"), "Select Custom Configuration:", choices = ""),
+    footer = tagList(
+      oasisuiButton(ns("abuttonselectconf"),
+                    label = "Select Configuration", align = "left"),
+      actionButton(ns("abuttoncancel"),
+                   label = "Cancel", align = "right")
+    )
+  )
+
+  # update tag based on analysis selection
+  observeEvent(input$abuttonselectconf, {
+    # Using analyses names to select the output configuration of a previously posted analyses
+    logMessage(paste0("updating output configuration because input$sinoutputoptions changed to ",input$sinoutputoptions))
+    if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
+      anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
+      anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
+      analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
+      if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
+        oasisuiNotification(type = "error",
+                            paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
+      } else {
+        logMessage(paste0("appling the output configuration of analysis ", anaName," id ", anaID))
+        # TO DO
+        # Get chosen tag out of the analysis settings
+        chosen_tag <- default_tags[1]
+        # Update tag
+        updateSelectInput(inputId = "sintag", selected = chosen_tag, session = session)
+        #Set inputs
+        .updateOutputConfig(analysis_settings)
+      }
+    }
+    removeModal()
+  })
+
   # Preselected Output Configuration -------------------------------------------
+
+  # Rerun case
   observeEvent({
     result$ana_flag
     analysisID()
   }, {
-    if (!is.null(analysisID())) {
-      if (result$ana_flag == "R") {
-        analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
-        if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
-          oasisuiNotification(type = "error",
-                              paste0("No output configuration associated to analysis ", analysisName()," id ", analysisID(), "."))
-        } else {
-          logMessage(paste0("appling the output configuration of analysis ", analysisName(), " id ",  analysisID() ))
-          #Set inputs
-          .updateOutputConfig(analysis_settings)
-        }
+    if (!is.null(analysisID()) && result$ana_flag == "R") {
+      analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
+      if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
+        oasisuiNotification(type = "error",
+                            paste0("No output configuration associated to analysis ", analysisName()," id ", analysisID(), "."))
+      } else {
+        logMessage(paste0("appling the output configuration of analysis ", analysisName(), " id ",  analysisID() ))
+        #Set inputs
+        .updateOutputConfig(analysis_settings)
       }
     }
   })
+
+  # Output Parameters Details --------------------------------------------------
+
+  observeEvent(input$sintag, {
+    if (input$sintag == default_tags[1]) { # Summary
+      hide("div_summary_levels_reports_ui")
+    } else {
+      show("div_summary_levels_reports_ui")
+      if (input$sintag == default_tags[2]) { # Drill-down
+        output$summary_levels_reports_ui <- renderUI({
+          fluidRow(
+            column(6,
+                   selectInput(inputId = ns("sinsummarylevels"), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[1], multiple = TRUE)
+            )
+          )
+        })
+      } else if (input$sintag == default_tags[3]) { # Custom
+        output$summary_levels_reports_ui <- renderUI({
+          fluidRow(
+            column(6,
+                   selectInput(inputId = ns("sinsummarylevels"), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[1], multiple = TRUE)
+            ),
+            column(6,
+                   selectInput(inputId = ns("sinreports"), label = "Reports", choices = output_options$variables, selected = output_options$variables[1], multiple = TRUE)
+            )
+          )
+        })
+      }
+    }
+  })
+
+  # checkboxses for all perspectives; available for all tags
+  output$perspective_ui <- renderUI(checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE, selected = output_options$losstypes[1]))
+
+
+  # review of output configuration in long format. As a collapsible panel. Available for all tags
+  output$out_params_review_ui <- renderUI(
+    tagList(
+      oasisuiPanel(
+        collapsible = TRUE,
+        show = FALSE,
+        id = ns("panel_OutputParamsReview"),
+        heading = h4("Output Parameters Review")
+      )
+    )
+  )
 
 
   # Run analysis ---------------------------------------------------------------
@@ -226,10 +357,6 @@ def_out_config <- function(input,
 
     # Predefined params
     tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-    tbl_analysesData <- tbl_analysesData %>% filter(status != Status$Processing & status != Status$Ready)
-    namesList <- tbl_analysesData[,tbl_analysesDataNames$name]
-    idList <- tbl_analysesData[,tbl_analysesDataNames$id]
-    choicesList <- paste(idList, namesList, sep = " / ")
 
     # Model Params
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
