@@ -26,7 +26,9 @@ LosstypesChoices <- list(
 output_options <- list(
   granularities = c("LOB", "Location", "County","State", "Policy", "Portfolio"),
   losstypes = c("GUL", "IL", "RI"),
-  variables = c("Full Sample", "PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT") #label fisible in plot output. Should be the same as in the checkboxes of output configuration
+  variables = c("Full Sample", "PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT"), #label fisible in plot output. Should be the same as in the checkboxes of output configuration
+  order = c(6,2,3,4,1,5),
+  variables_default = c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE)
 )
 
 #' varsdf

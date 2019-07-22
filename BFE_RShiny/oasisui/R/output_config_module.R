@@ -127,8 +127,9 @@ panelOutputParamsDetails <- function(id) {
       id = ns("panel_OutputParamsDetails"),
       heading = h4("Output Parameters Details"),
       uiOutput(ns("perspective_ui")), # checkboxses for all perspectives; available for all tags
-      hidden(div(id = ns("div_summary_levels_reports_ui"),
-                 uiOutput(ns("summary_levels_reports_ui")))), # combinations of summary levels and reports.
+      # hidden(div(id = ns("div_summary_levels_reports_ui"),
+      uiOutput(ns("summary_levels_reports_ui")), # combinations of summary levels and reports.
+      # ),
       uiOutput(ns("out_params_review_ui")) # review of output configuration in long format. As a collapsible panel. Available for all tags
     )
   )
@@ -168,12 +169,19 @@ def_out_config <- function(input,
 
   ns <- session$ns
 
+  # max number rows for custom output params
+  max_n <- 10
+
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
     # flag to know if the user is creating a new output configuration or rerunning an analysis
     ana_flag = "C",
     # result of posting RUN_analysis
-    ana_post_status = ""
+    ana_post_status = "",
+    # number of rows of output parameters - dependent on abuttonadd
+    n = 0,
+    # data for output params review
+    out_params_review = data.frame(perspective = c(), summary_level = c(), report = c())
   )
 
   # Set up ---------------------------------------------------------------------
@@ -281,37 +289,105 @@ def_out_config <- function(input,
 
   # Output Parameters Details --------------------------------------------------
 
-  observeEvent(input$sintag, {
-    if (input$sintag == default_tags[1]) { # Summary
-      hide("div_summary_levels_reports_ui")
-    } else {
-      show("div_summary_levels_reports_ui")
-      if (input$sintag == default_tags[2]) { # Drill-down
-        output$summary_levels_reports_ui <- renderUI({
-          fluidRow(
-            column(6,
-                   selectInput(inputId = ns("sinsummarylevels"), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[1], multiple = TRUE)
-            )
-          )
-        })
-      } else if (input$sintag == default_tags[3]) { # Custom
-        output$summary_levels_reports_ui <- renderUI({
-          fluidRow(
-            column(6,
-                   selectInput(inputId = ns("sinsummarylevels"), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[1], multiple = TRUE)
-            ),
-            column(6,
-                   selectInput(inputId = ns("sinreports"), label = "Reports", choices = output_options$variables, selected = output_options$variables[1], multiple = TRUE)
-            )
-          )
-        })
-      }
-    }
-  })
-
   # checkboxses for all perspectives; available for all tags
   output$perspective_ui <- renderUI(checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE, selected = output_options$losstypes[1]))
 
+
+  # >> summary levels and reports ----------------------------------------------
+
+  dynamicUI <- function(n) {
+    if (n > max_n) {
+      oasisuiNotification("Reached maximum number of entries.", type = "warning")
+      fluidRow(
+        column(5,
+               selectInput(inputId = ns(paste0("sinsummarylevels", n)), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[output_options$order][1], multiple = TRUE)
+        ),
+        column(5,
+               selectInput(inputId = ns(paste0("sinreports", n)), label = "Reports", choices = output_options$variables, selected = output_options$variables[output_options$variables_default][1], multiple = TRUE)
+        )
+      )
+    } else {
+      fluidRow(
+        column(5,
+               selectInput(inputId = ns(paste0("sinsummarylevels",n)), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[output_options$order][1], multiple = TRUE)
+        ),
+        column(5,
+               selectInput(inputId = ns(paste0("sinreports", n)), label = "Reports", choices = output_options$variables, selected = output_options$variables[output_options$variables_default][1], multiple = TRUE)
+        ),
+        column(1,
+               actionButton(ns(paste0("abuttonadd", n)), label = "", icon = icon("plus"))
+        )
+      )
+    }
+  }
+
+  observeEvent(input$sintag, {
+    logMessage(paste0("updating output parameters for ", input$sintag, " configuration"))
+
+    # clean up ui
+    logMessage("clean up UI")
+    if (any(grepl("sinsummarylevels", input))) {
+      removeUI(
+        selector = "div:has(> #sinsummarylevels)",
+        multiple = TRUE,
+        immediate = TRUE
+      )
+    }
+    if (any(grepl("sinreports", input))) {
+      removeUI(
+        selector = "div:has(> #sinreports)",
+        multiple = TRUE,
+        immediate = TRUE
+      )
+    }
+    if (any(grepl("abuttonadd", input))) {
+      removeUI(
+        selector = "div:has(> #abuttonadd)",
+        multiple = TRUE,
+        immediate = TRUE
+      )
+    }
+
+    # reset counter
+    logMessage(paste0("resetting result$n from ", result$n, " to 0"))
+    result$n <- 0
+    output$summary_levels_reports_ui <- renderUI({
+      if (input$sintag == default_tags[2]) {
+        tagList(
+          fluidRow(
+            column(5,
+                   selectInput(inputId = ns(paste0("sinsummarylevels", result$n)), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[output_options$order][1], multiple = TRUE)
+            )
+          )
+        )
+      } else if (input$sintag == default_tags[3]) {
+        tagList(
+          div(id = ns("placeholder")),
+          dynamicUI(result$n)
+        )
+      }
+    })
+  })
+
+  lapply(seq(0, max_n), function(x) {
+    observeEvent({
+      input[[paste0("abuttonadd", x)]]}, {
+        print(paste0("result$n ", result$n))
+        print(paste0("x ", x))
+        logMessage(paste0("insert ui because ", paste0("abuttonadd", x), " changed to ",  input[[paste0("abuttonadd", x)]]))
+        result$n <<- result$n + 1
+        print(paste0("result$n ", result$n))
+        insertUI(
+          selector = "#placeholder",
+          where = "afterEnd",
+          immediate = TRUE,
+          ui = dynamicUI(result$n)
+        )
+      })
+  })
+
+
+  # > Output Params Review -----------------------------------------------------
 
   # review of output configuration in long format. As a collapsible panel. Available for all tags
   output$out_params_review_ui <- renderUI(
@@ -320,11 +396,65 @@ def_out_config <- function(input,
         collapsible = TRUE,
         show = FALSE,
         id = ns("panel_OutputParamsReview"),
-        heading = h4("Output Parameters Review")
+        heading = h4("Output Parameters Review"),
+        oasisuiTableUI(ns("out_params_review_tbl")),
+        downloadButton(ns("download_out_params_review_tbl"), label = "Export to csv") %>%
+          bs_embed_tooltip(title = defineSingleAna$download_out_params_review_tbl, placement = "right")
       )
     )
   )
 
+  observe_output_param <- function(){
+    if (is.null(input$chkboxgrplosstypes)){
+      perspectives <- output_options$losstypes[1]
+    } else {
+      perspectives <- input$chkboxgrplosstypes
+    }
+    if (input$sintag == default_tags[1]) {
+      summary_levels <- c(output_options$granularities[output_options$order][1])
+      reports <- c(output_options$variables[output_options$variables_default])
+    } else if (input$sintag == default_tags[2]) {
+      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
+      reports <- c(output_options$variables[output_options$variables_default])
+    } else if (input$sintag == default_tags[3]) {
+      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
+      reports <- sapply(seq(0, result$n), function(x){input[[paste0("sinreports", x)]]})
+    }
+    if (summary_levels %>% unlist(recursive = TRUE) %>% is.null()) {summary_levels <- c(output_options$granularities[output_options$order][1])}
+    if (reports %>% unlist(recursive = TRUE) %>% is.null()) {reports <- c(output_options$variables[output_options$variables_default])}
+    result$out_params_review <- expand.grid(perspectives,summary_levels,reports) %>%
+      setNames(c("perspective", "summary_level", "report"))
+  }
+
+  sinsummarylevels_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
+  sinreports_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinreports", x)]]})})
+
+    observeEvent({
+      input$sintag
+      input$chkboxgrplosstypes
+      sinsummarylevels_react_all()
+      sinreports_react_all()
+    }, ignoreInit = TRUE,{
+      observe_output_param()
+      })
+
+  callModule(
+    oasisuiTable,
+    id = "out_params_review_tbl",
+    data = reactive({result$out_params_review}),
+    selection = "none",
+    escape = TRUE,
+    scrollX = FALSE,
+    filter = FALSE,
+    rownames = FALSE
+  )
+
+  output$download_out_params_review_tbl <- downloadHandler(
+    filename = paste0("outputParams_review_analysis_",analysisID(),".csv"),
+    content = function(file) {
+      fwrite(result$out_params_review %>% capitalize_names_df(), file, row.names = FALSE, quote = TRUE)
+    }
+  )
 
   # Run analysis ---------------------------------------------------------------
   # Execute analysis

@@ -45,7 +45,8 @@ defineSingleAna <- list(
   abuttonstartcancIG = "Start/Cancel input generation for selected analysis",
   abuttonConfirmDelIG = "Confirm interruption input generation",
   abuttonrunconfig = "Define output configuration and run analysis",
-  abuttonchoosetag = "Select tag from a previously used configuration."
+  abuttonchoosetag = "Select tag from a previously used configuration.",
+  download_out_params_review_tbl = "Download output parameters review."
 )
 
 ### Dashboard ------------------------------------------------------------------
