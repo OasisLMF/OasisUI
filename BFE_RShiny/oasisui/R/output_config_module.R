@@ -94,17 +94,17 @@ panelOutputParams <- function(id) {
         column(4,
                actionButton(ns(paste0("abuttonchoosetag")), label = NULL, icon = icon("list-alt"),
                             style = " color: rgb(71, 73, 73);
-                               background-color: white;
-                               padding: 0px;
-                               font-size: 24px;
-                               background-image: none;
-                               border: none;
-                                ") %>%
+                            background-color: white;
+                            padding: 0px;
+                            font-size: 24px;
+                            background-image: none;
+                            border: none;
+                            ") %>%
                  bs_embed_tooltip(title = defineSingleAna$abuttonchoosetag, placement = "right")
+               )
         )
-      )
-    )
-  )
+        )
+        )
 }
 
 #' panelOutputParamsDetails
@@ -404,11 +404,8 @@ def_out_config <- function(input,
     )
   )
 
-  sinsummarylevels_react_all <- reactive({sapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
-  sinreports_react_all <- reactive({sapply(seq(0, max_n), function(x){input[[paste0("sinreports", x)]]})})
-
   observe_output_param <- function(){
-    if (is.null(input$chkboxgrplosstypes)) {
+    if (is.null(input$chkboxgrplosstypes)){
       perspectives <- output_options$losstypes[1]
     } else {
       perspectives <- input$chkboxgrplosstypes
@@ -417,11 +414,11 @@ def_out_config <- function(input,
       summary_levels <- c(output_options$granularities[output_options$order][1])
       reports <- c(output_options$variables[output_options$variables_default])
     } else if (input$sintag == default_tags[2]) {
-      summary_levels <- sinsummarylevels_react_all()
+      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
       reports <- c(output_options$variables[output_options$variables_default])
     } else if (input$sintag == default_tags[3]) {
-      summary_levels <- sinsummarylevels_react_all()
-      reports <- sinreports_react_all()
+      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
+      reports <- sapply(seq(0, result$n), function(x){input[[paste0("sinreports", x)]]})
     }
     if (summary_levels %>% unlist(recursive = TRUE) %>% is.null()) {summary_levels <- c(output_options$granularities[output_options$order][1])}
     if (reports %>% unlist(recursive = TRUE) %>% is.null()) {reports <- c(output_options$variables[output_options$variables_default])}
@@ -429,14 +426,17 @@ def_out_config <- function(input,
       setNames(c("perspective", "summary_level", "report"))
   }
 
-    observeEvent({
-      input$sintag
-      input$chkboxgrplosstypes
-      sinsummarylevels_react_all()
-      sinreports_react_all()
-    }, ignoreInit = TRUE,{
-      observe_output_param()
-      })
+  sinsummarylevels_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
+  sinreports_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinreports", x)]]})})
+
+  observeEvent({
+    input$sintag
+    input$chkboxgrplosstypes
+    sinsummarylevels_react_all()
+    sinreports_react_all()
+  }, ignoreInit = TRUE,{
+    observe_output_param()
+  })
 
   callModule(
     oasisuiTable,
@@ -569,4 +569,3 @@ def_out_config <- function(input,
 
 
 }
-
