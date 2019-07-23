@@ -76,6 +76,8 @@ DATASETS
 \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
 \item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
 \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
+\item{\code{get_ana_oed_summay_levels(id)}}{return list of valid oed summary levels for a given analysis}
+ \item{\code{invalidate_ana_oed_summay_levels(id)}}{invalidate list of valid oed summary levels for a given analysis}
 \item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
 \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
 \item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}

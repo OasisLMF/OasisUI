@@ -77,6 +77,8 @@
 #' \item{\code{invalidate_ana_dataset_nrow(id, type, dataset_identifier)}}{invalidate a inputs/outputs file nrow given an analysis id}
 #' \item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
 #' \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
+#' \item{\code{get_ana_oed_summay_levels(id)}}{return list of valid oed summary levels for a given analysis}
+#'  \item{\code{invalidate_ana_oed_summay_levels(id)}}{invalidate list of valid oed summary levels for a given analysis}
 #' \item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
 #' \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
 #' \item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
@@ -466,6 +468,33 @@ DataHub <- R6Class(
     },
     #invalidate a inputs/outputs file size given an analysis id
     invalidate_ana_dataset_size = function(id, type, dataset_identifier, ...){
+      invisible()
+    },
+    #extract oed summary levels relevant for current analysis
+    get_ana_oed_summay_levels = function(id){
+      oed_fields_content <- self$get_oed_summary_levels()
+      oed_fields <- oed_fields_content %>%
+        unlist() %>%
+        as.data.frame(stringsAsFactors = FALSE) %>%
+        setNames("value") %>%
+        mutate(jsonnames = rownames(y)) %>%
+        separate(col = jsonnames, into = c("file", "oed_field", "field"), sep = "\\.") %>%
+        filter(field == "desc") %>%
+        select(oed_field, value) %>%
+        spread(oed_field, value) %>%
+        as.list()
+      oed_fields_ana_content <- self$get_ana_inputs_dataset_content(id, dataset_identifier = "summary_levles.json")
+      oed_fields <- oed_fields_ana_content %>%
+        unlist() %>%
+        as.data.frame(stringsAsFactors = FALSE) %>%
+        setNames("oed_field") %>%
+        mutate(jsonnames = rownames(.)) %>%
+        separate(col = jsonnames, into= c("perspective", "status"), sep = "\\.") %>%
+        mutate(status = substr(status,1,status %>% nchar() - 1)) %>%
+        mutate(desc = k[oed_field])
+    },
+    #invalidate oed summary levels relevant for current analysis
+    invalidate_ana_oed_summay_levels = function(id, ...){
       invisible()
     },
     #extract analysis settings content
