@@ -32,7 +32,6 @@
 #'
 #' \item{\code{get_user_destdir()}}{return path of user specific foder}
 #' \item{\code{oed_peril_codes()}}{return mapping of OED Peril names and codes.}
-#' \item{\code{get_oed_summary_levels()}}{return list of oed summary levels by file.}
 #'
 #' LISTS
 #'
@@ -158,9 +157,6 @@ DataHub <- R6Class(
     get_oed_peril_codes_mapping = function(){
       oed_perils_codes_mapping <- content(private$oasisapi$api_basic_query(query_path = "oed_peril_codes", query_method = "GET")$result)
       oed_perils_codes_mapping$peril_codes
-    },
-    get_oed_summary_levels = function(){
-      oed_summary_levels_lst <- content(private$oasisapi$api_basic_query(query_path = "oed_summary_levels", query_method = "GET")$result)
     },
     # LISTS ----
     # > Portfolio ----
@@ -472,26 +468,13 @@ DataHub <- R6Class(
     },
     #extract oed summary levels relevant for current analysis
     get_ana_oed_summay_levels = function(id){
-      oed_fields_content <- self$get_oed_summary_levels()
-      oed_fields <- oed_fields_content %>%
-        unlist() %>%
-        as.data.frame(stringsAsFactors = FALSE) %>%
-        setNames("value") %>%
-        mutate(jsonnames = rownames(y)) %>%
-        separate(col = jsonnames, into = c("file", "oed_field", "field"), sep = "\\.") %>%
-        filter(field == "desc") %>%
-        select(oed_field, value) %>%
-        spread(oed_field, value) %>%
-        as.list()
-      oed_fields_ana_content <- self$get_ana_inputs_dataset_content(id, dataset_identifier = "summary_levles.json")
+      oed_fields_ana_content <- content(private$oasisapi$api_get_query(query_path = paste("analyses", id, "summary_levels_file",  sep = "/"))$result)
       oed_fields <- oed_fields_ana_content %>%
         unlist() %>%
         as.data.frame(stringsAsFactors = FALSE) %>%
         setNames("oed_field") %>%
         mutate(jsonnames = rownames(.)) %>%
-        separate(col = jsonnames, into= c("perspective", "status"), sep = "\\.") %>%
-        mutate(status = substr(status,1,status %>% nchar() - 1)) %>%
-        mutate(desc = k[oed_field])
+        separate(col = jsonnames, into= c("perspective", "status"), sep = "\\.")
     },
     #invalidate oed summary levels relevant for current analysis
     invalidate_ana_oed_summay_levels = function(id, ...){
