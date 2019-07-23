@@ -404,8 +404,11 @@ def_out_config <- function(input,
     )
   )
 
+  sinsummarylevels_react_all <- reactive({sapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
+  sinreports_react_all <- reactive({sapply(seq(0, max_n), function(x){input[[paste0("sinreports", x)]]})})
+
   observe_output_param <- function(){
-    if (is.null(input$chkboxgrplosstypes)){
+    if (is.null(input$chkboxgrplosstypes)) {
       perspectives <- output_options$losstypes[1]
     } else {
       perspectives <- input$chkboxgrplosstypes
@@ -414,20 +417,17 @@ def_out_config <- function(input,
       summary_levels <- c(output_options$granularities[output_options$order][1])
       reports <- c(output_options$variables[output_options$variables_default])
     } else if (input$sintag == default_tags[2]) {
-      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
+      summary_levels <- sinsummarylevels_react_all()
       reports <- c(output_options$variables[output_options$variables_default])
     } else if (input$sintag == default_tags[3]) {
-      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
-      reports <- sapply(seq(0, result$n), function(x){input[[paste0("sinreports", x)]]})
+      summary_levels <- sinsummarylevels_react_all()
+      reports <- sinreports_react_all()
     }
     if (summary_levels %>% unlist(recursive = TRUE) %>% is.null()) {summary_levels <- c(output_options$granularities[output_options$order][1])}
     if (reports %>% unlist(recursive = TRUE) %>% is.null()) {reports <- c(output_options$variables[output_options$variables_default])}
     result$out_params_review <- expand.grid(perspectives,summary_levels,reports) %>%
       setNames(c("perspective", "summary_level", "report"))
   }
-
-  sinsummarylevels_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
-  sinreports_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinreports", x)]]})})
 
     observeEvent({
       input$sintag
