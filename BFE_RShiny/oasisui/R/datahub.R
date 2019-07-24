@@ -472,9 +472,9 @@ DataHub <- R6Class(
       oed_fields <- oed_fields_ana_content %>%
         unlist() %>%
         as.data.frame(stringsAsFactors = FALSE) %>%
-        setNames("oed_field") %>%
+        setNames("description") %>%
         mutate(jsonnames = rownames(.)) %>%
-        separate(col = jsonnames, into= c("perspective", "status"), sep = "\\.")
+        separate(col = jsonnames, into= c("perspective", "status", "oed_field"), sep = "\\.")
     },
     #invalidate oed summary levels relevant for current analysis
     invalidate_ana_oed_summay_levels = function(id, ...){
