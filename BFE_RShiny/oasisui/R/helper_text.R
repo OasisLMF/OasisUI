@@ -1,12 +1,25 @@
-# Helper texts to show explanations next to buttons.
-# A list per file.
-# Naming convention: buttonname
 
+#' Helper text
+#'
+#' Helper texts to show explanations next to buttons, one per file (?).
+#'
+#' @format Each object is a named list of character strings, the names
+#'   corresponding to the button IDs.
+#'
+#' @name helper-text
+NULL
+
+#' @rdname helper-text
+#'
+#' @export
 file_Viewer <- list(
   FLdownloadzip = "Download all selected files"
   #FVFLdownloadexcel = "Download files table"
 )
 
+#' @rdname helper-text
+#'
+#' @export
 landing_page <- list(
   abuttonanalysis = "Define analysis to run",
   abuttonbrowse = "Visualize outputs",
@@ -23,6 +36,9 @@ landing_page <- list(
   abuttonlogout = "Logout the application. You will need to sign back in"
 )
 
+#' @rdname helper-text
+#'
+#' @export
 defineSingleAna <- list(
   abuttoncreateana = "Create new analysis",
   abuttonshowanadetails = "Show details for selected analysis",
@@ -45,6 +61,9 @@ defineSingleAna <- list(
 
 ### Panel Browse ----
 
+#' @rdname helper-text
+#'
+#' @export
 dashboard <- list(
   selectAnaID = "Select analysis ID",
   selectBatchAnaID = "Select Batch analysis ID",
