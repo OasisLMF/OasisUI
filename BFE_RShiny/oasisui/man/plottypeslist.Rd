@@ -9,6 +9,6 @@
 plottypeslist
 }
 \description{
-list containing settings for plots
+List containing settings for plots.
 }
 \keyword{datasets}
