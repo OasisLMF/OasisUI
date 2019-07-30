@@ -9,6 +9,6 @@
 varsdf
 }
 \description{
-data frame of variables, with respective analysis_settings json field and info about being under lec_output in analysis_settings.json
+Data frame of variables, with respective analysis_settings json field and info about whether a variable is under lec_output in analysis_settings.json.
 }
 \keyword{datasets}

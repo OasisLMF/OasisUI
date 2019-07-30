@@ -6,8 +6,6 @@
 #'
 #' @description UI side of function wrapping panel to show analyses details table.
 #'
-#' @template params-module-ui
-#'
 #' @importFrom DT DTOutput
 #'
 #' @export
@@ -45,6 +43,7 @@ analysis_detailsUI <- function(id) {
 #'i
 #' @param analysisID Selected analysis ID.
 #' @param portfolioID Selected portfolio ID.
+#' @param counter Counter.
 #' @template params-module
 #'
 #' @export

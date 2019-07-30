@@ -4,11 +4,11 @@
 \name{LosstypesChoices}
 \alias{LosstypesChoices}
 \title{LosstypesChoices}
-\format{Named \code{list} of Losstypes Choices. (Name empty)}
+\format{Named \code{list} of Losstypes choices. Names being an empty space.}
 \usage{
 LosstypesChoices
 }
 \description{
-List of variables per granularity
+List of variables per granularity.
 }
 \keyword{datasets}

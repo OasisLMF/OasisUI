@@ -35,6 +35,7 @@ untar_list <- function(tarfile, to_strip = NULL){
 #'
 #' @importFrom data.table fread
 #' @importFrom jsonlite read_json
+#' @importFrom utils tail
 #'
 #' @export
 
@@ -68,6 +69,7 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
 #'
 #' @importFrom data.table fread
 #' @importFrom jsonlite read_json
+#' @importFrom utils tail
 #'
 #' @export
 
@@ -97,6 +99,8 @@ writefile <- function(data, dataset_identifier = NULL, destdir = tempdir(), file
 #' @param to_strip character vector of initial path to strip.
 #'
 #' @return simplified vector of paths.
+#'
+#' @importFrom utils glob2rx
 #'
 #' @export
 simplify_path <- function(x, to_strip = NULL) {

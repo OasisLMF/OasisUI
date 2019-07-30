@@ -70,6 +70,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
 #' @importFrom data.table fread
 #' @importFrom utils count.fields
 #' @importFrom utils zip
+#' @importFrom utils tail
 #' @importFrom jsonlite toJSON
 #'
 #' @export

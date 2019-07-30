@@ -11,7 +11,7 @@ modeldetails(input, output, session, modelID, portfolioID, file_pins,
   counter, active = reactive(TRUE))
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -24,8 +24,6 @@ modeldetails(input, output, session, modelID, portfolioID, file_pins,
 \item{counter}{Reactive value to trigger inputs download.}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{id}{Namespace ID for the module.}
 }
 \description{
 UI side of function wrapping panel to show model details.

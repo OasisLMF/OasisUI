@@ -4,11 +4,9 @@
 \alias{reportToVar}
 \title{reportToVar}
 \usage{
-reportToVar(varsdf)
-}
-\arguments{
-\item{varsdf}{dataframe of variables for output configuration. Defined in the package.}
+reportToVar()
 }
 \description{
-function to create a nemed list connecting the file names patterns with the coorresponding vaariables. takes as input varsdf
+Function to create a named list connecting the file names patterns with the corresponding variables.
+Operates on \code{varsdf}.
 }

@@ -1,3 +1,5 @@
+^inst/app/www/hazard_files$
+^CHANGELOG.md$
 ^man-roxygen$
 ^.*\.Rproj$
 ^\.Rproj\.user$

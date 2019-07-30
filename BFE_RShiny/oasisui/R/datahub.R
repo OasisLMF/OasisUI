@@ -659,8 +659,8 @@ DataHub <- R6Class(
 
 # Helper functions -----
 
-#Add descritption fields to outputs files
-.addDescription <- function(x, analysis_settings){
+# Add description fields to output files
+.addDescription <- function(x, analysis_settings) {
   x <- as.character(x)
   x <- strsplit(x, split = "[.]")[[1]][1]
   y <- unlist(strsplit(x, split = "_"))
@@ -671,7 +671,11 @@ DataHub <- R6Class(
     g_oed <- granToOed$oed[granToOed$order][g_idx]
   }
   g <- granToOed[granToOed$oed == g_oed, "gran"]
-  z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = reportToVar(varsdf)[[ report ]], stringsAsFactors = FALSE)
+  z <- reportToVar()[[report]]
+  if (is.null(z))
+    z <- "Summary Info"
+  z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = z, stringsAsFactors = FALSE)
+  z
 }
 
 .addIcons <- function(df, Status) {
