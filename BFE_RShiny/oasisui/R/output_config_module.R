@@ -269,6 +269,11 @@ def_out_config <- function(input,
     removeModal()
   })
 
+  # > close modal
+  observeEvent(input$abuttoncancel, {
+    removeModal()
+  })
+
   # Preselected Output Configuration -------------------------------------------
 
   # Rerun case
