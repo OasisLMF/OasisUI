@@ -9,6 +9,7 @@
 #' @template params-module-ui
 #'
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 def_out_configUI <- function(id) {
@@ -78,6 +79,7 @@ panelModelParams <- function(id) {
 #' @template params-module-ui
 #'
 #' @importFrom shinyjs hidden
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 panelOutputParams <- function(id) {
@@ -154,8 +156,8 @@ panelOutputParamsDetails <- function(id) {
 #' @return ana_post_status status of posting the analysis.
 #'
 #' @importFrom shinyjs hide
-#' @importFrom shinyjs show
 #' @importFrom dplyr filter
+#' @importFrom jsonlite write_json
 #'
 #' @export
 def_out_config <- function(input,
