@@ -7,8 +7,6 @@
 #'
 #' @description UI/View for the step3_configureOutput.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom shinyjs hidden

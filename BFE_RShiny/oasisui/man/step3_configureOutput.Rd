@@ -12,7 +12,7 @@ step3_configureOutput(input, output, session, active = reactive(TRUE),
   pfName = reactive(""), analysisID = reactive(NULL))
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -25,8 +25,6 @@ step3_configureOutput(input, output, session, active = reactive(TRUE),
 \item{pfName}{Name of selected portfolio.}
 
 \item{analysisID}{Selected analysis ID.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

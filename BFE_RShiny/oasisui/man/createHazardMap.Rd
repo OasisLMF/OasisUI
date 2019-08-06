@@ -17,8 +17,6 @@ createHazardMap(input, output, session, file_map, file_pins)
 \item{file_map}{File to plot as map.}
 
 \item{file_pins}{File to plot pins.}
-
-\item{id}{module id}
 }
 \value{
 Leaflet map.

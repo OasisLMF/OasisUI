@@ -11,7 +11,7 @@
 #' @param width widget width
 #' @param ... Arguments to [shiny::actionButton()].
 #'
-#' @return Acces to Oasis UI.
+#' @return Button widget (UI element).
 #'
 #' @export
 #'
@@ -35,28 +35,17 @@ oasisuiButton <- function(inputId, label, icon = NULL, width = NULL, class = c("
 #'
 #' @rdname oasisuiTableButton
 #'
-#' @description Modified version of the default [oasisui::oasisuiButton()].
+#' @description Modified version of the primary [oasisui::oasisuiButton()].
 #'
-#' @param ... Arguments to [oasisui::oasisuiButton()].
+#' @inheritParams oasisuiButton
 #'
-#' @return Acces to Oasis UI.
+#' @return Button widget (UI element).
 #'
 #' @export
 #'
 #' @md
 oasisuiTableButton <- function(inputId, label, icon = NULL, width = NULL, class = c("btn", "btn-secondary"), ...) {
-  value <- restoreInput(id = inputId, default = NULL)
-  df_class <- c("btn", "btn-default", "action-button")
-  fl_class <- paste(union(class, df_class), collapse = " ")
-  tags$button(
-    id = inputId,
-    style = if (!is.null(width)) paste0("width: ", validateCssUnit(width), ";"),
-    type = "button",
-    class = fl_class,
-    `data-val` = value,
-    list(shiny:::validateIcon(icon), label),
-    ...
-  )
+  oasisuiButton(inputId = inputId, label = label, icon = icon, width = width, class = class, ...)
 }
 
 #' oasisuiCheckboxButton

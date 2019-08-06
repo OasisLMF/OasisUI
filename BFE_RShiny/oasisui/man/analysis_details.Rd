@@ -10,7 +10,7 @@ analysis_detailsUI(id)
 analysis_details(input, output, session, analysisID, portfolioID, counter)
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -18,7 +18,7 @@ analysis_details(input, output, session, analysisID, portfolioID, counter)
 
 \item{portfolioID}{Selected portfolio ID.}
 
-\item{id}{Namespace ID for the module.}
+\item{counter}{Counter.}
 }
 \description{
 UI side of function wrapping panel to show analyses details table.
