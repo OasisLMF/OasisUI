@@ -12,7 +12,7 @@ step2_chooseAnalysis(input, output, session, active = reactive(TRUE),
   pfName = reactive({     "" }), pfstatus = reactive({     "" }))
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -25,8 +25,6 @@ step2_chooseAnalysis(input, output, session, active = reactive(TRUE),
 \item{pfName}{Name of selected portfolio}
 
 \item{pfstatus}{Status of selected portfolio}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 List of tags.

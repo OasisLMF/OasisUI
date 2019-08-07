@@ -21,7 +21,7 @@ oasisuiButton(inputId, label, icon = NULL, width = NULL,
 \item{...}{Arguments to \code{\link[shiny:actionButton]{shiny::actionButton()}}.}
 }
 \value{
-Acces to Oasis UI.
+Button widget (UI element).
 }
 \description{
 Modified version of the default \code{\link[shiny:actionButton]{shiny::actionButton()}}.

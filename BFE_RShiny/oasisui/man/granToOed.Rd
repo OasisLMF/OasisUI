@@ -9,6 +9,6 @@
 granToOed
 }
 \description{
-data frame of variables, with respective oed field and info from analysis_settings.json
+Data frame of variables, with respective oed field and info from analysis_settings.json.
 }
 \keyword{datasets}

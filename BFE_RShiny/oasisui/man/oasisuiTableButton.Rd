@@ -8,11 +8,21 @@ oasisuiTableButton(inputId, label, icon = NULL, width = NULL,
   class = c("btn", "btn-secondary"), ...)
 }
 \arguments{
-\item{...}{Arguments to \code{\link[oasisui:oasisuiButton]{oasisui::oasisuiButton()}}.}
+\item{inputId}{widget id}
+
+\item{label}{widget label}
+
+\item{icon}{widget icon}
+
+\item{width}{widget width}
+
+\item{class}{HTML class attribute.}
+
+\item{...}{Arguments to \code{\link[shiny:actionButton]{shiny::actionButton()}}.}
 }
 \value{
-Acces to Oasis UI.
+Button widget (UI element).
 }
 \description{
-Modified version of the default \code{\link[oasisui:oasisuiButton]{oasisui::oasisuiButton()}}.
+Modified version of the primary \code{\link[oasisui:oasisuiButton]{oasisui::oasisuiButton()}}.
 }

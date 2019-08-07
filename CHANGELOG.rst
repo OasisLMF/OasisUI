@@ -2,6 +2,31 @@ OasisUI Changelog
 ==================
 
 .. AUTO_INSERT-CHANGE_LIST  
+`1.2.0`_
+--------
+* Integrated `data_file` API resource for hazard maps
+
+`1.1.3`_
+--------
+* Updated icons and fonts 
+
+`1.1.2`_
+--------
+* Various fixes to exposure validation
+* Renamed scope-file endpoint in API
+
+`1.1.1`_
+--------
+* Updates for Dynamically adding widgets based on model parameters from `model_resources.json`
+
+`1.1.0`_
+--------
+* Fix for file size upload limit 
+* Fix when deleting Portfolios
+* Layout and UI improvements 
+* Improvement in report outputs
+* Added Hazard map for models 
+* Added exposure validation on files generation 
 
 `1.0.2`_
 --------
@@ -58,6 +83,10 @@ OasisUI Changelog
 
 
 .. AUTO_INSERT-CHANGE_DIFF
+.. _`1.2.0`:  https://github.com/OasisLMF/OasisUI/compare/1.1.2...1.2.0
+.. _`1.1.2`:  https://github.com/OasisLMF/OasisUI/compare/1.1.1...1.1.2
+.. _`1.1.1`:  https://github.com/OasisLMF/OasisUI/compare/1.1.0...1.1.1
+.. _`1.1.0`:  https://github.com/OasisLMF/OasisUI/compare/1.0.2...1.1.0
 .. _`1.0.2`:  https://github.com/OasisLMF/OasisUI/compare/1.0.1...1.0.2
 .. _`1.0.1`:  https://github.com/OasisLMF/OasisUI/compare/1.0.0...1.0.1
 .. _`1.0.0`:  https://github.com/OasisLMF/OasisUI/compare/1.0.0-rc1...1.0.0
