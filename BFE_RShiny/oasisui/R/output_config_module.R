@@ -94,6 +94,7 @@ panelOutputParams <- function(id) {
                selectInput(inputId = ns("sintag"), label = "Tag", choices = default_tags, selected = default_tags[1])
         ),
         column(4,
+               br(),
                actionButton(ns(paste0("abuttonchoosetag")), label = NULL, icon = icon("list-alt"),
                             style = " color: rgb(71, 73, 73);
                             background-color: white;
@@ -103,10 +104,10 @@ panelOutputParams <- function(id) {
                             border: none;
                             ") %>%
                  bs_embed_tooltip(title = defineSingleAna$abuttonchoosetag, placement = "right")
-               )
         )
-        )
-        )
+      )
+    )
+  )
 }
 
 #' panelOutputParamsDetails
@@ -156,6 +157,8 @@ panelOutputParamsDetails <- function(id) {
 #' @return ana_post_status status of posting the analysis.
 #'
 #' @importFrom shinyjs hide
+#' @importFrom shinyjs disable
+#' @importFrom shinyjs enable
 #' @importFrom dplyr filter
 #' @importFrom jsonlite write_json
 #'
@@ -172,7 +175,9 @@ def_out_config <- function(input,
   ns <- session$ns
 
   # max number rows for custom output params
-  max_n <- 10
+  max_n <- 8
+  # inserted fields
+  inserted <- c()
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
@@ -180,8 +185,10 @@ def_out_config <- function(input,
     ana_flag = "C",
     # result of posting RUN_analysis
     ana_post_status = "",
-    # number of rows of output parameters - dependent on abuttonadd
+    # initial number of rows of output parameters - dependent on abuttonadd
     n = 0,
+    # consecutive number of rows of output parameters - dependent on abuttonadd
+    n_add = 0,
     # data for output params review
     out_params_review = data.frame(perspective = c(), summary_level = c(), report = c())
   )
@@ -203,9 +210,10 @@ def_out_config <- function(input,
 
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
-    hide("panelDefineOutputs")
-    .defaultview()
-    result$ana_flag <- "C"
+    # hide("panelDefineOutputs")
+    # .defaultview()
+    # result$ana_flag <- "C"
+    hide("panel_anaoutput")
   })
 
   # configuration title
@@ -303,26 +311,17 @@ def_out_config <- function(input,
   # >> summary levels and reports ----------------------------------------------
 
   dynamicUI <- function(n) {
-    if (n > max_n) {
+    if (n >= max_n) {
+      disable("add_btn")
       oasisuiNotification("Reached maximum number of entries.", type = "warning")
-      fluidRow(
-        column(5,
-               selectInput(inputId = ns(paste0("sinsummarylevels", n)), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[output_options$order][1], multiple = TRUE)
-        ),
-        column(5,
-               selectInput(inputId = ns(paste0("sinreports", n)), label = "Reports", choices = output_options$variables, selected = output_options$variables[output_options$variables_default][1], multiple = TRUE)
-        )
-      )
     } else {
+      enable("add_btn")
       fluidRow(
         column(5,
                selectInput(inputId = ns(paste0("sinsummarylevels",n)), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[output_options$order][1], multiple = TRUE)
         ),
         column(5,
                selectInput(inputId = ns(paste0("sinreports", n)), label = "Reports", choices = output_options$variables, selected = output_options$variables[output_options$variables_default][1], multiple = TRUE)
-        ),
-        column(1,
-               actionButton(ns(paste0("abuttonadd", n)), label = "", icon = icon("plus"))
         )
       )
     }
@@ -347,13 +346,6 @@ def_out_config <- function(input,
         immediate = TRUE
       )
     }
-    if (any(grepl("abuttonadd", input))) {
-      removeUI(
-        selector = "div:has(> #abuttonadd)",
-        multiple = TRUE,
-        immediate = TRUE
-      )
-    }
 
     # reset counter
     logMessage(paste0("resetting result$n from ", result$n, " to 0"))
@@ -369,28 +361,48 @@ def_out_config <- function(input,
         )
       } else if (input$sintag == default_tags[3]) {
         tagList(
-          div(id = ns("placeholder")),
-          dynamicUI(result$n)
+          fluidRow(
+            column(2,
+                   actionButton(ns("add_btn"), label = "", icon = icon("plus")) %>%
+                     bs_embed_tooltip(title = defineSingleAna$add_btn, placement = "right")
+            ),
+            column(4,
+                   actionButton(ns("remove_btn"), label = "", icon = icon("times")) %>%
+                     bs_embed_tooltip(title = defineSingleAna$remove_btn, placement = "right")
+            )
+          ),
+          fluidRow(
+            dynamicUI(result$n)
+          ),
+          tags$div(id = 'placeholder')
         )
       }
     })
   })
 
-  lapply(seq(0, max_n), function(x) {
-    observeEvent({
-      input[[paste0("abuttonadd", x)]]}, {
-        print(paste0("result$n ", result$n))
-        print(paste0("x ", x))
-        logMessage(paste0("insert ui because ", paste0("abuttonadd", x), " changed to ",  input[[paste0("abuttonadd", x)]]))
-        result$n <<- result$n + 1
-        print(paste0("result$n ", result$n))
-        insertUI(
-          selector = "#placeholder",
-          where = "afterEnd",
-          immediate = TRUE,
-          ui = dynamicUI(result$n)
-        )
-      })
+  # insert new summary levels and reports
+  observeEvent(input$add_btn, {
+    result$n_add <- result$n_add + 1
+    id = "insert_fields"
+    logMessage(paste0("insert ui because ", "add_btn", " changed to ",  result$n_add))
+    insertUI(
+      selector = '#placeholder',
+      immediate = TRUE,
+      ui = tags$div(
+        id = id,
+        dynamicUI(result$n_add)
+      )
+    )
+    inserted <<- c(id, inserted)
+  })
+
+  # remove summary levels and reports
+  observeEvent(input$remove_btn, {
+    result$n_add <- result$n_add - 1
+    removeUI(
+      selector = paste0('#', inserted[length(inserted)])
+    )
+    inserted <<- inserted[-length(inserted)]
   })
 
 
@@ -424,13 +436,14 @@ def_out_config <- function(input,
       summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
       reports <- c(output_options$variables[output_options$variables_default])
     } else if (input$sintag == default_tags[3]) {
-      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
-      reports <- sapply(seq(0, result$n), function(x){input[[paste0("sinreports", x)]]})
+      summary_levels <- sapply(seq(0, result$n_add), function(x){input[[paste0("sinsummarylevels", x)]]})
+      reports <- sapply(seq(0, result$n_add), function(x){input[[paste0("sinreports", x)]]})
     }
     if (summary_levels %>% unlist(recursive = TRUE) %>% is.null()) {summary_levels <- c(output_options$granularities[output_options$order][1])}
     if (reports %>% unlist(recursive = TRUE) %>% is.null()) {reports <- c(output_options$variables[output_options$variables_default])}
-    result$out_params_review <- expand.grid(perspectives,summary_levels,reports) %>%
-      setNames(c("perspective", "summary_level", "report"))
+    result$out_params_review <- expand.grid(perspective = perspectives,
+                                            summary_level = summary_levels,
+                                            report = reports)
   }
 
   sinsummarylevels_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
