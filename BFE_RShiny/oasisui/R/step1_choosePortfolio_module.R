@@ -7,8 +7,6 @@
 #'
 #' @description UI/View for the step1_choosePortfolio.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom shinyjs hidden

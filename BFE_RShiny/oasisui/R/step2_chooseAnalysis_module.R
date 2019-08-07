@@ -8,8 +8,6 @@
 #'
 #' @description UI/View for the step2_chooseAnalysis.
 #'
-#' @template params-module-ui
-#'
 #' @return List of tags.
 #'
 #' @importFrom shinyjs hidden

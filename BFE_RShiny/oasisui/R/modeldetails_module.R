@@ -6,8 +6,6 @@
 #'
 #' @description UI side of function wrapping panel to show model details.
 #'
-#' @template params-module-ui
-#'
 #' @importFrom DT DTOutput
 #'
 #' @export

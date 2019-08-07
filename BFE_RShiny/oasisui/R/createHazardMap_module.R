@@ -5,8 +5,6 @@
 #'
 #' @rdname createHazardMap
 #'
-#' @template params-module
-#'
 #' @description Creates a hazard map using leaflet.
 #'
 #' @export
@@ -28,7 +26,7 @@ createHazardMapUI <- function(id) {
 #'
 #' @description Creates a hazard map using leaflet.
 #'
-#' @template params-module-ui
+#' @template params-module
 #' @param file_map File to plot as map.
 #' @param file_pins File to plot pins.
 #'
