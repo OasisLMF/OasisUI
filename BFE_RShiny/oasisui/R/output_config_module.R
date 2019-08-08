@@ -175,7 +175,7 @@ def_out_config <- function(input,
   ns <- session$ns
 
   # max number rows for custom output params
-  max_n <- 8
+  max_n <- 10
   # inserted fields
   inserted <- c()
 
@@ -315,7 +315,6 @@ def_out_config <- function(input,
       disable("add_btn")
       oasisuiNotification("Reached maximum number of entries.", type = "warning")
     } else {
-      enable("add_btn")
       fluidRow(
         column(5,
                selectInput(inputId = ns(paste0("sinsummarylevels",n)), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[output_options$order][1], multiple = TRUE)
@@ -362,17 +361,19 @@ def_out_config <- function(input,
       } else if (input$sintag == default_tags[3]) {
         tagList(
           fluidRow(
-            column(2,
+            column(1,
+                   br(),
                    actionButton(ns("add_btn"), label = "", icon = icon("plus")) %>%
                      bs_embed_tooltip(title = defineSingleAna$add_btn, placement = "right")
             ),
-            column(4,
+            column(2,
+                   br(),
                    actionButton(ns("remove_btn"), label = "", icon = icon("times")) %>%
                      bs_embed_tooltip(title = defineSingleAna$remove_btn, placement = "right")
+            ),
+            column(8,
+                   dynamicUI(result$n)
             )
-          ),
-          fluidRow(
-            dynamicUI(result$n)
           ),
           tags$div(id = 'placeholder')
         )
@@ -390,7 +391,11 @@ def_out_config <- function(input,
       immediate = TRUE,
       ui = tags$div(
         id = id,
-        dynamicUI(result$n_add)
+        fluidRow(
+          column(3),
+          column(8,
+                 dynamicUI(result$n_add))
+        )
       )
     )
     inserted <<- c(id, inserted)
@@ -398,6 +403,7 @@ def_out_config <- function(input,
 
   # remove summary levels and reports
   observeEvent(input$remove_btn, {
+    enable("add_btn")
     result$n_add <- result$n_add - 1
     removeUI(
       selector = paste0('#', inserted[length(inserted)])
