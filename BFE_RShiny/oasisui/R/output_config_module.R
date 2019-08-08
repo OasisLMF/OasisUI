@@ -157,6 +157,7 @@ panelOutputParamsDetails <- function(id) {
 #' @return ana_post_status status of posting the analysis.
 #'
 #' @importFrom shinyjs hide
+#' @importFrom shinyjs show
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
 #' @importFrom dplyr filter
@@ -204,6 +205,7 @@ def_out_config <- function(input,
 
   observeEvent(counter(), {
     .clearOutputOptions()
+    show("panel_anaoutput")
   })
 
   # Panel infos ----------------------------------------------------------------
