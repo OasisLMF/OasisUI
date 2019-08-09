@@ -153,6 +153,7 @@ panelDefineOutputsDetails <- function(id) {
       collapsible = FALSE,
       ns("panel_defAnaOutputDetails"),
       heading = h4("Model parameters"),
+      oasisuiButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
       div(id = ns("basic"), style = "width:100%; margin: 0 auto;",
           uiOutput(ns("basic_model_param")),
           uiOutput(ns("chkinputsperils"))
@@ -161,6 +162,7 @@ panelDefineOutputsDetails <- function(id) {
                  textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
                  checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
+                 oasisuiButton(inputId = ns("abuttonbasic"), label = "Basic"),
                  uiOutput(ns("advanced_model_param"))
       ))
     )
@@ -191,8 +193,6 @@ panelDefOutputConfiguration <- function(id) {
     hidden(div(id = ns("panel_configureAdvancedIL"), panel_configureAdvancedIL(id))),
     checkboxInput(ns("chkinputRI"), label = "Net RI Loss", value = FALSE),
     hidden(div(id = ns("panel_configureAdvancedRI"), panel_configureAdvancedRI(id))),
-    oasisuiButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
-    hidden(oasisuiButton(inputId = ns("abuttonbasic"), label = "Basic")),
     hidden(oasisuiButton(inputId = ns("abuttonclroutopt"), label = "Default"))
   )
 }
