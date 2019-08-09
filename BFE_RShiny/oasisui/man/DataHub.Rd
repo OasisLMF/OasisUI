@@ -31,7 +31,6 @@ GENERAL
 
 \item{\code{get_user_destdir()}}{return path of user specific foder}
 \item{\code{oed_peril_codes()}}{return mapping of OED Peril names and codes.}
-\item{\code{get_oed_summary_levels()}}{return list of oed summary levels by file.}
 
 LISTS
 
@@ -77,7 +76,7 @@ DATASETS
 \item{\code{get_ana_dataset_size(id, type, dataset_identifier)}}{extract a inputs/outputs file size given an analysis id}
 \item{\code{invalidate_ana_dataset_size(id, type, dataset_identifier)}}{invalidate a inputs/outputs file size given an analysis id}
 \item{\code{get_ana_oed_summary_levels(id)}}{return list of valid oed summary levels for a given analysis}
- \item{\code{invalidate_ana_oed_summay_levels(id)}}{invalidate list of valid oed summary levels for a given analysis}
+\item{\code{invalidate_ana_oed_summay_levels(id)}}{invalidate list of valid oed summary levels for a given analysis}
 \item{\code{get_ana_settings_content(id)}}{extract analysis settings content}
 \item{\code{invalidate_ana_settings_content(id)}}{invalidate analysis settings content}
 \item{\code{get_ana_validation_summary_content(id)}}{extract analysis validation summary content}
