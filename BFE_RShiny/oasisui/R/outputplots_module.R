@@ -104,22 +104,19 @@ panelOutputModuleUI <- function(id){
              div( class = "InlineSelectInput",
                   selectInput(inputId = ns("inputplottype"), label = "Select a plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1]))
       ),
-      br(),
       column(4,
              checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
       column(8,
              checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Summary Level", choices = output_options$granularities, inline = TRUE)),
-      br(),
       column(12,
              checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Report", choices = output_options$variables, inline = TRUE)),
-      br(),
       h4("Customize plot"),
-      column(4,
+      column(3,
              div(class = "InlineTextInput",
                  textInput(ns("textinputtitle"), "Title", ""))),
-      column(4,
-             (checkboxInput(ns("chkboxmillions"), "Y axis in millions", TRUE))),
-      column(4,
+      column(3,
+             checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
+      column(3,
              hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
       oasisuiButton(inputId = ns("abuttondraw"), label = "Draw Plot",  style = "float:right")
     ),
@@ -452,7 +449,7 @@ panelOutputModule <- function(input, output, session,
     # > draw plot --------------------------------------------------------------
     if (!is.null(data)) {
       # >> rescale Y axis to millions
-      if(input$chkboxmillions == TRUE) {
+      if (input$chkboxmillions) {
         data$value <- data$value / 1000000
         ylabel <- paste(ylabel, "in Millions")
       }
