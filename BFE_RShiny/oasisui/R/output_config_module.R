@@ -311,77 +311,79 @@ def_out_config <- function(input,
 
 
   # >> summary levels and reports ----------------------------------------------
-
   dynamicUI <- function(n) {
+    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
     if (n >= max_n) {
       disable("add_btn")
       oasisuiNotification("Reached maximum number of entries.", type = "warning")
     } else {
-      fluidRow(
-        column(5,
-               selectInput(inputId = ns(paste0("sinsummarylevels",n)), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[output_options$order][1], multiple = TRUE)
-        ),
-        column(5,
-               selectInput(inputId = ns(paste0("sinreports", n)), label = "Reports", choices = output_options$variables, selected = output_options$variables[output_options$variables_default][1], multiple = TRUE)
+      if(!is.na(oed_field)) {
+        fluidRow(
+          column(5,
+                 selectInput(inputId = ns(paste0("sinsummarylevels",n)),
+                             label = "Summary Levels",
+                             choices = session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field,
+                             multiple = TRUE)
+          ),
+          column(5,
+                 selectInput(inputId = ns(paste0("sinreports", n)), label = "Reports", choices = output_options$variables, selected = output_options$variables[output_options$variables_default][1], multiple = TRUE)
+          )
         )
-      )
+      }
     }
   }
 
-  observeEvent(input$sintag, {
-    logMessage(paste0("updating output parameters for ", input$sintag, " configuration"))
+  observeEvent({input$sintag
+    analysisID()}, {
+      logMessage(paste0("updating output parameters for ", input$sintag, " configuration"))
 
-    # clean up ui
-    logMessage("clean up UI")
-    if (any(grepl("sinsummarylevels", input))) {
-      removeUI(
-        selector = "div:has(> #sinsummarylevels)",
-        multiple = TRUE,
-        immediate = TRUE
-      )
-    }
-    if (any(grepl("sinreports", input))) {
-      removeUI(
-        selector = "div:has(> #sinreports)",
-        multiple = TRUE,
-        immediate = TRUE
-      )
-    }
-
-    # reset counter
-    logMessage(paste0("resetting result$n from ", result$n, " to 0"))
-    result$n <- 0
-    output$summary_levels_reports_ui <- renderUI({
-      if (input$sintag == default_tags[2]) {
-        tagList(
-          fluidRow(
-            column(5,
-                   selectInput(inputId = ns(paste0("sinsummarylevels", result$n)), label = "Summary Levels", choices = output_options$granularities, selected = output_options$granularities[output_options$order][1], multiple = TRUE)
-            )
-          )
-        )
-      } else if (input$sintag == default_tags[3]) {
-        tagList(
-          fluidRow(
-            column(1,
-                   br(),
-                   actionButton(ns("add_btn"), label = "", icon = icon("plus")) %>%
-                     bs_embed_tooltip(title = defineSingleAna$add_btn, placement = "right")
-            ),
-            column(2,
-                   br(),
-                   actionButton(ns("remove_btn"), label = "", icon = icon("times")) %>%
-                     bs_embed_tooltip(title = defineSingleAna$remove_btn, placement = "right")
-            ),
-            column(8,
-                   dynamicUI(result$n)
-            )
-          ),
-          tags$div(id = 'placeholder')
+      # clean up ui
+      logMessage("clean up UI")
+      if (any(grepl("sinsummarylevels", input))) {
+        removeUI(
+          selector = "div:has(> #sinsummarylevels)",
+          multiple = TRUE,
+          immediate = TRUE
         )
       }
+      if (any(grepl("sinreports", input))) {
+        removeUI(
+          selector = "div:has(> #sinreports)",
+          multiple = TRUE,
+          immediate = TRUE
+        )
+      }
+
+      # reset counter
+      logMessage(paste0("resetting result$n from ", result$n, " to 0"))
+      result$n <- 0
+      output$summary_levels_reports_ui <- renderUI({
+        if (input$sintag == default_tags[2]) {
+          tagList(
+            dynamicUI(result$n)
+          )
+        } else if (input$sintag == default_tags[3]) {
+          tagList(
+            fluidRow(
+              column(1,
+                     br(),
+                     actionButton(ns("add_btn"), label = "", icon = icon("plus")) %>%
+                       bs_embed_tooltip(title = defineSingleAna$add_btn, placement = "right")
+              ),
+              column(2,
+                     br(),
+                     actionButton(ns("remove_btn"), label = "", icon = icon("times")) %>%
+                       bs_embed_tooltip(title = defineSingleAna$remove_btn, placement = "right")
+              ),
+              column(8,
+                     dynamicUI(result$n)
+              )
+            ),
+            tags$div(id = 'placeholder')
+          )
+        }
+      })
     })
-  })
 
   # insert new summary levels and reports
   observeEvent(input$add_btn, {
@@ -498,7 +500,6 @@ def_out_config <- function(input,
 
     result$ana_post_status <- post_analysis_settings_file$status
   })
-
 
   # Helper Functions -----------------------------------------------------------
 
