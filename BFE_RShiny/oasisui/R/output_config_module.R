@@ -418,6 +418,7 @@ def_out_config <- function(input,
       selector = paste0('#', inserted[length(inserted)])
     )
     inserted <<- inserted[-length(inserted)]
+    observe_output_param()
   })
 
 
@@ -438,29 +439,48 @@ def_out_config <- function(input,
     )
   )
 
-  observe_output_param <- function(){
-    if (is.null(input$chkboxgrplosstypes)){
+  observe_output_param <- function() {
+    if (is.null(input$chkboxgrplosstypes)) {
       perspectives <- output_options$losstypes[1]
     } else {
       perspectives <- input$chkboxgrplosstypes
     }
-    if (input$sintag == default_tags[1]) {
-      summary_levels <- c(output_options$granularities[output_options$order][1])
-      reports <- c(output_options$variables[output_options$variables_default])
-    } else if (input$sintag == default_tags[2]) {
-      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
-      reports <- c(output_options$variables[output_options$variables_default])
-    } else if (input$sintag == default_tags[3]) {
-      summary_levels <- sapply(seq(0, result$n_add), function(x){input[[paste0("sinsummarylevels", x)]]})
-      reports <- sapply(seq(0, result$n_add), function(x){input[[paste0("sinreports", x)]]})
+
+    if (input$sintag == default_tags[3]) {
+      # custom
+      reports_summary_levels <- lapply(seq(0, result$n_add), function(x) {
+        expand.grid(
+          summary_level = input[[paste0("sinsummarylevels", x)]],
+          report = input[[paste0("sinreports", x)]]
+        )
+      })
+      reports_summary_levels <- do.call("rbind.data.frame", reports_summary_levels)
+      if (nrow(reports_summary_levels) == 0)
+        reports_summary_levels <- data.frame(
+          summary_level = "",
+          report = ""
+        )
+      result$out_params_review <- data.frame(
+        perspective = rep(perspectives, each = nrow(reports_summary_levels)),
+        rep(reports_summary_levels, times = length(perspectives))
+      )
+    } else {
+      # Summary (1) or Drill-down (2)
+      reports <- output_options$variables[output_options$variables_default]
+      summary_levels <- output_options$granularities[output_options$order][1]
+      if (input$sintag == default_tags[2]) {
+        summary_levels_tmp <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
+        if (summary_levels_tmp %>% unlist(recursive = TRUE) %>% is.null()) {
+          # keep basic
+        } else
+          summary_levels <- output_options$granularities[output_options$order][1]
+      }
+
+      result$out_params_review <- expand.grid(perspective = perspectives,
+                                              summary_level = summary_levels,
+                                              report = reports)
     }
-    if (summary_levels %>% unlist(recursive = TRUE) %>% is.null()) {
-      summary_levels <- c(output_options$granularities[output_options$order][1])
-    }
-    if (reports %>% unlist(recursive = TRUE) %>% is.null()) {reports <- c(output_options$variables[output_options$variables_default])}
-    result$out_params_review <- expand.grid(perspective = perspectives,
-                                            summary_level = summary_levels,
-                                            report = reports)
+    invisible()
   }
 
   sinsummarylevels_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
