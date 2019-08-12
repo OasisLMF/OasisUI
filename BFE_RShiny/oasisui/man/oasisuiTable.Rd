@@ -2,17 +2,15 @@
 % Please edit documentation in R/oasisuiTable_module.R
 \name{oasisuiTableUI}
 \alias{oasisuiTableUI}
-\alias{oasisuiTableSummaryUI}
 \alias{oasisuiTable}
 \title{oasisuiTableUI}
 \usage{
 oasisuiTableUI(id)
 
-oasisuiTableSummaryUI(id)
-
 oasisuiTable(input, output, session, data, selection = "none",
   escape = TRUE, scrollX = TRUE, filter = FALSE, rownames = TRUE,
-  preselRow = reactive({     NULL }), maxrowsperpage = 10)
+  preselRow = reactive({     NULL }), maxrowsperpage = 10,
+  summary = FALSE)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -34,10 +32,10 @@ oasisuiTable(input, output, session, data, selection = "none",
 \item{preselRow}{reactive of preselected row default reactive({NULL}).}
 
 \item{maxrowsperpage}{param of datatable, default 10.}
+
+\item{summary}{If table is being used in the Summary tab in Dashboard.}
 }
 \value{
-List of tags.
-
 List of tags.
 
 rows_selected reactive of selected rows as returned from datatable.

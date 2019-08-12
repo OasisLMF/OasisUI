@@ -131,7 +131,8 @@ defineID <- function(input, output, session,
     filter = FALSE,
     rownames = FALSE,
     preselRow = reactive({result$preselRow}),
-    maxrowsperpage = 10)
+    maxrowsperpage = 10,
+    summary = FALSE)
 
   # > Modal Dialogue
   AnaList <- modalDialog(

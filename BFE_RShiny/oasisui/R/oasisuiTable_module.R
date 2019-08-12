@@ -18,22 +18,6 @@ oasisuiTableUI <-  function(id){
   )
 }
 
-#' oasisuiTableSummaryUI
-#'
-#' @rdname oasisuiTable
-#'
-#' @return List of tags.
-#'
-#' @importFrom DT DTOutput
-#'
-#' @export
-oasisuiTableSummaryUI <-  function(id){
-  ns <- NS(id)
-  tagList(
-    DTOutput(ns("dt_oasisuiSummaryTable"))
-  )
-}
-
 # Server -----------------------------------------------------------------------
 
 #' oasisuiTable
@@ -52,6 +36,7 @@ oasisuiTableSummaryUI <-  function(id){
 #' @param rownames param of datatable, default TRUE.
 #' @param preselRow reactive of preselected row default reactive({NULL}).
 #' @param maxrowsperpage param of datatable, default 10.
+#' @param summary If table is being used in the Summary tab in Dashboard.
 #'
 #' @return rows_selected reactive of selected rows as returned from datatable.
 #' @return  rows_current reactive of current rows as returned from datatable.
@@ -70,7 +55,8 @@ oasisuiTable <- function(input, output, session,
                          filter = FALSE,
                          rownames = TRUE,
                          preselRow = reactive({NULL}),
-                         maxrowsperpage = 10) {
+                         maxrowsperpage = 10,
+                         summary = FALSE) {
 
   ns <- session$ns
 
@@ -82,33 +68,27 @@ oasisuiTable <- function(input, output, session,
       tbl_oasisuiTable <- data.frame(content = "nothing to show")
     }
 
-    datatable(
-      tbl_oasisuiTable %>% capitalize_names_df(),
-      class = "oasisui-table display",
-      rownames = rownames,
-      selection = list(mode = selection,
-                       selected = preselRow(),
-                       target = 'row'),
-      escape = escape,
-      options = getTableOptions(scrollX,maxrowsperpage = maxrowsperpage,
-                                escape = escape)
-    )
-  })
-
-  output$dt_oasisuiSummaryTable <- renderDT({
-
-    if (!is.null(data())) {
-      tbl_oasisuiTable <- data()
-    } else {
-      tbl_oasisuiTable <- data.frame(content = "nothing to show")
+    if (summary == FALSE) {
+      datatable(
+        tbl_oasisuiTable %>% capitalize_names_df(),
+        class = "oasisui-table display",
+        rownames = rownames,
+        selection = list(mode = selection,
+                         selected = preselRow(),
+                         target = 'row'),
+        escape = escape,
+        options = getTableOptions(scrollX,maxrowsperpage = maxrowsperpage,
+                                  escape = escape)
+      )
+    } else if(summary == TRUE) {
+      if (length(tbl_oasisuiTable) < 10) {
+        dt <- datatable(tbl_oasisuiTable, options = list(dom = 't'))
+      } else {
+        dt <- datatable(tbl_oasisuiTable, options = list(dom = 'p'))
+      }
+      dt
     }
 
-    if (length(tbl_oasisuiTable) < 12) {
-      dt <- datatable(tbl_oasisuiTable, options = list(dom = 't'))
-    } else {
-      dt <- datatable(tbl_oasisuiTable, options = list(dom = 'p'))
-    }
-    dt
   })
 
   observeEvent(data(), ignoreNULL = FALSE, {
