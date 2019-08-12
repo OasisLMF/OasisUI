@@ -312,7 +312,6 @@ def_out_config <- function(input,
 
   # >> summary levels and reports ----------------------------------------------
   dynamicUI <- function(n) {
-
     if (n >= max_n) {
       disable("add_btn")
       oasisuiNotification("Reached maximum number of entries.", type = "warning")
@@ -325,277 +324,284 @@ def_out_config <- function(input,
                            multiple = TRUE)
         ),
         column(5,
-               selectInput(inputId = ns(paste0("sinreports", n)), label = "Reports", choices = output_options$variables, selected = output_options$variables[output_options$variables_default][1], multiple = TRUE)
+               selectInput(inputId = ns(paste0("sinreports", n)),
+                           label = "Reports",
+                           choices = output_options$variables,
+                           selected = output_options$variables[output_options$variables_default][1],
+                           multiple = TRUE)
         )
       )
+    }
   }
-}
 
-observeEvent({input$sintag
-  analysisID()}, {
-    logMessage(paste0("updating output parameters for ", input$sintag, " configuration"))
+  observeEvent({input$sintag
+    analysisID()}, {
+      logMessage(paste0("updating output parameters for ", input$sintag, " configuration"))
 
-    # clean up ui
-    logMessage("clean up UI")
-    if (any(grepl("sinsummarylevels", input))) {
-      removeUI(
-        selector = "div:has(> #sinsummarylevels)",
-        multiple = TRUE,
-        immediate = TRUE
-      )
-    }
-    if (any(grepl("sinreports", input))) {
-      removeUI(
-        selector = "div:has(> #sinreports)",
-        multiple = TRUE,
-        immediate = TRUE
-      )
-    }
-
-    # reset counter
-    logMessage(paste0("resetting result$n from ", result$n, " to 0"))
-    result$n <- 0
-    output$summary_levels_reports_ui <- renderUI({
-      oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
-      if(!is.na(oed_field)) {
-        if (input$sintag == default_tags[2]) {
-          tagList(
-            dynamicUI(result$n)
-          )
-        } else if (input$sintag == default_tags[3]) {
-          tagList(
-            fluidRow(
-              column(1,
-                     br(),
-                     actionButton(ns("add_btn"), label = "", icon = icon("plus")) %>%
-                       bs_embed_tooltip(title = defineSingleAna$add_btn, placement = "right")
-              ),
-              column(2,
-                     br(),
-                     actionButton(ns("remove_btn"), label = "", icon = icon("times")) %>%
-                       bs_embed_tooltip(title = defineSingleAna$remove_btn, placement = "right")
-              ),
-              column(8,
-                     dynamicUI(result$n)
-              )
-            ),
-            tags$div(id = 'placeholder')
-          )
-        }
+      # clean up ui
+      logMessage("clean up UI")
+      if (any(grepl("sinsummarylevels", input))) {
+        removeUI(
+          selector = "div:has(> #sinsummarylevels)",
+          multiple = TRUE,
+          immediate = TRUE
+        )
       }
+      if (any(grepl("sinreports", input))) {
+        removeUI(
+          selector = "div:has(> #sinreports)",
+          multiple = TRUE,
+          immediate = TRUE
+        )
+      }
+
+      # reset counter
+      logMessage(paste0("resetting result$n from ", result$n, " to 0"))
+      result$n <- 0
+      output$summary_levels_reports_ui <- renderUI({
+        oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+        if(!is.na(oed_field)) {
+          if (input$sintag == default_tags[2]) {
+            tagList(
+              dynamicUI(result$n)
+            )
+          } else if (input$sintag == default_tags[3]) {
+            tagList(
+              fluidRow(
+                column(1,
+                       br(),
+                       actionButton(ns("add_btn"), label = "", icon = icon("plus")) %>%
+                         bs_embed_tooltip(title = defineSingleAna$add_btn, placement = "right")
+                ),
+                column(2,
+                       br(),
+                       actionButton(ns("remove_btn"), label = "", icon = icon("times")) %>%
+                         bs_embed_tooltip(title = defineSingleAna$remove_btn, placement = "right")
+                ),
+                column(8,
+                       dynamicUI(result$n)
+                )
+              ),
+              tags$div(id = 'placeholder')
+            )
+          }
+        }
+      })
     })
+
+  # insert new summary levels and reports
+  observeEvent(input$add_btn, {
+    result$n_add <- result$n_add + 1
+    id = "insert_fields"
+    logMessage(paste0("insert ui because ", "add_btn", " changed to ",  result$n_add))
+    insertUI(
+      selector = '#placeholder',
+      immediate = TRUE,
+      ui = tags$div(
+        id = id,
+        fluidRow(
+          column(3),
+          column(8,
+                 dynamicUI(result$n_add))
+        )
+      )
+    )
+    inserted <<- c(id, inserted)
   })
 
-# insert new summary levels and reports
-observeEvent(input$add_btn, {
-  result$n_add <- result$n_add + 1
-  id = "insert_fields"
-  logMessage(paste0("insert ui because ", "add_btn", " changed to ",  result$n_add))
-  insertUI(
-    selector = '#placeholder',
-    immediate = TRUE,
-    ui = tags$div(
-      id = id,
-      fluidRow(
-        column(3),
-        column(8,
-               dynamicUI(result$n_add))
+  # remove summary levels and reports
+  observeEvent(input$remove_btn, {
+    enable("add_btn")
+    result$n_add <- result$n_add - 1
+    removeUI(
+      selector = paste0('#', inserted[length(inserted)])
+    )
+    inserted <<- inserted[-length(inserted)]
+  })
+
+
+  # > Output Params Review -----------------------------------------------------
+
+  # review of output configuration in long format. As a collapsible panel. Available for all tags
+  output$out_params_review_ui <- renderUI(
+    tagList(
+      oasisuiPanel(
+        collapsible = TRUE,
+        show = FALSE,
+        id = ns("panel_OutputParamsReview"),
+        heading = h4("Output Parameters Review"),
+        oasisuiTableUI(ns("out_params_review_tbl")),
+        downloadButton(ns("download_out_params_review_tbl"), label = "Export to csv") %>%
+          bs_embed_tooltip(title = defineSingleAna$download_out_params_review_tbl, placement = "right")
       )
     )
   )
-  inserted <<- c(id, inserted)
-})
 
-# remove summary levels and reports
-observeEvent(input$remove_btn, {
-  enable("add_btn")
-  result$n_add <- result$n_add - 1
-  removeUI(
-    selector = paste0('#', inserted[length(inserted)])
+  observe_output_param <- function(){
+    if (is.null(input$chkboxgrplosstypes)){
+      perspectives <- output_options$losstypes[1]
+    } else {
+      perspectives <- input$chkboxgrplosstypes
+    }
+    if (input$sintag == default_tags[1]) {
+      summary_levels <- c(output_options$granularities[output_options$order][1])
+      reports <- c(output_options$variables[output_options$variables_default])
+    } else if (input$sintag == default_tags[2]) {
+      summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
+      reports <- c(output_options$variables[output_options$variables_default])
+    } else if (input$sintag == default_tags[3]) {
+      summary_levels <- sapply(seq(0, result$n_add), function(x){input[[paste0("sinsummarylevels", x)]]})
+      reports <- sapply(seq(0, result$n_add), function(x){input[[paste0("sinreports", x)]]})
+    }
+    if (summary_levels %>% unlist(recursive = TRUE) %>% is.null()) {
+      summary_levels <- c(output_options$granularities[output_options$order][1])
+      }
+    if (reports %>% unlist(recursive = TRUE) %>% is.null()) {reports <- c(output_options$variables[output_options$variables_default])}
+    result$out_params_review <- expand.grid(perspective = perspectives,
+                                            summary_level = summary_levels,
+                                            report = reports)
+  }
+
+  sinsummarylevels_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
+  sinreports_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinreports", x)]]})})
+
+  observeEvent({
+    input$sintag
+    input$chkboxgrplosstypes
+    sinsummarylevels_react_all()
+    sinreports_react_all()
+    analysisID()
+  }, ignoreInit = TRUE,{
+    observe_output_param()
+  })
+
+  callModule(
+    oasisuiTable,
+    id = "out_params_review_tbl",
+    data = reactive({result$out_params_review}),
+    selection = "none",
+    escape = TRUE,
+    scrollX = FALSE,
+    filter = FALSE,
+    rownames = FALSE
   )
-  inserted <<- inserted[-length(inserted)]
-})
 
-
-# > Output Params Review -----------------------------------------------------
-
-# review of output configuration in long format. As a collapsible panel. Available for all tags
-output$out_params_review_ui <- renderUI(
-  tagList(
-    oasisuiPanel(
-      collapsible = TRUE,
-      show = FALSE,
-      id = ns("panel_OutputParamsReview"),
-      heading = h4("Output Parameters Review"),
-      oasisuiTableUI(ns("out_params_review_tbl")),
-      downloadButton(ns("download_out_params_review_tbl"), label = "Export to csv") %>%
-        bs_embed_tooltip(title = defineSingleAna$download_out_params_review_tbl, placement = "right")
-    )
+  output$download_out_params_review_tbl <- downloadHandler(
+    filename = paste0("outputParams_review_analysis_",analysisID(),".csv"),
+    content = function(file) {
+      fwrite(result$out_params_review %>% capitalize_names_df(), file, row.names = FALSE, quote = TRUE)
+    }
   )
-)
 
-observe_output_param <- function(){
-  if (is.null(input$chkboxgrplosstypes)){
-    perspectives <- output_options$losstypes[1]
-  } else {
-    perspectives <- input$chkboxgrplosstypes
+  # Run analysis ---------------------------------------------------------------
+  # Execute analysis
+  onclick("abuttonexecuteanarun", {
+    analysis_settingsList <- .gen_analysis_settings()
+    #write out file to be uploades
+    currfolder <- session$userData$data_hub$get_user_destdir()
+    dest <- file.path(currfolder, "analysis_settings.json")
+    write_json(analysis_settingsList, dest, pretty = TRUE, auto_unbox = TRUE)
+
+    #post analysis settings
+    post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(query_path = paste("analyses", analysisID(), "settings_file", sep = "/"), query_body = dest, query_encode = "multipart")
+
+    result$ana_post_status <- post_analysis_settings_file$status
+  })
+
+  # Helper Functions -----------------------------------------------------------
+
+  .updateOutputConfig <- function(analysis_settings){
+
   }
-  if (input$sintag == default_tags[1]) {
-    summary_levels <- c(output_options$granularities[output_options$order][1])
-    reports <- c(output_options$variables[output_options$variables_default])
-  } else if (input$sintag == default_tags[2]) {
-    summary_levels <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
-    reports <- c(output_options$variables[output_options$variables_default])
-  } else if (input$sintag == default_tags[3]) {
-    summary_levels <- sapply(seq(0, result$n_add), function(x){input[[paste0("sinsummarylevels", x)]]})
-    reports <- sapply(seq(0, result$n_add), function(x){input[[paste0("sinreports", x)]]})
+
+  .gen_analysis_settings <- function(){
+
   }
-  if (summary_levels %>% unlist(recursive = TRUE) %>% is.null()) {summary_levels <- c(output_options$granularities[output_options$order][1])}
-  if (reports %>% unlist(recursive = TRUE) %>% is.null()) {reports <- c(output_options$variables[output_options$variables_default])}
-  result$out_params_review <- expand.grid(perspective = perspectives,
-                                          summary_level = summary_levels,
-                                          report = reports)
-}
 
-sinsummarylevels_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
-sinreports_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinreports", x)]]})})
+  .clearOutputOptions <- function() {
+    logMessage(".clearOutputOptions called")
 
-observeEvent({
-  input$sintag
-  input$chkboxgrplosstypes
-  sinsummarylevels_react_all()
-  sinreports_react_all()
-}, ignoreInit = TRUE,{
-  observe_output_param()
-})
+    # Predefined params
+    tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
 
-callModule(
-  oasisuiTable,
-  id = "out_params_review_tbl",
-  data = reactive({result$out_params_review}),
-  selection = "none",
-  escape = TRUE,
-  scrollX = FALSE,
-  filter = FALSE,
-  rownames = FALSE
-)
+    # Model Params
+    modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(query_path = paste( "models", modelID, "resource_file", sep = "/"), query_method = "GET")
+    if (!is.null(modelID) && !is.null(tbl_modelsDetails)) {
+      model_settings <- tbl_modelsDetails$model_settings #%>% unlist(recursive = FALSE)
+      names_settings_type <- lapply(names(model_settings), function(i) {model_settings[[i]][["type"]]}) %>%
+        setNames(names(model_settings))
 
-output$download_out_params_review_tbl <- downloadHandler(
-  filename = paste0("outputParams_review_analysis_",analysisID(),".csv"),
-  content = function(file) {
-    fwrite(result$out_params_review %>% capitalize_names_df(), file, row.names = FALSE, quote = TRUE)
-  }
-)
-
-# Run analysis ---------------------------------------------------------------
-# Execute analysis
-onclick("abuttonexecuteanarun", {
-  analysis_settingsList <- .gen_analysis_settings()
-  #write out file to be uploades
-  currfolder <- session$userData$data_hub$get_user_destdir()
-  dest <- file.path(currfolder, "analysis_settings.json")
-  write_json(analysis_settingsList, dest, pretty = TRUE, auto_unbox = TRUE)
-
-  #post analysis settings
-  post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(query_path = paste("analyses", analysisID(), "settings_file", sep = "/"), query_body = dest, query_encode = "multipart")
-
-  result$ana_post_status <- post_analysis_settings_file$status
-})
-
-# Helper Functions -----------------------------------------------------------
-
-.updateOutputConfig <- function(analysis_settings){
-
-}
-
-.gen_analysis_settings <- function(){
-
-}
-
-.clearOutputOptions <- function() {
-  logMessage(".clearOutputOptions called")
-
-  # Predefined params
-  tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-
-  # Model Params
-  modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
-  tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(query_path = paste( "models", modelID, "resource_file", sep = "/"), query_method = "GET")
-  if (!is.null(modelID) && !is.null(tbl_modelsDetails)) {
-    model_settings <- tbl_modelsDetails$model_settings #%>% unlist(recursive = FALSE)
-    names_settings_type <- lapply(names(model_settings), function(i) {model_settings[[i]][["type"]]}) %>%
-      setNames(names(model_settings))
-
-    if (length(names(model_settings)) > 0 ) {
-      # Basic model params
-      fixed_settings <- c("event_set", "event_occurrence_id")
-      basic_model_params <- names(model_settings)[names(model_settings) %in% fixed_settings]
-      ui_basic_model_param <- lapply(basic_model_params, function(p){
-        curr_param_lst <- model_settings[[p]]
-        curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
-        if (curr_param_lst$type == "boolean") {
-          checkboxInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, value = curr_param_lst$default)
-        } else if (curr_param_lst$type == "dictionary") {
-          selectInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
-                      choices = SwapNamesValueInList(curr_param_lst$values), selected =  curr_param_lst$default)
-        } else if (curr_param_lst$type == "float") {
-          sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
-                      min = curr_param_lst$min, max = curr_param_lst$max, value =  curr_param_lst$default)
-        }
-      })
-      output$basic_model_param <- renderUI(ui_basic_model_param)
-
-      # Perils Settings
-      model_perils <- names(model_settings)[grepl("peril_", names(model_settings))]
-      if (length(model_perils) > 0 ) {
-        ui_perils <- lapply(model_perils, function(p){
+      if (length(names(model_settings)) > 0 ) {
+        # Basic model params
+        fixed_settings <- c("event_set", "event_occurrence_id")
+        basic_model_params <- names(model_settings)[names(model_settings) %in% fixed_settings]
+        ui_basic_model_param <- lapply(basic_model_params, function(p){
           curr_param_lst <- model_settings[[p]]
           curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
-          checkboxInput(ns(paste0("model_params_", p)), label = curr_param_lst$name, value = curr_param_lst$default)
+          if (curr_param_lst$type == "boolean") {
+            checkboxInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, value = curr_param_lst$default)
+          } else if (curr_param_lst$type == "dictionary") {
+            selectInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        choices = SwapNamesValueInList(curr_param_lst$values), selected =  curr_param_lst$default)
+          } else if (curr_param_lst$type == "float") {
+            sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        min = curr_param_lst$min, max = curr_param_lst$max, value =  curr_param_lst$default)
+          }
         })
-        output$chkinputsperils <- renderUI(list(h5("Available Perils"),ui_perils))
-      }
+        output$basic_model_param <- renderUI(ui_basic_model_param)
 
-      # Advanced model params
-      advanced_model_param <- names(model_settings)[ names(model_settings) %notin% c(basic_model_params, model_perils)]
-      ui_advanced_model_param <- lapply(advanced_model_param, function(p){
-        curr_param_lst <- model_settings[[p]]
-        curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
-        if (curr_param_lst$type == "boolean") {
-          checkboxInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, value = curr_param_lst$default)
-        } else if (curr_param_lst$type == "dictionary") {
-          selectInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
-                      choices = .SwapNamesValueInList(curr_param_lst$values), selected =  curr_param_lst$default)
-        } else if (curr_param_lst$type == "float") {
-          sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
-                      min = curr_param_lst$min, max = curr_param_lst$max, value =  curr_param_lst$default)
+        # Perils Settings
+        model_perils <- names(model_settings)[grepl("peril_", names(model_settings))]
+        if (length(model_perils) > 0 ) {
+          ui_perils <- lapply(model_perils, function(p){
+            curr_param_lst <- model_settings[[p]]
+            curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+            checkboxInput(ns(paste0("model_params_", p)), label = curr_param_lst$name, value = curr_param_lst$default)
+          })
+          output$chkinputsperils <- renderUI(list(h5("Available Perils"),ui_perils))
         }
-      })
-      output$advanced_model_param <- renderUI(ui_advanced_model_param)
+
+        # Advanced model params
+        advanced_model_param <- names(model_settings)[ names(model_settings) %notin% c(basic_model_params, model_perils)]
+        ui_advanced_model_param <- lapply(advanced_model_param, function(p){
+          curr_param_lst <- model_settings[[p]]
+          curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+          if (curr_param_lst$type == "boolean") {
+            checkboxInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name, value = curr_param_lst$default)
+          } else if (curr_param_lst$type == "dictionary") {
+            selectInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        choices = .SwapNamesValueInList(curr_param_lst$values), selected =  curr_param_lst$default)
+          } else if (curr_param_lst$type == "float") {
+            sliderInput(inputId = ns(paste0("model_params_", p)), label = curr_param_name,
+                        min = curr_param_lst$min, max = curr_param_lst$max, value =  curr_param_lst$default)
+          }
+        })
+        output$advanced_model_param <- renderUI(ui_advanced_model_param)
+      }
     }
   }
-}
 
-.defaultview <- function(){
+  .defaultview <- function(){
 
-}
+  }
 
-.advancedview <- function(){
+  .advancedview <- function(){
 
-}
+  }
 
-.basicview <- function(){
+  .basicview <- function(){
 
-}
+  }
 
-# Module Outout --------------------------------------------------------------
+  # Module Outout --------------------------------------------------------------
 
-moduleOutput <- c(
-  list(
-    ana_flag = reactive(result$ana_flag),
-    ana_post_status = reactive(result$ana_post_status)
+  moduleOutput <- c(
+    list(
+      ana_flag = reactive(result$ana_flag),
+      ana_post_status = reactive(result$ana_post_status)
+    )
   )
-)
 
 
 }
