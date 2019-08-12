@@ -36,7 +36,7 @@ oasisuiTableUI <-  function(id){
 #' @param rownames param of datatable, default TRUE.
 #' @param preselRow reactive of preselected row default reactive({NULL}).
 #' @param maxrowsperpage param of datatable, default 10.
-#' @param summary If table is being used in the Summary tab in Dashboard.
+#' @param simple TRUE for simplified version fo table, FALSE otherwise.
 #'
 #' @return rows_selected reactive of selected rows as returned from datatable.
 #' @return  rows_current reactive of current rows as returned from datatable.
@@ -56,7 +56,7 @@ oasisuiTable <- function(input, output, session,
                          rownames = TRUE,
                          preselRow = reactive({NULL}),
                          maxrowsperpage = 10,
-                         summary = FALSE) {
+                         simple = FALSE) {
 
   ns <- session$ns
 
@@ -68,8 +68,8 @@ oasisuiTable <- function(input, output, session,
       tbl_oasisuiTable <- data.frame(content = "nothing to show")
     }
 
-    if (summary == FALSE) {
-      datatable(
+    if (!simple) {
+      dt <- datatable(
         tbl_oasisuiTable %>% capitalize_names_df(),
         class = "oasisui-table display",
         rownames = rownames,
@@ -80,15 +80,14 @@ oasisuiTable <- function(input, output, session,
         options = getTableOptions(scrollX,maxrowsperpage = maxrowsperpage,
                                   escape = escape)
       )
-    } else if(summary == TRUE) {
+    } else {
       if (length(tbl_oasisuiTable) < 10) {
         dt <- datatable(tbl_oasisuiTable, options = list(dom = 't'))
       } else {
         dt <- datatable(tbl_oasisuiTable, options = list(dom = 'p'))
       }
-      dt
     }
-
+    dt
   })
 
   observeEvent(data(), ignoreNULL = FALSE, {

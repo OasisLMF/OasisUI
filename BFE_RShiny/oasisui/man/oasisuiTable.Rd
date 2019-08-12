@@ -10,7 +10,7 @@ oasisuiTableUI(id)
 oasisuiTable(input, output, session, data, selection = "none",
   escape = TRUE, scrollX = TRUE, filter = FALSE, rownames = TRUE,
   preselRow = reactive({     NULL }), maxrowsperpage = 10,
-  summary = FALSE)
+  simple = FALSE)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -33,7 +33,7 @@ oasisuiTable(input, output, session, data, selection = "none",
 
 \item{maxrowsperpage}{param of datatable, default 10.}
 
-\item{summary}{If table is being used in the Summary tab in Dashboard.}
+\item{simple}{TRUE for simplified version fo table, FALSE otherwise.}
 }
 \value{
 List of tags.
