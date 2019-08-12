@@ -18,6 +18,22 @@ oasisuiTableUI <-  function(id){
   )
 }
 
+#' oasisuiTableSummaryUI
+#'
+#' @rdname oasisuiTable
+#'
+#' @return List of tags.
+#'
+#' @importFrom DT DTOutput
+#'
+#' @export
+oasisuiTableSummaryUI <-  function(id){
+  ns <- NS(id)
+  tagList(
+    DTOutput(ns("dt_oasisuiSummaryTable"))
+  )
+}
+
 # Server -----------------------------------------------------------------------
 
 #' oasisuiTable
@@ -77,6 +93,22 @@ oasisuiTable <- function(input, output, session,
       options = getTableOptions(scrollX,maxrowsperpage = maxrowsperpage,
                                 escape = escape)
     )
+  })
+
+  output$dt_oasisuiSummaryTable <- renderDT({
+
+    if (!is.null(data())) {
+      tbl_oasisuiTable <- data()
+    } else {
+      tbl_oasisuiTable <- data.frame(content = "nothing to show")
+    }
+
+    if (length(tbl_oasisuiTable) < 12) {
+      dt <- datatable(tbl_oasisuiTable, options = list(dom = 't'))
+    } else {
+      dt <- datatable(tbl_oasisuiTable, options = list(dom = 'p'))
+    }
+    dt
   })
 
   observeEvent(data(), ignoreNULL = FALSE, {

@@ -27,12 +27,12 @@ summarytabUI <- function(id) {
       column(6,
              div(
                id = ns("summarypanel"),
-               h5("Inputs"),
-               oasisuiTableUI(ns("summaryInputTable")),
-               h5("Parameters"),
-               oasisuiTableUI(ns("summaryParamsTable")),
-               h5("Outputs"),
-               oasisuiTableUI(ns("summaryOutputTable"))
+               h4("Inputs"),
+               oasisuiTableSummaryUI(ns("summaryInputTable")),
+               h4("Parameters"),
+               oasisuiTableSummaryUI(ns("summaryParamsTable")),
+               h4("Outputs"),
+               oasisuiTableSummaryUI(ns("summaryOutputTable"))
              )
       ),
       column(6,

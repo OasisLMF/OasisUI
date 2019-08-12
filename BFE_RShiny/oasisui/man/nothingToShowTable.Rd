@@ -10,5 +10,5 @@ nothingToShowTable(contentMessage = "No data found")
 \item{contentMessage}{Message to be displayed.}
 }
 \description{
-Shows message in case table is table.
+Shows message in case table is null.
 }

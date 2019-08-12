@@ -2,10 +2,13 @@
 % Please edit documentation in R/oasisuiTable_module.R
 \name{oasisuiTableUI}
 \alias{oasisuiTableUI}
+\alias{oasisuiTableSummaryUI}
 \alias{oasisuiTable}
 \title{oasisuiTableUI}
 \usage{
 oasisuiTableUI(id)
+
+oasisuiTableSummaryUI(id)
 
 oasisuiTable(input, output, session, data, selection = "none",
   escape = TRUE, scrollX = TRUE, filter = FALSE, rownames = TRUE,
@@ -33,6 +36,8 @@ oasisuiTable(input, output, session, data, selection = "none",
 \item{maxrowsperpage}{param of datatable, default 10.}
 }
 \value{
+List of tags.
+
 List of tags.
 
 rows_selected reactive of selected rows as returned from datatable.
