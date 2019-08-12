@@ -394,6 +394,7 @@ def_out_config <- function(input,
     result$n_add <- result$n_add + 1
     id = "insert_fields"
     logMessage(paste0("insert ui because ", "add_btn", " changed to ",  result$n_add))
+    inserted <<- c(id, inserted)
     insertUI(
       selector = '#placeholder',
       immediate = TRUE,
@@ -455,7 +456,7 @@ def_out_config <- function(input,
     }
     if (summary_levels %>% unlist(recursive = TRUE) %>% is.null()) {
       summary_levels <- c(output_options$granularities[output_options$order][1])
-      }
+    }
     if (reports %>% unlist(recursive = TRUE) %>% is.null()) {reports <- c(output_options$variables[output_options$variables_default])}
     result$out_params_review <- expand.grid(perspective = perspectives,
                                             summary_level = summary_levels,
