@@ -153,6 +153,7 @@ panelDefineOutputsDetails <- function(id) {
       collapsible = FALSE,
       ns("panel_defAnaOutputDetails"),
       heading = h4("Model parameters"),
+      oasisuiButton(inputId = ns("abuttonadvanced_1"), label = "Advanced"),
       div(id = ns("basic"), style = "width:100%; margin: 0 auto;",
           uiOutput(ns("basic_model_param")),
           uiOutput(ns("chkinputsperils"))
@@ -773,6 +774,10 @@ step3_configureOutput <- function(input, output, session,
     .advancedview()
   })
 
+  onclick("abuttonadvanced_1", {
+    .advancedview()
+  })
+
   # show basic view
   onclick("abuttonbasic", {
     .basicview()
@@ -1123,6 +1128,7 @@ step3_configureOutput <- function(input, output, session,
     show("configureAnaParamsAdvanced")
     show("abuttonbasic")
     hide("abuttonadvanced")
+    hide("abuttonadvanced_1")
     show("abuttonclroutopt")
   }
 
@@ -1134,6 +1140,7 @@ step3_configureOutput <- function(input, output, session,
     hide("configureAnaParamsAdvanced")
     hide("abuttonbasic")
     show("abuttonadvanced")
+    show("abuttonadvanced_1")
     hide("abuttonclroutopt")
   }
 
