@@ -36,7 +36,7 @@ oasisuiTableUI <-  function(id){
 #' @param rownames param of datatable, default TRUE.
 #' @param preselRow reactive of preselected row default reactive({NULL}).
 #' @param maxrowsperpage param of datatable, default 10.
-#' @param simple TRUE for simplified version fo table, FALSE otherwise.
+#' @param simple TRUE for simplified version of table, FALSE otherwise.
 #'
 #' @return rows_selected reactive of selected rows as returned from datatable.
 #' @return  rows_current reactive of current rows as returned from datatable.
@@ -77,7 +77,8 @@ oasisuiTable <- function(input, output, session,
                          selected = preselRow(),
                          target = 'row'),
         escape = escape,
-        options = getTableOptions(scrollX,maxrowsperpage = maxrowsperpage,
+        options = getTableOptions(scrollX,
+                                  maxrowsperpage = maxrowsperpage,
                                   escape = escape)
       )
     } else {

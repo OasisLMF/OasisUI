@@ -33,7 +33,7 @@ oasisuiTable(input, output, session, data, selection = "none",
 
 \item{maxrowsperpage}{param of datatable, default 10.}
 
-\item{simple}{TRUE for simplified version fo table, FALSE otherwise.}
+\item{simple}{TRUE for simplified version of table, FALSE otherwise.}
 }
 \value{
 List of tags.
