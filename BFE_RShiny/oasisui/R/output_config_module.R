@@ -360,10 +360,18 @@ def_out_config <- function(input,
       result$n <- 0
       output$summary_levels_reports_ui <- renderUI({
         oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
-        if(!is.na(oed_field)) {
+        # if oed fields are provided, a vector is returned, otherwise NA
+        if(all(is.na(oed_field))) {
+          logMessage("No list of summary levels provided")
+        } else {
           if (input$sintag == default_tags[2]) {
-            tagList(
-              dynamicUI(result$n)
+            fluidRow(
+              column(5,
+                     selectInput(inputId = ns(paste0("sinsummarylevels", result$n)),
+                                 label = "Summary Levels",
+                                 choices = oed_field,
+                                 multiple = TRUE)
+              )
             )
           } else if (input$sintag == default_tags[3]) {
             tagList(
