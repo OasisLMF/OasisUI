@@ -42,7 +42,7 @@ capitalize_names_df <- function(df) {
 #'
 #' @rdname nothingToShowTable
 #'
-#' @description Shows message in case table is table.
+#' @description Shows message in case table is null.
 #'
 #' @param contentMessage Message to be displayed.
 #'

@@ -27,11 +27,11 @@ summarytabUI <- function(id) {
       column(6,
              div(
                id = ns("summarypanel"),
-               h5("Inputs"),
+               h4("Inputs"),
                oasisuiTableUI(ns("summaryInputTable")),
-               h5("Parameters"),
+               h4("Parameters"),
                oasisuiTableUI(ns("summaryParamsTable")),
-               h5("Outputs"),
+               h4("Outputs"),
                oasisuiTableUI(ns("summaryOutputTable"))
              )
       ),
@@ -170,11 +170,7 @@ summarytab <- function(input, output, session,
     oasisuiTable,
     id = "summaryInputTable",
     data = dt_dataInput,
-    selection = "none",
-    escape = TRUE,
-    filter = FALSE,
-    rownames = FALSE,
-    maxrowsperpage = 10)
+    simple = TRUE)
 
   dt_dataParam <- reactive({
     if (!is.null(result$SummaryData)) {
@@ -194,11 +190,7 @@ summarytab <- function(input, output, session,
     oasisuiTable,
     id = "summaryParamsTable",
     data = dt_dataParam,
-    selection = "none",
-    escape = TRUE,
-    filter = FALSE,
-    rownames = FALSE,
-    maxrowsperpage = 10)
+    simple = TRUE)
 
   dt_dataOutput <- reactive({
     if (!is.null(result$SummaryData)) {
@@ -221,10 +213,7 @@ summarytab <- function(input, output, session,
     oasisuiTable,
     id = "summaryOutputTable",
     data = dt_dataOutput,
-    selection = "none",
-    escape = TRUE,
-    rownames = FALSE,
-    maxrowsperpage = 10)
+    simple = TRUE)
 
 
   # Plots ----------------------------------------------------------------------
