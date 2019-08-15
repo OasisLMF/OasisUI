@@ -186,7 +186,6 @@ panelModelTable <- function(id) {
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
-#' @importFrom shinyjs onclick
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
 #' @importFrom DT renderDT
@@ -312,7 +311,7 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   # Generate input -------------------------------------------------------------
-  onclick("abuttonstartcancIG", {
+  observeEvent(input$abuttonstartcancIG, {
     if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$input_gen_started) {
       showModal(.cancelIGModal())
     } else {
@@ -425,12 +424,12 @@ step2_chooseAnalysis <- function(input, output, session,
     counter = reactive({result$exposure_counter})
   )
 
-  onclick("buttonhideanadetails", {
+  observeEvent(input$buttonhideanadetails, {
     hide("panelAnalysisDetails")
   })
 
   # Analysis Logs --------------------------------------------------------------
-  onclick("abuttonshowlog", {
+  observeEvent(input$abuttonshowlog, {
     hide("panelAnalysisDetails")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
@@ -441,7 +440,7 @@ step2_chooseAnalysis <- function(input, output, session,
     .reloadAnaLog()
   })
 
-  onclick("buttonhideanalog", {
+  observeEvent(input$buttonhideanalog, {
     hide("panelAnalysisLog")
   })
 
@@ -511,7 +510,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Model Table ----------------------------------------------------------------
 
-  onclick("abuttoncreateana", {
+  observeEvent(input$abuttoncreateana, {
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
@@ -522,7 +521,7 @@ step2_chooseAnalysis <- function(input, output, session,
     .clearinputanaName()
   })
 
-  onclick("buttonhidemodel", {
+  observeEvent(input$buttonhidemodel, {
     hide("panelModelTable")
   })
 
@@ -557,7 +556,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Model Details Table --------------------------------------------------------
 
   # Show/hide Model Details Panel
-  onclick("abuttonmodeldetails", {
+  observeEvent(input$abuttonmodeldetails, {
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
@@ -582,7 +581,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Create new Analysis --------------------------------------------------------
 
-  onclick("abuttonsubmit", {
+  observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
       post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"), query_body = list(name = input$anaName, model = result$modelID), query_method = "POST")
       logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", portfolioID(),
@@ -665,15 +664,15 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   # Refresh Buttons ------------------------------------------------------------
-  onclick("abuttonanarefresh", {
+  observeEvent(input$abuttonanarefresh, {
     .reloadAnaData()
   })
 
-  onclick("abuttonanalogrefresh", {
+  observeEvent(input$abuttonanalogrefresh, {
     .reloadAnaLog()
   })
 
-  onclick("abuttonmodelrefresh", {
+  observeEvent(input$abuttonmodelrefresh, {
     .reloadtbl_modelsData()
   })
 

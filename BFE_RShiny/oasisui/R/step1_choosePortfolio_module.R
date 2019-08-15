@@ -199,7 +199,6 @@ panelLinkFiles <- function(id) {
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
-#' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT dataTableProxy
@@ -317,7 +316,7 @@ step1_choosePortfolio <- function(input, output, session,
   # Portfolio Details Table ----------------------------------------------------
 
   # Show Portfolio Details
-  onclick("abuttonpfdetails", {
+  observeEvent(input$abuttonpfdetails, {
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
     show("panelPortfolioDetails")
@@ -341,7 +340,7 @@ step1_choosePortfolio <- function(input, output, session,
   )
 
   # Hide portfolio Details
-  onclick("buttonhidepfdetails", {
+  observeEvent(input$buttonhidepfdetails, {
     hide("panelPortfolioDetails")
     logMessage("hiding panelPortfolioDetails")
   })
@@ -360,12 +359,12 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   # Hide portfolio Definition Panel
-  onclick("abuttonhidedefpfpanel", {
+  observeEvent(input$abuttonhidedefpfpanel, {
     hide("panelDefinePortfolio")
   })
 
   # Create portfolio
-  onclick("abuttoncreatepf", {
+  observeEvent(input$abuttoncreatepf, {
     hide("panelPortfolioDetails")
     hide("panelLinkFiles")
     result$portfolio_flag <- "C"
@@ -376,7 +375,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   ### Amend portfolio
-  onclick("abuttonamendpf", {
+  observeEvent(input$abuttonamendpf, {
     hide("panelPortfolioDetails")
     .defaultCreateProg()
     # TODO: review where/when/how this should be set
@@ -397,7 +396,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   ### Submit Button
-  onclick("abuttonpfsubmit", {
+  observeEvent(input$abuttonpfsubmit, {
     idxSel <- 1
     pageSel <- 1
     if (result$portfolio_flag == "C") {
@@ -460,12 +459,12 @@ step1_choosePortfolio <- function(input, output, session,
   }
 
   # Delete portfolio
-  onclick("abuttondeletepf",{
+  observeEvent(input$abuttondeletepf,{
     showModal(.pfdelmodal())
   })
 
-  # onclick of confirm delete button
-  onclick("abuttonuconfirmdel",{
+  # onfirm delete button
+  observeEvent(input$abuttonuconfirmdel,{
     hide("panelPortfolioDetails")
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
@@ -483,15 +482,15 @@ step1_choosePortfolio <- function(input, output, session,
     removeModal()
   })
 
-  # onclick of cancel delete button
-  onclick("abuttoncanceldel", {
+  # cancel delete button
+  observeEvent(input$abuttoncanceldel, {
     removeModal()
   })
 
   # Link files to portfolio ----------------------------------------------------
 
   #Show panel
-  onclick("abuttonuploadsourcefiles", {
+  observeEvent(input$abuttonuploadsourcefiles, {
     .clearUploadFiles()
     hide("panelPortfolioDetails")
     hide("panelDefinePortfolio")
@@ -521,7 +520,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   # Hide Link files Panel
-  onclick("abuttonhidelinkfilespanel", {
+  observeEvent(input$abuttonhidelinkfilespanel, {
     hide("panelLinkFiles")
   })
 
@@ -626,7 +625,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   # Refresh Buttons ------------------------------------------------------------
-  onclick("abuttonprgtblrfsh", {
+  observeEvent(input$abuttonprgtblrfsh, {
     .reloadtbl_portfoliosData()
   } )
 

@@ -1,16 +1,3 @@
-# Mock onclick() with plain observeEvent(). We only use it on buttons and
-# shinyjs::onclick() leads to performance issues for the version we use (fixed
-# in daattali/shinyjs PR #190)
-onclick <- function(id, expr) {
-  parentFrame <- parent.frame(1)
-  session <- shinyjs:::getSession()
-  expr <- substitute(expr)
-  shiny::observeEvent(session$input[[id]], {
-    eval(expr, envir = parentFrame)
-  })
-  invisible(NULL)
-}
-
 # Create Hazard Map module -----------------------------------------------------------
 
 # Shared Module documentation --------------------------------------------------

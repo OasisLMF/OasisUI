@@ -66,7 +66,6 @@ modeldetailsUI <- function(id) {
 #'
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
-#' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #'
@@ -183,13 +182,12 @@ modeldetails <- function(input,
     paste0('Resources of model id ', modelID())
   })
 
-  # onclick buttons
-  onclick("buttonhidemodeldetails", {
+  observeEvent(input$buttonhidemodeldetails, {
     hide("panel_model_details")
     logMessage("hiding panelModelDetails")
   })
 
-  onclick("abuttonmodeldetailrfsh", {
+  observeEvent(input$abuttonmodeldetailrfsh, {
     .reloadtbl_modelsDetails()
   })
 

@@ -286,7 +286,7 @@ ViewFilesInTable <- function(input, output, session,
     hide("oasisuiPanelFVExposureSelected")
   })
 
-  onclick("abuttonview", {
+  observeEvent(input$abuttonview, {
     show("oasisuiPanelFVExposureSelected")
   })
 
@@ -339,7 +339,7 @@ ViewFilesInTable <- function(input, output, session,
     hide("oasisuiPanelmapFVExposureSelected")
   })
 
-  onclick("abuttonmap", {
+  observeEvent(input$abuttonmap, {
     show("oasisuiPanelmapFVExposureSelected")
   })
 

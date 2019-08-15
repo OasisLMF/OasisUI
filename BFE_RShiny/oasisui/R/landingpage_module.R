@@ -119,7 +119,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
   )
 
   # Delete analysis ------------------------------------------------------------
-  onclick("abuttondelana", {
+  observeEvent(input$abuttondelana, {
     showModal(.deleteAna())
   })
 

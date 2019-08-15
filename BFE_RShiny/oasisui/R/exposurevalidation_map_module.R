@@ -148,7 +148,7 @@ exposurevalidationmap <- function(input,
     )
   )
 
-  onclick("abuttonviewtbl", {
+  observeEvent(input$abuttonviewtbl, {
     showModal(FileContent)
   })
 
@@ -195,7 +195,7 @@ exposurevalidationmap <- function(input,
   })
 
   # Refresh button -------------------------------------------------------------
-  onclick("abuttonexposurerefresh", {
+  observeEvent(input$abuttonexposurerefresh, {
     # Get modeled locations
     withModalSpinner(
       .reloadExposureValidation(),
