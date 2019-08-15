@@ -232,10 +232,12 @@ exposurevalidationmap <- function(input,
         TRUE ~ 2
       ))
 
-    popupData <- tagList(
-      strong("Location ID: "), df$LocNumber,
-      br(), strong("Latitude: "), df$Latitude,
-      br(), strong("Longitude: "), df$Longitude)
+    # popupData <- tagList(
+    #   strong("Location ID: "), df$LocNumber,
+    #   br(), strong("Latitude: "), df$Latitude,
+    #   br(), strong("Longitude: "), df$Longitude)
+
+    df <- build_marker_data(df)
 
     icon_map <- awesomeIcons(
       icon = 'map-marker-alt',
@@ -249,13 +251,13 @@ exposurevalidationmap <- function(input,
     leaflet(df) %>%
       addTiles() %>%
       addAwesomeMarkers(
-        lng = ~Longitude,
-        lat = ~Latitude,
+        lng = df$longitude,
+        lat = df$latitude,
         icon = icon_map,
         clusterOptions = markerClusterOptions(),
         group = "clustered",
         clusterId = "cluster",
-        popup = toString(popupData)) %>%
+        popup = ~df$popup) %>%
       onRender("function(el,x) {
                             map = this;
 

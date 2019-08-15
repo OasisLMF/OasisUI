@@ -67,7 +67,7 @@ createHazardMap <- function(input, output, session,
                             pins) {
 
   marker_data <- reactive({
-    .build_marker_data(pins())
+    build_marker_data(pins())
   })
 
   # Plot leaflet
@@ -80,24 +80,6 @@ createHazardMap <- function(input, output, session,
     logMessage("map built")
     map
   })
-
-  # Create marker data
-  .build_marker_data <- function(pins) {
-    data <- pins
-    names(data) <- tolower(names(data))
-    # Popup data, must be a character vector of html code
-    data$popup <- mapply(
-      function(id, lat, lng) {
-        as.character(div(
-          strong("Location ID: "), id,
-          br(), strong("Latitude: "), lat,
-          br(), strong("Longitude: "), lng
-        ))
-      },
-      data$locnumber, data$latitude, data$longitude
-    )
-    data
-  }
 
   # Create map
   .buildHazardMap <- function(map_data, marker_data) {
