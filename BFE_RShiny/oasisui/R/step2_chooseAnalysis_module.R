@@ -53,18 +53,18 @@ panelCreateAnalysesTable <- function(id) {
     fluidRow(
       column(12,
              oasisuiTableButton(inputId = ns("abuttonstartcancIG"), label = "Generate Inputs") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonstartcancIG, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonstartcancIG, placement = "right"),
              oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowlog, placement = "right"),
              oasisuiTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonshowanadetails, placement = "right")
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowanadetails, placement = "right")
       )
     ),
     br(),
     fluidRow(
       column(12,
              oasisuiButton(inputId = ns("abuttoncreateana"), label = "Create Analysis") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttoncreateana, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttoncreateana, placement = "right"),
              actionButton(ns("abuttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
       ),
       style = "margin-top: 10px;"
@@ -152,7 +152,7 @@ panelModelTable <- function(id) {
     fluidRow(
       column(4,
              oasisuiButton(ns("abuttonmodeldetails"), "Show Model Details", style = "float:left") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right")),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonmodeldetails, placement = "right")),
       column(6,
              br(),
              div(textInput(inputId = ns("anaName"), label = "Analysis Name"), style = "float:right;")),
@@ -352,7 +352,7 @@ step2_chooseAnalysis <- function(input, output, session,
                 footer = tagList(
                   oasisuiButton(ns("abuttonConfirmDelIG"),
                                  label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = defineSingleAna$abuttonConfirmDelIG, placement = "right"),
+                    bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonConfirmDelIG, placement = "right"),
                   actionButton(ns("btnCancelIGDel"),
                                label = "Go back", align = "right")
                 ),
