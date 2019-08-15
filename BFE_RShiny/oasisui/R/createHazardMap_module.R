@@ -28,12 +28,14 @@ NULL
 # UI ---------------------------------------------------------------------------
 #' @describeIn createHazardMap Returns the UI elements of the module.
 #'
+#' @importFrom shinycssloaders withSpinner
+#'
 #' @export
 createHazardMapUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    shinycssloaders::withSpinner(
+    withSpinner(
       leafletOutput(ns("hazardmap")),
       # style and color can be set as options used by all spinners
       color = "#bb252c"
