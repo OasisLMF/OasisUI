@@ -24,11 +24,11 @@ landingPageUI <- function(id) {
       ),
       DTOutput(ns("dt_anaInbox")),
       oasisuiButton(ns("abuttongotoana"), "Dashboard of Analyses Outputs", align = "right") %>%
-        bs_embed_tooltip(title = landing_page$abuttongotoana, placement = "right"),
+        bs_embed_tooltip(title = landing_page_tooltips$abuttongotoana, placement = "right"),
       oasisuiTableButton(inputId = ns("abuttondelana"), label = "Delete Analysis") %>%
-        bs_embed_tooltip(title = landing_page$abuttondelana, placement = "right"),
+        bs_embed_tooltip(title = landing_page_tooltips$abuttondelana, placement = "right"),
       downloadButton(ns("downloadexcel_ana"), label = "Export to csv") %>%
-        bs_embed_tooltip(title = landing_page$downloadexcel_ana, placement = "right")
+        bs_embed_tooltip(title = landing_page_tooltips$downloadexcel_ana, placement = "right")
     )
   )
 }
@@ -137,7 +137,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
                 footer = tagList(
                   oasisuiButton(ns("abuttonConfirmDelAna"),
                                  label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = landing_page$abuttonConfirmDelAna, placement = "right"),
+                    bs_embed_tooltip(title = landing_page_tooltips$abuttonConfirmDelAna, placement = "right"),
                   actionButton(ns("btnCancelDelAna"),
                                label = "Go back", align = "right")
                 ),

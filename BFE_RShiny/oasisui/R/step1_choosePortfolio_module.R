@@ -60,13 +60,13 @@ panelPortfolioTable <- function(id) {
     fluidRow(
       column(12,
              oasisuiTableButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonamendpf, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonamendpf, placement = "right"),
              oasisuiTableButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttondeletepf, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttondeletepf, placement = "right"),
              oasisuiTableButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonuploadsourcefiles, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonuploadsourcefiles, placement = "right"),
              oasisuiTableButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonpfdetails, placement = "right")
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfdetails, placement = "right")
       )
     ),
     br(),
@@ -123,7 +123,7 @@ panelDefinePortfolio <- function(id) {
       br(),
       column(2,
              oasisuiButton(ns("abuttonpfsubmit"), "Submit") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonpfsubmit, placement = "right"), style = "float:right"
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfsubmit, placement = "right"), style = "float:right"
       )
     )
   )

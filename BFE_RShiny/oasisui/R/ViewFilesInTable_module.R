@@ -28,7 +28,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
     DTOutput(ns("dt_outputFL")),
     if (includechkbox) {
       downloadButton(ns("FLdownloadzip"), label = "Export to zip") %>%
-        bs_embed_tooltip(title = file_Viewer$FLdownloadzip, placement = "right")
+        bs_embed_tooltip(title = file_Viewer_tooltips$FLdownloadzip, placement = "right")
     },
     if (!includechkbox) {
       downloadButton(ns("FLdownloadexcel"), label = "Export")

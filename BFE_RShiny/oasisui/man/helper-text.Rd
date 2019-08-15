@@ -3,23 +3,23 @@
 \docType{data}
 \name{helper-text}
 \alias{helper-text}
-\alias{file_Viewer}
-\alias{landing_page}
-\alias{defineSingleAna}
-\alias{dashboard}
+\alias{file_Viewer_tooltips}
+\alias{landing_page_tooltips}
+\alias{defineSingleAna_tooltips}
+\alias{dashboard_tooltips}
 \title{Helper text}
 \format{Each object is a named list of character strings, the names
   corresponding to the button IDs.}
 \usage{
-file_Viewer
+file_Viewer_tooltips
 
-landing_page
+landing_page_tooltips
 
-defineSingleAna
+defineSingleAna_tooltips
 
-dashboard
+dashboard_tooltips
 }
 \description{
-Helper texts to show explanations next to buttons, one per file (?).
+Helper texts to show explanations next to buttons. Grouped according to where the button is visible in the UI.
 }
 \keyword{datasets}

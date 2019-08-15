@@ -1,7 +1,7 @@
 
 #' Helper text
 #'
-#' Helper texts to show explanations next to buttons, one per file (?).
+#' Helper texts to show explanations next to buttons. Grouped according to where the button is visible in the UI.
 #'
 #' @format Each object is a named list of character strings, the names
 #'   corresponding to the button IDs.
@@ -12,15 +12,14 @@ NULL
 #' @rdname helper-text
 #'
 #' @export
-file_Viewer <- list(
+file_Viewer_tooltips <- list(
   FLdownloadzip = "Download all selected files"
-  #FVFLdownloadexcel = "Download files table"
 )
 
 #' @rdname helper-text
 #'
 #' @export
-landing_page <- list(
+landing_page_tooltips <- list(
   abuttonanalysis = "Define analysis to run",
   abuttonbrowse = "Visualize outputs",
   abuttondefineanasingle = "Define single analysis",
@@ -39,7 +38,7 @@ landing_page <- list(
 #' @rdname helper-text
 #'
 #' @export
-defineSingleAna <- list(
+defineSingleAna_tooltips <- list(
   abuttoncreateana = "Create new analysis",
   abuttonshowanadetails = "Show details for selected analysis",
   abuttonuploadsourcefiles = "Upload source files to selected portfolio",
@@ -64,9 +63,7 @@ defineSingleAna <- list(
 #' @rdname helper-text
 #'
 #' @export
-dashboard <- list(
+dashboard_tooltips <- list(
   selectAnaID = "Select analysis ID",
-  selectBatchAnaID = "Select Batch analysis ID",
-  abuttonplusplot = "Add a new plot",
   abuttonselectAna = "Select analysis"
 )
