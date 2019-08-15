@@ -75,9 +75,9 @@ createHazardMap <- function(input, output, session,
     # prevent rendering when map_data is unavailable ("falsy"), we would see an
     # error otherwise (if we would not have the spinner).
     req(map_data())
-    logMessage("building the map...")
+    logMessage("building the hazard map...")
     map <- .buildHazardMap(map_data(), marker_data())
-    logMessage("map built")
+    logMessage("hazard map built")
     map
   })
 

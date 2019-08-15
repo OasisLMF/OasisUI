@@ -28,11 +28,11 @@ createPlainMap <- function(df) {
 
   leaflet(df) %>%
     addTiles() %>%
-    addMarkers(lng = df$longitude,
-               lat = df$latitude,
+    addMarkers(lng = ~longitude,
+               lat = ~latitude,
                icon = icon_map,
                clusterOptions = markerClusterOptions(maxClusterRadius = 50),
-               popup = df$popup)
+               popup = ~popup)
 }
 
 

@@ -251,13 +251,13 @@ exposurevalidationmap <- function(input,
     leaflet(df) %>%
       addTiles() %>%
       addAwesomeMarkers(
-        lng = df$longitude,
-        lat = df$latitude,
+        lng = ~longitude,
+        lat = ~latitude,
         icon = icon_map,
         clusterOptions = markerClusterOptions(),
         group = "clustered",
         clusterId = "cluster",
-        popup = ~df$popup) %>%
+        popup = ~popup) %>%
       onRender("function(el,x) {
                             map = this;
 
