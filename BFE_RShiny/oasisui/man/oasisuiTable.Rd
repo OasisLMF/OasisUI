@@ -9,7 +9,8 @@ oasisuiTableUI(id)
 
 oasisuiTable(input, output, session, data, selection = "none",
   escape = TRUE, scrollX = TRUE, filter = FALSE, rownames = TRUE,
-  preselRow = reactive({     NULL }), maxrowsperpage = 10)
+  preselRow = reactive({     NULL }), maxrowsperpage = 10,
+  simple = FALSE)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -31,6 +32,8 @@ oasisuiTable(input, output, session, data, selection = "none",
 \item{preselRow}{reactive of preselected row default reactive({NULL}).}
 
 \item{maxrowsperpage}{param of datatable, default 10.}
+
+\item{simple}{TRUE for simplified version of table, FALSE otherwise.}
 }
 \value{
 List of tags.

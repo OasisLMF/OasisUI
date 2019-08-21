@@ -248,10 +248,7 @@ panelAnalysisLogs <- function(id) {
 #'                                 choices = LosstypesChoices,
 #'                                 selected = NULL),
 #'
-#'              checkboxGroupInput(ns("chkgullob"),
-#'                                 label = h6("LOB", class = "oasisui-granularity"),
-#'                                 choices = LosstypesChoices,
-#'                                 selected = NULL),
+#' panelDefOutputConfiguration
 #'
 #'              checkboxGroupInput(ns("chkgulpolicy"),
 #'                                 label = h6("Policy", class = "oasisui-granularity"),
@@ -781,6 +778,7 @@ step3_configureOutput <- function(input, output, session,
 
   # Update button in sidebar panel to update checkboxes for pre-populated values
   #To-Do update output configuration based on analysis setting
+
   # observeEvent(input$sinoutputoptions, {
   #   # Using analyses names to select the output configuration of a previously posted analyses
   #   logMessage(paste0("input$sinoutputoptions changed to ",input$sinoutputoptions))
@@ -1072,6 +1070,7 @@ step3_configureOutput <- function(input, output, session,
   # }
 
   # Clear other runtime params
+
   # .clearotherparams <- function() {
   #   logMessage(".clearotherparams called")
   #   .clearOutputOptions()
@@ -1212,7 +1211,6 @@ step3_configureOutput <- function(input, output, session,
   #   .clearotherparams()
   #   .basicview()
   # }
-
 
   #Generate Analysis settings file
   # .gen_analysis_settings <- function(){

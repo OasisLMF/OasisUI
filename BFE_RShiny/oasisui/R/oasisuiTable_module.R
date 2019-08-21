@@ -36,6 +36,7 @@ oasisuiTableUI <-  function(id){
 #' @param rownames param of datatable, default TRUE.
 #' @param preselRow reactive of preselected row default reactive({NULL}).
 #' @param maxrowsperpage param of datatable, default 10.
+#' @param simple TRUE for simplified version of table, FALSE otherwise.
 #'
 #' @return rows_selected reactive of selected rows as returned from datatable.
 #' @return  rows_current reactive of current rows as returned from datatable.
@@ -54,7 +55,8 @@ oasisuiTable <- function(input, output, session,
                          filter = FALSE,
                          rownames = TRUE,
                          preselRow = reactive({NULL}),
-                         maxrowsperpage = 10) {
+                         maxrowsperpage = 10,
+                         simple = FALSE) {
 
   ns <- session$ns
 
@@ -66,17 +68,27 @@ oasisuiTable <- function(input, output, session,
       tbl_oasisuiTable <- data.frame(content = "nothing to show")
     }
 
-    datatable(
-      tbl_oasisuiTable %>% capitalize_names_df(),
-      class = "oasisui-table display",
-      rownames = rownames,
-      selection = list(mode = selection,
-                       selected = preselRow(),
-                       target = 'row'),
-      escape = escape,
-      options = getTableOptions(scrollX,maxrowsperpage = maxrowsperpage,
-                                escape = escape)
-    )
+    if (!simple) {
+      dt <- datatable(
+        tbl_oasisuiTable %>% capitalize_names_df(),
+        class = "oasisui-table display",
+        rownames = rownames,
+        selection = list(mode = selection,
+                         selected = preselRow(),
+                         target = 'row'),
+        escape = escape,
+        options = getTableOptions(scrollX,
+                                  maxrowsperpage = maxrowsperpage,
+                                  escape = escape)
+      )
+    } else {
+      if (length(tbl_oasisuiTable) < 10) {
+        dt <- datatable(tbl_oasisuiTable, options = list(dom = 't'))
+      } else {
+        dt <- datatable(tbl_oasisuiTable, options = list(dom = 'p'))
+      }
+    }
+    dt
   })
 
   observeEvent(data(), ignoreNULL = FALSE, {
