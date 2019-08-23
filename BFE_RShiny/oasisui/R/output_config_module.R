@@ -6,8 +6,6 @@
 #'
 #' @description UI side of function wrapping panel to show oputput configuration.
 #'
-#' @template params-module-ui
-#'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
 #'
@@ -59,10 +57,12 @@ panelModelParams <- function(id) {
           uiOutput(ns("basic_model_param")),
           uiOutput(ns("chkinputsperils"))
       ),
+      oasisuiButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
       hidden(div(id = ns("configureAnaParamsAdvanced"), align = "left",
                  textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
                  textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
-                 checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
+                 # checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
+                 oasisuiButton(inputId = ns("abuttonbasic"), label = "Basic"),
                  uiOutput(ns("advanced_model_param"))
       ))
     )
@@ -149,7 +149,8 @@ panelOutputParamsDetails <- function(id) {
 #'
 #' @param analysisID Selected analysis ID.
 #' @param analysisName Selected analysis name.
-#' @param ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.
+#' @param ana_flag Flag to know if the user is creating a new output configuration or rerunning an analysis.
+#' @param counter Counter to decide whether to clear output options and show some panel (?)
 #' @template params-module
 #' @template params-active
 #'
@@ -475,13 +476,15 @@ def_out_config <- function(input,
     } else {
       # Summary (1) or Drill-down (2)
       reports <- output_options$variables[output_options$variables_default]
-      summary_levels <- output_options$granularities[output_options$order][1]
+      # TODO: default_level will be changed to a param after discussion
+      summary_levels <- output_options$default_level
       if (input$sintag == default_tags[2]) {
-        summary_levels_tmp <- sapply(seq(0, result$n), function(x){input[[paste0("sinsummarylevels", x)]]})
+        summary_levels_tmp <- input$sinsummarylevels0
         if (summary_levels_tmp %>% unlist(recursive = TRUE) %>% is.null()) {
           # keep basic
-        } else
-          summary_levels <- output_options$granularities[output_options$order][1]
+        } else {
+          summary_levels <- summary_levels_tmp
+        }
       }
 
       result$out_params_review <- expand.grid(perspective = perspectives,
@@ -524,6 +527,7 @@ def_out_config <- function(input,
 
   # Run analysis ---------------------------------------------------------------
   # Execute analysis
+
   onclick("abuttonexecuteanarun", {
     analysis_settingsList <- .gen_analysis_settings()
     #write out file to be uploades
@@ -537,14 +541,155 @@ def_out_config <- function(input,
     result$ana_post_status <- post_analysis_settings_file$status
   })
 
+  # show advanced view
+  onclick("abuttonadvanced", {
+    .advancedview()
+  })
+
+  # show basic view
+  onclick("abuttonbasic", {
+    .basicview()
+  })
+
   # Helper Functions -----------------------------------------------------------
 
   .updateOutputConfig <- function(analysis_settings){
-
+    logMessage(".updateOutputConfig called")
   }
 
-  .gen_analysis_settings <- function(){
+  .gen_analysis_settings <- function() {
+    logMessage(".gen_analysis_settings called")
+    # Predefined params
+    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+    modelData <- session$userData$data_hub$return_tbl_modelData(modelID)
 
+    fetch_model_settings <- function(modelID) {
+      # Predefined params
+      tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+      modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+      # modelData <- session$userData$data_hub$return_tbl_modelData(modelID)
+      tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(query_path = paste( "models", modelID, "resource_file", sep = "/"), query_method = "GET")
+      model_settings <- tbl_modelsDetails$model_settings %>%
+        unlist(recursive = FALSE)
+      model_params_lst <- lapply(names(model_settings), function(i){
+        ifelse(is.null(input[[paste0("model_params_", i)]]),model_settings[[i]]$default,input[[paste0("model_params_", i)]])
+      }) %>%
+        setNames(names(model_settings))
+      model_settings <- list(
+        return_period_file = TRUE,
+        model_settings
+      ) # list of 4 entries
+    }
+
+    inputsettings <- list(
+      "analysis_tag" = as.integer(result$anaID), #potential new tag analysis_id
+      "gul_threshold" = as.integer(input$tinputthreshold),
+      "model_version_id" = modelData[[tbl_modelsDataNames$model_id]], # potential new tag model_id
+      "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]], # potential new tag model_supplier_id
+      "number_of_samples" = as.integer(input$tinputnoofsample),
+      "prog_id" = as.integer(4), # potential new tag `portfolio_id`
+      "source_tag" = getOption("oasisui.settings.oasis_environment") # potential new tag environment_tag
+    )
+
+    fetch_summary <- function(prsp, checked) {
+
+      summary_template <- list(
+        summarycalc = FALSE,
+        eltcalc = FALSE,
+        aalcalc = FALSE,
+        pltcalc = FALSE,
+        id = 1,
+        oed_fields = "prog",
+        lec_output = TRUE,
+        leccalc = list(
+          return_period_file = TRUE,
+          outputs = list(
+            full_uncertainty_aep = FALSE,
+            full_uncertainty_oep = FALSE
+          )
+        )
+      )
+
+      if (prsp %in% checked) {
+
+        p <- which(result$out_params_review$perspective == prsp)
+
+        review_prsp <- result$out_params_review[p, ]
+        fields_to_add <- unique(review_prsp$summary_level)
+
+        update_item_list <- function(lst, reps) {
+          nm <- names(lst)
+          # we want to keep names!
+          names(nm) <- nm
+          ret <- lapply(nm, function(x, y) {
+            if (is.list(y[[x]])) {
+              update_item_list(y[[x]], reps = reps)
+            } else {
+              if (isFALSE(y[[x]])) {
+                if (x %in% reps) {
+                  TRUE
+                } else {
+                  NULL
+                }
+              } else {
+                # skip
+                y[[x]]
+              }
+            }
+          }, y = lst)
+          idxDrop <- sapply(ret, is.null)
+          ret[!idxDrop]
+        }
+
+        item_list_full <- list()
+        # for every item in fields_to_add (eg bitiv):
+        for (item in seq_len(length(fields_to_add))) {
+          item_list <- summary_template
+          item_list$id <- item
+          item_list$oed_fields <- as.character(fields_to_add[item])
+          idx_lvl <- review_prsp$summary_level == fields_to_add[item]
+          keep <- review_prsp[idx_lvl, "report"]
+          corresp_varsdf <- which(varsdf$labels %in% keep)
+          varsdf_field <- varsdf$field[corresp_varsdf]
+          item_list_upd <- update_item_list(item_list, varsdf_field)
+          item_list_full[[item]] <- item_list_upd
+        }
+
+        item_list_full
+
+      } else {
+        NULL
+      }
+    }
+
+    analysis_settings <- list(
+      analysis_settings = c(
+        list(
+          model_settings = fetch_model_settings()
+        ),
+        inputsettings,
+        list(
+          # TRUE should be changed to the choice in the checkboxgroup that matches the perspective
+          gul_output = TRUE,
+          gul_summaries = fetch_summary("GUL", input$chkboxgrplosstypes),
+          il_output = TRUE,
+          il_summaries = fetch_summary("IL", input$chkboxgrplosstypes),
+          ri_output = TRUE,
+          ri_summaries = fetch_summary("RI", input$chkboxgrplosstypes)
+        )
+      )
+    )
+
+    saveRDS(analysis_settings, file = "hello.rds")
+
+    # ReportChoices <- c("FullUncAEP", "FullUncOEP", "AAL")
+      # if (input$chkinputsummaryoption) {
+      #   for (l in names(outputsLossTypes)) {
+      #     outputsLossTypes[[l]][["prog"]] <- unique(c(outputsLossTypes[[l]][["prog"]], ReportChoices))
+      #   }
+      # }
+    analysis_settings
   }
 
   .clearOutputOptions <- function() {
@@ -611,16 +756,39 @@ def_out_config <- function(input,
     }
   }
 
-  .defaultview <- function(){
-
+  # Output view
+  .advancedview <- function() {
+    logMessage(".advancedview called")
+    show("panel_configureAdvancedGUL")
+    show("panel_configureAdvancedIL")
+    show("panel_configureAdvancedRI")
+    show("configureAnaParamsAdvanced")
+    show("abuttonbasic")
+    hide("abuttonadvanced")
+    show("abuttonclroutopt")
   }
 
-  .advancedview <- function(){
-
+  .basicview <- function() {
+    logMessage(".basicview called")
+    hide("panel_configureAdvancedGUL")
+    hide("panel_configureAdvancedIL")
+    hide("panel_configureAdvancedRI")
+    hide("configureAnaParamsAdvanced")
+    hide("abuttonbasic")
+    show("abuttonadvanced")
+    hide("abuttonclroutopt")
   }
 
-  .basicview <- function(){
-
+  .defaultview <- function() {
+    logMessage(".defaultview called")
+    updateCheckboxInput(session, "chkinputGUL", value = TRUE)
+    .defaultchkboxGULgrp()
+    updateCheckboxInput(session, "chkinputIL", value = FALSE)
+    .clearchkboxgrp(checkilgrplist)
+    updateCheckboxInput(session, "chkinputRI", value = FALSE)
+    .clearchkboxgrp(checkrigrplist)
+    .clearotherparams()
+    .basicview()
   }
 
   # Module Outout --------------------------------------------------------------

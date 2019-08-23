@@ -217,6 +217,8 @@ DataHub <- R6Class(
             as.data.frame() %>%
             setNames("files")
           analysis_settings <- self$get_ana_settings_content(id)
+          # oed_field <- get_ana_oed_summary_levels(id)
+          # oed_field$description
           data_list <- cbind(data_list,
                              do.call(rbind.data.frame,
                                      lapply(data_list$files,
@@ -465,7 +467,7 @@ DataHub <- R6Class(
     # extract oed summary levels relevant for current analysis
     get_ana_oed_summary_levels = function(id) {
       oed_fields_ana_content <- content(private$oasisapi$api_get_query(query_path = paste("analyses", id, "summary_levels_file",  sep = "/"))$result)
-      oed_fields <- oed_fields_ana_content %>%
+       oed_fields <- oed_fields_ana_content %>%
         unlist() %>%
         as.data.frame(stringsAsFactors = FALSE) %>%
         setNames("description") %>%
@@ -670,9 +672,10 @@ DataHub <- R6Class(
 )
 
 # Helper functions -----
-
 # Add description fields to output files
 .addDescription <- function(x, analysis_settings) {
+  # TODO: check and update (given granularities are now replaced by OED field summary levels)
+# in 147: method to retrieve summary lavels, look at it to see if description of summary levels is there
   x <- as.character(x)
   x <- strsplit(x, split = "[.]")[[1]][1]
   y <- unlist(strsplit(x, split = "_"))
@@ -680,9 +683,10 @@ DataHub <- R6Class(
   g_idx <- as.integer(gsub("S", "", y[2]))
   g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
   if (is.null(g_oed)) {
-    g_oed <- granToOed$oed[granToOed$order][g_idx]
+    warning("g_oed is NULL in .addDescription")
+    g_oed <- "prog"
   }
-  g <- granToOed[granToOed$oed == g_oed, "gran"]
+  g <- g_oed
   z <- reportToVar()[[report]]
   if (is.null(z))
     z <- "Summary Info"

@@ -158,10 +158,7 @@ checkboxGroupInput(ns("chkgulloc"),
                                 choices = LosstypesChoices,
                                 selected = NULL),
 
-checkboxGroupInput(ns("chkgullob"),
-                                label = h6("LOB", class = "oasisui-granularity"),
-                                choices = LosstypesChoices,
-                                selected = NULL),
+panelDefOutputConfiguration
 
 checkboxGroupInput(ns("chkgulpolicy"),
                                 label = h6("Policy", class = "oasisui-granularity"),

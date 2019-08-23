@@ -12,7 +12,7 @@ def_out_config(input, output, session, analysisID = reactive(NULL),
   counter = reactive(NULL), active = reactive(TRUE))
 }
 \arguments{
-\item{id}{module id}
+\item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
@@ -20,11 +20,11 @@ def_out_config(input, output, session, analysisID = reactive(NULL),
 
 \item{analysisName}{Selected analysis name.}
 
-\item{ana_flag}{flag to know if the user is creating a new output configuration or rerunning an analysis.}
+\item{ana_flag}{Flag to know if the user is creating a new output configuration or rerunning an analysis.}
+
+\item{counter}{Counter to decide whether to clear output options and show some panel (?)}
 
 \item{active}{reactive expression whether the module state should be updated.}
-
-\item{id}{Namespace ID for the module.}
 }
 \value{
 ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.
