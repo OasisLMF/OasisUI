@@ -681,8 +681,6 @@ def_out_config <- function(input,
       )
     )
 
-    saveRDS(analysis_settings, file = "hello.rds")
-
     # ReportChoices <- c("FullUncAEP", "FullUncOEP", "AAL")
       # if (input$chkinputsummaryoption) {
       #   for (l in names(outputsLossTypes)) {
