@@ -321,7 +321,8 @@ def_out_config <- function(input,
         column(5,
                selectInput(inputId = ns(paste0("sinsummarylevels",n)),
                            label = "Summary Levels",
-                           choices = session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field,
+                           choices = c("All Risks",
+                                       session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field),
                            multiple = TRUE)
         ),
         column(5,
@@ -370,7 +371,8 @@ def_out_config <- function(input,
               column(5,
                      selectInput(inputId = ns(paste0("sinsummarylevels", result$n)),
                                  label = "Summary Levels",
-                                 choices = oed_field,
+                                 selected = "All Risks",
+                                 choices = c("All Risks", oed_field),
                                  multiple = TRUE)
               )
             )
@@ -458,10 +460,18 @@ def_out_config <- function(input,
     if (input$sintag == default_tags[3]) {
       # custom
       reports_summary_levels <- lapply(seq(0, result$n_add), function(x) {
-        expand.grid(
-          summary_level = input[[paste0("sinsummarylevels", x)]],
-          report = input[[paste0("sinreports", x)]]
-        )
+        if (!is.null(input[[paste0("sinsummarylevels", x)]]) && input[[paste0("sinsummarylevels", x)]] == "All Risks") {
+          expand.grid(
+            summary_level = paste(session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field,
+                                  collapse = ", "),
+            report = paste(input[[paste0("sinreports", x)]], collapse=", ")
+          )
+        } else {
+          expand.grid(
+            summary_level = paste(input[[paste0("sinsummarylevels", x)]], collapse=", "),
+            report = paste(input[[paste0("sinreports", x)]], collapse=", ")
+          )
+        }
       })
       reports_summary_levels <- do.call("rbind.data.frame", reports_summary_levels)
       if (nrow(reports_summary_levels) == 0)
@@ -474,18 +484,36 @@ def_out_config <- function(input,
         rep(reports_summary_levels, times = length(perspectives))
       )
     } else {
-      # Summary (1) or Drill-down (2)
+      # Summary or Drill-down (2)
       reports <- output_options$variables[output_options$variables_default]
-      # TODO: default_level will be changed to a param after discussion
       summary_levels <- output_options$default_level
+
       if (input$sintag == default_tags[2]) {
-        summary_levels_tmp <- input$sinsummarylevels0
-        if (summary_levels_tmp %>% unlist(recursive = TRUE) %>% is.null()) {
-          # keep basic
+        if (!is.null(input$sinsummarylevels0) && input$sinsummarylevels0 == "All Risks") {
+          summary_levels_tmp <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
         } else {
-          summary_levels <- summary_levels_tmp
+          summary_levels_tmp <- lapply(seq(0, result$n_add), function(x) {
+            summary_level = input[[paste0("sinsummarylevels", x)]]
+          })
         }
+      } else {
+        summary_levels_tmp <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
       }
+
+      if (summary_levels_tmp %>% unlist(recursive = TRUE) %>% is.null()) {
+        # keep basic
+      } else {
+        summary_levels <- summary_levels_tmp
+      }
+
+      # place all sections for one row in one line in table
+      if (class(summary_levels) == "character") {
+      summary_levels <- paste(summary_levels, collapse = ", ")
+      } else {
+        # TODO: add space between commas
+      summary_levels <- c(summary_levels)
+      }
+      reports <- paste(reports, collapse = ", ")
 
       result$out_params_review <- expand.grid(perspective = perspectives,
                                               summary_level = summary_levels,
@@ -504,7 +532,9 @@ def_out_config <- function(input,
     sinreports_react_all()
     analysisID()
   }, ignoreInit = TRUE,{
-    observe_output_param()
+    if (length(analysisID()) != 0) {
+      observe_output_param()
+    }
   })
 
   callModule(
@@ -682,11 +712,7 @@ def_out_config <- function(input,
     )
 
     # ReportChoices <- c("FullUncAEP", "FullUncOEP", "AAL")
-      # if (input$chkinputsummaryoption) {
-      #   for (l in names(outputsLossTypes)) {
-      #     outputsLossTypes[[l]][["prog"]] <- unique(c(outputsLossTypes[[l]][["prog"]], ReportChoices))
-      #   }
-      # }
+
     analysis_settings
   }
 

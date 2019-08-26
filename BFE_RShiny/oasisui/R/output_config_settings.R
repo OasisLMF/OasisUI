@@ -30,7 +30,7 @@ output_options <- list(
   # order = c(6,2,3,4,1,5),
   variables_default = c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE),
   # TODO: temp - to discuss which default to place here
-  default_level = "accnumber"
+  default_level = ""
 )
 
 #' varsdf
