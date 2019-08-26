@@ -532,7 +532,7 @@ def_out_config <- function(input,
     sinreports_react_all()
     analysisID()
   }, ignoreInit = TRUE,{
-    if (length(analysisID()) != 0) {
+    if (length(analysisID()) > 0) {
       observe_output_param()
     }
   })
