@@ -77,7 +77,7 @@ panelAnalysisTable <- function(id) {
 #'
 #' @template params-module-ui
 #'
-#' @importFrom DT DTOutput
+#' @importFrom shinyjs hidden
 #'
 #' @export
 panelAnalysisLogs <- function(id) {
@@ -90,8 +90,10 @@ panelAnalysisLogs <- function(id) {
       uiOutput(ns("paneltitle_AnaLogs"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analysesrunlog")),
-    downloadButton(ns("download_log"), label = "Download")
+      div(class = "panel", style = 'overflow-y: scroll; max-height: 200px; min-height: 30px;',
+          textOutput(ns("text_analysesrunlog"))
+    ),
+    hidden(downloadButton(ns("download_log"), label = "Download"))
   )
 }
 
@@ -602,7 +604,7 @@ step3_configureOutput <- function(input, output, session,
 
     if (delete_analyses_id$status == "Success") {
       oasisuiNotification(type = "message",
-                           paste0("Analysis id ", analysisID, " cancelled."))
+                          paste0("Analysis id ", analysisID, " cancelled."))
       .reloadAnaData()
       idxSel <- match(analysisID, result$tbl_analysesData[, tbl_analysesDataNames$id])
       pageSel <- ceiling(idxSel/pageLength)
@@ -610,7 +612,7 @@ step3_configureOutput <- function(input, output, session,
       selectPage(dataTableProxy("dt_analyses"), pageSel)
     } else {
       oasisuiNotification(type = "error",
-                           paste0("Error in cancelling analysis ", result$anaID, ". Analysis is not running."))
+                          paste0("Error in cancelling analysis ", result$anaID, ". Analysis is not running."))
     }
 
   })
@@ -653,7 +655,7 @@ step3_configureOutput <- function(input, output, session,
         analysisName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
         if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
           oasisuiNotification(type = "error",
-                               paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID, "."))
+                              paste0("No output configuration associated to analysis ", analysisName," id ", result$anaID, "."))
         } else {
           logMessage(paste0("appling the output configuration of analysis ", analysisName, " id ", result$anaID))
           #Set inputs
@@ -754,7 +756,7 @@ step3_configureOutput <- function(input, output, session,
       analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
       if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
         oasisuiNotification(type = "error",
-                             paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
+                            paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
       } else {
         logMessage(paste0("appling the output configuration of analysis ", anaName," id ", anaID))
         #Set inputs
@@ -798,7 +800,7 @@ step3_configureOutput <- function(input, output, session,
 
     if (post_analysis_settings_file$status == "Success") {
       oasisuiNotification(type = "message",
-                           paste0("Analysis settings posted to ", result$anaID ,"."))
+                          paste0("Analysis settings posted to ", result$anaID ,"."))
 
       analyses_run <-  session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run", sep = "/"), query_method = "POST")
 
@@ -814,17 +816,17 @@ step3_configureOutput <- function(input, output, session,
 
         if (analyses_run[[tbl_analysesDataNames$status]] == "RUN_STARTED") {
           oasisuiNotification(type = "message",
-                               paste0("Analysis ", result$anaID ," is executing."))
+                              paste0("Analysis ", result$anaID ," is executing."))
         }
       } else {
         oasisuiNotification(type = "error",
-                             paste0("Run could not be started for analysis ", result$anaID, "."))
+                            paste0("Run could not be started for analysis ", result$anaID, "."))
       }
 
     } else {
       oasisuiNotification(type = "error",
-                           paste0("Analysis settings not posted to ", result$anaID ,
-                                  "; error ", post_analysis_settings_file$status, "."))
+                          paste0("Analysis settings not posted to ", result$anaID ,
+                                 "; error ", post_analysis_settings_file$status, "."))
     }
 
   })
@@ -853,8 +855,8 @@ step3_configureOutput <- function(input, output, session,
     }
   )
 
-  observeEvent(result$tbl_analysisrunlog, {
-    if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 1) {
+  observeEvent(result$tbl_analysisrunlog, ignoreNULL = FALSE, {
+    if (!is.null(result$tbl_analysisrunlog)) {
       show("download_log")
     } else {
       hide("download_log")
@@ -862,21 +864,13 @@ step3_configureOutput <- function(input, output, session,
   })
 
   ### Log Table
-  output$dt_analysesrunlog <- renderDT({
+  output$text_analysesrunlog <- renderText({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
-      if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 1) {
-        datatable(
-          result$tbl_analysisrunlog %>% capitalize_names_df(),
-          class = "oasisui-table display",
-          rownames = TRUE,
-          selection = "none",
-          escape = FALSE,
-          filter = 'bottom',
-          options = getTableOptions(maxrowsperpage = pageLength)
-        )
-      } else {
-        nothingToShowTable(paste0("No log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL")))
+      if (!is.null(result$tbl_analysisrunlog)){
+        result$tbl_analysisrunlog
+      } else{
+        paste0("No log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL"))
       }
     }
   })
@@ -910,6 +904,7 @@ step3_configureOutput <- function(input, output, session,
       hide("panelAnalysisLogs")
       if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+        .reloadAnaRunLog()
         logMessage(paste0("analysisId changed to ", result$anaID))
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
           show("panelAnalysisLogs")
@@ -968,7 +963,7 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
     if (!is.null(result$anaID)) {
-      session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run_traceback_file", sep = "/"))
+      result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run_traceback_file", sep = "/"))
     } else {
       result$tbl_analysisrunlog <-  NULL
     }
@@ -1168,7 +1163,7 @@ step3_configureOutput <- function(input, output, session,
       unlist(recursive = FALSE)
     model_params_lst <- lapply(names(model_settings), function(i){
       ifelse( is.null(input[[paste0("model_params_", i)]]),model_settings[[i]]$default,input[[paste0("model_params_", i)]])
-      }) %>%
+    }) %>%
       setNames(names(model_settings))
 
 

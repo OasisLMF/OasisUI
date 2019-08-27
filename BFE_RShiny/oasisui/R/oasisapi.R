@@ -297,6 +297,7 @@ OasisAPI <- R6Class(
     },
     # > return from query ----
     return_df = function(query_path, api_param = "", query_method = "GET") {
+
       content_lst <- content(self$api_query(query_path, query_list = api_param,  query_method)$result)
       if (length(content_lst) > 0) {
         if (length(content_lst[[1]]) > 1) {
@@ -309,6 +310,8 @@ OasisAPI <- R6Class(
           non_null_content_lst <- Filter(Negate(is.null), non_null_content_lst)
           df <- bind_rows(non_null_content_lst) %>%
             as.data.frame()
+        } else if (length(content_lst) == 1 && length(content_lst[[1]]) == 1 && any(grepl("/", content_lst[[1]]))){
+          df <- content_lst[[1]]
         } else {
           df <- NULL
         }

@@ -104,7 +104,7 @@ panelAnalysisDetails <- function(id) {
 #'
 #' @template params-module-ui
 #'
-#' @importFrom DT DTOutput
+#' @importFrom shinyjs hidden
 #'
 #' @export
 panelAnalysisLog <- function(id) {
@@ -119,8 +119,10 @@ panelAnalysisLog <- function(id) {
       oasisuiRefreshButton(ns("abuttonanalogrefresh")),
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analysislog")),
-    downloadButton(ns("download_log"), label = "Download")
+    div(class = "panel", style = 'overflow-y: scroll; max-height: 200px; min-height: 30px;',
+        textOutput(ns("text_analysislog"))
+    ),
+    hidden(downloadButton(ns("download_log"), label = "Download"))
   )
 }
 
@@ -463,30 +465,24 @@ step2_chooseAnalysis <- function(input, output, session,
     }
   )
 
-  observeEvent(result$tbl_analysislog, {
-    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 1) {
+  observeEvent(result$tbl_analysislog, ignoreNULL = FALSE, {
+    if (!is.null(result$tbl_analysislog)) {
       show("download_log")
     } else {
       hide("download_log")
     }
   })
 
-  output$dt_analysislog <- renderDT(
-    if (!is.null(result$tbl_analysislog) && nrow(result$tbl_analysislog) > 1) {
+  output$text_analysislog <- renderText({
+    if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
-      datatable(
-        result$tbl_analysislog %>% capitalize_names_df(),
-        class = "oasisui-table display",
-        rownames = TRUE,
-        filter = "none",
-        escape = FALSE,
-        selection = list(mode = 'none'),
-        options = getTableOptions(maxrowsperpage = pageLength)
-      )
-    } else {
-      nothingToShowTable(paste0("No log files associtated with analysis id ", result$analysisID))
+      if (!is.null(result$tbl_analysislog)){
+        result$tbl_analysislog
+      } else{
+        paste0("No log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL"))
+      }
     }
-  )
+  })
 
   #  panelAnalysisLog Table title
   output$paneltitle_panelAnalysisLog <- renderUI({
