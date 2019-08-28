@@ -18,7 +18,8 @@ def_out_configUI <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_defAnaConfigOutput"), inline = TRUE),
-      actionButton(inputId = ns("abuttonhidepanelconfigureoutput"), label = NULL, icon = icon("times"), style = "float: right;")
+      actionButton(inputId = ns("abuttonhidepanelconfigureoutput"), label = NULL,
+                   icon = icon("times"), style = "float: right;")
     ),
     fluidRow(
       column(4,
@@ -302,6 +303,8 @@ def_out_config <- function(input,
         #Set inputs
         .updateOutputConfig(analysis_settings)
       }
+      # Set view back to Summary
+      default_tags[1]
     }
   })
 
@@ -352,7 +355,16 @@ def_out_config <- function(input,
       })
     })
 
+  # Re-set default view when changing tag
+  observeEvent(input$sintag, {
+    if (input$sintag == default_tags[2] || input$sintag == default_tags[3]) {
+      removeUI(
+        selector = paste0('#', inserted[length(result$n_add)])
+      )
+      result$n_add <- 0
+    }
 
+  })
 
   # insert new summary levels and reports
   observeEvent(input$addBtn, {
@@ -383,7 +395,6 @@ def_out_config <- function(input,
       disable("removeBtn")
     }
   })
-
 
   # > Output Params Review -----------------------------------------------------
 
@@ -561,7 +572,12 @@ def_out_config <- function(input,
   # Summary Level and Reports fields
   dynamicUI <- function(tag, n) {
     oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+
     if (tag == 3) {
+
+      result$out_params_review <- expand.grid(perspective = "GUL",
+                                              summary_level = output_options$default_level,
+                                              report = output_options$default_level)
       fluidRow(
         column(5,
                selectInput(inputId = ns(paste0("sinsummarylevels", n)),
@@ -579,6 +595,10 @@ def_out_config <- function(input,
         )
       )
     } else {
+
+      result$out_params_review <- expand.grid(perspective = "GUL",
+                                              summary_level = output_options$default_level,
+                                              report = output_options$default_level)
       fluidRow(
         column(5,
                selectInput(inputId = ns(paste0("sinsummarylevels", result$n)),
