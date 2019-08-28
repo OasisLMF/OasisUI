@@ -159,7 +159,7 @@ panelOutputParamsDetails <- function(id) {
 #'
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
-#' @importFrom shinyjs disable
+#' @importFrom shinyjs disabled
 #' @importFrom shinyjs enable
 #' @importFrom dplyr filter
 #' @importFrom jsonlite write_json
@@ -268,7 +268,7 @@ def_out_config <- function(input,
                             paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
       } else {
         logMessage(paste0("appling the output configuration of analysis ", anaName," id ", anaID))
-        # TO DO
+        # TODO
         # Get chosen tag out of the analysis settings
         chosen_tag <- default_tags[1]
         # Update tag
@@ -312,17 +312,15 @@ def_out_config <- function(input,
 
 
   # >> summary levels and reports ----------------------------------------------
-  dynamicUI <- function(n) {
-    if (n >= max_n) {
-      disable("add_btn")
-      oasisuiNotification("Reached maximum number of entries.", type = "warning")
-    } else {
+  dynamicUI <- function(tag, n) {
+    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+    if (tag == 3) {
       fluidRow(
         column(5,
-               selectInput(inputId = ns(paste0("sinsummarylevels",n)),
+               selectInput(inputId = ns(paste0("sinsummarylevels", n)),
                            label = "Summary Levels",
                            choices = c("All Risks",
-                                       session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field),
+                                       oed_field),
                            multiple = TRUE)
         ),
         column(5,
@@ -333,7 +331,38 @@ def_out_config <- function(input,
                            multiple = TRUE)
         )
       )
+    } else {
+      fluidRow(
+        column(5,
+               selectInput(inputId = ns(paste0("sinsummarylevels", result$n)),
+                           label = "Summary Levels",
+                           choices = oed_field,
+                           multiple = TRUE)
+        )
+      )
     }
+  }
+
+  dynamicUI_btns <- function(tag, n) {
+
+    tagList(
+      fluidRow(
+        column(1,
+               br(),
+               actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
+                 bs_embed_tooltip(title = defineSingleAna$addBtn, placement = "right")
+        ),
+        column(2,
+               br(),
+               disabled(actionButton(ns("removeBtn"), label = "", icon = icon("times")) %>%
+                                   bs_embed_tooltip(title = defineSingleAna$removeBtn, placement = "right"))
+        ),
+        column(8,
+               dynamicUI(tag, n)
+        )
+      ),
+      tags$div(id = 'placeholder')
+    )
   }
 
   observeEvent({input$sintag
@@ -367,45 +396,15 @@ def_out_config <- function(input,
           logMessage("No list of summary levels provided")
         } else {
           if (input$sintag == default_tags[2]) {
-            fluidRow(
-              column(5,
-                     selectInput(inputId = ns(paste0("sinsummarylevels", result$n)),
-                                 label = "Summary Levels",
-                                 selected = "All Risks",
-                                 choices = c("All Risks", oed_field),
-                                 multiple = TRUE)
-              )
-            )
+            dynamicUI_btns(tag = 2, result$n)
           } else if (input$sintag == default_tags[3]) {
-            tagList(
-              fluidRow(
-                column(1,
-                       br(),
-                       actionButton(ns("add_btn"), label = "", icon = icon("plus")) %>%
-                         bs_embed_tooltip(title = defineSingleAna$add_btn, placement = "right")
-                ),
-                column(2,
-                       br(),
-                       actionButton(ns("remove_btn"), label = "", icon = icon("times")) %>%
-                         bs_embed_tooltip(title = defineSingleAna$remove_btn, placement = "right")
-                ),
-                column(8,
-                       dynamicUI(result$n)
-                )
-              ),
-              tags$div(id = 'placeholder')
-            )
+            dynamicUI_btns(tag = 3, result$n)
           }
         }
       })
     })
 
-  # insert new summary levels and reports
-  observeEvent(input$add_btn, {
-    result$n_add <- result$n_add + 1
-    id = "insert_fields"
-    logMessage(paste0("insert ui because ", "add_btn", " changed to ",  result$n_add))
-    inserted <<- c(id, inserted)
+  add_UI <- function(n, id, tag) {
     insertUI(
       selector = '#placeholder',
       immediate = TRUE,
@@ -414,22 +413,41 @@ def_out_config <- function(input,
         fluidRow(
           column(3),
           column(8,
-                 dynamicUI(result$n_add))
+                 dynamicUI(tag, n)
+          )
         )
       )
     )
+  }
+
+  # insert new summary levels and reports
+  observeEvent(input$addBtn, {
+    result$n_add <- result$n_add + 1
+    id = "insert_fields"
+    logMessage(paste0("insert ui because ", "addBtn", " changed to ",  result$n_add))
     inserted <<- c(id, inserted)
+    if (input$sintag == default_tags[3]) {
+      add_UI(result$n_add, id, 3)
+    } else if (input$sintag == default_tags[2]) {
+      add_UI(result$n_add, id, 2)
+    }
+    observe_output_param()
+    inserted <<- c(id, inserted)
+    enable("removeBtn")
   })
 
   # remove summary levels and reports
-  observeEvent(input$remove_btn, {
-    enable("add_btn")
+  observeEvent(input$removeBtn, {
+    enable("addBtn")
     result$n_add <- result$n_add - 1
     removeUI(
       selector = paste0('#', inserted[length(inserted)])
     )
     inserted <<- inserted[-length(inserted)]
     observe_output_param()
+    if(result$n < 1) {
+      disable("removeBtn")
+    }
   })
 
 
@@ -458,46 +476,72 @@ def_out_config <- function(input,
     }
 
     if (input$sintag == default_tags[3]) {
+
+# Custom(3)
+
+      reports <- output_options$default_level
+      summary_levels <- output_options$default_level
+
       # custom
-      reports_summary_levels <- lapply(seq(0, result$n_add), function(x) {
-        if (!is.null(input[[paste0("sinsummarylevels", x)]]) && input[[paste0("sinsummarylevels", x)]] == "All Risks") {
-          expand.grid(
-            summary_level = paste(session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field,
-                                  collapse = ", "),
-            report = paste(input[[paste0("sinreports", x)]], collapse=", ")
-          )
-        } else {
-          expand.grid(
-            summary_level = paste(input[[paste0("sinsummarylevels", x)]], collapse=", "),
-            report = paste(input[[paste0("sinreports", x)]], collapse=", ")
-          )
-        }
-      })
-      reports_summary_levels <- do.call("rbind.data.frame", reports_summary_levels)
-      if (nrow(reports_summary_levels) == 0)
-        reports_summary_levels <- data.frame(
-          summary_level = "",
-          report = ""
-        )
-      result$out_params_review <- data.frame(
-        perspective = rep(perspectives, each = nrow(reports_summary_levels)),
-        rep(reports_summary_levels, times = length(perspectives))
-      )
+      # reports_summary_levels <- lapply(seq(0, result$n_add), function(x) {
+        # if (!is.null(input[[paste0("sinsummarylevels", x)]])) {
+          # expand.grid(
+
+            # })
+            summary_levels_tmp = lapply(seq(0, result$n_add), function(x) {
+              input[[paste0("sinsummarylevels", x)]]})
+            report_tmp = lapply(seq(0, result$n_add), function(x) {
+              input[[paste0("sinreports", x)]]})
+            # report_tmp = paste(input[[paste0("sinreports", x)]], collapse = ", ")
+            # report = input[[paste0("sinreports", x)]]
+          # )
+        # }
+      # })
+      # reports_summary_levels <- do.call("rbind.data.frame", reports_summary_levels)
+      # if (nrow(reports_summary_levels) == 0)
+      #   reports_summary_levels <- data.frame(
+      #     summary_level = "",
+      #     report = ""
+      #   )
+
+      if (summary_levels_tmp %>% unlist(recursive = TRUE) %>% is.null()) {
+        # keep basic
+      } else {
+        summary_levels <- summary_levels_tmp
+      }
+
+      if (report_tmp %>% unlist(recursive = TRUE) %>% is.null()) {
+        # keep basic
+      } else {
+        reports <- report_tmp
+      }
+      # place all sections for one row in one line in table
+      if (class(summary_levels) == "character") {
+        summary_levels <- paste(summary_levels, collapse = ", ")
+        summary_levels <- c(summary_levels)
+      }
+
+      result$out_params_review <- expand.grid(perspective = perspectives,
+                                              summary_level = summary_levels,
+                                              report = reports)
+
+      # result$out_params_review <- expand.grid(
+      #   perspective = rep(perspectives, each = nrow(reports_summary_levels)),
+      #   rep(reports_summary_levels, times = length(perspectives))
+        # rep(reports_summary_levels, times = 1)
+      # )
     } else {
       # Summary or Drill-down (2)
       reports <- output_options$variables[output_options$variables_default]
       summary_levels <- output_options$default_level
 
       if (input$sintag == default_tags[2]) {
-        if (!is.null(input$sinsummarylevels0) && input$sinsummarylevels0 == "All Risks") {
-          summary_levels_tmp <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
-        } else {
           summary_levels_tmp <- lapply(seq(0, result$n_add), function(x) {
-            summary_level = input[[paste0("sinsummarylevels", x)]]
+            input[[paste0("sinsummarylevels", x)]]
           })
-        }
       } else {
-        summary_levels_tmp <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+        # summary_levels_tmp <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+        summary_levels_tmp <- "All Risks"
       }
 
       if (summary_levels_tmp %>% unlist(recursive = TRUE) %>% is.null()) {
@@ -508,12 +552,9 @@ def_out_config <- function(input,
 
       # place all sections for one row in one line in table
       if (class(summary_levels) == "character") {
-      summary_levels <- paste(summary_levels, collapse = ", ")
-      } else {
-        # TODO: add space between commas
-      summary_levels <- c(summary_levels)
+        summary_levels <- paste(summary_levels, collapse = ", ")
+        summary_levels <- c(summary_levels)
       }
-      reports <- paste(reports, collapse = ", ")
 
       result$out_params_review <- expand.grid(perspective = perspectives,
                                               summary_level = summary_levels,
@@ -643,10 +684,23 @@ def_out_config <- function(input,
 
       if (prsp %in% checked) {
 
+        selector_input <- lapply(seq(0, result$n_add), function(x) {
+          input[[paste0("sinsummarylevels", x)]]
+        })
+
         p <- which(result$out_params_review$perspective == prsp)
 
         review_prsp <- result$out_params_review[p, ]
-        fields_to_add <- unique(review_prsp$summary_level)
+ # Insert All Risks as default for both Summary and Drill down
+        if (input$sintag != default_tags[3] || "All Risks" %in% reports_summary_levels) {
+
+          # fields_to_add <- c(session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field,
+          #   unique(review_prsp$summary_level))
+          fields_to_add <- ""
+
+        } else {
+          fields_to_add <- unique(review_prsp$summary_level)
+        }
 
         update_item_list <- function(lst, reps) {
           nm <- names(lst)

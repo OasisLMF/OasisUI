@@ -47,8 +47,8 @@ defineSingleAna <- list(
   abuttonrunconfig = "Define output configuration and run analysis",
   abuttonchoosetag = "Select tag from a previously used configuration.",
   download_out_params_review_tbl = "Download output parameters review.",
-  add_btn = "Add new summary levels and reports",
-  remove_btn = "Remove summary levels and reports"
+  addBtn = "Add new summary levels and reports",
+  removeBtn = "Remove summary levels and reports"
 )
 
 ### Dashboard ------------------------------------------------------------------

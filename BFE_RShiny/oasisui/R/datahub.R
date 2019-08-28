@@ -683,8 +683,8 @@ DataHub <- R6Class(
   g_idx <- as.integer(gsub("S", "", y[2]))
   g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
   if (is.null(g_oed)) {
-    warning("g_oed is NULL in .addDescription")
-    g_oed <- "prog"
+    logMessage("g_oed is NULL in .addDescription")
+    g_oed <- "All Risks"
   }
   g <- g_oed
   z <- reportToVar()[[report]]
