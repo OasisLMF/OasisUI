@@ -312,58 +312,6 @@ def_out_config <- function(input,
 
 
   # >> summary levels and reports ----------------------------------------------
-  dynamicUI <- function(tag, n) {
-    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
-    if (tag == 3) {
-      fluidRow(
-        column(5,
-               selectInput(inputId = ns(paste0("sinsummarylevels", n)),
-                           label = "Summary Levels",
-                           choices = c("All Risks",
-                                       oed_field),
-                           multiple = TRUE)
-        ),
-        column(5,
-               selectInput(inputId = ns(paste0("sinreports", n)),
-                           label = "Reports",
-                           choices = output_options$variables,
-                           selected = output_options$variables[output_options$variables_default][1],
-                           multiple = TRUE)
-        )
-      )
-    } else {
-      fluidRow(
-        column(5,
-               selectInput(inputId = ns(paste0("sinsummarylevels", result$n)),
-                           label = "Summary Levels",
-                           choices = oed_field,
-                           multiple = TRUE)
-        )
-      )
-    }
-  }
-
-  dynamicUI_btns <- function(tag, n) {
-
-    tagList(
-      fluidRow(
-        column(1,
-               br(),
-               actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
-                 bs_embed_tooltip(title = defineSingleAna$addBtn, placement = "right")
-        ),
-        column(2,
-               br(),
-               disabled(actionButton(ns("removeBtn"), label = "", icon = icon("times")) %>%
-                                   bs_embed_tooltip(title = defineSingleAna$removeBtn, placement = "right"))
-        ),
-        column(8,
-               dynamicUI(tag, n)
-        )
-      ),
-      tags$div(id = 'placeholder')
-    )
-  }
 
   observeEvent({input$sintag
     analysisID()}, {
@@ -404,21 +352,7 @@ def_out_config <- function(input,
       })
     })
 
-  add_UI <- function(n, id, tag) {
-    insertUI(
-      selector = '#placeholder',
-      immediate = TRUE,
-      ui = tags$div(
-        id = id,
-        fluidRow(
-          column(3),
-          column(8,
-                 dynamicUI(tag, n)
-          )
-        )
-      )
-    )
-  }
+
 
   # insert new summary levels and reports
   observeEvent(input$addBtn, {
@@ -622,6 +556,80 @@ def_out_config <- function(input,
     .basicview()
   })
 
+# UI functions -----------------------------------------------------------------
+
+  # Summary Level and Reports fields
+  dynamicUI <- function(tag, n) {
+    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+    if (tag == 3) {
+      fluidRow(
+        column(5,
+               selectInput(inputId = ns(paste0("sinsummarylevels", n)),
+                           label = "Summary Levels",
+                           choices = c("All Risks",
+                                       oed_field),
+                           multiple = TRUE)
+        ),
+        column(5,
+               selectInput(inputId = ns(paste0("sinreports", n)),
+                           label = "Reports",
+                           choices = output_options$variables,
+                           selected = output_options$variables[output_options$variables_default][1],
+                           multiple = TRUE)
+        )
+      )
+    } else {
+      fluidRow(
+        column(5,
+               selectInput(inputId = ns(paste0("sinsummarylevels", result$n)),
+                           label = "Summary Levels",
+                           choices = oed_field,
+                           multiple = TRUE)
+        )
+      )
+    }
+  }
+
+  # add + and X buttons to dynamic UI
+  dynamicUI_btns <- function(tag, n) {
+
+    tagList(
+      fluidRow(
+        column(1,
+               br(),
+               actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
+                 bs_embed_tooltip(title = defineSingleAna$addBtn, placement = "right")
+        ),
+        column(2,
+               br(),
+               disabled(actionButton(ns("removeBtn"), label = "", icon = icon("times")) %>%
+                          bs_embed_tooltip(title = defineSingleAna$removeBtn, placement = "right"))
+        ),
+        column(8,
+               dynamicUI(tag, n)
+        )
+      ),
+      tags$div(id = 'placeholder')
+    )
+  }
+
+  # Add additional fields to the UI
+  add_UI <- function(n, id, tag) {
+    insertUI(
+      selector = '#placeholder',
+      immediate = TRUE,
+      ui = tags$div(
+        id = id,
+        fluidRow(
+          column(3),
+          column(8,
+                 dynamicUI(tag, n)
+          )
+        )
+      )
+    )
+  }
+
   # Helper Functions -----------------------------------------------------------
 
   .updateOutputConfig <- function(analysis_settings){
@@ -691,12 +699,12 @@ def_out_config <- function(input,
         p <- which(result$out_params_review$perspective == prsp)
 
         review_prsp <- result$out_params_review[p, ]
- # Insert All Risks as default for both Summary and Drill down
-        if (input$sintag != default_tags[3] || "All Risks" %in% reports_summary_levels) {
+ # All Risks as default for both Summary and Drill down
+        if (input$sintag != default_tags[3]) {
 
           # fields_to_add <- c(session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field,
           #   unique(review_prsp$summary_level))
-          fields_to_add <- ""
+          fields_to_add <- c("", unique(review_prsp$summary_level))
 
         } else {
           fields_to_add <- unique(review_prsp$summary_level)
@@ -732,8 +740,9 @@ def_out_config <- function(input,
           item_list <- summary_template
           item_list$id <- item
           item_list$oed_fields <- as.character(fields_to_add[item])
-          idx_lvl <- review_prsp$summary_level == fields_to_add[item]
-          keep <- review_prsp[idx_lvl, "report"]
+          review_prsp$summary_level <- fields_to_add[item]
+          idx_lvl <- review_prsp$summary_level
+          keep <- review_prsp[item, "report"]
           corresp_varsdf <- which(varsdf$labels %in% keep)
           varsdf_field <- varsdf$field[corresp_varsdf]
           item_list_upd <- update_item_list(item_list, varsdf_field)
