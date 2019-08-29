@@ -269,7 +269,6 @@ def_out_config <- function(input,
                             paste0("No output configuration associated to analysis ", anaName," id ", anaID, "."))
       } else {
         logMessage(paste0("appling the output configuration of analysis ", anaName," id ", anaID))
-        # TODO
         # Get chosen tag out of the analysis settings
         chosen_tag <- default_tags[1]
         # Update tag
@@ -689,7 +688,6 @@ def_out_config <- function(input,
               df <- data.frame(prsp, "", review_prsp$report)
               names(df) <- c("perspective","summary_level", "report")
               review_prsp <- df
-
             } else {
               review_prsp <- result$out_params_review[p, ]
             }
@@ -700,13 +698,11 @@ def_out_config <- function(input,
           df <- data.frame(prsp, "", review_prsp$report)
           names(df) <- c("perspective","summary_level", "report")
           review_prsp <- rbind(review_prsp, df)
-          print(review_prsp)
         } else {
           # Replace "All Risks" with empty field for Summary
           df <- data.frame(prsp, "", review_prsp$report)
           names(df) <- c("perspective","summary_level", "report")
           review_prsp <- df
-          print(review_prsp)
         }
 
         fields_to_add <- unique(review_prsp$summary_level)
@@ -740,7 +736,6 @@ def_out_config <- function(input,
           item_list <- summary_template
           item_list$id <- item
           item_list$oed_fields <- as.character(fields_to_add[item])
-          print(item_list$oed_fields)
           review_prsp$summary_level <- fields_to_add[item]
           idx_lvl <- review_prsp$summary_level
           keep <- review_prsp[item, "report"]
