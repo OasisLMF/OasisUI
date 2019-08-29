@@ -671,18 +671,10 @@ def_out_config <- function(input,
       )
 
       if (prsp %in% checked) {
-
-        selector_input <- lapply(seq(0, result$n_add), function(x) {
-          input[[paste0("sinsummarylevels", x)]]
-        })
-
         p <- which(result$out_params_review$perspective == prsp)
-
         review_prsp <- result$out_params_review[p, ]
         # All Risks as default for both Summary and Drill down, optional for Custom
-
         if (input$sintag == default_tags[3]) {
-
           review_prsp <- lapply(seq(1, length(review_prsp$summary_level)), function(x) {
             if (grepl("All Risks", review_prsp$summary_level[x])) {
               df <- data.frame(prsp, "", review_prsp$report)
