@@ -391,7 +391,7 @@ def_out_config <- function(input,
     )
     inserted <<- inserted[-length(inserted)]
     observe_output_param()
-    if(result$n < 1) {
+    if(result$n_add < 1) {
       disable("removeBtn")
     }
   })
@@ -428,8 +428,8 @@ def_out_config <- function(input,
           summary_level = paste(input[[paste0("sinsummarylevels", x)]], collapse = ", "),
           report = input[[paste0("sinreports", x)]]
         )
-
       })
+
       reports_summary_levels <- do.call("rbind.data.frame", reports_summary_levels)
       if (nrow(reports_summary_levels) == 0)
         reports_summary_levels <- data.frame(
@@ -438,7 +438,7 @@ def_out_config <- function(input,
         )
       result$out_params_review <- data.frame(
         perspective = rep(perspectives, each = nrow(reports_summary_levels)),
-        rep(reports_summary_levels, times = length(perspectives))
+        rep(reports_summary_levels, times = length(3))
       )
 
     } else if (input$sintag == default_tags[2]) {
@@ -452,37 +452,17 @@ def_out_config <- function(input,
 
       })
       reports_summary_levels <- do.call("rbind.data.frame", reports_summary_levels)
-      if (nrow(reports_summary_levels) == 0)
+
+      if (nrow(reports_summary_levels) == 0) {
         reports_summary_levels <- data.frame(
           summary_level = "",
-          report = ""
-        )
+          report = "")
+      }
+
       result$out_params_review <- data.frame(
         perspective = rep(perspectives, each = nrow(reports_summary_levels)),
-        rep(reports_summary_levels, times = length(perspectives))
+        rep(reports_summary_levels, times = length(3))
       )
-
-      # summary_levels <- output_options$default_level
-      # reports <- output_options$variables[output_options$variables_default]
-      #
-      # summary_levels_tmp <- lapply(seq(0, result$n_add), function(x) {
-      #   input[[paste0("sinsummarylevels", x)]]})
-      #
-      # if (summary_levels_tmp %>% unlist(recursive = TRUE) %>% is.null()) {
-      #   # keep basic
-      # } else {
-      #   summary_levels <- summary_levels_tmp
-      # }
-      #
-      # # place all sections for one row in one line in table
-      # if (class(summary_levels) == "character") {
-      #   summary_levels <- paste(summary_levels, collapse = ", ")
-      #   summary_levels <- c(summary_levels)
-      # }
-      #
-      # result$out_params_review <- expand.grid(perspective = perspectives,
-      #                                         summary_level = summary_levels,
-      #                                         report = reports)
     } else {
       # Summary (1)
 
@@ -700,17 +680,36 @@ def_out_config <- function(input,
         p <- which(result$out_params_review$perspective == prsp)
 
         review_prsp <- result$out_params_review[p, ]
-        # All Risks as default for both Summary and Drill down
-        if (input$sintag != default_tags[3]) {
+        # All Risks as default for both Summary and Drill down, optional for Custom
 
-          # fields_to_add <- c(session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field,
-          #   unique(review_prsp$summary_level))
-          fields_to_add <- c("", unique(review_prsp$summary_level))
+        if (input$sintag == default_tags[3]) {
 
+          review_prsp <- lapply(seq(1, length(review_prsp$summary_level)), function(x) {
+            if (grepl("All Risks", review_prsp$summary_level[x])) {
+              df <- data.frame(prsp, "", review_prsp$report)
+              names(df) <- c("perspective","summary_level", "report")
+              review_prsp <- df
+
+            } else {
+              review_prsp <- result$out_params_review[p, ]
+            }
+          })
+
+        } else if (input$sintag == default_tags[2]) {
+          # Add "All Risks" (empty field) to table for Drill-down
+          df <- data.frame(prsp, "", review_prsp$report)
+          names(df) <- c("perspective","summary_level", "report")
+          review_prsp <- rbind(review_prsp, df)
+          print(review_prsp)
         } else {
-          fields_to_add <- unique(review_prsp$summary_level)
+          # Replace "All Risks" with empty field for Summary
+          df <- data.frame(prsp, "", review_prsp$report)
+          names(df) <- c("perspective","summary_level", "report")
+          review_prsp <- df
+          print(review_prsp)
         }
 
+        fields_to_add <- unique(review_prsp$summary_level)
         update_item_list <- function(lst, reps) {
           nm <- names(lst)
           # we want to keep names!
@@ -741,6 +740,7 @@ def_out_config <- function(input,
           item_list <- summary_template
           item_list$id <- item
           item_list$oed_fields <- as.character(fields_to_add[item])
+          print(item_list$oed_fields)
           review_prsp$summary_level <- fields_to_add[item]
           idx_lvl <- review_prsp$summary_level
           keep <- review_prsp[item, "report"]
@@ -774,7 +774,6 @@ def_out_config <- function(input,
         )
       )
     )
-
     # ReportChoices <- c("FullUncAEP", "FullUncOEP", "AAL")
 
     analysis_settings
