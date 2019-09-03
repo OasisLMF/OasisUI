@@ -178,7 +178,7 @@ def_out_config <- function(input,
   ns <- session$ns
 
   # max number rows for custom output params
-  max_n <- 10
+  max_n <- 9
   # inserted fields
   inserted <- c()
 
@@ -373,8 +373,16 @@ def_out_config <- function(input,
     inserted <<- c(id, inserted)
     if (input$sintag == default_tags[3]) {
       add_UI(result$n_add, id, 3)
+      #Max number of fields limited to 9
+      if(result$n_add >= max_n) {
+        disable("addBtn")
+      }
     } else if (input$sintag == default_tags[2]) {
       add_UI(result$n_add, id, 2)
+      #Max number of fields limited to 8 because "All Risks" is there by default
+      if(result$n_add >= (max_n-1)) {
+        disable("addBtn")
+      }
     }
     observe_output_param()
     inserted <<- c(id, inserted)
@@ -407,72 +415,71 @@ def_out_config <- function(input,
         heading = h4("Output Parameters Review"),
         oasisuiTableUI(ns("out_params_review_tbl")),
         downloadButton(ns("download_out_params_review_tbl"), label = "Export to csv") %>%
-          bs_embed_tooltip(title = defineSingleAna$download_out_params_review_tbl, placement = "right")
+          bs_embed_tooltip(title = defineSingleAna$download_out_params_review_tbl, placement = "right"),
+        actionButton(inputId = ns("clearselection"), label = "Clear", style = "float:right;") %>%
+          bs_embed_tooltip(title = defineSingleAna$clearselection, placement = "right")
       )
     )
   )
 
   observe_output_param <- function() {
-    if (is.null(input$chkboxgrplosstypes)) {
-      perspectives <- output_options$losstypes[1]
-    } else {
-      perspectives <- input$chkboxgrplosstypes
-    }
 
     if (input$sintag == default_tags[3]) {
       # Custom(3)
 
-      reports_summary_levels <- lapply(seq(0, result$n_add), function(x) {
-        expand.grid(
-          summary_level = paste(input[[paste0("sinsummarylevels", x)]], collapse = ", "),
-          report = input[[paste0("sinreports", x)]]
-        )
-      })
-
-      reports_summary_levels <- do.call("rbind.data.frame", reports_summary_levels)
-      if (nrow(reports_summary_levels) == 0)
-        reports_summary_levels <- data.frame(
-          summary_level = "",
-          report = ""
-        )
-      result$out_params_review <- data.frame(
-        perspective = rep(perspectives, each = nrow(reports_summary_levels)),
-        rep(reports_summary_levels, times = length(3))
+      sum_rep_grid <- do.call(
+        "rbind.data.frame",
+        lapply(seq(0, result$n_add), function(x) {
+          expand.grid(summary_level = paste(sort(input[[paste0("sinsummarylevels", x)]]), collapse = ", "),
+                      report = sort(input[[paste0("sinreports", x)]])) %>%
+            filter(summary_level != "") %>%
+            filter(report != "")
+        })
       )
+
+      create_output_params(sum_rep_grid)
 
     } else if (input$sintag == default_tags[2]) {
       # Drill-down (2)
 
-      reports_summary_levels <- lapply(seq(0, result$n_add), function(x) {
-        expand.grid(
-          summary_level = paste(input[[paste0("sinsummarylevels", x)]], collapse = ", "),
-          report = output_options$variables[output_options$variables_default]
-        )
-
-      })
-      reports_summary_levels <- do.call("rbind.data.frame", reports_summary_levels)
-
-      if (nrow(reports_summary_levels) == 0) {
-        reports_summary_levels <- data.frame(
-          summary_level = "",
-          report = "")
-      }
-
-      result$out_params_review <- data.frame(
-        perspective = rep(perspectives, each = nrow(reports_summary_levels)),
-        rep(reports_summary_levels, times = length(3))
+      sum_rep_grid <- do.call(
+        "rbind.data.frame",
+        lapply(seq(0, result$n_add), function(x) {
+          expand.grid(summary_level = c("All Risks", sort(paste(input[[paste0("sinsummarylevels", x)]], collapse = ", "))),
+                      report = sort(output_options$variables[output_options$variables_default])) %>%
+            filter(summary_level != "")
+        })
       )
+
+      create_output_params(sum_rep_grid)
+
     } else {
       # Summary (1)
 
-      summary_levels <- "All Risks"
-      reports <- output_options$variables[output_options$variables_default]
-      result$out_params_review <- expand.grid(perspective = perspectives,
-                                              summary_level = summary_levels,
-                                              report = reports)
+      sum_rep_grid <- do.call(
+        "rbind.data.frame",
+        lapply(seq(0, result$n_add), function(x) {
+          expand.grid(summary_level = "All Risks",
+                      report = sort(output_options$variables[output_options$variables_default])) %>%
+            filter(summary_level != "")
+        })
+      )
+
+      create_output_params(sum_rep_grid)
+
     }
     invisible()
   }
+
+  observeEvent(result$out_params_review, {
+    if (nrow(result$out_params_review) == 0) {
+      disable("abuttonexecuteanarun")
+      disable("clearselection")
+    } else {
+      enable("abuttonexecuteanarun")
+      enable("clearselection")
+    }
+  })
 
   sinsummarylevels_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinsummarylevels", x)]]})})
   sinreports_react_all <- reactive({lapply(seq(0, max_n), function(x){input[[paste0("sinreports", x)]]})})
@@ -506,6 +513,27 @@ def_out_config <- function(input,
       fwrite(result$out_params_review %>% capitalize_names_df(), file, row.names = FALSE, quote = TRUE)
     }
   )
+
+  observeEvent(input$clearselection, {
+    result$n_add <- 0
+    result$n <- 0
+    removeUI(
+      selector = paste0('#', inserted[length(inserted)])
+    )
+    inserted <<- 0
+
+    output$summary_levels_reports_ui <- renderUI({
+      if(input$sintag == default_tags[3]) {
+        dynamicUI_btns(tag = 3, result$n)
+      } else if(input$sintag == default_tags[2]) {
+        dynamicUI_btns(tag = 2, result$n)
+      }
+
+    })
+
+    disable("clearselection")
+
+  })
 
   # Run analysis ---------------------------------------------------------------
   # Execute analysis
@@ -554,7 +582,6 @@ def_out_config <- function(input,
                selectInput(inputId = ns(paste0("sinreports", n)),
                            label = "Reports",
                            choices = output_options$variables,
-                           selected = output_options$variables[output_options$variables_default][1],
                            multiple = TRUE)
         )
       )
@@ -608,6 +635,23 @@ def_out_config <- function(input,
         )
       )
     )
+  }
+
+  # Output table function ------------------------------------------------------
+
+  create_output_params <- function(sum_rep_grid) {
+    if (is.null(input$chkboxgrplosstypes)) {
+      perspectives <- output_options$losstypes[1]
+    } else {
+      perspectives <- input$chkboxgrplosstypes
+    }
+
+    reports_summary_levels <- distinct(data.frame(
+      perspective = rep(perspectives, each = nrow(sum_rep_grid)),
+      rep(sum_rep_grid, times = length(3))
+    ))
+
+    result$out_params_review <- reports_summary_levels
   }
 
   # Helper Functions -----------------------------------------------------------
