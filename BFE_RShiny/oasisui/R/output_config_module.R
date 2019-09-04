@@ -161,8 +161,16 @@ panelOutputParamsDetails <- function(id) {
       # checkboxses for all perspectives; available for all tags
       uiOutput(ns("summary_levels_reports_ui")),
       # combinations of summary levels and reports.
-      uiOutput(ns("out_params_review_ui")) # review of output configuration in long format. As a collapsible panel. Available for all tags
-    )
+      uiOutput(ns("out_params_review_ui")), # review of output configuration in long format. As a collapsible panel. Available for all tags
+      hidden(
+        actionButton(
+          inputId = ns("clearselection"),
+          label = "Clear",
+          style = "float:right;"
+        ) %>%
+          bs_embed_tooltip(title = defineSingleAna$clearselection, placement = "right")
+      )
+      )
   )
 }
 
@@ -443,7 +451,7 @@ def_out_config <- function(input,
       if (all(is.na(oed_field))) {
         logMessage("No list of summary levels provided")
       } else {
-          dynamicUI_btns(tag = input$sintag, result$n)
+        dynamicUI_btns(tag = input$sintag, result$n)
       }
     })
   })
@@ -453,15 +461,14 @@ def_out_config <- function(input,
     result$n_add <- result$n_add + 1
     id = "insert_fields"
     logMessage(paste0("insert ui because ", "addBtn", " changed to ",  result$n_add))
-    inserted <<- c(id, inserted)
+    # inserted <<- c(id, inserted)
     add_UI(result$n_add, id, input$sintag)
-      #Max number of fields limited to 9
-      if (result$n_add >= max_n) {
-        disable("addBtn")
-      } else if (result$n_add >= (max_n - 1)) {
-        disable("addBtn")
-      }
-    observe_output_param()
+    #Max number of fields limited to 9
+    if (result$n_add >= max_n) {
+      disable("addBtn")
+    } else if (input$sintag == default_tags[2] && result$n_add >= (max_n - 1)) {
+      disable("addBtn")
+    }
     inserted <<- c(id, inserted)
     enable("removeBtn")
   })
@@ -469,13 +476,24 @@ def_out_config <- function(input,
   # remove summary levels and reports
   observeEvent(input$removeBtn, {
     enable("addBtn")
-    result$n_add <- result$n_add - 1
     removeUI(selector = paste0('#', inserted[length(inserted)]))
     inserted <<- inserted[-length(inserted)]
     observe_output_param()
+    result$n_add <- result$n_add - 1
     if (result$n_add < 1) {
       disable("removeBtn")
     }
+  })
+
+  # clear all items
+  observeEvent(input$clearselection, {
+    result$n_add <- 0
+    result$n <- 0
+    inserted <<- "insert_fields"
+    output$summary_levels_reports_ui <- renderUI({
+      dynamicUI_btns(tag = input$sintag, result$n)
+    })
+
   })
 
   # > Output Params Review -----------------------------------------------------
@@ -492,15 +510,7 @@ def_out_config <- function(input,
         bs_embed_tooltip(
           title = defineSingleAna$download_out_params_review_tbl,
           placement = "right"
-        ),
-      hidden(
-        actionButton(
-          inputId = ns("clearselection"),
-          label = "Clear",
-          style = "float:right;"
-        ) %>%
-          bs_embed_tooltip(title = defineSingleAna$clearselection, placement = "right")
-      )
+        )
     )
   ))
 
@@ -591,6 +601,8 @@ def_out_config <- function(input,
       } else {
         disable("clearselection")
       }
+    } else {
+      hide("clearselection")
     }
   })
 
@@ -618,17 +630,6 @@ def_out_config <- function(input,
       )
     }
   )
-
-  observeEvent(input$clearselection, {
-    result$n_add <- 0
-    result$n <- 0
-    inserted <<- 0
-
-    output$summary_levels_reports_ui <- renderUI({
-        dynamicUI_btns(tag = input$sintag, result$n)
-    })
-
-  })
 
   # Run analysis ---------------------------------------------------------------
   # Execute analysis
