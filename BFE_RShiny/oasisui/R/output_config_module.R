@@ -159,10 +159,8 @@ panelOutputParamsDetails <- function(id) {
       heading = h4("Output Parameters Details"),
       uiOutput(ns("perspective_ui")),
       # checkboxses for all perspectives; available for all tags
-      # hidden(div(id = ns("div_summary_levels_reports_ui"),
       uiOutput(ns("summary_levels_reports_ui")),
       # combinations of summary levels and reports.
-      # ),
       uiOutput(ns("out_params_review_ui")) # review of output configuration in long format. As a collapsible panel. Available for all tags
     )
   )
@@ -246,9 +244,6 @@ def_out_config <- function(input,
 
   # hide panel
   onclick("abuttonhidepanelconfigureoutput", {
-    # hide("panelDefineOutputs")
-    # .defaultview()
-    # result$ana_flag <- "C"
     hide("panel_anaoutput")
   })
 
@@ -448,11 +443,7 @@ def_out_config <- function(input,
       if (all(is.na(oed_field))) {
         logMessage("No list of summary levels provided")
       } else {
-        if (input$sintag == default_tags[2]) {
-          dynamicUI_btns(tag = 2, result$n)
-        } else if (input$sintag == default_tags[3]) {
-          dynamicUI_btns(tag = 3, result$n)
-        }
+          dynamicUI_btns(tag = input$sintag, result$n)
       }
     })
   })
@@ -463,19 +454,13 @@ def_out_config <- function(input,
     id = "insert_fields"
     logMessage(paste0("insert ui because ", "addBtn", " changed to ",  result$n_add))
     inserted <<- c(id, inserted)
-    if (input$sintag == default_tags[3]) {
-      add_UI(result$n_add, id, 3)
+    add_UI(result$n_add, id, input$sintag)
       #Max number of fields limited to 9
       if (result$n_add >= max_n) {
         disable("addBtn")
-      }
-    } else if (input$sintag == default_tags[2]) {
-      add_UI(result$n_add, id, 2)
-      #Max number of fields limited to 8 because "All Risks" is there by default
-      if (result$n_add >= (max_n - 1)) {
+      } else if (result$n_add >= (max_n - 1)) {
         disable("addBtn")
       }
-    }
     observe_output_param()
     inserted <<- c(id, inserted)
     enable("removeBtn")
@@ -640,12 +625,7 @@ def_out_config <- function(input,
     inserted <<- 0
 
     output$summary_levels_reports_ui <- renderUI({
-      if (input$sintag == default_tags[3]) {
-        dynamicUI_btns(tag = 3, result$n)
-      } else if (input$sintag == default_tags[2]) {
-        dynamicUI_btns(tag = 2, result$n)
-      }
-
+        dynamicUI_btns(tag = input$sintag, result$n)
     })
 
   })
@@ -691,7 +671,7 @@ def_out_config <- function(input,
     oed_field <-
       session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
 
-    if (tag == 3) {
+    if (tag == default_tags[3]) {
       fluidRow(column(
         5,
         selectInput(
@@ -711,7 +691,7 @@ def_out_config <- function(input,
           multiple = TRUE
         )
       ))
-    } else if (tag == 2) {
+    } else if (tag == default_tags[2]) {
       fluidRow(column(
         5,
         selectInput(
@@ -726,27 +706,29 @@ def_out_config <- function(input,
 
   # add "+" and "X" buttons to dynamic UI
   dynamicUI_btns <- function(tag, n) {
-    tagList(fluidRow(
-      column(
-        1,
-        br(),
-        actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
-          bs_embed_tooltip(title = defineSingleAna$addBtn, placement = "right")
+    if(tag == default_tags[2] || tag == default_tags[3]) {
+      tagList(fluidRow(
+        column(
+          1,
+          br(),
+          actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
+            bs_embed_tooltip(title = defineSingleAna$addBtn, placement = "right")
+        ),
+        column(2,
+               br(),
+               disabled(
+                 actionButton(
+                   ns("removeBtn"),
+                   label = "",
+                   icon = icon("times")
+                 ) %>%
+                   bs_embed_tooltip(title = defineSingleAna$removeBtn, placement = "right")
+               )),
+        column(8,
+               dynamicUI(tag, n))
       ),
-      column(2,
-             br(),
-             disabled(
-               actionButton(
-                 ns("removeBtn"),
-                 label = "",
-                 icon = icon("times")
-               ) %>%
-                 bs_embed_tooltip(title = defineSingleAna$removeBtn, placement = "right")
-             )),
-      column(8,
-             dynamicUI(tag, n))
-    ),
-    tags$div(id = 'placeholder'))
+      tags$div(id = 'placeholder'))
+    }
   }
 
   # Add additional fields to the UI
@@ -776,9 +758,7 @@ def_out_config <- function(input,
       rep(sum_rep_grid, times = length(3))
     ))
 
-    # logMessage(paste0("result$out_params_review was ", result$out_params_review))
     result$out_params_review <- reports_summary_levels
-    # logMessage(paste0("result$out_params_review now is ", result$out_params_review))
   }
 
   # Helper Functions -----------------------------------------------------------

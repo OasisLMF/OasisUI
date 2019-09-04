@@ -78,7 +78,7 @@ panelAnalysisTable <- function(id) {
 #'
 #' @template params-module-ui
 #'
-#' @importFrom DT DTOutput
+#' @importFrom shinyjs hidden
 #'
 #' @export
 panelAnalysisLogs <- function(id) {
@@ -91,8 +91,10 @@ panelAnalysisLogs <- function(id) {
       uiOutput(ns("paneltitle_AnaLogs"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-    DTOutput(ns("dt_analysesrunlog")),
-    downloadButton(ns("download_log"), label = "Download")
+      div(class = "panel", style = 'overflow-y: scroll; max-height: 200px; min-height: 30px;',
+          textOutput(ns("text_analysesrunlog"))
+    ),
+    hidden(downloadButton(ns("download_log"), label = "Download"))
   )
 }
 #
@@ -912,8 +914,8 @@ step3_configureOutput <- function(input, output, session,
     }
   )
 
-  observeEvent(result$tbl_analysisrunlog, {
-    if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 1) {
+  observeEvent(result$tbl_analysisrunlog, ignoreNULL = FALSE, {
+    if (!is.null(result$tbl_analysisrunlog)) {
       show("download_log")
     } else {
       hide("download_log")
@@ -921,21 +923,13 @@ step3_configureOutput <- function(input, output, session,
   })
 
   ### Log Table
-  output$dt_analysesrunlog <- renderDT({
+  output$text_analysesrunlog <- renderText({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
-      if (!is.null(result$tbl_analysisrunlog) && nrow(result$tbl_analysisrunlog) > 1) {
-        datatable(
-          result$tbl_analysisrunlog %>% capitalize_names_df(),
-          class = "oasisui-table display",
-          rownames = TRUE,
-          selection = "none",
-          escape = FALSE,
-          filter = 'bottom',
-          options = getTableOptions(maxrowsperpage = pageLength)
-        )
-      } else {
-        nothingToShowTable(paste0("No log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL")))
+      if (!is.null(result$tbl_analysisrunlog)){
+        result$tbl_analysisrunlog
+      } else{
+        paste0("No log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL"))
       }
     }
   })
@@ -969,6 +963,7 @@ step3_configureOutput <- function(input, output, session,
       hide("panelAnalysisLogs")
       if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+        .reloadAnaRunLog()
         logMessage(paste0("analysisId changed to ", result$anaID))
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
           show("panelAnalysisLogs")
@@ -1027,7 +1022,7 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
     if (!is.null(result$anaID)) {
-      session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run_traceback_file", sep = "/"))
+      result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run_traceback_file", sep = "/"))
     } else {
       result$tbl_analysisrunlog <-  NULL
     }

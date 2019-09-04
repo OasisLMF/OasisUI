@@ -217,8 +217,6 @@ DataHub <- R6Class(
             as.data.frame() %>%
             setNames("files")
           analysis_settings <- self$get_ana_settings_content(id)
-          # oed_field <- get_ana_oed_summary_levels(id)
-          # oed_field$description
           data_list <- cbind(data_list,
                              do.call(rbind.data.frame,
                                      lapply(data_list$files,
@@ -674,8 +672,6 @@ DataHub <- R6Class(
 # Helper functions -----
 # Add description fields to output files
 .addDescription <- function(x, analysis_settings) {
-  # TODO: check and update (given granularities are now replaced by OED field summary levels)
-# in 147: method to retrieve summary lavels, look at it to see if description of summary levels is there
   x <- as.character(x)
   x <- strsplit(x, split = "[.]")[[1]][1]
   y <- unlist(strsplit(x, split = "_"))
