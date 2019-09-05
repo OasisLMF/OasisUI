@@ -251,7 +251,7 @@ def_out_config <- function(input,
   # Panel infos ----------------------------------------------------------------
 
   # hide panel
-  onclick("abuttonhidepanelconfigureoutput", {
+  observeEvent(input$abuttonhidepanelconfigureoutput, {
     hide("panel_anaoutput")
   })
 
@@ -396,8 +396,6 @@ def_out_config <- function(input,
         #Set inputs
         .updateOutputConfig(analysis_settings)
       }
-      # Set view back to Summary
-      default_tags[1]
     }
   })
 
@@ -442,8 +440,6 @@ def_out_config <- function(input,
     }
 
     # reset counter
-    logMessage(paste0("resetting result$n from ", result$n, " to 0"))
-    result$n <- 0
     output$summary_levels_reports_ui <- renderUI({
       oed_field <-
         session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
@@ -460,8 +456,7 @@ def_out_config <- function(input,
   observeEvent(input$addBtn, {
     result$n_add <- result$n_add + 1
     id = "insert_fields"
-    logMessage(paste0("insert ui because ", "addBtn", " changed to ",  result$n_add))
-    # inserted <<- c(id, inserted)
+    logMessage(paste0("insert ui because addBtn changed to ",  result$n_add))
     add_UI(result$n_add, id, input$sintag)
     #Max number of fields limited to 9
     if (result$n_add >= max_n) {
@@ -478,8 +473,8 @@ def_out_config <- function(input,
     enable("addBtn")
     removeUI(selector = paste0('#', inserted[length(inserted)]))
     inserted <<- inserted[-length(inserted)]
-    observe_output_param()
     result$n_add <- result$n_add - 1
+    observe_output_param()
     if (result$n_add < 1) {
       disable("removeBtn")
     }
@@ -488,12 +483,10 @@ def_out_config <- function(input,
   # clear all items
   observeEvent(input$clearselection, {
     result$n_add <- 0
-    result$n <- 0
-    inserted <<- "insert_fields"
+    removeUI(selector = paste0('#', inserted[length(inserted)]))
     output$summary_levels_reports_ui <- renderUI({
       dynamicUI_btns(tag = input$sintag, result$n)
     })
-
   })
 
   # > Output Params Review -----------------------------------------------------
@@ -555,6 +548,7 @@ def_out_config <- function(input,
   }
 
   observeEvent(result$out_params_review, {
+    print(result$out_params_review)
     if (nrow(result$out_params_review) == 0) {
       disable("abuttonexecuteanarun")
     } else {
@@ -564,15 +558,20 @@ def_out_config <- function(input,
 
   sinsummarylevels_react_all <-
     reactive({
-      lapply(seq(0, max_n), function(x) {
-        input[[paste0("sinsummarylevels", x)]]
-      })
+      unlist(
+        lapply(seq(0, result$n_add), function(x) {
+          input[[paste0("sinsummarylevels", x)]]
+        })
+      )
     })
+
   sinreports_react_all <-
     reactive({
-      lapply(seq(0, max_n), function(x) {
-        input[[paste0("sinreports", x)]]
-      })
+      unlist(
+        lapply(seq(0, result$n_add), function(x) {
+          input[[paste0("sinreports", x)]]
+        })
+      )
     })
 
   observeEvent({
@@ -586,17 +585,9 @@ def_out_config <- function(input,
       observe_output_param()
     }
 
-    unlist_summary <- unlist(lapply(seq(0, result$n_add), function(x) {
-      input[[paste0("sinsummarylevels", x)]]
-    }))
-
-    unlist_reports <- unlist(lapply(seq(0, result$n_add), function(x) {
-      input[[paste0("sinsummarylevels", x)]]
-    }))
-
     if(input$sintag == default_tags[2] || input$sintag == default_tags[3]) {
       show("clearselection")
-      if(any(!is.null(unlist_summary)) && !is.null(any(unlist_reports))) {
+      if(any(!is.null(sinsummarylevels_react_all())) && !is.null(any(sinreports_react_all()))) {
         enable("clearselection")
       } else {
         disable("clearselection")
@@ -634,7 +625,7 @@ def_out_config <- function(input,
   # Run analysis ---------------------------------------------------------------
   # Execute analysis
 
-  onclick("abuttonexecuteanarun", {
+  observeEvent(input$abuttonexecuteanarun, {
     analysis_settingsList <- .gen_analysis_settings()
     #write out file to be uploades
     currfolder <- session$userData$data_hub$get_user_destdir()
@@ -656,12 +647,12 @@ def_out_config <- function(input,
   })
 
   # show advanced view
-  onclick("abuttonadvanced", {
+  observeEvent(input$abuttonadvanced, {
     .advancedview()
   })
 
   # show basic view
-  onclick("abuttonbasic", {
+  observeEvent(input$abuttonbasic, {
     .basicview()
   })
 
@@ -669,9 +660,7 @@ def_out_config <- function(input,
 
   # Summary Level and Reports fields
   dynamicUI <- function(tag, n) {
-    oed_field <-
-      session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
-
+    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
     if (tag == default_tags[3]) {
       fluidRow(column(
         5,
@@ -950,13 +939,6 @@ def_out_config <- function(input,
         }) %>%
         setNames(names(model_settings))
 
-      # lookup_settings <-  tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE)
-      # names_settings_type <-
-      #   lapply(names(lookup_settings), function(i) {
-      #     lookup_settings[[i]][["type"]]
-      #   }) %>%
-      #   setNames(names(lookup_settings))
-
       if (length(names(model_settings)) > 0) {
         # Basic model params
         fixed_settings <- c("event_set", "event_occurrence_id")
@@ -993,7 +975,6 @@ def_out_config <- function(input,
         output$basic_model_param <- renderUI(ui_basic_model_param)
 
         # Perils Settings
-        # model_perils <- lookup_settings$PerilCodes$values
         model_perils <- names(model_settings)[grepl("peril_", names(model_settings))]
         if (length(model_perils) > 0) {
           ui_perils <- lapply(seq(1, length(model_perils)), function(p) {
@@ -1045,36 +1026,16 @@ def_out_config <- function(input,
   # Output view
   .advancedview <- function() {
     logMessage(".advancedview called")
-    show("panel_configureAdvancedGUL")
-    show("panel_configureAdvancedIL")
-    show("panel_configureAdvancedRI")
     show("configureAnaParamsAdvanced")
     show("abuttonbasic")
     hide("abuttonadvanced")
-    show("abuttonclroutopt")
   }
 
   .basicview <- function() {
     logMessage(".basicview called")
-    hide("panel_configureAdvancedGUL")
-    hide("panel_configureAdvancedIL")
-    hide("panel_configureAdvancedRI")
     hide("configureAnaParamsAdvanced")
     hide("abuttonbasic")
     show("abuttonadvanced")
-    hide("abuttonclroutopt")
-  }
-
-  .defaultview <- function() {
-    logMessage(".defaultview called")
-    updateCheckboxInput(session, "chkinputGUL", value = TRUE)
-    .defaultchkboxGULgrp()
-    updateCheckboxInput(session, "chkinputIL", value = FALSE)
-    .clearchkboxgrp(checkilgrplist)
-    updateCheckboxInput(session, "chkinputRI", value = FALSE)
-    .clearchkboxgrp(checkrigrplist)
-    .clearotherparams()
-    .basicview()
   }
 
   # Module Outout --------------------------------------------------------------

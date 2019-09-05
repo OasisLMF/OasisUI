@@ -1,23 +1,5 @@
 # Output configuration options -------------------------------------------------
 
-# #' LosstypesChoices
-# #' @description List of variables per granularity.
-# #' @format Named \code{list} of Losstypes choices. Names being an empty space.
-# #' @export
-# LosstypesChoices <- list(
-#   " " = "Summary",
-#   " " = "ELT",
-#   " " = "FullUncAEP",
-#   " " = "FullUncOEP",
-#   " " = "AEPWheatsheaf",
-#   " " = "OEPWheatsheaf",
-#   # " " = "MeanAEPWheatsheaf",
-#   # " " = "MeanOEPWheatsheaf",
-#   # " " = "SampleMeanAEP",
-#   # " " = "gSampleMeanOEP",
-#   " " = "AAL",
-#   " " = "PLT")
-
 #' output_options
 #' @description List of losstypes and variables allowed.
 #' @format Named \code{list} of output options.
@@ -45,17 +27,6 @@ varsdf <- data.frame(
   lec_output = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE),
   stringsAsFactors = FALSE
 )
-
-# #' granToOed
-# #' @description Data frame of variables, with respective oed field and info from analysis_settings.json.
-# #' @format \code{data.frame} of granularities for output configuration.
-# #' @export
-# granToOed <- data.frame(
-#   oed = c("lob", "location", "county","state", "policy", "prog"),
-#   # gran = output_options$granularities,
-#   outputlosstype = c("lob", "loc", "county","state", "policy", "prog"),
-#   order = c(6,2,3,4,1,5),
-#   stringsAsFactors = FALSE)
 
 #' reportToVar
 #' @description Function to create a named list connecting the file names patterns with the corresponding variables.
