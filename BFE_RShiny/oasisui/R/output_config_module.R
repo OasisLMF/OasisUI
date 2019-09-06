@@ -440,8 +440,7 @@ def_out_config <- function(input,
 
     # reset counter
     output$summary_levels_reports_ui <- renderUI({
-      oed_field <-
-        session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+      oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
       # if oed fields are provided, a vector is returned, otherwise NA
       if (all(is.na(oed_field))) {
         logMessage("No list of summary levels provided")
@@ -457,10 +456,11 @@ def_out_config <- function(input,
     id <- length(inserted$val) + 1
     logMessage(paste0("insert ui because addBtn changed to ",  result$n_add))
     add_UI(result$n_add, id, input$sintag)
-    # Max number of fields limited to 9
+    # Max number of fields limited to 9 (current limitation by the back-end)
     if (result$n_add >= max_n) {
       disable("addBtn")
     } else if (input$sintag == default_tags[2] && result$n_add >= (max_n - 1)) {
+      # drill-down allows one slot less, since one is already pre-occupied by the default "All Risks"
       disable("addBtn")
     }
     inserted$val <- c(inserted$val, id)
@@ -470,9 +470,10 @@ def_out_config <- function(input,
   # remove summary levels and reports
   observeEvent(input$removeBtn, {
     result$n_add <- result$n_add - 1
-    if (input$sintag == default_tags[3] && result$n_add < max_n) {
+    if (result$n_add < (max_n - 1)) {
       enable("addBtn")
-    } else if (input$sintag == default_tags[2] && result$n_add < (max_n - 1)) {
+    } else if (input$sintag == default_tags[3] && result$n_add < max_n) {
+      # custom allows one more since no slot is pre-occupied by a default
       enable("addBtn")
     }
     removeUI(selector = paste0('#', inserted$val[length(inserted$val)]))
@@ -657,7 +658,7 @@ def_out_config <- function(input,
     }
   }
 
-  # add "+" and "X" buttons to dynamic UI
+  # add "+" and "x" buttons to dynamic UI
   dynamicUI_btns <- function(tag, n) {
     if(tag == default_tags[2] || tag == default_tags[3]) {
       tagList(fluidRow(
