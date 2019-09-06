@@ -463,8 +463,8 @@ step1_choosePortfolio <- function(input, output, session,
     showModal(.pfdelmodal())
   })
 
-  # onfirm delete button
-  observeEvent(input$abuttonuconfirmdel,{
+  # Confirm delete button
+  observeEvent(input$abuttonuconfirmdel, {
     hide("panelPortfolioDetails")
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
@@ -482,14 +482,14 @@ step1_choosePortfolio <- function(input, output, session,
     removeModal()
   })
 
-  # cancel delete button
+  # Cancel delete button
   observeEvent(input$abuttoncanceldel, {
     removeModal()
   })
 
   # Link files to portfolio ----------------------------------------------------
 
-  #Show panel
+  # Show panel
   observeEvent(input$abuttonuploadsourcefiles, {
     .clearUploadFiles()
     hide("panelPortfolioDetails")
@@ -497,7 +497,7 @@ step1_choosePortfolio <- function(input, output, session,
     show("panelLinkFiles")
   })
 
-  #Clear panel
+  # Clear panel
   observeEvent(input$abuttonpfclear, ignoreInit = TRUE, {
     .clearUploadFiles()
     result$SLFile <- NULL
@@ -516,16 +516,15 @@ step1_choosePortfolio <- function(input, output, session,
     } else {
       paste0('Amend input files to portfolio id ', pfId, ' ', pfName)
     }
-
   })
 
-  # Hide Link files Panel
+  # Hide link files panel
   observeEvent(input$abuttonhidelinkfilespanel, {
     hide("panelLinkFiles")
   })
 
   # Upload Location/Account File
-  .uploadSourceFile <- function(inFile, query_path ){
+  .uploadSourceFile <- function(inFile, query_path ) {
     logMessage(paste0("Uploading file ", inFile$datapath))
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     if (!is.null(inFile$datapath)) {
@@ -704,8 +703,7 @@ step1_choosePortfolio <- function(input, output, session,
                     value = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name])
   }
 
-  # Model Outout ---------------------------------------------------------------
-
+  # Module output ---------------------------------------------------------------
   moduleOutput <- c(
     list(
       portfolioID = reactive(result$portfolioID),
@@ -715,5 +713,4 @@ step1_choosePortfolio <- function(input, output, session,
   )
 
   moduleOutput
-
 }

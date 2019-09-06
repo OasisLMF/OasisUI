@@ -206,47 +206,35 @@ exposurevalidationmap <- function(input,
 
   # Utils functions ------------------------------------------------------------
 
-  #dummy for exposure location comparison
-  .reloadExposureValidation <- function(){
-
+  # dummy for exposure location comparison
+  .reloadExposureValidation <- function() {
     logMessage(".reloadExposureValidation called")
-
     uploaded_locs_check <- check_loc(analysisID(), portfolioID(), data_hub = session$userData$data_hub)
-
-    #updating reactive only when needed
+    # updating reactive only when needed
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
       result$uploaded_locs_check <- uploaded_locs_check
     }
-
   }
-
 
   # Exposure validation map
   .createExposureValMap <- function(df) {
-
     marker_colors <- c('green', 'red')
 
     df <- df %>%
       mutate(modeled = case_when(
         modeled == "TRUE" ~ 1,
         TRUE ~ 2
-      ))
-
-    # popupData <- tagList(
-    #   strong("Location ID: "), df$LocNumber,
-    #   br(), strong("Latitude: "), df$Latitude,
-    #   br(), strong("Longitude: "), df$Longitude)
-
-    df <- build_marker_data(df)
+      )) %>%
+      build_marker_data()
 
     icon_map <- awesomeIcons(
       icon = 'map-marker-alt',
       library = 'fa',
       iconColor = marker_colors[df$modeled],
-      markerColor =  marker_colors[df$modeled]
+      markerColor = marker_colors[df$modeled]
     )
 
-    # color clusters red if any mark is red, and green in fall marks are green.
+    # color clusters red if any mark is red, and green if all marks are green.
     # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
     leaflet(df) %>%
       addTiles() %>%
