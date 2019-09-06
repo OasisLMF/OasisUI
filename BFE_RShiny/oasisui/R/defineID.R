@@ -31,7 +31,7 @@ defineIDUI <- function(id, w, batch = FALSE){
                                background-image: none;
                                border: none;
                                 ") %>%
-           bs_embed_tooltip(title = dashboard$selectAnaID, placement = "right"),
+           bs_embed_tooltip(title = dashboard_tooltips$selectAnaID, placement = "right"),
          div(textOutput(ns("selectAnaInfo1"), inline = TRUE),
              style = "font-weight:bold; font-color: #2d2d2d;
                         display:inline;
@@ -141,7 +141,7 @@ defineID <- function(input, output, session,
     footer = tagList(
       oasisuiButton(ns("abuttonselectAna"),
                      label = "Select Analysis", align = "left") %>%
-        bs_embed_tooltip(title = dashboard$abuttonselectAna, placement = "right"),
+        bs_embed_tooltip(title = dashboard_tooltips$abuttonselectAna, placement = "right"),
       actionButton(ns("abuttoncancel"),
                    label = "Cancel", align = "right")
     )

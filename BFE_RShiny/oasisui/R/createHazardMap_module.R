@@ -1,18 +1,32 @@
 # Create Hazard Map module -----------------------------------------------------------
 
+# Shared Module documentation --------------------------------------------------
+#' Hazard Map Module
+#'
+#' Shiny Module for rendering a hazard map using Leaflet.
+#'
+#' @template params-module
+#'
+#' @examples # TODO
+#'
+#' @name createHazardMap
+NULL
+
 # UI ---------------------------------------------------------------------------
-#' createHazardMap
+#' @describeIn createHazardMap Returns the UI elements of the module.
 #'
-#' @rdname createHazardMap
-#'
-#' @description Creates a hazard map using leaflet.
+#' @importFrom shinycssloaders withSpinner
 #'
 #' @export
 createHazardMapUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    leafletOutput(ns("hazardmap"))
+    withSpinner(
+      leafletOutput(ns("hazardmap")),
+      # style and color can be set as options used by all spinners
+      color = "#bb252c"
+    )
     # fluidRow(
     #   sliderInput(ns("contrast_colors"), "Adjust color contrast", min = 0.1, max = 1, value = 0.5)
     # )
@@ -20,17 +34,12 @@ createHazardMapUI <- function(id) {
 }
 
 # Server -----------------------------------------------------------------------
-#' Create Hazard Map
+#' @param map_data Reactive expression yielding Leaflet map data.
+#' @param pins Reactive expression yielding location pins as a \code{data.frame}
+#'   with variables \code{locnumber}, \code{longitude}, \code{latitude}
+#'   (case-insensitive).
 #'
-#' @rdname createHazardMap
-#'
-#' @description Creates a hazard map using leaflet.
-#'
-#' @template params-module
-#' @param file_map File to plot as map.
-#' @param file_pins File to plot pins.
-#'
-#' @return Leaflet map.
+#' @describeIn createHazardMap Defines the server logic of the module.
 #'
 #' @importFrom geojsonio geojson_read
 #' @importFrom leaflet leaflet
@@ -43,18 +52,26 @@ createHazardMapUI <- function(id) {
 #'
 #' @export
 createHazardMap <- function(input, output, session,
-                            file_map,
-                            file_pins) {
+                            map_data,
+                            pins) {
 
-  ns <- session$ns
+  marker_data <- reactive({
+    build_marker_data(pins())
+  })
 
   # Plot leaflet
   output$hazardmap <- renderLeaflet({
-    .buildHazardMap(file_map, file_pins)
+    # prevent rendering when map_data is unavailable ("falsy"), we would see an
+    # error otherwise (if we would not have the spinner).
+    req(map_data())
+    logMessage("building the hazard map...")
+    map <- .buildHazardMap(map_data(), marker_data())
+    logMessage("hazard map built")
+    map
   })
 
   # Create map
-  .buildHazardMap <- function(file_map, file_pins) {
+  .buildHazardMap <- function(map_data, marker_data) {
 
     # Create map color palette
     pal <- colorNumeric("Reds", NULL)
@@ -63,35 +80,25 @@ createHazardMap <- function(input, output, session,
     icon_map <- awesomeIcons(
       icon = 'map-marker-alt',
       library = 'fa',
-      iconColor ='green',
-      markerColor =  'blue'
+      iconColor = 'green',
+      markerColor = 'blue'
     )
 
-    names(file_pins) <- tolower(names(file_pins))
-
-    popupData <- tagList(
-      strong("Location ID: "), file_pins$locnumber,
-      br(), strong("Latitude: "), file_pins$latitude,
-      br(), strong("Longitude: "), file_pins$longitude)
-
-    withModalSpinner(
-      hazardmap <- leaflet(file_map) %>%
-        addTiles() %>%
-        addPolygons(color = "transparent",
-                    fillColor = ~pal(file_map$ReturnLevel),
-                    fillOpacity = 1) %>%
-        addLegend(position = "topright",
-                  pal = pal,
-                  values = file_map$ReturnLevel) %>%
-        addAwesomeMarkers(lng = file_pins$longitude,
-                          lat = file_pins$latitude,
-                          icon = icon_map,
-                          clusterOptions = TRUE,
-                          popup = popupData),
-      "Rendering map...",
-      size = "s"
-    )
-
-    return(hazardmap)
+    hazardmap <- leaflet(map_data) %>%
+      addTiles() %>%
+      addPolygons(color = ~pal(ReturnLevel),
+                  fillColor = ~pal(ReturnLevel),
+                  opacity = 0.8,
+                  fillOpacity = 0.5) %>%
+      addLegend(position = "topright",
+                pal = pal,
+                values = ~ReturnLevel) %>%
+      addAwesomeMarkers(lng = marker_data$longitude,
+                        lat = marker_data$latitude,
+                        icon = icon_map,
+                        popup = marker_data$popup,
+                        clusterOptions = TRUE)
+    hazardmap
   }
+
 }

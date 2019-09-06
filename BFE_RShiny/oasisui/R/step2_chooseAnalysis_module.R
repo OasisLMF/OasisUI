@@ -53,18 +53,18 @@ panelCreateAnalysesTable <- function(id) {
     fluidRow(
       column(12,
              oasisuiTableButton(inputId = ns("abuttonstartcancIG"), label = "Generate Inputs") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonstartcancIG, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonstartcancIG, placement = "right"),
              oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowlog, placement = "right"),
              oasisuiTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonshowanadetails, placement = "right")
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowanadetails, placement = "right")
       )
     ),
     br(),
     fluidRow(
       column(12,
              oasisuiButton(inputId = ns("abuttoncreateana"), label = "Create Analysis") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttoncreateana, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttoncreateana, placement = "right"),
              actionButton(ns("abuttonpgotonextstep"), "Proceed to Configure Output & Run", style = "float:right")
       ),
       style = "margin-top: 10px;"
@@ -154,7 +154,7 @@ panelModelTable <- function(id) {
     fluidRow(
       column(4,
              oasisuiButton(ns("abuttonmodeldetails"), "Show Model Details", style = "float:left") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonmodeldetails, placement = "right")),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonmodeldetails, placement = "right")),
       column(6,
              br(),
              div(textInput(inputId = ns("anaName"), label = "Analysis Name"), style = "float:right;")),
@@ -188,7 +188,6 @@ panelModelTable <- function(id) {
 #'
 #' @importFrom shinyjs show
 #' @importFrom shinyjs hide
-#' @importFrom shinyjs onclick
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
 #' @importFrom DT renderDT
@@ -314,7 +313,7 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   # Generate input -------------------------------------------------------------
-  onclick("abuttonstartcancIG", {
+  observeEvent(input$abuttonstartcancIG, {
     if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == Status_details$input_gen_started) {
       showModal(.cancelIGModal())
     } else {
@@ -354,7 +353,7 @@ step2_chooseAnalysis <- function(input, output, session,
                 footer = tagList(
                   oasisuiButton(ns("abuttonConfirmDelIG"),
                                  label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = defineSingleAna$abuttonConfirmDelIG, placement = "right"),
+                    bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonConfirmDelIG, placement = "right"),
                   actionButton(ns("btnCancelIGDel"),
                                label = "Go back", align = "right")
                 ),
@@ -427,12 +426,12 @@ step2_chooseAnalysis <- function(input, output, session,
     counter = reactive({result$exposure_counter})
   )
 
-  onclick("buttonhideanadetails", {
+  observeEvent(input$buttonhideanadetails, {
     hide("panelAnalysisDetails")
   })
 
   # Analysis Logs --------------------------------------------------------------
-  onclick("abuttonshowlog", {
+  observeEvent(input$abuttonshowlog, {
     hide("panelAnalysisDetails")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
@@ -443,7 +442,7 @@ step2_chooseAnalysis <- function(input, output, session,
     .reloadAnaLog()
   })
 
-  onclick("buttonhideanalog", {
+  observeEvent(input$buttonhideanalog, {
     hide("panelAnalysisLog")
   })
 
@@ -507,7 +506,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Model Table ----------------------------------------------------------------
 
-  onclick("abuttoncreateana", {
+  observeEvent(input$abuttoncreateana, {
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
@@ -518,7 +517,7 @@ step2_chooseAnalysis <- function(input, output, session,
     .clearinputanaName()
   })
 
-  onclick("buttonhidemodel", {
+  observeEvent(input$buttonhidemodel, {
     hide("panelModelTable")
   })
 
@@ -553,7 +552,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Model Details Table --------------------------------------------------------
 
   # Show/hide Model Details Panel
-  onclick("abuttonmodeldetails", {
+  observeEvent(input$abuttonmodeldetails, {
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
@@ -578,7 +577,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Create new Analysis --------------------------------------------------------
 
-  onclick("abuttonsubmit", {
+  observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
       post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"), query_body = list(name = input$anaName, model = result$modelID), query_method = "POST")
       logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", portfolioID(),
@@ -661,15 +660,15 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   # Refresh Buttons ------------------------------------------------------------
-  onclick("abuttonanarefresh", {
+  observeEvent(input$abuttonanarefresh, {
     .reloadAnaData()
   })
 
-  onclick("abuttonanalogrefresh", {
+  observeEvent(input$abuttonanalogrefresh, {
     .reloadAnaLog()
   })
 
-  onclick("abuttonmodelrefresh", {
+  observeEvent(input$abuttonmodelrefresh, {
     .reloadtbl_modelsData()
   })
 

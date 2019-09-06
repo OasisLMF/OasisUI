@@ -92,7 +92,7 @@ portfolio_details <- function(input,
   })
 
   # reload Uploaded Inputs table-----------------------------------------------
-  onclick("abuttonuploadedrefresh", {
+  observeEvent(input$abuttonuploadedrefresh, {
     withModalSpinner(
       .reloadtbl_portfolioDetails(),
       "Refreshing...",

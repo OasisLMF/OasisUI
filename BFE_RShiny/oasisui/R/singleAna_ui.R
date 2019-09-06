@@ -12,9 +12,9 @@
 #'
 #' @export
 singleAnaUI <- function(id) {
-  
+
   ns <- NS(id)
-  
+
   tagList(
     singleAnaWorkflowStepsUI(ns("workflowsteps")),
     hidden(div(id = ns("panelDefineIDs"), panelDefineIDs(id))),
@@ -42,7 +42,7 @@ singleAnaUI <- function(id) {
 #' @export
 panelDefineIDs <- function(id) {
   ns <- NS(id)
-  
+
   panel(
     status = "primary",
     fluidRow(
@@ -57,7 +57,7 @@ panelDefineIDs <- function(id) {
                                       placeholder = 'Select',
                                       onInitialize = I('function() { this.setValue(""); }'))
                      )  %>%
-                       bs_embed_tooltip(title = defineSingleAna$portfolioID,
+                       bs_embed_tooltip(title = defineSingleAna_tooltips$portfolioID,
                                         placement = "right")
                  )
           )

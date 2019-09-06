@@ -24,9 +24,9 @@ pageheaderUI <- function(id) {
 
                        oasisuiButton(ns("abuttonlogout"),
                                       label = "Logout", align = "center", width = "100%")  %>%
-                         bs_embed_tooltip(title = landing_page$abuttonlogout, placement = "right")
+                         bs_embed_tooltip(title = landing_page_tooltips$abuttonlogout, placement = "right")
         ) %>%
-          bs_embed_tooltip(title = landing_page$accountDD, placement = "right")
+          bs_embed_tooltip(title = landing_page_tooltips$accountDD, placement = "right")
     )
   )
 }

@@ -51,18 +51,18 @@ panelAnalysisTable <- function(id) {
         fluidRow(column(12,
                         div(id = ns("divAnalysisButtons"),
                             oasisuiTableButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
-                              bs_embed_tooltip(title = defineSingleAna$abuttoncancelana, placement = "right"),
+                              bs_embed_tooltip(title = defineSingleAna_tooltips$abuttoncancelana, placement = "right"),
                             oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
-                              bs_embed_tooltip(title = defineSingleAna$abuttonshowlog, placement = "right")
+                              bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowlog, placement = "right")
                         ))
         ),
         br(),
         fluidRow(column(12,
                         oasisuiButton(inputId = ns("abuttonrunconfig"), label = "New Output Configuration") %>%
-                          bs_embed_tooltip(title = defineSingleAna$abuttonrunconfig, placement = "right"),
+                          bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonrunconfig, placement = "right"),
                         div(
                           actionButton(inputId = ns("abuttondisplayoutput"), label = "Proceed to Dashboard") %>%
-                            bs_embed_tooltip(title = defineSingleAna$abuttondisplayoutput, placement = "right"),
+                            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttondisplayoutput, placement = "right"),
                           style = "inline: true;float: right;")
         ))
     )
@@ -127,7 +127,7 @@ panelDefineOutputs <- function(id) {
     fluidRow(
       column(12,
              oasisuiButton(inputId = ns("abuttonexecuteanarun"), label = "Execute Run"), align = "right")) %>%
-      bs_embed_tooltip(title = defineSingleAna$abuttonexecuteanarun, placement = "right")
+      bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonexecuteanarun, placement = "right")
   )
 }
 
@@ -412,7 +412,6 @@ panel_configureAdvancedRI <- function(id) {
 #' @importFrom DT dataTableProxy
 #' @importFrom DT selectRows
 #' @importFrom DT selectPage
-#' @importFrom shinyjs onclick
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs show
@@ -581,7 +580,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Delete analysis button -----------------------------------------------------
-  onclick("abuttoncancelana", {
+  observeEvent(input$abuttoncancelana, {
     showModal(.cancelAnaModal())
   })
 
@@ -620,7 +619,7 @@ step3_configureOutput <- function(input, output, session,
 
   # Configure Output -----------------------------------------------------------
   # hide panel
-  onclick("abuttonhidepanelconfigureoutput", {
+  observeEvent(input$abuttonhidepanelconfigureoutput, {
     hide("panelDefineOutputs")
   })
 
@@ -637,7 +636,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   #Show Output Configuration Panel and Re-run
-  onclick("abuttonrunconfig", {
+  observeEvent(input$abuttonrunconfig, {
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
       if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
         .defaultview()
@@ -667,7 +666,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Hide Output Configuration panel
-  onclick("abuttonehidepanelconfigureoutput", {
+  observeEvent(input$abuttonehidepanelconfigureoutput, {
     hide("panelDefineOutputs")
     result$ana_flag <- "C"
   })
@@ -767,28 +766,28 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Clear the checkbox groups and preset dropdown - Set back to default
-  onclick("abuttonclroutopt", {
+  observeEvent(input$abuttonclroutopt, {
     .defaultview()
   })
 
   # show advanced view
-  onclick("abuttonadvanced", {
+  observeEvent(input$abuttonadvanced, {
     .advancedview()
   })
 
-  onclick("abuttonadvanced_1", {
+  observeEvent(input$abuttonadvanced_1, {
     .advancedview()
   })
 
   # show basic view
-  onclick("abuttonbasic", {
+  observeEvent(input$abuttonbasic, {
     .basicview()
   })
 
   # Run Analyses ---------------------------------------------------------------
 
   # Execute analysis
-  onclick("abuttonexecuteanarun", {
+  observeEvent(input$abuttonexecuteanarun, {
     analysis_settingsList <- .gen_analysis_settings()
     #write out file to be uploades
     currfolder <- session$userData$data_hub$get_user_destdir()
@@ -833,14 +832,14 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Logs -----------------------------------------------------------------------
-  onclick("abuttonshowlog", {
+  observeEvent(input$abuttonshowlog, {
     hide("panelDefineOutputs")
     show("panelAnalysisLogs")
     logMessage("showing analysis run log table")
     .reloadAnaRunLog()
   })
 
-  onclick("abuttonhidelog", {
+  observeEvent(input$abuttonhidelog, {
     hide("panelAnalysisLogs")
   })
 
@@ -885,11 +884,11 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Refresh Buttons ------------------------------------------------------------
-  onclick("abuttonanarefresh", {
+  observeEvent(input$abuttonanarefresh, {
     .reloadAnaData()
   } )
 
-  onclick("abuttonanarefreshlogs", {
+  observeEvent(input$abuttonanarefreshlogs, {
     .reloadAnaRunLog()
   })
 
@@ -977,8 +976,8 @@ step3_configureOutput <- function(input, output, session,
                 paste0("Are you sure that you want to cancel this analysis?"),
                 footer = tagList(
                   oasisuiButton(ns("abuttonConfirmDelAna"),
-                                label = "Confirm", align = "center") %>%
-                    bs_embed_tooltip(title = defineSingleAna$abuttonConfirmDel, placement = "right"),
+                                 label = "Confirm", align = "center") %>%
+                    bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonConfirmDel, placement = "right"),
                   actionButton(ns("btnCancelAnaDel"),
                                label = "Go back", align = "right")
                 ),

@@ -13,7 +13,7 @@
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
-ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
+ViewFilesInTableUI <- function(id, includechkbox = FALSE) {
   ns <- NS(id)
   tagList(
     tags$script("Shiny.addCustomMessageHandler('resetInputValue', function(variableName){
@@ -28,7 +28,7 @@ ViewFilesInTableUI <-  function(id, includechkbox = FALSE){
     DTOutput(ns("dt_outputFL")),
     if (includechkbox) {
       downloadButton(ns("FLdownloadzip"), label = "Export to zip") %>%
-        bs_embed_tooltip(title = file_Viewer$FLdownloadzip, placement = "right")
+        bs_embed_tooltip(title = file_Viewer_tooltips$FLdownloadzip, placement = "right")
     },
     if (!includechkbox) {
       downloadButton(ns("FLdownloadexcel"), label = "Export")
@@ -200,18 +200,20 @@ ViewFilesInTable <- function(input, output, session,
       })
       lapply(setdiff(input$dt_outputFL_rows_current, input$dt_outputFL_rows_selected), function(i) {
         session$sendCustomMessage(type = 'resetcolorWhite', message = session$ns(paste0("srows_", i)))
-        hide(paste0("vrows_", i))})
-    }else {
+        hide(paste0("vrows_", i))
+      })
+    } else {
       disable("FLdownloadzip")
-      lapply(input$dt_outputFL_rows_current, function(i){
+      lapply(input$dt_outputFL_rows_current, function(i) {
         session$sendCustomMessage(type = 'resetcolorWhite', message = session$ns(paste0("srows_", i)))
-        hide(paste0("vrows_", i))})
+        hide(paste0("vrows_", i))
+      })
     }
   })
 
   # Select All Functionality ---------------------------------------------------
 
-  #If page in table is changed, update rows selection based on select all value
+  # If page in table is changed, update rows selection based on select all value
   observeEvent(input$dt_outputFL_rows_current, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
       lapply(input$dt_outputFL_rows_current, function(i){
@@ -229,7 +231,7 @@ ViewFilesInTable <- function(input, output, session,
   observeEvent(input$chkboxselectall, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(result$tbl_filesListData_wButtons)) {
       if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
-        lapply(input$dt_outputFL_rows_current, function(i){
+        lapply(input$dt_outputFL_rows_current, function(i) {
           if (input$chkboxselectall) {
             session$sendCustomMessage(type = 'resetcolorOasis', message = session$ns(paste0("srows_", i)))
           } else {
@@ -238,7 +240,7 @@ ViewFilesInTable <- function(input, output, session,
         })
         selectRows(dataTableProxy("dt_outputFL"), input$dt_outputFL_rows_current)
       } else {
-        lapply(input$dt_outputFL_rows_current, function(i){
+        lapply(input$dt_outputFL_rows_current, function(i) {
           session$sendCustomMessage(type = 'resetcolorWhite', message =  session$ns( paste0("srows_", i)))
         })
         selectRows(dataTableProxy("dt_outputFL"), NULL)
@@ -286,7 +288,7 @@ ViewFilesInTable <- function(input, output, session,
     hide("oasisuiPanelFVExposureSelected")
   })
 
-  onclick("abuttonview", {
+  observeEvent(input$abuttonview, {
     show("oasisuiPanelFVExposureSelected")
   })
 
@@ -339,17 +341,17 @@ ViewFilesInTable <- function(input, output, session,
     hide("oasisuiPanelmapFVExposureSelected")
   })
 
-  onclick("abuttonmap", {
+  observeEvent(input$abuttonmap, {
     show("oasisuiPanelmapFVExposureSelected")
   })
 
-  observeEvent({input[["select_vbutton"]]},{
+  observeEvent({input[["select_vbutton"]]}, {
     splitidx <- strsplit(input[["select_vbutton"]], "_")
     idx <- as.numeric(splitidx[[1]][length(splitidx[[1]])])
     showModal(FileContent)
     session$sendCustomMessage(type = 'resetInputValue', message =  session$ns("select_vbutton"))
 
-    #Get dataframe
+    # Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
     if (result$currentFile %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
       result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
@@ -357,9 +359,11 @@ ViewFilesInTable <- function(input, output, session,
         filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
         filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
         result$currentFile <- paste0(result$currentFile, ".csv")
-        #Show buttons
+        # Show buttons
         if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
-          output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
+          output$plainmap <- renderLeaflet({
+            createPlainMap(result$tbl_fileData)
+          })
           show("abuttonmap")
         } else {
           hide("abuttonmap")
@@ -371,11 +375,12 @@ ViewFilesInTable <- function(input, output, session,
         filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
         filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
       }
-
-      #Show buttons
+      # Show buttons
       if ("latitude" %in% tolower(names(result$tbl_fileData))) {
         if (!is.null(result$tbl_fileData)) {
-          output$plainmap <- renderLeaflet({createPlainMap(result$tbl_fileData)})
+          output$plainmap <- renderLeaflet({
+            createPlainMap(result$tbl_fileData)
+          })
         }
         show("abuttonmap")
       } else {
@@ -412,7 +417,7 @@ ViewFilesInTable <- function(input, output, session,
         )
       )
     })
-  })#end observeEvent
+  }) # end observeEvent
 
 
   # Helper functions -----------------------------------------------------------

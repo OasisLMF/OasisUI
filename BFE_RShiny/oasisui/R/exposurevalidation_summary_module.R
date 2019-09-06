@@ -146,7 +146,7 @@ exposurevalidationsummary <- function(input,
 
 
   # Refresh button -------------------------------------------------------------
-  onclick("abuttonexposurerefresh", {
+  observeEvent(input$abuttonexposurerefresh, {
     # Get modeled locations
     withModalSpinner(
       result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID()),

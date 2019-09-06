@@ -1,10 +1,17 @@
+# Shared Module documentation --------------------------------------------------
+#' Hazard Map Module
+#'
+#' Shiny Module for showing model details.
+#'
+#' @template params-module
+#'
+#' @name modeldetails
+NULL
+
+
 # Model Details UI -----------------------------------------------
 
-#' modeldetailsUI
-#'
-#' @rdname modeldetails
-#'
-#' @description UI side of function wrapping panel to show model details.
+#' @describeIn modeldetails Returns the UI elements of the module.
 #'
 #' @importFrom DT DTOutput
 #'
@@ -49,22 +56,16 @@ modeldetailsUI <- function(id) {
 
 # Model Details Server -------------------------------------------
 
-#' modeldetails
-#'
-#' @rdname modeldetails
-#'
-#' @description Server side of function wrapping panel to show analyses details table.
-#'
 #' @param modelID Selected model ID.
 #' @param portfolioID Selected portfolio ID.
 #' @param file_pins file with coordiantes of exposure locations
 #' @param counter Reactive value to trigger inputs download.
-#' @template params-module
 #' @template params-active
+#'
+#' @describeIn modeldetails Defines the server logic of the module.
 #'
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
-#' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #'
@@ -161,34 +162,32 @@ modeldetails <- function(input,
       # path <- paste0("./www/hazard_files/", input$hazard_files)
       #geojsonio::geojson_read(path, what = "sp")
       mapfile_id <- result$mapfiles_lst[result$mapfiles_lst$filename == input$hazard_files, "id"]
-      result$mapfile <- session$userData$data_hub$get_model_hazard_dataset_content(id = mapfile_id, filename = input$hazard_files)
+      withModalSpinner(
+        result$mapfile <- session$userData$data_hub$get_model_hazard_dataset_content(id = mapfile_id, filename = input$hazard_files),
+        "Loading hazard map data..."
+      )
     }
   })
 
   # Draw map
-  observeEvent(result$mapfile, ignoreNULL = FALSE, {
-    if (!is.null(result$mapfile)) {
-      callModule(
-        createHazardMap,
-        id = "createHazardMap",
-        file_map = result$mapfile,
-        file_pins = result$uploaded_locs
-      )
-    }
-  })
+  callModule(
+    createHazardMap,
+    id = "createHazardMap",
+    reactive(result$mapfile),
+    reactive(result$uploaded_locs)
+  )
 
   # Details Model title
   output$paneltitle_ModelDetails <- renderUI({
     paste0('Resources of model id ', modelID())
   })
 
-  # onclick buttons
-  onclick("buttonhidemodeldetails", {
+  observeEvent(input$buttonhidemodeldetails, {
     hide("panel_model_details")
     logMessage("hiding panelModelDetails")
   })
 
-  onclick("abuttonmodeldetailrfsh", {
+  observeEvent(input$abuttonmodeldetailrfsh, {
     .reloadtbl_modelsDetails()
   })
 
