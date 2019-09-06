@@ -42,7 +42,7 @@ def_out_configUI <- function(id) {
       ), align = "right"
     )) %>%
       bs_embed_tooltip(
-        title = defineSingleAna$abuttonexecuteanarun,
+        title = defineSingleAna_tooltips$abuttonexecuteanarun,
         placement = "right"
       )
   )
@@ -132,7 +132,7 @@ panelOutputParams <- function(id) {
                             border: none;
                             "
         ) %>%
-          bs_embed_tooltip(title = defineSingleAna$abuttonchoosetag, placement = "right")
+          bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
       )
     )
   ))
@@ -168,7 +168,7 @@ panelOutputParamsDetails <- function(id) {
           label = "Clear",
           style = "float:right;"
         ) %>%
-          bs_embed_tooltip(title = defineSingleAna$clearselection, placement = "right")
+          bs_embed_tooltip(title = defineSingleAna_tooltips$clearselection, placement = "right")
       )
     )
   )
@@ -198,6 +198,7 @@ panelOutputParamsDetails <- function(id) {
 #' @importFrom shinyjs disabled
 #' @importFrom shinyjs enable
 #' @importFrom dplyr filter
+#' @importFrom dplyr distinct
 #' @importFrom jsonlite write_json
 #'
 #' @export
@@ -211,8 +212,8 @@ def_out_config <- function(input,
                            active = reactive(TRUE)) {
   ns <- session$ns
 
-  # max number rows for custom output params
-  max_n <- 9
+  # max number rows for custom output params is 9, but set to 8 when counting from 0
+  max_n <- 8
   # inserted fields
   inserted <- reactiveValues(val = 0)
 
@@ -456,7 +457,7 @@ def_out_config <- function(input,
     id <- length(inserted$val) + 1
     logMessage(paste0("insert ui because addBtn changed to ",  result$n_add))
     add_UI(result$n_add, id, input$sintag)
-    #Max number of fields limited to 9
+    # Max number of fields limited to 9
     if (result$n_add >= max_n) {
       disable("addBtn")
     } else if (input$sintag == default_tags[2] && result$n_add >= (max_n - 1)) {
@@ -468,13 +469,14 @@ def_out_config <- function(input,
 
   # remove summary levels and reports
   observeEvent(input$removeBtn, {
-    enable("addBtn")
-    # browser()
     result$n_add <- result$n_add - 1
+    if (input$sintag == default_tags[3] && result$n_add < max_n) {
+      enable("addBtn")
+    } else if (input$sintag == default_tags[2] && result$n_add < (max_n - 1)) {
+      enable("addBtn")
+    }
     removeUI(selector = paste0('#', inserted$val[length(inserted$val)]))
     inserted$val <- inserted$val[-length(inserted$val)]
-
-    observe_output_param()
     if (result$n_add < 1) {
       disable("removeBtn")
     }
@@ -500,7 +502,7 @@ def_out_config <- function(input,
       oasisuiTableUI(ns("out_params_review_tbl")),
       downloadButton(ns("download_out_params_review_tbl"), label = "Export to csv") %>%
         bs_embed_tooltip(
-          title = defineSingleAna$download_out_params_review_tbl,
+          title = defineSingleAna_tooltips$download_out_params_review_tbl,
           placement = "right"
         )
     )
@@ -514,23 +516,21 @@ def_out_config <- function(input,
     }
   })
 
-  sinsummarylevels_react_all <-
-    reactive({
-      unlist(
-        lapply(seq(0, result$n_add), function(x) {
-          input[[paste0("sinsummarylevels", x)]]
-        })
-      )
-    })
+  sinsummarylevels_react_all <- reactive({
+    unlist(
+      lapply(seq(0, result$n_add), function(x) {
+        input[[paste0("sinsummarylevels", x)]]
+      })
+    )
+  })
 
-  sinreports_react_all <-
-    reactive({
-      unlist(
-        lapply(seq(0, result$n_add), function(x) {
-          input[[paste0("sinreports", x)]]
-        })
-      )
-    })
+  sinreports_react_all <- reactive({
+    unlist(
+      lapply(seq(0, result$n_add), function(x) {
+        input[[paste0("sinreports", x)]]
+      })
+    )
+  })
 
   observeEvent({
     input$sintag
@@ -591,7 +591,7 @@ def_out_config <- function(input,
 
   observeEvent(input$abuttonexecuteanarun, {
     analysis_settingsList <- .gen_analysis_settings()
-    #write out file to be uploades
+    # write out file to be uploades
     currfolder <- session$userData$data_hub$get_user_destdir()
     dest <- file.path(currfolder, "analysis_settings.json")
     write_json(analysis_settingsList,
@@ -599,13 +599,12 @@ def_out_config <- function(input,
                pretty = TRUE,
                auto_unbox = TRUE)
 
-    #post analysis settings
-    post_analysis_settings_file <-
-      session$userData$oasisapi$api_post_file_query(
-        query_path = paste("analyses", analysisID(), "settings_file", sep = "/"),
-        query_body = dest,
-        query_encode = "multipart"
-      )
+    # post analysis settings
+    post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(
+      query_path = paste("analyses", analysisID(), "settings_file", sep = "/"),
+      query_body = dest,
+      query_encode = "multipart"
+    )
 
     result$ana_post_status <- post_analysis_settings_file$status
   })
@@ -666,7 +665,7 @@ def_out_config <- function(input,
           1,
           br(),
           actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
-            bs_embed_tooltip(title = defineSingleAna$addBtn, placement = "right")
+            bs_embed_tooltip(title = defineSingleAna_tooltips$addBtn, placement = "right")
         ),
         column(2,
                br(),
@@ -676,7 +675,7 @@ def_out_config <- function(input,
                    label = "",
                    icon = icon("times")
                  ) %>%
-                   bs_embed_tooltip(title = defineSingleAna$removeBtn, placement = "right")
+                   bs_embed_tooltip(title = defineSingleAna_tooltips$removeBtn, placement = "right")
                )),
         column(8,
                dynamicUI(tag, n))
@@ -701,7 +700,6 @@ def_out_config <- function(input,
   }
 
   # Output table function ------------------------------------------------------
-
   create_output_params <- function(sum_rep_grid) {
     if (is.null(input$chkboxgrplosstypes)) {
       perspectives <- output_options$losstypes[1]
@@ -710,7 +708,7 @@ def_out_config <- function(input,
     }
     reports_summary_levels <- distinct(data.frame(
       perspective = rep(perspectives, each = nrow(sum_rep_grid)),
-      rep(sum_rep_grid, times = length(3))
+      sum_rep_grid
     ))
 
     result$out_params_review <- reports_summary_levels
@@ -745,8 +743,7 @@ def_out_config <- function(input,
                                        filter(summary_level != "")
                                    }))
 
-      sum_rep_grid <-
-        rbind(sum_rep_grid_default, sum_rep_grid_user)
+      sum_rep_grid <- rbind(sum_rep_grid_default, sum_rep_grid_user)
     } else {
       # Summary (1)
       sum_rep_grid <- sum_rep_grid_default
@@ -809,50 +806,47 @@ def_out_config <- function(input,
     )
 
     fetch_summary <- function(prsp, checked) {
-      summary_template <- list(
-        summarycalc = FALSE,
-        eltcalc = FALSE,
-        aalcalc = FALSE,
-        pltcalc = FALSE,
-        id = 1,
-        oed_fields = "prog",
-        lec_output = TRUE,
-        leccalc = list(
-          return_period_file = TRUE,
-          outputs = list(
-            full_uncertainty_aep = FALSE,
-            full_uncertainty_oep = FALSE
+      if (prsp %in% checked) {
+        summary_template <- list(
+          summarycalc = FALSE,
+          eltcalc = FALSE,
+          aalcalc = FALSE,
+          pltcalc = FALSE,
+          id = 1,
+          oed_fields = "",
+          lec_output = TRUE,
+          leccalc = list(
+            return_period_file = TRUE,
+            outputs = list(
+              full_uncertainty_aep = FALSE,
+              full_uncertainty_oep = FALSE
+            )
           )
         )
-      )
 
-      if (prsp %in% checked) {
         p <- which(result$out_params_review$perspective == prsp)
-        review_prsp <- result$out_params_review[p,]
+        review_prsp <- result$out_params_review[p, ]
+        # convert factors to char
+        review_prsp[] <- sapply(review_prsp, as.character)
         # All Risks as default for both Summary and Drill down, optional for Custom
         if (input$sintag == default_tags[3]) {
-          review_prsp <-
-            lapply(seq(1, length(review_prsp$summary_level)), function(x) {
-              if (grepl("All Risks", review_prsp$summary_level[x])) {
-                df <- data.frame(prsp, "", review_prsp$report)
-                names(df) <-
-                  c("perspective", "summary_level", "report")
-                review_prsp <- df
-              } else {
-                review_prsp <- result$out_params_review[p,]
-              }
-            })
-
+          review_prsp$summary_level <- lapply(seq(1, length(review_prsp$summary_level)), function(x) {
+            if (grepl("All Risks", review_prsp$summary_level[x])) {
+              ""
+            } else {
+              review_prsp$summary_level[x]
+            }
+          })
+          # distinct, in case someone did multiple combinations of "All Risks"
+          review_prsp <- distinct(review_prsp)
         } else if (input$sintag == default_tags[2]) {
-          # Add "All Risks" (empty field) to table for Drill-down
-          df <- data.frame(prsp, "", review_prsp$report)
-          names(df) <- c("perspective", "summary_level", "report")
-          review_prsp <- rbind(review_prsp, df)
+          # Replace "All Risks" with empty string for Drill-down
+          p <- which(review_prsp$summary_level == "All Risks")
+          review_prsp$summary_level[p] <- ""
         } else {
-          # Replace "All Risks" with empty field for Summary
-          df <- data.frame(prsp, "", review_prsp$report)
-          names(df) <- c("perspective", "summary_level", "report")
-          review_prsp <- df
+          # Replace "All Risks" with empty string for Summary ("All Risks" being the
+          # only summary level in case of Summary!)
+          review_prsp$summary_level <- ""
         }
 
         fields_to_add <- unique(review_prsp$summary_level)
@@ -880,23 +874,22 @@ def_out_config <- function(input,
           ret[!idxDrop]
         }
 
+        # list collecting all sub-lists per summary level
         item_list_full <- list()
-        # for every item in fields_to_add (eg bitiv):
+        # for every item in fields_to_add (== summary level):
         for (item in seq_len(length(fields_to_add))) {
           item_list <- summary_template
           item_list$id <- item
-          item_list$oed_fields <- as.character(fields_to_add[item])
-          review_prsp$summary_level <- fields_to_add[item]
-          idx_lvl <- review_prsp$summary_level
-          keep <- review_prsp[item, "report"]
+          item_list$oed_fields <- fields_to_add[item]
+          # update requested reports for summary level that is being iterated
+          idx_item <- review_prsp$summary_level == fields_to_add[item]
+          keep <- review_prsp[idx_item, "report"]
           corresp_varsdf <- which(varsdf$labels %in% keep)
-          varsdf_field <- varsdf$field[corresp_varsdf]
-          item_list_upd <- update_item_list(item_list, varsdf_field)
+          item_list_upd <- update_item_list(item_list, varsdf$field[corresp_varsdf])
+          # add final item_list for single summary level to the list collecting all
           item_list_full[[item]] <- item_list_upd
         }
-
         item_list_full
-
       } else {
         NULL
       }
@@ -905,13 +898,13 @@ def_out_config <- function(input,
     analysis_settings <- list(analysis_settings = c(
       list(model_settings = fetch_model_settings()),
       inputsettings,
+      # TODO: add tag
       list(
-        # TRUE should be changed to the choice in the checkboxgroup that matches the perspective
-        gul_output = TRUE,
+        gul_output = "GUL" %in% input$chkboxgrplosstypes,
         gul_summaries = fetch_summary("GUL", input$chkboxgrplosstypes),
-        il_output = TRUE,
+        il_output = "IL" %in% input$chkboxgrplosstypes,
         il_summaries = fetch_summary("IL", input$chkboxgrplosstypes),
-        ri_output = TRUE,
+        ri_output = "RI" %in% input$chkboxgrplosstypes,
         ri_summaries = fetch_summary("RI", input$chkboxgrplosstypes)
       )
     ))
@@ -1042,12 +1035,11 @@ def_out_config <- function(input,
     show("abuttonadvanced")
   }
 
-  # Module Outout --------------------------------------------------------------
-
+  # Module Output --------------------------------------------------------------
   moduleOutput <- c(list(
     ana_flag = reactive(result$ana_flag),
-    ana_post_status = reactive(result$ana_post_status)
+    ana_post_status = reactive(result$ana_post_status),
+    ana_post_update = reactive(input$abuttonexecuteanarun)
   ))
-
 
 }

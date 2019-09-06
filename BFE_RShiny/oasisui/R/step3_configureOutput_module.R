@@ -366,18 +366,20 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Run Analyses ---------------------------------------------------------------
-
-  observeEvent(sub_modules$def_out_config$ana_post_status(), {
-    if (!is.null(result$anaID)){
+  #observeEvent(sub_modules$def_out_config$ana_post_status(), {
+  observeEvent(sub_modules$def_out_config$ana_post_update(), {
+    if (!is.null(result$anaID)) {
       if (sub_modules$def_out_config$ana_post_status() == "Success") {
         oasisuiNotification(type = "message",
-                            paste0("Analysis settings posted to ", result$anaID,"."))
-        analyses_run <-  session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run", sep = "/"), query_method = "POST")
+                            paste0("Analysis settings posted to ", result$anaID, "."))
+        analyses_run <- session$userData$oasisapi$return_df(paste("analyses", result$anaID, "run", sep = "/"), query_method = "POST")
         if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
-          idxSel <- match(result$anaID, analyses_run[, tbl_analysesDataNames$id])
+          #TODO: remove this comment line - idxSel <- match(result$anaID, analyses_run[, tbl_analysesDataNames$id])
+          idxSel <- match(result$anaID, result$tbl_analysesData[, tbl_analysesDataNames$id])
           pageSel <- ceiling(idxSel/pageLength)
           .reloadAnaData()
           hide("panelDefineOutputs")
+          # need to set selection back after reload above
           selectRows(dataTableProxy("dt_analyses"), idxSel)
           selectPage(dataTableProxy("dt_analyses"), pageSel)
           if (analyses_run[[tbl_analysesDataNames$status]] == "RUN_STARTED") {
