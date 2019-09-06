@@ -170,7 +170,7 @@ panelOutputParamsDetails <- function(id) {
         ) %>%
           bs_embed_tooltip(title = defineSingleAna$clearselection, placement = "right")
       )
-      )
+    )
   )
 }
 
@@ -542,18 +542,24 @@ def_out_config <- function(input,
     if (length(analysisID()) > 0) {
       observe_output_param()
     }
+  })
 
+  observeEvent(input$sintag, {
     if (input$sintag == default_tags[2] || input$sintag == default_tags[3]) {
       show("clearselection")
+    } else {
+      hide("clearselection")
+    }
+  })
+
+  observeEvent({sinsummarylevels_react_all()
+    sinreports_react_all()}, ignoreNULL = FALSE, {
       if (any(!is.null(sinsummarylevels_react_all())) || any(!is.null(sinreports_react_all()))) {
         enable("clearselection")
       } else {
         disable("clearselection")
       }
-    } else {
-      hide("clearselection")
-    }
-  })
+    })
 
   callModule(
     oasisuiTable,
