@@ -222,8 +222,6 @@ def_out_config <- function(input,
     ana_flag = "C",
     # result of posting RUN_analysis
     ana_post_status = "",
-    # initial number of rows of output parameters - dependent on abuttonadd
-    n = 0,
     # consecutive number of rows of output parameters - dependent on abuttonadd
     n_add = 0,
     # data for output params review
@@ -447,7 +445,7 @@ def_out_config <- function(input,
       if (all(is.na(oed_field))) {
         logMessage("No list of summary levels provided")
       } else {
-        dynamicUI_btns(tag = input$sintag, result$n)
+        dynamicUI_btns(tag = input$sintag, n = 0)
       }
     })
   })
@@ -485,9 +483,8 @@ def_out_config <- function(input,
   # clear all items
   observeEvent(input$clearselection, {
     result$n_add <- 0
-    # removeUI(selector = paste0('#', inserted$val[length(inserted$val)]))
     output$summary_levels_reports_ui <- renderUI({
-      dynamicUI_btns(tag = input$sintag, result$n)
+      dynamicUI_btns(tag = input$sintag, n = 0)
     })
   })
 
