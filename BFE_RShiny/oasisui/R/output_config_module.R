@@ -214,7 +214,7 @@ def_out_config <- function(input,
   # max number rows for custom output params
   max_n <- 9
   # inserted fields
-  inserted <- c()
+  inserted <- reactiveValues(val = 0)
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
@@ -455,7 +455,7 @@ def_out_config <- function(input,
   # insert new summary levels and reports
   observeEvent(input$addBtn, {
     result$n_add <- result$n_add + 1
-    id = "insert_fields"
+    id <- length(inserted$val) + 1
     logMessage(paste0("insert ui because addBtn changed to ",  result$n_add))
     add_UI(result$n_add, id, input$sintag)
     #Max number of fields limited to 9
@@ -464,16 +464,18 @@ def_out_config <- function(input,
     } else if (input$sintag == default_tags[2] && result$n_add >= (max_n - 1)) {
       disable("addBtn")
     }
-    inserted <<- c(id, inserted)
+    inserted$val <- c(inserted$val, id)
     enable("removeBtn")
   })
 
   # remove summary levels and reports
   observeEvent(input$removeBtn, {
     enable("addBtn")
-    removeUI(selector = paste0('#', inserted[length(inserted)]))
-    inserted <<- inserted[-length(inserted)]
+    # browser()
     result$n_add <- result$n_add - 1
+    removeUI(selector = paste0('#', inserted$val[length(inserted$val)]))
+    inserted$val <- inserted$val[-length(inserted$val)]
+
     observe_output_param()
     if (result$n_add < 1) {
       disable("removeBtn")
@@ -483,7 +485,7 @@ def_out_config <- function(input,
   # clear all items
   observeEvent(input$clearselection, {
     result$n_add <- 0
-    removeUI(selector = paste0('#', inserted[length(inserted)]))
+    # removeUI(selector = paste0('#', inserted$val[length(inserted$val)]))
     output$summary_levels_reports_ui <- renderUI({
       dynamicUI_btns(tag = input$sintag, result$n)
     })
@@ -507,48 +509,7 @@ def_out_config <- function(input,
     )
   ))
 
-  observe_output_param <- function() {
-    sum_rep_grid_default <- expand.grid(
-      summary_level = "All Risks",
-      report = sort(output_options$variables[output_options$variables_default])
-    )
-
-    if (input$sintag == default_tags[3]) {
-      # Custom(3)
-      sum_rep_grid_user <- do.call("rbind.data.frame",
-                                   lapply(seq(0, result$n_add), function(x) {
-                                     expand.grid(summary_level = paste(sort(input[[paste0("sinsummarylevels", x)]]), collapse = ", "),
-                                                 report = paste(input[[paste0("sinreports", x)]])
-                                     ) %>%
-                                       filter(summary_level != "") %>%
-                                       filter(report != "")
-                                   }))
-
-      sum_rep_grid <- sum_rep_grid_user
-    } else if (input$sintag == default_tags[2]) {
-      # Drill-down (2)
-      sum_rep_grid_user <- do.call("rbind.data.frame",
-                                   lapply(seq(0, result$n_add), function(x) {
-                                     expand.grid(
-                                       summary_level = paste(sort(input[[paste0("sinsummarylevels", x)]]), collapse = ", "),
-                                       report = sort(output_options$variables[output_options$variables_default])
-                                     ) %>%
-                                       filter(summary_level != "")
-                                   }))
-
-      sum_rep_grid <-
-        rbind(sum_rep_grid_default, sum_rep_grid_user)
-    } else {
-      # Summary (1)
-      sum_rep_grid <- sum_rep_grid_default
-    }
-
-    create_output_params(sum_rep_grid)
-    invisible()
-  }
-
   observeEvent(result$out_params_review, {
-    print(result$out_params_review)
     if (nrow(result$out_params_review) == 0) {
       disable("abuttonexecuteanarun")
     } else {
@@ -585,9 +546,9 @@ def_out_config <- function(input,
       observe_output_param()
     }
 
-    if(input$sintag == default_tags[2] || input$sintag == default_tags[3]) {
+    if (input$sintag == default_tags[2] || input$sintag == default_tags[3]) {
       show("clearselection")
-      if(any(!is.null(sinsummarylevels_react_all())) && !is.null(any(sinreports_react_all()))) {
+      if (any(!is.null(sinsummarylevels_react_all())) || any(!is.null(sinreports_react_all()))) {
         enable("clearselection")
       } else {
         disable("clearselection")
@@ -725,6 +686,7 @@ def_out_config <- function(input,
   add_UI <- function(n, id, tag) {
     insertUI(
       selector = '#placeholder',
+      where = "beforeBegin",
       immediate = TRUE,
       ui = tags$div(id = id,
                     fluidRow(column(3),
@@ -749,6 +711,46 @@ def_out_config <- function(input,
     ))
 
     result$out_params_review <- reports_summary_levels
+  }
+
+  observe_output_param <- function() {
+    sum_rep_grid_default <- expand.grid(
+      summary_level = "All Risks",
+      report = sort(output_options$variables[output_options$variables_default])
+    )
+
+    if (input$sintag == default_tags[3]) {
+      # Custom(3)
+      sum_rep_grid_user <- do.call("rbind.data.frame",
+                                   lapply(seq(0, result$n_add), function(x) {
+                                     expand.grid(summary_level = paste(sort(input[[paste0("sinsummarylevels", x)]]), collapse = ", "),
+                                                 report = paste(input[[paste0("sinreports", x)]])
+                                     ) %>%
+                                       filter(summary_level != "") %>%
+                                       filter(report != "")
+                                   }))
+
+      sum_rep_grid <- sum_rep_grid_user
+    } else if (input$sintag == default_tags[2]) {
+      # Drill-down (2)
+      sum_rep_grid_user <- do.call("rbind.data.frame",
+                                   lapply(seq(0, result$n_add), function(x) {
+                                     expand.grid(
+                                       summary_level = paste(sort(input[[paste0("sinsummarylevels", x)]]), collapse = ", "),
+                                       report = sort(output_options$variables[output_options$variables_default])
+                                     ) %>%
+                                       filter(summary_level != "")
+                                   }))
+
+      sum_rep_grid <-
+        rbind(sum_rep_grid_default, sum_rep_grid_user)
+    } else {
+      # Summary (1)
+      sum_rep_grid <- sum_rep_grid_default
+    }
+
+    create_output_params(sum_rep_grid)
+    invisible()
   }
 
   # Helper Functions -----------------------------------------------------------
@@ -910,7 +912,6 @@ def_out_config <- function(input,
         ri_summaries = fetch_summary("RI", input$chkboxgrplosstypes)
       )
     ))
-    # ReportChoices <- c("FullUncAEP", "FullUncOEP", "AAL")
 
     analysis_settings
   }
