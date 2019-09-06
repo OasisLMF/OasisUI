@@ -51,7 +51,6 @@ anainputsUI <- function(id,
 #' @param counter Reactive value storing actionButton status.
 #'
 #' @importFrom tibble add_column
-#' @importFrom shinyjs onclick
 #'
 #' @export
 anainputs <- function(input,
@@ -108,7 +107,7 @@ anainputs <- function(input,
     includechkbox = TRUE)
 
   # reload Generated Inputs table-----------------------------------------------
-  onclick("abuttonanainputrefresh", {
+  observeEvent(input$abuttonanainputrefresh, {
     .reloadInputs()
   })
 

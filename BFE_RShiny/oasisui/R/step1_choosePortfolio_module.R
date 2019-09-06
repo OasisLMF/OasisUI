@@ -60,13 +60,13 @@ panelPortfolioTable <- function(id) {
     fluidRow(
       column(12,
              oasisuiTableButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonamendpf, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonamendpf, placement = "right"),
              oasisuiTableButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttondeletepf, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttondeletepf, placement = "right"),
              oasisuiTableButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonuploadsourcefiles, placement = "right"),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonuploadsourcefiles, placement = "right"),
              oasisuiTableButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonpfdetails, placement = "right")
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfdetails, placement = "right")
       )
     ),
     br(),
@@ -123,7 +123,7 @@ panelDefinePortfolio <- function(id) {
       br(),
       column(2,
              oasisuiButton(ns("abuttonpfsubmit"), "Submit") %>%
-               bs_embed_tooltip(title = defineSingleAna$abuttonpfsubmit, placement = "right"), style = "float:right"
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfsubmit, placement = "right"), style = "float:right"
       )
     )
   )
@@ -199,7 +199,6 @@ panelLinkFiles <- function(id) {
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
-#' @importFrom shinyjs onclick
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
 #' @importFrom DT dataTableProxy
@@ -317,7 +316,7 @@ step1_choosePortfolio <- function(input, output, session,
   # Portfolio Details Table ----------------------------------------------------
 
   # Show Portfolio Details
-  onclick("abuttonpfdetails", {
+  observeEvent(input$abuttonpfdetails, {
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
     show("panelPortfolioDetails")
@@ -341,7 +340,7 @@ step1_choosePortfolio <- function(input, output, session,
   )
 
   # Hide portfolio Details
-  onclick("buttonhidepfdetails", {
+  observeEvent(input$buttonhidepfdetails, {
     hide("panelPortfolioDetails")
     logMessage("hiding panelPortfolioDetails")
   })
@@ -360,12 +359,12 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   # Hide portfolio Definition Panel
-  onclick("abuttonhidedefpfpanel", {
+  observeEvent(input$abuttonhidedefpfpanel, {
     hide("panelDefinePortfolio")
   })
 
   # Create portfolio
-  onclick("abuttoncreatepf", {
+  observeEvent(input$abuttoncreatepf, {
     hide("panelPortfolioDetails")
     hide("panelLinkFiles")
     result$portfolio_flag <- "C"
@@ -376,7 +375,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   ### Amend portfolio
-  onclick("abuttonamendpf", {
+  observeEvent(input$abuttonamendpf, {
     hide("panelPortfolioDetails")
     .defaultCreateProg()
     # TODO: review where/when/how this should be set
@@ -397,7 +396,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   ### Submit Button
-  onclick("abuttonpfsubmit", {
+  observeEvent(input$abuttonpfsubmit, {
     idxSel <- 1
     pageSel <- 1
     if (result$portfolio_flag == "C") {
@@ -460,12 +459,12 @@ step1_choosePortfolio <- function(input, output, session,
   }
 
   # Delete portfolio
-  onclick("abuttondeletepf",{
+  observeEvent(input$abuttondeletepf,{
     showModal(.pfdelmodal())
   })
 
-  # onclick of confirm delete button
-  onclick("abuttonuconfirmdel",{
+  # Confirm delete button
+  observeEvent(input$abuttonuconfirmdel, {
     hide("panelPortfolioDetails")
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
@@ -483,22 +482,22 @@ step1_choosePortfolio <- function(input, output, session,
     removeModal()
   })
 
-  # onclick of cancel delete button
-  onclick("abuttoncanceldel", {
+  # Cancel delete button
+  observeEvent(input$abuttoncanceldel, {
     removeModal()
   })
 
   # Link files to portfolio ----------------------------------------------------
 
-  #Show panel
-  onclick("abuttonuploadsourcefiles", {
+  # Show panel
+  observeEvent(input$abuttonuploadsourcefiles, {
     .clearUploadFiles()
     hide("panelPortfolioDetails")
     hide("panelDefinePortfolio")
     show("panelLinkFiles")
   })
 
-  #Clear panel
+  # Clear panel
   observeEvent(input$abuttonpfclear, ignoreInit = TRUE, {
     .clearUploadFiles()
     result$SLFile <- NULL
@@ -517,16 +516,15 @@ step1_choosePortfolio <- function(input, output, session,
     } else {
       paste0('Amend input files to portfolio id ', pfId, ' ', pfName)
     }
-
   })
 
-  # Hide Link files Panel
-  onclick("abuttonhidelinkfilespanel", {
+  # Hide link files panel
+  observeEvent(input$abuttonhidelinkfilespanel, {
     hide("panelLinkFiles")
   })
 
   # Upload Location/Account File
-  .uploadSourceFile <- function(inFile, query_path ){
+  .uploadSourceFile <- function(inFile, query_path ) {
     logMessage(paste0("Uploading file ", inFile$datapath))
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     if (!is.null(inFile$datapath)) {
@@ -626,7 +624,7 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   # Refresh Buttons ------------------------------------------------------------
-  onclick("abuttonprgtblrfsh", {
+  observeEvent(input$abuttonprgtblrfsh, {
     .reloadtbl_portfoliosData()
   } )
 
@@ -705,8 +703,7 @@ step1_choosePortfolio <- function(input, output, session,
                     value = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name])
   }
 
-  # Model Outout ---------------------------------------------------------------
-
+  # Module output ---------------------------------------------------------------
   moduleOutput <- c(
     list(
       portfolioID = reactive(result$portfolioID),
@@ -716,5 +713,4 @@ step1_choosePortfolio <- function(input, output, session,
   )
 
   moduleOutput
-
 }
