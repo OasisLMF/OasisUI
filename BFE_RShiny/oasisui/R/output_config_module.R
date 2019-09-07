@@ -109,31 +109,31 @@ panelOutputParams <- function(id) {
     heading = h4("Output Parameters"),
     fluidRow(
       column(
-        8,
+        12, # 8,
         selectInput(
           inputId = ns("sintag"),
           label = "Tag",
           choices = default_tags,
           selected = default_tags[1]
         )
-      ),
-      column(
-        4,
-        br(),
-        actionButton(
-          ns(paste0("abuttonchoosetag")),
-          label = NULL,
-          icon = icon("list-alt"),
-          style = " color: rgb(71, 73, 73);
-                            background-color: white;
-                            padding: 0px;
-                            font-size: 24px;
-                            background-image: none;
-                            border: none;
-                            "
-        ) %>%
-          bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
-      )
+      )#,
+      # column(
+      #   4,
+      #   br(),
+        # actionButton(
+        #   ns(paste0("abuttonchoosetag")),
+        #   label = NULL,
+        #   icon = icon("list-alt"),
+        #   style = " color: rgb(71, 73, 73);
+        #                     background-color: white;
+        #                     padding: 0px;
+        #                     font-size: 24px;
+        #                     background-image: none;
+        #                     border: none;
+        #                     "
+        # ) %>%
+        #   bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
+      # )
     )
   ))
 }
@@ -274,39 +274,38 @@ def_out_config <- function(input,
   # Select Tag from another analysis -------------------------------------------
 
   # Choose Tag
-  observeEvent(input$abuttonchoosetag, {
-    tbl_analysesData  <-
-      session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-    tbl_analysesData <-
-      tbl_analysesData %>% filter(grepl("run", tolower(status_detailed))) #keep all analyses that have been run, i.e. that have an analysis settings associated.
-    namesList <- tbl_analysesData[, tbl_analysesDataNames$name]
-    idList <- tbl_analysesData[, tbl_analysesDataNames$id]
-    choicesList <- paste(idList, namesList, sep = " / ")
-    showModal(AnaList)
-    updateSelectInput(inputId = "sinoutputoptions",
-                      choices = choicesList,
-                      session = session)
-  })
+  # observeEvent(input$abuttonchoosetag, {
+  #   tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+  #   # keep all analyses that have been run, i.e. that have an analysis settings associated.
+  #   tbl_analysesData <- tbl_analysesData %>% filter(grepl("run", tolower(status_detailed)))
+  #   namesList <- tbl_analysesData[, tbl_analysesDataNames$name]
+  #   idList <- tbl_analysesData[, tbl_analysesDataNames$id]
+  #   choicesList <- paste(idList, namesList, sep = " / ")
+  #   showModal(AnaList)
+  #   updateSelectInput(inputId = "sinoutputoptions",
+  #                     choices = choicesList,
+  #                     session = session)
+  # })
 
   # > Modal Dialogue
-  AnaList <- modalDialog(
-    easyClose = TRUE,
-    size = "l",
-    selectInput(
-      ns("sinoutputoptions"),
-      "Select Custom Configuration:",
-      choices = ""
-    ),
-    footer = tagList(
-      oasisuiButton(
-        ns("abuttonselectconf"),
-        label = "Select Configuration",
-        align = "left"
-      ),
-      actionButton(ns("abuttoncancel"),
-                   label = "Cancel", align = "right")
-    )
-  )
+  # AnaList <- modalDialog(
+  #   easyClose = TRUE,
+  #   size = "l",
+  #   selectInput(
+  #     ns("sinoutputoptions"),
+  #     "Select Custom Configuration:",
+  #     choices = ""
+  #   ),
+  #   footer = tagList(
+  #     oasisuiButton(
+  #       ns("abuttonselectconf"),
+  #       label = "Select Configuration",
+  #       align = "left"
+  #     ),
+  #     actionButton(ns("abuttoncancel"),
+  #                  label = "Cancel", align = "right")
+  #   )
+  # )
 
   # update tag based on analysis selection
   observeEvent(input$abuttonselectconf, {
@@ -320,10 +319,8 @@ def_out_config <- function(input,
     if (length(input$sinoutputoptions) > 0 &&
         input$sinoutputoptions != "") {
       anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
-      anaID <-
-        strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
-      analysis_settings <-
-        session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
+      anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
+      analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
       if (!is.null(analysis_settings$detail) &&
           analysis_settings$detail == "Not found.") {
         oasisuiNotification(
@@ -349,7 +346,7 @@ def_out_config <- function(input,
         updateSelectInput(inputId = "sintag",
                           selected = chosen_tag,
                           session = session)
-        #Set inputs
+        # Set inputs
         .updateOutputConfig(analysis_settings)
       }
     }
@@ -763,38 +760,31 @@ def_out_config <- function(input,
   .gen_analysis_settings <- function() {
     logMessage(".gen_analysis_settings called")
     # Predefined params
-    tbl_analysesData <-
-      session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-    modelID <-
-      tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
-    modelData <-
-      session$userData$data_hub$return_tbl_modelData(modelID)
+    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+    modelData <- session$userData$data_hub$return_tbl_modelData(modelID)
 
     fetch_model_settings <- function(modelID) {
-      # Predefined params
-      tbl_analysesData  <-
-        session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-      modelID <-
-        tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
-      # modelData <- session$userData$data_hub$return_tbl_modelData(modelID)
-      tbl_modelsDetails <-
-        session$userData$oasisapi$api_return_query_res(
-          query_path = paste("models", modelID, "resource_file", sep = "/"),
-          query_method = "GET"
-        )
+      tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("models", modelID, "resource_file", sep = "/"),
+        query_method = "GET"
+      )
       model_settings <- tbl_modelsDetails$model_settings %>%
         unlist(recursive = FALSE)
       model_params_lst <- lapply(names(model_settings), function(i) {
         ifelse(is.null(input[[paste0("model_params_", i)]]), model_settings[[i]]$default, input[[paste0("model_params_", i)]])
       }) %>%
         setNames(names(model_settings))
-      model_settings <- list(return_period_file = TRUE,
-                             model_settings) # list of 4 entries
+      model_settings <- c(
+        list(return_period_file = TRUE),
+        model_params_lst
+      ) # list of 4 entries
     }
 
     inputsettings <- list(
-      "analysis_tag" = as.integer(result$anaID),
-      #potential new tag analysis_id
+      "analysis_tag" = as.integer(analysisID()),
+      # TODO: add tag
+      # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
       "model_version_id" = modelData[[tbl_modelsDataNames$model_id]],
       # potential new tag model_id
@@ -803,7 +793,8 @@ def_out_config <- function(input,
       "number_of_samples" = as.integer(input$tinputnoofsample),
       "prog_id" = as.integer(4),
       # potential new tag `portfolio_id`
-      "source_tag" = getOption("oasisui.settings.oasis_environment") # potential new tag environment_tag
+      "source_tag" = getOption("oasisui.settings.oasis_environment")
+      # potential new tag environment_tag
     )
 
     fetch_summary <- function(prsp, checked) {
@@ -897,9 +888,8 @@ def_out_config <- function(input,
     }
 
     analysis_settings <- list(analysis_settings = c(
-      list(model_settings = fetch_model_settings()),
+      list(model_settings = fetch_model_settings(modelID = modelID)),
       inputsettings,
-      # TODO: add tag
       list(
         gul_output = "GUL" %in% input$chkboxgrplosstypes,
         gul_summaries = fetch_summary("GUL", input$chkboxgrplosstypes),
@@ -917,17 +907,14 @@ def_out_config <- function(input,
     logMessage(".clearOutputOptions called")
 
     # Predefined params
-    tbl_analysesData  <-
-      session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
 
     # Model Params
-    modelID <-
-      tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
-    tbl_modelsDetails <-
-      session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "resource_file", sep = "/"),
-        query_method = "GET"
-      )
+    modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID, "resource_file", sep = "/"),
+      query_method = "GET"
+    )
     if (!is.null(modelID) && !is.null(tbl_modelsDetails)) {
       model_settings <-
         tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
