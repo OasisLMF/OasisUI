@@ -361,10 +361,10 @@ summarytab <- function(input, output, session,
     }
     # read OEP & AEP files
     leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty",
-                           nonkeycols = c("summary_id", "return_period"), variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
+                           nonkeycols = c("summary_id", "return_period", "type"), variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
-        mutate(variable = paste0(variable, ".", return_period))
+        mutate(variable = paste(variable, type, return_period, sep = "."))
       plotleccalc <- data.frame("Specification" = leccalc$variable, "Value" = leccalc$value, "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
     } else {
       plotleccalc <- NULL
@@ -415,14 +415,15 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       if (compare) {
         data <- data %>%
-          gather(key = "gridcol", value = "Value",colnames)
+          gather(key = "gridcol", value = "Value", colnames)
       }
       data <- data %>%
-        separate(Specification, into = c("loss", "variable", "perspective", "returnperiod"), sep = "\\.") %>%
-        mutate(returnperiod = as.numeric(returnperiod)) %>%
-        mutate(variable = as.factor(variable))
-      data <- data %>%
-        filter(perspective == P)
+        separate(Specification, into = c("loss", "variable", "perspective", "type", "returnperiod"), sep = "\\.") %>%
+        mutate(returnperiod = as.numeric(returnperiod),
+               type = as.numeric(type),
+               variable = as.factor(variable)) %>%
+        filter(perspective == P,
+               type == 1)
       if (nrow(data) > 0 ) {
         data <- data %>%
           rename("colour" = "variable") %>%
