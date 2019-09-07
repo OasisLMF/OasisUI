@@ -330,8 +330,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Configure Output -----------------------------------------------------------
-
-  sub_modules$def_out_config <-  callModule(
+  sub_modules$def_out_config <- callModule(
     def_out_config,
     id = "def_out_config",
     analysisID = reactive( result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]),
@@ -341,14 +340,14 @@ step3_configureOutput <- function(input, output, session,
     active = active
   )
 
-  # #update ana flag
+  # update ana flag
   observeEvent(sub_modules$def_out_config$ana_flag(), ignoreInit = TRUE, {
     if (sub_modules$def_out_config$ana_flag() != result$ana_flag) {
       result$ana_flag <- sub_modules$def_out_config$ana_flag()
     }
   })
 
-  #Show Output Configuration Panel and Re-run
+  # Show Output Configuration Panel and Re-run
   observeEvent(input$abuttonrunconfig, {
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0) {
       if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
@@ -366,7 +365,6 @@ step3_configureOutput <- function(input, output, session,
   })
 
   # Run Analyses ---------------------------------------------------------------
-  #observeEvent(sub_modules$def_out_config$ana_post_status(), {
   observeEvent(sub_modules$def_out_config$ana_post_update(), {
     if (!is.null(result$anaID)) {
       if (sub_modules$def_out_config$ana_post_status() == "Success") {
@@ -374,7 +372,6 @@ step3_configureOutput <- function(input, output, session,
                             paste0("Analysis settings posted to ", result$anaID, "."))
         analyses_run <- session$userData$oasisapi$return_df(paste("analyses", result$anaID, "run", sep = "/"), query_method = "POST")
         if (!is.null(analyses_run) && nrow(analyses_run) == 1) {
-          #TODO: remove this comment line - idxSel <- match(result$anaID, analyses_run[, tbl_analysesDataNames$id])
           idxSel <- match(result$anaID, result$tbl_analysesData[, tbl_analysesDataNames$id])
           pageSel <- ceiling(idxSel/pageLength)
           .reloadAnaData()

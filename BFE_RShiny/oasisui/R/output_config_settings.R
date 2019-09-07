@@ -11,7 +11,7 @@ output_options <- list(
   variables = c("Full Sample", "PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT"),
   # order = c(6,2,3,4,1,5),
   variables_default = c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE),
-  # TODO: temp - to discuss which default to place here
+  # default empty string is interpreted as aggregation should happen across everything, i.e. without any specific summary level
   default_level = ""
 )
 
