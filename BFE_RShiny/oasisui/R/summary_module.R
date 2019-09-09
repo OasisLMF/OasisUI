@@ -19,7 +19,7 @@ summarytabUI <- function(id) {
   oasisuiPanel(
     id = ns("oasisuiPanelSummaryTable"),
     collapsible = FALSE,
-    heading =  tagAppendChildren(
+    heading = tagAppendChildren(
       h4("Summary table")
     ),
 
@@ -121,7 +121,7 @@ summarytab <- function(input, output, session,
         SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
       }
 
-      #define df to use
+      # define df to use
       if (compare) {
         if (!is.null(SummaryData1) && !is.null(SummaryData2)) {
           idx1 <- which(names(SummaryData1) == "Value")
@@ -228,12 +228,13 @@ summarytab <- function(input, output, session,
     }
     p <- NULL
     if (!is.null(data) && nrow(data) > 0) {
-      DFtype <- data.frame("Type" = {lapply(data$Specification, function(s) {
-        gsub("Mean AAL ", "", s)
+      DFtype <- data.frame("Type" = {
+        lapply(data$Specification, function(s) {
+          gsub("Mean AAL ", "", s)
+        }) %>%
+          unlist()
       }) %>%
-          unlist()}
-      ) %>%
-        separate(Type,into = c("perspective", "type"), sep = " ")
+        separate(Type, into = c("perspective", "type"), sep = " ")
       data <- cbind(data, DFtype)
       multipleplots <- FALSE
       if (compare) {
@@ -293,16 +294,15 @@ summarytab <- function(input, output, session,
   })
 
 
-
   # Helper functions -----------------------------------------------------------
   .returnData <- function(id, tbl_filesListDataana, filepattern, nonkeycols, variables) {
     perspectives <- c("gul", "il", "ri")
     DFList <- list()
-    for (p in 1:length(perspectives)) { #p <- 1
-      for (v in 1:length(variables)) { #v <-1
+    for (p in 1:length(perspectives)) {
+      for (v in 1:length(variables)) {
         variable <- variables[v]
         fileName <- tbl_filesListDataana %>%
-          filter(summary_level == "Portfolio") %>%
+          filter(summary_level == "All Risks") %>%
           filter(perspective == perspectives[p]) %>%
           filter(report == variable) %>%
           select(files)
@@ -314,7 +314,7 @@ summarytab <- function(input, output, session,
             var <- splitvar[length(splitvar)]
             DFList[[c]] <- output_file_df %>%
               gather(key = variable, value = value, -nonkeycols) %>%
-              mutate(variable = paste0(variable, ".",var, ".",perspectives[p]))
+              mutate(variable = paste0(variable, ".", var, ".", perspectives[p]))
           }
         }
       }
@@ -324,12 +324,13 @@ summarytab <- function(input, output, session,
   }
 
   .getSummary <- function(selectAnaID, portfolioID) {
-    #analyses settings
+    # TODO: check
+    # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
-    #read aal files
+    # read AAL files
     AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
     if (!is.null(AAL)) {
-      #infer params
+      # infer params
       tiv <- AAL %>%
         filter(grepl("exposure_value", variable)) %>%
         separate(variable, into = c("variables", "report", "perspective"), sep = "\\.") %>%
@@ -341,7 +342,7 @@ summarytab <- function(input, output, session,
                                      TRUE ~ variables)) %>%
         select(variables, value) %>%
         unique()
-      #AAL output
+      # AAL output
       outputsAALtmp <- AAL %>%
         select(-c("summary_id")) %>%
         filter(grepl("mean", variable)) %>%
@@ -358,19 +359,20 @@ summarytab <- function(input, output, session,
       outputsAAL <- NULL
       plotAALtmp <- NULL
     }
-    #read OEP & aEP files
-    leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty", nonkeycols = c("summary_id", "return_period"),variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
+    # read OEP & AEP files
+    leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty",
+                           nonkeycols = c("summary_id", "return_period", "type"), variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
-        mutate(variable = paste0(variable, ".", return_period))
+        mutate(variable = paste(variable, type, return_period, sep = "."))
       plotleccalc <- data.frame("Specification" = leccalc$variable, "Value" = leccalc$value, "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
     } else {
       plotleccalc <- NULL
     }
-    #Location file
+    # Location file
     Location <- session$userData$data_hub$get_pf_location_content(id = portfolioID)
     if (!is.null(Location)) {
-      #infer params
+      # infer params
       locnum <- length(unique(Location$LocNumber))
     } else {
       locnum <- 0
@@ -378,16 +380,16 @@ summarytab <- function(input, output, session,
 
     ana_settings <- analysis_settings[["analysis_settings"]]
     model_settings <- analysis_settings[["analysis_settings"]][["model_settings"]]
-    model_params_lst <-  sapply(names(model_settings), function(i){model_settings[[i]]})
+    model_params_lst <- sapply(names(model_settings), function(i){model_settings[[i]]})
 
-    #summary DF
+    # summary DF
     SpecificationRows <- c("exposure location count", tiv$variables, names(model_params_lst))
     ValueRows <- unlist(c(locnum, tiv$value, model_params_lst))
     TypeRows <- c("input", rep("input", nrow(tiv)), rep("param", length(model_params_lst)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 
-    #add AAL outputs
+    # add AAL outputs
     if (!is.null(outputsAAL)) {
       summary_df <- rbind(summary_df, outputsAAL)
     }
@@ -395,7 +397,7 @@ summarytab <- function(input, output, session,
     if (!is.null(plotAALtmp)) {
       summary_df <- rbind(summary_df, plotAALtmp)
     }
-    # add oep/aep plot output
+    # add OEP/AEP plot output
     if (!is.null(plotleccalc)) {
       summary_df <- rbind(summary_df, plotleccalc)
     }
@@ -403,7 +405,7 @@ summarytab <- function(input, output, session,
     return(summary_df)
   }
 
-  .prepareDataLinePlot <- function(P){
+  .prepareDataLinePlot <- function(P) {
     if (!is.null(result$SummaryData)) {
       data <- result$SummaryData %>%
         filter(Type == "leccalcplot")
@@ -413,14 +415,15 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       if (compare) {
         data <- data %>%
-          gather(key = "gridcol", value = "Value",colnames)
+          gather(key = "gridcol", value = "Value", colnames)
       }
       data <- data %>%
-        separate(Specification, into = c("loss", "variable", "perspective", "returnperiod"), sep = "\\.") %>%
-        mutate(returnperiod = as.numeric(returnperiod)) %>%
-        mutate(variable = as.factor(variable))
-      data <- data %>%
-        filter(perspective == P)
+        separate(Specification, into = c("loss", "variable", "perspective", "type", "returnperiod"), sep = "\\.") %>%
+        mutate(returnperiod = as.numeric(returnperiod),
+               type = as.numeric(type),
+               variable = as.factor(variable)) %>%
+        filter(perspective == P,
+               type == 1)
       if (nrow(data) > 0 ) {
         data <- data %>%
           rename("colour" = "variable") %>%

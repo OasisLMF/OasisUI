@@ -76,7 +76,7 @@ anainputs <- function(input,
   # })
 
   observeEvent(counter(), ignoreNULL = FALSE, {
-    logMessage(paste0("changing result$counter because counter() chanhgd to ", counter()))
+    logMessage(paste0("changing result$counter because counter() changed to ", counter()))
     if (is.null(input[["panel_anainputs-collapse-button"]])) {
       result$counter <- -1
     } else {

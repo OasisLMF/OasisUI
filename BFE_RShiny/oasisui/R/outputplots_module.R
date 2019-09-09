@@ -106,6 +106,7 @@ panelOutputModuleUI <- function(id){
       ),
       column(4,
              checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
+  # TODO: replace this checkbox-group with some other selector (maybe selectInput?) for OED-field summary-levels (only those that were run with the analysis)
       column(8,
              checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Summary Level", choices = output_options$granularities, inline = TRUE)),
       column(12,
@@ -259,12 +260,12 @@ panelOutputModule <- function(input, output, session,
     if (!is.null(inputplottype())) {
       .reactiveUpdateSelectGroupInput(result$Losstypes, output_options$losstypes, "chkboxgrplosstypes", inputplottype())
       .reactiveUpdateSelectGroupInput(result$Variables, output_options$variables, "chkboxgrpvariables", inputplottype())
-      .reactiveUpdateSelectGroupInput(result$Granularities, output_options$granularities, "chkboxgrpgranularities", inputplottype())
+      # TODO: .reactiveUpdateSelectGroupInput(result$Granularities, output_options$granularities, "chkboxgrpgranularities", inputplottype())
     }
   })
 
   # > based on inputs ----------------------------------------------------------
-  #GUL does not have policy
+  # TODO: GUL does not have policy
   observeEvent({
     chkbox$chkboxgrplosstypes()
     inputplottype()
@@ -275,7 +276,7 @@ panelOutputModule <- function(input, output, session,
     } else {
       Granularities <- result$Granularities
     }
-    .reactiveUpdateSelectGroupInput(Granularities, output_options$granularities, "chkboxgrpgranularities", inputplottype())
+    # TODO: .reactiveUpdateSelectGroupInput(Granularities, output_options$granularities, "chkboxgrpgranularities", inputplottype())
     .reactiveUpdateSelectGroupInput(result$Variables, output_options$variables, "chkboxgrpvariables", inputplottype())
   })
 

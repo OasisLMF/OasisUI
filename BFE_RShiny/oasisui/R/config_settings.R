@@ -23,6 +23,12 @@ Status_details <- list(
   run_ok = "run completed"
 )
 
+# Default Tags -----------------------------------------------------------------
+#' Default Tags
+#' @description Set of default tags for output parameters
+#' @export
+default_tags <- c("Summary", "Drill-down", "Custom")
+
 # Lists for tables cols names --------------------------------------------------
 
 

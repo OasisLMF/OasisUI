@@ -9,6 +9,6 @@
 output_options
 }
 \description{
-List of granularities, losstypes and variables allowed.
+List of losstypes and variables allowed.
 }
 \keyword{datasets}

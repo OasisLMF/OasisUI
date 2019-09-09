@@ -465,7 +465,7 @@ DataHub <- R6Class(
     # extract oed summary levels relevant for current analysis
     get_ana_oed_summary_levels = function(id) {
       oed_fields_ana_content <- content(private$oasisapi$api_get_query(query_path = paste("analyses", id, "summary_levels_file",  sep = "/"))$result)
-      oed_fields <- oed_fields_ana_content %>%
+       oed_fields <- oed_fields_ana_content %>%
         unlist() %>%
         as.data.frame(stringsAsFactors = FALSE) %>%
         setNames("description") %>%
@@ -670,7 +670,6 @@ DataHub <- R6Class(
 )
 
 # Helper functions -----
-
 # Add description fields to output files
 .addDescription <- function(x, analysis_settings) {
   x <- as.character(x)
@@ -679,10 +678,14 @@ DataHub <- R6Class(
   report <-  paste(y[3:(length(y))], collapse = "_")
   g_idx <- as.integer(gsub("S", "", y[2]))
   g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
-  if (is.null(g_oed)) {
-    g_oed <- granToOed$oed[granToOed$order][g_idx]
+  if (g_oed == "") {
+    g_oed <- "All Risks"
   }
-  g <- granToOed[granToOed$oed == g_oed, "gran"]
+  if (is.null(g_oed)) {
+    logMessage("g_oed is NULL in .addDescription")
+    g_oed <- "All Risks"
+  }
+  g <- g_oed
   z <- reportToVar()[[report]]
   if (is.null(z))
     z <- "Summary Info"
