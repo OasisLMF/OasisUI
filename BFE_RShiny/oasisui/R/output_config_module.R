@@ -617,7 +617,7 @@ def_out_config <- function(input,
     .basicview()
   })
 
-  # UI functions -----------------------------------------------------------------
+  # UI functions ---------------------------------------------------------------
 
   # Summary Level and Reports fields
   dynamicUI <- function(tag, n) {
@@ -805,7 +805,7 @@ def_out_config <- function(input,
           aalcalc = FALSE,
           pltcalc = FALSE,
           id = 1,
-          oed_fields = "",
+          oed_fields = list(),
           lec_output = TRUE,
           leccalc = list(
             return_period_file = TRUE,
@@ -872,12 +872,13 @@ def_out_config <- function(input,
         for (item in seq_len(length(fields_to_add))) {
           item_list <- summary_template
           item_list$id <- item
-          item_list$oed_fields <- fields_to_add[item]
           # update requested reports for summary level that is being iterated
           idx_item <- review_prsp$summary_level == fields_to_add[item]
           keep <- review_prsp[idx_item, "report"]
           corresp_varsdf <- which(varsdf$labels %in% keep)
           item_list_upd <- update_item_list(item_list, varsdf$field[corresp_varsdf])
+          # oed_fields should be a list in the json file
+          item_list_upd$oed_fields <- lapply(strsplit(fields_to_add[item], split = ", ")[[1]], identity)
           # add final item_list for single summary level to the list collecting all
           item_list_full[[item]] <- item_list_upd
         }

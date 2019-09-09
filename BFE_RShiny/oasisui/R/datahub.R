@@ -678,12 +678,11 @@ DataHub <- R6Class(
   report <-  paste(y[3:(length(y))], collapse = "_")
   g_idx <- as.integer(gsub("S", "", y[2]))
   g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
-  if (g_oed == "") {
-    g_oed <- "All Risks"
-  }
-  if (is.null(g_oed)) {
+  if (length(g_oed) == 0) {
     logMessage("g_oed is NULL in .addDescription")
     g_oed <- "All Risks"
+  } else {
+    g_oed <- unlist(g_oed)
   }
   g <- g_oed
   z <- reportToVar()[[report]]
