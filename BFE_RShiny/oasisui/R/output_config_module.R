@@ -822,7 +822,7 @@ def_out_config <- function(input,
         review_prsp[] <- sapply(review_prsp, as.character)
         # All Risks as default for both Summary and Drill down, optional for Custom
         if (input$sintag == default_tags[3]) {
-          review_prsp$summary_level <- lapply(seq(1, length(review_prsp$summary_level)), function(x) {
+          review_prsp$summary_level <- sapply(seq(1, length(review_prsp$summary_level)), function(x) {
             if (grepl("All Risks", review_prsp$summary_level[x])) {
               ""
             } else {
