@@ -72,8 +72,8 @@ outputplots <- function(input, output, session,
   observeEvent({
     selectAnaID()
     filesListData()}, {
-    plotPanels$remove_all()
-  })
+      plotPanels$remove_all()
+    })
 
   return(invisible())
 }
@@ -101,16 +101,16 @@ panelOutputModuleUI <- function(id){
       heading = "Custom plot",
       h4("Data to plot"),
       column(12,
-             div( class = "InlineSelectInput",
-                  selectInput(inputId = ns("inputplottype"), label = "Select a plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1]))
+             # div( class = "InlineSelectInput",
+             selectInput(inputId = ns("inputplottype"), label = "Plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1])
+             # )
       ),
-      column(4,
-             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
-  # TODO: replace this checkbox-group with some other selector (maybe selectInput?) for OED-field summary-levels (only those that were run with the analysis)
-      column(8,
-             checkboxGroupInput(inputId = ns("chkboxgrpgranularities"), label = "Summary Level", choices = output_options$granularities, inline = TRUE)),
       column(12,
-             checkboxGroupInput(inputId = ns("chkboxgrpvariables"), label = "Report", choices = output_options$variables, inline = TRUE)),
+             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = NULL, choices = output_options$losstypes, inline = TRUE)),
+      column(4,
+             uiOutput(ns("summary_levels_ui"))),
+      column(8,
+             selectInput(inputId = ns("pltreports"), label = "Report", choices = plottypeslist$`loss per return period`$Variables)),
       h4("Customize plot"),
       column(3,
              div(class = "InlineTextInput",
@@ -197,9 +197,7 @@ panelOutputModule <- function(input, output, session,
 
   # reactive values holding checkbox state
   chkbox <- list(
-    chkboxgrplosstypes = reactiveVal(NULL),
-    chkboxgrpvariables = reactiveVal(NULL),
-    chkboxgrpgranularities = reactiveVal(NULL)
+chkboxgrplosstypes = reactiveVal(NULL)
   )
 
   lapply(names(isolate(chkbox)), function(id) {
@@ -227,11 +225,18 @@ panelOutputModule <- function(input, output, session,
   observeEvent(inputplottype(), {
     result$Title <- ""
     output$outputplot <- renderPlotly(NULL)
-    if (length( plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
+    if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
       show("chkboxuncertainty")
     } else {
       updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
       hide("chkboxuncertainty")
+    }
+
+    # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
+    if (inputplottype() == "AAL bar plot") {
+      updateSelectInput(session, "pltreports", "Report", choices = plottypeslist$`AAL bar plot`$Variables)
+    } else {
+      updateSelectInput(session, "pltreports", "Report", choices = plottypeslist$`loss per return period`$Variables)
     }
   })
 
@@ -258,39 +263,48 @@ panelOutputModule <- function(input, output, session,
     result$Variables
   }, ignoreNULL = FALSE, {
     if (!is.null(inputplottype())) {
-      .reactiveUpdateSelectGroupInput(result$Losstypes, output_options$losstypes, "chkboxgrplosstypes", inputplottype())
-      .reactiveUpdateSelectGroupInput(result$Variables, output_options$variables, "chkboxgrpvariables", inputplottype())
-      # TODO: .reactiveUpdateSelectGroupInput(result$Granularities, output_options$granularities, "chkboxgrpgranularities", inputplottype())
+      .reactiveUpdateSelectGroupInput(result$Losstypes,
+                                      output_options$losstypes, "chkboxgrplosstypes",
+                                      inputplottype())
     }
   })
 
   # > based on inputs ----------------------------------------------------------
-  # TODO: GUL does not have policy
+
+  observeEvent(anaID(), {
+    output$summary_levels_ui <- renderUI({
+      selectInput(
+        inputId = ns("pltsummarylevels"),
+        label = "Summary Levels",
+        choices = unique(filesListData()$summary_level)
+      )
+    })
+  })
+
   observeEvent({
     chkbox$chkboxgrplosstypes()
     inputplottype()
   }, ignoreNULL = FALSE, {
     #if losstype = GUL then policy inactive
-    if ( "GUL" %in% chkbox$chkboxgrplosstypes()) {
+    if ("GUL" %in% chkbox$chkboxgrplosstypes()) {
+      #TODO: GUL does not have policy, more feedback required for development
       Granularities <- result$Granularities[which(result$Granularities != "Policy")]
     } else {
-      Granularities <- result$Granularities
+     Granularities <- result$Granularities
     }
-    # TODO: .reactiveUpdateSelectGroupInput(Granularities, output_options$granularities, "chkboxgrpgranularities", inputplottype())
-    .reactiveUpdateSelectGroupInput(result$Variables, output_options$variables, "chkboxgrpvariables", inputplottype())
   })
 
   # > button based on selection
   observeEvent({
     chkbox$chkboxgrplosstypes()
-    chkbox$chkboxgrpvariables()
-    chkbox$chkboxgrpgranularities()
+    input$pltreports
+    input$pltsummarylevels
     input$abuttondraw
   }, ignoreNULL = FALSE, {
 
     if (length(chkbox$chkboxgrplosstypes()) == 0 ||
-        length(chkbox$chkboxgrpvariables()) == 0 ||
-        length(chkbox$chkboxgrpgranularities()) == 0 ) {
+        length(input$pltsummarylevels) == 0 ||
+        length(input$pltreports) == 0 ) {
       disable("abuttondraw")
     } else {
       enable("abuttondraw")
@@ -306,8 +320,8 @@ panelOutputModule <- function(input, output, session,
     # > print current selection
     logMessage(paste0("Plotting ", inputplottype(),
                       " for loss types: ", chkbox$chkboxgrplosstypes(),
-                      ", variables: ", chkbox$chkboxgrpvariables(),
-                      ", granularities: ",chkbox$chkboxgrpgranularities()
+                      ", variables: ", input$pltreports,
+                      ", granularities: ", input$pltsummarylevels
                       # ", aggregated to Portfolio Level: ", input$chkboxaggregate
     ))
 
@@ -342,12 +356,12 @@ panelOutputModule <- function(input, output, session,
     # only one granularity is allowed
     # we can compare either multi-variables or multi-losstypes
     l_losstypes <- length(chkbox$chkboxgrplosstypes())
-    l_variables <- length(chkbox$chkboxgrpvariables())
-    l_granularities <- length(chkbox$chkboxgrpgranularities())
+    l_variables <- length(input$pltreports)
+    l_granularities <- length(input$pltsummarylevels)
     sanytyChecks <- FALSE
     if (l_losstypes > 1 && l_variables > 1) {
       oasisuiNotification(type = "error",
-                           "Only comparisons among perspectives or reports are allowed.")
+                          "Only comparisons among perspectives or reports are allowed.")
     } else {
       logMessage("Sanity checks passed")
       sanytyChecks <- TRUE
@@ -355,18 +369,17 @@ panelOutputModule <- function(input, output, session,
       plotstrc <- data.frame("perspective" = c(l_losstypes), "report" = c(l_variables), "summary_level" = c(l_granularities))
     }
 
-
     # >> define dynamic default title
     if (sanytyChecks) {
       if (input$textinputtitle != "") {
         result$Title <- input$textinputtitle
       } else {
         if (l_losstypes > 1) {
-          result$Title <- paste0(chkbox$chkboxgrpvariables(), " per ", chkbox$chkboxgrpgranularities())
+          result$Title <- paste0(input$pltreports, " per ", input$pltsummarylevels)
         } else if (l_variables > 1) {
-          result$Title <- paste0(chkbox$chkboxgrplosstypes(), " per ", chkbox$chkboxgrpgranularities())
+          result$Title <- paste0(chkbox$chkboxgrplosstypes(), " per ", input$pltsummarylevels)
         } else {
-          result$Title <- paste0(chkbox$chkboxgrpvariables(), " of ", chkbox$chkboxgrplosstypes(), " per ", chkbox$chkboxgrpgranularities())
+          result$Title <- paste0(input$pltreports, " of ", chkbox$chkboxgrplosstypes(), " per ", input$pltsummarylevels)
         }
       }
     }
@@ -375,11 +388,11 @@ panelOutputModule <- function(input, output, session,
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
         filesToPlot <- filesListData()  %>% filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
-                                                   report %in% chkbox$chkboxgrpvariables(),
-                                                   summary_level %in%  chkbox$chkboxgrpgranularities())
+                                                   report %in% input$pltreports,
+                                                   summary_level %in%  input$pltsummarylevels)
         if (nrow(filesToPlot) != prod(plotstrc)) {
           oasisuiNotification(type = "error",
-                               "The analysis did not produce the selected output. Please check the logs.")
+                              "The analysis did not produce the selected output. Please check the logs.")
           filesToPlot <- NULL
         }
       }
@@ -416,9 +429,13 @@ panelOutputModule <- function(input, output, session,
 
     # Make ggplot friendly -----------------------------------------------------
     if (!is.null(fileData)) {
-      data <- fileData %>% gather(key = variables, value = value, -nonkey) %>% separate(variables, into = c("variables", "keyval"), sep = "\\.") %>% spread(variables, value)
+      data <- fileData %>% gather(key = variables, value = value, -nonkey) %>%
+        separate(variables, into = c("variables", "keyval"), sep = "\\.") %>%
+        spread(variables, value)
+
       # rename column for Y axis
       data <- data %>% rename("value" = key)
+
       # rename column for x axis
       data <- data %>% rename("xaxis" = x)
       # rename column for granularity. Can be null if granularity level is portfolio
@@ -458,7 +475,9 @@ panelOutputModule <- function(input, output, session,
         p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
                          multipleplots = multipleplots)
       } else if (plottype == "bar") {
-        p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data, wuncertainty = input$chkboxuncertainty, multipleplots = multipleplots, xtickslabels = xtickslabels)
+        p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
+                        wuncertainty = input$chkboxuncertainty,
+                        multipleplots = multipleplots, xtickslabels = xtickslabels)
       }else if (plottype == "violin") {
         p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
                            multipleplots = multipleplots)
@@ -472,7 +491,7 @@ panelOutputModule <- function(input, output, session,
 
   # Helper functions -----------------------------------------------------------
 
-  # Helper function to enable and dosable checkboxes based on condition
+  # Helper function to enable and disable checkboxes based on condition
   .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
     logMessage(".reactiveUpdateSelectGroupInput called")
     # disable and untick variables that are not relevant
@@ -498,12 +517,12 @@ panelOutputModule <- function(input, output, session,
         fileData <- session$userData$data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = fileName)
       }, error = function(e) {
         oasisuiNotification(type = "error",
-                             paste0("Could not read file: ", e$message, "."))
+                            paste0("Could not read file: ", e$message, "."))
         fileData <- NULL
       })
     } else {
       oasisuiNotification(type = "error",
-                           "Invalid file.")
+                          "Invalid file.")
       fileData <- NULL
     }
     return(fileData)
@@ -557,7 +576,8 @@ panelOutputModule <- function(input, output, session,
   }
 
   # Bar Plot
-  .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE, multipleplots = FALSE, xtickslabels = NULL ){
+  .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE,
+                         multipleplots = FALSE, xtickslabels = NULL ){
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
       geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) +

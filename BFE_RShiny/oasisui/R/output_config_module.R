@@ -784,17 +784,12 @@ def_out_config <- function(input,
     inputsettings <- list(
       "analysis_tag" = as.integer(analysisID()),
       # TODO: add tag
-      # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
       "model_version_id" = modelData[[tbl_modelsDataNames$model_id]],
-      # potential new tag model_id
       "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
-      # potential new tag model_supplier_id
       "number_of_samples" = as.integer(input$tinputnoofsample),
       "prog_id" = as.integer(4),
-      # potential new tag `portfolio_id`
       "source_tag" = getOption("oasisui.settings.oasis_environment")
-      # potential new tag environment_tag
     )
 
     fetch_summary <- function(prsp, checked) {
@@ -822,7 +817,7 @@ def_out_config <- function(input,
         review_prsp[] <- sapply(review_prsp, as.character)
         # All Risks as default for both Summary and Drill down, optional for Custom
         if (input$sintag == default_tags[3]) {
-          review_prsp$summary_level <- lapply(seq(1, length(review_prsp$summary_level)), function(x) {
+          review_prsp$summary_level <- sapply(seq(1, length(review_prsp$summary_level)), function(x) {
             if (grepl("All Risks", review_prsp$summary_level[x])) {
               ""
             } else {

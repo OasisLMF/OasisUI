@@ -671,6 +671,7 @@ DataHub <- R6Class(
 
 # Helper functions -----
 # Add description fields to output files
+# REF: can be improved as analysis settings structure changed. Also check mapping objects
 .addDescription <- function(x, analysis_settings) {
   x <- as.character(x)
   x <- strsplit(x, split = "[.]")[[1]][1]

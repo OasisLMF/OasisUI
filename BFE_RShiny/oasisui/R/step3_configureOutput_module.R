@@ -333,7 +333,7 @@ step3_configureOutput <- function(input, output, session,
   sub_modules$def_out_config <- callModule(
     def_out_config,
     id = "def_out_config",
-    analysisID = reactive( result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]),
+    analysisID = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]),
     analysisName = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]),
     ana_flag = reactive(result$ana_flag),
     counter = reactive({input$abuttonrunconfig}),
