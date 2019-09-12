@@ -109,13 +109,12 @@ panelOutputModuleUI <- function(id){
              checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = NULL, choices = output_options$losstypes, inline = TRUE)),
       column(6,
              uiOutput(ns("reports_ui"))),
-      # selectInput(inputId = ns("pltreports"), label = "Report", choices = plottypeslist$`loss per return period`$Variables)),
       column(6,
              uiOutput(ns("summary_levels_ui"))),
-      # h4("Customize plot"),
+      br(),
       column(3,
              # div(class = "InlineTextInput",
-                 textInput(ns("textinputtitle"), "Title", ""))
+                 textInput(ns("textinputtitle"), "Title", "")),
              # ),
       column(4,
              checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
@@ -199,7 +198,9 @@ panelOutputModule <- function(input, output, session,
 
   # reactive values holding checkbox state
   chkbox <- list(
-    chkboxgrplosstypes = reactiveVal(NULL)
+    chkboxgrplosstypes = reactiveVal(NULL),
+    pltreports = reactiveVal(NULL),
+    pltsummarylevels = reactiveVal(NULL)
   )
 
   lapply(names(isolate(chkbox)), function(id) {
@@ -266,33 +267,45 @@ panelOutputModule <- function(input, output, session,
 
   observeEvent({anaID()
     inputplottype()}, {
-
       # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
       if(inputplottype() == "loss per return period") {
-        idx <- which(filesListData()$report == plottypeslist$`loss per return period`$Variables)
+        idx_r <- which(filesListData()$report == plottypeslist$`loss per return period`$Variables)
       } else if(inputplottype() == "AAL bar plot") {
-        idx <- which(filesListData()$report == plottypeslist$`AAL bar plot`$Variables)
+        idx_r <- which(filesListData()$report == plottypeslist$`AAL bar plot`$Variables)
       }
-      report <- filesListData()$report[idx]
+      report <- filesListData()$report[idx_r]
+
       output$reports_ui <- renderUI({
         selectInput(
           inputId = ns("pltreports"),
           label = "Report",
-          choices = unique(report)
+          choices = unique(report),
+          selected = NULL,
+          multiple = TRUE
         )
       })
-
-      if(length(idx) == 0) {
-        hide("pltreports")
-      } else {
-        show("pltreports")
-      }
     })
 
-  observeEvent(input$pltreports, {
+  # observeEvent({input$chkboxgrplosstypes
+  #   input$pltreports}, {
+  #   # if more than one checkbox and report are selected, pop up message and disable "Draw" btn
+  #   if(length(input$chkboxgrplosstypes) > 1 && length(input$pltreports) > 1) {
+  #     showModal(modalDialog(
+  #       title = "Attention!",
+  #       "Only two reports or two perspectives can be selected. Please remove one in either field",
+  #       footer = modalButton("Dismiss"),
+  #       easyClose = TRUE
+  #     ))
+  #     disable("abuttondraw")
+  #   } else {
+  #     enable("abuttondraw")
+  #   }
+  # })
+
+  observeEvent(input$pltreports, ignoreNULL = FALSE, {
     # display only summary levels that correspond to the selected report
-    idx <- which(filesListData()$report == input$pltreports)
-    summary_level <- filesListData()$summary_level[idx]
+    idx_s <- which(filesListData()$report == input$pltreports)
+    summary_level <- filesListData()$summary_level[idx_s]
 
     output$summary_levels_ui <- renderUI({
       selectInput(
@@ -301,12 +314,6 @@ panelOutputModule <- function(input, output, session,
         choices = unique(summary_level)
       )
     })
-
-    if(length(idx) == 0) {
-      hide("pltsummarylevels")
-    } else {
-      show("pltsummarylevels")
-    }
   })
 
   observeEvent({
@@ -325,19 +332,27 @@ panelOutputModule <- function(input, output, session,
   # > button based on selection
   observeEvent({
     chkbox$chkboxgrplosstypes()
-    input$pltreports
-    input$pltsummarylevels
+    chkbox$pltreports()
+    chkbox$pltsummarylevels()
     input$abuttondraw
   }, ignoreNULL = FALSE, {
 
     if (length(chkbox$chkboxgrplosstypes()) == 0 ||
-        length(input$pltsummarylevels) == 0 ||
-        length(input$pltreports) == 0 ) {
+        length(chkbox$pltsummarylevels()) == 0 ||
+        length(chkbox$pltreports()) == 0) {
+      disable("abuttondraw")
+    } else if (length(chkbox$chkboxgrplosstypes()) > 1 && length(chkbox$pltreports()) > 1) {
+      # if more than one checkbox and report are selected, pop up message and disable "Draw" btn
+      showModal(modalDialog(
+        title = "Attention!",
+        "Only two reports or two perspectives can be selected. Please remove one in either field",
+        footer = modalButton("Dismiss"),
+        easyClose = TRUE
+      ))
       disable("abuttondraw")
     } else {
       enable("abuttondraw")
     }
-
   })
 
   # Extract dataframe to plot --------------------------------------------------
@@ -594,7 +609,7 @@ panelOutputModule <- function(input, output, session,
   }
 
   # Line plot
-  .linePlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE){
+  .linePlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE) {
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
       geom_line(size = 1) +
@@ -605,7 +620,7 @@ panelOutputModule <- function(input, output, session,
 
   # Bar Plot
   .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE,
-                         multipleplots = FALSE, xtickslabels = NULL ){
+                         multipleplots = FALSE, xtickslabels = NULL ) {
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
       geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) +
