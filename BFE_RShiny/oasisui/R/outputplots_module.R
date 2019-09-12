@@ -99,7 +99,7 @@ panelOutputModuleUI <- function(id){
       id = ns("oasisuiPanelOutputModule"),
       collapsible = TRUE,
       heading = "Custom plot",
-      h4("Data to plot"),
+      # h4("Data to plot"),
       column(12,
              # div( class = "InlineSelectInput",
              selectInput(inputId = ns("inputplottype"), label = "Plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1])
@@ -107,15 +107,17 @@ panelOutputModuleUI <- function(id){
       ),
       column(12,
              checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = NULL, choices = output_options$losstypes, inline = TRUE)),
-      column(4,
+      column(6,
+             uiOutput(ns("reports_ui"))),
+      # selectInput(inputId = ns("pltreports"), label = "Report", choices = plottypeslist$`loss per return period`$Variables)),
+      column(6,
              uiOutput(ns("summary_levels_ui"))),
-      column(8,
-             selectInput(inputId = ns("pltreports"), label = "Report", choices = plottypeslist$`loss per return period`$Variables)),
-      h4("Customize plot"),
+      # h4("Customize plot"),
       column(3,
-             div(class = "InlineTextInput",
-                 textInput(ns("textinputtitle"), "Title", ""))),
-      column(3,
+             # div(class = "InlineTextInput",
+                 textInput(ns("textinputtitle"), "Title", ""))
+             # ),
+      column(4,
              checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
       column(3,
              hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
@@ -197,7 +199,7 @@ panelOutputModule <- function(input, output, session,
 
   # reactive values holding checkbox state
   chkbox <- list(
-chkboxgrplosstypes = reactiveVal(NULL)
+    chkboxgrplosstypes = reactiveVal(NULL)
   )
 
   lapply(names(isolate(chkbox)), function(id) {
@@ -221,26 +223,6 @@ chkboxgrplosstypes = reactiveVal(NULL)
     output$outputplot <- renderPlotly(NULL)
     for (id in names(chkbox)) chkbox[[id]](NULL)
   })
-
-  observeEvent(inputplottype(), {
-    result$Title <- ""
-    output$outputplot <- renderPlotly(NULL)
-    if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
-      show("chkboxuncertainty")
-    } else {
-      updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
-      hide("chkboxuncertainty")
-    }
-
-    # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
-    if (inputplottype() == "AAL bar plot") {
-      updateSelectInput(session, "pltreports", "Report", choices = plottypeslist$`AAL bar plot`$Variables)
-    } else {
-      updateSelectInput(session, "pltreports", "Report", choices = plottypeslist$`loss per return period`$Variables)
-    }
-  })
-
-  # Enable / Disable options ---------------------------------------------------
 
   # > based on analysis ID -----------------------------------------------------
   #Gather the Granularities, Variables and Losstypes based on the anaID output presets
@@ -271,14 +253,60 @@ chkboxgrplosstypes = reactiveVal(NULL)
 
   # > based on inputs ----------------------------------------------------------
 
-  observeEvent(anaID(), {
+  observeEvent(inputplottype(), {
+    result$Title <- ""
+    output$outputplot <- renderPlotly(NULL)
+    if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
+      show("chkboxuncertainty")
+    } else {
+      updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
+      hide("chkboxuncertainty")
+    }
+  })
+
+  observeEvent({anaID()
+    inputplottype()}, {
+
+      # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
+      if(inputplottype() == "loss per return period") {
+        idx <- which(filesListData()$report == plottypeslist$`loss per return period`$Variables)
+      } else if(inputplottype() == "AAL bar plot") {
+        idx <- which(filesListData()$report == plottypeslist$`AAL bar plot`$Variables)
+      }
+      report <- filesListData()$report[idx]
+      output$reports_ui <- renderUI({
+        selectInput(
+          inputId = ns("pltreports"),
+          label = "Report",
+          choices = unique(report)
+        )
+      })
+
+      if(length(idx) == 0) {
+        hide("pltreports")
+      } else {
+        show("pltreports")
+      }
+    })
+
+  observeEvent(input$pltreports, {
+    # display only summary levels that correspond to the selected report
+    idx <- which(filesListData()$report == input$pltreports)
+    summary_level <- filesListData()$summary_level[idx]
+
     output$summary_levels_ui <- renderUI({
       selectInput(
         inputId = ns("pltsummarylevels"),
         label = "Summary Levels",
-        choices = unique(filesListData()$summary_level)
+        choices = unique(summary_level)
       )
     })
+
+    if(length(idx) == 0) {
+      hide("pltsummarylevels")
+    } else {
+      show("pltsummarylevels")
+    }
   })
 
   observeEvent({
@@ -290,7 +318,7 @@ chkboxgrplosstypes = reactiveVal(NULL)
       #TODO: GUL does not have policy, more feedback required for development
       Granularities <- result$Granularities[which(result$Granularities != "Policy")]
     } else {
-     Granularities <- result$Granularities
+      Granularities <- result$Granularities
     }
   })
 
