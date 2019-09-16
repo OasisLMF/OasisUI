@@ -106,7 +106,7 @@ panelOutputModuleUI <- function(id){
              # )
       ),
       column(12,
-             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = NULL, choices = output_options$losstypes, inline = TRUE)),
+             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
       column(6,
              uiOutput(ns("reports_ui"))),
       column(6,
@@ -269,11 +269,14 @@ panelOutputModule <- function(input, output, session,
     inputplottype()}, {
       # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
       if(inputplottype() == "loss per return period") {
-        idx_r <- which(filesListData()$report == plottypeslist$`loss per return period`$Variables)
+        idx_r <- sapply(seq(1, length(filesListData()$report)),
+                    function(x) which(filesListData()$report == plottypeslist$`loss per return period`$Variables[x]))
+
       } else if(inputplottype() == "AAL bar plot") {
         idx_r <- which(filesListData()$report == plottypeslist$`AAL bar plot`$Variables)
       }
-      report <- filesListData()$report[idx_r]
+      idx_r <- unlist(idx_r)
+      report <- lapply(idx_r, function(x) {filesListData()$report[x]})
 
       output$reports_ui <- renderUI({
         selectInput(
