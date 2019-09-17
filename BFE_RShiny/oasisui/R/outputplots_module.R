@@ -451,7 +451,9 @@ panelOutputModule <- function(input, output, session,
         if (nrow(currfileData) > 0) {
           #Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
           nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
-          gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) & !(names(currfileData) %in% extracols) & !(names(currfileData) %in% x)]
+          gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) &
+                                            !(names(currfileData) %in% extracols) &
+                                            !(names(currfileData) %in% x)]
           if (any(which(plotstrc > 1))) {
             extension <- filesToPlot[i, suffix[which(plotstrc > 1)]] # losstype or Variable
           } else {
@@ -476,8 +478,15 @@ panelOutputModule <- function(input, output, session,
     # Make ggplot friendly -----------------------------------------------------
     if (!is.null(fileData)) {
       data <- fileData %>% gather(key = variables, value = value, -nonkey) %>%
-        separate(variables, into = c("variables", "keyval"), sep = "\\.") %>%
+        separate(variables, into = c("variables", "selection"), sep = "\\.") %>%
         spread(variables, value)
+# browser()
+      data <- data %>% rename("keyval" = summary_id)
+seldiff <- NULL
+      # in case that more than one report or perspective is selected
+      if (length(intersect(data$selection, data$selection)) > 1) {
+        seldiff <- data$selection
+      }
 
       # rename column for Y axis
       data <- data %>% rename("value" = key)
@@ -497,17 +506,20 @@ panelOutputModule <- function(input, output, session,
         data <- data %>% rename("reference" = reference)
       }
       # make multiplots if more than one losstype or variable is selected
-      if ( (any(plotstrc > 1) | plottype == "violin" ) & length(gridcol) > 0 ) {
-        multipleplots <- TRUE
-        data <- data %>% rename("colour" = keyval)
-      } else {
-        multipleplots <- FALSE
-        if (length(gridcol) > 0) {
-          data <- data %>% rename("colour" = "gridcol")
-        }  else {
-          data <- data %>% rename("colour" = keyval)
-        }
-      }
+      # if ( (any(plotstrc > 1) | plottype == "violin" ) & length(gridcol) > 0 ) {
+      #   multipleplots <- TRUE
+      #   data <- data %>% rename("colour" = keyval)
+      # } else {
+      #   multipleplots <- FALSE
+      #   if (length(gridcol) > 0) {
+      #     data <- data %>% rename("colour" = "gridcol")
+      #   }  else {
+      #     data <- data %>% rename("colour" = keyval)
+      #   }
+      # }
+
+      multipleplots <- TRUE
+      data <- data %>% rename("colour" = keyval)
     }
 
     # > draw plot --------------------------------------------------------------
@@ -520,6 +532,7 @@ panelOutputModule <- function(input, output, session,
       if (plottype == "line") {
         p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
                          multipleplots = multipleplots)
+        p <- p + labs("summary_id")
       } else if (plottype == "bar") {
         p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
                         wuncertainty = input$chkboxuncertainty,
@@ -606,7 +619,11 @@ panelOutputModule <- function(input, output, session,
   # add facets
   .multiplot <- function(p, multipleplots = FALSE){
     if (multipleplots) {
-      p <- p + facet_wrap(.~ gridcol)
+      if (length(intersect(p$data$selection, p$data$selection))) {
+        p <- p + facet_wrap(c(.~ gridcol, .~ selection))
+      } else {
+        p <- p + facet_wrap(.~ gridcol)
+      }
     }
     p
   }

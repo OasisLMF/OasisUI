@@ -784,11 +784,14 @@ def_out_config <- function(input,
     inputsettings <- list(
       "analysis_tag" = as.integer(analysisID()),
       # TODO: add tag
+      # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
       "model_version_id" = modelData[[tbl_modelsDataNames$model_id]],
       "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
       "number_of_samples" = as.integer(input$tinputnoofsample),
+      # potential new tag portfolio_id
       "prog_id" = as.integer(4),
+      # potential new tag environment_tag
       "source_tag" = getOption("oasisui.settings.oasis_environment")
     )
 

@@ -448,6 +448,8 @@ summarytab <- function(input, output, session,
 
 # Plot functions ---------------------------------------------------------------
 
+#obsolete functions
+
 #' basicplot structure
 #' @title basicplot
 #'
