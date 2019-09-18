@@ -2,6 +2,22 @@ OasisUI Changelog
 ==================
 
 .. AUTO_INSERT-CHANGE_LIST  
+`1.3.1`_
+--------
+* Fix for summary_level column selection
+
+`1.3.0`_
+--------
+* Output configuration update
+* Closes #147 Summary Level methods
+* UI for output configuration (from #148)
+* Closes #164 Improved hazard map performances
+* Closes #157 Fixed logs retrieving
+* Closes #159 Simplified table views
+* Closes #155 Added advanced button for model parameters in output configuration
+* Closes #134 Added rescaling of y-axis in output plots
+* Closes #126 Integrated more efficient data model and API integration based on R6 classes
+
 `1.2.0`_
 --------
 * Integrated `data_file` API resource for hazard maps
@@ -83,6 +99,8 @@ OasisUI Changelog
 
 
 .. AUTO_INSERT-CHANGE_DIFF
+.. _`1.3.1`:  https://github.com/OasisLMF/OasisUI/compare/1.3.0...1.3.1
+.. _`1.3.0`:  https://github.com/OasisLMF/OasisUI/compare/1.2.0...1.3.0
 .. _`1.2.0`:  https://github.com/OasisLMF/OasisUI/compare/1.1.2...1.2.0
 .. _`1.1.2`:  https://github.com/OasisLMF/OasisUI/compare/1.1.1...1.1.2
 .. _`1.1.1`:  https://github.com/OasisLMF/OasisUI/compare/1.1.0...1.1.1
