@@ -109,31 +109,31 @@ panelOutputParams <- function(id) {
     heading = h4("Output Parameters"),
     fluidRow(
       column(
-        12, # 8,
+        8,
         selectInput(
           inputId = ns("sintag"),
           label = "Tag",
           choices = default_tags,
           selected = default_tags[1]
         )
-      )#,
-      # column(
-      #   4,
-      #   br(),
-        # actionButton(
-        #   ns(paste0("abuttonchoosetag")),
-        #   label = NULL,
-        #   icon = icon("list-alt"),
-        #   style = " color: rgb(71, 73, 73);
-        #                     background-color: white;
-        #                     padding: 0px;
-        #                     font-size: 24px;
-        #                     background-image: none;
-        #                     border: none;
-        #                     "
-        # ) %>%
-        #   bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
-      # )
+      ),
+      column(
+        4,
+        br(),
+      actionButton(
+        ns(paste0("abuttonchoosetag")),
+        label = NULL,
+        icon = icon("list-alt"),
+        style = " color: rgb(71, 73, 73);
+                          background-color: white;
+                          padding: 0px;
+                          font-size: 24px;
+                          background-image: none;
+                          border: none;
+                          "
+      ) %>%
+        bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
+      )
     )
   ))
 }
@@ -254,58 +254,58 @@ def_out_config <- function(input,
     hide("panel_anaoutput")
   })
 
-  # configuration title
-  output$paneltitle_defAnaConfigOutput <- renderUI({
-    analysisName <-
-      ifelse(analysisName() == " ", "", paste0('"', analysisName(), '"'))
-    if (result$ana_flag  == "R") {
-      paste0('Re-define output configuration for analysis id ',
-             analysisID(),
-             ' ',
-             analysisName)
-    } else {
-      paste0('Define output configuration for analysis id ',
-             analysisID(),
-             ' ',
-             analysisName)
-    }
-  })
+    # configuration title
+    output$paneltitle_defAnaConfigOutput <- renderUI({
+      analysisName <-
+        ifelse(analysisName() == " ", "", paste0('"', analysisName(), '"'))
+      if (result$ana_flag  == "R") {
+        paste0('Re-define output configuration for analysis id ',
+               analysisID(),
+               ' ',
+               analysisName)
+      } else {
+        paste0('Define output configuration for analysis id ',
+               analysisID(),
+               ' ',
+               analysisName)
+      }
+    })
 
   # Select Tag from another analysis -------------------------------------------
 
   # Choose Tag
-  # observeEvent(input$abuttonchoosetag, {
-  #   tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-  #   # keep all analyses that have been run, i.e. that have an analysis settings associated.
-  #   tbl_analysesData <- tbl_analysesData %>% filter(grepl("run", tolower(status_detailed)))
-  #   namesList <- tbl_analysesData[, tbl_analysesDataNames$name]
-  #   idList <- tbl_analysesData[, tbl_analysesDataNames$id]
-  #   choicesList <- paste(idList, namesList, sep = " / ")
-  #   showModal(AnaList)
-  #   updateSelectInput(inputId = "sinoutputoptions",
-  #                     choices = choicesList,
-  #                     session = session)
-  # })
+  observeEvent(input$abuttonchoosetag, {
+    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    # keep all analyses that have been run, i.e. that have an analysis settings associated.
+    tbl_analysesData <- tbl_analysesData %>% filter(grepl("run", tolower(status_detailed)))
+    namesList <- tbl_analysesData[, tbl_analysesDataNames$name]
+    idList <- tbl_analysesData[, tbl_analysesDataNames$id]
+    choicesList <- paste(idList, namesList, sep = " / ")
+    showModal(AnaList)
+    updateSelectInput(inputId = "sinoutputoptions",
+                      choices = choicesList,
+                      session = session)
+  })
 
   # > Modal Dialogue
-  # AnaList <- modalDialog(
-  #   easyClose = TRUE,
-  #   size = "l",
-  #   selectInput(
-  #     ns("sinoutputoptions"),
-  #     "Select Custom Configuration:",
-  #     choices = ""
-  #   ),
-  #   footer = tagList(
-  #     oasisuiButton(
-  #       ns("abuttonselectconf"),
-  #       label = "Select Configuration",
-  #       align = "left"
-  #     ),
-  #     actionButton(ns("abuttoncancel"),
-  #                  label = "Cancel", align = "right")
-  #   )
-  # )
+  AnaList <- modalDialog(
+    easyClose = TRUE,
+    size = "l",
+    selectInput(
+      ns("sinoutputoptions"),
+      "Select Custom Configuration:",
+      choices = ""
+    ),
+    footer = tagList(
+      oasisuiButton(
+        ns("abuttonselectconf"),
+        label = "Select Configuration",
+        align = "left"
+      ),
+      actionButton(ns("abuttoncancel"),
+                   label = "Cancel", align = "right")
+    )
+  )
 
   # update tag based on analysis selection
   observeEvent(input$abuttonselectconf, {
@@ -341,10 +341,10 @@ def_out_config <- function(input,
           anaID
         ))
         # Get chosen tag out of the analysis settings
-        chosen_tag <- default_tags[1]
+        chosen_tag <- default_tags[3]
         # Update tag
         updateSelectInput(inputId = "sintag",
-                          selected = chosen_tag,
+                          # selected = chosen_tag,
                           session = session)
         # Set inputs
         .updateOutputConfig(analysis_settings)
@@ -596,14 +596,12 @@ def_out_config <- function(input,
                dest,
                pretty = TRUE,
                auto_unbox = TRUE)
-
     # post analysis settings
     post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(
       query_path = paste("analyses", analysisID(), "settings_file", sep = "/"),
       query_body = dest,
       query_encode = "multipart"
     )
-
     result$ana_post_status <- post_analysis_settings_file$status
   })
 
