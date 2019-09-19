@@ -120,19 +120,19 @@ panelOutputParams <- function(id) {
       column(
         4,
         br(),
-      actionButton(
-        ns(paste0("abuttonchoosetag")),
-        label = NULL,
-        icon = icon("list-alt"),
-        style = " color: rgb(71, 73, 73);
+        actionButton(
+          ns(paste0("abuttonchoosetag")),
+          label = NULL,
+          icon = icon("list-alt"),
+          style = " color: rgb(71, 73, 73);
                           background-color: white;
                           padding: 0px;
                           font-size: 24px;
                           background-image: none;
                           border: none;
                           "
-      ) %>%
-        bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
+        ) %>%
+          bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
       )
     )
   ))
@@ -254,22 +254,22 @@ def_out_config <- function(input,
     hide("panel_anaoutput")
   })
 
-    # configuration title
-    output$paneltitle_defAnaConfigOutput <- renderUI({
-      analysisName <-
-        ifelse(analysisName() == " ", "", paste0('"', analysisName(), '"'))
-      if (result$ana_flag  == "R") {
-        paste0('Re-define output configuration for analysis id ',
-               analysisID(),
-               ' ',
-               analysisName)
-      } else {
-        paste0('Define output configuration for analysis id ',
-               analysisID(),
-               ' ',
-               analysisName)
-      }
-    })
+  # configuration title
+  output$paneltitle_defAnaConfigOutput <- renderUI({
+    analysisName <-
+      ifelse(analysisName() == " ", "", paste0('"', analysisName(), '"'))
+    if (result$ana_flag  == "R") {
+      paste0('Re-define output configuration for analysis id ',
+             analysisID(),
+             ' ',
+             analysisName)
+    } else {
+      paste0('Define output configuration for analysis id ',
+             analysisID(),
+             ' ',
+             analysisName)
+    }
+  })
 
   # Select Tag from another analysis -------------------------------------------
 
@@ -340,15 +340,9 @@ def_out_config <- function(input,
           " id ",
           anaID
         ))
-        # Get chosen tag out of the analysis settings
-        chosen_tag <- default_tags[3]
-        # Update tag
-        updateSelectInput(inputId = "sintag",
-                          # selected = chosen_tag,
-                          session = session)
-        # Set inputs
-        .updateOutputConfig(analysis_settings)
       }
+      # re-set configuration to previous selection
+      .updateOutputConfig(analysis_settings, result$ana_flag)
     }
     removeModal()
   })
@@ -389,10 +383,10 @@ def_out_config <- function(input,
             analysisID()
           )
         )
-        #Set inputs
-        .updateOutputConfig(analysis_settings)
       }
     }
+    # re-set configuration to previous selection
+    .updateOutputConfig(analysis_settings, result$ana_flag)
   })
 
   # Output Parameters Details --------------------------------------------------
@@ -442,7 +436,7 @@ def_out_config <- function(input,
       if (all(is.na(oed_field))) {
         logMessage("No list of summary levels provided")
       } else {
-        dynamicUI_btns(tag = input$sintag, n = 0)
+        dynamicUI_btns(result$ana_flag, tag = input$sintag, n = 0)
       }
     })
   })
@@ -484,7 +478,7 @@ def_out_config <- function(input,
   observeEvent(input$clearselection, {
     result$n_add <- 0
     output$summary_levels_reports_ui <- renderUI({
-      dynamicUI_btns(tag = input$sintag, n = 0)
+      dynamicUI_btns("C", tag = input$sintag, n = 0)
     })
   })
 
@@ -616,45 +610,76 @@ def_out_config <- function(input,
   })
 
   # UI functions ---------------------------------------------------------------
-
   # Summary Level and Reports fields
-  dynamicUI <- function(tag, n) {
-    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
-    if (tag == default_tags[3]) {
+  dynamicUI <- function(ana_flag, tag, n) {
+    # If rerun, then display previous selection, otherwise all empty fields
+    if (ana_flag == "R") {
+      analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
+      # check for which perspective there are summary levels
+      if(length(analysis_settings$analysis_settings$gul_summaries) > 0) {
+        choices <- lapply(seq(1, length(analysis_settings$analysis_settings$gul_summaries)),
+                          function(x) {
+                            analysis_settings$analysis_settings$gul_summaries[[x]]$oed_fields
+                          })
+      } else if (length(analysis_settings$analysis_settings$il_summaries) > 0) {
+        choices <- lapply(seq(1, length(analysis_settings$analysis_settings$il_summaries)),
+                          function(x) {
+                            analysis_settings$analysis_settings$il_summaries[[x]]$oed_fields
+                          })
+      } else {
+        choices <- lapply(seq(1, length(analysis_settings$analysis_settings$il_summaries)),
+                          function(x) {
+                            analysis_settings$analysis_settings$il_summaries[[x]]$oed_fields
+                          })
+      }
+
       fluidRow(column(
         5,
         selectInput(
           inputId = ns(paste0("sinsummarylevels", n)),
           label = "Summary Levels",
-          choices = c("All Risks",
-                      oed_field),
-          multiple = TRUE
-        )
-      ),
-      column(
-        5,
-        selectInput(
-          inputId = ns(paste0("sinreports", n)),
-          label = "Reports",
-          choices = output_options$variables,
+          choices = as.list(unlist(choices)),
           multiple = TRUE
         )
       ))
-    } else if (tag == default_tags[2]) {
-      fluidRow(column(
-        5,
-        selectInput(
-          inputId = ns(paste0("sinsummarylevels", n)),
-          label = "Summary Levels",
-          choices = oed_field,
-          multiple = TRUE
-        )
-      ))
+    } else if (ana_flag == "C") {
+      oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+      if (tag == default_tags[3]) {
+        fluidRow(column(
+          5,
+          selectInput(
+            inputId = ns(paste0("sinsummarylevels", n)),
+            label = "Summary Levels",
+            choices = c("All Risks",
+                        oed_field),
+            multiple = TRUE
+          )
+        ),
+        column(
+          5,
+          selectInput(
+            inputId = ns(paste0("sinreports", n)),
+            label = "Reports",
+            choices = output_options$variables,
+            multiple = TRUE
+          )
+        ))
+      } else if (tag == default_tags[2]) {
+        fluidRow(column(
+          5,
+          selectInput(
+            inputId = ns(paste0("sinsummarylevels", n)),
+            label = "Summary Levels",
+            choices = oed_field,
+            multiple = TRUE
+          )
+        ))
+      }
     }
   }
 
   # add "+" and "x" buttons to dynamic UI
-  dynamicUI_btns <- function(tag, n) {
+  dynamicUI_btns <- function(ana_flag, tag, n) {
     if(tag == default_tags[2] || tag == default_tags[3]) {
       tagList(fluidRow(
         column(
@@ -674,7 +699,7 @@ def_out_config <- function(input,
                    bs_embed_tooltip(title = defineSingleAna_tooltips$removeBtn, placement = "right")
                )),
         column(8,
-               dynamicUI(tag, n))
+               dynamicUI(ana_flag, tag, n))
       ),
       tags$div(id = 'placeholder'))
     }
@@ -690,7 +715,7 @@ def_out_config <- function(input,
                     fluidRow(column(3),
                              column(
                                8,
-                               dynamicUI(tag, n)
+                               dynamicUI("C", tag, n)
                              )))
     )
   }
@@ -750,9 +775,24 @@ def_out_config <- function(input,
   }
 
   # Helper Functions -----------------------------------------------------------
-
-  .updateOutputConfig <- function(analysis_settings) {
+  # re-set Rerun panel to previous selection
+  .updateOutputConfig <- function(analysis_settings, ana_flag) {
     logMessage(".updateOutputConfig called")
+    if (ana_flag == "R") {
+      # In case of Rerun, tag is set to Custom
+      chosen_tag <- default_tags[3]
+      # Update tag
+      updateSelectInput(inputId = "sintag",
+                        selected = chosen_tag,
+                        session = session)
+    } else {
+      # In case of Output Configuration, tag is set to Summary
+      chosen_tag <- default_tags[1]
+      # Update tag
+      updateSelectInput(inputId = "sintag",
+                        selected = chosen_tag,
+                        session = session)
+    }
   }
 
   .gen_analysis_settings <- function() {
