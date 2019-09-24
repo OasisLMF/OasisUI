@@ -604,33 +604,38 @@ def_out_config <- function(input,
 
   # Summary Level and Reports fields
   dynamicUI <- function(ana_flag, tag, n) {
-    list <- session$userData$data_hub$get_ana_outputs_data_list(analysisID())
+    # Retrieve run information from API
+    out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID())
     oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
     # If rerun, then display previous selection, otherwise all empty fields
     if (ana_flag == "R") {
-      # Retrieve run information from API
-      choices_rep_all <- as.list(unlist(list$report))
-      choices_rep <- choices_rep_all[-which(choices_rep_all == "Summary Info")]
+      # Summary Info output is non-configurable, remove it
+      out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
+      # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
 
-      choices_per <- as.list(unlist(toupper(list$perspective)))
+      uniq_sum <- unique(out_cnfg_tbl$summary_level)
+      choices_sum <- lapply(uniq_sum, function(x) {
+        strsplit(x, ", ")[[1]]
+      })
 
-      choices_list <- unlist(lapply(seq(1, length(list$report)), function(x) {
-        list$summary_level[match(choices_rep_all[x], list$report)]
-      }))
+      # choices_list <- unlist(lapply(seq(1, length(out_cnfg_tbl$report)), function(x) {
+      #   out_cnfg_tbl$summary_level[match(choices_rep_all[x], out_cnfg_tbl$report)]
+      # }))
       # In case multiple fields were selected, split the comma and make them two separate strings
-      choices_sum <- unique(lapply(seq(1, length(list$report)), function(x) {
-        strsplit(choices_list[x], ", ")
-      }))
+      # choices_sum <- unique(lapply(seq(1, length(out_cnfg_tbl$report)), function(x) {
+      #   strsplit(choices_list[x], ", ")
+      # }))
 
       # combine multiple reports for same summary level
-      choices_rep_final <- lapply(seq(1, length(choices_sum)), function(x) {
-        list$report[which(choices_list[x] == list$summary_level)]
+      choices_rep_final <- lapply(uniq_sum, function(x) {
+        out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
       })
 
       result$n_add <- length(choices_sum)
 
-      # TODO update checboxes selection
-      updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_per)
+      # update checboxes selection
+      choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
+      updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
 
       if (tag == default_tags[3]) {
         lapply(seq(1, length(choices_sum)), function(x) {
@@ -641,7 +646,7 @@ def_out_config <- function(input,
                 inputId = ns(paste0("sinsummarylevels", x)),
                 label = "Summary Levels",
                 choices = c("All Risks", oed_field),
-                selected = choices_sum[[x]][[1]],
+                selected = choices_sum[[x]],
                 multiple = TRUE
               )
             ),
@@ -651,22 +656,14 @@ def_out_config <- function(input,
                 inputId = ns(paste0("sinreports", x)),
                 label = "Reports",
                 choices = output_options$variables,
-                selected = choices_rep_final[x][[1]],
+                selected = choices_rep_final[[x]],
                 multiple = TRUE
               )
             ))
         })
       } else if (tag == default_tags[2]) {
-        choices_rep_all <- as.list(unlist(session$userData$data_hub$get_ana_outputs_data_list(analysisID())$report))
-        choices_rep_all <- choices_rep_all[-which(choices_rep_all == c("Summary Info", "All Risks"))]
-        choices_list <- lapply(seq(1, length(choices_rep_all)), function(x) {
-          list$summary_level[match(choices_rep_all[x], choices_rep_all)]
-        })
-        # In case multiple fields were selected, split the comma and make them two separate strings
-        choices_sum <- unique(lapply(seq(1, length(choices_rep_all)), function(x) {
-          strsplit(choices_list[x][[1]], ", ")
-        }))
-
+        # browser()
+        choices_sum <- choices_sum[choices_sum != "All Risks"]
         lapply(seq(1, length(choices_sum)), function(x) {
           fluidRow(
             column(
@@ -675,7 +672,7 @@ def_out_config <- function(input,
                 inputId = ns(paste0("sinsummarylevels", x)),
                 label = "Summary Levels",
                 choices = oed_field,
-                selected = choices_sum[[x]][[1]],
+                selected = choices_sum[[x]],
                 multiple = TRUE
               )
             )
@@ -820,19 +817,15 @@ def_out_config <- function(input,
     if (ana_flag == "R") {
       # In case of Rerun, tag is set to Custom
       chosen_tag <- default_tags[3]
-      # Update tag
-      updateSelectInput(inputId = "sintag",
-                        selected = chosen_tag,
-                        session = session)
-      dynamicUI_btns(ana_flag, tag = chosen_tag, n = 0)
+      # dynamicUI_btns(ana_flag, tag = chosen_tag, n = 0)
     } else {
       # In case of Output Configuration, tag is set to Summary
       chosen_tag <- default_tags[1]
-      # Update tag
-      updateSelectInput(inputId = "sintag",
-                        selected = chosen_tag,
-                        session = session)
     }
+    # Update tag
+    updateSelectInput(inputId = "sintag",
+                      selected = chosen_tag,
+                      session = session)
   }
 
   .gen_analysis_settings <- function() {
