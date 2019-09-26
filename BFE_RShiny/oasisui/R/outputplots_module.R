@@ -433,7 +433,7 @@ panelOutputModule <- function(input, output, session,
     # > filter out files to read -----------------------------------------------
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
-        filesToPlot <- filesListData()  %>% filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
+        filesToPlot <- filesListData() %>% filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
                                                    report %in% input$pltreports,
                                                    summary_level %in%  input$pltsummarylevels)
         if (nrow(filesToPlot) != prod(plotstrc)) {
@@ -480,8 +480,22 @@ panelOutputModule <- function(input, output, session,
       data <- fileData %>% gather(key = variables, value = value, -nonkey) %>%
         separate(variables, into = c("variables", "selection"), sep = "\\.") %>%
         spread(variables, value)
-# browser()
+
+      summary_id_mapfile <- filesListData() %>% filter(grepl("summary-info", files),
+          perspective %in% tolower(chkbox$chkboxgrplosstypes()),
+          summary_level %in% input$pltsummarylevels)
+      summary_id_map <- as.data.frame(.readFile(summary_id_mapfile$files))
+      # for "All Risks", replace colname "n/a" and entry "undefined" with "All Risks"
+      if (summary_id_map[2][[1]] == "undefined") {
+        summary_id_map[2][[1]] <- "All Risks"
+        names(summary_id_map)[2] <- "All Risks"
+      }
+      summary_id_map$summary_desc <- do.call("paste", summary_id_map[2:ncol(summary_id_map)])
+      # replace summary IDs with descriptions
+      data <- data %>% mutate(summary_id = summary_id_map[match(summary_id, summary_id_map$summary_id), "summary_desc"])
+
       data <- data %>% rename("keyval" = summary_id)
+
 seldiff <- NULL
       # in case that more than one report or perspective is selected
       if (length(intersect(data$selection, data$selection)) > 1) {
