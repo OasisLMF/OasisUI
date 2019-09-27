@@ -114,8 +114,8 @@ panelOutputModuleUI <- function(id){
       br(),
       column(3,
              # div(class = "InlineTextInput",
-                 textInput(ns("textinputtitle"), "Title", "")),
-             # ),
+             textInput(ns("textinputtitle"), "Title", "")),
+      # ),
       column(4,
              checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
       column(3,
@@ -270,7 +270,7 @@ panelOutputModule <- function(input, output, session,
       # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
       if(inputplottype() == "loss per return period") {
         idx_r <- sapply(seq(1, length(filesListData()$report)),
-                    function(x) which(filesListData()$report == plottypeslist$`loss per return period`$Variables[x]))
+                        function(x) which(filesListData()$report == plottypeslist$`loss per return period`$Variables[x]))
 
       } else if(inputplottype() == "AAL bar plot") {
         idx_r <- which(filesListData()$report == plottypeslist$`AAL bar plot`$Variables)
@@ -434,8 +434,8 @@ panelOutputModule <- function(input, output, session,
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
         filesToPlot <- filesListData() %>% filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
-                                                   report %in% input$pltreports,
-                                                   summary_level %in%  input$pltsummarylevels)
+                                                  report %in% input$pltreports,
+                                                  summary_level %in%  input$pltsummarylevels)
         if (nrow(filesToPlot) != prod(plotstrc)) {
           oasisuiNotification(type = "error",
                               "The analysis did not produce the selected output. Please check the logs.")
@@ -482,8 +482,8 @@ panelOutputModule <- function(input, output, session,
         spread(variables, value)
 
       summary_id_mapfile <- filesListData() %>% filter(grepl("summary-info", files),
-          perspective %in% tolower(chkbox$chkboxgrplosstypes()),
-          summary_level %in% input$pltsummarylevels)
+                                                       perspective %in% tolower(chkbox$chkboxgrplosstypes()),
+                                                       summary_level %in% input$pltsummarylevels)
       summary_id_map <- as.data.frame(.readFile(summary_id_mapfile$files))
       # for "All Risks", replace colname "n/a" and entry "undefined" with "All Risks"
       if (summary_id_map[2][[1]] == "undefined") {
@@ -496,7 +496,7 @@ panelOutputModule <- function(input, output, session,
 
       data <- data %>% rename("keyval" = summary_id)
 
-seldiff <- NULL
+      seldiff <- NULL
       # in case that more than one report or perspective is selected
       if (length(intersect(data$selection, data$selection)) > 1) {
         seldiff <- data$selection
@@ -504,6 +504,11 @@ seldiff <- NULL
 
       # rename column for Y axis
       data <- data %>% rename("value" = key)
+
+      # filter for only type 1 and replace with "type 1"
+      data <- data %>%  filter(type == 1)
+      # data$type <- as.character(sapply("type", paste, data$type, sep = " "))
+      data$type <- paste("type", data$type)
 
       # rename column for x axis
       data <- data %>% rename("xaxis" = x)
