@@ -495,7 +495,6 @@ panelOutputModule <- function(input, output, session,
       data <- data %>% mutate(summary_id = summary_id_map[match(summary_id, summary_id_map$summary_id), "summary_desc"])
 
       data <- data %>% rename("keyval" = summary_id)
-
       seldiff <- NULL
       # in case that more than one report or perspective is selected
       if (length(intersect(data$selection, data$selection)) > 1) {
@@ -505,17 +504,18 @@ panelOutputModule <- function(input, output, session,
       # rename column for Y axis
       data <- data %>% rename("value" = key)
 
-      # filter for only type 1 and replace with "type 1"
-      data <- data %>%  filter(type == 1)
-      # data$type <- as.character(sapply("type", paste, data$type, sep = " "))
-      data$type <- paste("type", data$type)
-
+      if(input$inputplottype == "loss per return period") {
+        # filter for only type 1 and replace with "type 1"
+        data <- data %>%  filter(type == 1)
+        data$type <- paste("type", data$type)
+      }
       # rename column for x axis
       data <- data %>% rename("xaxis" = x)
       # rename column for granularity. Can be null if granularity level is portfolio
       if (length(gridcol) > 0) {
         data <- data %>% rename("gridcol" = gridcol)
       }
+
       # rename column for uncertainty. Not all files will have it
       if (length(uncertainty) > 0) {
         data <- data %>% rename("uncertainty" = uncertainty)
@@ -674,7 +674,7 @@ panelOutputModule <- function(input, output, session,
       #   p <- .addRefLine(p, unique(data$reference))
       # }
     }
-    p <- .multiplot(p,multipleplots)
+    p <- .multiplot(p, FALSE)
     p
   }
 
