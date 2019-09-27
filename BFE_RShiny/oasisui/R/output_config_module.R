@@ -77,8 +77,8 @@ panelModelParams <- function(id) {
         div(
           id = ns("configureAnaParamsAdvanced"),
           align = "left",
-          textInput(ns("tinputnoofsample"), label = "Number of Samples:", value = "10"),
-          textInput(ns("tinputthreshold"), label = "Loss Threshold:", value = "0"),
+          numericInput(ns("tinputnoofsample"), label = "Number of Samples:", value = 10),
+          numericInput(ns("tinputthreshold"), label = "Loss Threshold:", value = 0),
           uiOutput(ns("advanced_model_param")),
           # checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
           oasisuiButton(inputId = ns("abuttonbasic"), label = "Basic")
@@ -220,8 +220,6 @@ def_out_config <- function(input,
 
   # max number rows for custom output params is 9, but set to 8 when counting from 0
   max_n <- 8
-  # inserted fields
-  inserted <- reactiveValues(val = 0)
 
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
@@ -239,9 +237,12 @@ def_out_config <- function(input,
     )
   )
 
+  # inserted fields
+  inserted <- reactiveValues(val = 0)
+
   # Set up ---------------------------------------------------------------------
 
-  #ana_flag
+  # ana_flag
   observeEvent(ana_flag(), {
     if (ana_flag() != result$ana_flag) {
       result$ana_flag <- ana_flag()
@@ -262,8 +263,7 @@ def_out_config <- function(input,
 
   # configuration title
   output$paneltitle_defAnaConfigOutput <- renderUI({
-    analysisName <-
-      ifelse(analysisName() == " ", "", paste0('"', analysisName(), '"'))
+    analysisName <- ifelse(analysisName() == " ", "", paste0('"', analysisName(), '"'))
     if (result$ana_flag  == "R") {
       paste0('Re-define output configuration for analysis id ',
              analysisID(),
@@ -278,20 +278,6 @@ def_out_config <- function(input,
   })
 
   # Select Tag from another analysis -------------------------------------------
-
-  # Choose Tag
-  observeEvent(input$abuttonchoosetag, {
-    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-    # keep all analyses that have been run, i.e. that have an analysis settings associated.
-    tbl_analysesData <- tbl_analysesData %>% filter(grepl("run", tolower(status_detailed)))
-    namesList <- tbl_analysesData[, tbl_analysesDataNames$name]
-    idList <- tbl_analysesData[, tbl_analysesDataNames$id]
-    choicesList <- paste(idList, namesList, sep = " / ")
-    showModal(AnaList)
-    updateSelectInput(inputId = "sinoutputoptions",
-                      choices = choicesList,
-                      session = session)
-  })
 
   # > Modal Dialogue
   AnaList <- modalDialog(
@@ -313,45 +299,63 @@ def_out_config <- function(input,
     )
   )
 
+  # Choose Tag
+  observeEvent(input$abuttonchoosetag, {
+    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    # keep all analyses that have been run, i.e. that have an analysis settings associated.
+    tbl_analysesData <- tbl_analysesData %>% filter(grepl("run", tolower(status_detailed)))
+    namesList <- tbl_analysesData[, tbl_analysesDataNames$name]
+    idList <- tbl_analysesData[, tbl_analysesDataNames$id]
+    choicesList <- paste(idList, namesList, sep = " / ")
+    updateSelectInput(inputId = "sinoutputoptions",
+                      choices = choicesList,
+                      session = session)
+    showModal(AnaList)
+  })
+
   # update tag based on analysis selection
   observeEvent(input$abuttonselectconf, {
-    # Using analyses names to select the output configuration of a previously posted analyses
-    logMessage(
-      paste0(
-        "updating output configuration because input$sinoutputoptions changed to ",
-        input$sinoutputoptions
+      # Using analyses names to select the output configuration of a previously posted analyses
+      logMessage(
+        paste0(
+          "updating output configuration because input$sinoutputoptions changed to ",
+          input$sinoutputoptions
+        )
       )
-    )
-    if (length(input$sinoutputoptions) > 0 &&
-        input$sinoutputoptions != "") {
-      anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
-      anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
-      analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
-      if (!is.null(analysis_settings$detail) &&
-          analysis_settings$detail == "Not found.") {
-        oasisuiNotification(
-          type = "error",
-          paste0(
-            "No output configuration associated to analysis ",
+      if (length(input$sinoutputoptions) > 0 &&
+          input$sinoutputoptions != "") {
+        anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
+        anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
+        analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
+
+        if (!is.null(analysis_settings$detail) &&
+            analysis_settings$detail == "Not found.") {
+          oasisuiNotification(
+            type = "error",
+            paste0(
+              "No output configuration associated to analysis ",
+              anaName,
+              " id ",
+              anaID,
+              "."
+            )
+          )
+        } else {
+          logMessage(paste0(
+            "appling the output configuration of analysis ",
             anaName,
             " id ",
-            anaID,
-            "."
-          )
-        )
-      } else {
-        logMessage(paste0(
-          "appling the output configuration of analysis ",
-          anaName,
-          " id ",
-          anaID
-        ))
+            anaID
+          ))
+        }
+        # re-set configuration to previous selection
+        output$summary_levels_reports_ui <- renderUI({
+          dynamicUI_btns(anaID, "R", tag = input$sintag)
+        })
+        .updateOutputConfig(analysis_settings, result$ana_flag)
       }
-    }
-    # re-set configuration to previous selection
-    .updateOutputConfig(analysis_settings, result$ana_flag)
-    removeModal()
-  })
+      removeModal()
+    })
 
   # > close modal
   observeEvent(input$abuttoncancel, {
@@ -360,7 +364,7 @@ def_out_config <- function(input,
 
   # Preselected Output Configuration -------------------------------------------
 
-  # Rerun case
+  # log message and potential render UI in case analysis or flag changes
   observeEvent({
     result$ana_flag
     analysisID()
@@ -390,9 +394,9 @@ def_out_config <- function(input,
           )
         )
       }
+      # re-set configuration to previous selection
+      .updateOutputConfig(analysis_settings, result$ana_flag)
     }
-    # re-set configuration to previous selection
-    .updateOutputConfig(analysis_settings, result$ana_flag)
   })
 
   # >> summary levels and reports ----------------------------------------------
@@ -427,15 +431,21 @@ def_out_config <- function(input,
       if (all(is.na(oed_field))) {
         logMessage("No list of summary levels provided")
       } else {
-        dynamicUI_btns(result$ana_flag, tag = input$sintag, n = 0)
+        # below returns NULL for Summary case
+        dynamicUI_btns(analysisID(), result$ana_flag, tag = input$sintag)
       }
     })
+
+    # disable removeBtn in case there is just a single set of fields
+    if (result$n_add < 1) {
+      disable("removeBtn")
+    }
   })
 
   # insert new summary levels and reports
   observeEvent(input$addBtn, {
     result$n_add <- result$n_add + 1
-    id <- length(inserted$val) + 1
+    id <- length(inserted$val)
     logMessage(paste0("insert ui because addBtn changed to ",  result$n_add))
     add_UI(result$n_add, id, input$sintag)
     # Max number of fields limited to 9 (current limitation by the back-end)
@@ -445,19 +455,20 @@ def_out_config <- function(input,
       # drill-down allows one slot less, since one is already pre-occupied by the default "All Risks"
       disable("addBtn")
     }
-    inserted$val <- c(inserted$val, id)
     enable("removeBtn")
+    inserted$val <- c(inserted$val, id)
   })
 
   # remove summary levels and reports
   observeEvent(input$removeBtn, {
     result$n_add <- result$n_add - 1
-    if (result$n_add < (max_n - 1)) {
+    if (input$sintag == default_tags[2] && result$n_add < (max_n - 1)) {
       enable("addBtn")
     } else if (input$sintag == default_tags[3] && result$n_add < max_n) {
       # custom allows one more since no slot is pre-occupied by a default
       enable("addBtn")
     }
+    # print(inserted$val[length(inserted$val)])
     removeUI(selector = paste0('#', inserted$val[length(inserted$val)]))
     inserted$val <- inserted$val[-length(inserted$val)]
     if (result$n_add < 1) {
@@ -469,7 +480,7 @@ def_out_config <- function(input,
   observeEvent(input$clearselection, {
     result$n_add <- 0
     output$summary_levels_reports_ui <- renderUI({
-      dynamicUI_btns("C", tag = input$sintag, n = 0)
+      dynamicUI_btns(analysisID(), "C", tag = input$sintag)
     })
   })
 
@@ -603,42 +614,91 @@ def_out_config <- function(input,
   # UI functions ---------------------------------------------------------------
 
   # Summary Level and Reports fields
-  dynamicUI <- function(ana_flag, tag, n) {
-    # Retrieve run information from API
-    out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID())
-    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
-    # If rerun, then display previous selection, otherwise all empty fields
-    if (ana_flag == "R") {
-      # Summary Info output is non-configurable, remove it
-      out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
-      # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
+  dynamicUI <- function(analysisID, ana_flag, tag, n_field) {
+    # only called for Case 2 and 3 (drill-down or custom)
+    # Retrieve summary levels information from API
+    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID)$oed_field
+    # all empty fields
+    if (tag == default_tags[3]) {
+      fluidRow(
+        column(
+          5,
+          selectInput(
+            inputId = ns(paste0("sinsummarylevels", n_field)),
+            label = "Summary Levels",
+            choices = c("All Risks", oed_field),
+            selected = NULL,
+            multiple = TRUE
+          )
+        ),
+        column(
+          5,
+          selectInput(
+            inputId = ns(paste0("sinreports", n_field)),
+            label = "Reports",
+            choices = output_options$variables,
+            selected = NULL,
+            multiple = TRUE
+          )
+        )
+      )
+    } else if (tag == default_tags[2]) {
+      fluidRow(
+        column(
+          5,
+          selectInput(
+            inputId = ns(paste0("sinsummarylevels", n_field)),
+            label = "Summary Levels",
+            choices = oed_field,
+            selected = NULL,
+            multiple = TRUE
+          )
+        )
+      )
+    }
+  }
 
-      uniq_sum <- unique(out_cnfg_tbl$summary_level)
-      choices_sum <- lapply(uniq_sum, function(x) {
-        strsplit(x, ", ")[[1]]
-      })
+  # Summary Level and Reports fields in re-run situation
+  rerunUI <- function(analysisID, tag) {
+    # only called for Case 2 and 3 (drill-down or custom)
+    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID)$oed_field
+    # retrieve run information from API
+    out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
+    analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID, oasisapi = session$userData$oasisapi)
 
-      # choices_list <- unlist(lapply(seq(1, length(out_cnfg_tbl$report)), function(x) {
-      #   out_cnfg_tbl$summary_level[match(choices_rep_all[x], out_cnfg_tbl$report)]
-      # }))
-      # In case multiple fields were selected, split the comma and make them two separate strings
-      # choices_sum <- unique(lapply(seq(1, length(out_cnfg_tbl$report)), function(x) {
-      #   strsplit(choices_list[x], ", ")
-      # }))
+    analysis_settings[[1]]$model_settings # event_set, event_occurrence_id and whatever else (e.g. demand_surge). return_period_file can be ignored (?).
+    analysis_settings[[1]]$number_of_samples # input$tinputnoofsample
+    analysis_settings[[1]]$gul_threshold # input$tinputthreshold
+    # analysis_settings[[1]]$ui_config_tag
 
-      # combine multiple reports for same summary level
-      choices_rep_final <- lapply(uniq_sum, function(x) {
-        out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
-      })
+    # display previous selection
+    # Summary Info output is non-configurable, remove it
+    out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
+    # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
 
-      result$n_add <- length(choices_sum)
+    uniq_sum <- unique(out_cnfg_tbl$summary_level)
+    # In case multiple fields were selected, split the comma and make them two separate strings
+    choices_sum <- lapply(uniq_sum, function(x) {
+      strsplit(x, ", ")[[1]]
+    })
+    # combine multiple reports for same summary level
+    choices_rep_final <- lapply(uniq_sum, function(x) {
+      out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
+    })
 
-      # update checboxes selection
-      choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
-      updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+    # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
+    result$n_add <- length(choices_sum) - 1
+    inserted$val <- seq(0, result$n_add)
 
-      if (tag == default_tags[3]) {
-        lapply(seq(1, length(choices_sum)), function(x) {
+    # update checkboxes selection
+    choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
+    updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+
+    # update main panel
+    if (tag == default_tags[3]) {
+      lapply(seq(1, length(choices_sum)), function(x) {
+        tags$div(
+          id = x - 1,
           fluidRow(
             column(
               5,
@@ -660,11 +720,13 @@ def_out_config <- function(input,
                 multiple = TRUE
               )
             ))
-        })
-      } else if (tag == default_tags[2]) {
-        # browser()
-        choices_sum <- choices_sum[choices_sum != "All Risks"]
-        lapply(seq(1, length(choices_sum)), function(x) {
+        )
+      })
+    } else if (tag == default_tags[2]) {
+      choices_sum <- choices_sum[choices_sum != "All Risks"]
+      lapply(seq(1, length(choices_sum)), function(x) {
+        tags$div(
+          id = x - 1,
           fluidRow(
             column(
               5,
@@ -677,81 +739,54 @@ def_out_config <- function(input,
               )
             )
           )
-        })
-      }
-    } else if (ana_flag == "C") {
-      if (tag == default_tags[3]) {
-        fluidRow(column(
-          5,
-          selectInput(
-            inputId = ns(paste0("sinsummarylevels", n)),
-            label = "Summary Levels",
-            choices = c("All Risks",
-                        oed_field),
-            multiple = TRUE
-          )
-        ),
-        column(
-          5,
-          selectInput(
-            inputId = ns(paste0("sinreports", n)),
-            label = "Reports",
-            choices = output_options$variables,
-            multiple = TRUE
-          )
-        ))
-      } else if (tag == default_tags[2]) {
-        fluidRow(column(
-          5,
-          selectInput(
-            inputId = ns(paste0("sinsummarylevels", n)),
-            label = "Summary Levels",
-            choices = oed_field,
-            multiple = TRUE
-          )
-        ))
-      }
+        )
+      })
     }
   }
 
   # add "+" and "x" buttons to dynamic UI
-  dynamicUI_btns <- function(ana_flag, tag, n) {
-    if(tag == default_tags[2] || tag == default_tags[3]) {
+  dynamicUI_btns <- function(analysisID, ana_flag, tag) {
+
+    if (tag == default_tags[2] || tag == default_tags[3]) {
       tagList(fluidRow(
-        column(
-          1,
-          br(),
-          actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
-            bs_embed_tooltip(title = defineSingleAna_tooltips$addBtn, placement = "right")
+        column(1,
+               br(),
+               actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
+                 bs_embed_tooltip(title = defineSingleAna_tooltips$addBtn, placement = "right")
         ),
         column(2,
                br(),
-               disabled(
-                 actionButton(
-                   ns("removeBtn"),
-                   label = "",
-                   icon = icon("times")
-                 ) %>%
-                   bs_embed_tooltip(title = defineSingleAna_tooltips$removeBtn, placement = "right")
-               )),
+               #disabled(
+               actionButton(
+                 ns("removeBtn"),
+                 label = "",
+                 icon = icon("times")
+               ) %>%
+                 bs_embed_tooltip(title = defineSingleAna_tooltips$removeBtn, placement = "right")
+               #)
+        ),
         column(8,
-               dynamicUI(ana_flag, tag, n))
+               if (ana_flag == "C") {
+                 dynamicUI(analysisID, ana_flag, tag, 0)
+               } else if (ana_flag == "R") {
+                 rerunUI(analysisID, tag)
+               }
+        )
       ),
       tags$div(id = 'placeholder'))
     }
   }
 
   # Add additional fields to the UI
-  add_UI <- function(n, id, tag) {
+  add_UI <- function(n_field, id, tag) {
     insertUI(
       selector = '#placeholder',
       where = "beforeBegin",
       immediate = TRUE,
       ui = tags$div(id = id,
                     fluidRow(column(3),
-                             column(
-                               8,
-                               dynamicUI("C", tag, n)
+                             column(8,
+                                    dynamicUI(analysisID(), "C", tag, n_field)
                              )))
     )
   }
@@ -814,10 +849,15 @@ def_out_config <- function(input,
   # re-set Rerun panel to previous selection
   .updateOutputConfig <- function(analysis_settings, ana_flag) {
     logMessage(".updateOutputConfig called")
+
     if (ana_flag == "R") {
       # In case of Rerun, tag is set to Custom
       chosen_tag <- default_tags[3]
-      # dynamicUI_btns(ana_flag, tag = chosen_tag, n = 0)
+      # update Number of samples and Threshold in model params panel
+      if(is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
+        updateNumericInput(session, "tinputnoofsample", value = analysis_settings[[1]]$number_of_samples)
+        updateNumericInput(session, "tinputthreshold", value = analysis_settings[[1]]$gul_threshold)
+      }
     } else {
       # In case of Output Configuration, tag is set to Summary
       chosen_tag <- default_tags[1]
@@ -855,6 +895,7 @@ def_out_config <- function(input,
     inputsettings <- list(
       "analysis_tag" = as.integer(analysisID()),
       # TODO: add tag
+      "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
       "model_version_id" = modelData[[tbl_modelsDataNames$model_id]],
@@ -1039,8 +1080,7 @@ def_out_config <- function(input,
                           label = model_perils[[p]], # curr_param_lst$name,
                           value = TRUE) #curr_param_lst$default)
           })
-          output$chkinputsperils <-
-            renderUI(list(h5("Available Perils"), ui_perils))
+          output$chkinputsperils <- renderUI(list(h5("Available Perils"), ui_perils))
         }
 
         # Advanced model params
@@ -1074,8 +1114,7 @@ def_out_config <- function(input,
               )
             }
           })
-        output$advanced_model_param <-
-          renderUI(ui_advanced_model_param)
+        output$advanced_model_param <- renderUI(ui_advanced_model_param)
       }
     }
   }
