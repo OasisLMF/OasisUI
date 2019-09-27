@@ -355,7 +355,7 @@ def_out_config <- function(input,
         .updateOutputConfig(analysis_settings, result$ana_flag)
       }
       removeModal()
-    })
+  })
 
   # > close modal
   observeEvent(input$abuttoncancel, {
@@ -370,8 +370,7 @@ def_out_config <- function(input,
     analysisID()
   }, {
     if (!is.null(analysisID()) && result$ana_flag == "R") {
-      analysis_settings <-
-        session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
+      analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
       if (!is.null(analysis_settings$detail) &&
           analysis_settings$detail == "Not found.") {
         oasisuiNotification(
@@ -400,6 +399,10 @@ def_out_config <- function(input,
   })
 
   # >> summary levels and reports ----------------------------------------------
+  oed_field_react <- reactive({
+    print("oed_field_react")
+    session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+  })
 
   observeEvent({
     input$sintag
@@ -426,7 +429,8 @@ def_out_config <- function(input,
 
     # reset counter
     output$summary_levels_reports_ui <- renderUI({
-      oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
+      print("re-rendering")
+      oed_field <- oed_field_react()
       # if oed fields are provided, a vector is returned, otherwise NA
       if (all(is.na(oed_field))) {
         logMessage("No list of summary levels provided")
@@ -436,10 +440,12 @@ def_out_config <- function(input,
       }
     })
 
-    # disable removeBtn in case there is just a single set of fields
-    if (result$n_add < 1) {
+  })
+
+  # disable removeBtn in case there is just a single set of fields
+  observeEvent(result$n_add, {
+    if (result$n_add < 1)
       disable("removeBtn")
-    }
   })
 
   # insert new summary levels and reports
@@ -471,9 +477,6 @@ def_out_config <- function(input,
     # print(inserted$val[length(inserted$val)])
     removeUI(selector = paste0('#', inserted$val[length(inserted$val)]))
     inserted$val <- inserted$val[-length(inserted$val)]
-    if (result$n_add < 1) {
-      disable("removeBtn")
-    }
   })
 
   # clear all items
@@ -485,7 +488,6 @@ def_out_config <- function(input,
   })
 
   # > Output Params Review -----------------------------------------------------
-
   # review of output configuration in long format. As a collapsible panel. Available for all tags
   output$out_params_review_ui <- renderUI(tagList(
     oasisuiPanel(
@@ -582,7 +584,6 @@ def_out_config <- function(input,
 
   # Run analysis ---------------------------------------------------------------
   # Execute analysis
-
   observeEvent(input$abuttonexecuteanarun, {
     analysis_settingsList <- .gen_analysis_settings()
     # write out file to be uploades
@@ -614,10 +615,11 @@ def_out_config <- function(input,
   # UI functions ---------------------------------------------------------------
 
   # Summary Level and Reports fields
-  dynamicUI <- function(analysisID, ana_flag, tag, n_field) {
+  dynamicUI <- function(analysisID, tag, n_field) {
+    print("dynamicUI")
     # only called for Case 2 and 3 (drill-down or custom)
     # Retrieve summary levels information from API
-    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID)$oed_field
+    oed_field <- oed_field_react()
     # all empty fields
     if (tag == default_tags[3]) {
       fluidRow(
@@ -660,15 +662,16 @@ def_out_config <- function(input,
 
   # Summary Level and Reports fields in re-run situation
   rerunUI <- function(analysisID, tag) {
+    print("rerunUI")
     # only called for Case 2 and 3 (drill-down or custom)
-    oed_field <- session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID)$oed_field
+    oed_field <- oed_field_react()
     # retrieve run information from API
     out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID, oasisapi = session$userData$oasisapi)
 
-    analysis_settings[[1]]$model_settings # event_set, event_occurrence_id and whatever else (e.g. demand_surge). return_period_file can be ignored (?).
-    analysis_settings[[1]]$number_of_samples # input$tinputnoofsample
-    analysis_settings[[1]]$gul_threshold # input$tinputthreshold
+    #analysis_settings[[1]]$model_settings # event_set, event_occurrence_id and whatever else (e.g. demand_surge). return_period_file can be ignored (?).
+    #analysis_settings[[1]]$number_of_samples # input$tinputnoofsample
+    #analysis_settings[[1]]$gul_threshold # input$tinputthreshold
     # analysis_settings[[1]]$ui_config_tag
 
     # display previous selection
@@ -688,7 +691,7 @@ def_out_config <- function(input,
 
     # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
     result$n_add <- length(choices_sum) - 1
-    inserted$val <- seq(0, result$n_add)
+    inserted$val <- seq(0, isolate(result$n_add))
 
     # update checkboxes selection
     choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
@@ -703,7 +706,7 @@ def_out_config <- function(input,
             column(
               5,
               selectInput(
-                inputId = ns(paste0("sinsummarylevels", x)),
+                inputId = ns(paste0("sinsummarylevels", x - 1)),
                 label = "Summary Levels",
                 choices = c("All Risks", oed_field),
                 selected = choices_sum[[x]],
@@ -713,7 +716,7 @@ def_out_config <- function(input,
             column(
               5,
               selectInput(
-                inputId = ns(paste0("sinreports", x)),
+                inputId = ns(paste0("sinreports", x - 1)),
                 label = "Reports",
                 choices = output_options$variables,
                 selected = choices_rep_final[[x]],
@@ -731,7 +734,7 @@ def_out_config <- function(input,
             column(
               5,
               selectInput(
-                inputId = ns(paste0("sinsummarylevels", x)),
+                inputId = ns(paste0("sinsummarylevels", x - 1)),
                 label = "Summary Levels",
                 choices = oed_field,
                 selected = choices_sum[[x]],
@@ -746,7 +749,7 @@ def_out_config <- function(input,
 
   # add "+" and "x" buttons to dynamic UI
   dynamicUI_btns <- function(analysisID, ana_flag, tag) {
-
+    print("dynamicUI_btns")
     if (tag == default_tags[2] || tag == default_tags[3]) {
       tagList(fluidRow(
         column(1,
@@ -767,7 +770,7 @@ def_out_config <- function(input,
         ),
         column(8,
                if (ana_flag == "C") {
-                 dynamicUI(analysisID, ana_flag, tag, 0)
+                 dynamicUI(analysisID, tag, 0)
                } else if (ana_flag == "R") {
                  rerunUI(analysisID, tag)
                }
@@ -786,7 +789,7 @@ def_out_config <- function(input,
       ui = tags$div(id = id,
                     fluidRow(column(3),
                              column(8,
-                                    dynamicUI(analysisID(), "C", tag, n_field)
+                                    dynamicUI(analysisID(), tag, n_field)
                              )))
     )
   }
