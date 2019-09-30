@@ -154,7 +154,7 @@ panelOutputParamsDetails <- function(id) {
   tagList(
     oasisuiPanel(
       collapsible = TRUE,
-      show = FALSE,
+      show = TRUE,
       id = ns("panel_OutputParamsDetails"),
       heading = h4("Output Parameters Details"),
       checkboxGroupInput(
@@ -250,7 +250,7 @@ def_out_config <- function(input,
   })
 
   observeEvent(counter(), {
-    .clearOutputOptions()
+    # .clearOutputOptions(result$ana_flag)
     show("panel_anaoutput")
   })
 
@@ -315,46 +315,46 @@ def_out_config <- function(input,
 
   # update tag based on analysis selection
   observeEvent(input$abuttonselectconf, {
-      # Using analyses names to select the output configuration of a previously posted analyses
-      logMessage(
-        paste0(
-          "updating output configuration because input$sinoutputoptions changed to ",
-          input$sinoutputoptions
-        )
+    # Using analyses names to select the output configuration of a previously posted analyses
+    logMessage(
+      paste0(
+        "updating output configuration because input$sinoutputoptions changed to ",
+        input$sinoutputoptions
       )
-      if (length(input$sinoutputoptions) > 0 &&
-          input$sinoutputoptions != "") {
-        anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
-        anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
-        analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
+    )
+    if (length(input$sinoutputoptions) > 0 &&
+        input$sinoutputoptions != "") {
+      anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
+      anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
+      analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
 
-        if (!is.null(analysis_settings$detail) &&
-            analysis_settings$detail == "Not found.") {
-          oasisuiNotification(
-            type = "error",
-            paste0(
-              "No output configuration associated to analysis ",
-              anaName,
-              " id ",
-              anaID,
-              "."
-            )
-          )
-        } else {
-          logMessage(paste0(
-            "appling the output configuration of analysis ",
+      if (!is.null(analysis_settings$detail) &&
+          analysis_settings$detail == "Not found.") {
+        oasisuiNotification(
+          type = "error",
+          paste0(
+            "No output configuration associated to analysis ",
             anaName,
             " id ",
-            anaID
-          ))
-        }
-        # re-set configuration to previous selection
-        output$summary_levels_reports_ui <- renderUI({
-          dynamicUI_btns(anaID, "R", tag = input$sintag)
-        })
-        .updateOutputConfig(analysis_settings, result$ana_flag)
+            anaID,
+            "."
+          )
+        )
+      } else {
+        logMessage(paste0(
+          "appling the output configuration of analysis ",
+          anaName,
+          " id ",
+          anaID
+        ))
       }
-      removeModal()
+      # re-set configuration to previous selection
+      output$summary_levels_reports_ui <- renderUI({
+        dynamicUI_btns(anaID, "R", tag = input$sintag)
+      })
+      .updateOutputConfig(analysis_settings, result$ana_flag)
+    }
+    removeModal()
   })
 
   # > close modal
@@ -400,7 +400,6 @@ def_out_config <- function(input,
 
   # >> summary levels and reports ----------------------------------------------
   oed_field_react <- reactive({
-    print("oed_field_react")
     session$userData$data_hub$get_ana_oed_summary_levels(id = analysisID())$oed_field
   })
 
@@ -429,7 +428,6 @@ def_out_config <- function(input,
 
     # reset counter
     output$summary_levels_reports_ui <- renderUI({
-      print("re-rendering")
       oed_field <- oed_field_react()
       # if oed fields are provided, a vector is returned, otherwise NA
       if (all(is.na(oed_field))) {
@@ -444,8 +442,10 @@ def_out_config <- function(input,
 
   # disable removeBtn in case there is just a single set of fields
   observeEvent(result$n_add, {
-    if (result$n_add < 1)
+    if (result$n_add < 1) {
       disable("removeBtn")
+    }
+    # .clearOutputOptions(result$ana_flag)
   })
 
   # insert new summary levels and reports
@@ -474,7 +474,6 @@ def_out_config <- function(input,
       # custom allows one more since no slot is pre-occupied by a default
       enable("addBtn")
     }
-    # print(inserted$val[length(inserted$val)])
     removeUI(selector = paste0('#', inserted$val[length(inserted$val)]))
     inserted$val <- inserted$val[-length(inserted$val)]
   })
@@ -616,7 +615,6 @@ def_out_config <- function(input,
 
   # Summary Level and Reports fields
   dynamicUI <- function(analysisID, tag, n_field) {
-    print("dynamicUI")
     # only called for Case 2 and 3 (drill-down or custom)
     # Retrieve summary levels information from API
     oed_field <- oed_field_react()
@@ -662,7 +660,6 @@ def_out_config <- function(input,
 
   # Summary Level and Reports fields in re-run situation
   rerunUI <- function(analysisID, tag) {
-    print("rerunUI")
     # only called for Case 2 and 3 (drill-down or custom)
     oed_field <- oed_field_react()
     # retrieve run information from API
@@ -749,7 +746,6 @@ def_out_config <- function(input,
 
   # add "+" and "x" buttons to dynamic UI
   dynamicUI_btns <- function(analysisID, ana_flag, tag) {
-    print("dynamicUI_btns")
     if (tag == default_tags[2] || tag == default_tags[3]) {
       tagList(fluidRow(
         column(1,
@@ -860,6 +856,7 @@ def_out_config <- function(input,
       if(is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
         updateNumericInput(session, "tinputnoofsample", value = analysis_settings[[1]]$number_of_samples)
         updateNumericInput(session, "tinputthreshold", value = analysis_settings[[1]]$gul_threshold)
+
       }
     } else {
       # In case of Output Configuration, tag is set to Summary
@@ -1019,7 +1016,7 @@ def_out_config <- function(input,
     analysis_settings
   }
 
-  .clearOutputOptions <- function() {
+  .clearOutputOptions <- function(ana_flag) {
     logMessage(".clearOutputOptions called")
 
     # Predefined params
@@ -1045,33 +1042,43 @@ def_out_config <- function(input,
         fixed_settings <- c("event_set", "event_occurrence_id")
         basic_model_params <-
           names(model_settings)[names(model_settings) %in% fixed_settings]
+        if (ana_flag  == "R") {
+          analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
+          events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$event_occurrence_id)
+        }
         ui_basic_model_param <-
           lapply(basic_model_params, function(p) {
             curr_param_lst <- model_settings[[p]]
             curr_param_name <-
               capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
-            if (curr_param_lst$type == "boolean") {
-              checkboxInput(
-                inputId = ns(paste0("model_params_", p)),
-                label = curr_param_name,
-                value = curr_param_lst$default
-              )
-            } else if (curr_param_lst$type == "dictionary") {
-              selectInput(
-                inputId = ns(paste0("model_params_", p)),
-                label = curr_param_name,
-                choices = SwapNamesValueInList(curr_param_lst$values),
-                selected =  curr_param_lst$default
-              )
-            } else if (curr_param_lst$type == "float") {
-              sliderInput(
-                inputId = ns(paste0("model_params_", p)),
-                label = curr_param_name,
-                min = curr_param_lst$min,
-                max = curr_param_lst$max,
-                value =  curr_param_lst$default
-              )
+            if (ana_flag  == "R") {
+              selected <- events_merge[p]
+            } else {
+              selected <- curr_param_lst$default
             }
+            selected = curr_param_lst$default
+            # if (curr_param_lst$type == "boolean") {
+            #   checkboxInput(
+            #     inputId = ns(paste0("model_params_", p)),
+            #     label = curr_param_name,
+            #     value = curr_param_lst$default
+            #   )
+            # } else if (curr_param_lst$type == "dictionary") {
+            selectInput(
+              inputId = ns(paste0("model_params_", p)),
+              label = curr_param_name,
+              choices = SwapNamesValueInList(curr_param_lst$values),
+              selected =  selected
+            )
+            # } else if (curr_param_lst$type == "float") {
+            #   sliderInput(
+            #     inputId = ns(paste0("model_params_", p)),
+            #     label = curr_param_name,
+            #     min = curr_param_lst$min,
+            #     max = curr_param_lst$max,
+            #     value =  curr_param_lst$default
+            #   )
+            # }
           })
         output$basic_model_param <- renderUI(ui_basic_model_param)
 
