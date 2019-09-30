@@ -437,6 +437,7 @@ def_out_config <- function(input,
         dynamicUI_btns(analysisID(), result$ana_flag, tag = input$sintag)
       }
     })
+    .clearOutputOptions(result$ana_flag)
 
   })
 
@@ -445,7 +446,6 @@ def_out_config <- function(input,
     if (result$n_add < 1) {
       disable("removeBtn")
     }
-    # .clearOutputOptions(result$ana_flag)
   })
 
   # insert new summary levels and reports
@@ -856,7 +856,7 @@ def_out_config <- function(input,
       if(is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
         updateNumericInput(session, "tinputnoofsample", value = analysis_settings[[1]]$number_of_samples)
         updateNumericInput(session, "tinputthreshold", value = analysis_settings[[1]]$gul_threshold)
-
+        .clearOutputOptions(ana_flag)
       }
     } else {
       # In case of Output Configuration, tag is set to Summary
@@ -1044,7 +1044,7 @@ def_out_config <- function(input,
           names(model_settings)[names(model_settings) %in% fixed_settings]
         if (ana_flag  == "R") {
           analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
-          events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$event_occurrence_id)
+          events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$model_settings$event_occurrence_id)
         }
         ui_basic_model_param <-
           lapply(basic_model_params, function(p) {
@@ -1052,11 +1052,15 @@ def_out_config <- function(input,
             curr_param_name <-
               capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
             if (ana_flag  == "R") {
-              selected <- events_merge[p]
+              if (p == "event_set") {
+                selected <- events_merge[1]
+              } else if (p == "event_occurrence_id") {
+                selected <- events_merge[2]
+              }
             } else {
               selected <- curr_param_lst$default
             }
-            selected = curr_param_lst$default
+            # selected = curr_param_lst$default
             # if (curr_param_lst$type == "boolean") {
             #   checkboxInput(
             #     inputId = ns(paste0("model_params_", p)),
@@ -1111,7 +1115,7 @@ def_out_config <- function(input,
               selectInput(
                 inputId = ns(paste0("model_params_", p)),
                 label = curr_param_name,
-                choices = .SwapNamesValueInList(curr_param_lst$values),
+                choices = SwapNamesValueInList(curr_param_lst$values),
                 selected =  curr_param_lst$default
               )
             } else if (curr_param_lst$type == "float") {
