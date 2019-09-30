@@ -105,8 +105,10 @@ panelOutputModuleUI <- function(id){
              selectInput(inputId = ns("inputplottype"), label = "Plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1])
              # )
       ),
-      column(12,
+      column(6,
              checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
+      column(6,
+             uiOutput(ns("types_ui"))),
       column(6,
              uiOutput(ns("reports_ui"))),
       column(6,
@@ -285,6 +287,26 @@ panelOutputModule <- function(input, output, session,
           choices = unique(report),
           selected = NULL,
           multiple = TRUE
+        )
+      })
+# Retrieve types from API
+      types_list <- unique(unlist(lapply(seq(1, length(filesListData()$files)), function(x) {
+        session$userData$data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = filesListData()$files[x])$type
+      })
+      ))
+      # replace type 1 and 2 with Analytical and Sample resplectively
+      types_list <- types_list %>% replace(which(types_list == 2), "Sample")
+      if (length(which(types_list == 1)) != 0) {
+        types_list <- types_list %>% replace(which(types_list == 1), "Analytical")
+      }
+
+      output$types_ui <- renderUI({
+        selectInput(
+          inputId = ns("plttypes"),
+          label = "Type",
+          choices = types_list,
+          selected = types_list[which(types_list == "Sample")],
+          # multiple = TRUE
         )
       })
     })
@@ -495,18 +517,21 @@ panelOutputModule <- function(input, output, session,
       data <- data %>% mutate(summary_id = summary_id_map[match(summary_id, summary_id_map$summary_id), "summary_desc"])
 
       data <- data %>% rename("keyval" = summary_id)
-      seldiff <- NULL
-      # in case that more than one report or perspective is selected
-      if (length(intersect(data$selection, data$selection)) > 1) {
-        seldiff <- data$selection
-      }
-
+      # seldiff <- NULL
+      # # in case that more than one report or perspective is selected
+      # if (length(intersect(data$selection, data$selection)) > 1) {
+      #   seldiff <- data$selection
+      # }
       # rename column for Y axis
       data <- data %>% rename("value" = key)
 
       if(input$inputplottype == "loss per return period") {
-        # filter for only type 1 and replace with "type 1"
-        data <- data %>%  filter(type == 1)
+
+        data$type <- data$type %>% replace(which(data$type == 2), "Sample")
+        if (length(which(data$type == 1)) != 0) {
+          data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
+        }
+        data <- data %>%  filter(type == input$plttypes)
         data$type <- paste("type", data$type)
       }
       # rename column for x axis
