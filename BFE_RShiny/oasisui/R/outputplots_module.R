@@ -306,7 +306,7 @@ panelOutputModule <- function(input, output, session,
           label = "Type",
           choices = types_list,
           selected = types_list[which(types_list == "Sample")],
-          # multiple = TRUE
+          multiple = TRUE
         )
       })
     })
@@ -517,11 +517,7 @@ panelOutputModule <- function(input, output, session,
       data <- data %>% mutate(summary_id = summary_id_map[match(summary_id, summary_id_map$summary_id), "summary_desc"])
 
       data <- data %>% rename("keyval" = summary_id)
-      # seldiff <- NULL
-      # # in case that more than one report or perspective is selected
-      # if (length(intersect(data$selection, data$selection)) > 1) {
-      #   seldiff <- data$selection
-      # }
+
       # rename column for Y axis
       data <- data %>% rename("value" = key)
 
