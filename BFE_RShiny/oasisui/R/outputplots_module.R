@@ -289,23 +289,26 @@ panelOutputModule <- function(input, output, session,
           multiple = TRUE
         )
       })
-# Retrieve types from API
-      types_list <- unique(unlist(lapply(seq(1, length(filesListData()$files)), function(x) {
-        session$userData$data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = filesListData()$files[x])$type
-      })
-      ))
+      # Retrieve types from API
+      types_list <- unique(session$userData$data_hub$get_ana_outputs_dataset_content(
+        id = anaID(),
+        dataset_identifier = filesListData()$files[2])$type
+      )
+
       # replace type 1 and 2 with Analytical and Sample resplectively
-      types_list <- types_list %>% replace(which(types_list == 2), "Sample")
-      if (length(which(types_list == 1)) != 0) {
-        types_list <- types_list %>% replace(which(types_list == 1), "Analytical")
+      types_list <- types_list %>% replace(which(types_list == 1), "Analytical")
+      if (length(which(types_list == 2)) != 0) {
+        types_list <- types_list %>% replace(which(types_list == 2), "Sample")
       }
+      # sort list in descending alphabetical order
+      types_list <- sort(types_list)
 
       output$types_ui <- renderUI({
         selectInput(
           inputId = ns("plttypes"),
           label = "Type",
           choices = types_list,
-          selected = types_list[which(types_list == "Sample")],
+          selected = tail(types_list, n = 1),
           multiple = TRUE
         )
       })
@@ -443,11 +446,11 @@ panelOutputModule <- function(input, output, session,
         result$Title <- input$textinputtitle
       } else {
         if (l_losstypes > 1) {
-          result$Title <- paste0(input$pltreports, " per ", input$pltsummarylevels)
+          result$Title <- input$pltreports
         } else if (l_variables > 1) {
-          result$Title <- paste0(chkbox$chkboxgrplosstypes(), " per ", input$pltsummarylevels)
+          result$Title <- chkbox$chkboxgrplosstypes()
         } else {
-          result$Title <- paste0(input$pltreports, " of ", chkbox$chkboxgrplosstypes(), " per ", input$pltsummarylevels)
+          result$Title <- paste0(input$pltreports, " of ", chkbox$chkboxgrplosstypes())
         }
       }
     }
@@ -523,12 +526,12 @@ panelOutputModule <- function(input, output, session,
 
       if(input$inputplottype == "loss per return period") {
 
-        data$type <- data$type %>% replace(which(data$type == 2), "Sample")
-        if (length(which(data$type == 1)) != 0) {
-          data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
+        data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
+        if (length(which(data$type == 2)) != 0) {
+          data$type <- data$type %>% replace(which(data$type == 2), "Sample")
         }
         data <- data %>%  filter(type == input$plttypes)
-        data$type <- paste("type", data$type)
+        data$type <- paste(data$type, "Loss")
       }
       # rename column for x axis
       data <- data %>% rename("xaxis" = x)
