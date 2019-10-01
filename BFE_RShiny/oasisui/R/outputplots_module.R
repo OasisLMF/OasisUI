@@ -314,22 +314,6 @@ panelOutputModule <- function(input, output, session,
       })
     })
 
-  # observeEvent({input$chkboxgrplosstypes
-  #   input$pltreports}, {
-  #   # if more than one checkbox and report are selected, pop up message and disable "Draw" btn
-  #   if(length(input$chkboxgrplosstypes) > 1 && length(input$pltreports) > 1) {
-  #     showModal(modalDialog(
-  #       title = "Attention!",
-  #       "Only two reports or two perspectives can be selected. Please remove one in either field",
-  #       footer = modalButton("Dismiss"),
-  #       easyClose = TRUE
-  #     ))
-  #     disable("abuttondraw")
-  #   } else {
-  #     enable("abuttondraw")
-  #   }
-  # })
-
   observeEvent(input$pltreports, ignoreNULL = FALSE, {
     # display only summary levels that correspond to the selected report
     idx_s <- which(filesListData()$report == input$pltreports)
@@ -362,10 +346,12 @@ panelOutputModule <- function(input, output, session,
     chkbox$chkboxgrplosstypes()
     chkbox$pltreports()
     chkbox$pltsummarylevels()
+    input$plttypes
     input$abuttondraw
   }, ignoreNULL = FALSE, {
 
     if (length(chkbox$chkboxgrplosstypes()) == 0 ||
+        length(input$plttypes) == 0 ||
         length(chkbox$pltsummarylevels()) == 0 ||
         length(chkbox$pltreports()) == 0) {
       disable("abuttondraw")
@@ -530,9 +516,10 @@ panelOutputModule <- function(input, output, session,
         if (length(which(data$type == 2)) != 0) {
           data$type <- data$type %>% replace(which(data$type == 2), "Sample")
         }
-        data <- data %>%  filter(type == input$plttypes)
+        data <- data %>%  filter(type %in% input$plttypes)
         data$type <- paste(data$type, "Loss")
       }
+
       # rename column for x axis
       data <- data %>% rename("xaxis" = x)
       # rename column for granularity. Can be null if granularity level is portfolio
