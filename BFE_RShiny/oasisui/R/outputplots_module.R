@@ -603,7 +603,7 @@ panelOutputModule <- function(input, output, session,
     if (!is.na(fileName)) {
       logMessage(paste0("Reading file ", fileName))
       tryCatch({
-        fileData <- session$userData$data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = fileName)
+        fileData <- session$userData$data_hub$get_ana_outputs_dataset_content(id = anaID(), dataset_identifier = fileName[1])
       }, error = function(e) {
         oasisuiNotification(type = "error",
                             paste0("Could not read file: ", e$message, "."))
@@ -649,10 +649,10 @@ panelOutputModule <- function(input, output, session,
   # add facets
   .multiplot <- function(p, multipleplots = FALSE){
     if (multipleplots) {
-      if (length(intersect(p$data$selection, p$data$selection))) {
+      if (inputplottype() == "loss per return period") {
         p <- p + facet_wrap(c(.~ gridcol, .~ selection))
       } else {
-        p <- p + facet_wrap(.~ gridcol)
+        p <- p + facet_wrap(.~ selection)
       }
     }
     p
@@ -675,17 +675,18 @@ panelOutputModule <- function(input, output, session,
     p <- p +
       geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
       # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
-    if (wuncertainty){
-      p <- p +
-        geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
-                      size = .3,
-                      width = .2,                    # Width of the error bars
-                      position = position_dodge(.9))
-      # if ("reference" %in% names(data)) {
-      #   p <- .addRefLine(p, unique(data$reference))
-      # }
-    }
-    p <- .multiplot(p, FALSE)
+
+    # if (wuncertainty){
+    #   p <- p +
+    #     geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
+    #                   size = .3,
+    #                   width = .2,                    # Width of the error bars
+    #                   position = position_dodge(.9))
+    #   # if ("reference" %in% names(data)) {
+    #   #   p <- .addRefLine(p, unique(data$reference))
+    #   # }
+    # }
+    p <- .multiplot(p, multipleplots)
     p
   }
 
