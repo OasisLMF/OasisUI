@@ -510,7 +510,7 @@ panelOutputModule <- function(input, output, session,
       # rename column for Y axis
       data <- data %>% rename("value" = key)
 
-      if(input$inputplottype == "loss per return period") {
+      # if(input$inputplottype == "loss per return period") {
 
         data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
         if (length(which(data$type == 2)) != 0) {
@@ -518,7 +518,7 @@ panelOutputModule <- function(input, output, session,
         }
         data <- data %>%  filter(type %in% input$plttypes)
         data$type <- paste(data$type, "Loss")
-      }
+      # }
 
       # rename column for x axis
       data <- data %>% rename("xaxis" = x)
@@ -673,8 +673,8 @@ panelOutputModule <- function(input, output, session,
                          multipleplots = FALSE, xtickslabels = NULL ) {
     p <- .basicplot(xlabel, ylabel, titleToUse, data)
     p <- p +
-      geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) +
-      scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
+      geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
+      # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
     if (wuncertainty){
       p <- p +
         geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
