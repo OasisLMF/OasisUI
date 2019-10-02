@@ -259,12 +259,12 @@ panelOutputModule <- function(input, output, session,
   observeEvent(inputplottype(), {
     result$Title <- ""
     output$outputplot <- renderPlotly(NULL)
-    if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
-      show("chkboxuncertainty")
-    } else {
-      updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
-      hide("chkboxuncertainty")
-    }
+    # if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
+    #   show("chkboxuncertainty")
+    # } else {
+    #   updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
+    #   hide("chkboxuncertainty")
+    # }
   })
 
   observeEvent({anaID()
@@ -565,7 +565,7 @@ panelOutputModule <- function(input, output, session,
         p <- p + labs("summary_id")
       } else if (plottype == "bar") {
         p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
-                        wuncertainty = input$chkboxuncertainty,
+                        # wuncertainty = input$chkboxuncertainty,
                         multipleplots = multipleplots, xtickslabels = xtickslabels)
       }else if (plottype == "violin") {
         p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
