@@ -1044,14 +1044,16 @@ def_out_config <- function(input,
           names(model_settings)[names(model_settings) %in% fixed_settings]
         if (ana_flag  == "R") {
           analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
-          events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$model_settings$event_occurrence_id)
+          if(length(analysis_settings$detail) == 0) {
+            events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$model_settings$event_occurrence_id)
+          }
         }
         ui_basic_model_param <-
           lapply(basic_model_params, function(p) {
             curr_param_lst <- model_settings[[p]]
             curr_param_name <-
               capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
-            if (ana_flag  == "R") {
+            if (ana_flag  == "R" && length(analysis_settings$detail) == 0) {
               if (p == "event_set") {
                 selected <- events_merge[1]
               } else if (p == "event_occurrence_id") {
