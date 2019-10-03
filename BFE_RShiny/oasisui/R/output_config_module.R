@@ -666,15 +666,11 @@ def_out_config <- function(input,
     out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID, oasisapi = session$userData$oasisapi)
 
-    #analysis_settings[[1]]$model_settings # event_set, event_occurrence_id and whatever else (e.g. demand_surge). return_period_file can be ignored (?).
-    #analysis_settings[[1]]$number_of_samples # input$tinputnoofsample
-    #analysis_settings[[1]]$gul_threshold # input$tinputthreshold
-    # analysis_settings[[1]]$ui_config_tag
-
     # display previous selection
     # Summary Info output is non-configurable, remove it
-    out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
-    # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
+    if(length(out_cnfg_tbl) > 0) {
+      out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
+      # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
 
     uniq_sum <- unique(out_cnfg_tbl$summary_level)
     # In case multiple fields were selected, split the comma and make them two separate strings
@@ -693,6 +689,12 @@ def_out_config <- function(input,
     # update checkboxes selection
     choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
     updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+    } else {
+      choices_sum <- 0
+      choices_rep_final <- 0
+      result$n_add <- 0
+      inserted$val <- seq(0, isolate(result$n_add))
+    }
 
     # update main panel
     if (tag == default_tags[3]) {
