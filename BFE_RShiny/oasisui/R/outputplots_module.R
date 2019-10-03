@@ -193,9 +193,9 @@ panelOutputModule <- function(input, output, session,
   result <- reactiveValues(
     #plot and panel title
     Title = "",
-    Granularities = character(0),
+    SumLevel = character(0),
     Losstypes = character(0),
-    Variables = character(0)
+    Report = character(0)
   )
 
   # reactive values holding checkbox state
@@ -219,33 +219,31 @@ panelOutputModule <- function(input, output, session,
   #clean up panel objects when inactive
   observe(if (!active()) {
     result$Title <- ""
-    result$Granularities <- character(0)
+    result$SumLevel <- character(0)
     result$Losstypes <- character(0)
-    result$Variables <- character(0)
+    result$Report <- character(0)
     # plotlyOutput persists to re-creating the UI
     output$outputplot <- renderPlotly(NULL)
     for (id in names(chkbox)) chkbox[[id]](NULL)
   })
 
   # > based on analysis ID -----------------------------------------------------
-  #Gather the Granularities, Variables and Losstypes based on the anaID output presets
+  #Gather the Summary Levels, Reports and Losstypes based on the anaID output presets
   observe(if (active()) {
-    if (!is.null(filesListData() )) {
-      result$Granularities <- unique(filesListData()$summary_level)
+    if (!is.null(filesListData())) {
+      result$SumLevel <- unique(filesListData()$summary_level)
       result$Losstypes <- toupper(unique(filesListData()$perspective))
-      result$Variables <- unique(filesListData()$report)
+      result$Report <- unique(filesListData()$report)
     } else {
-      result$Granularities <- character(0)
+      result$SumLevel <- character(0)
       result$Losstypes <-  character(0)
-      result$Variables <-  character(0)
+      result$Report <-  character(0)
     }
   })
 
   observeEvent({
     inputplottype()
     result$Losstypes
-    result$Granularities
-    result$Variables
   }, ignoreNULL = FALSE, {
     if (!is.null(inputplottype())) {
       .reactiveUpdateSelectGroupInput(result$Losstypes,
@@ -259,20 +257,19 @@ panelOutputModule <- function(input, output, session,
   observeEvent(inputplottype(), {
     result$Title <- ""
     output$outputplot <- renderPlotly(NULL)
-    # if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
-    #   show("chkboxuncertainty")
-    # } else {
-    #   updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
-    #   hide("chkboxuncertainty")
-    # }
+    if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
+      show("chkboxuncertainty")
+    } else {
+      updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
+      hide("chkboxuncertainty")
+    }
   })
 
   observeEvent({anaID()
     inputplottype()}, {
       # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
       if(inputplottype() == "loss per return period") {
-        idx_r <- sapply(seq(1, length(filesListData()$report)),
-                        function(x) which(filesListData()$report == plottypeslist$`loss per return period`$Variables[x]))
+        idx_r <- which(filesListData()$report %in% plottypeslist$`loss per return period`$Variables)
 
       } else if(inputplottype() == "AAL bar plot") {
         idx_r <- which(filesListData()$report == plottypeslist$`AAL bar plot`$Variables)
@@ -289,10 +286,13 @@ panelOutputModule <- function(input, output, session,
           multiple = TRUE
         )
       })
+
+      # remove summary info file from list as it does not have a type
+      not_sum_info <- filesListData()$files[-grep("summary-info", filesListData()$files)][1]
       # Retrieve types from API
       types_list <- unique(session$userData$data_hub$get_ana_outputs_dataset_content(
         id = anaID(),
-        dataset_identifier = filesListData()$files[2])$type
+        dataset_identifier = not_sum_info)$type
       )
 
       # replace type 1 and 2 with Analytical and Sample resplectively
@@ -305,7 +305,7 @@ panelOutputModule <- function(input, output, session,
 
       output$types_ui <- renderUI({
         selectInput(
-          inputId = ns("plttypes"),
+          inputId = ns("calctypes"),
           label = "Type",
           choices = types_list,
           selected = tail(types_list, n = 1),
@@ -335,9 +335,9 @@ panelOutputModule <- function(input, output, session,
     #if losstype = GUL then policy inactive
     if ("GUL" %in% chkbox$chkboxgrplosstypes()) {
       #TODO: GUL does not have policy, more feedback required for development
-      Granularities <- result$Granularities[which(result$Granularities != "Policy")]
+      SumLevel <- result$SumLevel[which(result$SumLevel != "Policy")]
     } else {
-      Granularities <- result$Granularities
+      SumLevel <- result$SumLevel
     }
   })
 
@@ -346,12 +346,12 @@ panelOutputModule <- function(input, output, session,
     chkbox$chkboxgrplosstypes()
     chkbox$pltreports()
     chkbox$pltsummarylevels()
-    input$plttypes
+    input$calctypes
     input$abuttondraw
   }, ignoreNULL = FALSE, {
 
     if (length(chkbox$chkboxgrplosstypes()) == 0 ||
-        length(input$plttypes) == 0 ||
+        length(input$calctypes) == 0 ||
         length(chkbox$pltsummarylevels()) == 0 ||
         length(chkbox$pltreports()) == 0) {
       disable("abuttondraw")
@@ -496,6 +496,7 @@ panelOutputModule <- function(input, output, session,
                                                        perspective %in% tolower(chkbox$chkboxgrplosstypes()),
                                                        summary_level %in% input$pltsummarylevels)
       summary_id_map <- as.data.frame(.readFile(summary_id_mapfile$files))
+
       # for "All Risks", replace colname "n/a" and entry "undefined" with "All Risks"
       if (summary_id_map[2][[1]] == "undefined") {
         summary_id_map[2][[1]] <- "All Risks"
@@ -510,15 +511,12 @@ panelOutputModule <- function(input, output, session,
       # rename column for Y axis
       data <- data %>% rename("value" = key)
 
-      # if(input$inputplottype == "loss per return period") {
-
         data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
         if (length(which(data$type == 2)) != 0) {
           data$type <- data$type %>% replace(which(data$type == 2), "Sample")
         }
-        data <- data %>%  filter(type %in% input$plttypes)
+        data <- data %>%  filter(type %in% input$calctypes)
         data$type <- paste(data$type, "Loss")
-      # }
 
       # rename column for x axis
       data <- data %>% rename("xaxis" = x)
@@ -565,7 +563,7 @@ panelOutputModule <- function(input, output, session,
         p <- p + labs("summary_id")
       } else if (plottype == "bar") {
         p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
-                        # wuncertainty = input$chkboxuncertainty,
+                        wuncertainty = input$chkboxuncertainty,
                         multipleplots = multipleplots, xtickslabels = xtickslabels)
       }else if (plottype == "violin") {
         p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
@@ -623,7 +621,7 @@ panelOutputModule <- function(input, output, session,
   # value : column for aes y
   # colour : column for the aes col
   # flag multipleplots generates grid over col gridcol
-  .basicplot <- function(xlabel, ylabel, titleToUse, data){
+  .basicplot <- function(xlabel, ylabel, titleToUse, data) {
     p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
       labs(title = titleToUse, x = xlabel, y = ylabel) +
       theme(
@@ -676,16 +674,16 @@ panelOutputModule <- function(input, output, session,
       geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
       # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
 
-    # if (wuncertainty){
-    #   p <- p +
-    #     geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
-    #                   size = .3,
-    #                   width = .2,                    # Width of the error bars
-    #                   position = position_dodge(.9))
-    #   # if ("reference" %in% names(data)) {
-    #   #   p <- .addRefLine(p, unique(data$reference))
-    #   # }
-    # }
+    if (wuncertainty){
+      p <- p +
+        geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
+                      size = .3,
+                      width = .2,                    # Width of the error bars
+                      position = position_dodge(.9))
+      # if ("reference" %in% names(data)) {
+      #   p <- .addRefLine(p, unique(data$reference))
+      # }
+    }
     p <- .multiplot(p, multipleplots)
     p
   }
