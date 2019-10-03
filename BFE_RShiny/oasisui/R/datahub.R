@@ -184,7 +184,6 @@ DataHub <- R6Class(
           non_null_full_lst[[i]] %>%
             as.data.frame(stringsAsFactors = FALSE)
         })
-        hazard_data_df <- NULL
         if (!is.null(full_data_df)) {
           full_data_df <- full_data_df %>%
             bind_rows()
@@ -193,6 +192,8 @@ DataHub <- R6Class(
             filter( grepl("geojson", filename))
         }
         hazard_data_df
+      } else {
+        NULL
       }
     },
     # > Analysis ----
