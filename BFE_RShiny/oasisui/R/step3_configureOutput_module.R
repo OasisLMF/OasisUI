@@ -222,10 +222,11 @@ step3_configureOutput <- function(input, output, session,
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
             enable("abuttondisplayoutput")
           }
-          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
+          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == "ready") {
             enable("abuttonrunconfig")
             updateActionButton(session, inputId = "abuttonrunconfig", label = "Output Configuration")
-          } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Failed)) {
+          } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] %in%
+                     c("run completed", "run error")) {
             enable("abuttonrunconfig")
             updateActionButton(session, inputId = "abuttonrunconfig", label = "Rerun")
           } else {
