@@ -158,23 +158,25 @@ panelOutputModuleUI <- function(id){
 #' @importFrom dplyr intersect
 #' @importFrom tidyr gather
 #' @importFrom tidyr separate
-#' @importFrom tidyr  spread
+#' @importFrom tidyr spread
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_hline
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 labs
 #' @importFrom ggplot2 theme
-#' @importFrom ggplot2  aes
+#' @importFrom ggplot2 aes
 #' @importFrom ggplot2 element_text
 #' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 element_blank
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 facet_wrap
+#' @importFrom ggplot2 vars
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 geom_errorbar
 #' @importFrom ggplot2 geom_violin
 #' @importFrom ggplot2 position_dodge
+#' @importFrom ggplot2 label_value
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' @importFrom data.table fread
@@ -498,10 +500,11 @@ panelOutputModule <- function(input, output, session,
       summary_id_map <- as.data.frame(.readFile(summary_id_mapfile$files))
 
       # for "All Risks", replace colname "n/a" and entry "undefined" with "All Risks"
-      if (summary_id_map[2][[1]] == "undefined") {
-        summary_id_map[2][[1]] <- "All Risks"
+      if (names(summary_id_map)[2] %in% c("n/a", "_not_set_")) {
+        summary_id_map[, 2] <- "All Risks"
         names(summary_id_map)[2] <- "All Risks"
       }
+      summary_id_title <- paste(colnames(summary_id_map)[-1], collapse = " & ")
       summary_id_map$summary_desc <- do.call("paste", summary_id_map[2:ncol(summary_id_map)])
       # replace summary IDs with descriptions
       data <- data %>% mutate(summary_id = summary_id_map[match(summary_id, summary_id_map$summary_id), "summary_desc"])
@@ -515,7 +518,7 @@ panelOutputModule <- function(input, output, session,
         if (length(which(data$type == 2)) != 0) {
           data$type <- data$type %>% replace(which(data$type == 2), "Sample")
         }
-        data <- data %>%  filter(type %in% input$calctypes)
+        data <- data %>% filter(type %in% input$calctypes)
         data$type <- paste(data$type, "Loss")
 
       # rename column for x axis
@@ -559,13 +562,13 @@ panelOutputModule <- function(input, output, session,
       }
       if (plottype == "line") {
         p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
-                         multipleplots = multipleplots)
+                         summary_id_title, multipleplots = multipleplots)
         p <- p + labs("summary_id")
       } else if (plottype == "bar") {
         p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
-                        wuncertainty = input$chkboxuncertainty,
+                        summary_id_title, wuncertainty = input$chkboxuncertainty,
                         multipleplots = multipleplots, xtickslabels = xtickslabels)
-      }else if (plottype == "violin") {
+      } else if (plottype == "violin") {
         p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
                            multipleplots = multipleplots)
       }
@@ -621,16 +624,16 @@ panelOutputModule <- function(input, output, session,
   # value : column for aes y
   # colour : column for the aes col
   # flag multipleplots generates grid over col gridcol
-  .basicplot <- function(xlabel, ylabel, titleToUse, data) {
+  .basicplot <- function(xlabel, ylabel, titleToUse, data, legendtitle) {
     p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
-      labs(title = titleToUse, x = xlabel, y = ylabel) +
+      labs(title = titleToUse, x = xlabel, y = ylabel, col = legendtitle) +
       theme(
         plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
         text = element_text(size = 12),
         panel.background = element_blank(),
         axis.line.x = element_line(color = "grey45", size = 0.5),
         axis.line.y = element_line(color = "grey45", size = 0.5),
-        legend.title =  element_blank(),
+        #legend.title =  element_blank(),
         legend.position = "top"
       )
     p
@@ -648,17 +651,24 @@ panelOutputModule <- function(input, output, session,
   .multiplot <- function(p, multipleplots = FALSE){
     if (multipleplots) {
       if (inputplottype() == "loss per return period") {
-        p <- p + facet_wrap(c(.~ gridcol, .~ selection))
+        p <- p + facet_wrap(vars(gridcol, selection), labeller = function(labels, multi_line = FALSE) {
+          res <- label_value(labels = labels, multi_line = multi_line)
+          # fix for multi_line = FALSE leading to character(0) and y-facets with such label
+          if (length(res) == 1 && length(res[[1]]) == 0) {
+            res <- list()
+          }
+          res
+        })
       } else {
-        p <- p + facet_wrap(.~ selection)
+        p <- p + facet_wrap(~selection)
       }
     }
     p
   }
 
   # Line plot
-  .linePlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE) {
-    p <- .basicplot(xlabel, ylabel, titleToUse, data)
+  .linePlotDF <- function(..., multipleplots = FALSE) {
+    p <- .basicplot(...)
     p <- p +
       geom_line(size = 1) +
       geom_point(size = 2)
@@ -666,19 +676,19 @@ panelOutputModule <- function(input, output, session,
     p
   }
 
-  # Bar Plot
-  .barPlotDF <- function(xlabel, ylabel, titleToUse, data, wuncertainty = FALSE,
+  # Bar plot
+  .barPlotDF <- function(..., wuncertainty = FALSE,
                          multipleplots = FALSE, xtickslabels = NULL ) {
-    p <- .basicplot(xlabel, ylabel, titleToUse, data)
-    p <- p +
-      geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
+    p <- .basicplot(...)
+    p <- p + geom_bar(position = "dodge", stat = "identity")
+      #geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
       # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
 
     if (wuncertainty){
       p <- p +
         geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
                       size = .3,
-                      width = .2,                    # Width of the error bars
+                      width = .2, # Width of the error bars
                       position = position_dodge(.9))
       # if ("reference" %in% names(data)) {
       #   p <- .addRefLine(p, unique(data$reference))

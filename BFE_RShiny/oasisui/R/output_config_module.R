@@ -445,6 +445,8 @@ def_out_config <- function(input,
   observeEvent(result$n_add, {
     if (result$n_add < 1) {
       disable("removeBtn")
+    } else {
+      enable("removeBtn")
     }
   })
 
@@ -460,9 +462,6 @@ def_out_config <- function(input,
     } else if (input$sintag == default_tags[2] && result$n_add >= (max_n - 1)) {
       # drill-down allows one slot less, since one is already pre-occupied by the default "All Risks"
       disable("addBtn")
-    }
-    if (result$n_add >= 1) {
-      enable("removeBtn")
     }
     inserted$val <- c(inserted$val, id)
   })
@@ -760,14 +759,14 @@ def_out_config <- function(input,
         ),
         column(2,
                br(),
-               #disabled(
-               actionButton(
-                 ns("removeBtn"),
-                 label = "",
-                 icon = icon("times")
-               ) %>%
-                 bs_embed_tooltip(title = defineSingleAna_tooltips$removeBtn, placement = "right")
-               #)
+               disabled(
+                 actionButton(
+                   ns("removeBtn"),
+                   label = "",
+                   icon = icon("times")
+                 ) %>%
+                   bs_embed_tooltip(title = defineSingleAna_tooltips$removeBtn, placement = "right")
+               )
         ),
         column(8,
                if (ana_flag == "C") {
