@@ -461,7 +461,9 @@ def_out_config <- function(input,
       # drill-down allows one slot less, since one is already pre-occupied by the default "All Risks"
       disable("addBtn")
     }
-    enable("removeBtn")
+    if (result$n_add >= 1) {
+      enable("removeBtn")
+    }
     inserted$val <- c(inserted$val, id)
   })
 
