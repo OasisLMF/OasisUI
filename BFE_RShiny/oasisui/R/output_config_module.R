@@ -438,6 +438,7 @@ def_out_config <- function(input,
         dynamicUI_btns(analysisID(), result$ana_flag, tag = input$sintag)
       }
     })
+    .clearOutputOptions(result$ana_flag)
 
   })
 
@@ -446,7 +447,6 @@ def_out_config <- function(input,
     if (result$n_add < 1) {
       disable("removeBtn")
     }
-    # .clearOutputOptions(result$ana_flag)
   })
 
   # insert new summary levels and reports
@@ -668,15 +668,11 @@ def_out_config <- function(input,
     out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID, oasisapi = session$userData$oasisapi)
 
-    #analysis_settings[[1]]$model_settings # event_set, event_occurrence_id and whatever else (e.g. demand_surge). return_period_file can be ignored (?).
-    #analysis_settings[[1]]$number_of_samples # input$tinputnoofsample
-    #analysis_settings[[1]]$gul_threshold # input$tinputthreshold
-    # analysis_settings[[1]]$ui_config_tag
-
     # display previous selection
     # Summary Info output is non-configurable, remove it
-    out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
-    # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
+    if(length(out_cnfg_tbl) > 0) {
+      out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
+      # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
 
     uniq_sum <- unique(out_cnfg_tbl$summary_level)
     # In case multiple fields were selected, split the comma and make them two separate strings
@@ -695,6 +691,12 @@ def_out_config <- function(input,
     # update checkboxes selection
     choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
     updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+    } else {
+      choices_sum <- 0
+      choices_rep_final <- 0
+      result$n_add <- 0
+      inserted$val <- seq(0, isolate(result$n_add))
+    }
 
     # update main panel
     if (tag == default_tags[3]) {
@@ -857,7 +859,7 @@ def_out_config <- function(input,
       if(is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
         updateNumericInput(session, "tinputnoofsample", value = analysis_settings[[1]]$number_of_samples)
         updateNumericInput(session, "tinputthreshold", value = analysis_settings[[1]]$gul_threshold)
-
+        .clearOutputOptions(ana_flag)
       }
     } else {
       # In case of Output Configuration, tag is set to Summary
@@ -908,24 +910,43 @@ def_out_config <- function(input,
       "source_tag" = getOption("oasisui.settings.oasis_environment")
     )
 
-    fetch_summary <- function(prsp, checked) {
-      if (prsp %in% checked) {
-        summary_template <- list(
-          summarycalc = FALSE,
-          eltcalc = FALSE,
-          aalcalc = FALSE,
-          pltcalc = FALSE,
-          id = 1,
-          oed_fields = list(),
-          lec_output = TRUE,
-          leccalc = list(
-            return_period_file = TRUE,
-            outputs = list(
-              full_uncertainty_aep = FALSE,
-              full_uncertainty_oep = FALSE
+    # fetch_summary <- function(prsp, checked) {
+    #   if (prsp %in% checked) {
+    #     summary_template <- list(
+    #       summarycalc = FALSE,
+    #       eltcalc = FALSE,
+    #       aalcalc = FALSE,
+    #       pltcalc = FALSE,
+    #       id = 1,
+    #       oed_fields = list(),
+    #       lec_output = TRUE,
+    #       leccalc = list(
+    #         return_period_file = TRUE,
+    #         # outputs = list(
+    #           full_uncertainty_aep = FALSE,
+    #           full_uncertainty_oep = FALSE
+    #         # )
+    #       )
+    #     )
+
+        fetch_summary <- function(prsp, checked) {
+          if (prsp %in% checked) {
+            summary_template <- list(
+              summarycalc = FALSE,
+              eltcalc = FALSE,
+              aalcalc = FALSE,
+              pltcalc = FALSE,
+              id = 1,
+              oed_fields = list(),
+              lec_output = TRUE,
+              leccalc = list(
+                return_period_file = TRUE,
+                outputs = list(
+                  full_uncertainty_aep = FALSE,
+                  full_uncertainty_oep = FALSE
+                )
+              )
             )
-          )
-        )
 
         p <- which(result$out_params_review$perspective == prsp)
         review_prsp <- result$out_params_review[p, ]
@@ -1043,19 +1064,25 @@ def_out_config <- function(input,
           names(model_settings)[names(model_settings) %in% fixed_settings]
         if (ana_flag  == "R") {
           analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
-          events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$event_occurrence_id)
+          if(length(analysis_settings$detail) == 0) {
+            events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$model_settings$event_occurrence_id)
+          }
         }
         ui_basic_model_param <-
           lapply(basic_model_params, function(p) {
             curr_param_lst <- model_settings[[p]]
             curr_param_name <-
               capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
-            if (ana_flag  == "R") {
-              selected <- events_merge[p]
+            if (ana_flag  == "R" && length(analysis_settings$detail) == 0) {
+              if (p == "event_set") {
+                selected <- events_merge[1]
+              } else if (p == "event_occurrence_id") {
+                selected <- events_merge[2]
+              }
             } else {
               selected <- curr_param_lst$default
             }
-            selected = curr_param_lst$default
+            # selected = curr_param_lst$default
             # if (curr_param_lst$type == "boolean") {
             #   checkboxInput(
             #     inputId = ns(paste0("model_params_", p)),
@@ -1110,7 +1137,7 @@ def_out_config <- function(input,
               selectInput(
                 inputId = ns(paste0("model_params_", p)),
                 label = curr_param_name,
-                choices = .SwapNamesValueInList(curr_param_lst$values),
+                choices = SwapNamesValueInList(curr_param_lst$values),
                 selected =  curr_param_lst$default
               )
             } else if (curr_param_lst$type == "float") {

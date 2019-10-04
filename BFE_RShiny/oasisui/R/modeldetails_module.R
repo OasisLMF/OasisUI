@@ -205,6 +205,8 @@ modeldetails <- function(input,
       result$mapfiles_lst <- session$userData$data_hub$get_model_hazard_data_list(modelID())
       if (is.null(result$mapfiles_lst)) {
         hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
+      } else {
+        showTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
       }
     } else {
       result$tbl_modelsDetails <- NULL

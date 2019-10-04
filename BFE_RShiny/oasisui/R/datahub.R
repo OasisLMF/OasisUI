@@ -179,19 +179,22 @@ DataHub <- R6Class(
       # remove nulls
       non_null_full_lst <- lapply(full_lst, Filter, f = Negate(is.null))
       non_null_full_lst <- Filter(Negate(is.null), non_null_full_lst)
-      full_data_df <- lapply(seq(length(non_null_full_lst)), function(i){
-        non_null_full_lst[[i]] %>%
-          as.data.frame(stringsAsFactors = FALSE)
-      })
-      hazard_data_df <- NULL
-      if (!is.null(full_data_df)) {
-        full_data_df <- full_data_df %>%
-          bind_rows()
-        # hazard files are recognized by the extension
-        hazard_data_df <- full_data_df %>%
-          filter( grepl("geojson", filename))
+      if (length(non_null_full_lst) > 0) {
+        full_data_df <- lapply(seq(length(non_null_full_lst)), function(i){
+          non_null_full_lst[[i]] %>%
+            as.data.frame(stringsAsFactors = FALSE)
+        })
+        if (!is.null(full_data_df)) {
+          full_data_df <- full_data_df %>%
+            bind_rows()
+          # hazard files are recognized by the extension
+          hazard_data_df <- full_data_df %>%
+            filter( grepl("geojson", filename))
+        }
+        hazard_data_df
+      } else {
+        NULL
       }
-      hazard_data_df
     },
     # > Analysis ----
     # return list of analysis resources
