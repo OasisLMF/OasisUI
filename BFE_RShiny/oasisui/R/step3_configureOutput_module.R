@@ -222,10 +222,11 @@ step3_configureOutput <- function(input, output, session,
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Completed) {
             enable("abuttondisplayoutput")
           }
-          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Ready) {
+          if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == "ready") {
             enable("abuttonrunconfig")
             updateActionButton(session, inputId = "abuttonrunconfig", label = "Output Configuration")
-          } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Failed)) {
+          } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] %in%
+                     c("run completed", "run error")) {
             enable("abuttonrunconfig")
             updateActionButton(session, inputId = "abuttonrunconfig", label = "Rerun")
           } else {
@@ -333,7 +334,7 @@ step3_configureOutput <- function(input, output, session,
   sub_modules$def_out_config <- callModule(
     def_out_config,
     id = "def_out_config",
-    analysisID = reactive( result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]),
+    analysisID = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]),
     analysisName = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]),
     ana_flag = reactive(result$ana_flag),
     counter = reactive({input$abuttonrunconfig}),
@@ -449,8 +450,14 @@ step3_configureOutput <- function(input, output, session,
 
   # Refresh Buttons ------------------------------------------------------------
   observeEvent(input$abuttonanarefresh, {
+    idxSel <- match(result$anaID, result$tbl_analysesData[, tbl_analysesDataNames$id])
+    pageSel <- ceiling(idxSel/pageLength)
     .reloadAnaData()
-  } )
+    hide("panelDefineOutputs")
+    # keep analysis selection
+    selectRows(dataTableProxy("dt_analyses"), idxSel)
+    selectPage(dataTableProxy("dt_analyses"), pageSel)
+  })
 
   observeEvent(input$abuttonanarefreshlogs, {
     .reloadAnaRunLog()
@@ -466,7 +473,9 @@ step3_configureOutput <- function(input, output, session,
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
       hide("panelDefineOutputs")
       hide("panelAnalysisLogs")
-      if (length(input$dt_analyses_rows_selected) > 0 && !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
+      if (length(input$dt_analyses_rows_selected) > 0 &&
+          !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 &&
+          max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
         .reloadAnaRunLog()
         logMessage(paste0("analysisId changed to ", result$anaID))
@@ -517,7 +526,7 @@ step3_configureOutput <- function(input, output, session,
         result$tbl_analysesData <- tbl_analysesData
       }
       logMessage("analyses table refreshed")
-    }  else {
+    } else {
       result$tbl_analysesData <- NULL
     }
     invisible()

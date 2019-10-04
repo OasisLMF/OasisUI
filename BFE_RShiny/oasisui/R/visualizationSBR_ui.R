@@ -40,11 +40,11 @@ visualizationSBRUI <- function(id) {
         value = ns("tabsummary")
       ),
 
-      # tabPanel(
-      #   title = "Plots",
-      #   outputplotsUI(ns("outputplots")),
-      #   value = ns("tabplots")
-      # ),
+      tabPanel(
+        title = "Plots",
+        outputplotsUI(ns("outputplots")),
+        value = ns("tabplots")
+      ),
 
       tabPanel(
         title = "Files",

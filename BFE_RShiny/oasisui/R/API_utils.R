@@ -37,8 +37,8 @@ convert_created_modified <- function(tbl_obj) {
   tbl_obj_names <- names(tbl_obj)
   numpf <- nrow(tbl_obj)
   for (i in seq(numpf)) {
-    tbl_obj[i, "created"] <- toString(as.POSIXct(tbl_obj[i, "created"], format = "%d-%m-%YT%H:%M:%S"))
-    tbl_obj[i, "modified"] <- toString(as.POSIXct(tbl_obj[i, "modified"], format = "%d-%m-%YT%H:%M:%S"))
+    tbl_obj[i, "created"] <- toString(as.POSIXct(tbl_obj[i, "created"], format = "%Y-%m-%dT%H:%M:%S"))
+    tbl_obj[i, "modified"] <- toString(as.POSIXct(tbl_obj[i, "modified"], format = "%Y-%m-%dT%H:%M:%S"))
   }
   tbl_obj
 }

@@ -1,8 +1,8 @@
 test_that("convert_created_modified works",{
   tbl_analysesData <- data.frame(  id = c(3),
                                    name = "test",
-                                   created = "18-12-05T12:58:10.833113+0000",
-                                   modified = "8-12-05T12:58:48.417815+0000",
+                                   created = "05-12-18T12:58:10.833113+0000",
+                                   modified = "05-12-08T12:58:48.417815+0000",
                                    status = "INPUTS_GENERATION_ERROR",
                                    portfolio = c(4 ),
                                    model = c(1),
@@ -27,6 +27,7 @@ test_that("convert_created_modified works",{
                                    output_file = "Not Available",
                                    run_traceback_file = "Not Available",
                                    stringsAsFactors = FALSE)
+
   tbl_analysesData_modified <- convert_created_modified(tbl_analysesData)
   expect_equal(tbl_analysesData_modified, tbl_analysesData_modified_ref)
 })

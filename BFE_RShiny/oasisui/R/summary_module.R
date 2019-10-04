@@ -19,10 +19,6 @@ summarytabUI <- function(id) {
   oasisuiPanel(
     id = ns("oasisuiPanelSummaryTable"),
     collapsible = FALSE,
-    heading = tagAppendChildren(
-      h4("Summary table")
-    ),
-
     fluidRow(
       column(6,
              div(
@@ -324,7 +320,8 @@ summarytab <- function(input, output, session,
   }
 
   .getSummary <- function(selectAnaID, portfolioID) {
-    # TODO: check
+    # TODO: cross check the use of analysis settings with use in issue #173
+    # TODO: cross check overlap of helper functions and plots part here with code in outputplots_module.R
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
     # read AAL files
@@ -334,7 +331,7 @@ summarytab <- function(input, output, session,
       tiv <- AAL %>%
         filter(grepl("exposure_value", variable)) %>%
         separate(variable, into = c("variables", "report", "perspective"), sep = "\\.") %>%
-        mutate(type = case_when(as.character(type) == "1" ~ " (NI)",
+        mutate(type = case_when(as.character(type) == "1" ~ " (Analytical)",
                                 as.character(type) == "2" ~ " (Sample)",
                                 TRUE ~ as.character(type)),
                value = as.character(value),
@@ -348,7 +345,7 @@ summarytab <- function(input, output, session,
         filter(grepl("mean", variable)) %>%
         separate(variable, into = c("variables", "report", "perspective"), sep = "\\.")
       outputsAALtmp <- outputsAALtmp %>%
-        mutate(type = replace(type, type == "1", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (NI)"))) %>%
+        mutate(type = replace(type, type == "1", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
         mutate(type = replace(type, type == "2", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
       outputsAAL <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
       # AAL plot
@@ -362,6 +359,8 @@ summarytab <- function(input, output, session,
     # read OEP & AEP files
     leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty",
                            nonkeycols = c("summary_id", "return_period", "type"), variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
+    # REF: make more general, less-hard coded field names e.g.(return_period and others above)
+
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
         mutate(variable = paste(variable, type, return_period, sep = "."))
@@ -423,7 +422,7 @@ summarytab <- function(input, output, session,
                type = as.numeric(type),
                variable = as.factor(variable)) %>%
         filter(perspective == P,
-               type == 1)
+               type == max(type))
       if (nrow(data) > 0 ) {
         data <- data %>%
           rename("colour" = "variable") %>%
@@ -444,6 +443,8 @@ summarytab <- function(input, output, session,
 }
 
 # Plot functions ---------------------------------------------------------------
+
+#obsolete functions
 
 #' basicplot structure
 #' @title basicplot

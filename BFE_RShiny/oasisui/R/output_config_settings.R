@@ -12,6 +12,7 @@ output_options <- list(
   # order = c(6,2,3,4,1,5),
   variables_default = c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE),
   # default empty string is interpreted as aggregation should happen across everything, i.e. without any specific summary level
+  # REF: perhaps to be changed to "All Risks" and replace string with default_level elsewhere
   default_level = ""
 )
 
@@ -62,10 +63,10 @@ plottypeslist <- list(
   ),
   "AAL bar plot" = list(
     "Variables" = c("AAL"),
+    "x" = c("type"),
     "keycols" = c("mean"),
     "uncertaintycols" = c("standard_deviation"),
     "referencecols" = c("exposure_value"),
-    "x" = c("type"),
     "xtickslabels" = c("Numerically Integrated", "Sample Statistics"),
     "extracols" = c("X", "summary_id"),
     "plottype" = "bar",
