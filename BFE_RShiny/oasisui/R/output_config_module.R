@@ -911,24 +911,43 @@ def_out_config <- function(input,
       # potential new tag environment_tag
     )
 
-    fetch_summary <- function(prsp, checked) {
-      if (prsp %in% checked) {
-        summary_template <- list(
-          summarycalc = FALSE,
-          eltcalc = FALSE,
-          aalcalc = FALSE,
-          pltcalc = FALSE,
-          id = 1,
-          oed_fields = list(),
-          lec_output = TRUE,
-          leccalc = list(
-            return_period_file = TRUE,
-            # outputs = list(
-              full_uncertainty_aep = FALSE,
-              full_uncertainty_oep = FALSE
-            # )
-          )
-        )
+    # fetch_summary <- function(prsp, checked) {
+    #   if (prsp %in% checked) {
+    #     summary_template <- list(
+    #       summarycalc = FALSE,
+    #       eltcalc = FALSE,
+    #       aalcalc = FALSE,
+    #       pltcalc = FALSE,
+    #       id = 1,
+    #       oed_fields = list(),
+    #       lec_output = TRUE,
+    #       leccalc = list(
+    #         return_period_file = TRUE,
+    #         # outputs = list(
+    #           full_uncertainty_aep = FALSE,
+    #           full_uncertainty_oep = FALSE
+    #         # )
+    #       )
+    #     )
+
+        fetch_summary <- function(prsp, checked) {
+          if (prsp %in% checked) {
+            summary_template <- list(
+              summarycalc = FALSE,
+              eltcalc = FALSE,
+              aalcalc = FALSE,
+              pltcalc = FALSE,
+              id = 1,
+              oed_fields = list(),
+              lec_output = TRUE,
+              leccalc = list(
+                return_period_file = TRUE,
+                outputs = list(
+                  full_uncertainty_aep = FALSE,
+                  full_uncertainty_oep = FALSE
+                )
+              )
+            )
 
         p <- which(result$out_params_review$perspective == prsp)
         review_prsp <- result$out_params_review[p, ]
