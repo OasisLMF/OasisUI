@@ -1,7 +1,17 @@
 OasisUI Changelog 
 ==================
 
-.. AUTO_INSERT-CHANGE_LIST  
+`1.3.2`_
+--------
+* Closes #166
+* Fixes #170
+* Fixes #174
+* Fixes #176
+* Feature #148 Update Output config 
+* Closes #148
+* Closes #149
+* Fixes #154
+
 `1.3.1`_
 --------
 * Fix for summary_level column selection
@@ -99,6 +109,7 @@ OasisUI Changelog
 
 
 .. AUTO_INSERT-CHANGE_DIFF
+.. _`1.3.2`:  https://github.com/OasisLMF/OasisUI/compare/1.3.1...1.3.2
 .. _`1.3.1`:  https://github.com/OasisLMF/OasisUI/compare/1.3.0...1.3.1
 .. _`1.3.0`:  https://github.com/OasisLMF/OasisUI/compare/1.2.0...1.3.0
 .. _`1.2.0`:  https://github.com/OasisLMF/OasisUI/compare/1.1.2...1.2.0
