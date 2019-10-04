@@ -314,8 +314,7 @@ def_out_config <- function(input,
   })
 
   # update tag based on analysis selection
-  observeEvent({input$abuttonselectconf
-    analysisID()}, {
+  observeEvent(input$abuttonselectconf, {
       # Using analyses names to select the output configuration of a previously posted analyses
       logMessage(
         paste0(
