@@ -369,32 +369,37 @@ def_out_config <- function(input,
     result$ana_flag
     analysisID()
   }, {
-    if (!is.null(analysisID()) && result$ana_flag == "R") {
-      analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
-      if (!is.null(analysis_settings$detail) &&
-          analysis_settings$detail == "Not found.") {
-        oasisuiNotification(
-          type = "error",
-          paste0(
-            "No output configuration associated to analysis ",
-            analysisName(),
-            " id ",
-            analysisID(),
-            "."
+    if (length(analysisID()) > 0) {
+      if (result$ana_flag == "R") {
+        analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
+        if (!is.null(analysis_settings$detail) &&
+            analysis_settings$detail == "Not found.") {
+          oasisuiNotification(
+            type = "error",
+            paste0(
+              "No output configuration associated to analysis ",
+              analysisName(),
+              " id ",
+              analysisID(),
+              "."
+            )
           )
-        )
+        } else {
+          logMessage(
+            paste0(
+              "appling the output configuration of analysis ",
+              analysisName(),
+              " id ",
+              analysisID()
+            )
+          )
+        }
+        # re-set configuration to previous selection
+        .updateOutputConfig(analysis_settings, result$ana_flag)
       } else {
-        logMessage(
-          paste0(
-            "appling the output configuration of analysis ",
-            analysisName(),
-            " id ",
-            analysisID()
-          )
-        )
+        # re-set model params config
+        .clearOutputOptions("C")
       }
-      # re-set configuration to previous selection
-      .updateOutputConfig(analysis_settings, result$ana_flag)
     }
   })
 
@@ -426,7 +431,7 @@ def_out_config <- function(input,
                immediate = TRUE)
     }
 
-    # reset counter
+    # main output configuration panel (perspectives, summary levels, reports)
     output$summary_levels_reports_ui <- renderUI({
       oed_field <- oed_field_react()
       # if oed fields are provided, a vector is returned, otherwise NA
@@ -437,8 +442,6 @@ def_out_config <- function(input,
         dynamicUI_btns(analysisID(), result$ana_flag, tag = input$sintag)
       }
     })
-    .clearOutputOptions(result$ana_flag)
-
   })
 
   # disable removeBtn in case there is just a single set of fields
@@ -485,7 +488,6 @@ def_out_config <- function(input,
     output$summary_levels_reports_ui <- renderUI({
       dynamicUI_btns(analysisID(), "C", tag = input$sintag)
     })
-    #TODO:
   })
 
   # > Output Params Review -----------------------------------------------------
@@ -897,7 +899,7 @@ def_out_config <- function(input,
 
     inputsettings <- list(
       "analysis_tag" = as.integer(analysisID()),
-      # TODO: add tag
+      # category tag
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
@@ -910,43 +912,24 @@ def_out_config <- function(input,
       "source_tag" = getOption("oasisui.settings.oasis_environment")
     )
 
-    # fetch_summary <- function(prsp, checked) {
-    #   if (prsp %in% checked) {
-    #     summary_template <- list(
-    #       summarycalc = FALSE,
-    #       eltcalc = FALSE,
-    #       aalcalc = FALSE,
-    #       pltcalc = FALSE,
-    #       id = 1,
-    #       oed_fields = list(),
-    #       lec_output = TRUE,
-    #       leccalc = list(
-    #         return_period_file = TRUE,
-    #         # outputs = list(
-    #           full_uncertainty_aep = FALSE,
-    #           full_uncertainty_oep = FALSE
-    #         # )
-    #       )
-    #     )
-
-        fetch_summary <- function(prsp, checked) {
-          if (prsp %in% checked) {
-            summary_template <- list(
-              summarycalc = FALSE,
-              eltcalc = FALSE,
-              aalcalc = FALSE,
-              pltcalc = FALSE,
-              id = 1,
-              oed_fields = list(),
-              lec_output = TRUE,
-              leccalc = list(
-                return_period_file = TRUE,
-                outputs = list(
-                  full_uncertainty_aep = FALSE,
-                  full_uncertainty_oep = FALSE
-                )
-              )
+    fetch_summary <- function(prsp, checked) {
+      if (prsp %in% checked) {
+        summary_template <- list(
+          summarycalc = FALSE,
+          eltcalc = FALSE,
+          aalcalc = FALSE,
+          pltcalc = FALSE,
+          id = 1,
+          oed_fields = list(),
+          lec_output = TRUE,
+          leccalc = list(
+            return_period_file = TRUE,
+            outputs = list(
+              full_uncertainty_aep = FALSE,
+              full_uncertainty_oep = FALSE
             )
+          )
+        )
 
         p <- which(result$out_params_review$perspective == prsp)
         review_prsp <- result$out_params_review[p, ]
@@ -1037,42 +1020,38 @@ def_out_config <- function(input,
   }
 
   .clearOutputOptions <- function(ana_flag) {
+    # this is actually a function that takes care of the model parameters panel of the output configuration. possibly rename it.
     logMessage(".clearOutputOptions called")
 
     # Predefined params
     tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-
-    # Model Params
+    # Model params
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
-    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-      query_path = paste("models", modelID, "resource_file", sep = "/"),
-      query_method = "GET"
-    )
-    if (!is.null(modelID) && !is.null(tbl_modelsDetails)) {
-      model_settings <-
-        tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
-      names_settings_type <-
-        lapply(names(model_settings), function(i) {
-          model_settings[[i]][["type"]]
-        }) %>%
-        setNames(names(model_settings))
 
-      if (length(names(model_settings)) > 0) {
-        # Basic model params
-        fixed_settings <- c("event_set", "event_occurrence_id")
-        basic_model_params <-
-          names(model_settings)[names(model_settings) %in% fixed_settings]
-        if (ana_flag  == "R") {
-          analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
-          if(length(analysis_settings$detail) == 0) {
-            events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$model_settings$event_occurrence_id)
+    if (length(modelID) != 0) {
+      tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("models", modelID, "resource_file", sep = "/"),
+        query_method = "GET"
+      )
+      if (!is.null(tbl_modelsDetails)) {
+        model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
+        names_settings_type <- lapply(names(model_settings), function(i) {
+            model_settings[[i]][["type"]]
+          }) %>%
+          setNames(names(model_settings))
+        if (length(names(model_settings)) > 0) {
+          # Basic model params
+          fixed_settings <- c("event_set", "event_occurrence_id")
+          basic_model_params <- names(model_settings)[names(model_settings) %in% fixed_settings]
+          if (ana_flag  == "R") {
+            analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
+            if(length(analysis_settings$detail) == 0) {
+              events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$model_settings$event_occurrence_id)
+            }
           }
-        }
-        ui_basic_model_param <-
-          lapply(basic_model_params, function(p) {
+          ui_basic_model_param <- lapply(basic_model_params, function(p) {
             curr_param_lst <- model_settings[[p]]
-            curr_param_name <-
-              capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+            curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
             if (ana_flag  == "R" && length(analysis_settings$detail) == 0) {
               if (p == "event_set") {
                 selected <- events_merge[1]
@@ -1082,48 +1061,30 @@ def_out_config <- function(input,
             } else {
               selected <- curr_param_lst$default
             }
-            # selected = curr_param_lst$default
-            # if (curr_param_lst$type == "boolean") {
-            #   checkboxInput(
-            #     inputId = ns(paste0("model_params_", p)),
-            #     label = curr_param_name,
-            #     value = curr_param_lst$default
-            #   )
-            # } else if (curr_param_lst$type == "dictionary") {
+
             selectInput(
               inputId = ns(paste0("model_params_", p)),
               label = curr_param_name,
               choices = SwapNamesValueInList(curr_param_lst$values),
               selected =  selected
             )
-            # } else if (curr_param_lst$type == "float") {
-            #   sliderInput(
-            #     inputId = ns(paste0("model_params_", p)),
-            #     label = curr_param_name,
-            #     min = curr_param_lst$min,
-            #     max = curr_param_lst$max,
-            #     value =  curr_param_lst$default
-            #   )
-            # }
           })
-        output$basic_model_param <- renderUI(ui_basic_model_param)
+          output$basic_model_param <- renderUI(ui_basic_model_param)
 
-        # Perils Settings
-        model_perils <- names(model_settings)[grepl("peril_", names(model_settings))]
-        if (length(model_perils) > 0) {
-          ui_perils <- lapply(seq(1, length(model_perils)), function(p) {
-            checkboxInput(ns(paste0("model_params_", names(model_perils)[p])),
-                          label = model_perils[[p]], # curr_param_lst$name,
-                          value = TRUE) #curr_param_lst$default)
-          })
-          output$chkinputsperils <- renderUI(list(h5("Available Perils"), ui_perils))
-        }
+          # Perils settings
+          model_perils <- names(model_settings)[grepl("peril_", names(model_settings))]
+          if (length(model_perils) > 0) {
+            ui_perils <- lapply(seq(1, length(model_perils)), function(p) {
+              checkboxInput(ns(paste0("model_params_", names(model_perils)[p])),
+                            label = model_perils[[p]], # curr_param_lst$name,
+                            value = TRUE) #curr_param_lst$default)
+            })
+            output$chkinputsperils <- renderUI(list(h5("Available Perils"), ui_perils))
+          }
 
-        # Advanced model params
-        advanced_model_param <-
-          names(model_settings)[names(model_settings) %notin% c(basic_model_params, model_perils)]
-        ui_advanced_model_param <-
-          lapply(advanced_model_param, function(p) {
+          # Advanced model params
+          advanced_model_param <- names(model_settings)[names(model_settings) %notin% c(basic_model_params, model_perils)]
+          ui_advanced_model_param <- lapply(advanced_model_param, function(p) {
             curr_param_lst <- model_settings[[p]]
             curr_param_name <-
               capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
@@ -1150,7 +1111,8 @@ def_out_config <- function(input,
               )
             }
           })
-        output$advanced_model_param <- renderUI(ui_advanced_model_param)
+          output$advanced_model_param <- renderUI(ui_advanced_model_param)
+        }
       }
     }
   }
