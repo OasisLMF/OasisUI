@@ -369,6 +369,7 @@ def_out_config <- function(input,
     result$ana_flag
     analysisID()
   }, {
+    print(paste("*** result$ana_flag is:", result$ana_flag, "--- analysisID() is:", analysisID()))
     if (length(analysisID()) > 0) {
       if (result$ana_flag == "R") {
         analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
@@ -412,27 +413,29 @@ def_out_config <- function(input,
     input$sintag
     analysisID()
   }, {
-    logMessage(paste0(
-      "updating output parameters for ",
-      input$sintag,
-      " configuration"
-    ))
+    if (length(analysisID()) > 0) {
+      logMessage(paste0(
+        "updating output parameters for ",
+        input$sintag,
+        " configuration"
+      ))
 
-    # clean up ui
-    logMessage("clean up UI")
-    if (any(grepl("sinsummarylevels", input))) {
-      removeUI(selector = "div:has(> #sinsummarylevels)",
-               multiple = TRUE,
-               immediate = TRUE)
+      # clean up ui
+      logMessage("clean up UI")
+      if (any(grepl("sinsummarylevels", input))) {
+        removeUI(selector = "div:has(> #sinsummarylevels)",
+                 multiple = TRUE,
+                 immediate = TRUE)
+      }
+      if (any(grepl("sinreports", input))) {
+        removeUI(selector = "div:has(> #sinreports)",
+                 multiple = TRUE,
+                 immediate = TRUE)
+      }
     }
-    if (any(grepl("sinreports", input))) {
-      removeUI(selector = "div:has(> #sinreports)",
-               multiple = TRUE,
-               immediate = TRUE)
-    }
-
     # main output configuration panel (perspectives, summary levels, reports)
     output$summary_levels_reports_ui <- renderUI({
+      #if (length(analysisID()) > 0) {
       oed_field <- oed_field_react()
       # if oed fields are provided, a vector is returned, otherwise NA
       if (all(is.na(oed_field))) {
@@ -730,23 +733,38 @@ def_out_config <- function(input,
       })
     } else if (tag == default_tags[2]) {
       choices_sum <- choices_sum[choices_sum != "All Risks"]
-      lapply(seq(1, length(choices_sum)), function(x) {
-        tags$div(
-          id = x - 1,
-          fluidRow(
-            column(
-              5,
-              selectInput(
-                inputId = ns(paste0("sinsummarylevels", x - 1)),
-                label = "Summary Levels",
-                choices = oed_field,
-                selected = choices_sum[[x]],
-                multiple = TRUE
+      if (length(choices_sum) > 0) {
+        lapply(seq(1, length(choices_sum)), function(x) {
+          tags$div(
+            id = x - 1,
+            fluidRow(
+              column(
+                5,
+                selectInput(
+                  inputId = ns(paste0("sinsummarylevels", x - 1)),
+                  label = "Summary Levels",
+                  choices = oed_field,
+                  selected = choices_sum[[x]],
+                  multiple = TRUE
+                )
               )
             )
           )
+        })
+      } else {
+        fluidRow(
+          column(
+            5,
+            selectInput(
+              inputId = ns(paste0("sinsummarylevels", 0)),
+              label = "Summary Levels",
+              choices = oed_field,
+              selected = NULL,
+              multiple = TRUE
+            )
+          )
         )
-      })
+      }
     }
   }
 
