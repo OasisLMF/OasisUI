@@ -369,7 +369,7 @@ def_out_config <- function(input,
     result$ana_flag
     analysisID()
   }, {
-    print(paste("*** result$ana_flag is:", result$ana_flag, "--- analysisID() is:", analysisID()))
+    #print(paste("*** result$ana_flag is:", result$ana_flag, "--- analysisID() is:", analysisID()))
     if (length(analysisID()) > 0) {
       if (result$ana_flag == "R") {
         analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)

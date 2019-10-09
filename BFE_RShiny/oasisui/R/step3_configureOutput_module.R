@@ -264,10 +264,10 @@ step3_configureOutput <- function(input, output, session,
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- which(result$tbl_analysesData[, tbl_analysesDataNames$id] == analysisID())
       if (length(index) == 0 && is.null(analysisID())) {
-        print("*** analysisID() NULL, set index to 1")
+        #print("*** analysisID() NULL, set index to 1")
         index <- 1
       } else {
-        print(paste("*** index is", index))
+        #print(paste("*** index is", index))
       }
       logMessage("re-rendering analysis table")
       datatable(
