@@ -5,7 +5,7 @@
 \title{withModalSpinner}
 \usage{
 withModalSpinner(expr, info, spinner = icon("spinner", "fa-spin"),
-  size = "m")
+  size = "m", t = 0)
 }
 \arguments{
 \item{expr}{The \code{expression} to be evaluated.}
@@ -16,6 +16,8 @@ withModalSpinner(expr, info, spinner = icon("spinner", "fa-spin"),
 
 \item{size}{One of \code{"s"} for small, \code{"m"} (the default) for medium,
 or \code{"l"} for large.}
+
+\item{t}{Time to prolongue the appearing of the modalDialog.}
 }
 \description{
 Display a modal window with a spinning wheel and an information message
