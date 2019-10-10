@@ -136,7 +136,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
                 paste0("Are you sure that you want to delete this analysis?"),
                 footer = tagList(
                   oasisuiButton(ns("abuttonConfirmDelAna"),
-                                 label = "Confirm", align = "center") %>%
+                                label = "Confirm", align = "center") %>%
                     bs_embed_tooltip(title = landing_page_tooltips$abuttonConfirmDelAna, placement = "right"),
                   actionButton(ns("btnCancelDelAna"),
                                label = "Go back", align = "right")
@@ -152,11 +152,11 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
     delete_analyses_id <- session$userData$oasisapi$api_delete_query(query_path = paste("analyses", analysisID, sep = "/"))# api_delete_analyses_id(analysisID)
     if (delete_analyses_id$status == "Success") {
       oasisuiNotification(type = "message",
-                           paste0("Analysis id ", analysisID, " deleted."))
+                          paste0("Analysis id ", analysisID, " deleted."))
       .reloadAnaData()
     } else {
       oasisuiNotification(type = "error",
-                           paste0("Analysis id ", analysisID, " could not be deleted."))
+                          paste0("Analysis id ", analysisID, " could not be deleted."))
     }
   })
 
@@ -166,7 +166,11 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
 
   # Refresh button -------------------------------------------------------------
   observeEvent(input$abuttonrefreshanaInbox, {
-    .reloadAnaData()
+    withModalSpinner(
+      .reloadAnaData(),
+      "Refreshing...",
+      size = "s", t = 0.5
+    )
   })
 
   # Enable /Disable buttons ----------------------------------------------------

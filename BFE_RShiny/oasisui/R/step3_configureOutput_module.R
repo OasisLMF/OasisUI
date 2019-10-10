@@ -90,8 +90,8 @@ panelAnalysisLogs <- function(id) {
       uiOutput(ns("paneltitle_AnaLogs"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-      div(class = "panel", style = 'overflow-y: scroll; max-height: 200px; min-height: 30px;',
-          textOutput(ns("text_analysesrunlog"))
+    div(class = "panel", style = 'overflow-y: scroll; max-height: 200px; min-height: 30px;',
+        textOutput(ns("text_analysesrunlog"))
     ),
     hidden(downloadButton(ns("download_log"), label = "Download"))
   )
@@ -286,7 +286,7 @@ step3_configureOutput <- function(input, output, session,
   output$paneltitle_AnalysisTable <- renderUI({
     if (portfolioID() != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
-      paste0('Analyses associated with portfolio ', pfName, ', id ', portfolioID())
+      paste0('Analyses associated to portfolio ', pfName, ', id ', portfolioID())
     } else {
       paste0("Analyses")
     }
@@ -452,7 +452,11 @@ step3_configureOutput <- function(input, output, session,
   observeEvent(input$abuttonanarefresh, {
     idxSel <- match(result$anaID, result$tbl_analysesData[, tbl_analysesDataNames$id])
     pageSel <- ceiling(idxSel/pageLength)
-    .reloadAnaData()
+    withModalSpinner(
+      .reloadAnaData(),
+      "Refreshing...",
+      size = "s", t = 0.5
+    )
     hide("panelDefineOutputs")
     # keep analysis selection
     selectRows(dataTableProxy("dt_analyses"), idxSel)
@@ -549,7 +553,7 @@ step3_configureOutput <- function(input, output, session,
                 paste0("Are you sure that you want to cancel this analysis?"),
                 footer = tagList(
                   oasisuiButton(ns("abuttonConfirmDelAna"),
-                                 label = "Confirm", align = "center") %>%
+                                label = "Confirm", align = "center") %>%
                     bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonConfirmDel, placement = "right"),
                   actionButton(ns("btnCancelAnaDel"),
                                label = "Go back", align = "right")

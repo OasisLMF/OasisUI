@@ -108,19 +108,18 @@ anainputs <- function(input,
 
   # reload Generated Inputs table-----------------------------------------------
   observeEvent(input$abuttonanainputrefresh, {
-    .reloadInputs()
+    withModalSpinner(
+    .reloadInputs(),
+    "Refreshing...",
+    size = "s", t = 0.5
+    )
   })
 
   # Reload input generated table -----------------------------------------------
   .reloadInputs <- function(){
     logMessage(".reloadInputs called")
     if (!is.null(analysisID())) {
-      withModalSpinner(
-        dt_generated <- session$userData$data_hub$get_ana_inputs_data_list(analysisID()), #session$userData$data_hub$return_analyses_input_file_wicons_df(analysisID(),Status),
-        "Loading...",
-        size = "s"
-      )
-
+        dt_generated <- session$userData$data_hub$get_ana_inputs_data_list(analysisID()) #session$userData$data_hub$return_analyses_input_file_wicons_df(analysisID(),Status),
 
     } else {
       dt_generated <-  NULL
