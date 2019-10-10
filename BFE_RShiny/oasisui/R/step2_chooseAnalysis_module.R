@@ -289,12 +289,11 @@ step2_chooseAnalysis <- function(input, output, session,
 
 
   # Analysis ID ----------------------------------------------------------------
-
   observeEvent({
     input$dt_analyses_rows_selected
     # below is for the case when creating a new analysis
     # (selection will stay on the first row then but we need a re-trigger here to get the analysisID updated to the new one)
-    reactive(nrow(result$tbl_analysesData))
+    nrow(result$tbl_analysesData)
     portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_analyses_rows_selected)) {
         result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
@@ -305,7 +304,6 @@ step2_chooseAnalysis <- function(input, output, session,
     })
 
   # Model ID -------------------------------------------------------------------
-
   observeEvent({
     input$dt_models_rows_selected
     portfolioID()}, ignoreNULL = FALSE, {
@@ -711,7 +709,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaData <- function() {
     logMessage(".reloadAnaData step2 called")
     if (!is.null(portfolioID()) && portfolioID()  != "") {
-      tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+      tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
         result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
       }
