@@ -67,6 +67,8 @@ tbl_analysesDataNames <- list(
   name = "name",
   created = "created",
   modified = "modified",
+  task_started = "task_started",
+  task_finished = "task_finished",
   status_detailed = "status_detailed",
   status = "status",
   portfolio = "portfolio",

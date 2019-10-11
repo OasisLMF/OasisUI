@@ -628,6 +628,8 @@ DataHub <- R6Class(
                  supplier,
                  !! sym(tbl_analysesDataNames$created),
                  !! sym(tbl_analysesDataNames$modified),
+                 !! sym(tbl_analysesDataNames$task_started),
+                 !! sym(tbl_analysesDataNames$task_finished),
                  !! sym(tbl_analysesDataNames$status_detailed),
                  !! sym(tbl_analysesDataNames$status)) %>%
           rename("portfolio_id" = tbl_analysesDataNames$portfolio) %>%
@@ -662,8 +664,8 @@ DataHub <- R6Class(
           select(c(!! sym(tbl_analysesDataNames$id), !! sym(tbl_analysesDataNames$name),
                    !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
                    !! sym(tbl_analysesDataNames$modified), !! sym(tbl_analysesDataNames$created),
+                   !! sym(tbl_analysesDataNames$task_started), !! sym(tbl_analysesDataNames$task_finished),
                    !! sym(tbl_analysesDataNames$status_detailed), !! sym(tbl_analysesDataNames$status)))
-
       } else {
         tbl_analysesData <- NULL
       }

@@ -39,6 +39,11 @@ convert_created_modified <- function(tbl_obj) {
   for (i in seq(numpf)) {
     tbl_obj[i, "created"] <- toString(as.POSIXct(tbl_obj[i, "created"], format = "%Y-%m-%dT%H:%M:%S"))
     tbl_obj[i, "modified"] <- toString(as.POSIXct(tbl_obj[i, "modified"], format = "%Y-%m-%dT%H:%M:%S"))
+    # tasks started and finished available only for analyses table
+    if(length(tbl_obj[i, "task_started"]) != 0) {
+      tbl_obj[i, "task_started"] <- toString(as.POSIXct(tbl_obj[i, "task_started"], format = "%Y-%m-%dT%H:%M:%S"))
+      tbl_obj[i, "task_finished"] <- toString(as.POSIXct(tbl_obj[i, "task_finished"], format = "%Y-%m-%dT%H:%M:%S"))
+    }
   }
   tbl_obj
 }
