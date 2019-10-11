@@ -249,14 +249,14 @@ step1_choosePortfolio <- function(input, output, session,
   )
 
   #Set Params
-  observe( if (active()) {
+  observe(if (active()) {
     result$portfolioID <- isolate(portfolioID())
   })
 
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
-    if (currstep() == 1 ){
+    if (currstep() == 1 ) {
       .defaultCreateProg()
       .reloadtbl_portfoliosData()
     }
@@ -524,16 +524,16 @@ step1_choosePortfolio <- function(input, output, session,
   })
 
   # Upload Location/Account File
-  .uploadSourceFile <- function(inFile, query_path ) {
+  .uploadSourceFile <- function(inFile, query_path) {
     logMessage(paste0("Uploading file ", inFile$datapath))
-    pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
     if (!is.null(inFile$datapath)) {
+      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
       tmp <- unlist(strsplit(inFile$datapath, split = "/"))
       datapath <- paste(c(tmp[-length(tmp)], ""), collapse = "/")
       newfile <- paste0(datapath, inFile$name)
       file.rename(inFile$datapath, newfile)
       withModalSpinner(
-        post_file <- session$userData$oasisapi$api_post_file_query( paste("portfolios", pfId, query_path, sep = "/"),  query_body = newfile),
+        post_file <- session$userData$oasisapi$api_post_file_query(paste("portfolios", pfId, query_path, sep = "/"),  query_body = newfile),
         "Linking...",
         size = "s"
       )
@@ -546,24 +546,25 @@ step1_choosePortfolio <- function(input, output, session,
       }
       .reloadtbl_portfoliosData()
     }
+    invisible()
   }
 
-  observeEvent(input$SLFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$SLFile, ignoreInit = TRUE, {
     result$SLFile <- input$SLFile
     .uploadSourceFile(inFile = result$SLFile, query_path = "location_file")
   })
 
-  observeEvent(input$SAFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$SAFile, ignoreInit = TRUE, {
     result$SAFile <- input$SAFile
     .uploadSourceFile(inFile = result$SAFile, query_path = "accounts_file")
   })
 
-  observeEvent(input$SRFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$SRFile, ignoreInit = TRUE, {
     result$SRFile <- input$SRFile
     .uploadSourceFile(inFile = result$SRFile, query_path = "reinsurance_info_file")
   })
 
-  observeEvent(input$SRSFile, ignoreNULL = FALSE, ignoreInit = TRUE, {
+  observeEvent(input$SRSFile, ignoreInit = TRUE, {
     result$SRSFile <- input$SRSFile
     .uploadSourceFile(inFile = result$SRSFile, query_path = "reinsurance_scope_file")
   })
@@ -662,7 +663,7 @@ step1_choosePortfolio <- function(input, output, session,
   # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
-    logMessage(".hideDivs called")
+    logMessage(".hideDivs step1 called")
     # Section "Choose portfolio" = "1"
     hide("panelPortfolioTable")
     hide("panelPortfolioDetails")

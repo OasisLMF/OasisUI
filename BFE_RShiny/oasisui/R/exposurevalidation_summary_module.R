@@ -53,11 +53,8 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
 #' @importFrom dplyr filter
-#' @importFrom dplyr case_when
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
-#' @importFrom DT DTOutput
-#' @importFrom jsonlite read_json
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' @importFrom ggplot2 ggplot
@@ -69,11 +66,7 @@ exposurevalidationsummaryUI <- function(id) {
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 scale_fill_manual
 #' @importFrom ggplot2 scale_y_continuous
-#' @importFrom stats setNames
-#' @importFrom tidyr spread
 #' @importFrom tidyr gather
-#' @importFrom tidyr unite
-#' @importFrom tidyr separate
 #'
 #' @export
 exposurevalidationsummary <- function(input,
@@ -87,11 +80,11 @@ exposurevalidationsummary <- function(input,
 
   # Params and Reactive Values -------------------------------------------------
   result <- reactiveValues(
-    #dataframe summary
+    # dataframe summary
     summary_validation_tbl = NULL,
-    #summary for all perils
+    # summary for all perils
     summary_tbl = NULL,
-    #list perils
+    # list perils
     perils = NULL
   )
 
@@ -102,10 +95,11 @@ exposurevalidationsummary <- function(input,
     active()
     counter()
   }, {
-    if (length(active()) > 0 && active()) {
-      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID())
+    if (length(active()) > 0 && active() && counter() > 0) {
+      result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
       result$perils <- unique(result$summary_tbl$peril)
       updateSelectInput(session, inputId = "input_peril", choices = ifelse(!is.null(result$perils), result$perils, "no perils available for summary"))
+      # TODO: if above leaves input_peril the same, we still want to call .reloadSummary once
     }
   })
 
@@ -117,7 +111,6 @@ exposurevalidationsummary <- function(input,
   })
 
   # Summary table --------------------------------------------------------------
-
   output$dt_summary_validation <- renderDT(
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
       datatable(
@@ -133,32 +126,30 @@ exposurevalidationsummary <- function(input,
     }
   )
 
-  # Vusualize Summary ----------------------------------------------------------
-
+  # Visualize Summary ----------------------------------------------------------
   observeEvent(result$summary_tbl, {
     if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0) {
       if (ncol(result$summary_tbl) > 3) {
-      df_vis <- .extract_df_plot(df = result$summary_tbl)
-      output$outputplot_vis <- renderPlotly({ggplotly(.plot_stack_hist(df = df_vis) )})
+        df_vis <- .extract_df_plot(df = result$summary_tbl)
+        output$outputplot_vis <- renderPlotly({ggplotly(.plot_stack_hist(df = df_vis))})
       }
     }
   })
-
 
   # Refresh button -------------------------------------------------------------
   observeEvent(input$abuttonexposurerefresh, {
     # Get modeled locations
     withModalSpinner(
-      result$summary_tbl <-  session$userData$data_hub$get_ana_validation_summary_content(analysisID()),
+      result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID()),
       "Refreshing...",
       size = "s"
     )
     .reloadSummary()
   })
 
-  # Utils functions ------------------------------------------------------------
 
-  .extract_df_plot <- function(df){
+  # Utils functions ------------------------------------------------------------
+  .extract_df_plot <- function(df) {
     df <- df %>%
       filter(type %in% type_to_plot) %>%
       mutate(fail = 100*fail/all,
@@ -171,7 +162,7 @@ exposurevalidationsummary <- function(input,
     df
   }
 
-  # # visualize exposure validation summary
+  # visualize exposure validation summary
   .plot_stack_hist <- function(df) {
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
@@ -196,17 +187,12 @@ exposurevalidationsummary <- function(input,
     p
   }
 
-  # reload dataframes
-
-  #reload summary table
-  .reloadSummary <- function(input_peril){
-
+  # reload summary table
+  .reloadSummary <- function(input_peril) {
     logMessage(".reloadSummary called")
-
     # Clean up df
     result$summary_validation_tbl <- NULL
-
-    #Build df
+    # Build df
     if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0 && !is.null(input_peril)) {
       result$summary_validation_tbl <- result$summary_tbl %>%
         filter(peril == input_peril) %>%
@@ -216,4 +202,5 @@ exposurevalidationsummary <- function(input,
     }
   }
 
+  invisible()
 }

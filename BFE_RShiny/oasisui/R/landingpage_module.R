@@ -78,7 +78,7 @@ landingPage <- function(input, output, session, active = reactive(TRUE)) {
 
   # Reload Process Runs table
   .reloadAnaData <- function() {
-    logMessage(".reloadAnaData called")
+    logMessage(".reloadAnaData landingpage called")
     result$tbl_anaInbox <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
     logMessage("analyses table refreshed")
     invisible()

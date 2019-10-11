@@ -473,7 +473,7 @@ DataHub <- R6Class(
         as.data.frame(stringsAsFactors = FALSE) %>%
         setNames("description") %>%
         mutate(jsonnames = rownames(.)) %>%
-        separate(col = jsonnames, into= c("perspective", "status", "oed_field"), sep = "\\.")
+        separate(col = jsonnames, into = c("perspective", "status", "oed_field"), sep = "\\.")
       oed_fields
     },
     # invalidate oed summary levels relevant for current analysis
@@ -499,6 +499,8 @@ DataHub <- R6Class(
           as.data.frame(stringsAsFactors = FALSE)  %>%
           setNames("vals") %>%
           mutate(rowname = rownames(.)) %>%
+          # below is expected to throw a warning since type2 breakdown will be missing for some items (types):
+          # Warning: Expected 4 pieces. Missing pieces filled with `NA` in xx rows ...
           separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
           mutate(type2 = case_when(
             is.na(type2) ~ "",
@@ -663,7 +665,6 @@ DataHub <- R6Class(
                    !! sym(tbl_analysesDataNames$portfolio), !! sym(tbl_analysesDataNames$model),
                    !! sym(tbl_analysesDataNames$modified), !! sym(tbl_analysesDataNames$created),
                    !! sym(tbl_analysesDataNames$status_detailed), !! sym(tbl_analysesDataNames$status)))
-
       } else {
         tbl_analysesData <- NULL
       }
@@ -683,7 +684,7 @@ DataHub <- R6Class(
   g_idx <- as.integer(gsub("S", "", y[2]))
   g_oed <- analysis_settings[["analysis_settings"]][[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
   if (length(g_oed) == 0) {
-    logMessage("g_oed is NULL in .addDescription")
+    # logMessage("g_oed is NULL in .addDescription")
     g_oed <- "All Risks"
   } else {
     g_oed <- unlist(g_oed)

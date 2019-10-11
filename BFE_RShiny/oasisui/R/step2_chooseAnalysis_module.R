@@ -205,14 +205,12 @@ step2_chooseAnalysis <- function(input, output, session,
                                  portfolioID = reactive({""}),
                                  pfName = reactive({""}),
                                  pfstatus = reactive({""})
-
 ) {
 
   ns <- session$ns
 
   # Reactive Values and parameters ---------------------------------------------
-
-  #number of Rows per Page in a dataable
+  # number of rows per page in a datatable
   pageLength <- 5
 
   # list of sub-modules
@@ -226,12 +224,12 @@ step2_chooseAnalysis <- function(input, output, session,
     tbl_modelsData = NULL,
     # analyses table
     tbl_analysesData = NULL,
-    #analysis log
+    # analysis log
     tbl_analysislog = NULL,
-    #analysis ID
+    # analysis ID
     analysisID = NULL,
-    #exposure_counter
-    exposure_counter = NULL
+    # exposure_counter
+    exposure_counter = 0
   )
 
   # Panels Visualization -------------------------------------------------------
@@ -253,18 +251,20 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisGenInputs")
   })
 
-  # Analyses  Table ------------------------------------------------------------
-
+  # Analyses table ------------------------------------------------------------
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- 1
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData %>%session$userData$data_hub$return_tbl_analysesData_nice(admin_mode = getOption("oasisui.settings.admin.mode"), Status = Status, tbl_modelsDataNames = tbl_modelsDataNames, tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames),
+        result$tbl_analysesData %>% session$userData$data_hub$return_tbl_analysesData_nice(
+          admin_mode = getOption("oasisui.settings.admin.mode"),
+          Status = Status, tbl_modelsDataNames = tbl_modelsDataNames,
+          tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames
+        ),
         class = "oasisui-table display",
         rownames = FALSE,
-        selection = list(mode = 'single',
-                         selected = index),
+        selection = list(mode = 'single', selected = index),
         escape = FALSE,
         filter = 'bottom',
         options = getTableOptions(maxrowsperpage = pageLength)
@@ -273,7 +273,7 @@ step2_chooseAnalysis <- function(input, output, session,
       nothingToShowTable("No analysis available")
     })
 
-  # Create Analyses Table  Title
+  # Create Analyses Table Title
   output$paneltitle_CreateAnalysesTable <- renderUI({
     if (!is.null(portfolioID()) && portfolioID() != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
@@ -289,19 +289,21 @@ step2_chooseAnalysis <- function(input, output, session,
 
 
   # Analysis ID ----------------------------------------------------------------
-
   observeEvent({
     input$dt_analyses_rows_selected
+    # below is for the case when creating a new analysis
+    # (selection will stay on the first row then but we need a re-trigger here to get the analysisID updated to the new one)
+    nrow(result$tbl_analysesData)
     portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_analyses_rows_selected)) {
         result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+        logMessage(paste("updating result$analysisID in step2 to", result$analysisID))
       } else {
         result$analysisID <- NULL
       }
     })
 
   # Model ID -------------------------------------------------------------------
-
   observeEvent({
     input$dt_models_rows_selected
     portfolioID()}, ignoreNULL = FALSE, {
@@ -391,7 +393,6 @@ step2_chooseAnalysis <- function(input, output, session,
     pageSel <- ceiling(idxSel/pageLength)
     selectRows(dataTableProxy("dt_analyses"), idxSel)
     selectPage(dataTableProxy("dt_analyses"), pageSel)
-
   })
 
   # Analysis details ------------------------------------------------------------
@@ -488,9 +489,9 @@ step2_chooseAnalysis <- function(input, output, session,
   output$paneltitle_panelAnalysisLog <- renderUI({
     if (!is.null(result$analysisID)) {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-      paste0('Input generation Logs of analysis id ', toString(result$analysisID), ' ', anaName)
+      paste0('Input generation logs of analysis id ', toString(result$analysisID), ' ', anaName)
     } else {
-      paste0("Input generation Logs")
+      paste0("Input generation logs")
     }
   })
 
@@ -675,7 +676,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
-    logMessage(".hideDivs called")
+    logMessage(".hideDivs step2 called")
     #Section "Choose Analysis" = "2"
     hide("panelCreateAnalysesTable")
     hide("panelAnalysisDetails")
@@ -686,7 +687,7 @@ step2_chooseAnalysis <- function(input, output, session,
   }
 
   # show default analysis details
-  .defaultAnalysisDetails <- function(){
+  .defaultAnalysisDetails <- function() {
     curr_status <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed]
     if (length(curr_status) > 0 && !is.na(curr_status) &&  (curr_status == Status_details$ready ||
                                                             curr_status == Status_details$run_err ||
@@ -706,9 +707,9 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Reload Analysis table
   .reloadAnaData <- function() {
-    logMessage(".reloadAnaData called")
+    logMessage(".reloadAnaData step2 called")
     if (!is.null(portfolioID()) && portfolioID()  != "") {
-      tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+      tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
       if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
         result$tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
       }

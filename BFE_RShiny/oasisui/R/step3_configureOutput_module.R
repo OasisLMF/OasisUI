@@ -259,21 +259,26 @@ step3_configureOutput <- function(input, output, session,
     }
   })
 
-  # Analyses  Table ------------------------------------------------------------
-
+  # Analyses Table ------------------------------------------------------------
   output$dt_analyses <- renderDT(
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
-      index <- which(result$tbl_analysesData[ ,tbl_analysesDataNames$id] == analysisID())
+      index <- which(result$tbl_analysesData[, tbl_analysesDataNames$id] == analysisID())
       if (length(index) == 0 && is.null(analysisID())) {
+        #print("*** analysisID() NULL, set index to 1")
         index <- 1
+      } else {
+        #print(paste("*** index is", index))
       }
       logMessage("re-rendering analysis table")
       datatable(
-        result$tbl_analysesData %>% session$userData$data_hub$return_tbl_analysesData_nice(admin_mode = getOption("oasisui.settings.admin.mode"), Status = Status, tbl_modelsDataNames = tbl_modelsDataNames, tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames),
+        result$tbl_analysesData %>% session$userData$data_hub$return_tbl_analysesData_nice(
+          admin_mode = getOption("oasisui.settings.admin.mode"),
+          Status = Status, tbl_modelsDataNames = tbl_modelsDataNames,
+          tbl_portfoliosDataNames = tbl_portfoliosDataNames, tbl_analysesDataNames = tbl_analysesDataNames
+        ),
         class = "oasisui-table display",
         rownames = FALSE,
-        selection = list(mode = 'single',
-                         selected = index),
+        selection = list(mode = 'single', selected = index),
         escape = FALSE,
         filter = 'bottom',
         options = getTableOptions(maxrowsperpage = pageLength)
@@ -477,11 +482,11 @@ step3_configureOutput <- function(input, output, session,
           !is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 &&
           max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         result$anaID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-        .reloadAnaRunLog()
         logMessage(paste0("analysisId changed to ", result$anaID))
         if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] == Status$Failed) {
           show("panelAnalysisLogs")
           logMessage("showing analysis run log table")
+          .reloadAnaRunLog()
         }
       } else {
         result$anaID <- NULL
@@ -498,34 +503,35 @@ step3_configureOutput <- function(input, output, session,
   })
 
 
-  # Help Functions -------------------------------------------------------------
-
+  # Helper functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
-    logMessage(".hideDivs called")
+    logMessage(".hideDivs step3 called")
     #Section "Configure Output & Run" = "3"
     hide("panelAnalysisTable")
     hide("panelDefineOutputs")
     hide("panelAnalysisLogs")
+    invisible()
   }
 
-  #show default view for Section "Configure Output & Run" = "3"
-  .defaultstep3 <- function(){
+  # show default view for Section "Configure Output & Run" = "3"
+  .defaultstep3 <- function() {
     logMessage(".defaultstep3 called")
     show("panelAnalysisTable")
     # disable("chkgulpolicy")
+    invisible()
   }
 
   # Reload Analyses table
   .reloadAnaData <- function() {
-    logMessage(".reloadAnaData called")
-    if (portfolioID()  != "") {
-      tbl_analysesData  <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-      if (!is.null(tbl_analysesData)  && nrow(tbl_analysesData) > 0) {
+    logMessage(".reloadAnaData step3 called")
+    if (portfolioID() != "") {
+      tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+      if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0) {
         tbl_analysesData <- tbl_analysesData %>% filter(!! sym(tbl_analysesDataNames$portfolio) == portfolioID())
         result$tbl_analysesData <- tbl_analysesData
+        logMessage(paste("analyses table refreshed with", nrow(tbl_analysesData), "rows"))
       }
-      logMessage("analyses table refreshed")
     } else {
       result$tbl_analysesData <- NULL
     }
@@ -540,9 +546,10 @@ step3_configureOutput <- function(input, output, session,
     } else {
       result$tbl_analysisrunlog <-  NULL
     }
+    invisible()
   }
 
-  .cancelAnaModal <- function(){
+  .cancelAnaModal <- function() {
     ns <- session$ns
     modalDialog(label = "cancelAnaModal",
                 title = uiOutput(ns("cancelAnaModaltitle"), inline = TRUE),
