@@ -326,16 +326,24 @@ panelOutputModule <- function(input, output, session,
     # display only summary levels that correspond to the selected report
     idx_s <- lapply(input$pltreports, function(x) {(which(filesListData()$report == x))})
     if (length(input$pltreports) > 1) {
+      # inc ase two reports are selected, only show the summary levels common to both
       summary_level <- intersect(filesListData()$summary_level[idx_s[[1]]],
                                  filesListData()$summary_level[idx_s[[2]]])
     } else {
       summary_level <- filesListData()$summary_level[unlist(idx_s)]
     }
+    if (length(input$pltsummarylevels) > 0) {
+      # keep same summary level in case something was previously selected
+      selected <- input$pltsummarylevels
+    } else {
+      selected <- NULL
+    }
     output$summary_levels_ui <- renderUI({
       selectInput(
         inputId = ns("pltsummarylevels"),
         label = "Summary Levels",
-        choices = unique(summary_level)
+        choices = unique(summary_level),
+        selected = selected
       )
     })
   })
