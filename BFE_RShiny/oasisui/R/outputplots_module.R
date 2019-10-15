@@ -100,29 +100,35 @@ panelOutputModuleUI <- function(id){
       collapsible = TRUE,
       heading = "Custom plot",
       # h4("Data to plot"),
-      column(12,
-             # div( class = "InlineSelectInput",
-             selectInput(inputId = ns("inputplottype"), label = "Plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1])
-             # )
+      fluidRow(
+        column(12,
+               # div( class = "InlineSelectInput",
+               selectInput(inputId = ns("inputplottype"), label = "Plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1])
+               # )
+        )
       ),
-      column(6,
-             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
-      column(6,
-             uiOutput(ns("types_ui"))),
-      column(6,
-             uiOutput(ns("reports_ui"))),
-      column(6,
-             uiOutput(ns("summary_levels_ui"))),
+      fluidRow(
+        column(6,
+               checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
+        column(6,
+               uiOutput(ns("types_ui")))
+      ),
+      fluidRow(
+        column(6,
+               uiOutput(ns("reports_ui"))),
+        column(6,
+               uiOutput(ns("summary_levels_ui")))
+      ),
       br(),
-      column(3,
-             # div(class = "InlineTextInput",
-             textInput(ns("textinputtitle"), "Title", "")),
-      # ),
-      column(4,
-             checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
-      column(3,
-             hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
-      oasisuiButton(inputId = ns("abuttondraw"), label = "Draw Plot",  style = "float:right")
+      fluidRow(
+        column(3,
+               textInput(ns("textinputtitle"), "Title", "")),
+        column(4,
+               checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
+        column(3,
+               hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
+        oasisuiButton(inputId = ns("abuttondraw"), label = "Draw Plot",  style = "float:right")
+      )
     ),
 
     panel(
@@ -514,12 +520,12 @@ panelOutputModule <- function(input, output, session,
       # rename column for Y axis
       data <- data %>% rename("value" = key)
 
-        data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
-        if (length(which(data$type == 2)) != 0) {
-          data$type <- data$type %>% replace(which(data$type == 2), "Sample")
-        }
-        data <- data %>% filter(type %in% input$calctypes)
-        data$type <- paste(data$type, "Loss")
+      data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
+      if (length(which(data$type == 2)) != 0) {
+        data$type <- data$type %>% replace(which(data$type == 2), "Sample")
+      }
+      data <- data %>% filter(type %in% input$calctypes)
+      data$type <- paste(data$type, "Loss")
 
       # rename column for x axis
       data <- data %>% rename("xaxis" = x)
@@ -681,8 +687,8 @@ panelOutputModule <- function(input, output, session,
                          multipleplots = FALSE, xtickslabels = NULL ) {
     p <- .basicplot(...)
     p <- p + geom_bar(position = "dodge", stat = "identity")
-      #geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
-      # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
+    #geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
+    # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
 
     if (wuncertainty){
       p <- p +
