@@ -324,9 +324,13 @@ panelOutputModule <- function(input, output, session,
 
   observeEvent(input$pltreports, ignoreNULL = FALSE, {
     # display only summary levels that correspond to the selected report
-    idx_s <- which(filesListData()$report == input$pltreports)
-    summary_level <- filesListData()$summary_level[idx_s]
-
+    idx_s <- lapply(input$pltreports, function(x) {(which(filesListData()$report == x))})
+    if (length(input$pltreports) > 1) {
+      summary_level <- intersect(filesListData()$summary_level[idx_s[[1]]],
+                                 filesListData()$summary_level[idx_s[[2]]])
+    } else {
+      summary_level <- filesListData()$summary_level[unlist(idx_s)]
+    }
     output$summary_levels_ui <- renderUI({
       selectInput(
         inputId = ns("pltsummarylevels"),
