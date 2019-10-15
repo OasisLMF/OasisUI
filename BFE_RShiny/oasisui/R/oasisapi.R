@@ -149,13 +149,19 @@ OasisAPI <- R6Class(
       return(status_code(response))
     },
     # > api response ----
-    api_handle_response = function(response, ...) {
+    api_handle_response = function(response) {
       # re-route potential warning for logging
       tryCatch(warn_for_status(response),
-               warning = function(w) warning(w$message))
+               warning = function(w) {warning(w$message)})
+      status <- http_status(response)$category
+      if (status == "Client error" && response$headers[["content-type"]] == "text/html") {
+        stop("Client error in api_handle_response, probably trying to access a non-existent query path.")
+      } else if (status == "Client error" && !is.null(content(response)$detail) && content(response)$detail == "Not found.") {
+        warning("Client error in api_handle_response, valid query but API did not find / return the requested resource.")
+      }
       structure(
         list(
-          status = http_status(response)$category,
+          status = status,
           result = response
         ),
         class = c("apiresponse")
@@ -227,7 +233,7 @@ OasisAPI <- R6Class(
       private$version
     },
     # > api query -----
-    api_basic_query = function(query_path_basic, query_list = NULL, query_method, ...){
+    api_basic_query = function(query_path_basic, query_list = NULL, query_method, ...) {
       request_list <- expression(list(
         private$url,
         config = add_headers(
@@ -240,7 +246,7 @@ OasisAPI <- R6Class(
       response <- self$api_fetch_response(query_method, request_list)
       self$api_handle_response(response)
     },
-    api_query = function(query_path, query_list = NULL, query_method, ...){
+    api_query = function(query_path, query_list = NULL, query_method, ...) {
       # self$api_basic_query(query_path_basic = paste(private$version, query_path, "", sep = "/"), query_list, query_method)
       request_list <- expression(list(
         private$url,
@@ -254,16 +260,16 @@ OasisAPI <- R6Class(
       response <- self$api_fetch_response(query_method, request_list)
       self$api_handle_response(response)
     },
-    api_get_query = function(query_path, query_list = NULL, ...){
+    api_get_query = function(query_path, query_list = NULL, ...) {
       self$api_query(query_path, query_list, "GET", ...)
     },
-    api_post_query = function(query_path, query_list = NULL, ...){
+    api_post_query = function(query_path, query_list = NULL, ...) {
       self$api_query(query_path, query_list, "POST", ...)
     },
-    api_delete_query = function(query_path, query_list = NULL, ...){
+    api_delete_query = function(query_path, query_list = NULL, ...) {
       self$api_query(query_path, query_list, "DELETE", ...)
     },
-    api_post_file_query = function(query_path,  query_body = NULL,  ...){
+    api_post_file_query = function(query_path,  query_body = NULL,  ...) {
       request_list <- expression(list(
         private$url,
         config = add_headers(
@@ -277,7 +283,7 @@ OasisAPI <- R6Class(
       response <- self$api_fetch_response("POST", request_list)
       self$api_handle_response(response)
     },
-    api_body_query = function(query_path,  query_body = NULL, query_method = "POST", ...){
+    api_body_query = function(query_path,  query_body = NULL, query_method = "POST", ...) {
       request_list <- expression(list(
         private$url,
         config = add_headers(
@@ -291,13 +297,12 @@ OasisAPI <- R6Class(
       response <- self$api_fetch_response(query_method, request_list)
       self$api_handle_response(response)
     },
-    api_return_query_res = function(query_path, query_list = NULL, query_method, ...){
+    api_return_query_res = function(query_path, query_list = NULL, query_method, ...) {
       response <- self$api_query(query_path, query_list = NULL, query_method)
       content(response$result)
     },
     # > return from query ----
     return_df = function(query_path, api_param = "", query_method = "GET") {
-
       content_lst <- content(self$api_query(query_path, query_list = api_param,  query_method)$result)
       if (length(content_lst) > 0) {
         if (length(content_lst[[1]]) > 1) {
@@ -332,9 +337,8 @@ OasisAPI <- R6Class(
         write_disk(dest, overwrite = TRUE)
       ))
       response <- self$api_fetch_response("GET", request_list)
-      #response needed to place icon
-      self$api_handle_response(response, warning)
-
+      # response needed to place icon
+      self$api_handle_response(response)
     }
   )
 )

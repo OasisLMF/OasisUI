@@ -76,13 +76,13 @@ exposurevalidationmap <- function(input,
 
   # Params and Reactive Values -------------------------------------------------
   result <- reactiveValues(
-    #dataframe of checked exposures
+    # dataframe of checked exposures
     uploaded_locs_check = NULL,
-    #dataframe of checked exposures by perils
+    # dataframe of checked exposures by perils
     uploaded_locs_check_peril = NULL,
     # peril codes
     perils_codes = NULL,
-    #perils names
+    # perils names
     perils_names = NULL
   )
 
@@ -91,7 +91,7 @@ exposurevalidationmap <- function(input,
     counter()
     active()
   }, {
-    if (length(active()) > 0 && active() && !is.null(analysisID())) {
+    if (length(active()) > 0 && active() && counter() > 0 && !is.null(analysisID())) {
       .reloadExposureValidation()
       perils <- result$uploaded_locs_check$peril[!is.na(result$uploaded_locs_check$peril)] %>%
         unique()
@@ -123,7 +123,6 @@ exposurevalidationmap <- function(input,
   })
 
   # Show/Hide table button -----------------------------------------------------
-
   observeEvent(result$uploaded_locs_check_peril, ignoreNULL = FALSE, {
     if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
       show("div_abuttonviewtbl")
@@ -131,7 +130,6 @@ exposurevalidationmap <- function(input,
       hide("div_abuttonviewtbl")
     }
   })
-
 
   # Modal for tabular view  ----------------------------------------------------
   # Modal Panel
@@ -153,7 +151,6 @@ exposurevalidationmap <- function(input,
   })
 
   # Export to .csv -------------------------------------------------------------
-
   output$exp_downloadexcel <- downloadHandler(
     # Filename to download
     filename2download <- paste0("exposure_validation_", analysisID(), ".csv"),
@@ -191,7 +188,6 @@ exposurevalidationmap <- function(input,
     } else {
       NULL
     }
-
   })
 
   # Refresh button -------------------------------------------------------------
@@ -205,7 +201,6 @@ exposurevalidationmap <- function(input,
   })
 
   # Utils functions ------------------------------------------------------------
-
   # dummy for exposure location comparison
   .reloadExposureValidation <- function() {
     logMessage(".reloadExposureValidation called")
@@ -285,8 +280,9 @@ exposurevalidationmap <- function(input,
 
                             return L.divIcon({ html: '<div><span>'+count+'</span></div>', className: 'marker-cluster ' + style, iconSize: new L.Point(40, 40) });
                             }
-  }")
+      }")
 
   }
 
+  invisible()
 }

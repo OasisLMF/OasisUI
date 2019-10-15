@@ -469,16 +469,16 @@ panelOutputModule <- function(input, output, session,
 
     # > read files to plot -----------------------------------------------------
     if (!is.null(filesToPlot)) {
-      for (i in seq(nrow(filesToPlot))) { # i<- 1
+      for (i in seq(nrow(filesToPlot))) {
         currfileData <- .readFile(filesToPlot$files[i])
         if (nrow(currfileData) > 0) {
-          #Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
+          # Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
           nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
           gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) &
                                             !(names(currfileData) %in% extracols) &
                                             !(names(currfileData) %in% x)]
           if (any(which(plotstrc > 1))) {
-            extension <- filesToPlot[i, suffix[which(plotstrc > 1)]] # losstype or Variable
+            extension <- filesToPlot[i, suffix[which(plotstrc > 1)]] # losstype or variable
           } else {
             extension <- filesToPlot[i, suffix[3]] # granularity
           }
@@ -507,7 +507,7 @@ panelOutputModule <- function(input, output, session,
       summary_id_mapfile <- filesListData() %>% filter(grepl("summary-info", files),
                                                        perspective %in% tolower(chkbox$chkboxgrplosstypes()),
                                                        summary_level %in% input$pltsummarylevels)
-      summary_id_map <- as.data.frame(.readFile(summary_id_mapfile$files))
+      summary_id_map <- as.data.frame(.readFile(summary_id_mapfile$files[1]))
 
       # for "All Risks", replace colname "n/a" and entry "undefined" with "All Risks"
       if (names(summary_id_map)[2] %in% c("n/a", "_not_set_")) {
@@ -609,8 +609,8 @@ panelOutputModule <- function(input, output, session,
     updateCheckboxGroupInput(session = session, inputId = inputid, selected = selection)
   }
 
-  # Helper function to read one file from DB
-  .readFile <- function(fileName){
+  # Helper function to read one file
+  .readFile <- function(fileName) {
     if (!is.na(fileName)) {
       logMessage(paste0("Reading file ", fileName))
       tryCatch({

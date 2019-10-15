@@ -33,7 +33,7 @@ anainputs(input, output, session, analysisID, refresh_opt = TRUE,
 List of tags.
 }
 \description{
-UI/View for inputs of an analysis.
+UI/View for inputs of an analysis (table of files).
 
-Server logic for inputs of an analysis.
+Server logic for inputs of an analysis (table of files).
 }

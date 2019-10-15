@@ -4,7 +4,7 @@
 #' anainputsUI
 #' @rdname anainputs
 #'
-#' @description UI/View for inputs of an analysis.
+#' @description UI/View for inputs of an analysis (table of files).
 #'
 #' @param heading Panel title.
 #' @param collapsible Option to collapse panel, Default FALSE.
@@ -42,7 +42,7 @@ anainputsUI <- function(id,
 #'
 #' @rdname anainputs
 #'
-#' @description  Server logic for inputs of an analysis.
+#' @description  Server logic for inputs of an analysis (table of files).
 #'
 #' @template params-module
 #' @template params-active
@@ -50,7 +50,7 @@ anainputsUI <- function(id,
 #' @param refresh_opt Option to hide/show refresh button.
 #' @param counter Reactive value storing actionButton status.
 #'
-#' @importFrom tibble add_column
+#' @importFrom shinyjs hide
 #'
 #' @export
 anainputs <- function(input,
@@ -69,13 +69,13 @@ anainputs <- function(input,
     counter = 0
   )
 
-  # Commented out untill caching is implemented
+  # Commented out until caching is implemented
   # observeEvent( input[["panel_anainputs-collapse-button"]], ignoreNULL = FALSE, {
   #   logMessage(paste0("changing result$counter because input[['panel_anainputs-collapse-button']] changed to ",  input[["panel_anainputs-collapse-button"]]))
   #   result$counter <- input[["panel_anainputs-collapse-button"]]
   # })
 
-  observeEvent(counter(), ignoreNULL = FALSE, {
+  observeEvent(counter(), ignoreNULL = FALSE, ignoreInit = TRUE, {
     logMessage(paste0("changing result$counter because counter() changed to ", counter()))
     if (is.null(input[["panel_anainputs-collapse-button"]])) {
       result$counter <- -1
@@ -106,7 +106,7 @@ anainputs <- function(input,
     folderpath = "input",
     includechkbox = TRUE)
 
-  # reload Generated Inputs table-----------------------------------------------
+  # reload generated-inputs table-----------------------------------------------
   observeEvent(input$abuttonanainputrefresh, {
     withModalSpinner(
     .reloadInputs(),
@@ -116,16 +116,15 @@ anainputs <- function(input,
   })
 
   # Reload input generated table -----------------------------------------------
-  .reloadInputs <- function(){
+  .reloadInputs <- function() {
     logMessage(".reloadInputs called")
     if (!is.null(analysisID())) {
-        dt_generated <- session$userData$data_hub$get_ana_inputs_data_list(analysisID()) #session$userData$data_hub$return_analyses_input_file_wicons_df(analysisID(),Status),
-
+        dt_generated <- session$userData$data_hub$get_ana_inputs_data_list(analysisID()) #session$userData$data_hub$return_analyses_input_file_wicons_df(analysisID(),Status)
     } else {
       dt_generated <-  NULL
     }
     result$dt_generated  <- dt_generated
   }
 
-
+  invisible()
 }

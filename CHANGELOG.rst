@@ -1,6 +1,10 @@
 OasisUI Changelog 
 ==================
 
+`1.3.3`_
+--------
+* Fix for `1.3.2` release
+
 `1.3.2`_
 --------
 * Closes #166
@@ -109,6 +113,7 @@ OasisUI Changelog
 
 
 .. AUTO_INSERT-CHANGE_DIFF
+.. _`1.3.3`:  https://github.com/OasisLMF/OasisUI/compare/1.3.2...1.3.3
 .. _`1.3.2`:  https://github.com/OasisLMF/OasisUI/compare/1.3.1...1.3.2
 .. _`1.3.1`:  https://github.com/OasisLMF/OasisUI/compare/1.3.0...1.3.1
 .. _`1.3.0`:  https://github.com/OasisLMF/OasisUI/compare/1.2.0...1.3.0
