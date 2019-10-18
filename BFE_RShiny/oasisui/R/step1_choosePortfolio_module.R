@@ -403,12 +403,12 @@ step1_choosePortfolio <- function(input, output, session,
       post_portfolios <- session$userData$oasisapi$api_body_query(query_path = "portfolios", query_body = list(name = input$tinputpfName), query_method = "POST")
       if (post_portfolios$status == "Success") {
         oasisuiNotification(type = "message",
-                             paste0("Portfolio ", input$tinputpfName, " created."))
+                            paste0("Portfolio ", input$tinputpfName, " created."))
         .clearUploadFiles()
         show("panelLinkFiles")
       } else {
         oasisuiNotification(type = "error",
-                             paste0("Portfolio ", input$tinputpfName, " could not be created."))
+                            paste0("Portfolio ", input$tinputpfName, " could not be created."))
       }
     } else if (result$portfolio_flag == "A") {
       idxSel <- input$dt_Portfolios_rows_selected
@@ -417,10 +417,10 @@ step1_choosePortfolio <- function(input, output, session,
       put_portfolios_id <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", pfId, sep = "/"), query_body = list(name = input$tinputpfName), query_method = "PUT")
       if (put_portfolios_id$status == "Success") {
         oasisuiNotification(type = "message",
-                             paste0("Portfolio ", pfId, " updated."))
+                            paste0("Portfolio ", pfId, " updated."))
       } else {
         oasisuiNotification(type = "error",
-                             paste0("Failed to amend a portfolio ", pfId, " could not be updated."))
+                            paste0("Failed to amend a portfolio ", pfId, " could not be updated."))
       }
     }
 
@@ -449,7 +449,7 @@ step1_choosePortfolio <- function(input, output, session,
                 paste0("Are you sure that you want to delete?"),
                 footer = tagList(
                   oasisuiButton(ns("abuttonuconfirmdel"),
-                                 label = "Confirm", align = "center"),
+                                label = "Confirm", align = "center"),
                   actionButton(ns("abuttoncanceldel"),
                                label = "Cancel", align = "right")
                 ),
@@ -473,10 +473,10 @@ step1_choosePortfolio <- function(input, output, session,
     delete_portfolios_id <- session$userData$oasisapi$api_delete_query(query_path = paste("portfolios", pfid, sep = "/"))
     if (delete_portfolios_id$status == "Success") {
       oasisuiNotification(type = "message",
-                           paste0("Portfolio ", pfName, "deleted."))
+                          paste0("Portfolio ", pfName, "deleted."))
     } else {
       oasisuiNotification(type = "error",
-                           paste0("Portfolio ", pfName, " could not deleted."))
+                          paste0("Portfolio ", pfName, " could not deleted."))
     }
     .reloadtbl_portfoliosData()
     removeModal()
@@ -539,10 +539,10 @@ step1_choosePortfolio <- function(input, output, session,
       )
       if (post_file$status == "Success") {
         oasisuiNotification(type = "message",
-                             paste("File linked successfully."))
+                            paste("File linked successfully."))
       } else {
         oasisuiNotification(type = "error",
-                             paste("File link failed."))
+                            paste("File link failed."))
       }
       .reloadtbl_portfoliosData()
     }
@@ -602,7 +602,7 @@ step1_choosePortfolio <- function(input, output, session,
           if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0 && !bl_dirty ) {
             rowToSelect <- match(result$portfolioID, result$tbl_portfoliosData[, tbl_portfoliosDataNames$id])
             pageSel <- ceiling(rowToSelect/pageLength)
-            #backward propagation
+            # backward propagation
             if (is.null(input$dt_Portfolios_rows_selected)) {
               selectRows(dataTableProxy("dt_Portfolios"), rowToSelect)
               selectPage(dataTableProxy("dt_Portfolios"), pageSel)
@@ -626,8 +626,17 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Refresh Buttons ------------------------------------------------------------
   observeEvent(input$abuttonprgtblrfsh, {
-    .reloadtbl_portfoliosData()
-  } )
+      # withSpinner(
+      #   DTOutput(ns("dt_Portfolios")),
+      #   # style and color can be set as options used by all spinners
+      #   color = "#bb252c"
+      # )
+    withModalSpinner(
+      .reloadtbl_portfoliosData(),
+      "Refreshing...",
+      size = "s", t = 0.5
+    )
+  })
 
   # Updates dependent on changed: dt_Portfolios_rows_selected ------------------
   observeEvent(input$dt_Portfolios_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {

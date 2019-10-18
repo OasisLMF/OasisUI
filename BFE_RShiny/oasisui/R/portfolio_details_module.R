@@ -16,12 +16,11 @@ portfolio_detailsUI <- function(id) {
     heading = tagAppendChildren(
       h4("Source files for portfolio"),
       uiOutput(ns("paneltitle_pfDetails"), inline = TRUE),
-      oasisuiRefreshButton(ns("abuttondefpfrfsh")),
+      oasisuiRefreshButton(ns("abuttonuploadedrefresh")),
       actionButton(inputId = ns("buttonhidepfdetails"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     collapsible = FALSE,
     ns("panel_portfolio_details"),
-    div(id = ns("refresh"), oasisuiRefreshButton(ns("abuttonuploadedrefresh"))),
     ViewFilesInTableUI(id  = ns("portfolioDetails"), includechkbox = TRUE)
   )
 }
@@ -96,7 +95,7 @@ portfolio_details <- function(input,
     withModalSpinner(
       .reloadtbl_portfolioDetails(),
       "Refreshing...",
-      size = "s"
+      size = "s", t = 0.5
     )
   })
 

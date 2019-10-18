@@ -196,7 +196,7 @@ exposurevalidationmap <- function(input,
     withModalSpinner(
       .reloadExposureValidation(),
       "Refreshing...",
-      size = "s"
+      size = "s", t = 0.5
     )
   })
 
