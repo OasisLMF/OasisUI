@@ -602,7 +602,7 @@ step1_choosePortfolio <- function(input, output, session,
           if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0 && !bl_dirty ) {
             rowToSelect <- match(result$portfolioID, result$tbl_portfoliosData[, tbl_portfoliosDataNames$id])
             pageSel <- ceiling(rowToSelect/pageLength)
-            #backward propagation
+            # backward propagation
             if (is.null(input$dt_Portfolios_rows_selected)) {
               selectRows(dataTableProxy("dt_Portfolios"), rowToSelect)
               selectPage(dataTableProxy("dt_Portfolios"), pageSel)
@@ -636,7 +636,6 @@ step1_choosePortfolio <- function(input, output, session,
       "Refreshing...",
       size = "s", t = 0.5
     )
-
   })
 
   # Updates dependent on changed: dt_Portfolios_rows_selected ------------------

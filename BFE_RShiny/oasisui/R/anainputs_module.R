@@ -109,9 +109,9 @@ anainputs <- function(input,
   # reload generated-inputs table-----------------------------------------------
   observeEvent(input$abuttonanainputrefresh, {
     withModalSpinner(
-    .reloadInputs(),
-    "Refreshing...",
-    size = "s", t = 0.5
+      .reloadInputs(),
+      "Refreshing...",
+      size = "s", t = 0.5
     )
   })
 
@@ -119,7 +119,7 @@ anainputs <- function(input,
   .reloadInputs <- function() {
     logMessage(".reloadInputs called")
     if (!is.null(analysisID())) {
-        dt_generated <- session$userData$data_hub$get_ana_inputs_data_list(analysisID()) #session$userData$data_hub$return_analyses_input_file_wicons_df(analysisID(),Status)
+        dt_generated <- session$userData$data_hub$get_ana_inputs_data_list(analysisID())
     } else {
       dt_generated <-  NULL
     }

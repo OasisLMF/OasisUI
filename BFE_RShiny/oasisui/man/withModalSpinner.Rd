@@ -2,7 +2,7 @@
 % Please edit documentation in R/withModalSpinner.R
 \name{withModalSpinner}
 \alias{withModalSpinner}
-\title{withModalSpinner}
+\title{Modal window spinner}
 \usage{
 withModalSpinner(expr, info, spinner = icon("spinner", "fa-spin"),
   size = "m", t = 0)
@@ -17,7 +17,7 @@ withModalSpinner(expr, info, spinner = icon("spinner", "fa-spin"),
 \item{size}{One of \code{"s"} for small, \code{"m"} (the default) for medium,
 or \code{"l"} for large.}
 
-\item{t}{Time to prolongue the appearing of the modalDialog.}
+\item{t}{Time to prolong the appearing of the modalDialog.}
 }
 \description{
 Display a modal window with a spinning wheel and an information message

@@ -1,4 +1,4 @@
-#' @title withModalSpinner
+#' @title Modal window spinner
 #'
 #' @rdname withModalSpinner
 #'
@@ -9,7 +9,7 @@
 #' @param info The information message to be displayed.
 #' @param spinner The spinning wheel icon.
 #' @inheritParams shiny::modalDialog
-#' @param t Time to prolongue the appearing of the modalDialog.
+#' @param t Time to prolong the appearing of the modalDialog.
 #'
 #' @export
 #'
