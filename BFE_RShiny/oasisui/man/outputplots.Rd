@@ -7,7 +7,7 @@
 \usage{
 outputplotsUI(id)
 
-outputplots(input, output, session, selectAnaID, n_panels,
+outputplots(input, output, session, selectPortfID, selectAnaID, n_panels,
   filesListData = reactive(NULL), active)
 }
 \arguments{

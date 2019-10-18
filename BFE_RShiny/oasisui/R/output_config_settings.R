@@ -72,6 +72,10 @@ plottypeslist <- list(
     "plottype" = "bar",
     "xlabel" = c("Type"),
     "ylabel" = c("Loss")
+  ),
+  "return period map" = list(
+    # TODO this cannot be hardcoded
+    "Variables" = c("500", "250", "100", "50", "20", "10", "5", "2")
   )
 )
 

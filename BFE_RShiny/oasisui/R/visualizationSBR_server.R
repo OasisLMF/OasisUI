@@ -111,8 +111,9 @@ visualizationSBR <- function(input, output, session,
   sub_modules$outputplots <- callModule(
     outputplots,
     id = "outputplots",
+    selectPortfID = reactive(sub_modules$defineID$selectPortfolioID()),
     selectAnaID = reactive(sub_modules$defineID$selectAnaID()),
-    filesListData =   reactive({result$tbl_filesListDataana}),
+    filesListData = reactive({result$tbl_filesListDataana}),
     n_panels = n_panels,
     active = reactive({active() && input$tabsSBR == ns("tabplots")}))
 

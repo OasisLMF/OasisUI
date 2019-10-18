@@ -38,6 +38,7 @@ outputplotsUI <- function(id) {
 #'
 #' @export
 outputplots <- function(input, output, session,
+                        selectPortfID,
                         selectAnaID,
                         n_panels,
                         filesListData = reactive(NULL),
@@ -62,6 +63,7 @@ outputplots <- function(input, output, session,
   plotsubmodules <- lapply(seq_len(n_panels), function(i) {
     callModule(panelOutputModule, content_IDs[i],
                filesListData =  reactive(filesListData()),
+               portfId = selectPortfID,
                anaID = selectAnaID,
                active = reactive(plotPanels$state[[ns(panel_IDs[i])]]))
   })
@@ -89,6 +91,8 @@ outputplots <- function(input, output, session,
 #' @importFrom shinyWidgets panel
 #' @importFrom shinyjs hidden
 #' @importFrom plotly plotlyOutput
+#' @importFrom leaflet leafletOutput
+#' @importFrom shinyjs hidden
 #'
 #' @export
 panelOutputModuleUI <- function(id){
@@ -99,25 +103,27 @@ panelOutputModuleUI <- function(id){
       id = ns("oasisuiPanelOutputModule"),
       collapsible = TRUE,
       heading = "Custom plot",
-      # h4("Data to plot"),
       column(12,
-             # div( class = "InlineSelectInput",
-             selectInput(inputId = ns("inputplottype"), label = "Plot type", choices = names(plottypeslist), selected = names(plottypeslist)[1])
-             # )
+             selectInput(inputId = ns("inputplottype"),
+                         label = "Plot type",
+                         choices = names(plottypeslist),
+                         selected = names(plottypeslist)[1])
       ),
       column(6,
-             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"), label = "Perspective", choices = output_options$losstypes, inline = TRUE)),
+             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"),
+                                label = "Perspective",
+                                choices = output_options$losstypes,
+                                inline = TRUE)),
       column(6,
              uiOutput(ns("types_ui"))),
       column(6,
              uiOutput(ns("reports_ui"))),
       column(6,
+             uiOutput(ns("return_ui"))),
+      column(6,
              uiOutput(ns("summary_levels_ui"))),
-      br(),
       column(3,
-             # div(class = "InlineTextInput",
              textInput(ns("textinputtitle"), "Title", "")),
-      # ),
       column(4,
              checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
       column(3,
@@ -126,8 +132,9 @@ panelOutputModuleUI <- function(id){
     ),
 
     panel(
-      # heading = h4("Plot"),
-      plotlyOutput(ns("outputplot"))
+      hidden(plotlyOutput(ns("outputplot")))
+      ,
+      hidden(leafletOutput(ns("outputleaflet")))
     )
   )
 }
@@ -182,9 +189,16 @@ panelOutputModuleUI <- function(id){
 #' @importFrom data.table fread
 #' @importFrom shinyjs disable
 #' @importFrom shinyjs enable
+#' @importFrom leaflet leaflet
+#' @importFrom leaflet addTiles
+#' @importFrom leaflet renderLeaflet
+#' @importFrom leaflet awesomeIcons
+#' @importFrom leaflet addAwesomeMarkers
+#' @importFrom leaflet addCircles
 #'
 #' @export
 panelOutputModule <- function(input, output, session,
+                              portfId,
                               anaID,
                               filesListData = reactive(NULL), active) {
 
@@ -270,12 +284,35 @@ panelOutputModule <- function(input, output, session,
   observeEvent({anaID()
     inputplottype()}, {
       # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
-      if(inputplottype() == "loss per return period") {
+      if (inputplottype() == "return period map") {
+        output$return_ui <- renderUI({
+          selectInput(
+            inputId = ns("pltrtnprd"),
+            label = "Return Period",
+            choices = plottypeslist$`return period map`$Variables,
+            selected = NULL
+          )
+        })
+        hide("pltsummarylevels")
+        hide("chkboxmillions")
+        loc_num <- filesListData()$report[which(filesListData()$summary_level == "locnumber")]
+        # display only reports that contain locnumber in list of summary levels
+        loc_num_filter <- loc_num[-which(loc_num =="Summary Info")]
+        idx_r <- which(filesListData()$report == loc_num_filter)
+        multiple <- FALSE
+      } else if(inputplottype() == "loss per return period") {
+        hide("pltrtnprd")
+        show("pltsummarylevels")
+        show("chkboxmillions")
         idx_r <- which(filesListData()$report %in% plottypeslist$`loss per return period`$Variables)
-
-      } else if(inputplottype() == "AAL bar plot") {
+        multiple <- TRUE
+      } else {
+        hide("pltrtnprd")
+        show("pltsummarylevels")
         idx_r <- which(filesListData()$report == plottypeslist$`AAL bar plot`$Variables)
+        multiple <- TRUE
       }
+
       idx_r <- unlist(idx_r)
       report <- lapply(idx_r, function(x) {filesListData()$report[x]})
 
@@ -285,7 +322,7 @@ panelOutputModule <- function(input, output, session,
           label = "Report",
           choices = unique(report),
           selected = NULL,
-          multiple = TRUE
+          multiple = multiple
         )
       })
 
@@ -317,17 +354,18 @@ panelOutputModule <- function(input, output, session,
     })
 
   observeEvent(input$pltreports, ignoreNULL = FALSE, {
-    # display only summary levels that correspond to the selected report
-    idx_s <- which(filesListData()$report == input$pltreports)
-    summary_level <- filesListData()$summary_level[idx_s]
-
-    output$summary_levels_ui <- renderUI({
-      selectInput(
-        inputId = ns("pltsummarylevels"),
-        label = "Summary Levels",
-        choices = unique(summary_level)
-      )
-    })
+    if (length(inputplottype()) != 0 && inputplottype() != "return period map") {
+      # display only summary levels that correspond to the selected report
+      idx_s <- which(filesListData()$report == input$pltreports)
+      summary_level <- filesListData()$summary_level[idx_s]
+      output$summary_levels_ui <- renderUI({
+        selectInput(
+          inputId = ns("pltsummarylevels"),
+          label = "Summary Levels",
+          choices = unique(summary_level)
+        )
+      })
+    }
   })
 
   observeEvent({
@@ -349,25 +387,36 @@ panelOutputModule <- function(input, output, session,
     chkbox$pltreports()
     chkbox$pltsummarylevels()
     input$calctypes
-    input$abuttondraw
+    input$pltrtnprd
+    inputplottype()
   }, ignoreNULL = FALSE, {
-
-    if (length(chkbox$chkboxgrplosstypes()) == 0 ||
-        length(input$calctypes) == 0 ||
-        length(chkbox$pltsummarylevels()) == 0 ||
-        length(chkbox$pltreports()) == 0) {
-      disable("abuttondraw")
-    } else if (length(chkbox$chkboxgrplosstypes()) > 1 && length(chkbox$pltreports()) > 1) {
-      # if more than one checkbox and report are selected, pop up message and disable "Draw" btn
-      showModal(modalDialog(
-        title = "Attention!",
-        "Only two reports or two perspectives can be selected. Please remove one in either field",
-        footer = modalButton("Dismiss"),
-        easyClose = TRUE
-      ))
-      disable("abuttondraw")
-    } else {
-      enable("abuttondraw")
+    if (length(inputplottype()) != 0) {
+      if (inputplottype() != "return period map" && (length(chkbox$chkboxgrplosstypes()) > 0 &&
+                                                     length(input$calctypes) > 0 &&
+                                                     length(chkbox$pltsummarylevels()) > 0 &&
+                                                     length(chkbox$pltreports()) > 0)) {
+        enable("abuttondraw")
+        show("outputplot")
+        hide("outputleaflet")
+      } else if (inputplottype() == "return period map" &&
+                 (length(input$pltrtnprd) > 0 &&
+                  length(input$calctypes) > 0 &&
+                  length(chkbox$chkboxgrplosstypes()) > 0)) {
+        enable("abuttondraw")
+        hide("outputplot")
+        show("outputleaflet")
+      } else if (length(chkbox$chkboxgrplosstypes()) > 1 && length(chkbox$pltreports()) > 1) {
+        # if more than one checkbox and report are selected, pop up message and disable "Draw" btn
+        showModal(modalDialog(
+          title = "Attention!",
+          "Only two reports or two perspectives can be selected. Please remove one in either field",
+          footer = modalButton("Dismiss"),
+          easyClose = TRUE
+        ))
+        disable("abuttondraw")
+      } else {
+        disable("abuttondraw")
+      }
     }
   })
 
@@ -446,13 +495,20 @@ panelOutputModule <- function(input, output, session,
     # > filter out files to read -----------------------------------------------
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
-        filesToPlot <- filesListData() %>% filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
-                                                  report %in% input$pltreports,
-                                                  summary_level %in%  input$pltsummarylevels)
-        if (nrow(filesToPlot) != prod(plotstrc)) {
-          oasisuiNotification(type = "error",
-                              "The analysis did not produce the selected output. Please check the logs.")
-          filesToPlot <- NULL
+        if (inputplottype() == "return period map") {
+          filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber") %>%
+            filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
+                   report %in% input$pltreports)
+          # filter(grepl("uncertainty", files))
+        } else {
+          filesToPlot <- filesListData() %>% filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
+                                                    report %in% input$pltreports,
+                                                    summary_level %in%  input$pltsummarylevels)
+          if (nrow(filesToPlot) != prod(plotstrc)) {
+            oasisuiNotification(type = "error",
+                                "The analysis did not produce the selected output. Please check the logs.")
+            filesToPlot <- NULL
+          }
         }
       }
     }
@@ -490,93 +546,127 @@ panelOutputModule <- function(input, output, session,
 
     # Make ggplot friendly -----------------------------------------------------
     if (!is.null(fileData)) {
-      data <- fileData %>% gather(key = variables, value = value, -nonkey) %>%
-        separate(variables, into = c("variables", "selection"), sep = "\\.") %>%
-        spread(variables, value)
-
-      summary_id_mapfile <- filesListData() %>% filter(grepl("summary-info", files),
-                                                       perspective %in% tolower(chkbox$chkboxgrplosstypes()),
-                                                       summary_level %in% input$pltsummarylevels)
-      summary_id_map <- as.data.frame(.readFile(summary_id_mapfile$files[1]))
-
-      # for "All Risks", replace colname "n/a" and entry "undefined" with "All Risks"
-      if (names(summary_id_map)[2] %in% c("n/a", "_not_set_")) {
-        summary_id_map[, 2] <- "All Risks"
-        names(summary_id_map)[2] <- "All Risks"
+      data <- fileData
+      data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
+      if (length(which(data$type == 2)) != 0) {
+        data$type <- data$type %>% replace(which(data$type == 2), "Sample")
       }
-      summary_id_title <- paste(colnames(summary_id_map)[-1], collapse = " & ")
-      summary_id_map$summary_desc <- do.call("paste", summary_id_map[2:ncol(summary_id_map)])
-      # replace summary IDs with descriptions
-      data <- data %>% mutate(summary_id = summary_id_map[match(summary_id, summary_id_map$summary_id), "summary_desc"])
+      data <- data %>% filter(type %in% input$calctypes)
 
-      data <- data %>% rename("keyval" = summary_id)
-
-      # rename column for Y axis
-      data <- data %>% rename("value" = key)
-
-        data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
-        if (length(which(data$type == 2)) != 0) {
-          data$type <- data$type %>% replace(which(data$type == 2), "Sample")
+      if (inputplottype() == "return period map") {
+        if (grepl("locnumber", filesListData()$summary_level)) {
+          # filter for values related to locnumber
+          data <- data %>% filter(return_period == input$pltrtnprd)
         }
-        data <- data %>% filter(type %in% input$calctypes)
+      } else {
+        data <- data %>% gather(key = variables, value = value, -nonkey) %>%
+          separate(variables, into = c("variables", "selection"), sep = "\\.") %>%
+          spread(variables, value)
+
+        summary_id_mapfile <- filesListData() %>% filter(grepl("summary-info", files),
+                                                         perspective %in% tolower(chkbox$chkboxgrplosstypes()),
+                                                         summary_level %in% input$pltsummarylevels)
+        summary_id_map <- as.data.frame(.readFile(summary_id_mapfile$files[1]))
+
+        # for "All Risks", replace colname "n/a" and entry "undefined" with "All Risks"
+        if (names(summary_id_map)[2] %in% c("n/a", "_not_set_")) {
+          summary_id_map[, 2] <- "All Risks"
+          names(summary_id_map)[2] <- "All Risks"
+        }
+        summary_id_title <- paste(colnames(summary_id_map)[-1], collapse = " & ")
+        summary_id_map$summary_desc <- do.call("paste", summary_id_map[2:ncol(summary_id_map)])
+        # replace summary IDs with descriptions
+        data <- data %>% mutate(summary_id = summary_id_map[match(summary_id, summary_id_map$summary_id), "summary_desc"])
+
+        data <- data %>% rename("keyval" = summary_id)
+
+        # rename column for Y axis
+        data <- data %>% rename("value" = key)
+
+        # combine type and loss for Title
         data$type <- paste(data$type, "Loss")
 
-      # rename column for x axis
-      data <- data %>% rename("xaxis" = x)
-      # rename column for granularity. Can be null if granularity level is portfolio
-      if (length(gridcol) > 0) {
-        data <- data %>% rename("gridcol" = gridcol)
+        # rename column for x axis
+        data <- data %>% rename("xaxis" = x)
+        # rename column for granularity. Can be null if granularity level is portfolio
+        if (length(gridcol) > 0) {
+          data <- data %>% rename("gridcol" = gridcol)
+        }
+
+        # rename column for uncertainty. Not all files will have it
+        if (length(uncertainty) > 0) {
+          data <- data %>% rename("uncertainty" = uncertainty)
+        }
+        # rename column for refernece. Not all files will have it
+        if (length(reference) > 0) {
+          data <- data %>% rename("reference" = reference)
+        }
+        # make multiplots if more than one losstype or variable is selected
+        # if ( (any(plotstrc > 1) | plottype == "violin" ) & length(gridcol) > 0 ) {
+        #   multipleplots <- TRUE
+        #   data <- data %>% rename("colour" = keyval)
+        # } else {
+        #   multipleplots <- FALSE
+        #   if (length(gridcol) > 0) {
+        #     data <- data %>% rename("colour" = "gridcol")
+        #   }  else {
+        #     data <- data %>% rename("colour" = keyval)
+        #   }
+        # }
+
+        multipleplots <- TRUE
+        data <- data %>% rename("colour" = keyval)
       }
 
-      # rename column for uncertainty. Not all files will have it
-      if (length(uncertainty) > 0) {
-        data <- data %>% rename("uncertainty" = uncertainty)
-      }
-      # rename column for refernece. Not all files will have it
-      if (length(reference) > 0) {
-        data <- data %>% rename("reference" = reference)
-      }
-      # make multiplots if more than one losstype or variable is selected
-      # if ( (any(plotstrc > 1) | plottype == "violin" ) & length(gridcol) > 0 ) {
-      #   multipleplots <- TRUE
-      #   data <- data %>% rename("colour" = keyval)
-      # } else {
-      #   multipleplots <- FALSE
-      #   if (length(gridcol) > 0) {
-      #     data <- data %>% rename("colour" = "gridcol")
-      #   }  else {
-      #     data <- data %>% rename("colour" = keyval)
-      #   }
-      # }
+      # > draw plot --------------------------------------------------------------
+      if (inputplottype() == "return period map") {
+        lat <- session$userData$data_hub$get_pf_location_content(id = portfId())$Latitude
+        long <- session$userData$data_hub$get_pf_location_content(id = portfId())$Longitude
+        # characters <- nchar(round(mean(data$loss)))
+        loss <- data$loss/1000
+        icon_map <- awesomeIcons(
+          icon = 'map-marker-alt',
+          iconColor = "green",
+          markerColor = "darkred"
+        )
+        output$outputleaflet <- renderLeaflet({
+          leaflet(session$userData$data_hub$get_pf_location_content(id = portfId())) %>%
+            addTiles() %>%
+            addAwesomeMarkers(
+              lng = ~long,
+              lat = ~lat,
+              icon = icon_map,
+              clusterOptions = markerClusterOptions(),
+              group = "clustered",
+              clusterId = "cluster") %>%
+            addCircles(long, lat, radius = loss, fillOpacity = 0.003)
+        })
+      } else {
+        if (!is.null(data)) {
+          # >> rescale Y axis to millions
+          if (input$chkboxmillions) {
+            data$value <- data$value / 1000000
+            ylabel <- paste(ylabel, "in Millions")
+          }
 
-      multipleplots <- TRUE
-      data <- data %>% rename("colour" = keyval)
+          if (plottype == "line") {
+            p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
+                             summary_id_title, multipleplots = multipleplots)
+            p <- p + labs("summary_id")
+          } else if (plottype == "bar") {
+            p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
+                            summary_id_title, wuncertainty = input$chkboxuncertainty,
+                            multipleplots = multipleplots, xtickslabels = xtickslabels)
+          } else if (plottype == "violin") {
+            p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
+                               multipleplots = multipleplots)
+          }
+          output$outputplot <- renderPlotly({ggplotly(p)})
+        } else {
+          oasisuiNotification(type = "error", "No data to plot.")
+        }
+      }
     }
-
-    # > draw plot --------------------------------------------------------------
-    if (!is.null(data)) {
-      # >> rescale Y axis to millions
-      if (input$chkboxmillions) {
-        data$value <- data$value / 1000000
-        ylabel <- paste(ylabel, "in Millions")
-      }
-      if (plottype == "line") {
-        p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
-                         summary_id_title, multipleplots = multipleplots)
-        p <- p + labs("summary_id")
-      } else if (plottype == "bar") {
-        p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
-                        summary_id_title, wuncertainty = input$chkboxuncertainty,
-                        multipleplots = multipleplots, xtickslabels = xtickslabels)
-      } else if (plottype == "violin") {
-        p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
-                           multipleplots = multipleplots)
-      }
-      output$outputplot <- renderPlotly({ggplotly(p)})
-    } else {
-      oasisuiNotification(type = "error", "No data to plot.")
-    }
-
   })
 
   # Helper functions -----------------------------------------------------------
@@ -681,8 +771,8 @@ panelOutputModule <- function(input, output, session,
                          multipleplots = FALSE, xtickslabels = NULL ) {
     p <- .basicplot(...)
     p <- p + geom_bar(position = "dodge", stat = "identity")
-      #geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
-      # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
+    #geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
+    # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
 
     if (wuncertainty){
       p <- p +
