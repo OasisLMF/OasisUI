@@ -119,7 +119,12 @@ panelOutputModuleUI <- function(id){
       column(6,
              uiOutput(ns("reports_ui"))),
       column(6,
-             uiOutput(ns("return_ui"))),
+             selectInput(
+               inputId = ns("pltrtnprd"),
+               label = "Return Period",
+               choices = c(),
+               selected = NULL
+             )),
       column(6,
              uiOutput(ns("summary_levels_ui"))),
       column(3,
@@ -283,16 +288,14 @@ panelOutputModule <- function(input, output, session,
 
   observeEvent({anaID()
     inputplottype()}, {
-      # Update selectInput for the reports based on the choice of plots, for AAL bar plot only AAL will be displayed
+      output$outputleaflet <- NULL
+      # Update selectInputs based on the choice of plots, for AAL bar plot only AAL will be displayed
       if (inputplottype() == "return period map") {
-        output$return_ui <- renderUI({
-          selectInput(
-            inputId = ns("pltrtnprd"),
-            label = "Return Period",
-            choices = plottypeslist$`return period map`$Variables,
-            selected = NULL
-          )
-        })
+        filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber")
+        filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)][1]
+        data <- .readFile(filesToPlot)
+        updateSelectInput(session = session, inputId = "pltrtnprd", choices = unique(data$return_period))
+        show("pltrtnprd")
         hide("pltsummarylevels")
         hide("chkboxmillions")
         loc_num <- filesListData()$report[which(filesListData()$summary_level == "locnumber")]
@@ -365,6 +368,42 @@ panelOutputModule <- function(input, output, session,
           choices = unique(summary_level)
         )
       })
+    } else {
+      if (!is.null(filesListData())) {
+        filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber")
+        filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)][1]
+        data <- .readFile(filesToPlot)
+        # set up by type
+        data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
+        if (length(which(data$type == 2)) != 0) {
+          data$type <- data$type %>% replace(which(data$type == 2), "Sample")
+        }
+        data <- data %>%
+          filter(return_period %in% as.numeric(input$pltrtnprd)) %>%
+          filter(type == input$calctypes)
+
+        # # define number of entries
+        # entries <- 5
+        # # split loss vector into equal parts
+        # loss_entries <- length(data$loss)/entries
+        # choices <- c("1", round(loss_entries),
+        #              round(loss_entries*2),
+        #              round(loss_entries*3),
+        #              round(loss_entries*4),
+        #              loss_entries*5)
+        choices <- c(round(min(data$loss)),
+                     round((min(data$loss)+mean(data$loss))/3),
+                     round((min(data$loss)+mean(data$loss))/2),
+                     round(mean(data$loss)),
+                     round(max(data$loss)))
+        output$summary_levels_ui <- renderUI({
+          selectInput(
+            inputId = ns("pltlosses"),
+            label = "Losses",
+            choices = choices
+          )
+        })
+      }
     }
   })
 
@@ -503,7 +542,7 @@ panelOutputModule <- function(input, output, session,
         } else {
           filesToPlot <- filesListData() %>% filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
                                                     report %in% input$pltreports,
-                                                    summary_level %in%  input$pltsummarylevels)
+                                                    summary_level %in% input$pltsummarylevels)
           if (nrow(filesToPlot) != prod(plotstrc)) {
             oasisuiNotification(type = "error",
                                 "The analysis did not produce the selected output. Please check the logs.")
@@ -622,8 +661,7 @@ panelOutputModule <- function(input, output, session,
       if (inputplottype() == "return period map") {
         lat <- session$userData$data_hub$get_pf_location_content(id = portfId())$Latitude
         long <- session$userData$data_hub$get_pf_location_content(id = portfId())$Longitude
-        # characters <- nchar(round(mean(data$loss)))
-        loss <- data$loss/1000
+        loss <- which(data$loss <= as.numeric(input$pltlosses))
         icon_map <- awesomeIcons(
           icon = 'map-marker-alt',
           iconColor = "green",
@@ -639,7 +677,7 @@ panelOutputModule <- function(input, output, session,
               clusterOptions = markerClusterOptions(),
               group = "clustered",
               clusterId = "cluster") %>%
-            addCircles(long, lat, radius = loss, fillOpacity = 0.003)
+            addCircles(long[loss], lat[loss], radius = as.numeric(input$pltlosses)/100, fillOpacity = 0.03)
         })
       } else {
         if (!is.null(data)) {
