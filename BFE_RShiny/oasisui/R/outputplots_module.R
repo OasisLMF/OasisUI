@@ -127,7 +127,7 @@ panelOutputModuleUI <- function(id){
              )),
       column(6,
              uiOutput(ns("summary_levels_ui"))),
-      column(3,
+      column(6,
              textInput(ns("textinputtitle"), "Title", "")),
       column(4,
              checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
@@ -300,14 +300,18 @@ panelOutputModule <- function(input, output, session,
         hide("chkboxmillions")
         loc_num <- filesListData()$report[which(filesListData()$summary_level == "locnumber")]
         # display only reports that contain locnumber in list of summary levels
-        loc_num_filter <- loc_num[-which(loc_num =="Summary Info")]
+        # without Summary Info and ALL
+        loc_num_filter <- loc_num[-which(loc_num == "Summary Info")]
+        if ("AAL" %in% loc_num_filter) {
+          loc_num_filter <- loc_num_filter[-which(loc_num_filter == "AAL")]
+        }
         idx_r <- which(filesListData()$report == loc_num_filter)
         multiple <- FALSE
-      } else if(inputplottype() == "loss per return period") {
+      } else if(inputplottype() == "loss per return period line plot") {
         hide("pltrtnprd")
         show("pltsummarylevels")
         show("chkboxmillions")
-        idx_r <- which(filesListData()$report %in% plottypeslist$`loss per return period`$Variables)
+        idx_r <- which(filesListData()$report %in% plottypeslist$`loss per return period line plot`$Variables)
         multiple <- TRUE
       } else {
         hide("pltrtnprd")
@@ -356,56 +360,63 @@ panelOutputModule <- function(input, output, session,
       })
     })
 
-  observeEvent(input$pltreports, ignoreNULL = FALSE, {
-    if (length(inputplottype()) != 0 && inputplottype() != "return period map") {
-      # display only summary levels that correspond to the selected report
-      idx_s <- which(filesListData()$report == input$pltreports)
-      summary_level <- filesListData()$summary_level[idx_s]
-      output$summary_levels_ui <- renderUI({
-        selectInput(
-          inputId = ns("pltsummarylevels"),
-          label = "Summary Levels",
-          choices = unique(summary_level)
-        )
-      })
-    } else {
-      if (!is.null(filesListData())) {
-        filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber")
-        filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)][1]
-        data <- .readFile(filesToPlot)
-        # set up by type
-        data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
-        if (length(which(data$type == 2)) != 0) {
-          data$type <- data$type %>% replace(which(data$type == 2), "Sample")
-        }
-        data <- data %>%
-          filter(return_period %in% as.numeric(input$pltrtnprd)) %>%
-          filter(type == input$calctypes)
-
-        # # define number of entries
-        # entries <- 5
-        # # split loss vector into equal parts
-        # loss_entries <- length(data$loss)/entries
-        # choices <- c("1", round(loss_entries),
-        #              round(loss_entries*2),
-        #              round(loss_entries*3),
-        #              round(loss_entries*4),
-        #              loss_entries*5)
-        choices <- c(round(min(data$loss)),
-                     round((min(data$loss)+mean(data$loss))/3),
-                     round((min(data$loss)+mean(data$loss))/2),
-                     round(mean(data$loss)),
-                     round(max(data$loss)))
+  observeEvent({input$pltreports
+    input$pltrtnprd}, ignoreNULL = FALSE, {
+      if (length(inputplottype()) != 0 && inputplottype() != "return period map") {
+        # display only summary levels that correspond to the selected report
+        idx_s <- which(filesListData()$report == input$pltreports)
+        summary_level <- filesListData()$summary_level[idx_s]
         output$summary_levels_ui <- renderUI({
           selectInput(
-            inputId = ns("pltlosses"),
-            label = "Losses",
-            choices = choices
+            inputId = ns("pltsummarylevels"),
+            label = "Summary Levels",
+            choices = unique(summary_level)
           )
         })
+      } else {
+        if (!is.null(filesListData())) {
+          filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber")
+          filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)][1]
+          data <- .readFile(filesToPlot)
+          # set up by type
+          data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
+          if (length(which(data$type == 2)) != 0) {
+            data$type <- data$type %>% replace(which(data$type == 2), "Sample")
+          }
+
+          data <- data %>%
+            filter(return_period %in% as.numeric(input$pltrtnprd)) %>%
+            filter(type == input$calctypes)
+
+          # # define number of entries
+          # entries <- 5
+          # # split loss vector into equal parts
+          # loss_entries <- length(data$loss)/entries
+          # choices <- c("1", round(loss_entries),
+          #              round(loss_entries*2),
+          #              round(loss_entries*3),
+          #              round(loss_entries*4),
+          #              loss_entries*5)
+          # choices <- c(round(min(data$loss)),
+          #              round((min(data$loss)+mean(data$loss))/3),
+          #              round((min(data$loss)+mean(data$loss))/2),
+          #              round(mean(data$loss)),
+          #              round(max(data$loss)))
+          output$summary_levels_ui <- renderUI({
+            sliderInput(ns("pltlosses"), "Losses",
+                        min = round(min(data$loss)), max = round(max(data$loss)),
+                        value = c(round(min(data$loss)), round(mean(data$loss))),
+                        step = 1000
+            )
+            # selectInput(
+            #   inputId = ns("pltlosses"),
+            #   label = "Losses",
+            #   choices = choices
+            # )
+          })
+        }
       }
-    }
-  })
+    })
 
   observeEvent({
     chkbox$chkboxgrplosstypes()
@@ -593,7 +604,7 @@ panelOutputModule <- function(input, output, session,
       data <- data %>% filter(type %in% input$calctypes)
 
       if (inputplottype() == "return period map") {
-        if (grepl("locnumber", filesListData()$summary_level)) {
+        if (TRUE %in% grepl("locnumber", filesListData()$summary_level)) {
           # filter for values related to locnumber
           data <- data %>% filter(return_period == input$pltrtnprd)
         }
@@ -661,12 +672,13 @@ panelOutputModule <- function(input, output, session,
       if (inputplottype() == "return period map") {
         lat <- session$userData$data_hub$get_pf_location_content(id = portfId())$Latitude
         long <- session$userData$data_hub$get_pf_location_content(id = portfId())$Longitude
-        loss <- which(data$loss <= as.numeric(input$pltlosses))
+        loss <- which(dplyr::between(data$loss, min(as.numeric(input$pltlosses)), max(as.numeric(input$pltlosses))))
         icon_map <- awesomeIcons(
           icon = 'map-marker-alt',
           iconColor = "green",
-          markerColor = "darkred"
+          markerColor = "green"
         )
+
         output$outputleaflet <- renderLeaflet({
           leaflet(session$userData$data_hub$get_pf_location_content(id = portfId())) %>%
             addTiles() %>%
@@ -677,7 +689,8 @@ panelOutputModule <- function(input, output, session,
               clusterOptions = markerClusterOptions(),
               group = "clustered",
               clusterId = "cluster") %>%
-            addCircles(long[loss], lat[loss], radius = as.numeric(input$pltlosses)/100, fillOpacity = 0.03)
+            addCircles(long[loss], lat[loss], radius = as.numeric(input$pltlosses),
+                       fillOpacity = 0.03)
         })
       } else {
         if (!is.null(data)) {
@@ -778,7 +791,7 @@ panelOutputModule <- function(input, output, session,
   # add facets
   .multiplot <- function(p, multipleplots = FALSE){
     if (multipleplots) {
-      if (inputplottype() == "loss per return period") {
+      if (inputplottype() == "loss per return period line plot") {
         p <- p + facet_wrap(vars(gridcol, selection), labeller = function(labels, multi_line = FALSE) {
           res <- label_value(labels = labels, multi_line = multi_line)
           # fix for multi_line = FALSE leading to character(0) and y-facets with such label
