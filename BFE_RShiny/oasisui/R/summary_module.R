@@ -264,7 +264,7 @@ summarytab <- function(input, output, session,
       } else {
         tapye_label <- "Analytical"
       }
-      titleToUse <- paste("GUL EP Curve", ", Type", tapye_label)
+      titleToUse <- paste0("GUL EP Curve", ", ", tapye_label)
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
@@ -281,7 +281,7 @@ summarytab <- function(input, output, session,
       } else {
         tapye_label <- "Analytical"
       }
-      titleToUse <- paste("IL EP Curve", ", Type", tapye_label)
+      titleToUse <- paste0("IL EP Curve", ", ", tapye_label)
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
@@ -298,7 +298,7 @@ summarytab <- function(input, output, session,
       } else {
         tapye_label <- "Analytical"
       }
-      titleToUse <- paste("RI EP Curve", ", Type", tapye_label)
+      titleToUse <- paste0("RI EP Curve", ", ", tapye_label)
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
