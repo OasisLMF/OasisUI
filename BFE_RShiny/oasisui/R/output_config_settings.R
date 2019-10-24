@@ -73,7 +73,7 @@ plottypeslist <- list(
     "xlabel" = c("Type"),
     "ylabel" = c("Loss")
   ),
-  "return period map" = list(
+  "loss per return period map" = list(
     "Variables" = c()
   )
 )
