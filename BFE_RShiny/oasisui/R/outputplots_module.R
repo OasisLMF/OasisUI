@@ -168,6 +168,7 @@ panelOutputModuleUI <- function(id){
 #' @importFrom dplyr left_join
 #' @importFrom dplyr filter
 #' @importFrom dplyr intersect
+#' @importFrom dplyr between
 #' @importFrom tidyr gather
 #' @importFrom tidyr separate
 #' @importFrom tidyr spread
@@ -198,6 +199,7 @@ panelOutputModuleUI <- function(id){
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet awesomeIcons
+#' @importFrom leaflet setView
 #' @importFrom leaflet addAwesomeMarkers
 #' @importFrom leaflet addCircles
 #'
@@ -294,14 +296,27 @@ panelOutputModule <- function(input, output, session,
         filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber")
         filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)][1]
         data <- .readFile(filesToPlot)
-        updateSelectInput(session = session, inputId = "pltrtnprd", choices = unique(data$return_period))
-        show("pltrtnprd")
-        hide("pltsummarylevels")
-        hide("chkboxmillions")
         loc_num <- filesListData()$report[which(filesListData()$summary_level == "locnumber")]
         # display only reports that contain locnumber in list of summary levels
         # without Summary Info and ALL
         loc_num_filter <- loc_num[-which(loc_num == "Summary Info")]
+
+        updateSelectInput(session = session, inputId = "pltrtnprd", choices = unique(data$return_period))
+        if (length(input$chkboxgrplosstypes) > 1) {
+          showModal(modalDialog(
+            title = "Attention",
+            "Only one perspecritve is allowed for this plot selection",
+            footer = tagList(
+              modalButton("Ok")
+            )
+          ))
+          updateCheckboxGroupInput(session = session, inputId = "chkboxgrplosstypes", selected = NULL)
+        }
+
+        show("pltrtnprd")
+        hide("pltsummarylevels")
+        hide("chkboxmillions")
+        hide("textinputtitle")
         if ("AAL" %in% loc_num_filter) {
           loc_num_filter <- loc_num_filter[-which(loc_num_filter == "AAL")]
         }
@@ -311,11 +326,13 @@ panelOutputModule <- function(input, output, session,
         hide("pltrtnprd")
         show("pltsummarylevels")
         show("chkboxmillions")
+        show("textinputtitle")
         idx_r <- which(filesListData()$report %in% plottypeslist$`loss per return period line plot`$Variables)
         multiple <- TRUE
       } else {
         hide("pltrtnprd")
         show("pltsummarylevels")
+        show("textinputtitle")
         idx_r <- which(filesListData()$report == plottypeslist$`AAL bar plot`$Variables)
         multiple <- TRUE
       }
@@ -355,7 +372,7 @@ panelOutputModule <- function(input, output, session,
           label = "Type",
           choices = types_list,
           selected = tail(types_list, n = 1),
-          multiple = TRUE
+          multiple = multiple
         )
       })
     })
@@ -375,9 +392,24 @@ panelOutputModule <- function(input, output, session,
         })
       } else {
         if (!is.null(filesListData())) {
-          filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber")
-          filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)][1]
-          data <- .readFile(filesToPlot)
+          # filter by perspective
+          if (!is.null(input$chkboxgrplosstypes)) {
+            filesListData <- filesListData() %>% filter(perspective == tolower(input$chkboxgrplosstypes))
+          } else {
+            filesListData <- filesListData() %>% filter(perspective == "gul")
+          }
+          filesToPlot <- filesListData %>% filter(summary_level %in% "locnumber")
+          filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)]
+          #filter by report
+          if (length(filesToPlot) > 1) {
+            if (grepl("aep", tolower(input$pltreports))) {
+              filesToPlot <- filesToPlot[grep("aep", filesToPlot)]
+            } else {
+              filesToPlot <- filesToPlot[grep("oep", filesToPlot)]
+            }
+          }
+
+          data <- .readFile(filesToPlot[1])
           # set up by type
           data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
           if (length(which(data$type == 2)) != 0) {
@@ -387,7 +419,6 @@ panelOutputModule <- function(input, output, session,
           data <- data %>%
             filter(return_period %in% as.numeric(input$pltrtnprd)) %>%
             filter(type == input$calctypes)
-
           # # define number of entries
           # entries <- 5
           # # split loss vector into equal parts
@@ -397,11 +428,6 @@ panelOutputModule <- function(input, output, session,
           #              round(loss_entries*3),
           #              round(loss_entries*4),
           #              loss_entries*5)
-          # choices <- c(round(min(data$loss)),
-          #              round((min(data$loss)+mean(data$loss))/3),
-          #              round((min(data$loss)+mean(data$loss))/2),
-          #              round(mean(data$loss)),
-          #              round(max(data$loss)))
           output$summary_levels_ui <- renderUI({
             sliderInput(ns("pltlosses"), "Losses",
                         min = round(min(data$loss)), max = round(max(data$loss)),
@@ -670,27 +696,30 @@ panelOutputModule <- function(input, output, session,
 
       # > draw plot --------------------------------------------------------------
       if (inputplottype() == "return period map") {
-        lat <- session$userData$data_hub$get_pf_location_content(id = portfId())$Latitude
-        long <- session$userData$data_hub$get_pf_location_content(id = portfId())$Longitude
-        loss <- which(dplyr::between(data$loss, min(as.numeric(input$pltlosses)), max(as.numeric(input$pltlosses))))
+        loss <- which(between(data$loss, min(as.numeric(input$pltlosses)), max(as.numeric(input$pltlosses))))
+        lat <- session$userData$data_hub$get_pf_location_content(id = portfId())$Latitude[loss]
+        long <- session$userData$data_hub$get_pf_location_content(id = portfId())$Longitude[loss]
+        popup <- as.character(paste("Loss: ", round(data$loss[loss])))
         icon_map <- awesomeIcons(
           icon = 'map-marker-alt',
           iconColor = "green",
           markerColor = "green"
         )
-
+        scaling <- 500
         output$outputleaflet <- renderLeaflet({
-          leaflet(session$userData$data_hub$get_pf_location_content(id = portfId())) %>%
+          leaflet(session$userData$data_hub$get_pf_location_content(id = portfId())[loss, ]) %>%
             addTiles() %>%
+            setView(mean(long), mean(lat), zoom = 12) %>%
             addAwesomeMarkers(
               lng = ~long,
               lat = ~lat,
               icon = icon_map,
               clusterOptions = markerClusterOptions(),
               group = "clustered",
-              clusterId = "cluster") %>%
-            addCircles(long[loss], lat[loss], radius = as.numeric(input$pltlosses),
-                       fillOpacity = 0.03)
+              clusterId = "cluster",
+              popup = ~popup) %>%
+            addCircles(long, lat, radius = as.numeric(input$pltlosses)/scaling,
+                       fillOpacity = 0.1)
         })
       } else {
         if (!is.null(data)) {
