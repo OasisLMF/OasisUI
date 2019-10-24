@@ -17,7 +17,7 @@ exposurevalidationsummaryUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    fluidRow(div(oasisuiRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;")),
+    fluidRow(div(oasisuiRefreshButton(ns("abuttonSumexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
       column(12,
              selectInput(ns("input_peril"), label = "Pick peril", choices = NULL)
@@ -137,14 +137,14 @@ exposurevalidationsummary <- function(input,
   })
 
   # Refresh button -------------------------------------------------------------
-  observeEvent(input$abuttonexposurerefresh, {
+  observeEvent(input$abuttonSumexposurerefresh, {
     # Get modeled locations
+    result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
     withModalSpinner(
-      result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID()),
+      .reloadSummary(input$input_peril),
       "Refreshing...",
-      size = "s"
+      size = "s", t = 0.5
     )
-    .reloadSummary()
   })
 
 

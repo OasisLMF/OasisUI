@@ -103,37 +103,46 @@ panelOutputModuleUI <- function(id){
       id = ns("oasisuiPanelOutputModule"),
       collapsible = TRUE,
       heading = "Custom plot",
-      column(12,
-             selectInput(inputId = ns("inputplottype"),
-                         label = "Plot type",
-                         choices = names(plottypeslist),
-                         selected = names(plottypeslist)[1])
+      fluidRow(
+        column(12,
+               selectInput(inputId = ns("inputplottype"),
+                           label = "Plot type",
+                           choices = names(plottypeslist),
+                           selected = names(plottypeslist)[1])
+        )
       ),
-      column(6,
-             checkboxGroupInput(inputId = ns("chkboxgrplosstypes"),
-                                label = "Perspective",
-                                choices = output_options$losstypes,
-                                inline = TRUE)),
-      column(6,
-             uiOutput(ns("types_ui"))),
-      column(6,
-             uiOutput(ns("reports_ui"))),
-      column(6,
-             selectInput(
-               inputId = ns("pltrtnprd"),
-               label = "Return Period",
-               choices = c(),
-               selected = NULL
-             )),
-      column(6,
-             uiOutput(ns("summary_levels_ui"))),
-      column(6,
-             textInput(ns("textinputtitle"), "Title", "")),
-      column(4,
-             checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
-      column(3,
-             hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
-      oasisuiButton(inputId = ns("abuttondraw"), label = "Draw Plot",  style = "float:right")
+      fluidRow(
+        column(6,
+               checkboxGroupInput(inputId = ns("chkboxgrplosstypes"),
+                                  label = "Perspective",
+                                  choices = output_options$losstypes,
+                                  inline = TRUE)),
+        column(6,
+               uiOutput(ns("types_ui")))
+      ),
+      fluidRow(
+        column(6,
+               uiOutput(ns("reports_ui"))),
+        column(6,
+               selectInput(
+                 inputId = ns("pltrtnprd"),
+                 label = "Return Period",
+                 choices = c(),
+                 selected = NULL
+               )),
+        column(6,
+               uiOutput(ns("summary_levels_ui")))
+      ),
+      br(),
+      fluidRow(
+        column(3,
+               textInput(ns("textinputtitle"), "Title", "")),
+        column(4,
+               checkboxInput(ns("chkboxmillions"), "Y axis in Millions", TRUE)),
+        column(3,
+               hidden(checkboxInput(ns("chkboxuncertainty"), "Include Uncertainty", FALSE))),
+        oasisuiButton(inputId = ns("abuttondraw"), label = "Draw Plot",  style = "float:right")
+      )
     ),
 
     panel(

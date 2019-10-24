@@ -2,7 +2,7 @@
 % Please edit documentation in R/API_utils.R
 \name{convert_created_modified}
 \alias{convert_created_modified}
-\title{Convert created and modified columns}
+\title{Format-conversion for timestamps in tables}
 \usage{
 convert_created_modified(tbl_obj)
 }

@@ -277,7 +277,7 @@ step2_chooseAnalysis <- function(input, output, session,
   output$paneltitle_CreateAnalysesTable <- renderUI({
     if (!is.null(portfolioID()) && portfolioID() != "") {
       pfName <- ifelse(toString(pfName()) == " " | toString(pfName()) == "" | toString(pfName()) == "NA", "", paste0('"', toString(pfName()), '"'))
-      paste0('Analyses associated with portfolio ', pfName, ', id ', toString(portfolioID()))
+      paste0('Analyses associated to portfolio ', pfName, ', id ', toString(portfolioID()))
     } else {
       paste0('Analyses')
     }
@@ -327,10 +327,10 @@ step2_chooseAnalysis <- function(input, output, session,
       input_generation_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
       if (input_generation_id$status == "Success") {
         oasisuiNotification(type = "message",
-                             paste0("Input generation for analysis id ", result$analysisID, " started."))
+                            paste0("Input generation for analysis id ", result$analysisID, " started."))
       } else {
         oasisuiNotification(type = "error",
-                             paste0("Input generation for analysis id ", result$analysisID, " could not be started."))
+                            paste0("Input generation for analysis id ", result$analysisID, " could not be started."))
       }
       anaid <- result$analysisID
       .reloadAnaData()
@@ -354,7 +354,7 @@ step2_chooseAnalysis <- function(input, output, session,
                 paste0("Are you sure that you want to cancel this input generation?"),
                 footer = tagList(
                   oasisuiButton(ns("abuttonConfirmDelIG"),
-                                 label = "Confirm", align = "center") %>%
+                                label = "Confirm", align = "center") %>%
                     bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonConfirmDelIG, placement = "right"),
                   actionButton(ns("btnCancelIGDel"),
                                label = "Go back", align = "right")
@@ -381,10 +381,10 @@ step2_chooseAnalysis <- function(input, output, session,
 
     if (delete_analyses_id$status == "Success") {
       oasisuiNotification(type = "message",
-                           paste0("Input Generation for analysis id ", analysisID, "cancelled."))
+                          paste0("Input Generation for analysis id ", analysisID, "cancelled."))
     } else {
       oasisuiNotification(type = "error",
-                           paste0("Input Generation for analysis id ", analysisID, " could not be cancelled."))
+                          paste0("Input Generation for analysis id ", analysisID, " could not be cancelled."))
     }
 
     anaid <- result$analysisID
@@ -586,11 +586,11 @@ step2_chooseAnalysis <- function(input, output, session,
                         " model ",  result$modelID))
       if (post_portfolios_create_analysis$status == "Success") {
         oasisuiNotification(type = "message",
-                             paste0("Analysis ", input$anaName, " created."))
+                            paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()
       } else {
         oasisuiNotification(type = "error",
-                             paste0("Analysis ", input$anaName, " could not be created."))
+                            paste0("Analysis ", input$anaName, " could not be created."))
       }
     }
     hide("panelModelTable")
@@ -662,15 +662,27 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Refresh Buttons ------------------------------------------------------------
   observeEvent(input$abuttonanarefresh, {
-    .reloadAnaData()
+    withModalSpinner(
+      .reloadAnaData(),
+      "Refreshing...",
+      size = "s", t = 0.5
+    )
   })
 
   observeEvent(input$abuttonanalogrefresh, {
-    .reloadAnaLog()
+    withModalSpinner(
+      .reloadAnaLog(),
+      "Refreshing...",
+      size = "s", t = 0.5
+    )
   })
 
   observeEvent(input$abuttonmodelrefresh, {
-    .reloadtbl_modelsData()
+    withModalSpinner(
+      .reloadtbl_modelsData(),
+      "Refreshing...",
+      size = "s", t = 0.5
+    )
   })
 
   # Help Functions -------------------------------------------------------------
