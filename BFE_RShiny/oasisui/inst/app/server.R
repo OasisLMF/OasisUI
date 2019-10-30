@@ -24,6 +24,13 @@ server <- function(input, output, session) {
   tryCatch({
     invisible(session$userData$oasisapi$api_get_healthcheck())
   }, error = function(e) {
+    showModal(
+      modalDialog(
+        "API is down. Please try again later",
+        footer = NULL,
+        size = size
+      )
+    )
     logerror(e$message, logger = "oasisui.module")
   })
 
