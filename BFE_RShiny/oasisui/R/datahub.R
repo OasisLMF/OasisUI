@@ -564,7 +564,7 @@ DataHub <- R6Class(
     },
     # Models
     return_tbl_modelsData = function(supplier_id = "", tbl_modelsDataNames) {
-      tbl_modelsData <-  private$oasisapi$return_df(query_path = "models", api_param = list(`supplier_id` = supplier_id))
+      tbl_modelsData <- private$oasisapi$return_df(query_path = "models", api_param = list(`supplier_id` = supplier_id))
       if (!is.null(tbl_modelsData) && nrow(tbl_modelsData) > 0 && is.null(tbl_modelsData$detail)) {
         tbl_modelsData <- convert_created_modified(tbl_modelsData)
         tbl_modelsData <- tbl_modelsData %>%
@@ -575,7 +575,7 @@ DataHub <- R6Class(
       tbl_modelsData
     },
     return_tbl_modelData = function(id) {
-      tbl_modelData <-  private$oasisapi$return_df(paste("models", id,  sep = "/"))
+      tbl_modelData <- private$oasisapi$return_df(paste("models", id,  sep = "/"))
       if (!is.null(tbl_modelData) && nrow(tbl_modelData) > 0  && is.null(tbl_modelData$detail)) {
         tbl_modelData <- convert_created_modified(tbl_modelData)
       } else {
