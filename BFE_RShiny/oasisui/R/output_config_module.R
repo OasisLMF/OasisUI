@@ -388,7 +388,7 @@ def_out_config <- function(input,
         } else {
           logMessage(
             paste0(
-              "appling the output configuration of analysis ",
+              "applying the output configuration of analysis ",
               analysisName(),
               " id ",
               analysisID()
@@ -414,14 +414,13 @@ def_out_config <- function(input,
     analysisID()
   }, {
     if (length(analysisID()) > 0) {
-      logMessage(paste0(
-        "updating output parameters for ",
+      logMessage(paste(
+        "updating output parameters for",
         input$sintag,
-        " configuration"
+        "configuration and cleaning up UI"
       ))
 
-      # clean up ui
-      logMessage("clean up UI")
+      # clean up UI
       if (any(grepl("sinsummarylevels", input))) {
         removeUI(selector = "div:has(> #sinsummarylevels)",
                  multiple = TRUE,
@@ -670,32 +669,33 @@ def_out_config <- function(input,
     # only called for Case 2 and 3 (drill-down or custom)
     oed_field <- oed_field_react()
     # retrieve run information from API
+    browser()
     out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID, oasisapi = session$userData$oasisapi)
 
     # display previous selection
     # Summary Info output is non-configurable, remove it
-    if(length(out_cnfg_tbl) > 0) {
+    if (length(out_cnfg_tbl) > 0) {
       out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
       # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
 
-    uniq_sum <- unique(out_cnfg_tbl$summary_level)
-    # In case multiple fields were selected, split the comma and make them two separate strings
-    choices_sum <- lapply(uniq_sum, function(x) {
-      strsplit(x, ", ")[[1]]
-    })
-    # combine multiple reports for same summary level
-    choices_rep_final <- lapply(uniq_sum, function(x) {
-      out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
-    })
+      uniq_sum <- unique(out_cnfg_tbl$summary_level)
+      # In case multiple fields were selected, split the comma and make them two separate strings
+      choices_sum <- lapply(uniq_sum, function(x) {
+        strsplit(x, ", ")[[1]]
+      })
+      # combine multiple reports for same summary level
+      choices_rep_final <- lapply(uniq_sum, function(x) {
+        out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
+      })
 
-    # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
-    result$n_add <- length(choices_sum) - 1
-    inserted$val <- seq(0, isolate(result$n_add))
+      # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
+      result$n_add <- length(choices_sum) - 1
+      inserted$val <- seq(0, isolate(result$n_add))
 
-    # update checkboxes selection
-    choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
-    updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+      # update checkboxes selection
+      choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
+      updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
     } else {
       choices_sum <- 0
       choices_rep_final <- 0
@@ -876,7 +876,7 @@ def_out_config <- function(input,
       # In case of Rerun, tag is set to Custom
       chosen_tag <- default_tags[3]
       # update Number of samples and Threshold in model params panel
-      if(is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
+      if (is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
         updateNumericInput(session, "tinputnoofsample", value = analysis_settings[[1]]$number_of_samples)
         updateNumericInput(session, "tinputthreshold", value = analysis_settings[[1]]$gul_threshold)
         .clearOutputOptions(ana_flag)
@@ -1094,8 +1094,8 @@ def_out_config <- function(input,
           if (length(model_perils) > 0) {
             ui_perils <- lapply(seq(1, length(model_perils)), function(p) {
               checkboxInput(ns(paste0("model_params_", names(model_perils)[p])),
-                            label = model_perils[[p]], # curr_param_lst$name,
-                            value = TRUE) #curr_param_lst$default)
+                            label = model_perils[[p]],
+                            value = TRUE)
             })
             output$chkinputsperils <- renderUI(list(h5("Available Perils"), ui_perils))
           }
@@ -1157,4 +1157,5 @@ def_out_config <- function(input,
     ana_post_update = reactive(input$abuttonexecuteanarun)
   ))
 
+  moduleOutput
 }
