@@ -939,9 +939,9 @@ def_out_config <- function(input,
           pltcalc = FALSE,
           id = 1,
           oed_fields = list(),
-          lec_output = TRUE,
+          lec_output = FALSE,
           leccalc = list(
-            return_period_file = TRUE,
+            return_period_file = FALSE,
             # outputs = list(
               full_uncertainty_aep = FALSE,
               full_uncertainty_oep = FALSE
@@ -1008,6 +1008,10 @@ def_out_config <- function(input,
           # update requested reports for summary level that is being iterated
           idx_item <- review_prsp$summary_level == fields_to_add[item]
           keep <- review_prsp[idx_item, "report"]
+          if("LEC Full Uncertainty AEP" %in% keep || "LEC Full Uncertainty OEP" %in% keep) {
+            item_list$lec_output <- TRUE
+            item_list$return_period_file <- TRUE
+          }
           corresp_varsdf <- which(varsdf$labels %in% keep)
           item_list_upd <- update_item_list(item_list, varsdf$field[corresp_varsdf])
           # oed_fields should be a list in the json file
