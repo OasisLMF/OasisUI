@@ -325,7 +325,8 @@ summarytab <- function(input, output, session,
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
     # read AAL files
-    AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
+    AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(),
+                       filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
     if (!is.null(AAL)) {
       # infer params
       tiv <- AAL %>%
@@ -358,13 +359,15 @@ summarytab <- function(input, output, session,
     }
     # read OEP & AEP files
     leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty",
-                           nonkeycols = c("summary_id", "return_period", "type"), variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
+                           nonkeycols = c("summary_id", "return_period", "type"),
+                           variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
     # REF: make more general, less-hard coded field names e.g.(return_period and others above)
-
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
         mutate(variable = paste(variable, type, return_period, sep = "."))
-      plotleccalc <- data.frame("Specification" = leccalc$variable, "Value" = leccalc$value, "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
+      plotleccalc <- data.frame("Specification" = leccalc$variable,
+                                "Value" = leccalc$value,
+                                "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
     } else {
       plotleccalc <- NULL
     }

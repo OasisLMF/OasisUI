@@ -942,10 +942,10 @@ def_out_config <- function(input,
           lec_output = TRUE,
           leccalc = list(
             return_period_file = TRUE,
-            outputs = list(
+            # outputs = list(
               full_uncertainty_aep = FALSE,
               full_uncertainty_oep = FALSE
-            )
+            # )
           )
         )
 
