@@ -468,7 +468,7 @@ DataHub <- R6Class(
     # extract oed summary levels relevant for current analysis
     get_ana_oed_summary_levels = function(id) {
       oed_fields_ana_content <- content(private$oasisapi$api_get_query(query_path = paste("analyses", id, "summary_levels_file",  sep = "/"))$result)
-       oed_fields <- oed_fields_ana_content %>%
+      oed_fields <- oed_fields_ana_content %>%
         unlist() %>%
         as.data.frame(stringsAsFactors = FALSE) %>%
         setNames("description") %>%
@@ -564,7 +564,24 @@ DataHub <- R6Class(
     },
     # Models
     return_tbl_modelsData = function(supplier_id = "", tbl_modelsDataNames) {
-      tbl_modelsData <- private$oasisapi$return_df(query_path = "models", api_param = list(`supplier_id` = supplier_id))
+      # tbl_modelsData <- private$oasisapi$return_df(query_path = "models", api_param = list(`supplier_id` = supplier_id))
+      content_lst <- content(private$oasisapi$api_query(
+        query_path = "models",
+        query_list = list(`supplier_id` = supplier_id),
+        query_method = "GET"
+      )$result)
+      .flattenItem <- function(x) {
+        if (is.list(x)) {
+          paste(unlist(x), collapse = ",")
+        } else  if (length(x) == 0) {
+          "Not Available"
+        } else {
+          x
+        }
+      }
+      content_lst <- lapply(content_lst, function(x) {lapply(x, .flattenItem)})
+      tbl_modelsData <- as.data.frame(bind_rows(content_lst))
+      # go on
       if (!is.null(tbl_modelsData) && nrow(tbl_modelsData) > 0 && is.null(tbl_modelsData$detail)) {
         tbl_modelsData <- convert_created_modified(tbl_modelsData)
         tbl_modelsData <- tbl_modelsData %>%
@@ -576,7 +593,7 @@ DataHub <- R6Class(
     },
     return_tbl_modelData = function(id) {
       tbl_modelData <- private$oasisapi$return_df(paste("models", id,  sep = "/"))
-      if (!is.null(tbl_modelData) && nrow(tbl_modelData) > 0  && is.null(tbl_modelData$detail)) {
+      if (!is.null(tbl_modelData) && nrow(tbl_modelData) > 0 && is.null(tbl_modelData$detail)) {
         tbl_modelData <- convert_created_modified(tbl_modelData)
       } else {
         tbl_modelData <- NULL

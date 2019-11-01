@@ -55,8 +55,8 @@ tbl_modelsDataNames <- list(
   modified = "modified",
   model_id = "model_id",
   supplier_id = "supplier_id",
-  version_id = "version_id",
-  data_files = "data_files"
+  version_id = "version_id"#,
+  # data_files = "data_files"
 )
 
 #' tbl_analysesDataNames
