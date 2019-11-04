@@ -153,7 +153,7 @@ summarytab <- function(input, output, session,
       data <- result$SummaryData %>%
         filter(Type == "input")
       # insert commas at thousands
-      data$Value <- format(as.integer(data$Value), big.mark = ",", scientific = FALSE)
+      data$Value <- format(as.numeric(data$Value), big.mark = ",", scientific = FALSE)
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -174,8 +174,6 @@ summarytab <- function(input, output, session,
     if (!is.null(result$SummaryData)) {
       data <- result$SummaryData %>%
         filter(Type == "param")
-      # insert commas at thousands
-      data$Value <- format(as.integer(data$Value), big.mark = ",", scientific = FALSE)
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -200,7 +198,7 @@ summarytab <- function(input, output, session,
         mutate_if(is.numeric, ~round(., 0)) %>%
         transform(Value = as.character(Value))
       # insert commas at thousands
-      data$Value <- format(as.integer(data$Value), big.mark = ",", scientific = FALSE)
+      data$Value <- format(as.numeric(data$Value), big.mark = ",", scientific = FALSE)
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
