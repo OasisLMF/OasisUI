@@ -297,9 +297,13 @@ summarytab <- function(input, output, session,
     for (p in 1:length(perspectives)) {
       for (v in 1:length(variables)) {
         variable <- variables[v]
-        fileName <- tbl_filesListDataana %>%
-          filter(summary_level == "All Risks") %>%
-          filter(perspective == perspectives[p]) %>%
+        if (grepl("All Risks", tbl_filesListDataana$summary_level[v])) {
+          fileName <- tbl_filesListDataana %>%
+            filter(summary_level == "All Risks")
+        } else {
+          fileName <- tbl_filesListDataana
+        }
+        fileName <- fileName %>% filter(perspective == perspectives[p]) %>%
           filter(report == variable) %>%
           select(files)
         if (length(fileName$files) > 0) {
