@@ -24,9 +24,19 @@ server <- function(input, output, session) {
   tryCatch({
     invisible(session$userData$oasisapi$api_get_healthcheck())
   }, error = function(e) {
-    logerror(e$message, logger = "oasisui.module")
+    {showModal(
+      modalDialog(
+        "API is down. Please try again later",
+        footer = NULL,
+        size = "m",
+        fade = FALSE
+      )
+    )
+    logerror(e$message, logger = "oasisui.module")}
   })
-
+  if (session$userData$oasisapi$api_get_healthcheck() != 200) {
+    stop()
+  }
 
   # active main panel based on the reactive navigation state
   navigation_state <- reactiveNavigation("LP")

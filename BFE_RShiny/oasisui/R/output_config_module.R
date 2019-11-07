@@ -388,7 +388,7 @@ def_out_config <- function(input,
         } else {
           logMessage(
             paste0(
-              "appling the output configuration of analysis ",
+              "applying the output configuration of analysis ",
               analysisName(),
               " id ",
               analysisID()
@@ -414,14 +414,13 @@ def_out_config <- function(input,
     analysisID()
   }, {
     if (length(analysisID()) > 0) {
-      logMessage(paste0(
-        "updating output parameters for ",
+      logMessage(paste(
+        "updating output parameters for",
         input$sintag,
-        " configuration"
+        "configuration and cleaning up UI"
       ))
 
-      # clean up ui
-      logMessage("clean up UI")
+      # clean up UI
       if (any(grepl("sinsummarylevels", input))) {
         removeUI(selector = "div:has(> #sinsummarylevels)",
                  multiple = TRUE,
@@ -670,6 +669,7 @@ def_out_config <- function(input,
     # only called for Case 2 and 3 (drill-down or custom)
     oed_field <- oed_field_react()
     # retrieve run information from API
+
     # Get analysis status
     analysis_info <- session$userData$data_hub$return_tbl_analysesData(Status = Status,
                                                                        tbl_analysesDataNames = tbl_analysesDataNames) %>%
@@ -916,7 +916,7 @@ def_out_config <- function(input,
       # In case of Rerun, tag is set to Custom
       chosen_tag <- default_tags[3]
       # update Number of samples and Threshold in model params panel
-      if(is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
+      if (is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
         updateNumericInput(session, "tinputnoofsample", value = analysis_settings[[1]]$number_of_samples)
         updateNumericInput(session, "tinputthreshold", value = analysis_settings[[1]]$gul_threshold)
         .clearOutputOptions(ana_flag)
@@ -982,7 +982,6 @@ def_out_config <- function(input,
           lec_output = FALSE,
           leccalc = list(
             return_period_file = FALSE,
-            # outputs = list(
             full_uncertainty_aep = FALSE,
             full_uncertainty_oep = FALSE,
             wheatsheaf_aep = FALSE,
@@ -990,7 +989,6 @@ def_out_config <- function(input,
             wheatsheaf_mean_aep = FALSE,
             sample_mean_aep = FALSE,
             sample_mean_oep = FALSE
-            # )
           )
         )
 
@@ -1143,8 +1141,8 @@ def_out_config <- function(input,
           if (length(model_perils) > 0) {
             ui_perils <- lapply(seq(1, length(model_perils)), function(p) {
               checkboxInput(ns(paste0("model_params_", names(model_perils)[p])),
-                            label = model_perils[[p]], # curr_param_lst$name,
-                            value = TRUE) #curr_param_lst$default)
+                            label = model_perils[[p]],
+                            value = TRUE)
             })
             output$chkinputsperils <- renderUI(list(h5("Available Perils"), ui_perils))
           }
@@ -1206,4 +1204,5 @@ def_out_config <- function(input,
     ana_post_update = reactive(input$abuttonexecuteanarun)
   ))
 
+  moduleOutput
 }

@@ -152,6 +152,8 @@ summarytab <- function(input, output, session,
     if (!is.null(result$SummaryData)) {
       data <- result$SummaryData %>%
         filter(Type == "input")
+      # insert commas at thousands
+      data$Value <- format(as.numeric(data$Value), big.mark = ",", scientific = FALSE)
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -195,6 +197,8 @@ summarytab <- function(input, output, session,
         transform(Value = as.numeric(Value)) %>%
         mutate_if(is.numeric, ~round(., 0)) %>%
         transform(Value = as.character(Value))
+      # insert commas at thousands
+      data$Value <- format(as.numeric(data$Value), big.mark = ",", scientific = FALSE)
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -487,7 +491,7 @@ summarytab <- function(input, output, session,
 #' @importFrom ggplot2 element_text
 #' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 element_blank
-
+#'
 #' @export
 #'
 # Expected DF with columns:
