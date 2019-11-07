@@ -623,7 +623,8 @@ DataHub <- R6Class(
       }
       analyses_input_file_df
     },
-    return_tbl_analysesData_nice = function(tbl_analysesData, admin_mode, Status, tbl_modelsDataNames, tbl_portfoliosDataNames, tbl_analysesDataNames) {
+    return_tbl_analysesData_nice = function(tbl_analysesData, admin_mode, Status,
+                                            tbl_modelsDataNames, tbl_portfoliosDataNames, tbl_analysesDataNames) {
       # fetch model data to merge in table
       tbl_modelsData <- self$return_tbl_modelsData(tbl_modelsDataNames = tbl_modelsDataNames) %>%
         mutate(supplier = !! sym(tbl_modelsDataNames$supplier_id)) %>%
