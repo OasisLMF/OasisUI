@@ -312,9 +312,13 @@ summarytab <- function(input, output, session,
     for (p in 1:length(perspectives)) {
       for (v in 1:length(variables)) {
         variable <- variables[v]
-        fileName <- tbl_filesListDataana %>%
-          filter(summary_level == "All Risks") %>%
-          filter(perspective == perspectives[p]) %>%
+        if (grepl("All Risks", tbl_filesListDataana$summary_level[v])) {
+          fileName <- tbl_filesListDataana %>%
+            filter(summary_level == "All Risks")
+        } else {
+          fileName <- tbl_filesListDataana
+        }
+        fileName <- fileName %>% filter(perspective == perspectives[p]) %>%
           filter(report == variable) %>%
           select(files)
         if (length(fileName$files) > 0) {
@@ -340,7 +344,8 @@ summarytab <- function(input, output, session,
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
     # read AAL files
-    AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
+    AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(),
+                       filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
     if (!is.null(AAL)) {
       # infer params
       tiv <- AAL %>%
@@ -373,13 +378,15 @@ summarytab <- function(input, output, session,
     }
     # read OEP & AEP files
     leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty",
-                           nonkeycols = c("summary_id", "return_period", "type"), variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
+                           nonkeycols = c("summary_id", "return_period", "type"),
+                           variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
     # REF: make more general, less-hard coded field names e.g.(return_period and others above)
-
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
         mutate(variable = paste(variable, type, return_period, sep = "."))
-      plotleccalc <- data.frame("Specification" = leccalc$variable, "Value" = leccalc$value, "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
+      plotleccalc <- data.frame("Specification" = leccalc$variable,
+                                "Value" = leccalc$value,
+                                "Type" = rep("leccalcplot", nrow(leccalc)), stringsAsFactors = FALSE)
     } else {
       plotleccalc <- NULL
     }

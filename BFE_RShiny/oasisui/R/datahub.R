@@ -211,7 +211,7 @@ DataHub <- R6Class(
       data_list
     },
     get_ana_outputs_data_list = function(id, ...) {
-      tarfile <- self$get_analyses_outputs_tar(id, destdir =  private$user_destdir)
+        tarfile <- self$get_analyses_outputs_tar(id, destdir =  private$user_destdir)
       data_list <- NULL
       if (file.exists(tarfile)) {
         data_list <- untar_list(tarfile, to_strip = "output")
@@ -564,7 +564,24 @@ DataHub <- R6Class(
     },
     # Models
     return_tbl_modelsData = function(supplier_id = "", tbl_modelsDataNames) {
-      tbl_modelsData <-  private$oasisapi$return_df(query_path = "models", api_param = list(`supplier_id` = supplier_id))
+      # tbl_modelsData <-  private$oasisapi$return_df(query_path = "models", api_param = list(`supplier_id` = supplier_id))
+      content_lst <- content(private$oasisapi$api_query(
+        query_path = "models",
+        query_list = list(`supplier_id` = supplier_id),
+        query_method = "GET"
+      )$result)
+      .flattenItem <- function(x) {
+        if (is.list(x)) {
+          paste(unlist(x), collapse = ",")
+        } else  if (length(x) == 0) {
+          "Not Available"
+        } else {
+          x
+        }
+      }
+      content_lst <- lapply(content_lst, function(x) {lapply(x, .flattenItem)})
+      tbl_modelsData <- as.data.frame(bind_rows(content_lst))
+
       if (!is.null(tbl_modelsData) && nrow(tbl_modelsData) > 0 && is.null(tbl_modelsData$detail)) {
         tbl_modelsData <- convert_created_modified(tbl_modelsData)
         tbl_modelsData <- tbl_modelsData %>%
@@ -606,7 +623,8 @@ DataHub <- R6Class(
       }
       analyses_input_file_df
     },
-    return_tbl_analysesData_nice = function(tbl_analysesData, admin_mode, Status, tbl_modelsDataNames, tbl_portfoliosDataNames, tbl_analysesDataNames) {
+    return_tbl_analysesData_nice = function(tbl_analysesData, admin_mode, Status,
+                                            tbl_modelsDataNames, tbl_portfoliosDataNames, tbl_analysesDataNames) {
       # fetch model data to merge in table
       tbl_modelsData <- self$return_tbl_modelsData(tbl_modelsDataNames = tbl_modelsDataNames) %>%
         mutate(supplier = !! sym(tbl_modelsDataNames$supplier_id)) %>%
