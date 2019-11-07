@@ -315,13 +315,13 @@ def_out_config <- function(input,
 
   # update tag based on analysis selection
   observeEvent(input$abuttonselectconf, {
-      # Using analyses names to select the output configuration of a previously posted analyses
-      logMessage(
-        paste0(
-          "updating output configuration because input$sinoutputoptions changed to ",
-          input$sinoutputoptions
-        )
+    # Using analyses names to select the output configuration of a previously posted analyses
+    logMessage(
+      paste0(
+        "updating output configuration because input$sinoutputoptions changed to ",
+        input$sinoutputoptions
       )
+    )
     if (length(input$sinoutputoptions) > 0 &&
         input$sinoutputoptions != "") {
       anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
@@ -560,7 +560,7 @@ def_out_config <- function(input,
       } else {
         disable("clearselection")
       }
-  })
+    })
 
   callModule(
     oasisuiTable,
@@ -669,39 +669,79 @@ def_out_config <- function(input,
     # only called for Case 2 and 3 (drill-down or custom)
     oed_field <- oed_field_react()
     # retrieve run information from API
-    browser()
-    out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
-    analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID, oasisapi = session$userData$oasisapi)
 
-    # display previous selection
-    # Summary Info output is non-configurable, remove it
-    if (length(out_cnfg_tbl) > 0) {
-      out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
-      # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
+    # Get analysis status
+    analysis_info <- session$userData$data_hub$return_tbl_analysesData(Status = Status,
+                                                                       tbl_analysesDataNames = tbl_analysesDataNames) %>%
+      filter(id == analysisID)
+    analysis_status <- analysis_info$status_detailed
 
-      uniq_sum <- unique(out_cnfg_tbl$summary_level)
-      # In case multiple fields were selected, split the comma and make them two separate strings
-      choices_sum <- lapply(uniq_sum, function(x) {
-        strsplit(x, ", ")[[1]]
-      })
-      # combine multiple reports for same summary level
-      choices_rep_final <- lapply(uniq_sum, function(x) {
-        out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
-      })
+    if (analysis_status == "run completed") {
+      # if analysis run was succesful:
+      out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
 
-      # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
-      result$n_add <- length(choices_sum) - 1
-      inserted$val <- seq(0, isolate(result$n_add))
+      # display previous selection
+      # Summary Info output is non-configurable, remove it
+      if(length(out_cnfg_tbl) > 0) {
+        out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
+        # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
 
-      # update checkboxes selection
-      choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
-      updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+        uniq_sum <- unique(out_cnfg_tbl$summary_level)
+        # In case multiple fields were selected, split the comma and make them two separate strings
+        choices_sum <- lapply(uniq_sum, function(x) {
+          strsplit(x, ", ")[[1]]
+        })
+        # combine multiple reports for same summary level
+        choices_rep_final <- lapply(uniq_sum, function(x) {
+          out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
+        })
+      }
     } else {
-      choices_sum <- 0
-      choices_rep_final <- 0
-      result$n_add <- 0
-      inserted$val <- seq(0, isolate(result$n_add))
+      # if error:
+      out_cnfg_tbl <- session$userData$data_hub$get_ana_settings_content(
+        analysisID, oasisapi = session$userData$oasisapi)$analysis_settings
+
+      if (length(out_cnfg_tbl$gul_summaries) > 0 ||
+          length(out_cnfg_tbl$il_summaries) > 0 ||
+          length(out_cnfg_tbl$ri_summaries) > 0) {
+
+        if (length(out_cnfg_tbl$gul_summaries) > 0) {
+          prsp_sum <- out_cnfg_tbl$gul_summaries
+        } else if (length(out_cnfg_tbl$il_summaries) > 0) {
+          prsp_sum <- out_cnfg_tbl$il_summaries
+        } else {
+          prsp_sum <- out_cnfg_tbl$ri_summaries
+        }
+
+        # summary levels
+        choices_sum <- lapply(seq(1:length(prsp_sum)), function(x) {
+          if (length(prsp_sum[[x]]$oed_fields) == 0) {
+            prsp_sum[[x]]$oed_fields <- "All Risks"
+          }
+          unlist(prsp_sum[[x]]$oed_fields)
+        })
+        # reports
+        choices_rep_final <- lapply(seq(1:length(prsp_sum)), function(x) {
+          not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
+          names_reports <- as.list(names(prsp_sum[[x]]))
+          names_reports <- names_reports[-which(names_reports %in% not_include)]
+          if (length(names(prsp_sum[[x]]$leccalc)) > 0) {
+            choices_rep_final <- c(names_reports, as.list(names(prsp_sum[[x]]$leccalc)))
+          } else {
+            choices_rep_final <- as.list(names_reports)
+          }
+          choices_rep_final <- unlist(varsdf$labels[which(varsdf$fields %in% choices_rep_final)])
+          choices_rep_final
+        })
+      }
     }
+    # update checkboxes selection
+    choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
+    updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+
+    # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
+    result$n_add <- length(choices_sum) - 1
+    inserted$val <- seq(0, isolate(result$n_add))
 
     # update main panel
     if (tag == default_tags[3]) {
@@ -809,7 +849,7 @@ def_out_config <- function(input,
       ui = tags$div(id = id,
                     fluidRow(column(3),
                              column(8,
-                               dynamicUI("C", tag, n_field)
+                                    dynamicUI("C", tag, n_field)
                              )))
     )
   }
@@ -939,13 +979,16 @@ def_out_config <- function(input,
           pltcalc = FALSE,
           id = 1,
           oed_fields = list(),
-          lec_output = TRUE,
+          lec_output = FALSE,
           leccalc = list(
-            return_period_file = TRUE,
-            outputs = list(
-              full_uncertainty_aep = FALSE,
-              full_uncertainty_oep = FALSE
-            )
+            return_period_file = FALSE,
+            full_uncertainty_aep = FALSE,
+            full_uncertainty_oep = FALSE,
+            wheatsheaf_aep = FALSE,
+            wheatsheaf_oep = FALSE,
+            wheatsheaf_mean_aep = FALSE,
+            sample_mean_aep = FALSE,
+            sample_mean_oep = FALSE
           )
         )
 
@@ -1008,6 +1051,10 @@ def_out_config <- function(input,
           # update requested reports for summary level that is being iterated
           idx_item <- review_prsp$summary_level == fields_to_add[item]
           keep <- review_prsp[idx_item, "report"]
+          if("LEC Full Uncertainty AEP" %in% keep || "LEC Full Uncertainty OEP" %in% keep) {
+            item_list$lec_output <- TRUE
+            item_list$return_period_file <- TRUE
+          }
           corresp_varsdf <- which(varsdf$labels %in% keep)
           item_list_upd <- update_item_list(item_list, varsdf$field[corresp_varsdf])
           # oed_fields should be a list in the json file
@@ -1054,8 +1101,8 @@ def_out_config <- function(input,
       if (!is.null(tbl_modelsDetails)) {
         model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
         names_settings_type <- lapply(names(model_settings), function(i) {
-            model_settings[[i]][["type"]]
-          }) %>%
+          model_settings[[i]][["type"]]
+        }) %>%
           setNames(names(model_settings))
         if (length(names(model_settings)) > 0) {
           # Basic model params
