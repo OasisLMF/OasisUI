@@ -543,6 +543,14 @@ def_out_config <- function(input,
     if (length(analysisID()) > 0) {
       observe_output_param()
     }
+
+    if (length(input$chkboxgrplosstypes) > 0 &&
+        length(sinsummarylevels_react_all()) > 0 &&
+        length(sinreports_react_all() > 0)) {
+      enable("abuttonexecuteanarun")
+    } else {
+      disable("abuttonexecuteanarun")
+    }
   })
 
   observeEvent(input$sintag, {
