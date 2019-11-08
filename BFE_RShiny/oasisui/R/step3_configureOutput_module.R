@@ -146,13 +146,8 @@ step3_configureOutput <- function(input, output, session,
 
   # Reactive Values and parameters ---------------------------------------------
 
-  #number of Rows per Page in a dataable
+  # number of Rows per Page in a dataable
   pageLength <- 5
-
-  # Default checkgroup for  GUL, IL and RI
-  checkgulgrplist <- c("chkgulprog", "chkgulstate", "chkgulcounty", "chkgulloc", "chkgullob")
-  checkilgrplist <- c("chkilprog", "chkilstate", "chkilcounty", "chkilloc", "chkillob", "chkilpolicy")
-  checkrigrplist <- c("chkriprog", "chkristate", "chkricounty", "chkriloc", "chkrilob", "chkripolicy")
 
   # > Reactive Values ----------------------------------------------------------
   result <- reactiveValues(
@@ -236,28 +231,6 @@ step3_configureOutput <- function(input, output, session,
       }
     }
   )
-
-  # reactive expression yielding the output options as a list
-  outputOptionsList <- reactive({paste(collapse = ",", c(
-    input$chkinputGUL, input$chkgulprog, input$chkgulpolicy,
-    input$chkgulstate, input$chkgulcounty, input$chkgulloc,
-    input$chkgullob,
-    input$chkinputIL, input$chkilprog, input$chkilpolicy,
-    input$chkilstate, input$chkilcounty, input$chkilloc,
-    input$chkillob,
-    input$chkinputRI, input$chkriprog, input$chkripolicy,
-    input$chkristate, input$chkricounty, input$chkriloc,
-    input$chkrilob
-  ))})
-
-  # Enable and disable buttons based on output confifig
-  observeEvent(outputOptionsList(), ignoreNULL = FALSE, ignoreInit = TRUE, {
-    if (outputOptionsList() != "") {
-      enable("abuttonexecuteanarun")
-    } else {
-      disable("abuttonexecuteanarun")
-    }
-  })
 
   # Analyses Table ------------------------------------------------------------
   output$dt_analyses <- renderDT(
