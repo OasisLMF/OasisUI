@@ -677,7 +677,7 @@ def_out_config <- function(input,
     analysis_status <- analysis_info$status_detailed
 
     if (analysis_status == "run completed") {
-      # if analysis run was succesful:
+      # if analysis run was successful:
       out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
 
       # display previous selection
@@ -1005,6 +1005,7 @@ def_out_config <- function(input,
             wheatsheaf_aep = FALSE,
             wheatsheaf_oep = FALSE,
             wheatsheaf_mean_aep = FALSE,
+            wheatsheaf_mean_oep = FALSE,
             sample_mean_aep = FALSE,
             sample_mean_oep = FALSE
           )
@@ -1074,7 +1075,7 @@ def_out_config <- function(input,
                         "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP")
           if (length(intersect(lec_list, keep)) > 0) {
             item_list$lec_output <- TRUE
-            item_list$return_period_file <- TRUE
+            item_list$leccalc$return_period_file <- TRUE
           }
           corresp_varsdf <- which(varsdf$labels %in% keep)
           item_list_upd <- update_item_list(item_list, varsdf$field[corresp_varsdf])
