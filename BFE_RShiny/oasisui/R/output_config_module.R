@@ -695,6 +695,10 @@ def_out_config <- function(input,
         choices_rep_final <- lapply(uniq_sum, function(x) {
           out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
         })
+
+        # update checkboxes selection
+        choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
+        updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
       }
     } else {
       # if error:
@@ -733,11 +737,22 @@ def_out_config <- function(input,
           choices_rep_final <- unlist(varsdf$labels[which(varsdf$fields %in% choices_rep_final)])
           choices_rep_final
         })
+
+        choices_prsp <- NULL
+        if (out_cnfg_tbl$gul_output) {
+          choices_prsp <- c(choices_prsp, "GUL")
+        }
+        if (out_cnfg_tbl$il_output) {
+          choices_prsp <- c(choices_prsp, "IL")
+        }
+        if (out_cnfg_tbl$ri_output) {
+          choices_prsp <- c(choices_prsp, "RI")
+        }
+        # update checkboxes selection
+        updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+
       }
     }
-    # update checkboxes selection
-    choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
-    updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
 
     # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
     result$n_add <- length(choices_sum) - 1
@@ -857,15 +872,18 @@ def_out_config <- function(input,
   # Output table function ------------------------------------------------------
   create_output_params <- function(sum_rep_grid) {
     if (is.null(input$chkboxgrplosstypes)) {
-      perspectives <- output_options$losstypes[1]
+      reports_summary_levels <- data.frame(
+        perspective = character(0),
+        summary_level = character(0),
+        report = character(0)
+      )
     } else {
       perspectives <- input$chkboxgrplosstypes
+      reports_summary_levels <- distinct(data.frame(
+        perspective = rep(perspectives, each = nrow(sum_rep_grid)),
+        sum_rep_grid
+      ))
     }
-    reports_summary_levels <- distinct(data.frame(
-      perspective = rep(perspectives, each = nrow(sum_rep_grid)),
-      sum_rep_grid
-    ))
-
     result$out_params_review <- reports_summary_levels
   }
 
@@ -1051,7 +1069,10 @@ def_out_config <- function(input,
           # update requested reports for summary level that is being iterated
           idx_item <- review_prsp$summary_level == fields_to_add[item]
           keep <- review_prsp[idx_item, "report"]
-          if("LEC Full Uncertainty AEP" %in% keep || "LEC Full Uncertainty OEP" %in% keep) {
+          lec_list <- c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP",
+                        "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP", "LEC Mean Wheatsheaf AEP",
+                        "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP")
+          if (length(intersect(lec_list, keep)) > 0) {
             item_list$lec_output <- TRUE
             item_list$return_period_file <- TRUE
           }

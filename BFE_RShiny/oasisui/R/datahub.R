@@ -211,7 +211,7 @@ DataHub <- R6Class(
       data_list
     },
     get_ana_outputs_data_list = function(id, ...) {
-        tarfile <- self$get_analyses_outputs_tar(id, destdir =  private$user_destdir)
+      tarfile <- self$get_analyses_outputs_tar(id, destdir =  private$user_destdir)
       data_list <- NULL
       if (file.exists(tarfile)) {
         data_list <- untar_list(tarfile, to_strip = "output")
