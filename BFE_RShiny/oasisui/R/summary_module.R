@@ -361,7 +361,7 @@ summarytab <- function(input, output, session,
       plotAALtmp <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
     } else {
       tiv <- data.frame(variables = NULL,
-                  value = NULL)
+                        value = NULL)
       outputsAAL <- NULL
       plotAALtmp <- NULL
     }
