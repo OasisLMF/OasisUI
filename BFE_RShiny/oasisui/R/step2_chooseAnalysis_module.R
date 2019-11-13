@@ -381,10 +381,10 @@ step2_chooseAnalysis <- function(input, output, session,
 
     if (delete_analyses_id$status == "Success") {
       oasisuiNotification(type = "message",
-                          paste0("Input Generation for analysis id ", analysisID, "cancelled."))
+                          paste("Input Generation for analysis id", analysisID, "cancelled."))
     } else {
       oasisuiNotification(type = "error",
-                          paste0("Input Generation for analysis id ", analysisID, " could not be cancelled."))
+                          paste("Input Generation for analysis id", analysisID, "could not be cancelled."))
     }
 
     anaid <- result$analysisID
@@ -396,7 +396,7 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
   # Analysis details ------------------------------------------------------------
-  observeEvent (input$abuttonshowanadetails, {
+  observeEvent(input$abuttonshowanadetails, {
     hide("panelAnalysisLog")
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
@@ -450,7 +450,7 @@ step2_chooseAnalysis <- function(input, output, session,
   output$paneltitle_AnalysisLog <- renderUI({
     analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
     AnaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
-    paste0('Logs for analysis ', analysisID, ' ', AnaName)
+    paste("Logs for analysis", analysisID, AnaName)
   })
 
 
@@ -477,15 +477,15 @@ step2_chooseAnalysis <- function(input, output, session,
   output$text_analysislog <- renderText({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
-      if (!is.null(result$tbl_analysislog)){
+      if (!is.null(result$tbl_analysislog)) {
         result$tbl_analysislog
-      } else{
-        paste0("No log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL"))
+      } else {
+        paste("No log files associated with analysis ID", ifelse(!is.null(result$analysisID), result$analysisID, "NULL"))
       }
     }
   })
 
-  #  panelAnalysisLog Table title
+  # panelAnalysisLog table title
   output$paneltitle_panelAnalysisLog <- renderUI({
     if (!is.null(result$analysisID)) {
       anaName <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
@@ -741,7 +741,7 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
     if (!is.null(result$analysisID)) {
-      result$tbl_analysislog <- session$userData$oasisapi$return_df(paste( "analyses", result$analysisID, "input_generation_traceback_file", sep = "/"))
+      result$tbl_analysislog <- session$userData$oasisapi$return_df(paste("analyses", result$analysisID, "input_generation_traceback_file", sep = "/"))
     } else {
       result$tbl_analysislog <-  NULL
     }
@@ -759,8 +759,7 @@ step2_chooseAnalysis <- function(input, output, session,
     invisible()
   }
 
-  # Model Outout ---------------------------------------------------------------
-
+  # Module Output ---------------------------------------------------------------
   moduleOutput <- c(
     list(
       analysisID = reactive({result$analysisID}),
@@ -769,5 +768,4 @@ step2_chooseAnalysis <- function(input, output, session,
   )
 
   moduleOutput
-
 }
