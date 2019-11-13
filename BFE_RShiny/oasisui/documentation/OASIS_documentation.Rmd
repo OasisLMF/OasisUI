@@ -30,51 +30,112 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 
 This documentation guides the user through a step-by-step process from creating a portfolio to running an analysis and observing the output results. 
 
-After having downloaded the app, the user will be prompted to login. To view the admin mode, the credentials are:
+After having downloaded the app, the user will be prompted to login. 
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/oasis_log_in.png")
+```
+
+To view the admin mode, the credentials are:
 
   - username: admin
   - password: password
   
 Under this mode more information will be displayed in the some of the tables, however functionalities do not vary depending on credentials. 
-Table include information regarding portfolio and analyses. Their statuses are represented by icons:
+Tables summarize information regarding portfolio and analyses. Their statuses are represented by icons:
 
 - In progress: the API is processing the inputs
-```{r, fig.align='left', out.width = "30px", out.height = "30px", echo = FALSE}
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/run_in_progress_icon.png")
 ```
 - Failed: something went wrong during the processing (e.g. wrong model, inputs...)
-```{r, fig.align='left', out.width = "30px", out.height = "30px", echo = FALSE}
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/run_failed_icon.png")
 ```
 - Ready: processing of input files and model was successful, analysis is ready to be run
-```{r, fig.align='left', out.width = "30px", out.height = "30px", echo = FALSE}
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/run_ready_icon.png")
 ```
 - Completed: processing was completed successfully
-```{r, fig.align='left', out.width = "30px", out.height = "30px", echo = FALSE}
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/run_completed_icon.png")
 ```
 
+In most tables and panels, a few buttons are present to facilitate the UI experience:
 
+  - Refresh: table is re-generated and statuses updated  
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/refresh_btn.png")
+```
 
+  - Collapse: window is shrunk. Once clicked, the icon will change to the expand button 
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/collapse_panel_btn.png")
+```
+
+  - Collapse: window is expanded. Once clicked, the icon will change to the collapse button 
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/expand_panel_btn.png")
+```
+
+  - Close: window is closed
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/close_btn.png")
+```
+
+  - Stripy button: to select a previously run analysis 
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/stripy_btn.png")
+```
 # The Home page
 The Home page shows all of the analyses created by the user as well as all the accessible sections.
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/landing_page.png")
 ```
-The Home button on the top left will re-direct the user to this view at any point. The OASIS logo will re-direct to the OASIS website. 
+Starting from the top, the user icon prompts the log out
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/user_btn.png")
+```
+```{r, fig.align='center', out.width = "150px", out.height = "150px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/user_btn_logout.png")
+```
+The OASIS logo will re-direct to the OASIS website. 
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/logo/oasis_logo.png")
+```
+The panel right below lists the sections available in the UI
+```{r, fig.align='center', out.width = "150px", out.height = "150px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/home_page_dropdown.png")
+```
+Several functionalities are integrated within:
+  - The Home button on the top left will re-direct the user to this view at any point. 
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/home_btn.png")
+```
 
-From the main page, both the Analysis or the Dashboard section can be accessed. The first is to create a portfolio and run an analysis, the latter to view results from the run and create additional plots. 
+  - The collapse button will minimize the dropdown window to give more space to the other panels:
+```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/collapse_btn.png")
+```
+  - The **Analysis** button brings the user steps required to create a portfolio and run an analysis
+
+  - The **Dashboard** button allows the user to view results from a successful run and create additional plots
+
+
+This dropdown can accessed at any point during the workflow to re-direct the user to any section of the UI.
 
 # Create a portfolio and run an analysis
-The Analysis section guides the user towards a complete workflow from creating a portfolio to running an analysis. It can be accessed from the Home page by clicking on **Analysis** -> **Single Analysis** in the dropdown. It is divided into 3 different steps, each for a different functionality.
+The Analysis section guides the user towards a complete workflow from creating a portfolio to running an analysis. It can be accessed from the Home page by clicking on **Analysis** -> **Single Analysis** in the dropdown. 
+```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/go_to_analysis.png")
+```
+It is divided into 3 different steps, each for a different functionality.
 
-### Step 1
+### Choose Portfolio
 The first step is to create a portfolio.  
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_1/step_1.png")
 ```
-In case no portfolio was previously created, the table will be empty. In order to create a portfolio, a name is mandatory. 
+In case no portfolio was previously created, the table will show as empty. In order to create a portfolio, a name is mandatory. 
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_1/name_portfolio.png")
 ```
@@ -90,7 +151,7 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 
 When the status of the portfolio is “Ready”, then it is possible to move forward to step 2 by clicking on *Proceed to Choose Analysis*. 
 	
-### Step 2
+### Choose Analysis
 In the second step, a new analysis can be created by clicking on **Create Analysis**. 
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/step_2.png")
@@ -130,8 +191,8 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 ```
 At this point, it is possible to proceed to Configure Output & Run. If the analysis fails, you can see the details in the log file. If an analysis already exists, you can see relevant information by clicking on **Show Details**.
 	
-### Step 3
-In the third step, the configuration of the run has to be selected. 
+### Configure Ouput & Run
+In the third step, the user can create the selection of a new the configuration for a run. 
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/step_3.png")
 ```
@@ -165,7 +226,11 @@ In case of a rerun, the tag will be set to Custom and will display the previous 
 Once the selection is completed, you can click on **Execute Run**. In case the run fails, it is possible to see details in the log window; if successful, then it is possible to proceed to the Dashboard.
 
 # View results and create additional plots
-The Dashboard section compiles results from the run and allows the user to create additional plots. Functionalities in this page can only be accessed if an analysis was successful. It can be reached from the Home page either by selecting the analysis from the “Analyses Table” and clicking on **Dashboard of Analyses Outputs** or by clicking on **Dashboard** → **Single Analysis Dashboard** in the drop-down on the left. The analysis can be chosen or changed at any time by clicking on the stripy button on the top left. It comprises of 3 tabs Summary, Plots, and Files, which include all information of the analysis and portfolio and where additional actions can be carried out. 
+The Dashboard section compiles results from the run and allows the user to create additional plots. Functionalities in this page can only be accessed if an analysis was successful. It can be reached from the Home page either by selecting the analysis from the “Analyses Table” and clicking on **Dashboard of Analyses Outputs** or by clicking on **Dashboard** → **Single Analysis Dashboard** in the drop-down from the Home page. 
+```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/go_to_dashboard.png")
+```
+The analysis can be chosen or changed at any time by clicking on the stripy button on the top left. It comprises of 3 tabs Summary, Plots, and Files, which include all information of the analysis and portfolio and where additional actions can be carried out. 
 
 ### Summary
 The first tab is the Summary, which shows the Inputs, Parameters and Outputs tables, as well as plots for any selection of OEP, AEP and AAL for both Analytical and Sample. The OEP and AEP curves are plotted separately for all of the chosen perspectives.
