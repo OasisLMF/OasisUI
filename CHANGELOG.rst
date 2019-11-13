@@ -1,6 +1,13 @@
 OasisUI Changelog 
 ==================
 
+`1.3.5`_
+--------
+* closes #173 - Update Output config view according to previous selection
+* closes #179 - Update to analysis settings for leccalc in OasisLMF>=1.4.3 
+* closes #183 - Handle API connection error on login
+* fixes #185 - Issue with single data file in API model
+
 `1.3.3`_
 --------
 * Fix for `1.3.2` release
@@ -113,6 +120,7 @@ OasisUI Changelog
 
 
 .. AUTO_INSERT-CHANGE_DIFF
+.. _`1.3.5`:  https://github.com/OasisLMF/OasisUI/compare/1.3.3...1.3.5
 .. _`1.3.3`:  https://github.com/OasisLMF/OasisUI/compare/1.3.2...1.3.3
 .. _`1.3.2`:  https://github.com/OasisLMF/OasisUI/compare/1.3.1...1.3.2
 .. _`1.3.1`:  https://github.com/OasisLMF/OasisUI/compare/1.3.0...1.3.1
