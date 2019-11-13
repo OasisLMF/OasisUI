@@ -311,12 +311,7 @@ summarytab <- function(input, output, session,
           filter(report == variable) %>%
           select(files)
         if (length(fileName$files) > 0) {
-          if (length(fileName$files) > 1) {
-            S2_file <- grep("S2", fileName$files)
-            output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files[S2_file] %>% as.character())
-          } else {
             output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files %>% as.character())
-          }
           if (!is.null(output_file_df)) {
             c <- length(DFList) + 1
             splitvar <- unlist(strsplit(variable, " "))
