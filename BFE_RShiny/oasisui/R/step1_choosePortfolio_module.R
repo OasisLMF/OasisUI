@@ -156,20 +156,17 @@ panelLinkFiles <- function(id) {
     fluidRow(
       # Source Location File
       column(3,
-             fileInput(inputId = ns("SLFile"), label = 'Location file:', accept = c('csv', 'comma-separated-values', '.csv'))),
+             uiOutput(ns("SLFile_ui"))),
       # Source Account File
       column(3,
-             fileInput(inputId = ns("SAFile"), label = 'Account file:',
-                       accept = c('csv', 'comma-separated-values', '.csv'))),
+             uiOutput(ns("SAFile_ui"))),
 
       # Source Reinsurance File
       column(3,
-             fileInput(inputId = ns("SRFile"), label = 'RI info file:',
-                       accept = c('csv', 'comma-separated-values', '.csv'))),
+             uiOutput(ns("SRFile_ui"))),
       # Source Reinsurance Scope File
       column(3,
-             fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
-                       accept = c('csv', 'comma-separated-values', '.csv')))
+             uiOutput(ns("SRSFile_ui")))
     ),
     fluidRow(
       column(12,
@@ -236,14 +233,6 @@ step1_choosePortfolio <- function(input, output, session,
     portfolioName = "",
     # reactive value for the portfolio table
     tbl_portfoliosData = NULL,
-    # SL file to load
-    SLfile = NULL,
-    # SA file to load
-    SAfile = NULL,
-    # SR file to load
-    SRfile = NULL,
-    # SA file to load
-    SRSfile = NULL,
     # flag to know if the user is creating or amending a portfolio
     portfolio_flag = "C"
   )
@@ -500,10 +489,23 @@ step1_choosePortfolio <- function(input, output, session,
   # Clear panel
   observeEvent(input$abuttonpfclear, ignoreInit = TRUE, {
     .clearUploadFiles()
-    result$SLFile <- NULL
-    result$SAFile <- NULL
-    result$SRFile <- NULL
-    result$SRSFile <- NULL
+    # Re-setting fileInputs
+    output$SLFile_ui <- renderUI({
+      fileInput(inputId = ns("SLFile"), label = 'Location file:',
+                accept = c('csv', 'comma-separated-values', '.csv'))
+    })
+    output$SAFile_ui <- renderUI({
+      fileInput(inputId = ns("SAFile"), label = 'Account file:',
+                accept = c('csv', 'comma-separated-values', '.csv'))
+    })
+    output$SRFile_ui <- renderUI({
+      fileInput(inputId = ns("SRFile"), label = 'RI info file:',
+                accept = c('csv', 'comma-separated-values', '.csv'))
+    })
+    output$SRSFile_ui <- renderUI({
+      fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
+                accept = c('csv', 'comma-separated-values', '.csv'))
+    })
   })
 
   # Link files to portfolio title
@@ -518,55 +520,43 @@ step1_choosePortfolio <- function(input, output, session,
     }
   })
 
-  # Hide link files panel
-  observeEvent(input$abuttonhidelinkfilespanel, {
-    hide("panelLinkFiles")
+  # Rendering of fileInputs
+  output$SLFile_ui <- renderUI({
+    fileInput(inputId = ns("SLFile"), label = 'Location file:',
+              accept = c('csv', 'comma-separated-values', '.csv'))
+  })
+  output$SAFile_ui <- renderUI({
+    fileInput(inputId = ns("SAFile"), label = 'Account file:',
+              accept = c('csv', 'comma-separated-values', '.csv'))
+  })
+  output$SRFile_ui <- renderUI({
+    fileInput(inputId = ns("SRFile"), label = 'RI info file:',
+              accept = c('csv', 'comma-separated-values', '.csv'))
+  })
+  output$SRSFile_ui <- renderUI({
+    fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
+              accept = c('csv', 'comma-separated-values', '.csv'))
   })
 
-  # Upload Location/Account File
-  .uploadSourceFile <- function(inFile, query_path) {
-    logMessage(paste0("Uploading file ", inFile$datapath))
-    if (!is.null(inFile$datapath)) {
-      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
-      tmp <- unlist(strsplit(inFile$datapath, split = "/"))
-      datapath <- paste(c(tmp[-length(tmp)], ""), collapse = "/")
-      newfile <- paste0(datapath, inFile$name)
-      file.rename(inFile$datapath, newfile)
-      withModalSpinner(
-        post_file <- session$userData$oasisapi$api_post_file_query(paste("portfolios", pfId, query_path, sep = "/"),  query_body = newfile),
-        "Linking...",
-        size = "s"
-      )
-      if (post_file$status == "Success") {
-        oasisuiNotification(type = "message",
-                            paste("File linked successfully."))
-      } else {
-        oasisuiNotification(type = "error",
-                            paste("File link failed."))
-      }
-      .reloadtbl_portfoliosData()
-    }
-    invisible()
-  }
-
   observeEvent(input$SLFile, ignoreInit = TRUE, {
-    result$SLFile <- input$SLFile
-    .uploadSourceFile(inFile = result$SLFile, query_path = "location_file")
+    .uploadSourceFile(inFile = input$SLFile, query_path = "location_file")
   })
 
   observeEvent(input$SAFile, ignoreInit = TRUE, {
-    result$SAFile <- input$SAFile
-    .uploadSourceFile(inFile = result$SAFile, query_path = "accounts_file")
+    .uploadSourceFile(inFile = input$SAFile, query_path = "accounts_file")
   })
 
   observeEvent(input$SRFile, ignoreInit = TRUE, {
-    result$SRFile <- input$SRFile
-    .uploadSourceFile(inFile = result$SRFile, query_path = "reinsurance_info_file")
+    .uploadSourceFile(inFile = input$SRFile, query_path = "reinsurance_info_file")
   })
 
   observeEvent(input$SRSFile, ignoreInit = TRUE, {
-    result$SRSFile <- input$SRSFile
-    .uploadSourceFile(inFile = result$SRSFile, query_path = "reinsurance_scope_file")
+    .uploadSourceFile(inFile = input$SRSFile, query_path = "reinsurance_scope_file")
+  })
+
+  # Hide link files panel
+  observeEvent(input$abuttonhidelinkfilespanel, {
+    hide("panelLinkFiles")
   })
 
   # Define portfolioID ---------------------------------------------------------
@@ -626,11 +616,6 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Refresh Buttons ------------------------------------------------------------
   observeEvent(input$abuttonprgtblrfsh, {
-      # withSpinner(
-      #   DTOutput(ns("dt_Portfolios")),
-      #   # style and color can be set as options used by all spinners
-      #   color = "#bb252c"
-      # )
     withModalSpinner(
       .reloadtbl_portfoliosData(),
       "Refreshing...",
@@ -711,6 +696,32 @@ step1_choosePortfolio <- function(input, output, session,
     logMessage(".updatePortfolioName called")
     updateTextInput(session, "tinputpfName",
                     value = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name])
+  }
+
+  # Upload Location/Account File
+  .uploadSourceFile <- function(inFile, query_path) {
+    logMessage(paste0("Uploading file ", inFile$datapath))
+    if (!is.null(inFile$datapath)) {
+      pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
+      tmp <- unlist(strsplit(inFile$datapath, split = "/"))
+      datapath <- paste(c(tmp[-length(tmp)], ""), collapse = "/")
+      newfile <- paste0(datapath, inFile$name)
+      file.rename(inFile$datapath, newfile)
+      withModalSpinner(
+        post_file <- session$userData$oasisapi$api_post_file_query(paste("portfolios", pfId, query_path, sep = "/"),  query_body = newfile),
+        "Linking...",
+        size = "s"
+      )
+      if (post_file$status == "Success") {
+        oasisuiNotification(type = "message",
+                            paste("File linked successfully."))
+      } else {
+        oasisuiNotification(type = "error",
+                            paste("File link failed."))
+      }
+      .reloadtbl_portfoliosData()
+    }
+    invisible()
   }
 
   # Module output ---------------------------------------------------------------
