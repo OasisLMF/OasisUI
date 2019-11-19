@@ -263,7 +263,11 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
-      titleToUse <- "GUL EP Curve"
+      if (unique(data$type) == 2) {
+        titleToUse <- "GUL EP Curve - Sample"
+      } else {
+        titleToUse <- "GUL EP Curve - Analytical"
+      }
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
@@ -275,7 +279,11 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
-      titleToUse <- "IL EP Curve"
+      if (unique(data$type) == 2) {
+        titleToUse <- "IL EP Curve - Sample"
+      } else {
+        titleToUse <- "IL EP Curve - Analytical"
+      }
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
@@ -287,7 +295,11 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
-      titleToUse <- "RI EP Curve"
+      if (unique(data$type) == 2) {
+        titleToUse <- "RI EP Curve - Sample"
+      } else {
+        titleToUse <- "RI EP Curve - Analytical"
+      }
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
