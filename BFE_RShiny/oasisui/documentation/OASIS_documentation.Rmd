@@ -10,9 +10,8 @@ output:
 library(fontawesome)
 library(knitr)
 ```
-
-
 \pagenumbering{gobble}
+
 \vspace*{7cm}
 \begin{center}
 
@@ -25,7 +24,7 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 \newpage
 \tableofcontents
 \newpage
-
+\pagenumbering{arabic}
 # Introduction
 
 This documentation guides the user through a step-by-step process from creating a portfolio to running an analysis and observing the output results. 
