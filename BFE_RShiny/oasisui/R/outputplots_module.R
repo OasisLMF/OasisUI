@@ -407,48 +407,57 @@ panelOutputModule <- function(input, output, session,
           } else {
             filesListData <- filesListData() %>% filter(perspective == "gul")
           }
-          filesToPlot <- filesListData %>% filter(summary_level %in% "locnumber")
-          filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)]
-          #filter by report
-          if (length(filesToPlot) > 1) {
-            if (grepl("aep", tolower(input$pltreports))) {
-              filesToPlot <- filesToPlot[grep("aep", filesToPlot)]
-            } else {
-              filesToPlot <- filesToPlot[grep("oep", filesToPlot)]
+
+          if (filesListData$summary_level %in% "locnumber") {
+            filesToPlot <- filesListData %>% filter(summary_level %in% "locnumber")
+            filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)]
+            #filter by report
+            if (length(filesToPlot) > 1) {
+              if (grepl("aep", tolower(input$pltreports))) {
+                filesToPlot <- filesToPlot[grep("aep", filesToPlot)]
+              } else {
+                filesToPlot <- filesToPlot[grep("oep", filesToPlot)]
+              }
             }
-          }
 
-          data <- .readFile(filesToPlot[1])
-          # set up by type
-          data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
-          if (length(which(data$type == 2)) != 0) {
-            data$type <- data$type %>% replace(which(data$type == 2), "Sample")
-          }
+            data <- .readFile(filesToPlot[1])
+            # set up by type
+            data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
+            if (length(which(data$type == 2)) != 0) {
+              data$type <- data$type %>% replace(which(data$type == 2), "Sample")
+            }
 
-          data <- data %>%
-            filter(return_period %in% as.numeric(input$pltrtnprd)) %>%
-            filter(type == input$calctypes)
-          # # define number of entries
-          # entries <- 5
-          # # split loss vector into equal parts
-          # loss_entries <- length(data$loss)/entries
-          # choices <- c("1", round(loss_entries),
-          #              round(loss_entries*2),
-          #              round(loss_entries*3),
-          #              round(loss_entries*4),
-          #              loss_entries*5)
-          output$summary_levels_ui <- renderUI({
-            sliderInput(ns("pltlosses"), "Losses",
-                        min = round(min(data$loss)), max = round(max(data$loss)),
-                        value = c(round(min(data$loss)), round(mean(data$loss))),
-                        step = 1000
-            )
-            # selectInput(
-            #   inputId = ns("pltlosses"),
-            #   label = "Losses",
-            #   choices = choices
-            # )
-          })
+            data <- data %>%
+              filter(return_period %in% as.numeric(input$pltrtnprd)) %>%
+              filter(type == input$calctypes)
+            # # define number of entries
+            # entries <- 5
+            # # split loss vector into equal parts
+            # loss_entries <- length(data$loss)/entries
+            # choices <- c("1", round(loss_entries),
+            #              round(loss_entries*2),
+            #              round(loss_entries*3),
+            #              round(loss_entries*4),
+            #              loss_entries*5)
+            output$summary_levels_ui <- renderUI({
+              sliderInput(ns("pltlosses"), "Losses",
+                          min = round(min(data$loss)), max = round(max(data$loss)),
+                          value = c(round(min(data$loss)), round(mean(data$loss))),
+                          step = 1000
+              )
+              # selectInput(
+              #   inputId = ns("pltlosses"),
+              #   label = "Losses",
+              #   choices = choices
+              # )
+            })
+          } else {
+            output$summary_levels_ui <- renderUI({
+              sliderInput(ns("pltlosses"), "Losses",
+                          min = 0, max = 0,
+                          value = 0)
+            })
+          }
         }
       }
     })
@@ -477,9 +486,9 @@ panelOutputModule <- function(input, output, session,
   }, ignoreNULL = FALSE, {
     if (length(inputplottype()) != 0) {
       if (inputplottype() != "loss per return period map" && (length(chkbox$chkboxgrplosstypes()) > 0 &&
-                                                     length(input$calctypes) > 0 &&
-                                                     length(chkbox$pltsummarylevels()) > 0 &&
-                                                     length(chkbox$pltreports()) > 0)) {
+                                                              length(input$calctypes) > 0 &&
+                                                              length(chkbox$pltsummarylevels()) > 0 &&
+                                                              length(chkbox$pltreports()) > 0)) {
         enable("abuttondraw")
         show("outputplot")
         hide("outputleaflet")
