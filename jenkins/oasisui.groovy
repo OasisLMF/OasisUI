@@ -127,11 +127,34 @@ node {
                     }
                  }
             )
+
+            //Git Tag
+            sshagent (credentials: [git_creds]) {
+                dir(source_workspace) {
+                    sh "git tag ${env.TAG_RELEASE}"
+                    sh "git push origin ${env.TAG_RELEASE}"
+                }
+            }
+
+            // Create Github release 
+            withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
+                String repo = "OasisLMF/OasisUI"
+                def json_request = readJSON text: '{}'
+                json_request['tag_name'] = RELEASE_TAG
+                json_request['target_commitish'] = 'master'
+                json_request['name'] = RELEASE_TAG
+                json_request['body'] = ""
+                json_request['draft'] = false
+                json_request['prerelease'] = false
+                writeJSON file: 'gh_request.json', json: json_request
+                sh 'curl -XPOST -H "Authorization:token ' + gh_token + "\" --data @gh_request.json https://api.github.com/repos/$repo/releases > gh_response.json"
+            }
         }
     } catch(hudson.AbortException | org.jenkinsci.plugins.workflow.steps.FlowInterruptedException buildException) {
         hasFailed = true
         error('Build Failed')
     } finally {
+
         //Docker cleanup
         dir(build_workspace) {
             if(params.PURGE){
@@ -152,14 +175,17 @@ node {
             SLACK_CHAN = (params.PUBLISH ? "#builds-release":"#builds-dev")
             slackSend(channel: SLACK_CHAN, message: SLACK_MSG, color: slackColor)
         }
-        //Git Tagging
-        if(! hasFailed && params.PUBLISH){
-            sshagent (credentials: [git_creds]) {
-                dir(source_workspace) {
-                    sh "git tag ${env.TAG_RELEASE}"
-                    sh "git push origin ${env.TAG_RELEASE}"
-                }
-            }
-        }
+
+        // Run merge back if publish
+        if (params.PUBLISH){ 
+            dir(source_workspace) {
+                sshagent (credentials: [git_creds]) {
+                    sh "git checkout master && git pull"
+                    sh "git merge ${source_branch} && git push"
+                    sh "git checkout develop && git pull"
+                    sh "git merge master && git push"
+                }   
+            }   
+        }   
     }
 }

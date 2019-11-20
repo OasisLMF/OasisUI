@@ -45,7 +45,13 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
   if (file.exists(file.path(destdir, dataset_identifier))) {
     extension <-  strsplit(dataset_identifier, split = "\\.") %>% unlist() %>% tail(n = 1)
     if (extension == "csv") {
-      data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
+      if (length(dataset_identifier) > 1) {
+        data_1 <- fread(file.path(destdir, dataset_identifier)[1], nrows = nrows)
+        data_2 <- fread(file.path(destdir, dataset_identifier)[2], nrows = nrows)
+        data <- rbind(data_1, data_2)
+      } else {
+        data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
+      }
     } else if (extension == "json") {
       data <- read_json(file.path(destdir, dataset_identifier))
     } else{
