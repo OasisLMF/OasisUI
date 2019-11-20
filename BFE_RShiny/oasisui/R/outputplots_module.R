@@ -302,10 +302,10 @@ panelOutputModule <- function(input, output, session,
       output$outputleaflet <- NULL
       # Update selectInputs based on the choice of plots, for AAL bar plot only AAL will be displayed
       if (inputplottype() == "loss per return period map") {
-        filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber")
+        filesToPlot <- filesListData() %>% filter(grepl("locnumber", summary_level))
         filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)][1]
         data <- .readFile(filesToPlot)
-        loc_num <- filesListData()$report[which(filesListData()$summary_level == "locnumber")]
+        loc_num <- filesListData()$report[which(grepl("locnumber", filesListData()$summary_level))]
         # display only reports that contain locnumber in list of summary levels
         # without Summary Info and ALL
         loc_num_filter <- loc_num[-which(loc_num == "Summary Info")]
@@ -329,7 +329,7 @@ panelOutputModule <- function(input, output, session,
         if ("AAL" %in% loc_num_filter) {
           loc_num_filter <- loc_num_filter[-which(loc_num_filter == "AAL")]
         }
-        idx_r <- which(filesListData()$report == loc_num_filter)
+        idx_r <- which(filesListData()$report == unique(loc_num_filter))
         multiple <- FALSE
       } else if(inputplottype() == "loss per return period line plot") {
         hide("pltrtnprd")
@@ -408,8 +408,8 @@ panelOutputModule <- function(input, output, session,
             filesListData <- filesListData() %>% filter(perspective == "gul")
           }
 
-          if (filesListData$summary_level %in% "locnumber") {
-            filesToPlot <- filesListData %>% filter(summary_level %in% "locnumber")
+          if (length(grep("locnumber", filesListData$summary_level)) > 0) {
+            filesToPlot <- filesListData %>% filter(grepl("locnumber", filesListData$summary_level))
             filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)]
             #filter by report
             if (length(filesToPlot) > 1) {
@@ -419,7 +419,7 @@ panelOutputModule <- function(input, output, session,
                 filesToPlot <- filesToPlot[grep("oep", filesToPlot)]
               }
             }
-
+#TODO: this should be whatever locnumber was selected, in case that there is more than 1 entry
             data <- .readFile(filesToPlot[1])
             # set up by type
             data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
@@ -590,7 +590,7 @@ panelOutputModule <- function(input, output, session,
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
         if (inputplottype() == "loss per return period map") {
-          filesToPlot <- filesListData() %>% filter(summary_level %in% "locnumber") %>%
+          filesToPlot <- filesListData() %>% filter(grepl("locnumber", summary_level)) %>%
             filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
                    report %in% input$pltreports)
           # filter(grepl("uncertainty", files))
