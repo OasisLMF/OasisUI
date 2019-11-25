@@ -248,18 +248,12 @@ The second tag available in the dropdown is *Drill down*, where in addition to *
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/drilldown_step_3.png")
 ```
-```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
-knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/drilldown_field_chosen.png")
-```
 
 The last tag is *Custom*, where any combination of summary levels and the reports. This is the only tag option that does not include a default selection. 
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/custom_step_3.png")
 ```
 It is possible to add rows for more combinations. In case that multiple entries are selected in one field, they will be aggregated whereas entries belonging to different rows will be treated separately. The **Clear** button will erase the entire selection. At the bottom, the table will show the entire selection. 
-```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
-knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/custom_step_3_report_fields.png")
-```
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/custom_step_3_fields_chosen.png")
 ```
