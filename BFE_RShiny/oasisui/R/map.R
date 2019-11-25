@@ -5,6 +5,8 @@
 #' @description Creates a plain map using leaflet.
 #'
 #' @param df df to plot as map
+#' @param session Current session.
+#' @param analysisID Chosen analysis ID.
 #'
 #' @return Leaflet map.
 #'
@@ -14,9 +16,9 @@
 #' @importFrom leaflet markerClusterOptions
 #'
 #' @export
-createPlainMap <- function(df) {
+createPlainMap <- function(df, session, analysisID) {
 
-  df <- build_marker_data(df)
+  df <- build_marker_data(df, session, analysisID)
 
   # Create custom icons
   icon_map <- awesomeIcons(
@@ -71,8 +73,6 @@ build_marker_data <- function(data, session, analysisID) {
     function(id, bitiv, streetaddress, postalcode, message) {
       as.character(div(
         strong("Location ID: "), id,
-        # br(), strong("Latitude: "), lat,
-        # br(), strong("Longitude: "), lng
         strong("TIV: "), bitiv,
         br(), strong("Street Address: "), streetaddress,
         br(), strong("Postal code: "), postalcode,

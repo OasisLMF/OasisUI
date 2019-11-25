@@ -5,12 +5,16 @@
 \alias{build_marker_data}
 \title{Create Plain Map}
 \usage{
-createPlainMap(df)
+createPlainMap(df, session, analysisID)
 
 build_marker_data(data, session, analysisID)
 }
 \arguments{
 \item{df}{df to plot as map}
+
+\item{session}{Current session.}
+
+\item{analysisID}{Chosen analysis ID.}
 
 \item{data}{dataframe containing location id and coordinates.}
 
