@@ -204,7 +204,12 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/model_hazard_map.png")
 ```
 
-Once the analysis is created, the status will show as "In Progress" in the analyses table. By clicking on the refresh button, the status will change to either "ready" or "inputs error". 
+Once the analysis is created, the status will show as "In Progress" in the analyses table. 
+
+```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/step_2_inputs_generation.png")
+```
+By clicking on the refresh button, the status will change to either "ready" or "inputs error". 
 ```{r, fig.align='center', out.width = "200px", out.height = "200px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/analysis_ready.png")
 ```
