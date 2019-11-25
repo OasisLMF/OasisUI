@@ -43,22 +43,43 @@ createPlainMap <- function(df) {
 #' @description Builds markers data to be used in a map rendered with leaflet.
 #'
 #' @param data dataframe containing location id and coordinates.
+#' @param session Current session.
+#' @param analysisID Chosen analysis ID.
 #'
 #' @return dataframe with popup information under "popup".
 #'
 #' @export
-build_marker_data <- function(data) {
+build_marker_data <- function(data, session, analysisID) {
   names(data) <- tolower(names(data))
+
+  # extract error messages in case status is "Fail"
+  ns <- session$ns
+  keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = analysisID,
+                                                                   dataset_identifier = "keys-errors.csv",
+                                                                   type = "input") %>% filter(PerilID == "ORF")
+  error_msg <- data.frame(message = 1:length(data$bitiv))
+  for (i in seq(1, length(data$bitiv))) {
+    if (length(keys_errors$LocID[which(keys_errors$LocID == i)]) == 0) {
+      error_msg$message[i] <- NA
+    } else {
+      error_msg$message[i] <- keys_errors$Message[which(keys_errors$LocID == i)]
+    }
+  }
+
   # Popup data, must be a character vector of html code
   data$popup <- mapply(
-    function(id, lat, lng) {
+    function(id, bitiv, streetaddress, postalcode, message) {
       as.character(div(
         strong("Location ID: "), id,
-        br(), strong("Latitude: "), lat,
-        br(), strong("Longitude: "), lng
+        # br(), strong("Latitude: "), lat,
+        # br(), strong("Longitude: "), lng
+        strong("TIV: "), bitiv,
+        br(), strong("Street Address: "), streetaddress,
+        br(), strong("Postal code: "), postalcode,
+        br(), strong("Error message: "), message
       ))
     },
-    data$locnumber, data$latitude, data$longitude
+    data$locnumber, data$bitiv, data$streetaddress, data$postalcode, error_msg$message
   )
   data
 }

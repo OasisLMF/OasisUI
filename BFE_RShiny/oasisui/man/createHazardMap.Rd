@@ -7,7 +7,7 @@
 \usage{
 createHazardMapUI(id)
 
-createHazardMap(input, output, session, map_data, pins)
+createHazardMap(input, output, session, map_data, pins, analysisID)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

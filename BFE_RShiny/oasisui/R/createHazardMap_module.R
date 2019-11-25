@@ -53,10 +53,11 @@ createHazardMapUI <- function(id) {
 #' @export
 createHazardMap <- function(input, output, session,
                             map_data,
-                            pins) {
+                            pins, analysisID) {
 
+  ns <- session$ns
   marker_data <- reactive({
-    build_marker_data(pins())
+    build_marker_data(data = pins(), session = session, analysisID = analysisID)
   })
 
   # Plot leaflet

@@ -122,7 +122,12 @@ ViewFilesInTable <- function(input, output, session,
         )),
         filesListData)
       }
-      filesListData <- cbind(filesListData,data.frame(view = .shinyInput(actionButton, "vrows_", nrow(filesListData), Label = "View", hidden = TRUE, onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'), onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+      filesListData <- cbind(filesListData,
+                             data.frame(view = .shinyInput(actionButton,
+                                                           "vrows_", nrow(filesListData),
+                                                           Label = "View", hidden = TRUE,
+                                                           onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'),
+                                                           onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       result$tbl_filesListData_wButtons <- filesListData
     } else {
       result$tbl_filesListData_wButtons <- NULL
@@ -183,8 +188,8 @@ ViewFilesInTable <- function(input, output, session,
   output$FLdownloadexcel <- downloadHandler(
     filename = "file.csv",
     content = function(file) {
-       session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename, file_towrite = file)
-      }
+      session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename, file_towrite = file)
+    }
   )
 
   # Selected Row ---------------------------------------------------------------

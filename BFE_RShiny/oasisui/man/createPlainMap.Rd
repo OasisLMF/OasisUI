@@ -7,12 +7,16 @@
 \usage{
 createPlainMap(df)
 
-build_marker_data(data)
+build_marker_data(data, session, analysisID)
 }
 \arguments{
 \item{df}{df to plot as map}
 
 \item{data}{dataframe containing location id and coordinates.}
+
+\item{session}{Current session.}
+
+\item{analysisID}{Chosen analysis ID.}
 }
 \value{
 Leaflet map.

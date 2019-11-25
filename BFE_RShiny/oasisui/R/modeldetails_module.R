@@ -56,6 +56,7 @@ modeldetailsUI <- function(id) {
 
 # Model Details Server -------------------------------------------
 
+#' @param analysisID Selected analysis ID.
 #' @param modelID Selected model ID.
 #' @param portfolioID Selected portfolio ID.
 #' @param file_pins file with coordiantes of exposure locations
@@ -73,6 +74,7 @@ modeldetailsUI <- function(id) {
 modeldetails <- function(input,
                          output,
                          session,
+                         analysisID,
                          modelID,
                          portfolioID,
                          file_pins,
@@ -174,7 +176,8 @@ modeldetails <- function(input,
     createHazardMap,
     id = "createHazardMap",
     reactive(result$mapfile),
-    reactive(result$uploaded_locs)
+    reactive(result$uploaded_locs),
+    analysisID = analysisID
   )
 
   # Details Model title
