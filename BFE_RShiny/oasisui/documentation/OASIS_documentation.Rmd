@@ -100,6 +100,7 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 
 \newpage
 # Home page & Navigation
+
 After logging in, the user will be prompted to the Home page. This window shows all of the analyses created by the user as well as all the accessible sections.
 ```{r, fig.align='center', out.width = "500px", out.height = "500px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/landing_page.png")
