@@ -58,28 +58,41 @@ build_marker_data <- function(data, session, analysisID) {
   ns <- session$ns
   keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = analysisID,
                                                                    dataset_identifier = "keys-errors.csv",
-                                                                   type = "input") %>% filter(PerilID == "ORF")
-  error_msg <- data.frame(message = 1:length(data$bitiv))
-  for (i in seq(1, length(data$bitiv))) {
-    if (length(keys_errors$LocID[which(keys_errors$LocID == i)]) == 0) {
-      error_msg$message[i] <- NA
-    } else {
-      error_msg$message[i] <- keys_errors$Message[which(keys_errors$LocID == i)]
+                                                                   type = "input")
+  error_msg <- data.frame(message = 1:length(data$buildingtiv))
+  if (!is.null(keys_errors)) {
+    keys_errors <- keys_errors %>% filter(PerilID == "ORF")
+    for (i in seq(1, length(data$buildingtiv))) {
+      if (length(keys_errors$LocID[which(keys_errors$LocID == i)]) == 0) {
+        error_msg$message[i] <- NA
+      } else {
+        error_msg$message[i] <- keys_errors$Message[which(keys_errors$LocID == i)]
+      }
     }
+  } else {
+    error_msg$message <- rep_len(NA, length(data$buildingtiv))
+  }
+
+# In case streetaddress and postalcode are not entries of the data frame, create vector of NAs
+  if (is.null(data$streetaddress)) {
+    data$streetaddress <- rep_len(NA, length(data$buildingtiv))
+  }
+  if (is.null(data$postalcode)) {
+    data$postalcode <- rep_len(NA, length(data$buildingtiv))
   }
 
   # Popup data, must be a character vector of html code
   data$popup <- mapply(
-    function(id, bitiv, streetaddress, postalcode, message) {
+    function(id, buildingtiv, streetaddress, postalcode, message) {
       as.character(div(
         strong("Location ID: "), id,
-        strong("TIV: "), bitiv,
+        strong("TIV: "), buildingtiv,
         br(), strong("Street Address: "), streetaddress,
         br(), strong("Postal code: "), postalcode,
         br(), strong("Error message: "), message
       ))
     },
-    data$locnumber, data$bitiv, data$streetaddress, data$postalcode, error_msg$message
+    data$locnumber, data$buildingtiv, data$streetaddress, data$postalcode, error_msg$message
   )
   data
 }
