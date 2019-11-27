@@ -24,7 +24,7 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 \pagenumbering{arabic}
 # Introduction
 
-This documentation guides the user through a step-by-step process from creating a portfolio to running an analysis and accessing the output results.
+The aim of this document is to provide a step-by-step user guide for the Oasis User Interface (UI). 
 
 ### Log in
 
@@ -36,61 +36,63 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 Credentials will be provided by the administrator. Please note that there are some differences between ‘administrator’ and ‘non-admin’ modes. As an administrator, some of the tables will contain more information,  however functionalities of the UI do not vary.
 
 ### Statuses
-The progress of each step along the process is represented by the status icons which are found along the right-hand side of the ‘Portfolios’ or ‘Analyses’ tables. 
+The progress of each step along the process is represented by the status icons which are found along the right-hand side of the ***Portfolios*** or ***Analyses*** ***tables***. 
 ```{r, fig.align='center', out.width = "500px", out.height = "500px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/icons_table.png")
 ```
 
-Icons represent actions performed by the API: 
-- In progress: the API is processing the inputs,
+The following icons represent actions performed by the API: 
+
+- "In progress": the API is processing the inputs,
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/run_in_progress_icon.png")
 ```
-- Failed: something went wrong during the processing (e.g. wrong model or uploaded files, ...),
+- "Failed": something went wrong during the processing (e.g. wrong model or uploaded files, ...),
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/run_failed_icon.png")
 ```
-- Ready: processing of input files and model was successful, analysis is ready to be run,
+- "Ready": processing of input files and model was successful, analysis is ready to be run,
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/run_ready_icon.png")
 ```
-- Completed: processing was completed successfully.
+- "Completed": processing was completed successfully.
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/run_completed_icon.png")
 ```
 
-### Buttons
+### Functional Switches
 
-There are some buttons throughout the process that may be of help to the user:
+It is worth noting the following functional switches that will be beneficial to the user: 
 
-  - Refresh: table is re-generated and statuses updated,  
+  - **Refresh**: table is re-generated and statuses updated,  
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/refresh_btn.png")
 ```
-  - Collapse: window is shrunk. Once clicked, the icon will change to the expand button,
+  - **Collapse**: window collapses. Once clicked, the icon will change to the expand button,
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/collapse_panel_btn.png")
 ```
-  - Expand: window is expanded. Once clicked, the icon will change to the collapse button, 
+  - **Expand**: window is expanded. Once clicked, the icon will change to the collapse button, 
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/expand_panel_btn.png")
 ```
-  - Close: window is closed,
+  - **Close**: window is closed,
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/close_btn.png")
 ```
-  - Pop-up list: to select a previously run analysis,
+  - **Pop-up list**: to select a previously run analysis,
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/stripy_btn.png")
 ```
 
-  - View: contents of files can be viewed by selecting the row and clicking on the button. In case of Location files, a map option is also displayed. 
+  - **View**: contents of files can be viewed by selecting the row and clicking on the **View** button. In case of Location files, a map option is also displayed. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/view_btn.png")
 ```
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/view_btn_content.png")
 ```
+With the ‘Location’ files, a map option is also displayed as highlighted in the following figures.
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/icons/view_btn_location.png")
 ```
@@ -128,9 +130,9 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/collapse_btn.png")
 ```
-        - The **Analysis** button brings the user steps required to create a portfolio and run an analysis, whereas the **Dashboard** button allows the user to view results from a successful run and create additional plots,
+        - The **Analysis** button allows the user to start the process of creating a portfolio and running  an analysis, whereas the **Dashboard** button allows the user to view results from a successful run and create additional plots.
 
-4. The Analysis table shows all previously created analyses. If an analysis was successful, it is possible to go directly to the Dashboard by selecting the related row and clicking on **Dashboard of Analyses Outputs**. Additionally, this is the only place where an analysis can be deleted.
+4. The ***Analysis table*** shows all previously created analyses. If an analysis was successful, the user can go directly to the Dashboard by selecting the related row and clicking on **Dashboard of Analyses Outputs**. Additionally, this is the only place where an analysis can be deleted.
 ```{r, fig.align='center', out.width = "500px", out.height = "500px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/analyses_table.png")
 ```
@@ -141,14 +143,14 @@ The Analysis section guides the user towards a complete workflow from creating a
 ```{r, fig.align='center', out.width = "250px", out.height = "250px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/go_to_analysis.png")
 ```
-It is divided into 3 steps outlined below.
+It is divided into three steps outlined below.
 
 ### Choose Portfolio
-The first step involves choosing a portfolio. If no portfolio has been created previously, the Portfolios table will be empty. 
+The first step involves choosing a portfolio. If no portfolio has been created previously, the ***Portfolios table*** will be empty. 
 ```{r, fig.align='center', out.width = "500px", out.height = "500px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_1/step_1.png")
 ```
-To model or review a previously created portfolio that requires no further changes, the user can simply select this row from the table while any portfolio can also be deleted or amended from this table by clicking respectively **Delete Portfolio** and **Amend Portfolio**. Once a previous portfolio has been chosen, the user can then progress onto the next step by clicking on **Proceed to Choose Analysis**.
+To model or review a previously created portfolio that requires no further changes, the user can simply select this row from the table. Any portfolio can be deleted or amended from this table by clicking either **Delete Portfolio** or **Amend Portfolio**. Once a previous portfolio has been chosen, the user can then progress onto the next step by clicking on **Proceed to Choose Analysis**.
 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_1/step_1_btns.png")
@@ -158,7 +160,9 @@ When creating a new portfolio, a name is mandatory.
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_1/name_portfolio.png")
 ```
-After the portfolio has been labeled, a Location file has to be uploaded. The ‘location’ file is the only compulsory data file required to produce the ground-up loss (GUL). The ‘account’ file will then be required to calculate the insured loss (IL) and the ‘RI scope’ and ‘RI info’ files will then be needed to model the net of reinsurance perspective, making four files in total. If a portfolio was previously created but require different data files to be uploaded, this panel can be accessed by clicking on  **Upload Source Files**. 
+
+After the portfolio has been labeled, a ‘location’ file has to be uploaded. The ‘location’ file is the only compulsory data file required to produce the ground-up loss (GUL). The ‘account’ file will then be required to calculate the insured loss (IL) and the ‘RI scope’ and ‘RI info’ files will be needed to model the net of reinsurance perspective, making four files in total. If a portfolio was previously created but require different data files to be uploaded, this panel can be accessed by clicking on  **Upload Source Files**. 
+
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_1/uploaded_loc_file.png")
 ```
@@ -174,7 +178,7 @@ By clicking on the refresh button on the top right, the status of the portfolio 
 [^1]: Statuses explanations can be found in the Introduction section under the "Statuses" paragraph.
 	
 ### Choose Analysis
-In the second step, a new analysis can be created by clicking on **Create Analysis**. If other analyses related to the same portfolio were previously created, they will appear in the Analyses table. 
+In the second step, a new analysis can be created by clicking on **Create Analysis**. If other analyses related to the same portfolio were previously created, they will appear in the ***Analyses table***. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/step_2.png")
 ```
@@ -184,14 +188,14 @@ It is also possible to change the portfolio by selecting a different one in the 
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/portfolio_selection_step_2.png")
 ```
 
-To choose a previously created analysis, the corresponding row in the Analyses table has to be selected, then the user can progress onto the third step by clicking on **Proceed to Configure Output & Run**.
+To choose a previously created analysis, the corresponding row in the ***Analyses table*** has to be selected. The user can now progress onto the third step by clicking on **Proceed to Configure Output & Run**.
 
 After creating and naming the analysis, the user has to choose a model to run.
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/create_analysis.png")
 ```
 
-This is the only step where a model can be selected and this action cannot be reverted. Once an analysis has been created, it is not possible to change it. If the wrong model was associated, a new analysis with the right choice will have to be created. Model information will depend on what the administrator has set up, further details such as model settings and hazard maps (if available) can be viewed by clicking on **Show Model Details**.
+This is the only step where a model can be selected and this action cannot be reverted. Once an analysis has been created, it is not possible to change it. If the wrong model was associated, a new analysis with the right choice will have to be created. Model information will depend on what the administrator has set up, further details on model settings and hazard maps (if available) can be viewed by clicking on **Show Model Details** and are highlighted in the figures below..
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/model_details.png")
 ```
@@ -199,7 +203,7 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/model_hazard_map.png")
 ```
 
-Once the analysis is created, the status will show as "inputs generation started" in the analyses table. 
+Once the analysis is created, the status will show as "inputs generation started" in the ***Analyses table***. 
 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/step_2_inputs_generation.png")
@@ -209,37 +213,46 @@ By clicking on the refresh button, the status will change to either "ready" or "
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/analysis_ready.png")
 ```
 
-There could be several reasons for an “inputs error”, such as the  wrong model or file being chosen or there could be some temporary issues on the back-end API. Details of a analysis can be viewed in the log file. Once the status is “ready”, the Validation Summary and Map as well as the inputs will be displayed.
+There could be several reasons for an “inputs error”, such as the wrong model or file being chosen or there could be some temporary issues in the back-end API. Details of an analysis can be viewed in the log file. 
+Once the status is “ready”, the ‘Validation Summary’,  ‘Validation Map’ and ‘Inputs’ will be displayed as highlighted in the figures below:
+
+ - The ‘Validation Summary’ displays some exposure information and highlights the successful and failed exposures. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/validation_summary.png")
 ```
+
+ - The ‘Validation Map’ is interactive and displays the pins of each successfully imported location in green with its corresponding address, TIV and location ID. These pins are displayed in red if they failed.
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/validation_map.png")
 ```
+
+- The ‘Inputs’ display the analyses input files which have been generated combining the imported and exposure information as well as the selected model settings. These can be viewed and downloaded as csv, json or txt.
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/inputs_step_2.png")
 ```
-At this point, it is possible to proceed to Configure Output & Run. 
+  The user can now proceed to step 3 by clicking **Configure Output & Run**. 
 	
 ### Configure Output & Run
-In the third step, the user can run an analysis with a related configuration of parameters. The Analysis status will still be "ready" and will change after a configuration is run.  
+In the third step, the user can choose the model configuration and parameters before running the analysis. The Analysis status will still be “ready” and will change after a configuration is run.
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/step_3.png")
 ```
-For a newly created analysis, the label of the button below will be **Output Configuration**. If an analysis was already run, the label will switch to **Rerun** and the related window will display the previous configuration. 
+
+ For a new analysis, the user should select **Output Configuration**. If the analysis was run previously, the user should select **Rerun** and the related window will display the previous configuration.
 
 The Output configuration window includes choices of perspectives, summary levels, reports and model parameters. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/output_config_btn.png")
 ```
 
-On the left the Model Parameters panel shows the available selection for the chosen model  
+On the left, the ‘Model Parameters’ panel shows the available selection for the chosen model. More parameters can be viewed and selected when the user clicks on **Advanced**.
 ```{r, fig.align='center', out.width = "250px", out.height = "250px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/model_parameters.png")
 ```
 These settings are model-specific and will change with a different model.
 
-On the right the Output Parameters panel shows all options for tags, perspectives, summary levels and reports. If no previous configuration was selected for the analysis, the default tag will be set to **Summary**, which includes *All Risks* as the summary level and *AAL*, *LEC Full Uncertainty OEP* and *LEC Full Uncertainty AEP* for the reports. 
+On the right, the ‘Output Parameters’ panel displays all options for tags, perspectives, summary levels and reports. If no previous configuration was selected for the analysis, the default tag will be set to *Summary*. This includes *All Risks* at the summary level and *AAL*, *LEC Full Uncertainty OEP* and *LEC Full Uncertainty AEP* for the reports. 
+
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/output_config_summary.png")
 ```
@@ -254,20 +267,24 @@ The final tag is *Custom*, where any combination of summary levels and reports a
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/custom_step_3.png")
 ```
-Here, the user can produce an extensive suite of outputs with various combinations. If multiple entries are selected in the ‘Summary Levels’, the losses for each ‘Report’ selected will be aggregated. If the user requires the losses to be separated by individual ‘Summary Level’ then these will need to be selected separately. It is possible to add rows for more combinations by clicking on the "+" button and remove other by clicking on the "-". 
+
+From here, the user can produce an extensive suite of outputs with various combinations. If multiple entries are selected in the ‘Summary Levels’, the losses for each ‘Report’ selected will be aggregated on the same line in ***Output Parameters Review***. If the user requires the losses to be separated by individual ‘Summary Level’ then these will need to be selected separately. It is possible to add rows for more combinations by clicking on the "+" button and remove other by clicking on the "-". 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/custom_step_3_fields_chosen.png")
 ```
 It is also possible to duplicate the output configuration used in another analysis by clicking on the pop-up list button on the right of the Tag dropdown. 
+```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
+knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/step_3_stripy_btn.png")
+```
 
-The **Clear** button will erase the entire selection. Once the selection is completed, it can be executed by clicking on **Execute Run**. 
+The **Clear** button will erase the entire selection. Once the selection is completed, the model can be run by clicking on **Execute Run**. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/step_3_run_btns.png")
 ```
-By clicking on the refresh button, the analysis status will change from "run started" to "completed" or "run error". In the event of a failed run, the details of the failure can be viewed in the log window ;  if successful, the user should proceed to the Dashboard.
+By clicking on the refresh button, the analysis status will change from "run started" to "completed" or "run error". In the event of a failed run, the details of the failure can be viewed in the log window ;  if successful, the user should proceed to the **Dashboard**.
 
 # View results 
-The Dashboard section contains the model outputs from successfully run analyses and allows the user to create additional plots and view the input and output files. This view can be reached from the Home page by either selecting an analysis from the Analyses Table and clicking on **Dashboard of Analyses Outputs** or by clicking on **Dashboard** → **Single Analysis Dashboard** in the drop-down. 
+The Dashboard section contains the model outputs from successfully run analyses and allows the user to create additional plots and view the input and output files. This view can be reached from the Home page by either selecting an analysis from the ***Analyses table*** and clicking on **Dashboard of Analyses Outputs** or by clicking on **Dashboard** → **Single Analysis Dashboard** in the drop-down. 
 ```{r, fig.align='center', out.width = "300px", out.height = "500px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/go_to_dashboard.png")
 ```
@@ -276,18 +293,18 @@ Results from a different analysis can be viewed at any time by clicking on the p
 This section comprises of 3 tabs: Summary, Plots, and Files. 
 
 ### Summary
-The Summary tab shows the Inputs, Parameters and Outputs tables, as well as plots for any selection of *AAL* (for both Analytical and Sample types), *LEC Full Uncertainty OEP* and *LEC Full Uncertainty AEP* (Sample type if available, otherwise Analytical). Graphs are plotted separately for all of the chosen perspectives.
+The Summary tab shows the ***Inputs***, ***Parameters*** and ***Outputs*** ***tables***, as well as plots for any selection of *AAL* (for both Analytical and Sample types), *LEC Full Uncertainty OEP* and *LEC Full Uncertainty AEP* (Sample type if available, otherwise Analytical). Graphs are plotted separately for all of the chosen perspectives.
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/dashboard/dashboard.png")
 ```
 
 ### Plots
-Additional plots can be created in the Plots tab by clicking on *New Plot*. However, plots will not be stored, hence as soon the page is changed they will disappear.
+Additional plots can be created in the ‘Plots’ tab by clicking on **New Plot**. However, these plots will not be stored and will be removed as soon the page is changed. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/dashboard/dashboard_custom_plot.png")
 ```
 
-Choices of plots include: *loss per return period* and *AAL bar plot*, respectively producing a line and a bar plot for any choice of perspectives, reports and summary levels previously selected in the third step of the Analysis. Multiple selections of either perspectives or reports and, if available, both Sample and Analytical types can be made; an equivalent number of plots will be produced. The legend shows all of the summary IDs retrieved from the summary levels. A different title other than the automatically generated one can be typed.
+Choices of plots include: *loss per return period* and *AAL bar plot*, respectively producing a line and a bar plot for any choice of perspectives, reports and summary levels previously selected in the third step of the Analysis. Multiple selections of either perspectives or reports and, if available, both Sample and Analytical types can be made. The user can label their plots in ‘Title’.
 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/dashboard/dashboard_plot_inputs.png")
@@ -305,41 +322,43 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 A maximum number of five panels can be created.
 
 ### Files
-The Files tab comprises of two tables for the output and input files. 
+The Files tab comprises of two panels. 
+
+The first window shows the ***Output files table***, which lists the output files. These files include all information regarding the run selection and all related outputs. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/dashboard/dashboard_outputs.png")
 ```
 
+Below the ***Input files table*** contains all of the analysis' input files. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/dashboard/dashboard_inputs.png")
 ```
 
-The content of each file can be viewed in a separate pop-up by selecting the equivalent row and clicking on the **View** button. Content of the files can be exported as zip.
+The content of each file can be viewed in a separate pop-up by selecting the equivalent row and clicking on the **View** button. These files can also be downloaded as a zip.
 
 \newpage
 # Glossary
 - AAL: Average Annual Loss. 
-- All Risks: all OED fields (open exposure database) 
-- Account file: Contains all financial policy terms such as deductibles, limits and shares
+- All Risks: all OED fields (open exposure database). 
+- Account file: Contains all financial policy terms such as deductibles, limits and shares.
 - AEP: Aggregate Exceedance Probability. The losses from all modeled events in a given year or period.
-- Custom option: no default summary levels and reports
+- Custom option: no default summary levels and reports.
 - Demand Surge: An uplift to modeled losses to account for higher repair costs for building damage that could occur following large catastrophic events. 
-- Drilldown option: default summary levels and reports with no option of additional summary levels
-- Event Set: Probabilistic or Historical
+- Drilldown option: default summary levels and reports with no option of additional summary levels.
+- Event Set: Probabilistic or Historical.
 - Perspectives: GUL (Ground Up Loss). The losses produced before any policy terms are applied. IL (Insured (or gross) Loss). The losses produced net of any policy terms. RI (reinsurance). The losses net of any reinsurance structure.
-- Hazard Map: probability distribution of Intensity for each combination of events and area perils
-- Inputs: input files
+- Hazard Map: probability distribution of intensity for each combination of events and area perils.
 - Location file: file containing exposure information such as address and location data, occupancy, construction and building age. Coverage total insured values are also contained in this file.
-- Loss Threshold: amount of loss not to be exceeded
-- Model: combination of hazard and vulnerability modules
-- Number of Samples: 
-- Occurrence Set: Time Dependent or Time Independent
+- Loss Threshold: amount of loss not to be exceeded.
+- Model: combination of hazard and vulnerability modules.
+- Number of Samples:  number of ‘Monte Carlo’ simulations to be run.
+- Occurrence Set: Time Dependent or Time Independent.
 - OEP: Occurrence Exceedance Probability. The losses from the single largest event in a given year or period.
 - Portfolio: Contains all exposure, policy and reinsurance information to be modeled. 
-- Resources: model and lookup settings
+- Resources: model and lookup settings.
 - Return period: The probabilistic loss of different severities along a loss curve.
 - RI scope file: Reinsurance scope file: Contains information on which exposures being modeled, the reinsurance should apply to.
 - RI info file: Reinsurance information file. Contains information on the reinsurance structure such as attachment point, limits, shares and reinstatement premiums.
 - Summary option: default summary levels and reports with no option of additional combination
-- TIV: Total Insured Value
+- TIV: Total Insured Value.
 
