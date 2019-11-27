@@ -1,9 +1,6 @@
 ---
-# title: ""
-# author: ""
-# date: ""
 output:
-  pdf_document
+  pdf_document: default
 ---
 
 ```{r load_packages, message=FALSE, warning=FALSE, include=FALSE} 
@@ -120,12 +117,13 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/home_page_dropdown.png")
 ```
     Several functionalities are integrated within:
-        - The Home button on the top left will re-direct the user to the Home page view at any point, 
+    
+   - The Home button on the top left will re-direct the user to the Home page view at any point, 
       
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/home_btn.png")
 ```
-        - The collapse button will minimize the navigation panel (dropdown window) to allow for more space for the other panels,
+   - The collapse button will minimize the navigation panel (dropdown window) to allow for more space for the other panels,
     
 ```{r, fig.align='center', out.width = "30px", out.height = "30px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/landing_page/collapse_btn.png")
@@ -188,7 +186,7 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 
 To choose a previously created analysis, the corresponding row in the Analyses table has to be selected, then the user can progress onto the third step by clicking on **Proceed to Configure Output & Run**.
 
-After crating and naming the analysis, the user has to choose a model to run.
+After creating and naming the analysis, the user has to choose a model to run.
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_2/create_analysis.png")
 ```
@@ -266,7 +264,7 @@ The **Clear** button will erase the entire selection. Once the selection is comp
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
 knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documentation/step_3/step_3_run_btns.png")
 ```
-By Clicking on the refresh button, the analysis status will change from "run started" to "completed" or "run error". In the event of a failed run, the details of the failure can be viewed in the log window ;  if successful, the user should proceed to the Dashboard.
+By clicking on the refresh button, the analysis status will change from "run started" to "completed" or "run error". In the event of a failed run, the details of the failure can be viewed in the log window ;  if successful, the user should proceed to the Dashboard.
 
 # View results 
 The Dashboard section contains the model outputs from successfully run analyses and allows the user to create additional plots and view the input and output files. This view can be reached from the Home page by either selecting an analysis from the Analyses Table and clicking on **Dashboard of Analyses Outputs** or by clicking on **Dashboard** → **Single Analysis Dashboard** in the drop-down. 
@@ -305,6 +303,7 @@ knitr::include_graphics("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/documen
 ```
 
 A maximum number of five panels can be created.
+
 ### Files
 The Files tab comprises of two tables for the output and input files. 
 ```{r, fig.align='center', out.width = "400px", out.height = "400px", echo = FALSE}
