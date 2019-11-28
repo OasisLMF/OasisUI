@@ -73,7 +73,7 @@ build_marker_data <- function(data, session, analysisID) {
     error_msg$message <- rep_len(NA, length(data$buildingtiv))
   }
 
-# In case streetaddress and postalcode are not entries of the data frame, create vector of NAs
+  # In case streetaddress and postalcode are not entries of the data frame, create vector of NAs
   if (is.null(data$streetaddress)) {
     data$streetaddress <- rep_len(NA, length(data$buildingtiv))
   }
@@ -81,18 +81,27 @@ build_marker_data <- function(data, session, analysisID) {
     data$postalcode <- rep_len(NA, length(data$buildingtiv))
   }
 
+  # sum over all TIVs
+  tiv <- data.frame(total = rep_len(0, length(data$buildingtiv)))
+  for (i in grep("tiv", names(data))) {
+    if(!is.na(data[i])) {
+      tiv_var <- data[i]
+      tiv$total <- tiv$total + tiv_var
+    }
+  }
+
   # Popup data, must be a character vector of html code
   data$popup <- mapply(
-    function(id, buildingtiv, streetaddress, postalcode, message) {
+    function(id, total, streetaddress, postalcode, message) {
       as.character(div(
         strong("Location ID: "), id,
-        strong("TIV: "), buildingtiv,
+        br(), strong("TIV: "), total,
         br(), strong("Street Address: "), streetaddress,
         br(), strong("Postal code: "), postalcode,
         br(), strong("Error message: "), message
       ))
     },
-    data$locnumber, data$buildingtiv, data$streetaddress, data$postalcode, error_msg$message
+    data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg$message
   )
   data
 }
