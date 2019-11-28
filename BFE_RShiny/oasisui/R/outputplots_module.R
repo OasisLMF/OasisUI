@@ -419,7 +419,7 @@ panelOutputModule <- function(input, output, session,
                 filesToPlot <- filesToPlot[grep("oep", filesToPlot)]
               }
             }
-#TODO: this should be whatever locnumber was selected, in case that there is more than 1 entry
+            #TODO: this should be whatever locnumber was selected, in case that there is more than 1 entry
             data <- .readFile(filesToPlot[1])
             # set up by type
             data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
@@ -442,7 +442,7 @@ panelOutputModule <- function(input, output, session,
             output$summary_levels_ui <- renderUI({
               sliderInput(ns("pltlosses"), "Losses",
                           min = round(min(data$loss)), max = round(max(data$loss)),
-                          value = c(round(min(data$loss)), round(mean(data$loss))),
+                          value = c(round(min(data$loss)), round(max(data$loss))),
                           step = 1000
               )
               # selectInput(
@@ -717,13 +717,38 @@ panelOutputModule <- function(input, output, session,
         loss <- which(between(data$loss, min(as.numeric(input$pltlosses)), max(as.numeric(input$pltlosses))))
         lat <- session$userData$data_hub$get_pf_location_content(id = portfId())$Latitude[loss]
         long <- session$userData$data_hub$get_pf_location_content(id = portfId())$Longitude[loss]
-        popup <- as.character(paste("Loss: ", round(data$loss[loss])))
+        loc_num <- session$userData$data_hub$get_pf_location_content(id = portfId())$LocNumber[loss]
+
+        popup <- lapply(seq(1, length(data$loss[loss])), function(x) {
+          as.character(div(
+            strong("Location ID: "), loc_num[x],
+            br(), strong("Loss:"), round(data$loss[x])
+          ))
+        })
+
+        getColor <- function() {
+          sapply(seq(1, length(data$loss[loss])), function(x) {
+            if(data$loss[loss][x] < quantile(data$loss[loss], probs = 1/4)) {
+              "white"
+            } else if(data$loss[loss][x] < mean(data$loss[loss])) {
+              "blue"
+            } else if(data$loss[loss][x] < round(quantile(data$loss[loss], probs = 3/4))) {
+              "darkblue"
+            } else if(data$loss[loss][x] < round(quantile(data$loss[loss], probs = 6/7))) {
+              "gray"
+            } else {
+              "black"
+            }
+          })
+        }
+
         icon_map <- awesomeIcons(
           icon = 'map-marker-alt',
-          iconColor = "green",
-          markerColor = "green"
+          iconColor = getColor(),
+          markerColor = getColor()
         )
-        scaling <- 500
+        # scaling <- 500
+
         output$outputleaflet <- renderLeaflet({
           leaflet(session$userData$data_hub$get_pf_location_content(id = portfId())[loss, ]) %>%
             addTiles() %>%
@@ -735,9 +760,17 @@ panelOutputModule <- function(input, output, session,
               clusterOptions = markerClusterOptions(),
               group = "clustered",
               clusterId = "cluster",
-              popup = ~popup) %>%
-            addCircles(long, lat, radius = as.numeric(input$pltlosses)/scaling,
-                       fillOpacity = 0.1)
+              popup = ~popup[loss]) %>%
+            addLegend(colors = c("#e8e6e6", "blue", "darkblue", "gray", "black"),
+                      labels = c(paste("<", round(quantile(data$loss[loss], probs = 1/4))),
+                                 paste("<", round(mean(data$loss[loss]))),
+                                 paste("<", round(quantile(data$loss[loss], probs = 3/4))),
+                                 paste("<", round(quantile(data$loss[loss], probs = 6/7))),
+                                 paste("<=", max(data$loss[loss]))),
+                      title = "Loss")
+          #%>%
+          # addCircles(long, lat, radius = as.numeric(input$pltlosses)/scaling,
+          #            fillOpacity = 0.1)
         })
       } else {
         if (!is.null(data)) {
