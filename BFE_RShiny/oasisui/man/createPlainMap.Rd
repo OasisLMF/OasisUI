@@ -5,22 +5,22 @@
 \alias{build_marker_data}
 \title{Create Plain Map}
 \usage{
-createPlainMap(df, session, analysisID)
+createPlainMap(df, session, paramID)
 
-build_marker_data(data, session, analysisID)
+build_marker_data(data, session, paramID)
 }
 \arguments{
 \item{df}{df to plot as map}
 
 \item{session}{Current session.}
 
-\item{analysisID}{Chosen analysis ID.}
+\item{paramID}{Chosen parameter ID.}
 
 \item{data}{dataframe containing location id and coordinates.}
 
 \item{session}{Current session.}
 
-\item{analysisID}{Chosen analysis ID.}
+\item{paramID}{Chosen parameter ID.}
 }
 \value{
 Leaflet map.

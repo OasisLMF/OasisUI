@@ -6,7 +6,7 @@
 #'
 #' @param df df to plot as map
 #' @param session Current session.
-#' @param analysisID Chosen analysis ID.
+#' @param paramID Chosen parameter ID.
 #'
 #' @return Leaflet map.
 #'
@@ -16,9 +16,9 @@
 #' @importFrom leaflet markerClusterOptions
 #'
 #' @export
-createPlainMap <- function(df, session, analysisID) {
+createPlainMap <- function(df, session, paramID) {
 
-  df <- build_marker_data(df, session, analysisID)
+  df <- build_marker_data(df, session, paramID)
 
   # Create custom icons
   icon_map <- awesomeIcons(
@@ -46,17 +46,17 @@ createPlainMap <- function(df, session, analysisID) {
 #'
 #' @param data dataframe containing location id and coordinates.
 #' @param session Current session.
-#' @param analysisID Chosen analysis ID.
+#' @param paramID Chosen parameter ID.
 #'
 #' @return dataframe with popup information under "popup".
 #'
 #' @export
-build_marker_data <- function(data, session, analysisID) {
+build_marker_data <- function(data, session, paramID) {
   names(data) <- tolower(names(data))
 
   # extract error messages in case status is "Fail"
   ns <- session$ns
-  keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = analysisID,
+  keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = paramID,
                                                                    dataset_identifier = "keys-errors.csv",
                                                                    type = "input")
   error_msg <- data.frame(message = 1:length(data$buildingtiv))
