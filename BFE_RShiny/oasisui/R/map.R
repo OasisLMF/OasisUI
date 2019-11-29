@@ -61,12 +61,15 @@ build_marker_data <- function(data, session, paramID) {
                                                                    type = "input")
   error_msg <- data.frame(message = 1:length(data$buildingtiv))
   if (!is.null(keys_errors)) {
-    keys_errors <- keys_errors %>% filter(PerilID == "ORF")
     for (i in seq(1, length(data$buildingtiv))) {
       if (length(keys_errors$LocID[which(keys_errors$LocID == i)]) == 0) {
         error_msg$message[i] <- NA
       } else {
-        error_msg$message[i] <- keys_errors$Message[which(keys_errors$LocID == i)]
+        errors_list <- as.list(keys_errors$Message[which(keys_errors$LocID == i)])
+        errors_paste <- paste(lapply(seq(1, length(errors_list)), function (x) {
+          paste(keys_errors$PerilID[x], ":", errors_list[x], "/")
+        }), collapse = " ")
+        error_msg$message[i] <- errors_paste
       }
     }
   } else {
