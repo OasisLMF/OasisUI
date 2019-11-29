@@ -766,7 +766,7 @@ panelOutputModule <- function(input, output, session,
                                  paste("<", round(mean(data$loss[loss]))),
                                  paste("<", round(quantile(data$loss[loss], probs = 3/4))),
                                  paste("<", round(quantile(data$loss[loss], probs = 6/7))),
-                                 paste("<=", max(data$loss[loss]))),
+                                 paste("<=", round(max(data$loss[loss])))),
                       title = "Loss")
           #%>%
           # addCircles(long, lat, radius = as.numeric(input$pltlosses)/scaling,
