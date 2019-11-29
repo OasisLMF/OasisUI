@@ -154,6 +154,8 @@ panelLinkFiles <- function(id) {
     ),
 
     fluidRow(
+      # uiOutputs are used here because of the Clear button where they need to be reset.
+      # Shiny does not provide an updatefileInput functionality, hence inputs cannot be reset unless the panel is re-rendered.
       # Source Location File
       column(3,
              uiOutput(ns("SLFile_ui"))),

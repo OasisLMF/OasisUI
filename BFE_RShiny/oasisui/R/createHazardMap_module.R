@@ -55,9 +55,8 @@ createHazardMap <- function(input, output, session,
                             map_data,
                             pins, analysisID) {
 
-  ns <- session$ns
   marker_data <- reactive({
-    build_marker_data(data = pins(), session = session, paramID = analysisID)
+    build_marker_data(data = pins(), session = session, paramID = analysisID())
   })
 
   # Plot leaflet

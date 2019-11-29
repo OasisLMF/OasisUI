@@ -55,13 +55,49 @@ build_marker_data <- function(data, session, paramID) {
   names(data) <- tolower(names(data))
 
   # extract error messages in case status is "Fail"
-  ns <- session$ns
+  error_msg <- keys_errors_msg(data, session, paramID)
+
+  # In case streetaddress and postalcode are not entries of the data frame, create vector of NAs
+  if (is.null(data$streetaddress)) {
+    data$streetaddress <- rep_len(NA, nrow(data))
+  }
+  if (is.null(data$postalcode)) {
+    data$postalcode <- rep_len(NA, nrow(data))
+  }
+
+  # sum over all TIVs
+  tiv <- data.frame(total = rep_len(0, nrow(data)))
+  for (i in grep("tiv", names(data))) {
+    if(!is.na(data[i])) {
+      tiv_var <- data[i]
+      tiv$total <- tiv$total + tiv_var
+    }
+  }
+
+  # Popup data, must be a character vector of html code
+  data$popup <- mapply(
+    function(id, total, streetaddress, postalcode, error_msg) {
+      as.character(div(
+        strong("Location ID: "), id,
+        br(), strong("TIV: "), total,
+        br(), strong("Street Address: "), streetaddress,
+        br(), strong("Postal code: "), postalcode,
+        br(), strong("Error message: "), error_msg
+      ))
+    },
+    data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg
+  )
+  data
+}
+
+keys_errors_msg <- function(data, session, paramID) {
+  # ns <- session$ns
   keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = paramID,
                                                                    dataset_identifier = "keys-errors.csv",
                                                                    type = "input")
-  error_msg <- data.frame(message = 1:length(data$buildingtiv))
+  error_msg <- data.frame(message = 1:nrow(data))
   if (!is.null(keys_errors)) {
-    for (i in seq(1, length(data$buildingtiv))) {
+    for (i in seq(1, nrow(data))) {
       if (length(keys_errors$LocID[which(keys_errors$LocID == i)]) == 0) {
         error_msg$message[i] <- NA
       } else {
@@ -73,38 +109,8 @@ build_marker_data <- function(data, session, paramID) {
       }
     }
   } else {
-    error_msg$message <- rep_len(NA, length(data$buildingtiv))
+    error_msg$message <- rep_len(NA, nrow(data))
   }
-
-  # In case streetaddress and postalcode are not entries of the data frame, create vector of NAs
-  if (is.null(data$streetaddress)) {
-    data$streetaddress <- rep_len(NA, length(data$buildingtiv))
-  }
-  if (is.null(data$postalcode)) {
-    data$postalcode <- rep_len(NA, length(data$buildingtiv))
-  }
-
-  # sum over all TIVs
-  tiv <- data.frame(total = rep_len(0, length(data$buildingtiv)))
-  for (i in grep("tiv", names(data))) {
-    if(!is.na(data[i])) {
-      tiv_var <- data[i]
-      tiv$total <- tiv$total + tiv_var
-    }
-  }
-
-  # Popup data, must be a character vector of html code
-  data$popup <- mapply(
-    function(id, total, streetaddress, postalcode, message) {
-      as.character(div(
-        strong("Location ID: "), id,
-        br(), strong("TIV: "), total,
-        br(), strong("Street Address: "), streetaddress,
-        br(), strong("Postal code: "), postalcode,
-        br(), strong("Error message: "), message
-      ))
-    },
-    data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg$message
-  )
-  data
+  error_msg$message
 }
+
