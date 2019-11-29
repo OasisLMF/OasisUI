@@ -490,7 +490,6 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Clear panel
   observeEvent(input$abuttonpfclear, ignoreInit = TRUE, {
-    .clearUploadFiles()
     # Re-setting fileInputs
     output$SLFile_ui <- renderUI({
       fileInput(inputId = ns("SLFile"), label = 'Location file:',
