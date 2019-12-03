@@ -747,7 +747,6 @@ panelOutputModule <- function(input, output, session,
           iconColor = getColor(),
           markerColor = getColor()
         )
-        # scaling <- 500
 
         output$outputleaflet <- renderLeaflet({
           leaflet(session$userData$data_hub$get_pf_location_content(id = portfId())[loss, ]) %>%
@@ -761,16 +760,14 @@ panelOutputModule <- function(input, output, session,
               group = "clustered",
               clusterId = "cluster",
               popup = ~popup[loss]) %>%
-            addLegend(colors = c("#e8e6e6", "blue", "darkblue", "gray", "black"),
+            addLegend(colors = c("#e8e6e6", "#49aad1", "#046187", "#666666", "black"),
                       labels = c(paste("<", round(quantile(data$loss[loss], probs = 1/4))),
                                  paste("<", round(mean(data$loss[loss]))),
                                  paste("<", round(quantile(data$loss[loss], probs = 3/4))),
                                  paste("<", round(quantile(data$loss[loss], probs = 6/7))),
                                  paste("<=", round(max(data$loss[loss])))),
+                      opacity = 1,
                       title = "Loss")
-          #%>%
-          # addCircles(long, lat, radius = as.numeric(input$pltlosses)/scaling,
-          #            fillOpacity = 0.1)
         })
       } else {
         if (!is.null(data)) {
