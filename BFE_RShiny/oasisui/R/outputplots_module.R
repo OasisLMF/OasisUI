@@ -726,15 +726,20 @@ panelOutputModule <- function(input, output, session,
           ))
         })
 
+        loss_1_quant <- quantile(data$loss[loss], probs = 1/4)
+        loss_mean <- mean(data$loss[loss])
+        loss_3_quant <- round(quantile(data$loss[loss], probs = 3/4))
+        loss_6_quant <- round(quantile(data$loss[loss], probs = 6/7))
+
         getColor <- function() {
           sapply(seq(1, length(data$loss[loss])), function(x) {
-            if(data$loss[loss][x] < quantile(data$loss[loss], probs = 1/4)) {
+            if(data$loss[loss][x] < loss_1_quant) {
               "white"
-            } else if(data$loss[loss][x] < mean(data$loss[loss])) {
+            } else if(data$loss[loss][x] < loss_mean) {
               "blue"
-            } else if(data$loss[loss][x] < round(quantile(data$loss[loss], probs = 3/4))) {
+            } else if(data$loss[loss][x] < loss_3_quant) {
               "darkblue"
-            } else if(data$loss[loss][x] < round(quantile(data$loss[loss], probs = 6/7))) {
+            } else if(data$loss[loss][x] < loss_6_quant) {
               "gray"
             } else {
               "black"
@@ -760,11 +765,16 @@ panelOutputModule <- function(input, output, session,
               group = "clustered",
               clusterId = "cluster",
               popup = ~popup[loss]) %>%
-            addLegend(colors = c("#e8e6e6", "#49aad1", "#046187", "#666666", "black"),
-                      labels = c(paste("<", round(quantile(data$loss[loss], probs = 1/4))),
-                                 paste("<", round(mean(data$loss[loss]))),
-                                 paste("<", round(quantile(data$loss[loss], probs = 3/4))),
-                                 paste("<", round(quantile(data$loss[loss], probs = 6/7))),
+            # add borders to legend squares
+            addLegend(colors = c("white; border:1px solid black",
+                                 "#49aad1; border:1px solid black",
+                                 "#046187; border:1px solid black",
+                                 "#666666; border:1px solid black",
+                                 "black; border:1px solid black"),
+                      labels = c(paste("<", round(loss_1_quant)),
+                                 paste("<", round(loss_mean)),
+                                 paste("<", round(loss_3_quant)),
+                                 paste("<", round(loss_6_quant)),
                                  paste("<=", round(max(data$loss[loss])))),
                       opacity = 1,
                       title = "Loss")
