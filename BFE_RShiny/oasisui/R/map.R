@@ -67,10 +67,11 @@ build_marker_data <- function(data, session, paramID) {
 
   # sum over all TIVs
   tiv <- data.frame(total = rep_len(0, nrow(data)))
+  tiv_var <- 0
   for (i in grep("tiv", names(data))) {
-    if(length(i) > 0) {
-      tiv_var <- data[i]
-      tiv$total <- tiv$total + tiv_var
+    if(length(i) > 0 && !is.na(data[i])) {
+      tiv_var <- tiv_var + data[i]
+      tiv$total <- tiv_var
     }
   }
 
