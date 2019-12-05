@@ -13,6 +13,9 @@ check_loc(analysisID, portfolioID, data_hub)
 
 \item{data_hub}{data hub stored in session$userData$data_hub}
 }
+\value{
+Checked uploaded locations (added peril_id).
+}
 \description{
 Compares uploaded and modeled locations.
 }
