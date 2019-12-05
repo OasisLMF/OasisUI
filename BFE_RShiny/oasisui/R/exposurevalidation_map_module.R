@@ -100,23 +100,19 @@ exposurevalidationmap <- function(input,
       result$perils_names <- unlist(mapped_perils,  use.names = FALSE)
       result$peril_codes <- names(mapped_perils)
       logMessage("Updating input$chkgrp_perils")
-      updateCheckboxGroupInput(session, inputId = "chkgrp_perils", choices = result$perils_names, selected = result$perils_names)
+      updateCheckboxGroupInput(session, inputId = "chkgrp_perils", choices = as.list(perils), selected = as.list(perils))
     }
   })
 
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-        left_join(
-          data.frame(
-            LocNumber = unique( result$uploaded_locs_check$LocNumber),
-            modeled = sapply(unique( result$uploaded_locs_check$LocNumber), function(x){
-              curr_loc <- result$uploaded_locs_check %>%
-                filter(LocNumber == x)
-              any(curr_loc$peril_id %in% result$peril_codes[which(result$perils_names == input$chkgrp_perils)])
-            })
-          )
+        mutate(modeled = case_when(
+          is.na(peril_id) ~ FALSE,
+          peril_id %in% input$chkgrp_perils ~ TRUE,
+          TRUE ~ NA)
         ) %>%
+        filter(!is.na(modeled)) %>%
         select(-peril_id) %>%
         distinct()
     }
@@ -209,6 +205,7 @@ exposurevalidationmap <- function(input,
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
       result$uploaded_locs_check <- uploaded_locs_check
     }
+    invisible()
   }
 
   # Exposure validation map
@@ -220,7 +217,7 @@ exposurevalidationmap <- function(input,
         modeled == "TRUE" ~ 1,
         TRUE ~ 2
       )) %>%
-      build_marker_data()
+      build_marker_data(session = session, paramID = analysisID())
 
     icon_map <- awesomeIcons(
       icon = 'map-marker-alt',

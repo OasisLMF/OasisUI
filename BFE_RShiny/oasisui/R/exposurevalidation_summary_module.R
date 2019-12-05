@@ -98,7 +98,12 @@ exposurevalidationsummary <- function(input,
     if (length(active()) > 0 && active() && counter() > 0) {
       result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
       result$perils <- unique(result$summary_tbl$peril)
-      updateSelectInput(session, inputId = "input_peril", choices = ifelse(!is.null(result$perils), result$perils, "no perils available for summary"))
+      if (is.null(result$perils)) {
+        peril_choices <- "no perils available for summary"
+      } else {
+        peril_choices <- result$perils
+      }
+      updateSelectInput(session, inputId = "input_peril", choices = peril_choices)
       # TODO: if above leaves input_peril the same, we still want to call .reloadSummary once
     }
   })
@@ -117,11 +122,11 @@ exposurevalidationsummary <- function(input,
       result$summary_validation_tbl$all <- format(result$summary_validation_tbl$all,
                                                   big.mark = ",", scientific = FALSE)
       result$summary_validation_tbl$fail <- format(result$summary_validation_tbl$fail,
-                                                  big.mark = ",", scientific = FALSE)
+                                                   big.mark = ",", scientific = FALSE)
       result$summary_validation_tbl$nomatch <- format(result$summary_validation_tbl$nomatch,
-                                                  big.mark = ",", scientific = FALSE)
+                                                      big.mark = ",", scientific = FALSE)
       result$summary_validation_tbl$success <- format(result$summary_validation_tbl$success,
-                                                  big.mark = ",", scientific = FALSE)
+                                                      big.mark = ",", scientific = FALSE)
       datatable(
         result$summary_validation_tbl %>% capitalize_names_df(),
         class = "oasisui-table display",

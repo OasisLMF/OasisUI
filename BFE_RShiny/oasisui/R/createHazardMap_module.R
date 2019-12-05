@@ -38,6 +38,7 @@ createHazardMapUI <- function(id) {
 #' @param pins Reactive expression yielding location pins as a \code{data.frame}
 #'   with variables \code{locnumber}, \code{longitude}, \code{latitude}
 #'   (case-insensitive).
+#' @param analysisID Chosen analysis.
 #'
 #' @describeIn createHazardMap Defines the server logic of the module.
 #'
@@ -53,10 +54,10 @@ createHazardMapUI <- function(id) {
 #' @export
 createHazardMap <- function(input, output, session,
                             map_data,
-                            pins) {
+                            pins, analysisID) {
 
   marker_data <- reactive({
-    build_marker_data(pins())
+    build_marker_data(data = pins(), session = session, paramID = analysisID())
   })
 
   # Plot leaflet
