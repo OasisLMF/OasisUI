@@ -38,6 +38,7 @@ createHazardMapUI <- function(id) {
 #' @param pins Reactive expression yielding location pins as a \code{data.frame}
 #'   with variables \code{locnumber}, \code{longitude}, \code{latitude}
 #'   (case-insensitive).
+#' @param analysisID Chosen analysis.
 #'
 #' @describeIn createHazardMap Defines the server logic of the module.
 #'

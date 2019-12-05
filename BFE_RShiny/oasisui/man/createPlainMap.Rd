@@ -2,12 +2,9 @@
 % Please edit documentation in R/map.R
 \name{createPlainMap}
 \alias{createPlainMap}
-\alias{build_marker_data}
 \title{Create Plain Map}
 \usage{
 createPlainMap(df, session, paramID)
-
-build_marker_data(data, session, paramID)
 }
 \arguments{
 \item{df}{df to plot as map}
@@ -15,20 +12,10 @@ build_marker_data(data, session, paramID)
 \item{session}{Current session.}
 
 \item{paramID}{Chosen parameter ID.}
-
-\item{data}{dataframe containing location id and coordinates.}
-
-\item{session}{Current session.}
-
-\item{paramID}{Chosen parameter ID.}
 }
 \value{
 Leaflet map.
-
-dataframe with popup information under "popup".
 }
 \description{
 Creates a plain map using leaflet.
-
-Builds markers data to be used in a map rendered with leaflet.
 }

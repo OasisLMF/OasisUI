@@ -40,7 +40,7 @@ createPlainMap <- function(df, session, paramID) {
 
 #' build_marker_data
 #'
-#' @rdname createPlainMap
+#' @rdname build_marker_data
 #'
 #' @description Builds markers data to be used in a map rendered with leaflet.
 #'
