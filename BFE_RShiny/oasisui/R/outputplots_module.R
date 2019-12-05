@@ -419,7 +419,8 @@ panelOutputModule <- function(input, output, session,
                 filesToPlot <- filesToPlot[grep("oep", filesToPlot)]
               }
             }
-            #TODO: this should be whatever locnumber was selected, in case that there is more than 1 entry
+
+           # TODO: review for composite summary levels
             data <- .readFile(filesToPlot[1])
             # set up by type
             data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
@@ -430,26 +431,12 @@ panelOutputModule <- function(input, output, session,
             data <- data %>%
               filter(return_period %in% as.numeric(input$pltrtnprd)) %>%
               filter(type == input$calctypes)
-            # # define number of entries
-            # entries <- 5
-            # # split loss vector into equal parts
-            # loss_entries <- length(data$loss)/entries
-            # choices <- c("1", round(loss_entries),
-            #              round(loss_entries*2),
-            #              round(loss_entries*3),
-            #              round(loss_entries*4),
-            #              loss_entries*5)
             output$summary_levels_ui <- renderUI({
               sliderInput(ns("pltlosses"), "Losses",
                           min = round(min(data$loss)), max = round(max(data$loss)),
                           value = c(round(min(data$loss)), round(max(data$loss))),
                           step = 1000
               )
-              # selectInput(
-              #   inputId = ns("pltlosses"),
-              #   label = "Losses",
-              #   choices = choices
-              # )
             })
           } else {
             output$summary_levels_ui <- renderUI({
@@ -726,21 +713,21 @@ panelOutputModule <- function(input, output, session,
           ))
         })
 
-        loss_1_quant <- quantile(data$loss[loss], probs = 1/4)
-        loss_mean <- mean(data$loss[loss])
+        loss_1_quant <- round(quantile(data$loss[loss], probs = 1/4))
+        loss_mean <- round(mean(data$loss[loss]))
         loss_3_quant <- round(quantile(data$loss[loss], probs = 3/4))
         loss_6_quant <- round(quantile(data$loss[loss], probs = 6/7))
 
-        getColor <- function() {
+        colorShades <- function() {
           sapply(seq(1, length(data$loss[loss])), function(x) {
             if(data$loss[loss][x] < loss_1_quant) {
-              "white"
+              "beige"
             } else if(data$loss[loss][x] < loss_mean) {
-              "blue"
+              "lightred"
             } else if(data$loss[loss][x] < loss_3_quant) {
-              "darkblue"
+              "red"
             } else if(data$loss[loss][x] < loss_6_quant) {
-              "gray"
+              "darkred"
             } else {
               "black"
             }
@@ -749,8 +736,8 @@ panelOutputModule <- function(input, output, session,
 
         icon_map <- awesomeIcons(
           icon = 'map-marker-alt',
-          iconColor = getColor(),
-          markerColor = getColor()
+          iconColor = colorShades(),
+          markerColor = colorShades()
         )
 
         output$outputleaflet <- renderLeaflet({
@@ -765,19 +752,18 @@ panelOutputModule <- function(input, output, session,
               group = "clustered",
               clusterId = "cluster",
               popup = ~popup[loss]) %>%
-            # add borders to legend squares
-            addLegend(colors = c("white; border:1px solid black",
-                                 "#49aad1; border:1px solid black",
-                                 "#046187; border:1px solid black",
-                                 "#666666; border:1px solid black",
-                                 "black; border:1px solid black"),
+            addLegend(colors = c("#fcbe8d",
+                                 "salmon",
+                                 "red",
+                                 "darkred",
+                                 "black"),
                       labels = c(paste("<", round(loss_1_quant)),
                                  paste("<", round(loss_mean)),
                                  paste("<", round(loss_3_quant)),
                                  paste("<", round(loss_6_quant)),
                                  paste("<=", round(max(data$loss[loss])))),
-                      opacity = 1,
-                      title = "Loss")
+            opacity = 0.7,
+            title = "Loss")
         })
       } else {
         if (!is.null(data)) {
