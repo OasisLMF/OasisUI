@@ -107,16 +107,12 @@ exposurevalidationmap <- function(input,
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-        left_join(
-          data.frame(
-            LocNumber = unique( result$uploaded_locs_check$LocNumber),
-            modeled = sapply(unique(result$uploaded_locs_check$LocNumber), function(x) {
-              curr_loc <- result$uploaded_locs_check %>%
-                filter(LocNumber == x)
-              any(curr_loc$peril_id %in% result$peril_codes[which(result$perils_names == input$chkgrp_perils)])
-            })
-          )
+        mutate(modeled = case_when(
+          is.na(peril_id) ~ FALSE,
+          peril_id %in% input$chkgrp_perils ~ TRUE,
+          TRUE ~ NA)
         ) %>%
+        filter(!is.na(modeled)) %>%
         select(-peril_id) %>%
         distinct()
     }
@@ -209,6 +205,7 @@ exposurevalidationmap <- function(input,
     if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
       result$uploaded_locs_check <- uploaded_locs_check
     }
+    invisible()
   }
 
   # Exposure validation map

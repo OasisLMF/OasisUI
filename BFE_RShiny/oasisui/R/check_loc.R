@@ -28,7 +28,6 @@ check_loc <- function(analysisID, portfolioID, data_hub){
 
   #dummy to test validation
   #modelled_locs <- modelled_locs[1:30,]
-
   uploaded_locs_check <- full_join(uploaded_locs, modelled_locs, by = "loc_idx") %>%
     select(-one_of( names(modelled_locs %>% select(-"peril_id")))) %>%
     distinct()
