@@ -7,13 +7,15 @@
 \usage{
 modeldetailsUI(id)
 
-modeldetails(input, output, session, modelID, portfolioID, file_pins,
-  counter, active = reactive(TRUE))
+modeldetails(input, output, session, analysisID, modelID, portfolioID,
+  file_pins, counter, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
+
+\item{analysisID}{Selected analysis ID.}
 
 \item{modelID}{Selected model ID.}
 

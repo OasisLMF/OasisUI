@@ -570,6 +570,7 @@ step2_chooseAnalysis <- function(input, output, session,
   callModule(
     modeldetails,
     id = "modeldetails",
+    analysisID = reactive({result$analysisID}),
     modelID = reactive({result$modelID}),
     portfolioID = portfolioID,
     counter = reactive({input$abuttonmodeldetails}),

@@ -263,12 +263,11 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
-      if (data$type == 1) {
-        type_label <- "Sample"
+      if (unique(data$type) == 2) {
+        titleToUse <- "GUL EP Curve - Sample"
       } else {
-        tapye_label <- "Analytical"
+        titleToUse <- "GUL EP Curve - Analytical"
       }
-      titleToUse <- paste0("GUL EP Curve", ", ", tapye_label)
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
@@ -280,12 +279,11 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
-      if (data$type == 1) {
-        type_label <- "Sample"
+      if (unique(data$type) == 2) {
+        titleToUse <- "IL EP Curve - Sample"
       } else {
-        tapye_label <- "Analytical"
+        titleToUse <- "IL EP Curve - Analytical"
       }
-      titleToUse <- paste0("IL EP Curve", ", ", tapye_label)
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
@@ -297,12 +295,12 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       xlabel <- "Return Period"
       ylabel <- "Loss in Millions"
-      if (data$type == 1) {
-        type_label <- "Sample"
+      if (unique(data$type) == 2) {
+        titleToUse <- "RI EP Curve - Sample"
       } else {
-        tapye_label <- "Analytical"
+        titleToUse <- "RI EP Curve - Analytical"
       }
-      titleToUse <- paste0("RI EP Curve", ", ", tapye_label)
+
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p

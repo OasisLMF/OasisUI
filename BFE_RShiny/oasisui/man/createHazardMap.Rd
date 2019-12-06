@@ -7,7 +7,7 @@
 \usage{
 createHazardMapUI(id)
 
-createHazardMap(input, output, session, map_data, pins)
+createHazardMap(input, output, session, map_data, pins, analysisID)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -19,6 +19,8 @@ createHazardMap(input, output, session, map_data, pins)
 \item{pins}{Reactive expression yielding location pins as a \code{data.frame}
 with variables \code{locnumber}, \code{longitude}, \code{latitude}
 (case-insensitive).}
+
+\item{analysisID}{Chosen analysis.}
 }
 \description{
 Shiny Module for rendering a hazard map using Leaflet.

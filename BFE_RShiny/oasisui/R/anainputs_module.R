@@ -51,6 +51,7 @@ anainputsUI <- function(id,
 #' @param counter Reactive value storing actionButton status.
 #'
 #' @importFrom shinyjs hide
+#' @importFrom dplyr arrange
 #'
 #' @export
 anainputs <- function(input,
@@ -123,7 +124,7 @@ anainputs <- function(input,
     } else {
       dt_generated <-  NULL
     }
-    result$dt_generated  <- dt_generated
+    result$dt_generated  <- arrange(dt_generated, files)
   }
 
   invisible()
