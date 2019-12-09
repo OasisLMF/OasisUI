@@ -1,6 +1,12 @@
 OasisUI Changelog 
 ==================
 
+`1.4.0`_
+--------
+* #187 - Updates to plots and reporting 
+* #202 - Order files in tables alphabetically
+* #205 - UI user guide documentation
+
 `1.3.5`_
 --------
 * closes #173 - Update Output config view according to previous selection
@@ -119,7 +125,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
-.. AUTO_INSERT-CHANGE_DIFF
+.. _`1.4.0`:  https://github.com/OasisLMF/OasisUI/compare/1.3.5...1.4.0
 .. _`1.3.5`:  https://github.com/OasisLMF/OasisUI/compare/1.3.3...1.3.5
 .. _`1.3.3`:  https://github.com/OasisLMF/OasisUI/compare/1.3.2...1.3.3
 .. _`1.3.2`:  https://github.com/OasisLMF/OasisUI/compare/1.3.1...1.3.2
