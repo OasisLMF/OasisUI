@@ -73,8 +73,9 @@ plottypeslist <- list(
     "xlabel" = c("Type"),
     "ylabel" = c("Loss")
   ),
-  "loss per return period map" = list(
-    "Variables" = c()
+  "loss for return period map" = list(
+    "Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
+    "plottype" = "map"
   )
 )
 

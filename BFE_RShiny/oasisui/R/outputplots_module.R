@@ -301,7 +301,7 @@ panelOutputModule <- function(input, output, session,
     inputplottype()}, {
       output$outputleaflet <- NULL
       # Update selectInputs based on the choice of plots, for AAL bar plot only AAL will be displayed
-      if (inputplottype() == "loss per return period map") {
+      if (inputplottype() == "loss for return period map") {
         filesToPlot <- filesListData() %>% filter(grepl("locnumber", summary_level))
         filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)][1]
         data <- .readFile(filesToPlot)
@@ -388,7 +388,7 @@ panelOutputModule <- function(input, output, session,
 
   observeEvent({input$pltreports
     input$pltrtnprd}, ignoreNULL = FALSE, {
-      if (length(inputplottype()) != 0 && inputplottype() != "loss per return period map") {
+      if (length(inputplottype()) != 0 && inputplottype() != "loss for return period map") {
         # display only summary levels that correspond to the selected report
         idx_s <- which(filesListData()$report == input$pltreports)
         summary_level <- filesListData()$summary_level[idx_s]
@@ -472,14 +472,14 @@ panelOutputModule <- function(input, output, session,
     inputplottype()
   }, ignoreNULL = FALSE, {
     if (length(inputplottype()) != 0) {
-      if (inputplottype() != "loss per return period map" && (length(chkbox$chkboxgrplosstypes()) > 0 &&
+      if (inputplottype() != "loss for return period map" && (length(chkbox$chkboxgrplosstypes()) > 0 &&
                                                               length(input$calctypes) > 0 &&
                                                               length(chkbox$pltsummarylevels()) > 0 &&
                                                               length(chkbox$pltreports()) > 0)) {
         enable("abuttondraw")
         show("outputplot")
         hide("outputleaflet")
-      } else if (inputplottype() == "loss per return period map" &&
+      } else if (inputplottype() == "loss for return period map" &&
                  (length(input$pltrtnprd) > 0 &&
                   length(input$calctypes) > 0 &&
                   length(chkbox$chkboxgrplosstypes()) > 0)) {
@@ -576,7 +576,7 @@ panelOutputModule <- function(input, output, session,
     # > filter out files to read -----------------------------------------------
     if (sanytyChecks) {
       if (!is.null(filesListData()) & nrow(plotstrc) > 0 ) {
-        if (inputplottype() == "loss per return period map") {
+        if (inputplottype() == "loss for return period map") {
           filesToPlot <- filesListData() %>% filter(grepl("locnumber", summary_level)) %>%
             filter(perspective %in% tolower(chkbox$chkboxgrplosstypes()),
                    report %in% input$pltreports)
@@ -634,7 +634,7 @@ panelOutputModule <- function(input, output, session,
       }
       data <- data %>% filter(type %in% input$calctypes)
 
-      if (inputplottype() == "loss per return period map") {
+      if (inputplottype() == "loss for return period map") {
         if (TRUE %in% grepl("locnumber", filesListData()$summary_level)) {
           # filter for values related to locnumber
           data <- data %>% filter(return_period == input$pltrtnprd)
@@ -700,11 +700,12 @@ panelOutputModule <- function(input, output, session,
       }
 
       # > draw plot --------------------------------------------------------------
-      if (inputplottype() == "loss per return period map") {
+      if (inputplottype() == "loss for return period map") {
         loss <- which(between(data$loss, min(as.numeric(input$pltlosses)), max(as.numeric(input$pltlosses))))
-        lat <- session$userData$data_hub$get_pf_location_content(id = portfId())$Latitude[loss]
-        long <- session$userData$data_hub$get_pf_location_content(id = portfId())$Longitude[loss]
-        loc_num <- session$userData$data_hub$get_pf_location_content(id = portfId())$LocNumber[loss]
+        pf_loc_content <- session$userData$data_hub$get_pf_location_content(id = portfId())
+        lat <- pf_loc_content$Latitude[loss]
+        long <- pf_loc_content$Longitude[loss]
+        loc_num <- pf_loc_content$LocNumber[loss]
 
         popup <- lapply(seq(1, length(data$loss[loss])), function(x) {
           as.character(div(
@@ -713,31 +714,13 @@ panelOutputModule <- function(input, output, session,
           ))
         })
 
-        loss_1_quant <- round(quantile(data$loss[loss], probs = 1/4))
         loss_mean <- round(mean(data$loss[loss]))
-        loss_3_quant <- round(quantile(data$loss[loss], probs = 3/4))
-        loss_6_quant <- round(quantile(data$loss[loss], probs = 6/7))
-
-        colorShades <- function() {
-          sapply(seq(1, length(data$loss[loss])), function(x) {
-            if(data$loss[loss][x] < loss_1_quant) {
-              "beige"
-            } else if(data$loss[loss][x] < loss_mean) {
-              "lightred"
-            } else if(data$loss[loss][x] < loss_3_quant) {
-              "red"
-            } else if(data$loss[loss][x] < loss_6_quant) {
-              "darkred"
-            } else {
-              "black"
-            }
-          })
-        }
+        loss_quant <- round(quantile(data$loss[loss], probs = c(1/4, 3/4, 6/7)))
 
         icon_map <- awesomeIcons(
           icon = 'map-marker-alt',
-          iconColor = colorShades(),
-          markerColor = colorShades()
+          iconColor = .colorShades(data$loss[loss], loss_mean, loss_quant),
+          markerColor = .colorShades(data$loss[loss], loss_mean, loss_quant)
         )
 
         output$outputleaflet <- renderLeaflet({
@@ -757,10 +740,10 @@ panelOutputModule <- function(input, output, session,
                                  "red",
                                  "darkred",
                                  "black"),
-                      labels = c(paste("<", round(loss_1_quant)),
-                                 paste("<", round(loss_mean)),
-                                 paste("<", round(loss_3_quant)),
-                                 paste("<", round(loss_6_quant)),
+                      labels = c(paste("<", unname(loss_quant[1])),
+                                 paste("<", loss_mean),
+                                 paste("<", unname(loss_quant[2])),
+                                 paste("<", unname(loss_quant[3])),
                                  paste("<=", round(max(data$loss[loss])))),
             opacity = 0.7,
             title = "Loss")
@@ -794,17 +777,28 @@ panelOutputModule <- function(input, output, session,
   })
 
   # Helper functions -----------------------------------------------------------
+  # Colors for markers
+  .colorShades <- function(lossdata, loss_mean, loss_quant) {
+    sapply(seq(1, length(lossdata)), function(x) {
+      if (lossdata[x] < loss_quant[1]) {
+        "beige"
+      } else if(lossdata[x] < loss_mean) {
+        "lightred"
+      } else if(lossdata[x] < loss_quant[2]) {
+        "red"
+      } else if(lossdata[x] < loss_quant[3]) {
+        "darkred"
+      } else {
+        "black"
+      }
+    })
+  }
 
   # Helper function to enable and disable checkboxes based on condition
   .reactiveUpdateSelectGroupInput <- function(reactivelistvalues, listvalues, inputid, plotType) {
     logMessage(".reactiveUpdateSelectGroupInput called")
-    # disable and untick variables that are not relevant
-    if (inputid == "chkboxgrpvariables" && !is.null(plotType)) {
-      relevantVariables <- plottypeslist[[plotType]][["Variables"]]
-      selectable <- intersect(reactivelistvalues, relevantVariables)
-    } else {
-      selectable <- as.character(reactivelistvalues)
-    }
+    # disable and untick boxes that are not relevant
+    selectable <- as.character(reactivelistvalues)
     selection <- intersect(selectable, chkbox[[inputid]]())
     updateCheckboxGroupInput(session = session, inputId = inputid, selected = FALSE)
     # N.B.: JavaScript array indices start at 0
