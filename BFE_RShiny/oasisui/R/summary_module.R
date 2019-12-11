@@ -153,7 +153,7 @@ summarytab <- function(input, output, session,
       data <- result$SummaryData %>%
         filter(Type == "input")
       # insert commas at thousands
-      data$Value <- format(as.numeric(data$Value), big.mark = ",", scientific = FALSE)
+      data$Value <- add_commas(as.numeric(data$Value))
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -198,7 +198,7 @@ summarytab <- function(input, output, session,
         mutate_if(is.numeric, ~round(., 0)) %>%
         transform(Value = as.character(Value))
       # insert commas at thousands
-      data$Value <- format(as.numeric(data$Value), big.mark = ",", scientific = FALSE)
+      data$Value <- add_commas(as.numeric(data$Value))
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -300,6 +300,7 @@ summarytab <- function(input, output, session,
       } else {
         titleToUse <- "RI EP Curve - Analytical"
       }
+
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
@@ -313,17 +314,13 @@ summarytab <- function(input, output, session,
     for (p in 1:length(perspectives)) {
       for (v in 1:length(variables)) {
         variable <- variables[v]
-        if (grepl("All Risks", tbl_filesListDataana$summary_level[v])) {
-          fileName <- tbl_filesListDataana %>%
-            filter(summary_level == "All Risks")
-        } else {
-          fileName <- tbl_filesListDataana
-        }
-        fileName <- fileName %>% filter(perspective == perspectives[p]) %>%
+        fileName <- tbl_filesListDataana %>%
           filter(report == variable) %>%
+          filter(summary_level == "All Risks") %>%
+          filter(perspective == perspectives[p]) %>%
           select(files)
         if (length(fileName$files) > 0) {
-            output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files %>% as.character())
+          output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files %>% as.character())
           if (!is.null(output_file_df)) {
             c <- length(DFList) + 1
             splitvar <- unlist(strsplit(variable, " "))
