@@ -735,17 +735,17 @@ panelOutputModule <- function(input, output, session,
               group = "clustered",
               clusterId = "cluster",
               popup = ~popup[loss]) %>%
-            addLegend(colors = c("#fcbe8d",
+            addLegend(colors = c("#0e6199",
+                                 "#56d0e8",
                                  "salmon",
                                  "red",
-                                 "darkred",
-                                 "black"),
+                                 "darkred"),
                       labels = c(paste("<", unname(loss_quant[1])),
                                  paste("<", loss_mean),
                                  paste("<", unname(loss_quant[2])),
                                  paste("<", unname(loss_quant[3])),
                                  paste("<=", round(max(data$loss[loss])))),
-            opacity = 0.7,
+            opacity = 0.8,
             title = "Loss")
         })
       } else {
@@ -781,15 +781,15 @@ panelOutputModule <- function(input, output, session,
   .colorShades <- function(lossdata, loss_mean, loss_quant) {
     sapply(seq(1, length(lossdata)), function(x) {
       if (lossdata[x] < loss_quant[1]) {
-        "beige"
+        "darkblue"
       } else if(lossdata[x] < loss_mean) {
-        "lightred"
+        "lightblue"
       } else if(lossdata[x] < loss_quant[2]) {
-        "red"
+        "lightred"
       } else if(lossdata[x] < loss_quant[3]) {
-        "darkred"
+        "red"
       } else {
-        "black"
+        "darkred"
       }
     })
   }
