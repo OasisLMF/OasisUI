@@ -714,13 +714,12 @@ panelOutputModule <- function(input, output, session,
           ))
         })
 
-        loss_mean <- round(mean(data$loss[loss]))
-        loss_quant <- round(quantile(data$loss[loss], probs = c(1/4, 3/4, 6/7)))
+        loss_quant <- round(quantile(data$loss[loss], probs = c(1/4, 1/2, 3/4, 6/7)))
 
         icon_map <- awesomeIcons(
           icon = 'map-marker-alt',
-          iconColor = .colorShades(data$loss[loss], loss_mean, loss_quant),
-          markerColor = .colorShades(data$loss[loss], loss_mean, loss_quant)
+          iconColor = .colorShades(data$loss[loss], loss_quant),
+          markerColor = .colorShades(data$loss[loss], loss_quant)
         )
 
         output$outputleaflet <- renderLeaflet({
@@ -741,9 +740,9 @@ panelOutputModule <- function(input, output, session,
                                  "red",
                                  "darkred"),
                       labels = c(paste("<", unname(loss_quant[1])),
-                                 paste("<", loss_mean),
                                  paste("<", unname(loss_quant[2])),
                                  paste("<", unname(loss_quant[3])),
+                                 paste("<", unname(loss_quant[4])),
                                  paste("<=", round(max(data$loss[loss])))),
             opacity = 0.8,
             title = "Loss")
@@ -778,15 +777,15 @@ panelOutputModule <- function(input, output, session,
 
   # Helper functions -----------------------------------------------------------
   # Colors for markers
-  .colorShades <- function(lossdata, loss_mean, loss_quant) {
+  .colorShades <- function(lossdata, loss_quant) {
     sapply(seq(1, length(lossdata)), function(x) {
       if (lossdata[x] < loss_quant[1]) {
         "darkblue"
-      } else if(lossdata[x] < loss_mean) {
-        "lightblue"
       } else if(lossdata[x] < loss_quant[2]) {
-        "lightred"
+        "lightblue"
       } else if(lossdata[x] < loss_quant[3]) {
+        "lightred"
+      } else if(lossdata[x] < loss_quant[4]) {
         "red"
       } else {
         "darkred"
