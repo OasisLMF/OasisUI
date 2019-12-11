@@ -119,14 +119,11 @@ exposurevalidationsummary <- function(input,
   output$dt_summary_validation <- renderDT(
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
       # insert commas at thousands
-      result$summary_validation_tbl$all <- format(result$summary_validation_tbl$all,
-                                                  big.mark = ",", scientific = FALSE)
-      result$summary_validation_tbl$fail <- format(result$summary_validation_tbl$fail,
-                                                   big.mark = ",", scientific = FALSE)
-      result$summary_validation_tbl$nomatch <- format(result$summary_validation_tbl$nomatch,
-                                                      big.mark = ",", scientific = FALSE)
-      result$summary_validation_tbl$success <- format(result$summary_validation_tbl$success,
-                                                      big.mark = ",", scientific = FALSE)
+      result$summary_validation_tbl$all <- add_commas(result$summary_validation_tbl$all)
+      result$summary_validation_tbl$fail <- add_commas(result$summary_validation_tbl$fail)
+      result$summary_validation_tbl$nomatch <- add_commas(result$summary_validation_tbl$nomatch)
+      result$summary_validation_tbl$success <- add_commas(result$summary_validation_tbl$success)
+
       datatable(
         result$summary_validation_tbl %>% capitalize_names_df(),
         class = "oasisui-table display",
