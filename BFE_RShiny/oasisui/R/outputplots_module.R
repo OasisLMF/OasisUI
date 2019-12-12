@@ -211,6 +211,7 @@ panelOutputModuleUI <- function(id){
 #' @importFrom leaflet setView
 #' @importFrom leaflet addAwesomeMarkers
 #' @importFrom leaflet addCircles
+#' @importFrom leaflet.extras addFullscreenControl
 #'
 #' @export
 panelOutputModule <- function(input, output, session,
@@ -745,7 +746,8 @@ panelOutputModule <- function(input, output, session,
                                  paste("<", unname(loss_quant[4])),
                                  paste("<=", round(max(data$loss[loss])))),
             opacity = 0.8,
-            title = "Loss")
+            title = "Loss") %>% # make map full screen
+            addFullscreenControl(pseudoFullscreen = TRUE)
         })
       } else {
         if (!is.null(data)) {

@@ -98,10 +98,14 @@ exposurevalidationsummary <- function(input,
     if (length(active()) > 0 && active() && counter() > 0) {
       result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
       result$perils <- unique(result$summary_tbl$peril)
+      keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = analysisID(),
+                                                                       dataset_identifier = "keys-errors.csv",
+                                                                       type = "input")
+      peril_id <- unique(keys_errors$PerilID)
       if (is.null(result$perils)) {
         peril_choices <- "no perils available for summary"
       } else {
-        peril_choices <- result$perils
+        peril_choices <- paste0(result$perils, " (", peril_id, ")")
       }
       updateSelectInput(session, inputId = "input_peril", choices = peril_choices)
       # TODO: if above leaves input_peril the same, we still want to call .reloadSummary once
@@ -111,7 +115,7 @@ exposurevalidationsummary <- function(input,
   # Perils ---------------------------------------------------------------------
   observeEvent(input$input_peril, {
     if (!is.na(input$input_peril) && input$input_peril != "") {
-      .reloadSummary(input_peril = input$input_peril)
+      .reloadSummary(input_peril = result$perils)
     }
   })
 

@@ -14,6 +14,7 @@
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet addMarkers
 #' @importFrom leaflet markerClusterOptions
+#' @importFrom leaflet.extras addFullscreenControl
 #'
 #' @export
 createPlainMap <- function(df, session, paramID) {
@@ -34,7 +35,8 @@ createPlainMap <- function(df, session, paramID) {
                lat = ~latitude,
                icon = icon_map,
                clusterOptions = markerClusterOptions(maxClusterRadius = 50),
-               popup = ~popup)
+               popup = ~popup) %>% # make map full screen
+    addFullscreenControl(pseudoFullscreen = TRUE)
 }
 
 
@@ -65,12 +67,12 @@ build_marker_data <- function(data, session, paramID) {
     data$postalcode <- rep_len(NA, nrow(data))
   }
 
-  # sum over all TIVs
+  # sum over all TIVs]
   tiv <- data.frame(total = rep_len(0, nrow(data)))
   tiv_var <- 0
   for (i in grep("tiv", names(data))) {
-    if(length(i) > 0 && !is.na(data[i])) {
-      tiv_var <- tiv_var + data[i]
+    if(length(i) > 0 && !is.na(data[[i]])) {
+      tiv_var <- tiv_var + data[[i]]
       tiv$total <- tiv_var
     }
   }

@@ -60,6 +60,7 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom leaflet markerClusterOptions
 #' @importFrom leaflet awesomeIcons
 #' @importFrom leaflet renderLeaflet
+#' @importFrom leaflet.extras addFullscreenControl
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
 #'
@@ -228,7 +229,7 @@ exposurevalidationmap <- function(input,
 
     # color clusters red if any mark is red, and green if all marks are green.
     # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
-    leaflet(df) %>%
+    map <- leaflet(df) %>%
       addTiles() %>%
       addAwesomeMarkers(
         lng = ~longitude,
@@ -277,8 +278,8 @@ exposurevalidationmap <- function(input,
 
                             return L.divIcon({ html: '<div><span>'+count+'</span></div>', className: 'marker-cluster ' + style, iconSize: new L.Point(40, 40) });
                             }
-      }")
-
+      }") %>% # make map full screen
+      addFullscreenControl(pseudoFullscreen = TRUE)
   }
 
   invisible()
