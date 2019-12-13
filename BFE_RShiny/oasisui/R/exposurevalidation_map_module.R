@@ -110,12 +110,23 @@ exposurevalidationmap <- function(input,
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
         distinct() %>%
         mutate(modeled = case_when(
-          # is.na(peril_id) ~ FALSE,
           peril_id %in% input$chkgrp_perils ~ TRUE,
           peril_id %notin% input$chkgrp_perils ~ FALSE)
         ) %>%
         filter(!is.na(modeled)) %>%
         select(-peril_id)
+
+      # result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
+      #   distinct() %>%
+      #   mutate(modeled = case_when(
+      #     is.na(peril_id) ~ FALSE,
+      #     peril_id %in% input$chkgrp_perils ~ TRUE,
+      #     TRUE ~ NA)
+      #   ) %>%
+      #   filter(!is.na(modeled)) %>%
+      #   select(-peril_id) %>%
+      #   distinct()
+
     }
   })
 
