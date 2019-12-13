@@ -126,7 +126,7 @@ panelOutputModuleUI <- function(id){
         column(6,
                selectInput(
                  inputId = ns("pltrtnprd"),
-                 label = "Return Period",
+                 label = "RP",
                  choices = c(),
                  selected = NULL
                )),
@@ -832,7 +832,7 @@ panelOutputModule <- function(input, output, session,
   # colour : column for the aes col
   # flag multipleplots generates grid over col gridcol
   .basicplot <- function(xlabel, ylabel, titleToUse, data, legendtitle) {
-    p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
+    p <- ggplot(data, aes(x = xaxis, y = value, col = colour)) +
       labs(title = titleToUse, x = xlabel, y = ylabel, col = legendtitle) +
       theme(
         plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),

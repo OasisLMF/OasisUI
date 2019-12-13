@@ -261,7 +261,7 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("gul")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "GUL EP Curve - Sample"
@@ -277,7 +277,7 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("il")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "IL EP Curve - Sample"
@@ -293,7 +293,7 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("ri")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "RI EP Curve - Sample"
