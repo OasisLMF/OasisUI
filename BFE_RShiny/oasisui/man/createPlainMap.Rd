@@ -4,7 +4,7 @@
 \alias{createPlainMap}
 \title{Create Plain Map}
 \usage{
-createPlainMap(df, session, paramID)
+createPlainMap(df, session, paramID, step)
 }
 \arguments{
 \item{df}{df to plot as map}
@@ -12,6 +12,8 @@ createPlainMap(df, session, paramID)
 \item{session}{Current session.}
 
 \item{paramID}{Chosen parameter ID.}
+
+\item{step}{current step in UI.}
 }
 \value{
 Leaflet map.

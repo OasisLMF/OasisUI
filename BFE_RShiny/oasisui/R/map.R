@@ -7,6 +7,7 @@
 #' @param df df to plot as map
 #' @param session Current session.
 #' @param paramID Chosen parameter ID.
+#' @param step current step in UI.
 #'
 #' @return Leaflet map.
 #'
@@ -17,9 +18,9 @@
 #' @importFrom leaflet.extras addFullscreenControl
 #'
 #' @export
-createPlainMap <- function(df, session, paramID) {
+createPlainMap <- function(df, session, paramID, step) {
 
-  df <- build_marker_data(df, session, paramID)
+  df <- build_marker_data(df, session, paramID, step)
 
   # Create custom icons
   icon_map <- awesomeIcons(
@@ -49,11 +50,12 @@ createPlainMap <- function(df, session, paramID) {
 #' @param data dataframe containing location id and coordinates.
 #' @param session Current session.
 #' @param paramID Chosen parameter ID.
+#' @param step current step in UI.
 #'
 #' @return dataframe with popup information under "popup".
 #'
 #' @export
-build_marker_data <- function(data, session, paramID) {
+build_marker_data <- function(data, session, paramID, step) {
   names(data) <- tolower(names(data))
 
   # extract error messages in case status is "Fail"
@@ -80,13 +82,21 @@ build_marker_data <- function(data, session, paramID) {
   # Popup data, must be a character vector of html code
   data$popup <- mapply(
     function(id, total, streetaddress, postalcode, error_msg) {
-      as.character(div(
+      msg_basic <- as.character(div(
         strong("Location ID: "), id,
         br(), strong("TIV: "), total,
         br(), strong("Street Address: "), streetaddress,
-        br(), strong("Postal code: "), postalcode,
-        br(), strong("Error message: "), error_msg
+        br(), strong("Postal code: "), postalcode
       ))
+      if (step == 1) {
+        # Do not include the error message if in step 1
+        msg_basic
+      } else {
+        as.character(div(
+          msg_basic,
+          br(), strong("Error message: "), error_msg
+        ))
+      }
     },
     data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg
   )

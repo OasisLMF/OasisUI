@@ -108,14 +108,14 @@ exposurevalidationmap <- function(input,
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
+        distinct() %>%
         mutate(modeled = case_when(
-          is.na(peril_id) ~ FALSE,
+          # is.na(peril_id) ~ FALSE,
           peril_id %in% input$chkgrp_perils ~ TRUE,
-          TRUE ~ NA)
+          peril_id %notin% input$chkgrp_perils ~ FALSE)
         ) %>%
         filter(!is.na(modeled)) %>%
-        select(-peril_id) %>%
-        distinct()
+        select(-peril_id)
     }
   })
 
@@ -218,7 +218,7 @@ exposurevalidationmap <- function(input,
         modeled == "TRUE" ~ 1,
         TRUE ~ 2
       )) %>%
-      build_marker_data(session = session, paramID = analysisID())
+      build_marker_data(session = session, paramID = analysisID(), step = 2)
 
     icon_map <- awesomeIcons(
       icon = 'map-marker-alt',
