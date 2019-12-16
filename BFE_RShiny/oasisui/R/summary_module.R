@@ -230,7 +230,7 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       DFtype <- data.frame("Type" = {
         lapply(data$Specification, function(s) {
-          gsub("Mean AAL ", "", s)
+          gsub("AAL ", "", s)
         }) %>%
           unlist()
       }) %>%
@@ -363,8 +363,8 @@ summarytab <- function(input, output, session,
         filter(grepl("mean", variable)) %>%
         separate(variable, into = c("variables", "report", "perspective"), sep = "\\.")
       outputsAALtmp <- outputsAALtmp %>%
-        mutate(type = replace(type, type == "1", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
-        mutate(type = replace(type, type == "2", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
+        mutate(type = replace(type, type == "1", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
+        mutate(type = replace(type, type == "2", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
       outputsAAL <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
       # AAL plot
       plotAALtmp <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
