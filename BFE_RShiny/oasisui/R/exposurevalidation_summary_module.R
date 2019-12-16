@@ -20,7 +20,7 @@ exposurevalidationsummaryUI <- function(id) {
     fluidRow(div(oasisuiRefreshButton(ns("abuttonSumexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
       column(12,
-             selectInput(ns("input_peril"), label = "Pick peril", choices = NULL)
+             selectInput(ns("input_peril"), label = "Pick peril", choices = NULL, multiple = TRUE)
       )
     ),
     fluidRow(
@@ -212,13 +212,19 @@ exposurevalidationsummary <- function(input,
     result$summary_validation_tbl <- NULL
     # Build df
     if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0 && !is.null(input_peril)) {
-      result$summary_validation_tbl <- result$summary_tbl %>%
-        filter(peril == input_peril) %>%
-        select(-peril)
+      # match inputs to perils
+      perils_match <- unlist(lapply(seq(1, length(result$perils)), function(x) {
+        y <- grep(result$perils[x], input$input_peril)
+        which(result$perils[y] == result$summary_tbl$peril)
+      }))
+      result$summary_validation_tbl <- result$summary_tbl[perils_match,]
+      # result$summary_validation_tbl <- result$summary_tbl %>%
+      #   filter(peril == result$perils[perils_match]) %>%
+      # select(-peril)
     } else {
       result$summary_validation_tbl <- NULL
     }
   }
 
-  invisible()
+  # invisible()
 }
