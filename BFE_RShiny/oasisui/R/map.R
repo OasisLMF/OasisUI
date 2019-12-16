@@ -75,31 +75,37 @@ build_marker_data <- function(data, session, paramID, step) {
   for (i in grep("tiv", names(data))) {
     if(length(i) > 0 && !is.na(data[[i]])) {
       tiv_var <- tiv_var + data[[i]]
-      tiv$total <- tiv_var
+      tiv$total <- add_commas(tiv_var)
     }
   }
 
   # Popup data, must be a character vector of html code
-  data$popup <- mapply(
-    function(id, total, streetaddress, postalcode, error_msg) {
-      msg_basic <- as.character(div(
-        strong("Location ID: "), id,
-        br(), strong("TIV: "), total,
-        br(), strong("Street Address: "), streetaddress,
-        br(), strong("Postal code: "), postalcode
-      ))
       if (step == 1) {
         # Do not include the error message if in step 1
-        msg_basic
+        data$popup <- mapply(
+          function(id, total, streetaddress, postalcode, error_msg) {
+            as.character(div(
+              strong("Location ID: "), id,
+              br(), strong("TIV: "), total,
+              br(), strong("Street Address: "), streetaddress,
+              br(), strong("Postal code: "), postalcode
+            ))
+          },
+          data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg)
       } else {
-        as.character(div(
-          msg_basic,
-          br(), strong("Error message: "), error_msg
-        ))
-      }
-    },
-    data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg
-  )
+        data$popup <- mapply(
+          function(id, total, streetaddress, postalcode, error_msg) {
+            as.character(div(
+              strong("Location ID: "), id,
+              br(), strong("TIV: "), total,
+              br(), strong("Street Address: "), streetaddress,
+              br(), strong("Postal code: "), postalcode,
+              br(), strong("Error message: "), error_msg
+            ))
+      },
+      data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg)
+    }
+
   data
 }
 
