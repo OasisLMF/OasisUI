@@ -494,7 +494,7 @@ summarytab <- function(input, output, session,
 # colour : column for the aes col
 # flag multipleplots generates grid over col gridcol
 
-basicplot <- function(xlabel, ylabel, titleToUse, data){
+basicplot <- function(xlabel, ylabel, titleToUse, data) {
   p <- ggplot(data, aes(x = xaxis, y = value)) +
     labs(title = titleToUse, x = xlabel, y = ylabel) +
     theme(
@@ -558,15 +558,18 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_point
+#' @importFrom scales comma
 #'
 #' @export
 # Expected DF with columns:
 # xaxis : column for aes x
 # value : column for aes y
 # colour : column for the aes col
-linePlot <- function(xlabel, ylabel, titleToUse, data){
+linePlot <- function(xlabel, ylabel, titleToUse, data) {
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
     geom_line(size = 1, aes(color = colour)) +
-    geom_point(size = 2, aes(color = colour))
+    geom_point(size = 2, aes(color = colour)) +
+    scale_x_continuous(labels = comma) +
+    scale_y_continuous(labels = comma)
   p
 }
