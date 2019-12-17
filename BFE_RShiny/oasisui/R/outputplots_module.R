@@ -126,7 +126,7 @@ panelOutputModuleUI <- function(id){
         column(6,
                selectInput(
                  inputId = ns("pltrtnprd"),
-                 label = "Return Period",
+                 label = "RP",
                  choices = c(),
                  selected = NULL
                )),
@@ -420,7 +420,7 @@ panelOutputModule <- function(input, output, session,
               }
             }
 
-           # TODO: review for composite summary levels
+            # TODO: review for composite summary levels
             data <- .readFile(filesToPlot[1])
             # set up by type
             data$type <- data$type %>% replace(which(data$type == 1), "Analytical")
@@ -744,8 +744,8 @@ panelOutputModule <- function(input, output, session,
                                  paste("<", unname(loss_quant[3])),
                                  paste("<", unname(loss_quant[4])),
                                  paste("<=", round(max(data$loss[loss])))),
-            opacity = 0.8,
-            title = "Loss")
+                      opacity = 0.8,
+                      title = "Loss")
         })
       } else {
         if (!is.null(data)) {
@@ -757,7 +757,9 @@ panelOutputModule <- function(input, output, session,
 
           if (plottype == "line") {
             p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
-                             summary_id_title, multipleplots = multipleplots)
+                             summary_id_title, multipleplots = multipleplots) +
+              scale_x_continuous(labels = comma) +
+              scale_y_continuous(labels = comma)
             p <- p + labs("summary_id")
           } else if (plottype == "bar") {
             p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
@@ -832,7 +834,7 @@ panelOutputModule <- function(input, output, session,
   # colour : column for the aes col
   # flag multipleplots generates grid over col gridcol
   .basicplot <- function(xlabel, ylabel, titleToUse, data, legendtitle) {
-    p <- ggplot(data, aes(x = xaxis, y = value, col = as.factor(colour))) +
+    p <- ggplot(data, aes(x = xaxis, y = value, col = colour)) +
       labs(title = titleToUse, x = xlabel, y = ylabel, col = legendtitle) +
       theme(
         plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),

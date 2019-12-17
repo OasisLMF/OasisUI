@@ -230,7 +230,7 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       DFtype <- data.frame("Type" = {
         lapply(data$Specification, function(s) {
-          gsub("Mean AAL ", "", s)
+          gsub("AAL ", "", s)
         }) %>%
           unlist()
       }) %>%
@@ -261,7 +261,7 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("gul")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "GUL EP Curve - Sample"
@@ -277,7 +277,7 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("il")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "IL EP Curve - Sample"
@@ -293,7 +293,7 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("ri")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "RI EP Curve - Sample"
@@ -363,8 +363,8 @@ summarytab <- function(input, output, session,
         filter(grepl("mean", variable)) %>%
         separate(variable, into = c("variables", "report", "perspective"), sep = "\\.")
       outputsAALtmp <- outputsAALtmp %>%
-        mutate(type = replace(type, type == "1", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
-        mutate(type = replace(type, type == "2", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
+        mutate(type = replace(type, type == "1", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
+        mutate(type = replace(type, type == "2", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
       outputsAAL <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
       # AAL plot
       plotAALtmp <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
@@ -494,7 +494,7 @@ summarytab <- function(input, output, session,
 # colour : column for the aes col
 # flag multipleplots generates grid over col gridcol
 
-basicplot <- function(xlabel, ylabel, titleToUse, data){
+basicplot <- function(xlabel, ylabel, titleToUse, data) {
   p <- ggplot(data, aes(x = xaxis, y = value)) +
     labs(title = titleToUse, x = xlabel, y = ylabel) +
     theme(
@@ -558,15 +558,18 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_point
+#' @importFrom scales comma
 #'
 #' @export
 # Expected DF with columns:
 # xaxis : column for aes x
 # value : column for aes y
 # colour : column for the aes col
-linePlot <- function(xlabel, ylabel, titleToUse, data){
+linePlot <- function(xlabel, ylabel, titleToUse, data) {
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
     geom_line(size = 1, aes(color = colour)) +
-    geom_point(size = 2, aes(color = colour))
+    geom_point(size = 2, aes(color = colour)) +
+    scale_x_continuous(labels = comma) +
+    scale_y_continuous(labels = comma)
   p
 }
