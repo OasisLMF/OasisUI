@@ -50,6 +50,7 @@ createHazardMapUI <- function(id) {
 #' @importFrom leaflet addPolygons
 #' @importFrom leaflet addLegend
 #' @importFrom leaflet addAwesomeMarkers
+#' @importFrom leaflet.extras addFullscreenControl
 #'
 #' @export
 createHazardMap <- function(input, output, session,
@@ -57,7 +58,7 @@ createHazardMap <- function(input, output, session,
                             pins, analysisID) {
 
   marker_data <- reactive({
-    build_marker_data(data = pins(), session = session, paramID = analysisID())
+    build_marker_data(data = pins(), session = session, paramID = analysisID(), step = 2)
   })
 
   # Plot leaflet
@@ -98,7 +99,8 @@ createHazardMap <- function(input, output, session,
                         lat = marker_data$latitude,
                         icon = icon_map,
                         popup = marker_data$popup,
-                        clusterOptions = TRUE)
+                        clusterOptions = TRUE) %>% # make map full screen
+      addFullscreenControl(pseudoFullscreen = TRUE)
     hazardmap
   }
 

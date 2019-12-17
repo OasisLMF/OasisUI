@@ -4,7 +4,7 @@
 \alias{build_marker_data}
 \title{build_marker_data}
 \usage{
-build_marker_data(data, session, paramID)
+build_marker_data(data, session, paramID, step)
 }
 \arguments{
 \item{data}{dataframe containing location id and coordinates.}
@@ -12,6 +12,8 @@ build_marker_data(data, session, paramID)
 \item{session}{Current session.}
 
 \item{paramID}{Chosen parameter ID.}
+
+\item{step}{current step in UI.}
 }
 \value{
 dataframe with popup information under "popup".

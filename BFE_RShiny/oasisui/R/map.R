@@ -7,6 +7,7 @@
 #' @param df df to plot as map
 #' @param session Current session.
 #' @param paramID Chosen parameter ID.
+#' @param step current step in UI.
 #'
 #' @return Leaflet map.
 #'
@@ -14,11 +15,12 @@
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet addMarkers
 #' @importFrom leaflet markerClusterOptions
+#' @importFrom leaflet.extras addFullscreenControl
 #'
 #' @export
-createPlainMap <- function(df, session, paramID) {
+createPlainMap <- function(df, session, paramID, step) {
 
-  df <- build_marker_data(df, session, paramID)
+  df <- build_marker_data(df, session, paramID, step)
 
   # Create custom icons
   icon_map <- awesomeIcons(
@@ -34,7 +36,8 @@ createPlainMap <- function(df, session, paramID) {
                lat = ~latitude,
                icon = icon_map,
                clusterOptions = markerClusterOptions(maxClusterRadius = 50),
-               popup = ~popup)
+               popup = ~popup) %>% # make map full screen
+    addFullscreenControl(pseudoFullscreen = TRUE)
 }
 
 
@@ -47,11 +50,12 @@ createPlainMap <- function(df, session, paramID) {
 #' @param data dataframe containing location id and coordinates.
 #' @param session Current session.
 #' @param paramID Chosen parameter ID.
+#' @param step current step in UI.
 #'
 #' @return dataframe with popup information under "popup".
 #'
 #' @export
-build_marker_data <- function(data, session, paramID) {
+build_marker_data <- function(data, session, paramID, step) {
   names(data) <- tolower(names(data))
 
   # extract error messages in case status is "Fail"
@@ -69,25 +73,39 @@ build_marker_data <- function(data, session, paramID) {
   tiv <- data.frame(total = rep_len(0, nrow(data)))
   tiv_var <- 0
   for (i in grep("tiv", names(data))) {
-    if(length(i) > 0 && !is.na(data[i])) {
-      tiv_var <- tiv_var + data[i]
-      tiv$total <- tiv_var
+    if(length(i) > 0 && !is.na(data[[i]])) {
+      tiv_var <- tiv_var + data[[i]]
+      tiv$total <- add_commas(tiv_var)
     }
   }
 
   # Popup data, must be a character vector of html code
-  data$popup <- mapply(
-    function(id, total, streetaddress, postalcode, error_msg) {
-      as.character(div(
-        strong("Location ID: "), id,
-        br(), strong("TIV: "), total,
-        br(), strong("Street Address: "), streetaddress,
-        br(), strong("Postal code: "), postalcode,
-        br(), strong("Error message: "), error_msg
-      ))
-    },
-    data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg
-  )
+  if (step == 1) {
+    # Do not include the error message if in step 1
+    data$popup <- mapply(
+      function(id, total, streetaddress, postalcode) {
+        as.character(div(
+          strong("Location ID: "), id,
+          br(), strong("TIV: "), total,
+          br(), strong("Street Address: "), streetaddress,
+          br(), strong("Postal code: "), postalcode
+        ))
+      },
+      data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode)
+  } else {
+    data$popup <- mapply(
+      function(id, total, streetaddress, postalcode, error_msg) {
+        as.character(div(
+          strong("Location ID: "), id,
+          br(), strong("TIV: "), total,
+          br(), strong("Street Address: "), streetaddress,
+          br(), strong("Postal code: "), postalcode,
+          br(), strong("Error message: "), error_msg
+        ))
+      },
+      data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg)
+  }
+
   data
 }
 
