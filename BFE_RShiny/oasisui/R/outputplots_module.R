@@ -745,8 +745,8 @@ panelOutputModule <- function(input, output, session,
                                  paste("<", unname(loss_quant[3])),
                                  paste("<", unname(loss_quant[4])),
                                  paste("<=", round(max(data$loss[loss])))),
-            opacity = 0.8,
-            title = "Loss") %>% # make map full screen
+                      opacity = 0.8,
+                      title = "Loss") %>% # make map full screen
             addFullscreenControl(pseudoFullscreen = TRUE)
         })
       } else {

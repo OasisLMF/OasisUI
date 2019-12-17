@@ -80,31 +80,31 @@ build_marker_data <- function(data, session, paramID, step) {
   }
 
   # Popup data, must be a character vector of html code
-      if (step == 1) {
-        # Do not include the error message if in step 1
-        data$popup <- mapply(
-          function(id, total, streetaddress, postalcode, error_msg) {
-            as.character(div(
-              strong("Location ID: "), id,
-              br(), strong("TIV: "), total,
-              br(), strong("Street Address: "), streetaddress,
-              br(), strong("Postal code: "), postalcode
-            ))
-          },
-          data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg)
-      } else {
-        data$popup <- mapply(
-          function(id, total, streetaddress, postalcode, error_msg) {
-            as.character(div(
-              strong("Location ID: "), id,
-              br(), strong("TIV: "), total,
-              br(), strong("Street Address: "), streetaddress,
-              br(), strong("Postal code: "), postalcode,
-              br(), strong("Error message: "), error_msg
-            ))
+  if (step == 1) {
+    # Do not include the error message if in step 1
+    data$popup <- mapply(
+      function(id, total, streetaddress, postalcode) {
+        as.character(div(
+          strong("Location ID: "), id,
+          br(), strong("TIV: "), total,
+          br(), strong("Street Address: "), streetaddress,
+          br(), strong("Postal code: "), postalcode
+        ))
+      },
+      data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode)
+  } else {
+    data$popup <- mapply(
+      function(id, total, streetaddress, postalcode, error_msg) {
+        as.character(div(
+          strong("Location ID: "), id,
+          br(), strong("TIV: "), total,
+          br(), strong("Street Address: "), streetaddress,
+          br(), strong("Postal code: "), postalcode,
+          br(), strong("Error message: "), error_msg
+        ))
       },
       data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg)
-    }
+  }
 
   data
 }
