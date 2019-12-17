@@ -225,5 +225,5 @@ exposurevalidationsummary <- function(input,
     }
   }
 
-  # invisible()
+  invisible()
 }
