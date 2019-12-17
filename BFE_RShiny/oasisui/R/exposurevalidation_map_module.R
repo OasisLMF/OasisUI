@@ -107,25 +107,16 @@ exposurevalidationmap <- function(input,
 
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-        distinct() %>%
         mutate(modeled = case_when(
+          is.na(peril_id) ~ FALSE,
           peril_id %in% input$chkgrp_perils ~ TRUE,
-          peril_id %notin% input$chkgrp_perils ~ FALSE)
+          TRUE ~ NA)
         ) %>%
         filter(!is.na(modeled)) %>%
-        select(-peril_id)
-
-      # result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-      #   distinct() %>%
-      #   mutate(modeled = case_when(
-      #     is.na(peril_id) ~ FALSE,
-      #     peril_id %in% input$chkgrp_perils ~ TRUE,
-      #     TRUE ~ NA)
-      #   ) %>%
-      #   filter(!is.na(modeled)) %>%
-      #   select(-peril_id) %>%
-      #   distinct()
+        select(-peril_id) %>%
+        distinct()
 
     }
   })
@@ -240,7 +231,7 @@ exposurevalidationmap <- function(input,
 
     # color clusters red if any mark is red, and green if all marks are green.
     # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
-    map <- leaflet(df) %>%
+    leaflet(df) %>%
       addTiles() %>%
       addAwesomeMarkers(
         lng = ~longitude,
