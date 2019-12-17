@@ -220,9 +220,6 @@ exposurevalidationsummary <- function(input,
         which(result$perils[y] == result$summary_tbl$peril)
       }))
       result$summary_validation_tbl <- result$summary_tbl[perils_match,]
-      # result$summary_validation_tbl <- result$summary_tbl %>%
-      #   filter(peril == result$perils[perils_match]) %>%
-      # select(-peril)
     } else {
       result$summary_validation_tbl <- NULL
     }

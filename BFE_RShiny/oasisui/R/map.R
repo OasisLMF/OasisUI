@@ -69,7 +69,7 @@ build_marker_data <- function(data, session, paramID, step) {
     data$postalcode <- rep_len(NA, nrow(data))
   }
 
-  # sum over all TIVs]
+  # sum over all TIVs
   tiv <- data.frame(total = rep_len(0, nrow(data)))
   tiv_var <- 0
   for (i in grep("tiv", names(data))) {
