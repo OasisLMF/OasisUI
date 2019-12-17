@@ -104,6 +104,8 @@ exposurevalidationsummary <- function(input,
       peril_id <- unique(keys_errors$PerilID)
       if (is.null(result$perils)) {
         peril_choices <- "no perils available for summary"
+      } else if (!is.null(result$perils) && length(peril_id) == 0) {
+        peril_choices <- result$perils
       } else {
         peril_choices <- paste0(result$perils, " (", peril_id, ")")
       }
