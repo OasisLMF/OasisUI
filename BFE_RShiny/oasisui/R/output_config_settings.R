@@ -58,7 +58,7 @@ plottypeslist <- list(
     "xtickslabels" = list(),
     "extracols" = c("X", "summary_id"),
     "plottype" = "line",
-    "xlabel" = c("Return Period"),
+    "xlabel" = c("RP"),
     "ylabel" = c("Loss")
   ),
   "AAL bar plot" = list(
@@ -87,6 +87,6 @@ plottypeslist <- list(
 #                               "xtickslabels" = list(),
 #                               "extracols" = c("X", "summary_id", "sidx"),
 #                               "plottype" = "violin",
-#                               "xlabel" = c("Return Period"),
+#                               "xlabel" = c("RP"),
 #                               "ylabel" = c("Loss")
 # )
