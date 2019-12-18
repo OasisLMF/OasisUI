@@ -295,7 +295,7 @@ DataHub <- R6Class(
     # extract model resource file given model id
     get_model_resource_dataset_content = function(id, ...) {
       # retrieve model resource file from API
-      get_response <- private$oasisapi$api_get_query(query_path = paste( "models", id, "resource_file", sep = "/"))
+      get_response <- private$oasisapi$api_get_query(query_path = paste( "models", id, "settings", sep = "/"))
       modelsIdResourceFileList <- content(get_response$result)
       if (!is.null(modelsIdResourceFileList)) {
         modelsList_names <- names(modelsIdResourceFileList)

@@ -958,7 +958,7 @@ def_out_config <- function(input,
 
     fetch_model_settings <- function(modelID) {
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "resource_file", sep = "/"),
+        query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
       model_settings <- tbl_modelsDetails$model_settings %>%
@@ -1117,7 +1117,7 @@ def_out_config <- function(input,
 
     if (length(modelID) != 0) {
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "resource_file", sep = "/"),
+        query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
       if (!is.null(tbl_modelsDetails)) {
