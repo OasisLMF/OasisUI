@@ -45,9 +45,7 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
     extension <-  strsplit(dataset_identifier, split = "\\.") %>% unlist() %>% tail(n = 1)
     if (extension == "csv") {
       if (length(dataset_identifier) > 1) {
-        data_1 <- fread(file.path(destdir, dataset_identifier)[1], nrows = nrows)
-        data_2 <- fread(file.path(destdir, dataset_identifier)[2], nrows = nrows)
-        data <- rbind(data_1, data_2)
+        stop("More than 1 dataset_identifier was passed to read_file_from_tar function")
       } else {
         data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
       }
