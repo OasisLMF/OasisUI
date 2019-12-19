@@ -251,7 +251,7 @@ summarytab <- function(input, output, session,
       ylabel <- "Loss in Millions"
       titleToUse <- "AAL"
 
-      p <- barPlot(xlabel, ylabel, titleToUse, data, multipleplots )
+      p <- barPlot(xlabel, ylabel, titleToUse, data, multipleplots)
     }
     p
   })
@@ -535,7 +535,7 @@ basicplot <- function(xlabel, ylabel, titleToUse, data) {
 
 barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
-    geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(data$colour)))
+    geom_bar(position = "dodge", stat = "identity", aes(fill = colour))
   if (multipleplots) {
     p <- p + facet_wrap(.~ gridcol)
   }
