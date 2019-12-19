@@ -231,7 +231,7 @@ exposurevalidationmap <- function(input,
           modeled == "TRUE" ~ 1,
           TRUE ~ 2
         )) %>%
-        build_marker_data(session = session, paramID = analysisID(), step = 2)
+        build_marker_data(session = session, paramID = analysisID(), step = "Validation Map")
 
       icon_map <- awesomeIcons(
         icon = 'map-marker-alt',

@@ -7,7 +7,7 @@
 #' @param df df to plot as map
 #' @param session Current session.
 #' @param paramID Chosen parameter ID.
-#' @param step current step in UI.
+#' @param step Only important if user is in Validation Map. NULL by default.
 #'
 #' @return Leaflet map.
 #'
@@ -18,7 +18,7 @@
 #' @importFrom leaflet.extras addFullscreenControl
 #'
 #' @export
-createPlainMap <- function(df, session, paramID, step) {
+createPlainMap <- function(df, session, paramID, step = NULL) {
 
   df <- build_marker_data(df, session, paramID, step)
 
@@ -50,16 +50,16 @@ createPlainMap <- function(df, session, paramID, step) {
 #' @param data dataframe containing location id and coordinates.
 #' @param session Current session.
 #' @param paramID Chosen parameter ID.
-#' @param step current step in UI.
+#' @param step Only important if user is in Validation Map. NULL by default.
 #'
 #' @return dataframe with popup information under "popup".
 #'
 #' @export
-build_marker_data <- function(data, session, paramID, step) {
+build_marker_data <- function(data, session, paramID, step = NULL) {
   names(data) <- tolower(names(data))
 
   # extract error messages in case status is "Fail"
-  error_msg <- keys_errors_msg(data, session, paramID)
+  error_msg <- .keys_errors_msg(data, session, paramID)
 
   # In case streetaddress and postalcode are not entries of the data frame, create vector of NAs
   if (is.null(data$streetaddress)) {
@@ -80,19 +80,8 @@ build_marker_data <- function(data, session, paramID, step) {
   }
 
   # Popup data, must be a character vector of html code
-  if (step == 1) {
-    # Do not include the error message if in step 1
-    data$popup <- mapply(
-      function(id, total, streetaddress, postalcode) {
-        as.character(div(
-          strong("Location ID: "), id,
-          br(), strong("TIV: "), total,
-          br(), strong("Street Address: "), streetaddress,
-          br(), strong("Postal code: "), postalcode
-        ))
-      },
-      data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode)
-  } else {
+  if (!is.null(step)) {
+    # Include error message only if validation map
     data$popup <- mapply(
       function(id, total, streetaddress, postalcode, error_msg) {
         as.character(div(
@@ -104,12 +93,24 @@ build_marker_data <- function(data, session, paramID, step) {
         ))
       },
       data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg)
+  } else {
+    data$popup <- mapply(
+      function(id, total, streetaddress, postalcode) {
+        as.character(div(
+          strong("Location ID: "), id,
+          br(), strong("TIV: "), total,
+          br(), strong("Street Address: "), streetaddress,
+          br(), strong("Postal code: "), postalcode
+        ))
+      },
+      data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode)
   }
-
   data
 }
 
-keys_errors_msg <- function(data, session, paramID) {
+
+# Extraxt error messages
+.keys_errors_msg <- function(data, session, paramID) {
   keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = paramID,
                                                                    dataset_identifier = "keys-errors.csv",
                                                                    type = "input")

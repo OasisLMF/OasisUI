@@ -4,7 +4,7 @@
 \alias{build_marker_data}
 \title{build_marker_data}
 \usage{
-build_marker_data(data, session, paramID, step)
+build_marker_data(data, session, paramID, step = NULL)
 }
 \arguments{
 \item{data}{dataframe containing location id and coordinates.}
@@ -13,7 +13,7 @@ build_marker_data(data, session, paramID, step)
 
 \item{paramID}{Chosen parameter ID.}
 
-\item{step}{current step in UI.}
+\item{step}{Only important if user is in Validation Map. NULL by default.}
 }
 \value{
 dataframe with popup information under "popup".
