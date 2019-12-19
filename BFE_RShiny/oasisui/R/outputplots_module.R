@@ -711,7 +711,7 @@ panelOutputModule <- function(input, output, session,
         popup <- lapply(seq(1, length(data$loss[loss])), function(x) {
           as.character(div(
             strong("Location ID: "), loc_num[x],
-            br(), strong("Loss:"), round(data$loss[x])
+            br(), strong("Loss:"), add_commas(round(data$loss[x]))
           ))
         })
 
