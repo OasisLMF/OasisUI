@@ -38,7 +38,6 @@ untar_list <- function(tarfile, to_strip = NULL){
 #' @importFrom utils tail
 #'
 #' @export
-
 read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(), nrows = Inf){
   untar(tarfile, files = dataset_identifier, exdir = destdir)
   data = NULL

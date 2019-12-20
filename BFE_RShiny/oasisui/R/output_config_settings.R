@@ -49,7 +49,7 @@ reportToVar <- function() {
 #' @format Named \code{list} of output plot options.
 #' @export
 plottypeslist <- list(
-  "loss per return period" = list(
+  "loss per return period line plot" = list(
     "Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
     "keycols" = c("loss"),
     "uncertaintycols" = c(),
@@ -58,7 +58,7 @@ plottypeslist <- list(
     "xtickslabels" = list(),
     "extracols" = c("X", "summary_id"),
     "plottype" = "line",
-    "xlabel" = c("Return Period"),
+    "xlabel" = c("RP"),
     "ylabel" = c("Loss")
   ),
   "AAL bar plot" = list(
@@ -72,6 +72,10 @@ plottypeslist <- list(
     "plottype" = "bar",
     "xlabel" = c("Type"),
     "ylabel" = c("Loss")
+  ),
+  "loss for return period map" = list(
+    "Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
+    "plottype" = "map"
   )
 )
 
@@ -83,6 +87,6 @@ plottypeslist <- list(
 #                               "xtickslabels" = list(),
 #                               "extracols" = c("X", "summary_id", "sidx"),
 #                               "plottype" = "violin",
-#                               "xlabel" = c("Return Period"),
+#                               "xlabel" = c("RP"),
 #                               "ylabel" = c("Loss")
 # )

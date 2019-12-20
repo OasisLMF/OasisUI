@@ -60,6 +60,7 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom leaflet markerClusterOptions
 #' @importFrom leaflet awesomeIcons
 #' @importFrom leaflet renderLeaflet
+#' @importFrom leaflet.extras addFullscreenControl
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
 #'
@@ -106,6 +107,7 @@ exposurevalidationmap <- function(input,
 
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+
       result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
         mutate(modeled = case_when(
           is.na(peril_id) ~ FALSE,
@@ -115,6 +117,7 @@ exposurevalidationmap <- function(input,
         filter(!is.na(modeled)) %>%
         select(-peril_id) %>%
         distinct()
+
     }
   })
 
@@ -217,7 +220,7 @@ exposurevalidationmap <- function(input,
         modeled == "TRUE" ~ 1,
         TRUE ~ 2
       )) %>%
-      build_marker_data(session = session, paramID = analysisID())
+      build_marker_data(session = session, paramID = analysisID(), step = 2)
 
     icon_map <- awesomeIcons(
       icon = 'map-marker-alt',
@@ -277,8 +280,8 @@ exposurevalidationmap <- function(input,
 
                             return L.divIcon({ html: '<div><span>'+count+'</span></div>', className: 'marker-cluster ' + style, iconSize: new L.Point(40, 40) });
                             }
-      }")
-
+      }") %>% # make map full screen
+      addFullscreenControl(pseudoFullscreen = TRUE)
   }
 
   invisible()

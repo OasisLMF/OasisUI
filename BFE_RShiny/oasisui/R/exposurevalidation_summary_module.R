@@ -20,7 +20,7 @@ exposurevalidationsummaryUI <- function(id) {
     fluidRow(div(oasisuiRefreshButton(ns("abuttonSumexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
       column(12,
-             selectInput(ns("input_peril"), label = "Pick peril", choices = NULL)
+             selectInput(ns("input_peril"), label = "Pick peril", choices = NULL, multiple = TRUE)
       )
     ),
     fluidRow(
@@ -98,10 +98,16 @@ exposurevalidationsummary <- function(input,
     if (length(active()) > 0 && active() && counter() > 0) {
       result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
       result$perils <- unique(result$summary_tbl$peril)
+      keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = analysisID(),
+                                                                       dataset_identifier = "keys-errors.csv",
+                                                                       type = "input")
+      peril_id <- unique(keys_errors$PerilID)
       if (is.null(result$perils)) {
         peril_choices <- "no perils available for summary"
-      } else {
+      } else if (!is.null(result$perils) && length(peril_id) == 0) {
         peril_choices <- result$perils
+      } else {
+        peril_choices <- paste0(result$perils, " (", peril_id, ")")
       }
       updateSelectInput(session, inputId = "input_peril", choices = peril_choices)
       # TODO: if above leaves input_peril the same, we still want to call .reloadSummary once
@@ -111,7 +117,7 @@ exposurevalidationsummary <- function(input,
   # Perils ---------------------------------------------------------------------
   observeEvent(input$input_peril, {
     if (!is.na(input$input_peril) && input$input_peril != "") {
-      .reloadSummary(input_peril = input$input_peril)
+      .reloadSummary(input_peril = result$perils)
     }
   })
 
@@ -119,14 +125,11 @@ exposurevalidationsummary <- function(input,
   output$dt_summary_validation <- renderDT(
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
       # insert commas at thousands
-      result$summary_validation_tbl$all <- format(result$summary_validation_tbl$all,
-                                                  big.mark = ",", scientific = FALSE)
-      result$summary_validation_tbl$fail <- format(result$summary_validation_tbl$fail,
-                                                   big.mark = ",", scientific = FALSE)
-      result$summary_validation_tbl$nomatch <- format(result$summary_validation_tbl$nomatch,
-                                                      big.mark = ",", scientific = FALSE)
-      result$summary_validation_tbl$success <- format(result$summary_validation_tbl$success,
-                                                      big.mark = ",", scientific = FALSE)
+      result$summary_validation_tbl$all <- add_commas(result$summary_validation_tbl$all)
+      result$summary_validation_tbl$fail <- add_commas(result$summary_validation_tbl$fail)
+      result$summary_validation_tbl$nomatch <- add_commas(result$summary_validation_tbl$nomatch)
+      result$summary_validation_tbl$success <- add_commas(result$summary_validation_tbl$success)
+
       datatable(
         result$summary_validation_tbl %>% capitalize_names_df(),
         class = "oasisui-table display",
@@ -181,7 +184,7 @@ exposurevalidationsummary <- function(input,
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
     n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
-    p <- ggplot(data = df, aes(x = df$type, y = df$value, fill = df$key)) +
+    p <- ggplot(data = df, aes(x = type, y = value, fill = key)) +
       theme(
         plot.title = element_blank(),
         text = element_text(size = 12),
@@ -208,9 +211,12 @@ exposurevalidationsummary <- function(input,
     result$summary_validation_tbl <- NULL
     # Build df
     if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0 && !is.null(input_peril)) {
-      result$summary_validation_tbl <- result$summary_tbl %>%
-        filter(peril == input_peril) %>%
-        select(-peril)
+      # match inputs to perils
+      perils_match <- unlist(lapply(seq(1, length(result$perils)), function(x) {
+        y <- grep(result$perils[x], input$input_peril)
+        which(result$perils[y] == result$summary_tbl$peril)
+      }))
+      result$summary_validation_tbl <- result$summary_tbl[perils_match,]
     } else {
       result$summary_validation_tbl <- NULL
     }

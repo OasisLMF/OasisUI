@@ -153,7 +153,7 @@ summarytab <- function(input, output, session,
       data <- result$SummaryData %>%
         filter(Type == "input")
       # insert commas at thousands
-      data$Value <- format(as.numeric(data$Value), big.mark = ",", scientific = FALSE)
+      data$Value <- add_commas(as.numeric(data$Value))
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -198,7 +198,7 @@ summarytab <- function(input, output, session,
         mutate_if(is.numeric, ~round(., 0)) %>%
         transform(Value = as.character(Value))
       # insert commas at thousands
-      data$Value <- format(as.numeric(data$Value), big.mark = ",", scientific = FALSE)
+      data$Value <- add_commas(as.numeric(data$Value))
       if (!is.null(data) && nrow(data) > 0) {
         data <- data %>%
           select(-Type)
@@ -230,7 +230,7 @@ summarytab <- function(input, output, session,
     if (!is.null(data) && nrow(data) > 0) {
       DFtype <- data.frame("Type" = {
         lapply(data$Specification, function(s) {
-          gsub("Mean AAL ", "", s)
+          gsub("AAL ", "", s)
         }) %>%
           unlist()
       }) %>%
@@ -261,7 +261,7 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("gul")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "GUL EP Curve - Sample"
@@ -277,7 +277,7 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("il")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "IL EP Curve - Sample"
@@ -293,13 +293,14 @@ summarytab <- function(input, output, session,
     p <- NULL
     data <- .prepareDataLinePlot("ri")
     if (!is.null(data) && nrow(data) > 0) {
-      xlabel <- "Return Period"
+      xlabel <- "RP"
       ylabel <- "Loss in Millions"
       if (unique(data$type) == 2) {
         titleToUse <- "RI EP Curve - Sample"
       } else {
         titleToUse <- "RI EP Curve - Analytical"
       }
+
       p <- linePlot(xlabel, ylabel, titleToUse, data)
     }
     p
@@ -313,17 +314,13 @@ summarytab <- function(input, output, session,
     for (p in 1:length(perspectives)) {
       for (v in 1:length(variables)) {
         variable <- variables[v]
-        if (grepl("All Risks", tbl_filesListDataana$summary_level[v])) {
-          fileName <- tbl_filesListDataana %>%
-            filter(summary_level == "All Risks")
-        } else {
-          fileName <- tbl_filesListDataana
-        }
-        fileName <- fileName %>% filter(perspective == perspectives[p]) %>%
+        fileName <- tbl_filesListDataana %>%
           filter(report == variable) %>%
+          filter(summary_level == "All Risks") %>%
+          filter(perspective == perspectives[p]) %>%
           select(files)
         if (length(fileName$files) > 0) {
-            output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files %>% as.character())
+          output_file_df <- session$userData$data_hub$get_ana_outputs_dataset_content(id, fileName$files %>% as.character())
           if (!is.null(output_file_df)) {
             c <- length(DFList) + 1
             splitvar <- unlist(strsplit(variable, " "))
@@ -366,8 +363,8 @@ summarytab <- function(input, output, session,
         filter(grepl("mean", variable)) %>%
         separate(variable, into = c("variables", "report", "perspective"), sep = "\\.")
       outputsAALtmp <- outputsAALtmp %>%
-        mutate(type = replace(type, type == "1", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
-        mutate(type = replace(type, type == "2", paste0("Mean AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
+        mutate(type = replace(type, type == "1", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
+        mutate(type = replace(type, type == "2", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
       outputsAAL <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
       # AAL plot
       plotAALtmp <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
@@ -497,7 +494,7 @@ summarytab <- function(input, output, session,
 # colour : column for the aes col
 # flag multipleplots generates grid over col gridcol
 
-basicplot <- function(xlabel, ylabel, titleToUse, data){
+basicplot <- function(xlabel, ylabel, titleToUse, data) {
   p <- ggplot(data, aes(x = xaxis, y = value)) +
     labs(title = titleToUse, x = xlabel, y = ylabel) +
     theme(
@@ -561,15 +558,18 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_point
+#' @importFrom scales comma
 #'
 #' @export
 # Expected DF with columns:
 # xaxis : column for aes x
 # value : column for aes y
 # colour : column for the aes col
-linePlot <- function(xlabel, ylabel, titleToUse, data){
+linePlot <- function(xlabel, ylabel, titleToUse, data) {
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
     geom_line(size = 1, aes(color = colour)) +
-    geom_point(size = 2, aes(color = colour))
+    geom_point(size = 2, aes(color = colour)) +
+    scale_x_continuous(labels = comma) +
+    scale_y_continuous(labels = comma)
   p
 }

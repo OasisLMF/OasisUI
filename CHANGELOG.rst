@@ -1,6 +1,18 @@
 OasisUI Changelog 
 ==================
 
+`1.4.1`_
+--------
+* Replaced mean with quantile at 1/2
+* New color scheme for pins
+* Added commas in numbers
+* Functionality to expand plots to full screen
+* Fixed bug in showing map for location.csv in validation panel generated input
+* Added code name to drop down in validation map
+* Multi-select for perils
+* Bug fix in case no peril id is present
+* Renamed "mean AAl" to "AAL" in summary tab
+
 `1.4.0`_
 --------
 * #187 - Updates to plots and reporting 
@@ -125,6 +137,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
+.. _`1.4.1`:  https://github.com/OasisLMF/OasisUI/compare/1.4.0...1.4.1
 .. _`1.4.0`:  https://github.com/OasisLMF/OasisUI/compare/1.3.5...1.4.0
 .. _`1.3.5`:  https://github.com/OasisLMF/OasisUI/compare/1.3.3...1.3.5
 .. _`1.3.3`:  https://github.com/OasisLMF/OasisUI/compare/1.3.2...1.3.3
