@@ -157,10 +157,8 @@ node {
 
         //Docker cleanup
         dir(build_workspace) {
-            if(params.PURGE){
-                sh PIPELINE + " purge_image ${proxy_image} ${env.TAG_RELEASE}"
-                sh PIPELINE + " purge_image ${app_image} ${env.TAG_RELEASE}"
-            }
+            sh PIPELINE + " purge_image ${proxy_image} ${env.TAG_RELEASE}"
+            sh PIPELINE + " purge_image ${app_image} ${env.TAG_RELEASE}"
         }
 
         //Notify Slack
