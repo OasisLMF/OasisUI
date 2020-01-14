@@ -961,8 +961,10 @@ def_out_config <- function(input,
         query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
-      model_settings <- tbl_modelsDetails$model_settings %>%
-        unlist(recursive = FALSE)
+      model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
+        tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
+      # model_settings <- tbl_modelsDetails$model_settings %>%
+      #   unlist(recursive = FALSE)
       model_params_lst <- lapply(names(model_settings), function(i) {
         ifelse(is.null(input[[paste0("model_params_", i)]]), model_settings[[i]]$default, input[[paste0("model_params_", i)]])
       }) %>%
@@ -1123,7 +1125,6 @@ def_out_config <- function(input,
       if (!is.null(tbl_modelsDetails)) {
         model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
                             tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
-        # browser()
         names_settings_type <- lapply(names(model_settings), function(i) {
           model_settings[[i]][["type"]]
         }) %>%
