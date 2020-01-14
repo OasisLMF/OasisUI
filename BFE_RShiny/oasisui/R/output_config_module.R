@@ -1121,7 +1121,9 @@ def_out_config <- function(input,
         query_method = "GET"
       )
       if (!is.null(tbl_modelsDetails)) {
-        model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
+        model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
+                            tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
+        # browser()
         names_settings_type <- lapply(names(model_settings), function(i) {
           model_settings[[i]][["type"]]
         }) %>%
@@ -1173,8 +1175,16 @@ def_out_config <- function(input,
           advanced_model_param <- names(model_settings)[names(model_settings) %notin% c(basic_model_params, model_perils)]
           ui_advanced_model_param <- lapply(advanced_model_param, function(p) {
             curr_param_lst <- model_settings[[p]]
-            curr_param_name <-
-              capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+
+            if (p == "PerilCodes") {
+              curr_param_name <- "Perils"
+              multiple = TRUE
+            } else {
+              curr_param_name <-
+                capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
+              multiple = FALSE
+            }
+
             if (curr_param_lst$type == "boolean") {
               checkboxInput(
                 inputId = ns(paste0("model_params_", p)),
@@ -1186,7 +1196,8 @@ def_out_config <- function(input,
                 inputId = ns(paste0("model_params_", p)),
                 label = curr_param_name,
                 choices = SwapNamesValueInList(curr_param_lst$values),
-                selected =  curr_param_lst$default
+                selected =  curr_param_lst$default,
+                multiple = multiple
               )
             } else if (curr_param_lst$type == "float") {
               sliderInput(
