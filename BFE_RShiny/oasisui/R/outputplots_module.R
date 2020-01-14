@@ -759,10 +759,8 @@ panelOutputModule <- function(input, output, session,
 
           if (plottype == "line") {
             p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
-                             summary_id_title, multipleplots = multipleplots) +
-              scale_x_continuous(labels = comma) +
-              scale_y_continuous(labels = comma)
-            p <- p + labs("summary_id")
+                             summary_id_title, multipleplots = multipleplots)
+            # p <- p + labs("summary_id")
           } else if (plottype == "bar") {
             p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
                             summary_id_title, wuncertainty = input$chkboxuncertainty,
@@ -771,7 +769,8 @@ panelOutputModule <- function(input, output, session,
             p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
                                multipleplots = multipleplots)
           }
-          output$outputplot <- renderPlotly({ggplotly(p)})
+          # output$outputplot <- renderPlotly({ggplotly(p)})
+          output$outputplot <- renderPlotly({p})
         } else {
           oasisuiNotification(type = "error", "No data to plot.")
         }
@@ -878,13 +877,18 @@ panelOutputModule <- function(input, output, session,
   }
 
   # Line plot
-  .linePlotDF <- function(..., multipleplots = FALSE) {
-    p <- .basicplot(...)
+  .linePlotDF <- function(xlabel, ylabel, titleToUse, data, legendtitle, multipleplots = FALSE) {
+    p <- .basicplot(xlabel, ylabel, titleToUse, data, legendtitle)
+    RP <- add_commas(data$xaxis)
+    Loss <- add_commas(data$value)
+    Colour <- add_commas(data$colour)
     p <- p +
       geom_line(size = 1) +
-      geom_point(size = 2)
+      geom_point(size = 2, aes(color = colour, return = RP, loss = Loss, type = Colour)) +
+      scale_x_continuous(labels = comma) +
+      scale_y_continuous(labels = comma)
     p <- .multiplot(p, multipleplots)
-    p
+    ggplotly(p, tooltip = c("type", "return", "loss"))
   }
 
   # Bar plot

@@ -184,7 +184,10 @@ exposurevalidationsummary <- function(input,
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
     n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
-    p <- ggplot(data = df, aes(x = type, y = value, fill = key)) +
+    # browser()
+    status <- df$key
+    percentage <- df$value
+    p <- ggplot(data = df, aes(x = type, y = percentage, fill = status)) +
       theme(
         plot.title = element_blank(),
         text = element_text(size = 12),
@@ -201,7 +204,7 @@ exposurevalidationsummary <- function(input,
       scale_fill_manual(values = c("fail" = "#f29c24", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E")) +
       scale_y_continuous(breaks = brks, labels = lbs) +
       facet_wrap(df$peril, ncol = n_plots_row)
-    p
+    # p
   }
 
   # reload summary table

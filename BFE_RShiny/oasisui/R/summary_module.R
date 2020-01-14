@@ -534,12 +534,15 @@ basicplot <- function(xlabel, ylabel, titleToUse, data) {
 # flag multipleplots generates grid over col gridcol
 
 barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
+  Perspective <- data$xaxis
+  Loss <- add_commas(data$value)
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
-    geom_bar(position = "dodge", stat = "identity", aes(fill = colour))
+    geom_bar(position = "dodge", stat = "identity", aes(fill = colour, prsp = Perspective, loss = Loss)) +
+    geom_point(size = 2, aes(color = colour, prsp = Perspective, loss = Loss))
   if (multipleplots) {
     p <- p + facet_wrap(.~ gridcol)
   }
-  p
+  ggplotly(p, tooltip = c("colour", "prsp", "loss"))
 }
 
 
@@ -566,10 +569,12 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
 # value : column for aes y
 # colour : column for the aes col
 linePlot <- function(xlabel, ylabel, titleToUse, data) {
+  RP <- add_commas(data$xaxis)
+  Loss <- add_commas(data$value)
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
     geom_line(size = 1, aes(color = colour)) +
-    geom_point(size = 2, aes(color = colour)) +
+    geom_point(size = 2, aes(color = colour, return = RP, loss = Loss)) +
     scale_x_continuous(labels = comma) +
     scale_y_continuous(labels = comma)
-  p
+  ggplotly(p, tooltip = c("colour", "return", "loss"))
 }
