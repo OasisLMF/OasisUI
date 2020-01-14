@@ -109,7 +109,7 @@ exposurevalidationsummary <- function(input,
       } else {
         peril_choices <- paste0(result$perils, " (", peril_id, ")")
       }
-      updateSelectInput(session, inputId = "input_peril", choices = peril_choices)
+      updateSelectInput(session, inputId = "input_peril", choices = peril_choices, selected = peril_choices)
       # TODO: if above leaves input_peril the same, we still want to call .reloadSummary once
     }
   })
