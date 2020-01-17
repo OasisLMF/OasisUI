@@ -892,9 +892,13 @@ panelOutputModule <- function(input, output, session,
   }
 
   # Bar plot
-  .barPlotDF <- function(..., wuncertainty = FALSE,
+  .barPlotDF <- function(xlabel, ylabel, titleToUse, data, legendtitle, wuncertainty = FALSE,
                          multipleplots = FALSE, xtickslabels = NULL ) {
-    p <- .basicplot(...)
+    p <- .basicplot(xlabel, ylabel, titleToUse, data, legendtitle)
+
+    data$uncertainty <- add_commas(data$uncertainty)
+    data$value <- add_commas(data$value)
+    data$reference <- add_commas(data$reference)
     p <- p + geom_bar(position = "dodge", stat = "identity")
     #geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
     # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
