@@ -90,8 +90,7 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
 
     # Footer ----
     fillRow(
-      em("OasisUI 1.1",
-         class = "oasisui-footer"),
+      em(paste("OasisUI", as.character(utils::packageVersion("oasisui"))), class = "oasisui-footer"),
       a(href = "https://shiny.rstudio.com/",
         em("Powered by RShiny",
            class = "rshiny-footer"),

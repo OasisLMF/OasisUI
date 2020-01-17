@@ -1,5 +1,5 @@
 Package: oasisui
-Version: 0.1.0
+Version: 1.3.2
 License: BSD_3_clause + file LICENSE
 Title: Oasis User Interface
 Description: This package provides an extensible implementation of a user
