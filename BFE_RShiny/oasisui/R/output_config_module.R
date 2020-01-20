@@ -590,25 +590,13 @@ def_out_config <- function(input,
   # Execute analysis
   observeEvent(input$abuttonexecuteanarun, {
     analysis_settingsList <- .gen_analysis_settings()
+
     # write out file to be uploades
-    currfolder <- session$userData$data_hub$get_user_destdir()
-    dest <- file.path(currfolder, "analysis_settings.json")
-    write_json(analysis_settingsList,
-               dest,
-               pretty = TRUE,
-               auto_unbox = TRUE)
-    # post analysis settings
-    # post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(
-    #   query_path = paste("analyses", analysisID(), "settings_file", sep = "/"),
-    #   query_body = dest,
-    #   query_encode = "multipart"
-    # )
-    post_analysis_settings <- session$userData$oasisapi$api_post_query(
+    post_analysis_settings <- session$userData$oasisapi$api_body_query(
       query_path = paste("analyses", analysisID(), "settings", sep = "/"),
-      query_list = analysis_settingsList
+      query_body = analysis_settingsList[[1]]
     )
 
-    # result$ana_post_status <- post_analysis_settings_file$status
     result$ana_post_status <- post_analysis_settings$status
   })
 
@@ -968,26 +956,23 @@ def_out_config <- function(input,
       )
       model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
                           tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
-      # model_settings <- tbl_modelsDetails$model_settings %>%
-      #   unlist(recursive = FALSE)
-      model_params_lst <- lapply(names(model_settings), function(i) {
-        c(input$supported_perils, input$boolean_params, input$event_occurrence, input$event_set)
-        # if(!is.null(input[[paste0("model_params_", i)]]) && class(input[[paste0("model_params_", i)]]) == "character") {
-        #   as.list(input[[paste0("model_params_", i)]])
-        # } else {
-        # browser()
-        # ifelse(is.null(input[[paste0("model_params_", i)]]), model_settings[[i]]$default, input[[paste0("model_params_", i)]])
-        # }
-      }) %>%
-        setNames(names(model_settings))
+
+      model_inputs <- c(input$perils, input$boolean_params, input$event_occurrence, input$event_set)
+      model_params_lst <- lapply(seq(1, length(model_inputs)), function(i) {
+        model_match <- grep(model_inputs[i], model_settings)
+        if (model_match == 4) {
+          model_match <- grep(model_inputs[i], model_settings[[4]])
+        }
+        model_settings[model_match]
+      })
       model_settings <- c(
         list(return_period_file = TRUE),
-        model_params_lst
+        unlist(model_params_lst)
       ) # list of 4 entries
     }
 
     inputsettings <- list(
-      "analysis_tag" = as.integer(analysisID()),
+      "analysis_tag" = as.character(analysisID()),
       # category tag
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
@@ -1202,7 +1187,7 @@ def_out_config <- function(input,
           boolean_params_fun <- function(model_settings) {
             if (length(grep("boolean_parameters", names(model_settings))) > 0) {
               checkboxInput(
-                inputId = "boolean_params",
+                inputId = ns("boolean_params"),
                 label = capitalize_first_letter(gsub("_", ": ", model_settings$boolean_parameters$name)),
                 value = model_settings$boolean_parameters$default
               )
