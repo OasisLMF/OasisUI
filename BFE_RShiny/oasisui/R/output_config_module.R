@@ -1184,25 +1184,29 @@ def_out_config <- function(input,
 
           boolean_params_fun <- function(model_settings) {
             if (length(grep("boolean_parameters", names(model_settings))) > 0) {
-              checkboxInput(
-                inputId = ns("boolean_params"),
-                label = capitalize_first_letter(gsub("_", ": ", model_settings$boolean_parameters$name)),
-                value = model_settings$boolean_parameters$default
-              )
+              lapply(seq(1, length(grep("boolean_parameters", names(model_settings)))), function (x) {
+                checkboxInput(
+                  inputId = ns(paste("boolean_params", x)),
+                  label = capitalize_first_letter(gsub("_", ": ", model_settings$boolean_parameters$name[x])),
+                  value = model_settings$boolean_parameters$default[x]
+                )
+              })
             }
           }
 
           perils_fun <- function(model_settings) {
             if (length(grep("supported_perils", names(model_settings))) > 0) {
-              selectInput(
-                inputId = ns("perils"),
-                label = "Perils",
-                choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (x) {
-                  tbl_modelsDetails$lookup_settings$supported_perils[[x]]$desc}),
-                selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (x) {
-                  tbl_modelsDetails$lookup_settings$supported_perils[[x]]$desc}),
-                multiple = TRUE
-              )
+              lapply(seq(1, length(grep("supported_perils", names(model_settings)))), function (x) {
+                selectInput(
+                  inputId = ns(paste("perils", x)),
+                  label = "Perils",
+                  choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils[x])), function (y) {
+                    tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc[x]}),
+                  selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
+                    tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc[x]}),
+                  multiple = TRUE
+                )
+              })
             }
           }
 
