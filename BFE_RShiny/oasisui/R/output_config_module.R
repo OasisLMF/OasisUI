@@ -1204,14 +1204,15 @@ def_out_config <- function(input,
                     tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc[x]}),
                   selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
                     tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc[x]}),
-                  multiple = TRUE
+                    multiple = TRUE
                 )
               })
             }
           }
 
           output$advanced_model_param <- renderUI({
-            c(event_set_fun(model_settings),
+            tagList(
+            event_set_fun(model_settings),
               event_occurrence_fun(model_settings),
               perils_fun(model_settings),
               boolean_params_fun(model_settings))
