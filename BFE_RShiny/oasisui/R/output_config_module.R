@@ -590,13 +590,11 @@ def_out_config <- function(input,
   # Execute analysis
   observeEvent(input$abuttonexecuteanarun, {
     analysis_settingsList <- .gen_analysis_settings()
-
-    # write out file to be uploades
+    # post analysis settings
     post_analysis_settings <- session$userData$oasisapi$api_body_query(
       query_path = paste("analyses", analysisID(), "settings", sep = "/"),
       query_body = analysis_settingsList[[1]]
     )
-
     result$ana_post_status <- post_analysis_settings$status
   })
 

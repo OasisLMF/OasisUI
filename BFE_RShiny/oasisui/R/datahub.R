@@ -482,7 +482,7 @@ DataHub <- R6Class(
     },
     # extract analysis settings content
     get_ana_settings_content = function(id,  ...) {
-      dataset_content <- private$oasisapi$api_get_query(query_path = paste("analyses", id, "settings_file",  sep = "/"))
+      dataset_content <- private$oasisapi$api_get_query(query_path = paste("analyses", id, "settings",  sep = "/"))
       content(dataset_content$result)
     },
     # invalidate analysis settings content
