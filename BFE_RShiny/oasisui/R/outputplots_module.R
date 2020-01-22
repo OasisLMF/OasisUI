@@ -865,10 +865,10 @@ panelOutputModule <- function(input, output, session,
     # add commas to numeric entries and rename them for more user-friendly tooltip
     RP <- add_commas(data$xaxis)
     Loss <- add_commas(data$value)
-    `Summary Level` <- add_commas(data$colour)
+    Summary_Level <- add_commas(data$colour)
     p <- p +
       geom_line(size = 1) +
-      geom_point(size = 2, aes(color = colour, return = RP, loss = Loss, type = `Summary Level`)) +
+      geom_point(size = 2, aes(color = colour, return = RP, loss = Loss, type = Summary_Level)) +
       scale_x_continuous(labels = comma) +
       scale_y_continuous(labels = comma)
     p <- .multiplot(p, multipleplots)
