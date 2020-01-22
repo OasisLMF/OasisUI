@@ -583,9 +583,10 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
 linePlot <- function(xlabel, ylabel, titleToUse, data) {
   RP <- add_commas(data$xaxis)
   Loss <- add_commas(data$value)
+  Report <- data$colour
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
     geom_line(size = 1, aes(color = colour)) +
-    geom_point(size = 2, aes(color = colour, return = RP, loss = Loss)) +
+    geom_point(size = 2, aes(color = Report, return = RP, loss = Loss)) +
     scale_x_continuous(labels = comma) +
     scale_y_continuous(labels = comma)
   ggplotly(p, tooltip = c("colour", "return", "loss"))
