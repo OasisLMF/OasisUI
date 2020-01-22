@@ -401,10 +401,22 @@ summarytab <- function(input, output, session,
     model_settings <- analysis_settings[["analysis_settings"]][["model_settings"]]
     model_params_lst <- sapply(names(model_settings), function(i){model_settings[[i]]})
 
+    model_params_list <- as.list(model_params_lst)
+    if (isTRUE(model_params_lst[4])) {
+      tot_locations <- nrow(check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub) %>%
+                              filter(peril_id == model_params_lst[4]) %>%
+                              distinct())
+    } else {
+      tot_locations <- nrow(check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub) %>%
+                              filter(peril_id == model_params_lst[4]) %>%
+                              distinct())
+    }
+
     # summary DF
-    SpecificationRows <- c("exposure location count", tiv$variables, names(model_params_lst))
-    ValueRows <- unlist(c(locnum, tiv$value, model_params_lst))
-    TypeRows <- c("input", rep("input", nrow(tiv)), rep("param", length(model_params_lst)))
+    model_params_lst <- c(input$supported_perils, input$boolean_params, input$event_occurrence, input$event_set)
+    SpecificationRows <- c("exposure location count", tiv$variables, "modelled locations", names(model_params_lst))
+    ValueRows <- unlist(c(locnum, tiv$value, tot_locations, model_params_lst))
+    TypeRows <- c("input", rep("input", nrow(tiv)), "input", rep("param", length(model_params_lst)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 

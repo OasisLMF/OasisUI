@@ -80,7 +80,6 @@ panelModelParams <- function(id) {
           numericInput(ns("tinputnoofsample"), label = "Number of Samples:", value = 10),
           numericInput(ns("tinputthreshold"), label = "Loss Threshold:", value = 0),
           uiOutput(ns("advanced_model_param")),
-          # checkboxInput(ns("chkinputsummaryoption"), "Summary Reports", value = TRUE),
           oasisuiButton(inputId = ns("abuttonbasic"), label = "Basic")
         )
       )
@@ -591,20 +590,12 @@ def_out_config <- function(input,
   # Execute analysis
   observeEvent(input$abuttonexecuteanarun, {
     analysis_settingsList <- .gen_analysis_settings()
-    # write out file to be uploades
-    currfolder <- session$userData$data_hub$get_user_destdir()
-    dest <- file.path(currfolder, "analysis_settings.json")
-    write_json(analysis_settingsList,
-               dest,
-               pretty = TRUE,
-               auto_unbox = TRUE)
     # post analysis settings
-    post_analysis_settings_file <- session$userData$oasisapi$api_post_file_query(
-      query_path = paste("analyses", analysisID(), "settings_file", sep = "/"),
-      query_body = dest,
-      query_encode = "multipart"
+    post_analysis_settings <- session$userData$oasisapi$api_body_query(
+      query_path = paste("analyses", analysisID(), "settings", sep = "/"),
+      query_body = analysis_settingsList[[1]]
     )
-    result$ana_post_status <- post_analysis_settings_file$status
+    result$ana_post_status <- post_analysis_settings$status
   })
 
   # show advanced view
@@ -958,23 +949,28 @@ def_out_config <- function(input,
 
     fetch_model_settings <- function(modelID) {
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "resource_file", sep = "/"),
+        query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
-      model_settings <- tbl_modelsDetails$model_settings %>%
-        unlist(recursive = FALSE)
-      model_params_lst <- lapply(names(model_settings), function(i) {
-        ifelse(is.null(input[[paste0("model_params_", i)]]), model_settings[[i]]$default, input[[paste0("model_params_", i)]])
-      }) %>%
-        setNames(names(model_settings))
+      model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
+                          tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
+
+      model_inputs <- c(input$perils, input$boolean_params, input$event_occurrence, input$event_set)
+      model_params_lst <- lapply(seq(1, length(model_inputs)), function(i) {
+        model_match <- grep(model_inputs[i], model_settings)
+        if (model_match == 4) {
+          model_match <- grep(model_inputs[i], model_settings[[4]])
+        }
+        model_settings[model_match]
+      })
       model_settings <- c(
         list(return_period_file = TRUE),
-        model_params_lst
+        unlist(model_params_lst)
       ) # list of 4 entries
     }
 
     inputsettings <- list(
-      "analysis_tag" = as.integer(analysisID()),
+      "analysis_tag" = as.character(analysisID()),
       # category tag
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
@@ -1117,15 +1113,17 @@ def_out_config <- function(input,
 
     if (length(modelID) != 0) {
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "resource_file", sep = "/"),
+        query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
       if (!is.null(tbl_modelsDetails)) {
-        model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
-        names_settings_type <- lapply(names(model_settings), function(i) {
-          model_settings[[i]][["type"]]
-        }) %>%
-          setNames(names(model_settings))
+        model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
+                            tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
+        # names_settings_type <- lapply(names(model_settings), function(i) {
+        #   model_settings[[i]][["type"]]
+        # }) %>%
+        #   setNames(names(model_settings))
+
         if (length(names(model_settings)) > 0) {
           # Basic model params
           fixed_settings <- c("event_set", "event_occurrence_id")
@@ -1158,47 +1156,67 @@ def_out_config <- function(input,
           })
           output$basic_model_param <- renderUI(ui_basic_model_param)
 
-          # Perils settings
-          model_perils <- names(model_settings)[grepl("peril_", names(model_settings))]
-          if (length(model_perils) > 0) {
-            ui_perils <- lapply(seq(1, length(model_perils)), function(p) {
-              checkboxInput(ns(paste0("model_params_", names(model_perils)[p])),
-                            label = model_perils[[p]],
-                            value = TRUE)
-            })
-            output$chkinputsperils <- renderUI(list(h5("Available Perils"), ui_perils))
+          # Advanced model params
+
+          event_set_fun <- function(model_settings) {
+            selectInput(
+              inputId = ns("event_set"),
+              label = "Event Set",
+              choices = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
+                model_settings$event_set.options[[x]]$desc}),
+              selected = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
+                model_settings$event_set.options[[x]]$desc}),
+              multiple = FALSE
+            )
           }
 
-          # Advanced model params
-          advanced_model_param <- names(model_settings)[names(model_settings) %notin% c(basic_model_params, model_perils)]
-          ui_advanced_model_param <- lapply(advanced_model_param, function(p) {
-            curr_param_lst <- model_settings[[p]]
-            curr_param_name <-
-              capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
-            if (curr_param_lst$type == "boolean") {
-              checkboxInput(
-                inputId = ns(paste0("model_params_", p)),
-                label = curr_param_name,
-                value = curr_param_lst$default
-              )
-            } else if (curr_param_lst$type == "dictionary") {
-              selectInput(
-                inputId = ns(paste0("model_params_", p)),
-                label = curr_param_name,
-                choices = SwapNamesValueInList(curr_param_lst$values),
-                selected =  curr_param_lst$default
-              )
-            } else if (curr_param_lst$type == "float") {
-              sliderInput(
-                inputId = ns(paste0("model_params_", p)),
-                label = curr_param_name,
-                min = curr_param_lst$min,
-                max = curr_param_lst$max,
-                value =  curr_param_lst$default
-              )
+          event_occurrence_fun <- function(model_settings) {
+            selectInput(
+              inputId = ns("event_occurrence"),
+              label = "Event Occurrence",
+              choices = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
+                model_settings$event_occurrence_id.options[[x]]$desc}),
+              selected = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
+                model_settings$event_occurrence_id.options[[x]]$desc}),
+              multiple = FALSE
+            )
+          }
+
+          boolean_params_fun <- function(model_settings) {
+            if (length(grep("boolean_parameters", names(model_settings))) > 0) {
+              lapply(seq(1, length(grep("boolean_parameters", names(model_settings)))), function (x) {
+                checkboxInput(
+                  inputId = ns(paste("boolean_params", x)),
+                  label = capitalize_first_letter(gsub("_", ": ", model_settings$boolean_parameters$name[x])),
+                  value = model_settings$boolean_parameters$default[x]
+                )
+              })
             }
+          }
+
+          perils_fun <- function(model_settings) {
+            if (length(grep("supported_perils", names(model_settings))) > 0) {
+              lapply(seq(1, length(grep("supported_perils", names(model_settings)))), function (x) {
+                selectInput(
+                  inputId = ns(paste("perils", x)),
+                  label = "Perils",
+                  choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils[x])), function (y) {
+                    tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc[x]}),
+                  selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
+                    tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc[x]}),
+                    multiple = TRUE
+                )
+              })
+            }
+          }
+
+          output$advanced_model_param <- renderUI({
+            tagList(
+            event_set_fun(model_settings),
+              event_occurrence_fun(model_settings),
+              perils_fun(model_settings),
+              boolean_params_fun(model_settings))
           })
-          output$advanced_model_param <- renderUI(ui_advanced_model_param)
         }
       }
     }
