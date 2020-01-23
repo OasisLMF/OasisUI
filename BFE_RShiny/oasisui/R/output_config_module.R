@@ -1126,38 +1126,6 @@ def_out_config <- function(input,
 
         if (length(names(model_settings)) > 0) {
           # Basic model params
-          fixed_settings <- c("event_set", "event_occurrence_id")
-          basic_model_params <- names(model_settings)[names(model_settings) %in% fixed_settings]
-          if (ana_flag  == "R") {
-            analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
-            if(length(analysis_settings$detail) == 0) {
-              events_merge <- c(analysis_settings[[1]]$model_settings$event_set, analysis_settings[[1]]$model_settings$event_occurrence_id)
-            }
-          }
-          ui_basic_model_param <- lapply(basic_model_params, function(p) {
-            curr_param_lst <- model_settings[[p]]
-            curr_param_name <- capitalize_first_letter(gsub("_", ": ", curr_param_lst$name))
-            if (ana_flag  == "R" && length(analysis_settings$detail) == 0) {
-              if (p == "event_set") {
-                selected <- events_merge[1]
-              } else if (p == "event_occurrence_id") {
-                selected <- events_merge[2]
-              }
-            } else {
-              selected <- curr_param_lst$default
-            }
-
-            selectInput(
-              inputId = ns(paste0("model_params_", p)),
-              label = curr_param_name,
-              choices = SwapNamesValueInList(curr_param_lst$values),
-              selected =  selected
-            )
-          })
-          output$basic_model_param <- renderUI(ui_basic_model_param)
-
-          # Advanced model params
-
           event_set_fun <- function(model_settings) {
             selectInput(
               inputId = ns("event_set"),
@@ -1181,14 +1149,54 @@ def_out_config <- function(input,
               multiple = FALSE
             )
           }
+          output$basic_model_param <- renderUI(
+            tagList(
+              event_set_fun(model_settings),
+              event_occurrence_fun(model_settings))
+          )
+
+          # Advanced model params
+          string_fun <- function(model_settings) {
+            if (length(grep("string_parameters", names(model_settings))) > 0) {
+
+            }
+          }
+
+          list_fun <- function(model_settings) {
+            if (length(grep("list_parameters", names(model_settings))) > 0) {
+
+            }
+          }
+
+          dictionary_fun <- function(model_settings) {
+            if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
+
+            }
+          }
 
           boolean_params_fun <- function(model_settings) {
             if (length(grep("boolean_parameters", names(model_settings))) > 0) {
-              lapply(seq(1, length(grep("boolean_parameters", names(model_settings)))), function (x) {
+              lapply(grep("boolean_parameters", names(model_settings)), function (x) {
+                boolean_num <- names(model_settings)[x]
                 checkboxInput(
-                  inputId = ns(paste("boolean_params", x)),
-                  label = capitalize_first_letter(gsub("_", ": ", model_settings$boolean_parameters$name[x])),
-                  value = model_settings$boolean_parameters$default[x]
+                  inputId = ns(paste0("boolean_", x)),
+                  label = gsub("_", " ", model_settings[[x]]$name),
+                  value = model_settings[[x]]$default
+                )
+              })
+            }
+          }
+
+          float_fun <- function(model_settings) {
+            if (length(grep("float_parameters", names(model_settings))) > 0) {
+              lapply(grep("float_parameters", names(model_settings)), function (x) {
+                float_num <- names(model_settings)[x]
+                sliderInput(
+                  inputId = ns(paste("float_", x)),
+                  label = gsub("_", " ", model_settings[[x]]$name),
+                  min = model_settings[[x]]$min,
+                  max =model_settings[[x]]$max,
+                  value = model_settings[[x]]$default
                 )
               })
             }
@@ -1196,26 +1204,26 @@ def_out_config <- function(input,
 
           perils_fun <- function(model_settings) {
             if (length(grep("supported_perils", names(model_settings))) > 0) {
-              lapply(seq(1, length(grep("supported_perils", names(model_settings)))), function (x) {
-                selectInput(
-                  inputId = ns(paste("perils", x)),
-                  label = "Perils",
-                  choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils[x])), function (y) {
-                    tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc[x]}),
-                  selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
-                    tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc[x]}),
-                    multiple = TRUE
-                )
-              })
+              selectInput(
+                inputId = ns("supported_perils"),
+                label = "Perils",
+                choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
+                  tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
+                selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
+                  tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
+                multiple = TRUE
+              )
             }
           }
 
           output$advanced_model_param <- renderUI({
             tagList(
-            event_set_fun(model_settings),
-              event_occurrence_fun(model_settings),
-              perils_fun(model_settings),
-              boolean_params_fun(model_settings))
+              string_fun(model_settings),
+              list_fun(model_settings),
+              dictionary_fun(model_settings),
+              boolean_params_fun(model_settings),
+              float_fun(model_settings),
+              perils_fun(model_settings))
           })
         }
       }
