@@ -659,38 +659,39 @@ def_out_config <- function(input,
     # retrieve run information from API
 
     # Get analysis status
-    analysis_info <- session$userData$data_hub$return_tbl_analysesData(Status = Status,
-                                                                       tbl_analysesDataNames = tbl_analysesDataNames) %>%
-      filter(id == analysisID)
-    analysis_status <- analysis_info$status_detailed
+    # analysis_info <- session$userData$data_hub$return_tbl_analysesData(Status = Status,
+    #                                                                    tbl_analysesDataNames = tbl_analysesDataNames) %>%
+    #   filter(id == analysisID)
+    # analysis_status <- analysis_info$status_detailed
 
-    if (analysis_status == "run completed") {
-      # if analysis run was successful:
-      out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
-
-      # display previous selection
-      # Summary Info output is non-configurable, remove it
-      if(length(out_cnfg_tbl) > 0) {
-        out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
-
-        uniq_sum <- unique(out_cnfg_tbl$summary_level)
-        # In case multiple fields were selected, split the comma and make them two separate strings
-        choices_sum <- lapply(uniq_sum, function(x) {
-          strsplit(x, ", ")[[1]]
-        })
-        # combine multiple reports for same summary level
-        choices_rep_final <- lapply(uniq_sum, function(x) {
-          out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
-        })
-
-        # update checkboxes selection
-        choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
-        updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
-      }
-    } else {
+    # if (analysis_status == "run completed") {
+    #   # if analysis run was successful:
+    #   out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
+    #
+    #   # display previous selection
+    #   # Summary Info output is non-configurable, remove it
+    #   if(length(out_cnfg_tbl) > 0) {
+    #     out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
+    #
+    #     uniq_sum <- unique(out_cnfg_tbl$summary_level)
+    #
+    #     # In case multiple fields were selected, split the comma and make them two separate strings
+    #     choices_sum <- lapply(uniq_sum, function(x) {
+    #       strsplit(x, ", ")[[1]]
+    #     })
+    #     # combine multiple reports for same summary level
+    #     choices_rep_final <- lapply(uniq_sum, function(x) {
+    #       out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
+    #     })
+    #
+    #     # update checkboxes selection
+    #     choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
+    #     updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+    #   }
+    # } else {
       # if error:
       out_cnfg_tbl <- session$userData$data_hub$get_ana_settings_content(
-        analysisID, oasisapi = session$userData$oasisapi)$analysis_settings
+        analysisID, oasisapi = session$userData$oasisapi)
 
       if (length(out_cnfg_tbl$gul_summaries) > 0 ||
           length(out_cnfg_tbl$il_summaries) > 0 ||
@@ -711,6 +712,7 @@ def_out_config <- function(input,
           }
           unlist(prsp_sum[[x]]$oed_fields)
         })
+
         # reports
         choices_rep_final <- lapply(seq(1:length(prsp_sum)), function(x) {
           not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
@@ -739,7 +741,7 @@ def_out_config <- function(input,
         updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
 
       }
-    }
+    # }
 
     # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
     result$n_add <- length(choices_sum) - 1

@@ -44,11 +44,10 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
   if (file.exists(file.path(destdir, dataset_identifier))) {
     extension <-  strsplit(dataset_identifier, split = "\\.") %>% unlist() %>% tail(n = 1)
     if (extension == "csv") {
-      if (length(dataset_identifier) > 1) {
-        stop("More than 1 dataset_identifier was passed to read_file_from_tar function")
-      } else {
-        data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
-      }
+      data <- lapply(seq(1, length(file.path(destdir, dataset_identifier))), function(x) {
+        fread(file.path(destdir, dataset_identifier)[x], nrows = nrows)
+      })
+      data <- do.call(rbind, data)
     } else if (extension == "json") {
       data <- read_json(file.path(destdir, dataset_identifier))
     } else{
