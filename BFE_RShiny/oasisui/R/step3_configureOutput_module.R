@@ -519,7 +519,7 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
     if (!is.null(result$anaID)) {
-      result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste( "analyses", result$anaID, "run_traceback_file", sep = "/"))
+      result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste("analyses", result$anaID, "run_traceback_file", sep = "/"))
     } else {
       result$tbl_analysisrunlog <-  NULL
     }

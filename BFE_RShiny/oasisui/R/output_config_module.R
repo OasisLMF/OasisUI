@@ -368,7 +368,7 @@ def_out_config <- function(input,
     result$ana_flag
     analysisID()
   }, {
-    #print(paste("*** result$ana_flag is:", result$ana_flag, "--- analysisID() is:", analysisID()))
+
     if (length(analysisID()) > 0) {
       if (result$ana_flag == "R") {
         analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
@@ -433,7 +433,6 @@ def_out_config <- function(input,
     }
     # main output configuration panel (perspectives, summary levels, reports)
     output$summary_levels_reports_ui <- renderUI({
-      #if (length(analysisID()) > 0) {
       oed_field <- oed_field_react()
       # if oed fields are provided, a vector is returned, otherwise NA
       if (all(is.na(oed_field))) {
@@ -564,9 +563,7 @@ def_out_config <- function(input,
   callModule(
     oasisuiTable,
     id = "out_params_review_tbl",
-    data = reactive({
-      result$out_params_review
-    }),
+    data = reactive({result$out_params_review}),
     selection = "none",
     escape = TRUE,
     scrollX = FALSE,
@@ -675,7 +672,6 @@ def_out_config <- function(input,
       # Summary Info output is non-configurable, remove it
       if(length(out_cnfg_tbl) > 0) {
         out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
-        # out_cnfg_tbl <- out_cnfg_tbl %>% dplyr::filter()
 
         uniq_sum <- unique(out_cnfg_tbl$summary_level)
         # In case multiple fields were selected, split the comma and make them two separate strings
@@ -926,8 +922,8 @@ def_out_config <- function(input,
       chosen_tag <- default_tags[3]
       # update Number of samples and Threshold in model params panel
       if (is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
-        updateNumericInput(session, "tinputnoofsample", value = analysis_settings[[1]]$number_of_samples)
-        updateNumericInput(session, "tinputthreshold", value = analysis_settings[[1]]$gul_threshold)
+        updateNumericInput(session, "tinputnoofsample", value = analysis_settings$number_of_samples)
+        updateNumericInput(session, "tinputthreshold", value = analysis_settings$gul_threshold)
         .clearOutputOptions(ana_flag)
       }
     } else {
@@ -955,7 +951,7 @@ def_out_config <- function(input,
       model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
                           tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
 
-      model_inputs <- c(input$perils, input$boolean_params, input$event_occurrence, input$event_set)
+      model_inputs <- c(input$supported_perils, input$boolean_params, input$event_occurrence, input$event_set)
       model_params_lst <- lapply(seq(1, length(model_inputs)), function(i) {
         model_match <- grep(model_inputs[i], model_settings)
         if (model_match == 4) {
@@ -1119,13 +1115,10 @@ def_out_config <- function(input,
       if (!is.null(tbl_modelsDetails)) {
         model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
                             tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
-        # names_settings_type <- lapply(names(model_settings), function(i) {
-        #   model_settings[[i]][["type"]]
-        # }) %>%
-        #   setNames(names(model_settings))
 
         if (length(names(model_settings)) > 0) {
           # Basic model params
+          # Event set
           event_set_fun <- function(model_settings) {
             selectInput(
               inputId = ns("event_set"),
@@ -1138,6 +1131,7 @@ def_out_config <- function(input,
             )
           }
 
+          # Event Occurrence
           event_occurrence_fun <- function(model_settings) {
             selectInput(
               inputId = ns("event_occurrence"),
@@ -1149,6 +1143,7 @@ def_out_config <- function(input,
               multiple = FALSE
             )
           }
+
           output$basic_model_param <- renderUI(
             tagList(
               event_set_fun(model_settings),
@@ -1156,24 +1151,28 @@ def_out_config <- function(input,
           )
 
           # Advanced model params
+          # string parameters
           string_fun <- function(model_settings) {
             if (length(grep("string_parameters", names(model_settings))) > 0) {
 
             }
           }
 
+          # list parameters
           list_fun <- function(model_settings) {
             if (length(grep("list_parameters", names(model_settings))) > 0) {
 
             }
           }
 
+          # dictionary parameters
           dictionary_fun <- function(model_settings) {
             if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
 
             }
           }
 
+          # boolean parameters
           boolean_params_fun <- function(model_settings) {
             if (length(grep("boolean_parameters", names(model_settings))) > 0) {
               lapply(grep("boolean_parameters", names(model_settings)), function (x) {
@@ -1187,6 +1186,7 @@ def_out_config <- function(input,
             }
           }
 
+          # float parameters
           float_fun <- function(model_settings) {
             if (length(grep("float_parameters", names(model_settings))) > 0) {
               lapply(grep("float_parameters", names(model_settings)), function (x) {
@@ -1202,6 +1202,7 @@ def_out_config <- function(input,
             }
           }
 
+          # supported perils parameters
           perils_fun <- function(model_settings) {
             if (length(grep("supported_perils", names(model_settings))) > 0) {
               selectInput(
