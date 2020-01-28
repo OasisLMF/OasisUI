@@ -263,10 +263,25 @@ modeldetails <- function(input,
   .reloadtbl_modelsDetails <- function() {
     logMessage(".reloadtbl_modelsDetails called")
 
-    result$tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
       query_path = paste("models", modelID(), "settings", sep = "/"),
       query_method = "GET"
     )
+
+    if (!is.null(tbl_modelsDetails)) {
+      result$tbl_modelsDetails <- tbl_modelsDetails
+      logMessage("model resources table refreshed")
+      result$uploaded_locs <- session$userData$data_hub$get_pf_location_content(id = portfolioID())
+      logMessage("uploaded_locs refreshed")
+      result$mapfiles_lst <- session$userData$data_hub$get_model_hazard_data_list(modelID())
+      if (is.null(result$mapfiles_lst)) {
+        hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
+      } else {
+        showTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
+      }
+    } else {
+      result$tbl_modelsDetails <- NULL
+    }
 
     result$tbl_modelsDetails
   }
