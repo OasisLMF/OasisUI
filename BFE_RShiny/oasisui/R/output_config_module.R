@@ -1118,138 +1118,140 @@ def_out_config <- function(input,
 
         if (length(names(model_settings)) > 0) {
           # Basic model params
-          # Event set
-          event_set_fun <- function(model_settings) {
-            selectInput(
-              inputId = ns("event_set"),
-              label = "Event Set:",
-              choices = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
-                model_settings$event_set.options[[x]]$desc}),
-              selected = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
-                model_settings$event_set.options[[x]]$desc}),
-              multiple = FALSE
-            )
-          }
-
-          # Event Occurrence
-          event_occurrence_fun <- function(model_settings) {
-            selectInput(
-              inputId = ns("event_occurrence"),
-              label = "Event Occurrence:",
-              choices = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
-                model_settings$event_occurrence_id.options[[x]]$desc}),
-              selected = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
-                model_settings$event_occurrence_id.options[[x]]$desc}),
-              multiple = FALSE
-            )
-          }
-
           output$basic_model_param <- renderUI(
             tagList(
-              event_set_fun(model_settings),
-              event_occurrence_fun(model_settings))
+              .event_set_fun(model_settings),
+              .event_occurrence_fun(model_settings))
           )
 
           # Advanced model params
-          # string parameters
-          string_fun <- function(model_settings) {
-            if (length(grep("string_parameters", names(model_settings))) > 0) {
-              lapply(grep("string_parameters", names(model_settings)), function (x) {
-                selectInput(
-                  inputId = ns(paste0("string_", x)),
-                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-                  choices = model_settings[[x]]$default,
-                  selected = model_settings[[x]]$default,
-                  multiple = TRUE
-                )
-              })
-            }
-          }
-
-          # list parameters
-          list_fun <- function(model_settings) {
-            if (length(grep("list_parameters", names(model_settings))) > 0) {
-              lapply(grep("list_parameters", names(model_settings)), function (x) {
-                selectInput(
-                  inputId = ns(paste0("list_", x)),
-                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-                  choices = model_settings[[x]]$default,
-                  selected = model_settings[[x]]$default,
-                  multiple = TRUE
-                )
-              })
-            }
-          }
-
-          # dictionary parameters
-          dictionary_fun <- function(model_settings) {
-            if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
-              lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
-                selectInput(
-                  inputId = ns(paste0("dictionary_", x)),
-                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-                  choices = model_settings[[x]]$default,
-                  selected = model_settings[[x]]$default,
-                  multiple = TRUE
-                )
-              })
-            }
-          }
-
-          # boolean parameters
-          boolean_params_fun <- function(model_settings) {
-            if (length(grep("boolean_parameters", names(model_settings))) > 0) {
-              lapply(grep("boolean_parameters", names(model_settings)), function (x) {
-                checkboxInput(
-                  inputId = ns(paste0("boolean_", x)),
-                  label = gsub("_", " ", model_settings[[x]]$name) %>% capitalize_first_letter(),
-                  value = model_settings[[x]]$default
-                )
-              })
-            }
-          }
-
-          # float parameters
-          float_fun <- function(model_settings) {
-            if (length(grep("float_parameters", names(model_settings))) > 0) {
-              lapply(grep("float_parameters", names(model_settings)), function (x) {
-                sliderInput(
-                  inputId = ns(paste("float_", x)),
-                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-                  min = model_settings[[x]]$min,
-                  max = model_settings[[x]]$max,
-                  value = model_settings[[x]]$default
-                )
-              })
-            }
-          }
-
-          # supported perils parameters
-          perils_fun <- function(model_settings) {
-            if (length(grep("supported_perils", names(model_settings))) > 0) {
-              selectInput(
-                inputId = ns("supported_perils"),
-                label = "Supported Perils:",
-                choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
-                  tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
-                selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
-                  tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
-                multiple = TRUE
-              )
-            }
-          }
-
           output$advanced_model_param <- renderUI({
             tagList(
-              string_fun(model_settings),
-              list_fun(model_settings),
-              dictionary_fun(model_settings),
-              boolean_params_fun(model_settings),
-              float_fun(model_settings),
-              perils_fun(model_settings))
+              .string_fun(model_settings),
+              .list_fun(model_settings),
+              .dictionary_fun(model_settings),
+              .boolean_params_fun(model_settings),
+              .float_fun(model_settings),
+              .perils_fun(tbl_modelsDetails, model_settings))
           })
         }
       }
+    }
+  }
+
+  # Basic view functions -------------------------------------------------------
+  # Event set
+  .event_set_fun <- function(model_settings) {
+    selectInput(
+      inputId = ns("event_set"),
+      label = "Event Set:",
+      choices = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
+        model_settings$event_set.options[[x]]$desc}),
+      selected = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
+        model_settings$event_set.options[[x]]$desc}),
+      multiple = FALSE
+    )
+  }
+
+  # Event Occurrence
+  .event_occurrence_fun <- function(model_settings) {
+    selectInput(
+      inputId = ns("event_occurrence"),
+      label = "Event Occurrence:",
+      choices = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
+        model_settings$event_occurrence_id.options[[x]]$desc}),
+      selected = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
+        model_settings$event_occurrence_id.options[[x]]$desc}),
+      multiple = FALSE
+    )
+  }
+
+  # Advanced view functions ----------------------------------------------------
+  # string parameters
+  .string_fun <- function(model_settings) {
+    if (length(grep("string_parameters", names(model_settings))) > 0) {
+      lapply(grep("string_parameters", names(model_settings)), function (x) {
+        selectInput(
+          inputId = ns(paste0("string_", x)),
+          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+          choices = model_settings[[x]]$default,
+          selected = model_settings[[x]]$default,
+          multiple = TRUE
+        )
+      })
+    }
+  }
+
+  # list parameters
+  .list_fun <- function(model_settings) {
+    if (length(grep("list_parameters", names(model_settings))) > 0) {
+      lapply(grep("list_parameters", names(model_settings)), function (x) {
+        selectInput(
+          inputId = ns(paste0("list_", x)),
+          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+          choices = model_settings[[x]]$default,
+          selected = model_settings[[x]]$default,
+          multiple = TRUE
+        )
+      })
+    }
+  }
+
+  # dictionary parameters
+  .dictionary_fun <- function(model_settings) {
+    if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
+      lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
+        selectInput(
+          inputId = ns(paste0("dictionary_", x)),
+          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+          choices = model_settings[[x]]$default,
+          selected = model_settings[[x]]$default,
+          multiple = TRUE
+        )
+      })
+    }
+  }
+
+  # boolean parameters
+  .boolean_params_fun <- function(model_settings) {
+    if (length(grep("boolean_parameters", names(model_settings))) > 0) {
+      lapply(grep("boolean_parameters", names(model_settings)), function (x) {
+        checkboxInput(
+          inputId = ns(paste0("boolean_", x)),
+          label = gsub("_", " ", model_settings[[x]]$name) %>% capitalize_first_letter(),
+          value = model_settings[[x]]$default
+        )
+      })
+    }
+  }
+
+  # float parameters
+  .float_fun <- function(model_settings) {
+    if (length(grep("float_parameters", names(model_settings))) > 0) {
+      lapply(grep("float_parameters", names(model_settings)), function (x) {
+        sliderInput(
+          inputId = ns(paste("float_", x)),
+          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+          min = model_settings[[x]]$min,
+          max = model_settings[[x]]$max,
+          value = model_settings[[x]]$default
+        )
+      })
+    }
+  }
+
+  # supported perils parameters
+  .perils_fun <- function(tbl_modelsDetails, model_settings) {
+    if (length(grep("supported_perils", names(model_settings))) > 0) {
+      selectInput(
+        inputId = ns("supported_perils"),
+        label = "Supported Perils:",
+        choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
+          tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
+        selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
+          tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
+        multiple = TRUE
+      )
     }
   }
 
