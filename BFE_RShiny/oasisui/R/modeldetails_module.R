@@ -41,6 +41,11 @@ modeldetailsUI <- function(id) {
         value = ns("tabresources")
       ),
       tabPanel(
+        title = "JSON",
+        h4("Model Settings JSON file"),
+        verbatimTextOutput(ns("json_model_settings"))
+      ),
+      tabPanel(
         title = "Hazard Maps",
         selectInput(inputId = ns("hazard_files"),
                     label = "Choose hazard file",
@@ -109,10 +114,42 @@ modeldetails <- function(input,
 
   # Tab Resources ------------------------------------------------------------
   output$dt_model_settings <- renderDT(
-    if (!is.null(result$tbl_modelsDetails[1]) && nrow(result$tbl_modelsDetails[[1]]) > 0) {
+    if (!is.null(result$tbl_modelsDetails$model_settings) &&
+        length(result$tbl_modelsDetails$model_settings) > 0) {
       logMessage("re-rendering model settings table")
+      df <- result$tbl_modelsDetails$model_settings
+
+      #extract names from model settings
+      name_param <- names(df)
+
+      #extract description from model settings
+      Description <- lapply(seq(1, length(name_param)), function(x) {
+        entry <- df[[x]]
+        descrp <- entry$desc
+        if(is.null(entry$desc)) {
+          descrp <- entry[[length(entry)]]$desc
+        }
+        descrp
+      })
+
+      #extract default values from model settings
+      Default <- lapply(seq(1, length(name_param)), function(x) {
+        entry <- df[x][[names(df[x])]]
+
+        if(is.null(entry$name)) {
+          lapply(seq(1, length(df[x][[names(df[x])]])), function(y) {
+            set <- df[x][[names(df[x])]][[y]]
+            rbind(set$default)
+          })
+        } else {
+          df[[x]][["default"]]
+        }
+      })
+      #rename names list for data frame title
+      Name <- name_param
+      #create model settings data table
       datatable(
-        result$tbl_modelsDetails[[1]] %>% capitalize_names_df(),
+        cbind(Name, Description, Default),
         class = "oasisui-table display",
         rownames = FALSE,
         filter = "none",
@@ -126,10 +163,24 @@ modeldetails <- function(input,
   )
 
   output$dt_lookup_settings <- renderDT(
-    if (!is.null(result$tbl_modelsDetails[2]) && nrow(result$tbl_modelsDetails[[2]]) > 0) {
+    if (!is.null(result$tbl_modelsDetails$lookup_settings) &&
+        length(result$tbl_modelsDetails$lookup_settings) > 0) {
       logMessage("re-rendering lookup settings table")
+      df <- result$tbl_modelsDetails$lookup_settings
+
+      #extract ID from lookup settings
+      ID <- lapply(grep("id", names(unlist(df))), function(x) {
+        unlist(df)[x]
+      })
+
+      #extract description from lookup settings
+      Description <- lapply(ID, function(x) {
+        name_desc <- gsub("id", "desc", names(x))
+        unlist(as.data.frame(df)[which(names(as.data.frame(df)) == name_desc)])
+      })
+
       datatable(
-        result$tbl_modelsDetails[[2]],
+        cbind(ID, Description),
         class = "oasisui-table display",
         rownames = FALSE,
         filter = "none",
@@ -137,10 +188,22 @@ modeldetails <- function(input,
         selection = "none",
         options = getTableOptions()
       )
+
     } else {
       nothingToShowTable(paste0("No lookup settings files associated with Model ID ", modelID()))
     }
   )
+
+  # Tab JSON file --------------------------------------------------------------
+
+  output$json_model_settings <- renderText({
+    if (!is.null(result$tbl_modelsDetails)) {
+      logMessage("re-rendering model settings JSON")
+      toJSON(result$tbl_modelsDetails, pretty = TRUE)
+    } else {
+      paste0("No model settings JSON file associated with Model ID", modelID())
+    }
+  })
 
   # Tab Hazard Map -------------------------------------------------------------
 
@@ -199,21 +262,12 @@ modeldetails <- function(input,
   # Reload Programme Model Details table
   .reloadtbl_modelsDetails <- function() {
     logMessage(".reloadtbl_modelsDetails called")
-    tbl_modelsDetails <- session$userData$data_hub$get_model_resource_dataset_content(modelID())
-    if (!is.null(tbl_modelsDetails)) {
-      result$tbl_modelsDetails <- tbl_modelsDetails
-      logMessage("model resources table refreshed")
-      result$uploaded_locs <- session$userData$data_hub$get_pf_location_content(id = portfolioID())
-      logMessage("uploaded_locs refreshed")
-      result$mapfiles_lst <- session$userData$data_hub$get_model_hazard_data_list(modelID())
-      if (is.null(result$mapfiles_lst)) {
-        hideTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
-      } else {
-        showTab(inputId = "tabsModelsDetails", target = ns("tabmaps"))
-      }
-    } else {
-      result$tbl_modelsDetails <- NULL
-    }
+
+    result$tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID(), "settings", sep = "/"),
+      query_method = "GET"
+    )
+
     result$tbl_modelsDetails
   }
 

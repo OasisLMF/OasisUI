@@ -397,25 +397,29 @@ summarytab <- function(input, output, session,
       locnum <- 0
     }
 
-    ana_settings <- analysis_settings[["analysis_settings"]]
-    model_settings <- analysis_settings[["analysis_settings"]][["model_settings"]]
+    ana_settings <- analysis_settings
+    model_settings <- analysis_settings$model_settings
     model_params_lst <- sapply(names(model_settings), function(i){model_settings[[i]]})
 
-    model_params_list <- as.list(model_params_lst)
-    if (isTRUE(model_params_lst[4])) {
-      tot_locations <- nrow(check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub) %>%
-                              filter(peril_id == model_params_lst[4]) %>%
-                              distinct())
-    } else {
-      tot_locations <- nrow(check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub) %>%
-                              filter(peril_id == model_params_lst[4]) %>%
-                              distinct())
-    }
+    # check which perils were chosen
+    supported_perils_all <- model_settings[grep("supported_perils", names(model_settings))]
+    supported_perils_id <- as.list(supported_perils_all[grep(".id", names(supported_perils_all))])
+    # extract the whole files with locations and perils
+    locations_all <- check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub)
+    # distinguish for unique location
+    locs_unique <- distinct(locations_all, LocNumber, .keep_all = TRUE)
+    # filter by peril
+    mod_locations_filter <- lapply(seq(1, length(supported_perils_id)), function(x) {
+      nrow(locs_unique %>%
+          filter(peril_id == supported_perils_id[x]))
+    })
+    # sum over all unique locations filtered by perils
+    mod_locations <- do.call(sum, mod_locations_filter)
 
     # summary DF
     model_params_lst <- c(input$supported_perils, input$boolean_params, input$event_occurrence, input$event_set)
     SpecificationRows <- c("exposure location count", tiv$variables, "modelled locations", names(model_params_lst))
-    ValueRows <- unlist(c(locnum, tiv$value, tot_locations, model_params_lst))
+    ValueRows <- unlist(c(locnum, tiv$value, mod_locations, model_params_lst))
     TypeRows <- c("input", rep("input", nrow(tiv)), "input", rep("param", length(model_params_lst)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
