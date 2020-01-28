@@ -1122,7 +1122,7 @@ def_out_config <- function(input,
           event_set_fun <- function(model_settings) {
             selectInput(
               inputId = ns("event_set"),
-              label = "Event Set",
+              label = "Event Set:",
               choices = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
                 model_settings$event_set.options[[x]]$desc}),
               selected = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
@@ -1135,7 +1135,7 @@ def_out_config <- function(input,
           event_occurrence_fun <- function(model_settings) {
             selectInput(
               inputId = ns("event_occurrence"),
-              label = "Event Occurrence",
+              label = "Event Occurrence:",
               choices = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
                 model_settings$event_occurrence_id.options[[x]]$desc}),
               selected = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
@@ -1154,21 +1154,45 @@ def_out_config <- function(input,
           # string parameters
           string_fun <- function(model_settings) {
             if (length(grep("string_parameters", names(model_settings))) > 0) {
-
+              lapply(grep("string_parameters", names(model_settings)), function (x) {
+                selectInput(
+                  inputId = ns(paste0("string_", x)),
+                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+                  choices = model_settings[[x]]$default,
+                  selected = model_settings[[x]]$default,
+                  multiple = TRUE
+                )
+              })
             }
           }
 
           # list parameters
           list_fun <- function(model_settings) {
             if (length(grep("list_parameters", names(model_settings))) > 0) {
-
+              lapply(grep("list_parameters", names(model_settings)), function (x) {
+                selectInput(
+                  inputId = ns(paste0("list_", x)),
+                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+                  choices = model_settings[[x]]$default,
+                  selected = model_settings[[x]]$default,
+                  multiple = TRUE
+                )
+              })
             }
           }
 
           # dictionary parameters
           dictionary_fun <- function(model_settings) {
             if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
-
+              lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
+                selectInput(
+                  inputId = ns(paste0("dictionary_", x)),
+                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+                  choices = model_settings[[x]]$default,
+                  selected = model_settings[[x]]$default,
+                  multiple = TRUE
+                )
+              })
             }
           }
 
@@ -1176,10 +1200,9 @@ def_out_config <- function(input,
           boolean_params_fun <- function(model_settings) {
             if (length(grep("boolean_parameters", names(model_settings))) > 0) {
               lapply(grep("boolean_parameters", names(model_settings)), function (x) {
-                boolean_num <- names(model_settings)[x]
                 checkboxInput(
                   inputId = ns(paste0("boolean_", x)),
-                  label = gsub("_", " ", model_settings[[x]]$name),
+                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
                   value = model_settings[[x]]$default
                 )
               })
@@ -1190,12 +1213,11 @@ def_out_config <- function(input,
           float_fun <- function(model_settings) {
             if (length(grep("float_parameters", names(model_settings))) > 0) {
               lapply(grep("float_parameters", names(model_settings)), function (x) {
-                float_num <- names(model_settings)[x]
                 sliderInput(
                   inputId = ns(paste("float_", x)),
-                  label = gsub("_", " ", model_settings[[x]]$name),
+                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
                   min = model_settings[[x]]$min,
-                  max =model_settings[[x]]$max,
+                  max = model_settings[[x]]$max,
                   value = model_settings[[x]]$default
                 )
               })
@@ -1207,7 +1229,7 @@ def_out_config <- function(input,
             if (length(grep("supported_perils", names(model_settings))) > 0) {
               selectInput(
                 inputId = ns("supported_perils"),
-                label = "Perils",
+                label = "Supported Perils:",
                 choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
                   tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
                 selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
