@@ -1202,7 +1202,7 @@ def_out_config <- function(input,
               lapply(grep("boolean_parameters", names(model_settings)), function (x) {
                 checkboxInput(
                   inputId = ns(paste0("boolean_", x)),
-                  label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+                  label = gsub("_", " ", model_settings[[x]]$name) %>% capitalize_first_letter(),
                   value = model_settings[[x]]$default
                 )
               })
