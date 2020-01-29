@@ -49,7 +49,6 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
       } else {
         data <- fread(file.path(destdir, dataset_identifier), nrows = nrows)
       }
-      data <- do.call(rbind, data)
     } else if (extension == "json") {
       data <- read_json(file.path(destdir, dataset_identifier))
     } else{
