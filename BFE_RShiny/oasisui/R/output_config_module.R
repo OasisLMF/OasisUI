@@ -689,58 +689,58 @@ def_out_config <- function(input,
     #     updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
     #   }
     # } else {
-      # if error:
-      out_cnfg_tbl <- session$userData$data_hub$get_ana_settings_content(
-        analysisID, oasisapi = session$userData$oasisapi)
+    # if error:
+    out_cnfg_tbl <- session$userData$data_hub$get_ana_settings_content(
+      analysisID, oasisapi = session$userData$oasisapi)
 
-      if (length(out_cnfg_tbl$gul_summaries) > 0 ||
-          length(out_cnfg_tbl$il_summaries) > 0 ||
-          length(out_cnfg_tbl$ri_summaries) > 0) {
+    if (length(out_cnfg_tbl$gul_summaries) > 0 ||
+        length(out_cnfg_tbl$il_summaries) > 0 ||
+        length(out_cnfg_tbl$ri_summaries) > 0) {
 
-        if (length(out_cnfg_tbl$gul_summaries) > 0) {
-          prsp_sum <- out_cnfg_tbl$gul_summaries
-        } else if (length(out_cnfg_tbl$il_summaries) > 0) {
-          prsp_sum <- out_cnfg_tbl$il_summaries
-        } else {
-          prsp_sum <- out_cnfg_tbl$ri_summaries
-        }
-
-        # summary levels
-        choices_sum <- lapply(seq(1:length(prsp_sum)), function(x) {
-          if (length(prsp_sum[[x]]$oed_fields) == 0) {
-            prsp_sum[[x]]$oed_fields <- "All Risks"
-          }
-          unlist(prsp_sum[[x]]$oed_fields)
-        })
-
-        # reports
-        choices_rep_final <- lapply(seq(1:length(prsp_sum)), function(x) {
-          not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
-          names_reports <- as.list(names(prsp_sum[[x]]))
-          names_reports <- names_reports[-which(names_reports %in% not_include)]
-          if (length(names(prsp_sum[[x]]$leccalc)) > 0) {
-            choices_rep_final <- c(names_reports, as.list(names(prsp_sum[[x]]$leccalc)))
-          } else {
-            choices_rep_final <- as.list(names_reports)
-          }
-          choices_rep_final <- unlist(varsdf$labels[which(varsdf$fields %in% choices_rep_final)])
-          choices_rep_final
-        })
-
-        choices_prsp <- NULL
-        if (out_cnfg_tbl$gul_output) {
-          choices_prsp <- c(choices_prsp, "GUL")
-        }
-        if (out_cnfg_tbl$il_output) {
-          choices_prsp <- c(choices_prsp, "IL")
-        }
-        if (out_cnfg_tbl$ri_output) {
-          choices_prsp <- c(choices_prsp, "RI")
-        }
-        # update checkboxes selection
-        updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
-
+      if (length(out_cnfg_tbl$gul_summaries) > 0) {
+        prsp_sum <- out_cnfg_tbl$gul_summaries
+      } else if (length(out_cnfg_tbl$il_summaries) > 0) {
+        prsp_sum <- out_cnfg_tbl$il_summaries
+      } else {
+        prsp_sum <- out_cnfg_tbl$ri_summaries
       }
+
+      # summary levels
+      choices_sum <- lapply(seq(1:length(prsp_sum)), function(x) {
+        if (length(prsp_sum[[x]]$oed_fields) == 0) {
+          prsp_sum[[x]]$oed_fields <- "All Risks"
+        }
+        unlist(prsp_sum[[x]]$oed_fields)
+      })
+
+      # reports
+      choices_rep_final <- lapply(seq(1:length(prsp_sum)), function(x) {
+        not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
+        names_reports <- as.list(names(prsp_sum[[x]]))
+        names_reports <- names_reports[-which(names_reports %in% not_include)]
+        if (length(names(prsp_sum[[x]]$leccalc)) > 0) {
+          choices_rep_final <- c(names_reports, as.list(names(prsp_sum[[x]]$leccalc)))
+        } else {
+          choices_rep_final <- as.list(names_reports)
+        }
+        choices_rep_final <- unlist(varsdf$labels[which(varsdf$fields %in% choices_rep_final)])
+        choices_rep_final
+      })
+
+      choices_prsp <- NULL
+      if (out_cnfg_tbl$gul_output) {
+        choices_prsp <- c(choices_prsp, "GUL")
+      }
+      if (out_cnfg_tbl$il_output) {
+        choices_prsp <- c(choices_prsp, "IL")
+      }
+      if (out_cnfg_tbl$ri_output) {
+        choices_prsp <- c(choices_prsp, "RI")
+      }
+      # update checkboxes selection
+      updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
+
+    }
     # }
 
     # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
@@ -958,8 +958,10 @@ def_out_config <- function(input,
         model_match <- grep(model_inputs[i], model_settings)
         if (model_match == 4) {
           model_match <- grep(model_inputs[i], model_settings[[4]])
+          model_settings$event_set.options[model_match][[1]]
+        } else {
+          model_settings[model_match]
         }
-        model_settings[model_match]
       })
       model_settings <- c(
         list(return_period_file = TRUE),
@@ -1188,13 +1190,18 @@ def_out_config <- function(input,
   .list_fun <- function(model_settings) {
     if (length(grep("list_parameters", names(model_settings))) > 0) {
       lapply(grep("list_parameters", names(model_settings)), function (x) {
-        selectInput(
-          inputId = ns(paste0("list_", x)),
-          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          choices = model_settings[[x]]$default,
-          selected = model_settings[[x]]$default,
-          multiple = TRUE
-        )
+        list_params <- model_settings[grep("list_parameters", names(model_settings))]
+        lapply(seq(1, length(list_params$list_parameters$default)), function (y) {
+          label <- paste0(gsub("_", " ", list_params$list_parameters$name[y]), ":") %>% capitalize_first_letter()
+          if (label == "NA:") {
+            label <- ""
+          }
+          textInput(
+            inputId = ns(paste0("list_", y, "_", x)),
+            label = label,
+            value = unlist(list_params$list_parameters$default[y])
+          )
+        })
       })
     }
   }
@@ -1203,13 +1210,14 @@ def_out_config <- function(input,
   .dictionary_fun <- function(model_settings) {
     if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
       lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
-        selectInput(
-          inputId = ns(paste0("dictionary_", x)),
-          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          choices = model_settings[[x]]$default,
-          selected = model_settings[[x]]$default,
-          multiple = TRUE
-        )
+        dict_params <- model_settings[grep("dictionary_parameters", names(model_settings))]
+        lapply(seq(1, length(dict_params$dictionary_parameters$default)), function (y) {
+          textInput(
+            inputId = ns(paste0("dictionary_", y, "_", x)),
+            label = paste0(gsub("_", " ", names(dict_params$dictionary_parameters$default)[y]), ":") %>% capitalize_first_letter(),
+            value = dict_params$dictionary_parameters$default[y][[1]]
+          )
+        })
       })
     }
   }

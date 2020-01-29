@@ -337,7 +337,6 @@ summarytab <- function(input, output, session,
   }
 
   .getSummary <- function(selectAnaID, portfolioID) {
-    # TODO: cross check the use of analysis settings with use in issue #173
     # TODO: cross check overlap of helper functions and plots part here with code in outputplots_module.R
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
