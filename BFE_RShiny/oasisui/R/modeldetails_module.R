@@ -120,10 +120,22 @@ modeldetails <- function(input,
       df <- result$tbl_modelsDetails$model_settings
 
       #extract names from model settings
-      name_param <- names(df)
+      type_param <- names(df)
+
+      Name <- lapply(seq(1, length(type_param)), function(x) {
+        entry <- df[x][[names(df[x])]]
+        if(is.null(entry$name)) {
+          lapply(seq(1, length(df[x][[names(df[x])]])), function(y) {
+            set <- df[x][[names(df[x])]][[y]]
+            set$name
+          })
+        } else {
+          df[[x]][["name"]]
+        }
+      })
 
       #extract description from model settings
-      Description <- lapply(seq(1, length(name_param)), function(x) {
+      Description <- lapply(seq(1, length(type_param)), function(x) {
         entry <- df[[x]]
         descrp <- entry$desc
         if(is.null(entry$desc)) {
@@ -133,9 +145,8 @@ modeldetails <- function(input,
       })
 
       #extract default values from model settings
-      Default <- lapply(seq(1, length(name_param)), function(x) {
+      Default <- lapply(seq(1, length(type_param)), function(x) {
         entry <- df[x][[names(df[x])]]
-
         if(is.null(entry$name)) {
           lapply(seq(1, length(df[x][[names(df[x])]])), function(y) {
             set <- df[x][[names(df[x])]][[y]]
@@ -145,11 +156,12 @@ modeldetails <- function(input,
           df[[x]][["default"]]
         }
       })
+
       #rename names list for data frame title
-      Name <- name_param
+      Type <- type_param
       #create model settings data table
       datatable(
-        cbind(Name, Description, Default),
+        cbind(Type, Name, Description, Default),
         class = "oasisui-table display",
         rownames = FALSE,
         filter = "none",
