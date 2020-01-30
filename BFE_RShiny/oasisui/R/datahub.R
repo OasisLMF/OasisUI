@@ -467,7 +467,8 @@ DataHub <- R6Class(
     },
     # extract oed summary levels relevant for current analysis
     get_ana_oed_summary_levels = function(id) {
-      oed_fields_ana_content <- content(private$oasisapi$api_get_query(query_path = paste("analyses", id, "summary_levels_file",  sep = "/"))$result)
+      oed_fields_ana_content <- content(private$oasisapi$api_get_query(query_path = paste("analyses", id,
+                                                                                          "summary_levels_file",  sep = "/"))$result)
       oed_fields <- oed_fields_ana_content %>%
         unlist() %>%
         as.data.frame(stringsAsFactors = FALSE) %>%
@@ -672,7 +673,7 @@ DataHub <- R6Class(
     },
     return_tbl_analysesData = function(name = "", Status, tbl_analysesDataNames) {
       tbl_analysesData <- private$oasisapi$return_df("analyses", list(name = name))
-      if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0 && is.null(tbl_analysesData$detail)) {
+      if (!is.null(tbl_analysesData) && nrow(tbl_analysesData) > 0 && is.null(tbl_analysesData$status_detailed)) {
         tbl_analysesData <- tbl_analysesData %>%
           select(-contains("file")) %>%
           as.data.frame()

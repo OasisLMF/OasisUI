@@ -398,11 +398,11 @@ summarytab <- function(input, output, session,
 
     model_settings <- analysis_settings$model_settings
     model_params_lst <- sapply(names(model_settings), function(i){model_settings[[i]]})
-
     # check which perils were chosen
-    if (length(grep("supported_perils", names(model_settings))) > 0) {
-      supported_perils_all <- model_settings[grep("supported_perils", names(model_settings))]
-      supported_perils_id <- as.list(supported_perils_all[grep(".id", names(supported_perils_all))])
+    if (length(grep("perils", names(model_settings))) > 0) {
+      supported_perils_all <- model_settings[grep("perils", names(model_settings))][[1]]
+      # separate string to have all codes as different entries
+      supported_perils_id <- unlist(strsplit(supported_perils_all, ", "))
       # extract the whole files with locations and perils
       locations_all <- check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub)
       # distinguish for unique location

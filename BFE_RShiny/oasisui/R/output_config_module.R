@@ -953,20 +953,109 @@ def_out_config <- function(input,
       model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
                           tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
 
-      model_inputs <- c(input$supported_perils, input$boolean_params, input$event_occurrence, input$event_set)
-      model_params_lst <- lapply(seq(1, length(model_inputs)), function(i) {
-        model_match <- grep(model_inputs[i], model_settings)
-        if (model_match == 4) {
-          model_match <- grep(model_inputs[i], model_settings[[4]])
-          model_settings$event_set.options[model_match][[1]]
-        } else {
-          model_settings[model_match]
-        }
+      #extract input ids for Model Params
+      dict_params <- model_settings[grep("dictionary_parameters", names(model_settings))]
+      list_params <- model_settings[grep("list_parameters", names(model_settings))]
+
+      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function (x) {input[[paste0("string_", x)]]}))
+      if(length(dict_params) > 0) {
+        dict_input <- unlist(lapply(seq(1, length(dict_params$dictionary_parameters$default)), function (y) {input[[paste0("dictionary_", y)]]
+        }))
+      } else {
+        dict_input <- NULL
+      }
+      perils_input <- paste0(input$supported_perils, collapse = ", ")
+
+      # list_input <- unlist(lapply(seq(1, length(list_params$list_parameters$default)), function (y) {input[[paste0("list_", y)]]
+      # }))
+      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function (x) {input[[paste0("boolean_", x)]]})
+      float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function (x) {input[[paste0("float_", x)]]}))
+
+      # find boolean parameters
+      if(!is.null(boolean_input)) {
+      boolean_lst <- lapply(seq(1, length(boolean_input)), function(i) {
+        model_match <- model_settings[grep(boolean_input[i], model_settings)]
+        model_match[[names(model_match)]][["name"]]
       })
-      model_settings <- c(
-        list(return_period_file = TRUE),
-        unlist(model_params_lst)
-      ) # list of 4 entries
+      } else {
+        model_params_lst <- NULL
+      }
+
+      #find perils parameters
+      if(!is.null(input$supported_perils)) {
+      perils_lst <- lapply(seq(1, length(input$supported_perils)), function(i) {
+        model_match <- model_settings[grep(input$supported_perils[i], model_settings)]
+        model_match[[names(model_match)]][["id"]]
+      })
+      } else {
+        model_params_lst <- NULL
+      }
+
+      if(!is.null(string_input)) {
+        string_model_s <- model_settings[grep(string_input, model_settings)]
+      } else {
+        string_model_s <- NULL
+      }
+
+      if (!is.null(dict_input)) {
+        dict_input <- paste(dict_input, collapse = ", ")
+      } else {
+        dict_input <- NULL
+      }
+
+      #name model settings entries
+      string_name <- string_model_s$string_parameters$name
+      list_name <- list_params$list_parameters$name
+      dict_name <- dict_params$dictionary_parameters$name
+      boolean_name <- boolean_lst
+      float_name <- model_settings$float_parameters$name
+      perils_name <- "Supported perils"
+
+      names_ls <- list(
+        string_name,
+        list_name,
+        dict_name,
+        float_name,
+        perils_name
+      )
+
+      model_settings <- list(
+        input$event_set,
+        input$event_occurrence,
+        string_input,
+        input$list_1,
+        dict_input,
+        float_input,
+        perils_input
+      )
+
+      model_settings <- c(model_settings, boolean_input)
+
+      #remove all NULL elements
+      if (length(which(sapply(names_ls, is.null))) > 0) {
+        model_settings <- model_settings[-which(sapply(model_settings, is.null))]
+      }
+
+      names_full_list <- list(
+        "event_set",
+        "event_occurrence_id",
+        string_name,
+        list_name,
+        dict_name,
+        float_name,
+        perils_name
+      )
+
+      names_full_list <- c(names_full_list, boolean_name)
+
+      #remove all NULL elements
+      if (length(which(sapply(names_ls, is.null))) > 0) {
+        names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.null))]
+      } else {
+        names(model_settings) <- names_full_list
+      }
+
+      model_settings
     }
 
     inputsettings <- list(
@@ -1087,7 +1176,6 @@ def_out_config <- function(input,
     }
 
     analysis_settings <- list(analysis_settings = c(
-      list(model_settings = fetch_model_settings(modelID = modelID)),
       inputsettings,
       list(
         gul_output = "GUL" %in% input$chkboxgrplosstypes,
@@ -1096,7 +1184,8 @@ def_out_config <- function(input,
         il_summaries = fetch_summary("IL", input$chkboxgrplosstypes),
         ri_output = "RI" %in% input$chkboxgrplosstypes,
         ri_summaries = fetch_summary("RI", input$chkboxgrplosstypes)
-      )
+      ),
+      list(model_settings = fetch_model_settings(modelID = modelID))
     ))
 
     analysis_settings
@@ -1150,9 +1239,9 @@ def_out_config <- function(input,
       inputId = ns("event_set"),
       label = "Event Set:",
       choices = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
-        model_settings$event_set.options[[x]]$desc}),
+        model_settings$event_set.options[[x]]$id}),
       selected = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
-        model_settings$event_set.options[[x]]$desc}),
+        model_settings$event_set.options[[x]]$id}),
       multiple = FALSE
     )
   }
@@ -1163,9 +1252,9 @@ def_out_config <- function(input,
       inputId = ns("event_occurrence"),
       label = "Event Occurrence:",
       choices = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
-        model_settings$event_occurrence_id.options[[x]]$desc}),
+        model_settings$event_occurrence_id.options[[x]]$id}),
       selected = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
-        model_settings$event_occurrence_id.options[[x]]$desc}),
+        model_settings$event_occurrence_id.options[[x]]$id}),
       multiple = FALSE
     )
   }
@@ -1189,36 +1278,32 @@ def_out_config <- function(input,
   # list parameters
   .list_fun <- function(model_settings) {
     if (length(grep("list_parameters", names(model_settings))) > 0) {
-      lapply(grep("list_parameters", names(model_settings)), function (x) {
+      # lapply(grep("list_parameters", names(model_settings)), function (x) {
         list_params <- model_settings[grep("list_parameters", names(model_settings))]
-        lapply(seq(1, length(list_params$list_parameters$default)), function (y) {
-          label <- paste0(gsub("_", " ", list_params$list_parameters$name[y]), ":") %>% capitalize_first_letter()
-          if (label == "NA:") {
-            label <- ""
-          }
+        # lapply(seq(1, length(list_params$list_parameters$default)), function (y) {
           textInput(
-            inputId = ns(paste0("list_", y, "_", x)),
-            label = label,
-            value = unlist(list_params$list_parameters$default[y])
+            inputId = ns(paste0("list_", 1)),
+            label = paste0(gsub("_", " ", list_params$list_parameters$name[1]), ":") %>% capitalize_first_letter(),
+            value = paste(unlist(model_settings$list_parameters$default), collapse = ", ")
           )
-        })
-      })
+        # })
+      # })
     }
   }
 
   # dictionary parameters
   .dictionary_fun <- function(model_settings) {
     if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
-      lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
+      # lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
         dict_params <- model_settings[grep("dictionary_parameters", names(model_settings))]
         lapply(seq(1, length(dict_params$dictionary_parameters$default)), function (y) {
           textInput(
-            inputId = ns(paste0("dictionary_", y, "_", x)),
+            inputId = ns(paste0("dictionary_", y)),
             label = paste0(gsub("_", " ", names(dict_params$dictionary_parameters$default)[y]), ":") %>% capitalize_first_letter(),
             value = dict_params$dictionary_parameters$default[y][[1]]
           )
         })
-      })
+      # })
     }
   }
 
@@ -1240,7 +1325,7 @@ def_out_config <- function(input,
     if (length(grep("float_parameters", names(model_settings))) > 0) {
       lapply(grep("float_parameters", names(model_settings)), function (x) {
         sliderInput(
-          inputId = ns(paste("float_", x)),
+          inputId = ns(paste0("float_", x)),
           label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
           min = model_settings[[x]]$min,
           max = model_settings[[x]]$max,
@@ -1257,9 +1342,9 @@ def_out_config <- function(input,
         inputId = ns("supported_perils"),
         label = "Supported Perils:",
         choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
-          tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
+          tbl_modelsDetails$lookup_settings$supported_perils[[y]]$id}),
         selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
-          tbl_modelsDetails$lookup_settings$supported_perils[[y]]$desc}),
+          tbl_modelsDetails$lookup_settings$supported_perils[[y]]$id}),
         multiple = TRUE
       )
     }
