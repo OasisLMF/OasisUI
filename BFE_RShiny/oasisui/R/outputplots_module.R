@@ -864,7 +864,7 @@ panelOutputModule <- function(input, output, session,
     p <- .basicplot(xlabel, ylabel, titleToUse, data, legendtitle)
     # add commas to numeric entries and rename them for more user-friendly tooltip
     RP <- add_commas(data$xaxis)
-    Loss <- add_commas(data$value)
+    Loss <- add_commas(data$value*1000000)
     Summary_Level <- add_commas(data$colour)
     p <- p +
       geom_line(size = 1) +
@@ -879,12 +879,7 @@ panelOutputModule <- function(input, output, session,
   .barPlotDF <- function(xlabel, ylabel, titleToUse, data, legendtitle, wuncertainty = FALSE,
                          multipleplots = FALSE, xtickslabels = NULL ) {
 
-    #rename columns to get more user-friendly tooltip
-    colnames(data)[1] <- "Summary_Level"
-    colnames(data)[2] <- "Loss"
-    colnames(data)[5] <- "Percentage"
-
-    p <- ggplot(data, aes(x = Loss, y = Percentage, col = Summary_Level)) +
+    p <- ggplot(data, aes(x = xaxis, y = value, col = colour)) +
       labs(title = titleToUse, x = xlabel, y = ylabel, col = legendtitle) +
       theme(
         plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
@@ -897,9 +892,14 @@ panelOutputModule <- function(input, output, session,
 
     # add commas to numeric entries
     data$uncertainty <- add_commas(data$uncertainty)
-    data$Percentage <- add_commas(data$Percentage)
     data$reference <- add_commas(data$reference)
-    p <- p + geom_bar(position = "dodge", stat = "identity")
+
+    #rename tooltip entries
+    "Summary_Level" <- data$colour
+    "Type" <- data$xaxis
+    "Loss" <- add_commas(data$value*1000000)
+
+    p <- p + geom_bar(position = "dodge", stat = "identity", aes(sum_level = Summary_Level, type = Type, loss = Loss))
 
     if (wuncertainty) {
       p <- p +
@@ -912,7 +912,7 @@ panelOutputModule <- function(input, output, session,
       # }
     }
     p <- .multiplot(p, multipleplots)
-    p
+    ggplotly(p, tooltip = c("sum_level", "type", "loss"))
   }
 
   # Module Output --------------------------------------------------------------

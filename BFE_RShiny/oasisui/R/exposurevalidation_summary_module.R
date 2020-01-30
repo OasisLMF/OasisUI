@@ -184,7 +184,6 @@ exposurevalidationsummary <- function(input,
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
     n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
-    # browser()
     status <- df$key
     percentage <- df$value
     p <- ggplot(data = df, aes(x = type, y = percentage, fill = status)) +

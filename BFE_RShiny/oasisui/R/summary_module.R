@@ -552,10 +552,10 @@ basicplot <- function(xlabel, ylabel, titleToUse, data) {
 
 barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
   Perspective <- data$xaxis
-  Loss <- add_commas(data$value)
+  Loss <- add_commas(data$value*1000000)
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
-    geom_bar(position = "dodge", stat = "identity", aes(fill = colour, prsp = Perspective, loss = Loss)) +
-    geom_point(size = 2, aes(color = colour, prsp = Perspective, loss = Loss))
+    geom_bar(position = "dodge", stat = "identity", aes(fill = colour, prsp = Perspective, loss = Loss))
+
   if (multipleplots) {
     p <- p + facet_wrap(.~ gridcol)
   }
@@ -587,7 +587,8 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
 # colour : column for the aes col
 linePlot <- function(xlabel, ylabel, titleToUse, data) {
   RP <- add_commas(data$xaxis)
-  Loss <- add_commas(data$value)
+  #convert value back to the full length from Millions scale
+  Loss <- add_commas(data$value*1000000)
   Report <- data$colour
   p <- basicplot(xlabel, ylabel, titleToUse, data) +
     geom_line(size = 1, aes(color = colour)) +
