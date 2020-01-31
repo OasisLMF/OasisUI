@@ -69,8 +69,7 @@ panelModelParams <- function(id) {
       div(
         id = ns("basic"),
         style = "width:100%; margin: 0 auto;",
-        uiOutput(ns("basic_model_param")),
-        uiOutput(ns("chkinputsperils"))
+        uiOutput(ns("basic_model_param"))
       ),
       oasisuiButton(inputId = ns("abuttonadvanced"), label = "Advanced"),
       hidden(
@@ -166,7 +165,7 @@ panelOutputParamsDetails <- function(id) {
       # checkboxses for all perspectives; available for all tags
       uiOutput(ns("summary_levels_reports_ui")),
       # combinations of summary levels and reports.
-      uiOutput(ns("out_params_review_ui")), # review of output configuration in long format. As a collapsible panel. Available for all tags
+      uiOutput(ns("out_params_review_ui")),
       hidden(
         actionButton(
           inputId = ns("clearselection"),
@@ -249,7 +248,7 @@ def_out_config <- function(input,
   })
 
   observeEvent(counter(), {
-    # .clearOutputOptions(result$ana_flag)
+    .clearOutputOptions(result$ana_flag)
     show("panel_anaoutput")
   })
 
@@ -349,7 +348,7 @@ def_out_config <- function(input,
       }
       # re-set configuration to previous selection
       output$summary_levels_reports_ui <- renderUI({
-        dynamicUI_btns(anaID, "R", tag = input$sintag)
+        dynamicUI_btns(session, anaID, "R", tag = input$sintag, oed_field_react())
       })
       .updateOutputConfig(analysis_settings, result$ana_flag)
     }
@@ -439,7 +438,7 @@ def_out_config <- function(input,
         logMessage("No list of summary levels provided")
       } else {
         # below returns NULL for Summary case
-        dynamicUI_btns(analysisID(), result$ana_flag, tag = input$sintag)
+        dynamicUI_btns(session, analysisID(), result$ana_flag, tag = input$sintag, oed_field_react())
       }
     })
   })
@@ -486,7 +485,7 @@ def_out_config <- function(input,
   observeEvent(input$clearselection, {
     result$n_add <- 0
     output$summary_levels_reports_ui <- renderUI({
-      dynamicUI_btns(analysisID(), "C", tag = input$sintag)
+      dynamicUI_btns(session, analysisID(), "C", tag = input$sintag, oed_field_react())
     })
   })
 
@@ -539,7 +538,7 @@ def_out_config <- function(input,
     analysisID()
   }, ignoreInit = TRUE, {
     if (length(analysisID()) > 0) {
-      observe_output_param()
+      .observe_output_param()
     }
   })
 
@@ -607,243 +606,6 @@ def_out_config <- function(input,
 
   # UI functions ---------------------------------------------------------------
 
-  # Summary Level and Reports fields
-  dynamicUI <- function(analysisID, tag, n_field) {
-    # only called for Case 2 and 3 (drill-down or custom)
-    # Retrieve summary levels information from API
-    oed_field <- oed_field_react()
-    # all empty fields
-    if (tag == default_tags[3]) {
-      fluidRow(
-        column(
-          5,
-          selectInput(
-            inputId = ns(paste0("sinsummarylevels", n_field)),
-            label = "Summary Levels",
-            choices = c("All Risks", oed_field),
-            selected = NULL,
-            multiple = TRUE
-          )
-        ),
-        column(
-          5,
-          selectInput(
-            inputId = ns(paste0("sinreports", n_field)),
-            label = "Reports",
-            choices = output_options$variables,
-            selected = NULL,
-            multiple = TRUE
-          )
-        )
-      )
-    } else if (tag == default_tags[2]) {
-      fluidRow(
-        column(
-          5,
-          selectInput(
-            inputId = ns(paste0("sinsummarylevels", n_field)),
-            label = "Summary Levels",
-            choices = oed_field,
-            selected = NULL,
-            multiple = TRUE
-          )
-        )
-      )
-    }
-  }
-
-  # Summary Level and Reports fields in re-run situation
-  rerunUI <- function(analysisID, tag) {
-    # only called for Case 2 and 3 (drill-down or custom)
-    oed_field <- oed_field_react()
-    # retrieve run information from API
-
-    # Get analysis status
-    # analysis_info <- session$userData$data_hub$return_tbl_analysesData(Status = Status,
-    #                                                                    tbl_analysesDataNames = tbl_analysesDataNames) %>%
-    #   filter(id == analysisID)
-    # analysis_status <- analysis_info$status_detailed
-
-    # if (analysis_status == "run completed") {
-    #   # if analysis run was successful:
-    #   out_cnfg_tbl <- session$userData$data_hub$get_ana_outputs_data_list(analysisID)
-    #
-    #   # display previous selection
-    #   # Summary Info output is non-configurable, remove it
-    #   if(length(out_cnfg_tbl) > 0) {
-    #     out_cnfg_tbl <- out_cnfg_tbl[-which(out_cnfg_tbl$report == "Summary Info"), ]
-    #
-    #     uniq_sum <- unique(out_cnfg_tbl$summary_level)
-    #
-    #     # In case multiple fields were selected, split the comma and make them two separate strings
-    #     choices_sum <- lapply(uniq_sum, function(x) {
-    #       strsplit(x, ", ")[[1]]
-    #     })
-    #     # combine multiple reports for same summary level
-    #     choices_rep_final <- lapply(uniq_sum, function(x) {
-    #       out_cnfg_tbl$report[which(x == out_cnfg_tbl$summary_level)]
-    #     })
-    #
-    #     # update checkboxes selection
-    #     choices_prsp <- unique(toupper(out_cnfg_tbl$perspective))
-    #     updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
-    #   }
-    # } else {
-    # if error:
-    out_cnfg_tbl <- session$userData$data_hub$get_ana_settings_content(
-      analysisID, oasisapi = session$userData$oasisapi)
-
-    if (length(out_cnfg_tbl$gul_summaries) > 0 ||
-        length(out_cnfg_tbl$il_summaries) > 0 ||
-        length(out_cnfg_tbl$ri_summaries) > 0) {
-
-      if (length(out_cnfg_tbl$gul_summaries) > 0) {
-        prsp_sum <- out_cnfg_tbl$gul_summaries
-      } else if (length(out_cnfg_tbl$il_summaries) > 0) {
-        prsp_sum <- out_cnfg_tbl$il_summaries
-      } else {
-        prsp_sum <- out_cnfg_tbl$ri_summaries
-      }
-
-      # summary levels
-      choices_sum <- lapply(seq(1:length(prsp_sum)), function(x) {
-        if (length(prsp_sum[[x]]$oed_fields) == 0) {
-          prsp_sum[[x]]$oed_fields <- "All Risks"
-        }
-        unlist(prsp_sum[[x]]$oed_fields)
-      })
-
-      # reports
-      choices_rep_final <- lapply(seq(1:length(prsp_sum)), function(x) {
-        not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
-        names_reports <- as.list(names(prsp_sum[[x]]))
-        names_reports <- names_reports[-which(names_reports %in% not_include)]
-        if (length(names(prsp_sum[[x]]$leccalc)) > 0) {
-          choices_rep_final <- c(names_reports, as.list(names(prsp_sum[[x]]$leccalc)))
-        } else {
-          choices_rep_final <- as.list(names_reports)
-        }
-        choices_rep_final <- unlist(varsdf$labels[which(varsdf$fields %in% choices_rep_final)])
-        choices_rep_final
-      })
-
-      choices_prsp <- NULL
-      if (out_cnfg_tbl$gul_output) {
-        choices_prsp <- c(choices_prsp, "GUL")
-      }
-      if (out_cnfg_tbl$il_output) {
-        choices_prsp <- c(choices_prsp, "IL")
-      }
-      if (out_cnfg_tbl$ri_output) {
-        choices_prsp <- c(choices_prsp, "RI")
-      }
-      # update checkboxes selection
-      updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
-
-    }
-    # }
-
-    # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
-    result$n_add <- length(choices_sum) - 1
-    inserted$val <- seq(0, isolate(result$n_add))
-
-    # update main panel
-    if (tag == default_tags[3]) {
-      lapply(seq(1, length(choices_sum)), function(x) {
-        tags$div(
-          id = x - 1,
-          fluidRow(
-            column(
-              5,
-              selectInput(
-                inputId = ns(paste0("sinsummarylevels", x - 1)),
-                label = "Summary Levels",
-                choices = c("All Risks", oed_field),
-                selected = choices_sum[[x]],
-                multiple = TRUE
-              )
-            ),
-            column(
-              5,
-              selectInput(
-                inputId = ns(paste0("sinreports", x - 1)),
-                label = "Reports",
-                choices = output_options$variables,
-                selected = choices_rep_final[[x]],
-                multiple = TRUE
-              )
-            ))
-        )
-      })
-    } else if (tag == default_tags[2]) {
-      choices_sum <- choices_sum[choices_sum != "All Risks"]
-      if (length(choices_sum) > 0) {
-        lapply(seq(1, length(choices_sum)), function(x) {
-          tags$div(
-            id = x - 1,
-            fluidRow(
-              column(
-                5,
-                selectInput(
-                  inputId = ns(paste0("sinsummarylevels", x - 1)),
-                  label = "Summary Levels",
-                  choices = oed_field,
-                  selected = choices_sum[[x]],
-                  multiple = TRUE
-                )
-              )
-            )
-          )
-        })
-      } else {
-        fluidRow(
-          column(
-            5,
-            selectInput(
-              inputId = ns(paste0("sinsummarylevels", 0)),
-              label = "Summary Levels",
-              choices = oed_field,
-              selected = NULL,
-              multiple = TRUE
-            )
-          )
-        )
-      }
-    }
-  }
-
-  # add "+" and "x" buttons to dynamic UI
-  dynamicUI_btns <- function(analysisID, ana_flag, tag) {
-    if (tag == default_tags[2] || tag == default_tags[3]) {
-      tagList(fluidRow(
-        column(1,
-               br(),
-               actionButton(ns("addBtn"), label = "", icon = icon("plus")) %>%
-                 bs_embed_tooltip(title = defineSingleAna_tooltips$addBtn, placement = "right")
-        ),
-        column(2,
-               br(),
-               disabled(
-                 actionButton(
-                   ns("removeBtn"),
-                   label = "",
-                   icon = icon("times")
-                 ) %>%
-                   bs_embed_tooltip(title = defineSingleAna_tooltips$removeBtn, placement = "right")
-               )
-        ),
-        column(8,
-               if (ana_flag == "C") {
-                 dynamicUI(analysisID, tag, 0)
-               } else if (ana_flag == "R") {
-                 rerunUI(analysisID, tag)
-               }
-        )
-      ),
-      tags$div(id = 'placeholder'))
-    }
-  }
-
   # Add additional fields to the UI
   add_UI <- function(n_field, id, tag) {
     insertUI(
@@ -853,13 +615,13 @@ def_out_config <- function(input,
       ui = tags$div(id = id,
                     fluidRow(column(3),
                              column(8,
-                                    dynamicUI("C", tag, n_field)
+                                    dynamicUI(session, "C", tag, n_field, oed_field_react())
                              )))
     )
   }
 
   # Output table function ------------------------------------------------------
-  create_output_params <- function(sum_rep_grid) {
+  .create_output_params <- function(sum_rep_grid) {
     if (is.null(input$chkboxgrplosstypes)) {
       reports_summary_levels <- data.frame(
         perspective = character(0),
@@ -876,7 +638,7 @@ def_out_config <- function(input,
     result$out_params_review <- reports_summary_levels
   }
 
-  observe_output_param <- function() {
+  .observe_output_param <- function() {
     sum_rep_grid_default <- expand.grid(
       summary_level = "All Risks",
       report = sort(output_options$variables[output_options$variables_default])
@@ -911,11 +673,11 @@ def_out_config <- function(input,
       sum_rep_grid <- sum_rep_grid_default
     }
 
-    create_output_params(sum_rep_grid)
+    .create_output_params(sum_rep_grid)
     invisible()
   }
 
-  # Helper Functions -----------------------------------------------------------
+  # Update and Clear Outputs Functions -----------------------------------------
   # re-set Rerun panel to previous selection
   .updateOutputConfig <- function(analysis_settings, ana_flag) {
     logMessage(".updateOutputConfig called")
@@ -924,8 +686,6 @@ def_out_config <- function(input,
       chosen_tag <- default_tags[3]
       # update Number of samples and Threshold in model params panel
       if (is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
-        updateNumericInput(session, "tinputnoofsample", value = analysis_settings$number_of_samples)
-        updateNumericInput(session, "tinputthreshold", value = analysis_settings$gul_threshold)
         .clearOutputOptions(ana_flag)
       }
     } else {
@@ -937,6 +697,40 @@ def_out_config <- function(input,
                       selected = chosen_tag,
                       session = session)
   }
+
+  .clearOutputOptions <- function(ana_flag) {
+    # this is actually a function that takes care of the model parameters panel of the output configuration. possibly rename it.
+    logMessage(".clearOutputOptions called")
+
+    # Predefined params
+    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    # Model params
+    modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+
+    if (length(modelID) != 0) {
+      tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("models", modelID, "settings", sep = "/"),
+        query_method = "GET"
+      )
+      if (!is.null(tbl_modelsDetails)) {
+        model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
+
+        if (length(names(model_settings)) > 0) {
+          # Basic model params
+          output$basic_model_param <- renderUI({
+            basicConfig_funs(session, model_settings)
+          })
+
+          # Advanced model params
+          output$advanced_model_param <- renderUI({
+            advancedConfig_funs(session, model_settings)
+          })
+        }
+      }
+    }
+  }
+
+  # Generate analysis settings -------------------------------------------------
 
   .gen_analysis_settings <- function() {
     logMessage(".gen_analysis_settings called")
@@ -950,41 +744,19 @@ def_out_config <- function(input,
         query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
-      model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)#,
-      # tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
-
-      # remove_event_set <- model_settings[-grep("event_set", names(model_settings))]
-      # remove_event_occurrence <- remove_event_set[-grep("event_occurrence", names(remove_event_set))]
-      # #extract input ids for Model Params
-      # lapply(names(remove_event_occurrence), function (x) {
-      #   input[[x]]
-      # })
+      model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
 
       string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function (x) {input[[paste0("string_parameters", x)]]}))
-      dict_input <- unlist(lapply(grep("dictionary_parameters", names(model_settings)), function (x) {input[[paste0("dictionary_parameters", x)]]}))
+      dict_input <- unlist(lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
+        lapply(seq(1, length(model_settings[[x]]$default)), function (x) {
+          input[[paste0("dictionary_parameters", x)]]
+        })
+      }))
+      dict_input <- paste0(dict_input, collapse = ", ")
       boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function (x) {input[[paste0("boolean_parameters", x)]]})
       float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function (x) {input[[paste0("float_parameters", x)]]}))
       list_input <- unlist(lapply(grep("list_parameters", names(model_settings)), function (x) {input[[paste0("list_parameters", x)]]}))
-      # perils_input <- paste0(input$supported_perils, collapse = ", ")
 
-      # #find perils parameters
-      # if(!is.null(input$supported_perils) || perils_input != "") {
-      #   perils_name <- "Supported perils"
-      # } else {
-      #   # perils_lst <- NULL
-      #   perils_name <- NULL
-      #   perils_input <- NULL
-      # }
-
-      # find boolean parameters
-      if(!is.null(boolean_input)) {
-        boolean_name <- lapply(seq(1, length(boolean_input)), function(i) {
-          model_match <- model_settings[grep(boolean_input[i], model_settings)]
-          model_match[[names(model_match)]][["name"]]
-        })
-      } else {
-        boolean_name <- NULL
-      }
       inputs_list <- list(list_input,
                           string_input,
                           dict_input,
@@ -994,70 +766,35 @@ def_out_config <- function(input,
                           "string_parameters",
                           "dictionary_parameters",
                           "float_parameters")
-      # inputs_name <- c()
-      # for (param in params_list) {
-      #   browser()
-      #   param_num <- which(param == params_list)
-      #   if(!is.null(inputs_list[param_num])) {
-      #     param_name <- unlist(lapply(grep(param, names(model_settings)), function(i) {
-      #       model_match <- model_settings[i]
-      #       lapply(seq(1, length(model_match)), function(j) {
-      #         model_match[[j]][["name"]]
-      #       })
-      #     }))
-      #   }
-      #   inputs_name[[param]] <- param_name
-      # }
-
-      # find list parameters
-      if(!is.null(list_input)) {
-        list_input <- as.data.frame(unlist(strsplit(list_input, ",")))
-        list_name <- unlist(lapply(grep("list_parameters", names(model_settings)), function(i) {
-          model_match <- model_settings[i]
-          lapply(seq(1, length(model_match)), function(j) {
-            model_match[[j]][["name"]]
-          })
-        }))
-      } else {
-        list_name <- NULL
+      #create list of model inputs names
+      inputs_name <- c()
+      for (param in seq(1, length(params_list))) {
+        if(!is.null(inputs_list[param])) {
+          param_name <- unlist(lapply(grep(params_list[param], names(model_settings)), function(i) {
+            model_match <- model_settings[i]
+            lapply(seq(1, length(model_match)), function(j) {
+              model_match[[j]][["name"]]
+            })
+          }))
+        }
+        inputs_name[[param]] <- param_name
       }
 
-      # find string parameters
-      if(!is.null(string_input)) {
-        string_name <- unlist(lapply(grep("string_parameters", names(model_settings)), function(i) {
-          model_match <- model_settings[i]
-          lapply(seq(1, length(model_match)), function(j) {
-            model_match[[j]][["name"]]
-          })
-        }))
+      # find boolean parameters names
+      if(!is.null(boolean_input)) {
+        boolean_name <- lapply(seq(1, length(boolean_input)), function(i) {
+          model_match <- model_settings[grep(boolean_input[i], model_settings)]
+          model_match[[names(model_match)]][["name"]]
+        })
       } else {
-        string_name <- NULL
+        boolean_name <- NULL
       }
 
-      # find dictionary parameters
-      if(!is.null(dict_input)) {
-        dict_name <- unlist(lapply(grep("dictionary_parameters", names(model_settings)), function(i) {
-          model_match <- model_settings[i]
-          lapply(seq(1, length(model_match)), function(j) {
-            model_match[[j]][["name"]]
-          })
-        }))
-      } else {
-        dict_name <- NULL
-      }
+      # set certain inputs in the right format
+      dict_input <- as.list(strsplit(dict_input, ","))
+      list_input <- as.data.frame(unlist(strsplit(list_input, ",")))
 
-      # find float parameters
-      if(!is.null(float_input)) {
-        float_name <- unlist(lapply(grep("float_parameters", names(model_settings)), function(i) {
-          model_match <- model_settings[i]
-          lapply(seq(1, length(model_match)), function(j) {
-            model_match[[j]][["name"]]
-          })
-        }))
-      } else {
-        float_name <- NULL
-      }
-
+      # create model settings for analysis settings
       model_settings <- c(input$event_set,
                           input$event_occurrence,
                           boolean_input,
@@ -1070,14 +807,11 @@ def_out_config <- function(input,
       if (length(which(sapply(model_settings, is.null))) > 0) {
         model_settings <- model_settings[-which(sapply(model_settings, is.null))]
       }
-
+      #create list of names for modle settings
       names_full_list <- c("event_set",
                            "event_occurrence_id",
                            boolean_name,
-                           string_name,
-                           list_name,
-                           dict_name,
-                           float_name)
+                           inputs_name)
 
       #remove all NULL elements
       if (length(which(sapply(names_full_list, is.null))) > 0) {
@@ -1100,7 +834,7 @@ def_out_config <- function(input,
       "number_of_samples" = as.integer(input$tinputnoofsample),
       # potential new tag portfolio_id
       "prog_id" = as.integer(session$userData$oasisapi$api_return_query_res(query_path = paste("analyses", analysisID(), sep = "/"),
-                                                                 query_method = "GET")[["portfolio"]]),
+                                                                            query_method = "GET")[["portfolio"]]),
       # potential new tag environment_tag
       "source_tag" = getOption("oasisui.settings.oasis_environment")
     )
@@ -1218,171 +952,6 @@ def_out_config <- function(input,
 
     analysis_settings
   }
-
-  .clearOutputOptions <- function(ana_flag) {
-    # this is actually a function that takes care of the model parameters panel of the output configuration. possibly rename it.
-    logMessage(".clearOutputOptions called")
-
-    # Predefined params
-    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-    # Model params
-    modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
-
-    if (length(modelID) != 0) {
-      tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "settings", sep = "/"),
-        query_method = "GET"
-      )
-      if (!is.null(tbl_modelsDetails)) {
-        model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)#,
-        # tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
-
-        if (length(names(model_settings)) > 0) {
-          # Basic model params
-          output$basic_model_param <- renderUI(
-            tagList(
-              .event_set_fun(model_settings),
-              .event_occurrence_fun(model_settings))
-          )
-
-          # Advanced model params
-          output$advanced_model_param <- renderUI({
-            tagList(
-              .string_fun(model_settings),
-              .list_fun(model_settings),
-              .dictionary_fun(model_settings),
-              .boolean_params_fun(model_settings),
-              .float_fun(model_settings)#,
-              # .perils_fun(tbl_modelsDetails, model_settings))
-            )
-          })
-        }
-      }
-    }
-  }
-
-  # Basic view functions -------------------------------------------------------
-  # Event set
-  .event_set_fun <- function(model_settings) {
-    selectInput(
-      inputId = ns("event_set"),
-      label = "Event Set:",
-      choices = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
-        model_settings$event_set.options[[x]]$id}),
-      selected = lapply(seq(1, length(model_settings$event_set.options)), function (x) {
-        model_settings$event_set.options[[x]]$id}),
-      multiple = FALSE
-    )
-  }
-
-  # Event Occurrence
-  .event_occurrence_fun <- function(model_settings) {
-    selectInput(
-      inputId = ns("event_occurrence"),
-      label = "Event Occurrence:",
-      choices = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
-        model_settings$event_occurrence_id.options[[x]]$id}),
-      selected = lapply(seq(1, length(model_settings$event_occurrence_id.options)), function (x) {
-        model_settings$event_occurrence_id.options[[x]]$id}),
-      multiple = FALSE
-    )
-  }
-
-  # Advanced view functions ----------------------------------------------------
-  # string parameters
-  .string_fun <- function(model_settings) {
-    if (length(grep("string_parameters", names(model_settings))) > 0) {
-      lapply(grep("string_parameters", names(model_settings)), function (x) {
-        # lapply(seq(1, length(grep("string_parameters", names(model_settings)))), function(y) {
-        selectInput(
-          inputId = ns(paste0("string_parameters", x)),
-          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          choices = model_settings[[x]]$default,
-          selected = model_settings[[x]]$default,
-          multiple = TRUE
-        )
-        # })
-      })
-    }
-  }
-
-  # list parameters
-  .list_fun <- function(model_settings) {
-    if (length(grep("list_parameters", names(model_settings))) > 0) {
-      lapply(grep("list_parameters", names(model_settings)), function (x) {
-        list_params <- model_settings[grep("list_parameters", names(model_settings))]
-        # lapply(seq(1, length(grep("list_parameters", names(model_settings)))), function(y) {
-        textInput(
-          inputId = ns(paste0("list_parameters", x)),
-          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          value = paste(unlist(model_settings[[x]]$default), collapse = ", ")
-        )
-        # })
-      })
-    }
-  }
-
-  # dictionary parameters
-  .dictionary_fun <- function(model_settings) {
-    if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
-      lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
-        lapply(seq(1, length(model_settings[[x]]$default)), function (y) {
-          textInput(
-            inputId = ns(paste0("dictionary_parameters", y)),
-            label = names(model_settings[[x]]$default[y]),
-            value = model_settings[[x]]$default[[y]]
-          )
-        })
-      })
-    }
-  }
-
-  # boolean parameters
-  .boolean_params_fun <- function(model_settings) {
-    if (length(grep("boolean_parameters", names(model_settings))) > 0) {
-      lapply(grep("boolean_parameters", names(model_settings)), function (x) {
-        # lapply(seq(1, length(grep("boolean_parameters", names(model_settings)))), function(y) {
-        checkboxInput(
-          inputId = ns(paste0("boolean_parameters", x)),
-          label = gsub("_", " ", model_settings[[x]]$name) %>% capitalize_first_letter(),
-          value = model_settings[[x]]$default
-        )
-        # })
-      })
-    }
-  }
-
-  # float parameters
-  .float_fun <- function(model_settings) {
-    if (length(grep("float_parameters", names(model_settings))) > 0) {
-      lapply(grep("float_parameters", names(model_settings)), function (x) {
-        # lapply(seq(1, length(grep("float_parameters", names(model_settings)))), function(y) {
-        sliderInput(
-          inputId = ns(paste0("float_parameters", x)),
-          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          min = model_settings[[x]]$min,
-          max = model_settings[[x]]$max,
-          value = model_settings[[x]]$default
-        )
-        # })
-      })
-    }
-  }
-
-  # # supported perils parameters
-  # .perils_fun <- function(tbl_modelsDetails, model_settings) {
-  #   if (length(grep("supported_perils", names(model_settings))) > 0) {
-  #     selectInput(
-  #       inputId = ns("supported_perils"),
-  #       label = "Supported Perils:",
-  #       choices = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
-  #         tbl_modelsDetails$lookup_settings$supported_perils[[y]]$id}),
-  #       selected = lapply(seq(1, length(tbl_modelsDetails$lookup_settings$supported_perils)), function (y) {
-  #         tbl_modelsDetails$lookup_settings$supported_perils[[y]]$id}),
-  #       multiple = TRUE
-  #     )
-  #   }
-  # }
 
   # Output view
   .advancedview <- function() {

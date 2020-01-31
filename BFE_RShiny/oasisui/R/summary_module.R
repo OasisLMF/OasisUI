@@ -408,11 +408,6 @@ summarytab <- function(input, output, session,
       query_method = "GET"
     )[["lookup_settings"]]
     if (!is.null(tbl_lookup$supported_perils)) {
-      # # check which perils were chosen
-      # if (length(grep("perils", names(model_settings))) > 0) {
-      #   supported_perils_all <- model_settings[grep("perils", names(model_settings))][[1]]
-      #   # separate string to have all codes as different entries
-      #   supported_perils_id <- unlist(strsplit(supported_perils_all, ", "))
       # extract the whole files with locations and perils
       locations_all <- check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub)
       # distinguish for unique location
