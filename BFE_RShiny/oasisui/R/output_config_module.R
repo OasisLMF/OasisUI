@@ -1011,6 +1011,7 @@ def_out_config <- function(input,
 
       # find list parameters
       if(!is.null(list_input)) {
+        list_input <- as.data.frame(unlist(strsplit(list_input, ",")))
         list_name <- unlist(lapply(grep("list_parameters", names(model_settings)), function(i) {
           model_match <- model_settings[i]
           lapply(seq(1, length(model_match)), function(j) {
@@ -1162,11 +1163,7 @@ def_out_config <- function(input,
               update_item_list(y[[x]], reps = reps)
             } else {
               if (isFALSE(y[[x]])) {
-                if (x %in% reps) {
-                  TRUE
-                } else {
-                  NULL
-                }
+                if (x %in% reps) {TRUE} else {NULL}
               } else {
                 # skip
                 y[[x]]
