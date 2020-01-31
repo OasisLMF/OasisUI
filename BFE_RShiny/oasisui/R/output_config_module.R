@@ -950,8 +950,8 @@ def_out_config <- function(input,
         query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
-      model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
-                          tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
+      model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)#,
+      # tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
 
       # remove_event_set <- model_settings[-grep("event_set", names(model_settings))]
       # remove_event_occurrence <- remove_event_set[-grep("event_occurrence", names(remove_event_set))]
@@ -960,13 +960,12 @@ def_out_config <- function(input,
       #   input[[x]]
       # })
 
-      dict_params <- model_settings[grep("dictionary_parameters", names(model_settings))]
       string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function (x) {input[[paste0("string_parameters", x)]]}))
       dict_input <- unlist(lapply(grep("dictionary_parameters", names(model_settings)), function (x) {input[[paste0("dictionary_parameters", x)]]}))
-      # perils_input <- paste0(input$supported_perils, collapse = ", ")
       boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function (x) {input[[paste0("boolean_parameters", x)]]})
       float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function (x) {input[[paste0("float_parameters", x)]]}))
       list_input <- unlist(lapply(grep("list_parameters", names(model_settings)), function (x) {input[[paste0("list_parameters", x)]]}))
+      # perils_input <- paste0(input$supported_perils, collapse = ", ")
 
       # #find perils parameters
       # if(!is.null(input$supported_perils) || perils_input != "") {
@@ -986,6 +985,29 @@ def_out_config <- function(input,
       } else {
         boolean_name <- NULL
       }
+      inputs_list <- list(list_input,
+                          string_input,
+                          dict_input,
+                          float_input)
+
+      params_list <- list("list_parameters",
+                          "string_parameters",
+                          "dictionary_parameters",
+                          "float_parameters")
+      # inputs_name <- c()
+      # for (param in params_list) {
+      #   browser()
+      #   param_num <- which(param == params_list)
+      #   if(!is.null(inputs_list[param_num])) {
+      #     param_name <- unlist(lapply(grep(param, names(model_settings)), function(i) {
+      #       model_match <- model_settings[i]
+      #       lapply(seq(1, length(model_match)), function(j) {
+      #         model_match[[j]][["name"]]
+      #       })
+      #     }))
+      #   }
+      #   inputs_name[[param]] <- param_name
+      # }
 
       # find list parameters
       if(!is.null(list_input)) {
@@ -1035,13 +1057,8 @@ def_out_config <- function(input,
         float_name <- NULL
       }
 
-      model_settings <- list(
-        input$event_set,
-        input$event_occurrence#,
-        # perils_input
-      )
-
-      model_settings <- c(model_settings,
+      model_settings <- c(input$event_set,
+                          input$event_occurrence,
                           boolean_input,
                           string_input,
                           list_input,
@@ -1053,13 +1070,8 @@ def_out_config <- function(input,
         model_settings <- model_settings[-which(sapply(model_settings, is.null))]
       }
 
-      names_full_list <- list(
-        "event_set",
-        "event_occurrence_id"#,
-        # perils_name
-      )
-
-      names_full_list <- c(names_full_list,
+      names_full_list <- c("event_set",
+                           "event_occurrence_id",
                            boolean_name,
                            string_name,
                            list_name,
@@ -1086,7 +1098,8 @@ def_out_config <- function(input,
       "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
       "number_of_samples" = as.integer(input$tinputnoofsample),
       # potential new tag portfolio_id
-      "prog_id" = as.integer(4),
+      "prog_id" = as.integer(session$userData$oasisapi$api_return_query_res(query_path = paste("analyses", analysisID(), sep = "/"),
+                                                                 query_method = "GET")[["portfolio"]]),
       # potential new tag environment_tag
       "source_tag" = getOption("oasisui.settings.oasis_environment")
     )
@@ -1224,8 +1237,8 @@ def_out_config <- function(input,
         query_method = "GET"
       )
       if (!is.null(tbl_modelsDetails)) {
-        model_settings <- c(tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE),
-                            tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
+        model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)#,
+        # tbl_modelsDetails$lookup_settings %>% unlist(recursive = FALSE))
 
         if (length(names(model_settings)) > 0) {
           # Basic model params
@@ -1284,13 +1297,13 @@ def_out_config <- function(input,
     if (length(grep("string_parameters", names(model_settings))) > 0) {
       lapply(grep("string_parameters", names(model_settings)), function (x) {
         # lapply(seq(1, length(grep("string_parameters", names(model_settings)))), function(y) {
-          selectInput(
-            inputId = ns(paste0("string_parameters", x)),
-            label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-            choices = model_settings[[x]]$default,
-            selected = model_settings[[x]]$default,
-            multiple = TRUE
-          )
+        selectInput(
+          inputId = ns(paste0("string_parameters", x)),
+          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+          choices = model_settings[[x]]$default,
+          selected = model_settings[[x]]$default,
+          multiple = TRUE
+        )
         # })
       })
     }
@@ -1300,14 +1313,14 @@ def_out_config <- function(input,
   .list_fun <- function(model_settings) {
     if (length(grep("list_parameters", names(model_settings))) > 0) {
       lapply(grep("list_parameters", names(model_settings)), function (x) {
-      list_params <- model_settings[grep("list_parameters", names(model_settings))]
-      # lapply(seq(1, length(grep("list_parameters", names(model_settings)))), function(y) {
-      textInput(
-        inputId = ns(paste0("list_parameters", x)),
-        label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-        value = paste(unlist(model_settings[[x]]$default), collapse = ", ")
-      )
-      # })
+        list_params <- model_settings[grep("list_parameters", names(model_settings))]
+        # lapply(seq(1, length(grep("list_parameters", names(model_settings)))), function(y) {
+        textInput(
+          inputId = ns(paste0("list_parameters", x)),
+          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+          value = paste(unlist(model_settings[[x]]$default), collapse = ", ")
+        )
+        # })
       })
     }
   }
@@ -1316,14 +1329,14 @@ def_out_config <- function(input,
   .dictionary_fun <- function(model_settings) {
     if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
       lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
-      lapply(seq(1, length(model_settings[[x]]$default)), function (y) {
-        textInput(
-          inputId = ns(paste0("dictionary_parameters", y)),
-          label = names(model_settings[[x]]$default[y]),
-          value = model_settings[[x]]$default[[y]]
-        )
+        lapply(seq(1, length(model_settings[[x]]$default)), function (y) {
+          textInput(
+            inputId = ns(paste0("dictionary_parameters", y)),
+            label = names(model_settings[[x]]$default[y]),
+            value = model_settings[[x]]$default[[y]]
+          )
+        })
       })
-     })
     }
   }
 
@@ -1337,7 +1350,7 @@ def_out_config <- function(input,
           label = gsub("_", " ", model_settings[[x]]$name) %>% capitalize_first_letter(),
           value = model_settings[[x]]$default
         )
-      # })
+        # })
       })
     }
   }
@@ -1354,7 +1367,7 @@ def_out_config <- function(input,
           max = model_settings[[x]]$max,
           value = model_settings[[x]]$default
         )
-      # })
+        # })
       })
     }
   }
