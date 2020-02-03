@@ -81,6 +81,7 @@ summarytabUI <- function(id) {
 summarytab <- function(input, output, session,
                        selectAnaID1 = reactive(NULL),
                        selectAnaID2 = reactive(NULL),
+                       modelID = reactive(NULL),
                        portfolioID1 = reactive(""),
                        portfolioID2 = reactive(""),
                        tbl_filesListDataana1 = reactive(NULL),
@@ -111,10 +112,10 @@ summarytab <- function(input, output, session,
       SummaryData <- NULL
 
       if (!is.null(selectAnaID1()) && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
-        SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
+        SummaryData1 <- .getSummary(selectAnaID1(), modelID(), portfolioID1())
       }
       if (!is.null(selectAnaID2()) && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
-        SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
+        SummaryData2 <- .getSummary(selectAnaID2(), modelID(), portfolioID2())
       }
 
       # define df to use
@@ -336,8 +337,7 @@ summarytab <- function(input, output, session,
     return(DF)
   }
 
-  .getSummary <- function(selectAnaID, portfolioID) {
-    # TODO: cross check the use of analysis settings with use in issue #173
+  .getSummary <- function(selectAnaID, modelID, portfolioID) {
     # TODO: cross check overlap of helper functions and plots part here with code in outputplots_module.R
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
@@ -399,18 +399,23 @@ summarytab <- function(input, output, session,
 
     model_settings <- analysis_settings$model_settings
     model_params_lst <- sapply(names(model_settings), function(i){model_settings[[i]]})
-
-    # check which perils were chosen
-    if (length(grep("supported_perils", names(model_settings))) > 0) {
-      supported_perils_all <- model_settings[grep("supported_perils", names(model_settings))]
-      supported_perils_id <- as.list(supported_perils_all[grep(".id", names(supported_perils_all))])
+    modelID <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("analyses", selectAnaID, sep = "/"),
+      query_method = "GET"
+    )[["model"]]
+    tbl_lookup <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID, "settings", sep = "/"),
+      query_method = "GET"
+    )[["lookup_settings"]]
+    if (!is.null(tbl_lookup$supported_perils)) {
       # extract the whole files with locations and perils
       locations_all <- check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub)
       # distinguish for unique location
       locs_unique <- distinct(locations_all, LocNumber, .keep_all = TRUE)
       # filter by peril
-      mod_locations_filter <- lapply(seq(1, length(supported_perils_id)), function(x) {
-        nrow(locs_unique %>% filter(peril_id == supported_perils_id[x]))
+      mod_locations_filter <- lapply(seq(1, length(tbl_lookup$supported_perils)), function(x) {
+        perils_id <- tbl_lookup$supported_perils[[x]][["id"]]
+        nrow(locs_unique %>% filter(peril_id == perils_id))
       })
       # sum over all unique locations filtered by perils
       mod_locations <- do.call(sum, mod_locations_filter)

@@ -284,7 +284,8 @@ panelOutputModule <- function(input, output, session,
 
   # > based on inputs ----------------------------------------------------------
 
-  observeEvent(inputplottype(), {
+  observeEvent({inputplottype()
+    input$chkboxgrplosstypes}, {
     result$Title <- ""
     output$outputplot <- renderPlotly(NULL)
     if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
@@ -293,6 +294,21 @@ panelOutputModule <- function(input, output, session,
       updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
       hide("chkboxuncertainty")
     }
+
+    if (inputplottype() == "loss for return period map" && length(input$chkboxgrplosstypes) > 1) {
+      showModal(modalDialog(
+        title = "Attention",
+        "Only one perspective is allowed for this plot selection",
+        footer = tagList(
+          modalButton("Ok")
+        )
+      ))
+      disable("abuttondraw")
+      # updateCheckboxGroupInput(session = session, inputId = "chkboxgrplosstypes", selected = NULL)
+    } else if (length(input$chkboxgrplosstypes) == 1) {
+      enable("abuttondraw")
+    }
+
   })
 
   observeEvent({anaID()
@@ -309,16 +325,6 @@ panelOutputModule <- function(input, output, session,
         loc_num_filter <- loc_num[-which(loc_num == "Summary Info")]
 
         updateSelectInput(session = session, inputId = "pltrtnprd", choices = unique(data$return_period))
-        if (length(input$chkboxgrplosstypes) > 1) {
-          showModal(modalDialog(
-            title = "Attention",
-            "Only one perspecritve is allowed for this plot selection",
-            footer = tagList(
-              modalButton("Ok")
-            )
-          ))
-          updateCheckboxGroupInput(session = session, inputId = "chkboxgrplosstypes", selected = NULL)
-        }
 
         show("pltrtnprd")
         hide("pltsummarylevels")
@@ -480,7 +486,7 @@ panelOutputModule <- function(input, output, session,
       } else if (inputplottype() == "loss for return period map" &&
                  (length(input$pltrtnprd) > 0 &&
                   length(input$calctypes) > 0 &&
-                  length(chkbox$chkboxgrplosstypes()) > 0)) {
+                  length(chkbox$chkboxgrplosstypes()) == 1)) {
         enable("abuttondraw")
         hide("outputplot")
         show("outputleaflet")
