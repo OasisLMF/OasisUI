@@ -186,9 +186,8 @@ modeldetails <- function(input,
       })
 
       #extract description from lookup settings
-      Description <- lapply(ID, function(x) {
-        name_desc <- gsub("id", "desc", names(x))
-        unlist(as.data.frame(df)[which(names(as.data.frame(df)) == name_desc)])
+      Description <- lapply(seq_len(length(ID)), function(x) {
+        df[[1]][[x]][["desc"]]
       })
 
       datatable(
