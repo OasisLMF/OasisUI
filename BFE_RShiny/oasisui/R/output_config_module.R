@@ -792,7 +792,8 @@ def_out_config <- function(input,
 
       # set certain inputs in the right format
       dict_input <- as.list(strsplit(dict_input, ","))
-      list_input <- as.data.frame(unlist(strsplit(list_input, ",")))
+      if (!is.null(list_input))
+        list_input <- as.data.frame(unlist(strsplit(list_input, ",")))
 
       # create model settings for analysis settings
       model_settings <- c(input$event_set,

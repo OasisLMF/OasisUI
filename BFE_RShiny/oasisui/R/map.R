@@ -109,7 +109,7 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
 }
 
 
-# Extraxt error messages
+# Extract error messages
 .keys_errors_msg <- function(data, session, paramID) {
   keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = paramID,
                                                                    dataset_identifier = "keys-errors.csv",
