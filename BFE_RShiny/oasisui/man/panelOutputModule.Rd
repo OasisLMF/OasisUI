@@ -15,14 +15,16 @@ panelOutputModule(input, output, session, portfId, anaID,
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{anaID}{is selectAnaID}
+\item{portfId}{Portfolio ID.}
 
-\item{filesListData}{table of output files for a given anaID}
+\item{anaID}{Analysis ID.}
+
+\item{filesListData}{Table of output files for a given anaID.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 }
 \value{
-reactive value of the title
+Reactive value of the title.
 }
 \description{
 Server logic to show graphical output such as plots.

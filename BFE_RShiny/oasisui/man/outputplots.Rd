@@ -15,11 +15,13 @@ outputplots(input, output, session, selectPortfID, selectAnaID, n_panels,
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
-\item{selectAnaID}{id of selected analysis}
+\item{selectPortfID}{ID of selected portfolio.}
 
-\item{n_panels}{number of panels}
+\item{selectAnaID}{ID of selected analysis.}
 
-\item{filesListData}{Table of output files for a given analysis id}
+\item{n_panels}{Number of panels.}
+
+\item{filesListData}{Table of output files for a given analysis ID.}
 
 \item{active}{reactive expression whether the module state should be updated.}
 }

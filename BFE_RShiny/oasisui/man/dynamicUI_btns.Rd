@@ -15,10 +15,10 @@ dynamicUI_btns(session, analysisID, ana_flag, tag, oed_field)
 
 \item{tag}{Current tag.}
 
-\item{oed_field}{oed fields.}
+\item{oed_field}{Oed fields.}
 }
 \value{
-UI function.
+UI element.
 }
 \description{
 Add "+" and "x" buttons to dynamic UI.

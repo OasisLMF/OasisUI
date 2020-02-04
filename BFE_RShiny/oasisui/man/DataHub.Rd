@@ -58,7 +58,6 @@ DATASETS
 \item{\code{get_pf_dataset_nrow(id, dataset_identifier)}}{extract a source file (location/account...) nrow given a portfolio id}
 \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
 > Model
-\item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
 \item{\code{invalidate_model_resource_dataset_content(id)}}{invalidate model resource file given model id}
 \item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file content given file id}
 \item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file content given file id}

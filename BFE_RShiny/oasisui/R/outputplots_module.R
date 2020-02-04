@@ -32,9 +32,10 @@ outputplotsUI <- function(id) {
 #'
 #' @template params-module
 #' @template params-active
-#' @param selectAnaID id of selected analysis
-#' @param n_panels number of panels
-#' @param filesListData Table of output files for a given analysis id
+#' @param selectPortfID ID of selected portfolio.
+#' @param selectAnaID ID of selected analysis.
+#' @param n_panels Number of panels.
+#' @param filesListData Table of output files for a given analysis ID.
 #'
 #' @export
 outputplots <- function(input, output, session,
@@ -95,7 +96,7 @@ outputplots <- function(input, output, session,
 #' @importFrom shinyjs hidden
 #'
 #' @export
-panelOutputModuleUI <- function(id){
+panelOutputModuleUI <- function(id) {
   ns <- NS(id)
 
   tagList(
@@ -164,10 +165,11 @@ panelOutputModuleUI <- function(id){
 #' @template params-module
 #' @template params-active
 #'
-#' @param filesListData table of output files for a given anaID
-#' @param anaID is selectAnaID
+#' @param filesListData Table of output files for a given anaID.
+#' @param portfId Portfolio ID.
+#' @param anaID Analysis ID.
 #'
-#' @return reactive value of the title
+#' @return Reactive value of the title.
 #'
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
@@ -212,6 +214,7 @@ panelOutputModuleUI <- function(id){
 #' @importFrom leaflet addAwesomeMarkers
 #' @importFrom leaflet addCircles
 #' @importFrom leaflet.extras addFullscreenControl
+#' @importFrom stats quantile
 #'
 #' @export
 panelOutputModule <- function(input, output, session,
