@@ -107,17 +107,21 @@ exposurevalidationmap <- function(input,
 
   observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-
-      result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-        mutate(modeled = case_when(
-          is.na(peril_id) ~ FALSE,
-          peril_id %in% input$chkgrp_perils ~ TRUE,
-          TRUE ~ NA)
-        ) %>%
-        filter(!is.na(modeled)) %>%
-        select(-peril_id) %>%
-        distinct()
-
+      if (is.null(input$chkgrp_perils)) {
+        result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
+          mutate(modeled = NA)
+      } else {
+        result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
+          filter(peril_id %in% input$chkgrp_perils) %>%
+          mutate(modeled = case_when(
+            is.na(peril_id) ~ FALSE,
+            peril_id %in% input$chkgrp_perils ~ TRUE,
+            TRUE ~ NA)
+          ) %>%
+          filter(!is.na(modeled)) %>%
+          select(-peril_id) %>%
+          distinct()
+      }
     }
   })
 
@@ -215,19 +219,26 @@ exposurevalidationmap <- function(input,
   .createExposureValMap <- function(df) {
     marker_colors <- c('green', 'red')
 
-    df <- df %>%
-      mutate(modeled = case_when(
-        modeled == "TRUE" ~ 1,
-        TRUE ~ 2
-      )) %>%
-      build_marker_data(session = session, paramID = analysisID(), step = 2)
+    if (is.null(input$chkgrp_perils)) {
+      icon_map <- NULL
+      df <- df
+      leaflet(df) %>%
+        addTiles() %>%
+        leaflet::setView(mean(df$Longitude), mean(df$Latitude), zoom = 20)
+    } else {
+      df <- df %>%
+        mutate(modeled = case_when(
+          modeled == "TRUE" ~ 1,
+          TRUE ~ 2
+        )) %>%
+        build_marker_data(session = session, paramID = analysisID(), step = "Validation Map")
 
-    icon_map <- awesomeIcons(
-      icon = 'map-marker-alt',
-      library = 'fa',
-      iconColor = marker_colors[df$modeled],
-      markerColor = marker_colors[df$modeled]
-    )
+      icon_map <- awesomeIcons(
+        icon = 'map-marker-alt',
+        library = 'fa',
+        iconColor = marker_colors[df$modeled],
+        markerColor = marker_colors[df$modeled]
+      )
 
     # color clusters red if any mark is red, and green if all marks are green.
     # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
@@ -282,6 +293,7 @@ exposurevalidationmap <- function(input,
                             }
       }") %>% # make map full screen
       addFullscreenControl(pseudoFullscreen = TRUE)
+    }
   }
 
   invisible()

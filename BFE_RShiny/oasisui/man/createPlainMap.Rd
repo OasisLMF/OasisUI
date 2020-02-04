@@ -4,7 +4,7 @@
 \alias{createPlainMap}
 \title{Create Plain Map}
 \usage{
-createPlainMap(df, session, paramID, step)
+createPlainMap(df, session, paramID, step = NULL)
 }
 \arguments{
 \item{df}{df to plot as map}
@@ -13,7 +13,7 @@ createPlainMap(df, session, paramID, step)
 
 \item{paramID}{Chosen parameter ID.}
 
-\item{step}{current step in UI.}
+\item{step}{Only important if user is in Validation Map. NULL by default.}
 }
 \value{
 Leaflet map.

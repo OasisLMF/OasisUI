@@ -367,7 +367,7 @@ ViewFilesInTable <- function(input, output, session,
         # Show buttons
         if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
           output$plainmap <- renderLeaflet({
-            createPlainMap(result$tbl_fileData, session = session, paramID = param(), step = 1)
+            createPlainMap(result$tbl_fileData, session = session, paramID = param(), step = NULL)
           })
           show("abuttonmap")
         } else {
@@ -384,7 +384,7 @@ ViewFilesInTable <- function(input, output, session,
       if ("latitude" %in% tolower(names(result$tbl_fileData))) {
         if (!is.null(result$tbl_fileData)) {
           output$plainmap <- renderLeaflet({
-            createPlainMap(result$tbl_fileData, session = session, paramID = param(), step = 2)
+            createPlainMap(result$tbl_fileData, session = session, paramID = param(), step = NULL)
           })
         }
         show("abuttonmap")

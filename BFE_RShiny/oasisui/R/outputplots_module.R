@@ -198,14 +198,11 @@ panelOutputModuleUI <- function(id) {
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 geom_errorbar
-#' @importFrom ggplot2 geom_violin
 #' @importFrom ggplot2 position_dodge
 #' @importFrom ggplot2 label_value
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
 #' @importFrom data.table fread
-#' @importFrom shinyjs disable
-#' @importFrom shinyjs enable
 #' @importFrom leaflet leaflet
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet renderLeaflet
@@ -692,18 +689,6 @@ panelOutputModule <- function(input, output, session,
         if (length(reference) > 0) {
           data <- data %>% rename("reference" = reference)
         }
-        # make multiplots if more than one losstype or variable is selected
-        # if ( (any(plotstrc > 1) | plottype == "violin" ) & length(gridcol) > 0 ) {
-        #   multipleplots <- TRUE
-        #   data <- data %>% rename("colour" = keyval)
-        # } else {
-        #   multipleplots <- FALSE
-        #   if (length(gridcol) > 0) {
-        #     data <- data %>% rename("colour" = "gridcol")
-        #   }  else {
-        #     data <- data %>% rename("colour" = keyval)
-        #   }
-        # }
 
         multipleplots <- TRUE
         data <- data %>% rename("colour" = keyval)
@@ -720,7 +705,7 @@ panelOutputModule <- function(input, output, session,
         popup <- lapply(seq(1, length(data$loss[loss])), function(x) {
           as.character(div(
             strong("Location ID: "), loc_num[x],
-            br(), strong("Loss:"), round(data$loss[x])
+            br(), strong("Loss:"), add_commas(round(data$loss[x]))
           ))
         })
 
@@ -768,19 +753,16 @@ panelOutputModule <- function(input, output, session,
 
           if (plottype == "line") {
             p <- .linePlotDF(xlabel, ylabel, toupper(result$Title), data,
-                             summary_id_title, multipleplots = multipleplots) +
-              scale_x_continuous(labels = comma) +
-              scale_y_continuous(labels = comma)
-            p <- p + labs("summary_id")
+                             summary_id_title, multipleplots = multipleplots)
+            # p <- p + labs("summary_id")
           } else if (plottype == "bar") {
             p <- .barPlotDF(xlabel, ylabel, toupper(result$Title), data,
                             summary_id_title, wuncertainty = input$chkboxuncertainty,
                             multipleplots = multipleplots, xtickslabels = xtickslabels)
-          } else if (plottype == "violin") {
-            p <- .violinPlotDF(xlabel, ylabel, toupper(result$Title), data,
-                               multipleplots = multipleplots)
           }
-          output$outputplot <- renderPlotly({ggplotly(p)})
+
+          # output$outputplot <- renderPlotly({ggplotly(p)})
+          output$outputplot <- renderPlotly({p})
         } else {
           oasisuiNotification(type = "error", "No data to plot.")
         }
@@ -887,24 +869,48 @@ panelOutputModule <- function(input, output, session,
   }
 
   # Line plot
-  .linePlotDF <- function(..., multipleplots = FALSE) {
-    p <- .basicplot(...)
+  .linePlotDF <- function(xlabel, ylabel, titleToUse, data, legendtitle, multipleplots = FALSE) {
+    p <- .basicplot(xlabel, ylabel, titleToUse, data, legendtitle)
+    # add commas to numeric entries and rename them for more user-friendly tooltip
+    RP <- add_commas(data$xaxis)
+    Loss <- add_commas(data$value*1000000)
+    Summary_Level <- add_commas(data$colour)
     p <- p +
       geom_line(size = 1) +
-      geom_point(size = 2)
+      geom_point(size = 2, aes(color = colour, return = RP, loss = Loss, type = Summary_Level)) +
+      scale_x_continuous(labels = comma) +
+      scale_y_continuous(labels = comma)
     p <- .multiplot(p, multipleplots)
-    p
+    ggplotly(p, tooltip = c("type", "return", "loss"))
   }
 
   # Bar plot
-  .barPlotDF <- function(..., wuncertainty = FALSE,
+  .barPlotDF <- function(xlabel, ylabel, titleToUse, data, legendtitle, wuncertainty = FALSE,
                          multipleplots = FALSE, xtickslabels = NULL ) {
-    p <- .basicplot(...)
-    p <- p + geom_bar(position = "dodge", stat = "identity")
-    #geom_bar(position = "dodge", stat = "identity", aes(fill = as.factor(colour))) #+
-    # scale_x_continuous(breaks = seq(max(data$xaxis)), labels = xtickslabels)
 
-    if (wuncertainty){
+    p <- ggplot(data, aes(x = xaxis, y = value, col = colour)) +
+      labs(title = titleToUse, x = xlabel, y = ylabel, col = legendtitle) +
+      theme(
+        plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
+        text = element_text(size = 12),
+        panel.background = element_blank(),
+        axis.line.x = element_line(color = "grey45", size = 0.5),
+        axis.line.y = element_line(color = "grey45", size = 0.5),
+        legend.position = "top"
+      )
+
+    # add commas to numeric entries
+    data$uncertainty <- add_commas(data$uncertainty)
+    data$reference <- add_commas(data$reference)
+
+    #rename tooltip entries
+    "Summary_Level" <- data$colour
+    "Type" <- data$xaxis
+    "Loss" <- add_commas(data$value*1000000)
+
+    p <- p + geom_bar(position = "dodge", stat = "identity", aes(sum_level = Summary_Level, type = Type, loss = Loss))
+
+    if (wuncertainty) {
       p <- p +
         geom_errorbar(aes(ymin = value - uncertainty, ymax = value + uncertainty),
                       size = .3,
@@ -915,16 +921,7 @@ panelOutputModule <- function(input, output, session,
       # }
     }
     p <- .multiplot(p, multipleplots)
-    p
-  }
-
-  # Violin Plot
-  .violinPlotDF <- function(xlabel, ylabel, titleToUse, data, multipleplots = FALSE){
-    p <- .basicplot(xlabel, ylabel, titleToUse, data)
-    p <- p +
-      geom_violin(aes(fill = colour, alpha = 0.2), show.legend = FALSE)
-    p <- .multiplot(p,multipleplots)
-    p
+    ggplotly(p, tooltip = c("sum_level", "type", "loss"))
   }
 
   # Module Output --------------------------------------------------------------
