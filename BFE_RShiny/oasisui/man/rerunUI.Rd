@@ -13,11 +13,11 @@ rerunUI(session, analysisID, tag, oed_field)
 
 \item{tag}{Current tag.}
 
-\item{oed_field}{oed fields.}
+\item{oed_field}{Oed fields.}
 }
 \value{
-UI function.
+UI element.
 }
 \description{
-Summary Level and Reports fields in re-run situation.
+Summary level and reports fields in re-run situation.
 }

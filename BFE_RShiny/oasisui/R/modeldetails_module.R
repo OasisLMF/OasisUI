@@ -94,12 +94,11 @@ modeldetails <- function(input,
     tbl_modelsDetails = NULL,
     # list of hazard maps associated to model,
     mapfiles_lst = NULL,
-    #file for hazard map
+    # file for hazard map
     mapfile = NULL,
     # file for pins
     uploaded_locs = NULL
   )
-
 
   # Initialize -----------------------------------------------------------------
   observeEvent({
@@ -117,51 +116,35 @@ modeldetails <- function(input,
     if (!is.null(result$tbl_modelsDetails$model_settings) &&
         length(result$tbl_modelsDetails$model_settings) > 0) {
       logMessage("re-rendering model settings table")
-      df <- result$tbl_modelsDetails$model_settings
+      mdl_sets <- result$tbl_modelsDetails$model_settings
 
-      #extract names from model settings
-      type_param <- names(df)
-
-      Name <- lapply(seq(1, length(type_param)), function(x) {
-        entry <- df[x][[names(df[x])]]
-        if(is.null(entry$name)) {
-          lapply(seq(1, length(df[x][[names(df[x])]])), function(y) {
-            set <- df[x][[names(df[x])]][[y]]
-            set$name
+      # extract names, description and default values from model settings
+      DF <- lapply(seq_len(length(mdl_sets)), function(x) {
+        entry <- mdl_sets[[x]]
+        if (is.null(entry$name)) {
+          SubDF <- lapply(seq_len(length(entry)), function(y) {
+            data.frame(
+              Type = names(mdl_sets)[x],
+              Name = entry[[y]]$name,
+              Description = entry[[y]]$desc,
+              Default = paste(unlist(entry[[y]]$default), collapse = ", ")
+            )
           })
+          do.call(rbind, SubDF)
         } else {
-          df[[x]][["name"]]
+          data.frame(
+            Type = names(mdl_sets)[x],
+            Name = entry$name,
+            Description = entry$desc,
+            Default = paste(unlist(entry$default), collapse = ", ")
+          )
         }
       })
+      DF <- do.call(rbind, DF)
 
-      #extract description from model settings
-      Description <- lapply(seq(1, length(type_param)), function(x) {
-        entry <- df[[x]]
-        descrp <- entry$desc
-        if(is.null(entry$desc)) {
-          descrp <- entry[[length(entry)]]$desc
-        }
-        descrp
-      })
-
-      #extract default values from model settings
-      Default <- lapply(seq(1, length(type_param)), function(x) {
-        entry <- df[x][[names(df[x])]]
-        if(is.null(entry$name)) {
-          lapply(seq(1, length(df[x][[names(df[x])]])), function(y) {
-            set <- df[x][[names(df[x])]][[y]]
-            rbind(set$default)
-          })
-        } else {
-          df[[x]][["default"]]
-        }
-      })
-
-      #rename names list for data frame title
-      Type <- type_param
-      #create model settings data table
+      # create model settings data table
       datatable(
-        cbind(Type, Name, Description, Default),
+        DF,
         class = "oasisui-table display",
         rownames = FALSE,
         filter = "none",
@@ -178,16 +161,16 @@ modeldetails <- function(input,
     if (!is.null(result$tbl_modelsDetails$lookup_settings) &&
         length(result$tbl_modelsDetails$lookup_settings) > 0) {
       logMessage("re-rendering lookup settings table")
-      df <- result$tbl_modelsDetails$lookup_settings
+      lkp_sets <- result$tbl_modelsDetails$lookup_settings
 
-      #extract ID from lookup settings
-      ID <- lapply(grep("id", names(unlist(df))), function(x) {
-        unlist(df)[x]
+      # extract ID from lookup settings
+      ID <- lapply(grep("id", names(unlist(lkp_sets))), function(x) {
+        unlist(lkp_sets)[x]
       })
 
-      #extract description from lookup settings
+      # extract description from lookup settings
       Description <- lapply(seq_len(length(ID)), function(x) {
-        df[[1]][[x]][["desc"]]
+        lkp_sets[[1]][[x]][["desc"]]
       })
 
       datatable(
@@ -199,14 +182,12 @@ modeldetails <- function(input,
         selection = "none",
         options = getTableOptions()
       )
-
     } else {
       nothingToShowTable(paste0("No lookup settings files associated with Model ID ", modelID()))
     }
   )
 
   # Tab JSON file --------------------------------------------------------------
-
   output$json_model_settings <- renderText({
     if (!is.null(result$tbl_modelsDetails)) {
       logMessage("re-rendering model settings JSON")
@@ -217,7 +198,6 @@ modeldetails <- function(input,
   })
 
   # Tab Hazard Map -------------------------------------------------------------
-
   observeEvent(input$tabsModelsDetails, {
     if (input$tabsModelsDetails == ns("tabmaps")) {
       if (!is.null(result$mapfiles_lst)) {
@@ -297,5 +277,5 @@ modeldetails <- function(input,
     result$tbl_modelsDetails
   }
 
+  invisible()
 }
-

@@ -7,7 +7,7 @@
 #'
 #' @description UI/View of summary elements of an analysis.
 #'
-#' @return list of tags
+#' @return UI panel element.
 #'
 #' @importFrom plotly plotlyOutput
 #'
@@ -81,7 +81,6 @@ summarytabUI <- function(id) {
 summarytab <- function(input, output, session,
                        selectAnaID1 = reactive(NULL),
                        selectAnaID2 = reactive(NULL),
-                       modelID = reactive(NULL),
                        portfolioID1 = reactive(""),
                        portfolioID2 = reactive(""),
                        tbl_filesListDataana1 = reactive(NULL),
@@ -112,10 +111,10 @@ summarytab <- function(input, output, session,
       SummaryData <- NULL
 
       if (!is.null(selectAnaID1()) && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
-        SummaryData1 <- .getSummary(selectAnaID1(), modelID(), portfolioID1())
+        SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
       }
       if (!is.null(selectAnaID2()) && portfolioID2() != "" && !is.null(tbl_filesListDataana1())) {
-        SummaryData2 <- .getSummary(selectAnaID2(), modelID(), portfolioID2())
+        SummaryData2 <- .getSummary(selectAnaID2(), portfolioID2())
       }
 
       # define df to use
@@ -337,8 +336,8 @@ summarytab <- function(input, output, session,
     return(DF)
   }
 
-  .getSummary <- function(selectAnaID, modelID, portfolioID) {
-    # TODO: cross check overlap of helper functions and plots part here with code in outputplots_module.R
+  .getSummary <- function(selectAnaID, portfolioID) {
+    # TODO: check overlap of helper functions and plots part here with code in outputplots_module.R
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
     # read AAL files

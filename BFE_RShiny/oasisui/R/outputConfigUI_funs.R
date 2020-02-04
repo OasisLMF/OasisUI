@@ -1,15 +1,14 @@
-
 #' Dynamic UI
 #'
-#' @description Add "+" and "x" buttons to dynamic UI.
+#' @description Add input fields for custom and drill-down configuration.
 #'
 #' @param session Current session.
 #' @param analysisID Current analysis ID.
 #' @param tag Current tag.
 #' @param n_field Number of fields to produce.
-#' @param oed_field oed fields.
+#' @param oed_field Oed fields.
 #'
-#' @return UI function.
+#' @return UI element.
 #'
 #' @export
 dynamicUI <- function(session, analysisID, tag, n_field, oed_field) {
@@ -58,14 +57,14 @@ dynamicUI <- function(session, analysisID, tag, n_field, oed_field) {
 
 #' Rerun UI
 #'
-#' @description Summary Level and Reports fields in re-run situation.
+#' @description Summary level and reports fields in re-run situation.
 #'
 #' @param session Current session.
 #' @param analysisID Current analysis ID.
 #' @param tag Current tag.
-#' @param oed_field oed fields.
+#' @param oed_field Oed fields.
 #'
-#' @return UI function.
+#' @return UI element.
 #'
 #' @export
 rerunUI <- function(session, analysisID, tag, oed_field) {
@@ -211,9 +210,9 @@ rerunUI <- function(session, analysisID, tag, oed_field) {
 #' @param analysisID Current analysis ID.
 #' @param ana_flag Analysis flag.
 #' @param tag Current tag.
-#' @param oed_field oed fields.
+#' @param oed_field Oed fields.
 #'
-#' @return UI function.
+#' @return UI element.
 #'
 #' @export
 dynamicUI_btns <- function(session, analysisID, ana_flag, tag, oed_field) {

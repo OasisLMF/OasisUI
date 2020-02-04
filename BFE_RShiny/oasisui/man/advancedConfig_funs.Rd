@@ -9,10 +9,10 @@ advancedConfig_funs(session, model_settings)
 \arguments{
 \item{session}{Current session.}
 
-\item{model_settings}{Model settings retireved from the API.}
+\item{model_settings}{Model settings retrieved from the API.}
 }
 \value{
-List of functions.
+List of UI elements (input/selector widgets).
 }
 \description{
 Functions for the Advanced Output Configuration/Rerun Model Parameters view.

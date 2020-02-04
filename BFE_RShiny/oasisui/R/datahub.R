@@ -59,7 +59,6 @@
 #' \item{\code{get_pf_dataset_nrow(id, dataset_identifier)}}{extract a source file (location/account...) nrow given a portfolio id}
 #' \item{\code{invalidate_pf_dataset_nrow(id, dataset_identifier)}}{invalidate a source file (location/account...) header given a portfolio id}
 #' > Model
-#' \item{\code{get_model_resource_dataset_content(id)}}{extract model resource file given model id}
 #' \item{\code{invalidate_model_resource_dataset_content(id)}}{invalidate model resource file given model id}
 #' \item{\code{get_model_hazard_dataset_content(id)}}{extract model hazard resource file content given file id}
 #' \item{\code{invalidate_model_hazard_dataset_content(id)}}{invalidate model hazard resource file content given file id}
@@ -292,61 +291,6 @@ DataHub <- R6Class(
     },
 
     # > MODEL METHODS ----
-    # extract model resource file given model id
-    get_model_resource_dataset_content = function(id, ...) {
-      # retrieve model resource file from API
-      get_response <- private$oasisapi$api_get_query(query_path = paste( "models", id, "settings", sep = "/"))
-      modelsIdResourceFileList <- content(get_response$result)
-      if (!is.null(modelsIdResourceFileList)) {
-        modelsList_names <- names(modelsIdResourceFileList)
-        return_list <- lapply(modelsList_names, function(i) {
-          # extract sublist
-          curr_list <- unlist(unlist(modelsIdResourceFileList[i], recursive = FALSE, use.names = FALSE), recursive = FALSE)
-          # get names of sub lists
-          lst_names <- lapply(curr_list, names)
-          # find sub-lists names that are common to all sublists
-          colsResources <- Reduce(intersect, lst_names)
-          # find must-have columns which are missing
-          colsmust <- setdiff(c("values", "name"), colsResources)
-          # initialise dataframe to have the common names plus must-haves as columns
-          if (length(colsmust) > 0) {
-            df <- data.frame(matrix(ncol = length(colsResources) + length(colsmust), nrow = 0), stringsAsFactors = FALSE)
-            names(df) <- c(colsResources, colsmust)
-          } else {
-            df <- data.frame(matrix(ncol = length(colsResources), nrow = 0), stringsAsFactors = FALSE)
-            names(df) <- colsResources
-          }
-          # construct dataframe
-          for (j in names(curr_list)) {
-            curr_df <- unlist(curr_list[[j]]) %>%
-              bind_rows() %>%
-              as.data.frame(stringsAsFactors = FALSE)
-            # identify columns to be merged together
-            cols2merge <- setdiff(names(curr_df), colsResources)
-            # identify missing columns for binding curr_df with df
-            colmissing <- setdiff(unique(c(colsmust,colsResources)), names(curr_df))
-            if (length(cols2merge) > 0) {
-              curr_df <- curr_df %>%
-                unite(col = "values", c(cols2merge), sep = ", " )
-            } else if (length(colmissing) > 0 ) {
-              df2add <- c("-")
-              names(df2add) <- colmissing
-              curr_df <- c(curr_df, df2add) %>% as.data.frame()
-            }
-            # make sure the column names is filled in
-            if ("name" %notin% names(curr_df)) {
-              curr_df <- cbind(curr_df, data.frame(name = j))
-            }
-            df <- rbind(df, curr_df)
-          }
-          df
-        })
-        names(return_list) <- modelsList_names
-      } else {
-        return_list <- NULL
-      }
-      return_list
-    },
     # invalidate model resource file given model id
     invalidate_model_resource_dataset_content = function(id, ...) {
       invisible()

@@ -746,33 +746,33 @@ def_out_config <- function(input,
       )
       model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
 
-      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function (x) {input[[paste0("string_parameters", x)]]}))
-      dict_input <- unlist(lapply(grep("dictionary_parameters", names(model_settings)), function (x) {
-        lapply(seq(1, length(model_settings[[x]]$default)), function (x) {
-          input[[paste0("dictionary_parameters", x)]]
+      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {input[[paste0("string_parameters", x)]]}))
+      dict_input <- unlist(lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
+        lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
+          input[[paste0("dictionary_parameters", x, y)]]
         })
       }))
-      dict_input <- paste0(dict_input, collapse = ", ")
-      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function (x) {input[[paste0("boolean_parameters", x)]]})
-      float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function (x) {input[[paste0("float_parameters", x)]]}))
-      list_input <- unlist(lapply(grep("list_parameters", names(model_settings)), function (x) {input[[paste0("list_parameters", x)]]}))
+      dict_input <- paste(dict_input, collapse = ", ")
+      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {input[[paste0("boolean_parameters", x)]]})
+      float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function(x) {input[[paste0("float_parameters", x)]]}))
+      list_input <- unlist(lapply(grep("list_parameters", names(model_settings)), function(x) {input[[paste0("list_parameters", x)]]}))
 
-      inputs_list <- list(list_input,
-                          string_input,
+      inputs_list <- list(string_input,
+                          list_input,
                           dict_input,
                           float_input)
 
-      params_list <- list("list_parameters",
-                          "string_parameters",
+      params_list <- list("string_parameters",
+                          "list_parameters",
                           "dictionary_parameters",
                           "float_parameters")
-      #create list of model inputs names
+      # create list of re-ordered and grouped model inputs names
       inputs_name <- c()
-      for (param in seq(1, length(params_list))) {
-        if(!is.null(inputs_list[param])) {
+      for (param in seq_len(length(params_list))) {
+        if (!is.null(inputs_list[param])) {
           param_name <- unlist(lapply(grep(params_list[param], names(model_settings)), function(i) {
             model_match <- model_settings[i]
-            lapply(seq(1, length(model_match)), function(j) {
+            lapply(seq_len(length(model_match)), function(j) {
               model_match[[j]][["name"]]
             })
           }))
@@ -781,10 +781,10 @@ def_out_config <- function(input,
       }
 
       # find boolean parameters names
-      if(!is.null(boolean_input)) {
-        boolean_name <- lapply(seq(1, length(boolean_input)), function(i) {
-          model_match <- model_settings[grep(boolean_input[i], model_settings)]
-          model_match[[names(model_match)]][["name"]]
+      if (!is.null(boolean_input)) {
+        boolean_name <- lapply(seq_len(length(boolean_input)), function(i) {
+          model_match <- model_settings[grep("boolean_parameters", names(model_settings))][[i]]
+          model_match[["name"]]
         })
       } else {
         boolean_name <- NULL
@@ -797,23 +797,24 @@ def_out_config <- function(input,
       # create model settings for analysis settings
       model_settings <- c(input$event_set,
                           input$event_occurrence,
+                          # note that boolean_input is a list, making sure that the result of this c() is a flat list!
                           boolean_input,
                           string_input,
                           list_input,
                           dict_input,
                           float_input)
 
-      #remove all NULL elements
+      # remove all NULL elements
       if (length(which(sapply(model_settings, is.null))) > 0) {
         model_settings <- model_settings[-which(sapply(model_settings, is.null))]
       }
-      #create list of names for modle settings
+      # create list of names for model settings
       names_full_list <- c("event_set",
                            "event_occurrence_id",
                            boolean_name,
                            inputs_name)
 
-      #remove all NULL elements
+      # remove all NULL elements
       if (length(which(sapply(names_full_list, is.null))) > 0) {
         names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.null))]
       } else {
