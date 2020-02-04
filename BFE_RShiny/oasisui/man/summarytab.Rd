@@ -32,7 +32,7 @@ summarytab(input, output, session, selectAnaID1 = reactive(NULL),
 \item{active}{reactive expression whether the module state should be updated.}
 }
 \value{
-list of tags
+UI panel element.
 
 list of tags
 }

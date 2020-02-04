@@ -7,7 +7,7 @@
 #'
 #' @description UI/View of summary elements of an analysis.
 #'
-#' @return list of tags
+#' @return UI panel element.
 #'
 #' @importFrom plotly plotlyOutput
 #'
@@ -337,8 +337,7 @@ summarytab <- function(input, output, session,
   }
 
   .getSummary <- function(selectAnaID, portfolioID) {
-    # TODO: cross check the use of analysis settings with use in issue #173
-    # TODO: cross check overlap of helper functions and plots part here with code in outputplots_module.R
+    # TODO: check overlap of helper functions and plots part here with code in outputplots_module.R
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
     # read AAL files
@@ -397,14 +396,36 @@ summarytab <- function(input, output, session,
       locnum <- 0
     }
 
-    ana_settings <- analysis_settings[["analysis_settings"]]
-    model_settings <- analysis_settings[["analysis_settings"]][["model_settings"]]
+    model_settings <- analysis_settings$model_settings
     model_params_lst <- sapply(names(model_settings), function(i){model_settings[[i]]})
+    modelID <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("analyses", selectAnaID, sep = "/"),
+      query_method = "GET"
+    )[["model"]]
+    tbl_lookup <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID, "settings", sep = "/"),
+      query_method = "GET"
+    )[["lookup_settings"]]
+    if (!is.null(tbl_lookup$supported_perils)) {
+      # extract the whole files with locations and perils
+      locations_all <- check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub)
+      # distinguish for unique location
+      locs_unique <- distinct(locations_all, LocNumber, .keep_all = TRUE)
+      # filter by peril
+      mod_locations_filter <- lapply(seq(1, length(tbl_lookup$supported_perils)), function(x) {
+        perils_id <- tbl_lookup$supported_perils[[x]][["id"]]
+        nrow(locs_unique %>% filter(peril_id == perils_id))
+      })
+      # sum over all unique locations filtered by perils
+      mod_locations <- do.call(sum, mod_locations_filter)
+    } else {
+      mod_locations <- 0
+    }
 
     # summary DF
-    SpecificationRows <- c("exposure location count", tiv$variables, names(model_params_lst))
-    ValueRows <- unlist(c(locnum, tiv$value, model_params_lst))
-    TypeRows <- c("input", rep("input", nrow(tiv)), rep("param", length(model_params_lst)))
+    SpecificationRows <- c("exposure location count", tiv$variables, "modelled locations", names(model_params_lst))
+    ValueRows <- unlist(c(locnum, tiv$value, mod_locations, model_params_lst))
+    TypeRows <- c("input", rep("input", nrow(tiv)), "input", rep("param", length(model_params_lst)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 
