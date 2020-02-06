@@ -1,6 +1,13 @@
 OasisUI Changelog 
 ==================
 
+`1.5.0`_
+--------
+* #211 - Match the footer version number to the Release tags (github / docker)
+* #210 - A collection of small UI updates 
+* #206 - Update to support API json endpoints `models/{id}/settings` and `analyses/{id}/settings`
+* #194 - Show how many locations are being lost when modelled
+
 `1.4.1`_
 --------
 * Replaced mean with quantile at 1/2
@@ -137,6 +144,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
+.. _`1.5.0`:  https://github.com/OasisLMF/OasisUI/compare/1.4.1...1.5.0
 .. _`1.4.1`:  https://github.com/OasisLMF/OasisUI/compare/1.4.0...1.4.1
 .. _`1.4.0`:  https://github.com/OasisLMF/OasisUI/compare/1.3.5...1.4.0
 .. _`1.3.5`:  https://github.com/OasisLMF/OasisUI/compare/1.3.3...1.3.5
