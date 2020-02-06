@@ -90,7 +90,7 @@ advancedConfig_funs <- function(session, model_settings) {
         lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
           textInput(
             inputId = ns(paste0("dictionary_parameters", x, y)),
-            label = names(model_settings[[x]]$default[y]),
+            label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default[y]), sep = ": "),
             value = model_settings[[x]]$default[[y]]
           )
         })
