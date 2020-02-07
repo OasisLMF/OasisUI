@@ -782,7 +782,7 @@ def_out_config <- function(input,
       }
 
       # find boolean parameters names
-      if (length(boolean_input) > 0) {
+      if (!all(is.null(unlist(boolean_input)))) {
         boolean_name <- lapply(seq_len(length(boolean_input)), function(i) {
           model_match <- model_settings[grep("boolean_parameters", names(model_settings))][[i]]
           model_match[["name"]]
@@ -808,9 +808,11 @@ def_out_config <- function(input,
                           dict_input,
                           float_input)
 
-      # NULL or list() elements won't survive the c() above!
-
-      # create list/vector of names for model settings
+      # remove all NULL elements
+      if (length(which(sapply(model_settings, is.null))) > 0) {
+        model_settings <- model_settings[-which(sapply(model_settings, is.null))]
+      }
+      # create list of names for model settings
       names_full_list <- c("event_set",
                            "event_occurrence_id",
                            boolean_name,
