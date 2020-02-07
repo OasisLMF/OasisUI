@@ -745,13 +745,14 @@ def_out_config <- function(input,
         query_method = "GET"
       )
       model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
-
+#browser()
       string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {input[[paste0("string_parameters", x)]]}))
       dict_input <- unlist(lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
         lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
-          input[[paste0("dictionary_parameters", x, y)]]
+          setNames(input[[paste0("dictionary_parameters", x, y)]], names(model_settings[[x]]$default[y]))
         })
       }))
+      # below is purposedly list() rather than NULL in case there are none!
       boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {input[[paste0("boolean_parameters", x)]]})
       float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function(x) {input[[paste0("float_parameters", x)]]}))
       list_input <- unlist(lapply(grep("list_parameters", names(model_settings)), function(x) {input[[paste0("list_parameters", x)]]}))
@@ -781,7 +782,7 @@ def_out_config <- function(input,
       }
 
       # find boolean parameters names
-      if (!is.null(boolean_input)) {
+      if (length(boolean_input) > 0) {
         boolean_name <- lapply(seq_len(length(boolean_input)), function(i) {
           model_match <- model_settings[grep("boolean_parameters", names(model_settings))][[i]]
           model_match[["name"]]
@@ -791,7 +792,8 @@ def_out_config <- function(input,
       }
 
       # set certain inputs in the right format
-      dict_input <- list(dict_input)
+      if (!is.null(dict_input))
+        dict_input <- list(dict_input)
       if (!is.null(list_input))
         #list_input <- as.data.frame(unlist(strsplit(list_input, ", ")))
         list_input <- strsplit(list_input, ", ")
@@ -806,11 +808,9 @@ def_out_config <- function(input,
                           dict_input,
                           float_input)
 
-      # NULL elements won't survive the c() above!
-      # if (length(which(sapply(model_settings, is.null))) > 0) {
-      #   model_settings <- model_settings[-which(sapply(model_settings, is.null))]
-      # }
-      # create list of names for model settings
+      # NULL or list() elements won't survive the c() above!
+
+      # create list/vector of names for model settings
       names_full_list <- c("event_set",
                            "event_occurrence_id",
                            boolean_name,

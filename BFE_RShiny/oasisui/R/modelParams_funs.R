@@ -12,8 +12,11 @@ basicConfig_funs <- function(session, model_settings) {
   ns <- session$ns
   # Event set
   .event_set_fun <- function(model_settings) {
-    selectChoices <- lapply(seq_len(length(model_settings$event_set.options)), function(x) {
-      model_settings$event_set.options[[x]]$id
+    selectChoices <- lapply(model_settings$event_set.options, function(x) {
+      x$id
+    })
+    names(selectChoices) <- sapply(model_settings$event_set.options, function(x) {
+      x$desc
     })
     selectInput(
       inputId = ns("event_set"),
@@ -26,8 +29,11 @@ basicConfig_funs <- function(session, model_settings) {
 
   # Event occurrence
   .event_occurrence_fun <- function(model_settings) {
-    selectChoices <- lapply(seq(1, length(model_settings$event_occurrence_id.options)), function(x) {
-      model_settings$event_occurrence_id.options[[x]]$id
+    selectChoices <- lapply(model_settings$event_occurrence_id.options, function(x) {
+      x$id
+    })
+    names(selectChoices) <- sapply(model_settings$event_occurrence_id.options, function(x) {
+      x$desc
     })
     selectInput(
       inputId = ns("event_occurrence"),
@@ -59,12 +65,10 @@ advancedConfig_funs <- function(session, model_settings) {
   .string_fun <- function(model_settings) {
     if (length(grep("string_parameters", names(model_settings))) > 0) {
       lapply(grep("string_parameters", names(model_settings)), function(x) {
-        selectInput(
+        textInput(
           inputId = ns(paste0("string_parameters", x)),
           label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          choices = model_settings[[x]]$default,
-          selected = model_settings[[x]]$default,
-          multiple = TRUE
+          value = model_settings[[x]]$default
         )
       })
     }
