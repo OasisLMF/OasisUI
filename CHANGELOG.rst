@@ -1,10 +1,15 @@
-OasisUI Changelog 
+OasisUI Changelog
 ==================
+
+`1.5.1`_
+--------
+* Fix dashboard crash
+* Various fixes for output configuration and the update model_settings schema
 
 `1.5.0`_
 --------
 * #211 - Match the footer version number to the Release tags (github / docker)
-* #210 - A collection of small UI updates 
+* #210 - A collection of small UI updates
 * #206 - Update to support API json endpoints `models/{id}/settings` and `analyses/{id}/settings`
 * #194 - Show how many locations are being lost when modelled
 
@@ -22,14 +27,14 @@ OasisUI Changelog
 
 `1.4.0`_
 --------
-* #187 - Updates to plots and reporting 
+* #187 - Updates to plots and reporting
 * #202 - Order files in tables alphabetically
 * #205 - UI user guide documentation
 
 `1.3.5`_
 --------
 * closes #173 - Update Output config view according to previous selection
-* closes #179 - Update to analysis settings for leccalc in OasisLMF>=1.4.3 
+* closes #179 - Update to analysis settings for leccalc in OasisLMF>=1.4.3
 * closes #183 - Handle API connection error on login
 * fixes #185 - Issue with single data file in API model
 
@@ -43,7 +48,7 @@ OasisUI Changelog
 * Fixes #170
 * Fixes #174
 * Fixes #176
-* Feature #148 Update Output config 
+* Feature #148 Update Output config
 * Closes #148
 * Closes #149
 * Fixes #154
@@ -70,7 +75,7 @@ OasisUI Changelog
 
 `1.1.3`_
 --------
-* Updated icons and fonts 
+* Updated icons and fonts
 
 `1.1.2`_
 --------
@@ -83,60 +88,60 @@ OasisUI Changelog
 
 `1.1.0`_
 --------
-* Fix for file size upload limit 
+* Fix for file size upload limit
 * Fix when deleting Portfolios
-* Layout and UI improvements 
+* Layout and UI improvements
 * Improvement in report outputs
-* Added Hazard map for models 
-* Added exposure validation on files generation 
+* Added Hazard map for models
+* Added exposure validation on files generation
 
 `1.0.2`_
 --------
-* Update and simplify Dockerfile for `oasisui_app` 
+* Update and simplify Dockerfile for `oasisui_app`
 * Update for status display of an analysis
 * New table headers
 * Added Download Button for log files
-* Fixed display of folders in files list 
+* Fixed display of folders in files list
 
 `1.0.1`_
 --------
-* Update to Summary Output reporting tables 
+* Update to Summary Output reporting tables
 * Cosmetics updates
-* Fix for file names on download 
+* Fix for file names on download
 * Fix model_settings sublevel in analysis_settings.json
 
 `1.0.0`_
 --------
-* Upgrade to Font Awesome 5 and update Icons 
+* Upgrade to Font Awesome 5 and update Icons
 * Fix for zip download selected files
-* Added info column for analyses status 
+* Added info column for analyses status
 * Fix for status_detailed ordering
 
 
 `1.0.0-rc1`_ (Release candidate 1)
 --------
-* Beta Release of Overhauled UI 
-* docker image `flamingo_server` deprecated 
+* Beta Release of Overhauled UI
+* docker image `flamingo_server` deprecated
 * image rename `shiny_proxy` -> `oasisui_proxy`
 * image rename `flamingo_shiny` -> `oasisui_app`
-* legacy files removed (MSSQL / Older UI) 
+* legacy files removed (MSSQL / Older UI)
 
 
 `0.397.0`_ (SQL)
 --------
-* Minor fixes 
-* Update docker files 
+* Minor fixes
+* Update docker files
 
 
 `0.395.3`_ (SQL)
 --------
 * Update schema.sql for RI
-* Fixes for RI support 
+* Fixes for RI support
 
 
 `0.395.0`_ (SQL)
 --------
-* Feature - Support for Reinsurance in Flamingo UI 
+* Feature - Support for Reinsurance in Flamingo UI
 
 
 `0.394.3`_ (SQL)
@@ -144,6 +149,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
+.. _`1.5.1`:  https://github.com/OasisLMF/OasisUI/compare/1.5.0...1.5.1
 .. _`1.5.0`:  https://github.com/OasisLMF/OasisUI/compare/1.4.1...1.5.0
 .. _`1.4.1`:  https://github.com/OasisLMF/OasisUI/compare/1.4.0...1.4.1
 .. _`1.4.0`:  https://github.com/OasisLMF/OasisUI/compare/1.3.5...1.4.0
