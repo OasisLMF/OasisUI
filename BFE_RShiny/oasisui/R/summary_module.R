@@ -397,7 +397,13 @@ summarytab <- function(input, output, session,
     }
 
     model_settings <- analysis_settings$model_settings
-    model_params_lst <- sapply(names(model_settings), function(i){model_settings[[i]]})
+    model_params_lst <- lapply(names(model_settings), function(i){
+      setting <- model_settings[[i]]
+      if (length(setting) > 1) {
+        setting <- paste(setting, collapse = ", ")
+      }
+      setting
+      }) %>% setNames(names(model_settings))
     modelID <- session$userData$oasisapi$api_return_query_res(
       query_path = paste("analyses", selectAnaID, sep = "/"),
       query_method = "GET"
