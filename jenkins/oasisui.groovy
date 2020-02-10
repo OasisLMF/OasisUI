@@ -11,6 +11,7 @@ node {
         [$class: 'StringParameterDefinition',  name: 'BASE_TAG', defaultValue: 'latest'],
         [$class: 'BooleanParameterDefinition', name: 'PURGE', value: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', name: 'PUBLISH', value: Boolean.valueOf(false)],
+        [$class: 'BooleanParameterDefinition', name: 'AUTO_MERGE', defaultValue: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', name: 'SLACK_MESSAGE', value: Boolean.valueOf(false)]
       ])
     ])
@@ -175,7 +176,7 @@ node {
         }
 
         // Run merge back if publish
-        if (params.PUBLISH){ 
+        if (params.PUBLISH && params.AUTOMERGE){ 
             dir(source_workspace) {
                 sshagent (credentials: [git_creds]) {
                     sh "git stash"
