@@ -18,13 +18,15 @@ basicConfig_funs <- function(session, model_settings) {
     names(selectChoices) <- sapply(model_settings$event_set.options, function(x) {
       x$desc
     })
+    doHide <- length(model_settings$event_set.options) < 2
+    style <- if (doHide) "display: none" else ""
     selectInput(
       inputId = ns("event_set"),
       label = "Event Set:",
       choices = selectChoices,
-      selected = selectChoices,
+      selected = model_settings$event_set.default,
       multiple = FALSE
-    )
+    ) %>% tagAppendAttributes(id = ns("eventset_ctnr"), style = style)
   }
 
   # Event occurrence
@@ -35,13 +37,15 @@ basicConfig_funs <- function(session, model_settings) {
     names(selectChoices) <- sapply(model_settings$event_occurrence_id.options, function(x) {
       x$desc
     })
+    doHide <- length(model_settings$event_occurrence_id.options) < 2
+    style <- if (doHide) "display: none" else ""
     selectInput(
       inputId = ns("event_occurrence"),
       label = "Event Occurrence:",
       choices = selectChoices,
-      selected = selectChoices,
+      selected = model_settings$event_occurrence_id.default,
       multiple = FALSE
-    )
+    ) %>% tagAppendAttributes(id = ns("eventoccurrence_ctnr"), style = style)
   }
 
   tagList(.event_set_fun(model_settings),

@@ -731,7 +731,6 @@ def_out_config <- function(input,
   }
 
   # Generate analysis settings -------------------------------------------------
-
   .gen_analysis_settings <- function() {
     logMessage(".gen_analysis_settings called")
     # Predefined params
@@ -747,11 +746,11 @@ def_out_config <- function(input,
       model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
 
       string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {input[[paste0("string_parameters", x)]]}))
-      dict_input <- unlist(lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
-        lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
+      dict_input <- lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
+        as.list(sapply(seq_len(length(model_settings[[x]]$default)), function(y) {
           setNames(input[[paste0("dictionary_parameters", x, y)]], names(model_settings[[x]]$default[y]))
-        })
-      }))
+        }))
+      })
       # below is purposedly list() rather than NULL in case there are none!
       boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {input[[paste0("boolean_parameters", x)]]})
       float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function(x) {input[[paste0("float_parameters", x)]]}))
@@ -769,7 +768,7 @@ def_out_config <- function(input,
       # create list of re-ordered and grouped model inputs names
       inputs_name <- c()
       for (param in seq_len(length(params_list))) {
-        if (!is.null(inputs_list[[param]])) {
+        if (length(inputs_list[[param]]) > 0) {
           param_name <- unlist(lapply(grep(params_list[param], names(model_settings)), function(i) {
             model_match <- model_settings[i]
             lapply(seq_len(length(model_match)), function(j) {
@@ -792,10 +791,7 @@ def_out_config <- function(input,
       }
 
       # set certain inputs in the right format
-      if (!is.null(dict_input))
-        dict_input <- list(dict_input)
       if (!is.null(list_input))
-        #list_input <- as.data.frame(unlist(strsplit(list_input, ", ")))
         list_input <- strsplit(list_input, ", ")
 
       # create model settings for analysis settings
