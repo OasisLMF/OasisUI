@@ -11,7 +11,7 @@
 #' @importFrom DT DTOutput
 #'
 #' @export
-oasisuiTableUI <-  function(id){
+oasisuiTableUI <- function(id) {
   ns <- NS(id)
   tagList(
     DTOutput(ns("dt_oasisuiTable"))

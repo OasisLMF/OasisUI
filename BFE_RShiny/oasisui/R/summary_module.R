@@ -397,13 +397,9 @@ summarytab <- function(input, output, session,
     }
 
     model_settings <- analysis_settings$model_settings
-    model_params_lst <- lapply(names(model_settings), function(i){
-      setting <- model_settings[[i]]
-      if (length(setting) > 1) {
-        setting <- paste(setting, collapse = ", ")
-      }
-      setting
-      }) %>% setNames(names(model_settings))
+    model_params_lst <- sapply(model_settings, function(i) {
+      paste(i, collapse = ", ")
+    })
     modelID <- session$userData$oasisapi$api_return_query_res(
       query_path = paste("analyses", selectAnaID, sep = "/"),
       query_method = "GET"
@@ -429,9 +425,9 @@ summarytab <- function(input, output, session,
     }
 
     # summary DF
-    SpecificationRows <- c("exposure location count", tiv$variables, "modelled locations", names(model_params_lst))
+    SpecificationRows <- c("exposure location count", tiv$variables, "modelled locations", names(model_settings))
     ValueRows <- unlist(c(locnum, tiv$value, mod_locations, model_params_lst))
-    TypeRows <- c("input", rep("input", nrow(tiv)), "input", rep("param", length(model_params_lst)))
+    TypeRows <- c("input", rep("input", nrow(tiv)), "input", rep("param", length(model_settings)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 
