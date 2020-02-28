@@ -500,6 +500,7 @@ summarytab <- function(input, output, session,
 #' @param ylabel label y axis
 #' @param titleToUse plot title
 #' @param data dataset to plot
+#' @param group Used to create line plot with factors.
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 labs
@@ -517,8 +518,8 @@ summarytab <- function(input, output, session,
 # colour : column for the aes col
 # flag multipleplots generates grid over col gridcol
 
-basicplot <- function(xlabel, ylabel, titleToUse, data) {
-  p <- ggplot(data, aes(x = xaxis, y = value)) +
+basicplot <- function(xlabel, ylabel, titleToUse, data, group) {
+  p <- ggplot(data, aes(x = xaxis, y = value, group = group)) +
     labs(title = titleToUse, x = xlabel, y = ylabel) +
     theme(
       plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
@@ -559,7 +560,7 @@ basicplot <- function(xlabel, ylabel, titleToUse, data) {
 barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
   Perspective <- data$xaxis
   Loss <- add_commas(data$value*1000000)
-  p <- basicplot(xlabel, ylabel, titleToUse, data) +
+  p <- basicplot(xlabel, ylabel, titleToUse, data, group = Loss) +
     geom_bar(position = "dodge", stat = "identity", aes(fill = colour, prsp = Perspective, loss = Loss))
 
   if (multipleplots) {
@@ -596,10 +597,11 @@ linePlot <- function(xlabel, ylabel, titleToUse, data) {
   #convert value back to the full length from Millions scale
   Loss <- add_commas(data$value*1000000)
   Report <- data$colour
-  p <- basicplot(xlabel, ylabel, titleToUse, data) +
-    geom_line(size = 1, aes(color = colour)) +
-    geom_point(size = 2, aes(color = Report, return = RP, loss = Loss)) +
-    scale_x_continuous(labels = comma) +
-    scale_y_continuous(labels = comma)
-  ggplotly(p, tooltip = c("colour", "return", "loss"))
+  data$xaxis <- as.factor(add_commas(data$xaxis))
+
+  p_scaled <- basicplot(xlabel, ylabel, titleToUse, data, group = Report) +
+    geom_point(size = 2, aes(color = Report, return = RP, loss = Loss), guides = FALSE) +
+    geom_line(size = 1, aes(color = colour))
+
+  ggplotly(p_scaled, tooltip = c("colour", "return", "loss"))
 }

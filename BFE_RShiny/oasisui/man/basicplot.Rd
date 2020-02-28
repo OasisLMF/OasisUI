@@ -4,7 +4,7 @@
 \alias{basicplot}
 \title{basicplot}
 \usage{
-basicplot(xlabel, ylabel, titleToUse, data)
+basicplot(xlabel, ylabel, titleToUse, data, group)
 }
 \arguments{
 \item{xlabel}{label x axis}
@@ -14,6 +14,8 @@ basicplot(xlabel, ylabel, titleToUse, data)
 \item{titleToUse}{plot title}
 
 \item{data}{dataset to plot}
+
+\item{group}{Used to create line plot with factors.}
 }
 \description{
 basic plot
