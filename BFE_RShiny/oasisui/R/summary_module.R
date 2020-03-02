@@ -599,9 +599,9 @@ linePlot <- function(xlabel, ylabel, titleToUse, data) {
   Report <- data$colour
   data$xaxis <- as.factor(add_commas(data$xaxis))
 
-  p_scaled <- basicplot(xlabel, ylabel, titleToUse, data, group = Report) +
+  p <- basicplot(xlabel, ylabel, titleToUse, data, group = Report) +
     geom_point(size = 2, aes(color = Report, return = RP, loss = Loss), guides = FALSE) +
     geom_line(size = 1, aes(color = colour))
 
-  ggplotly(p_scaled, tooltip = c("colour", "return", "loss"))
+  ggplotly(p, tooltip = c("colour", "return", "loss"))
 }
