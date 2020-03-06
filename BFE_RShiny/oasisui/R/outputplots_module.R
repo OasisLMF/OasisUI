@@ -871,9 +871,9 @@ panelOutputModule <- function(input, output, session,
   # Line plot
   .linePlotDF <- function(xlabel, ylabel, titleToUse, data, legendtitle, multipleplots = FALSE) {
     # add commas to numeric entries and rename them for more user-friendly tooltip
-    RP <- as.factor(add_commas(data$xaxis))
     data$xaxis <- as.factor(add_commas(data$xaxis))
-    Loss <- add_commas(data$value*1000000)
+    RP <- data$xaxis
+    Loss <- add_commas(data$value * 1000000)
     Summary_Level <- add_commas(data$colour)
     p <- .basicplot(xlabel, ylabel, titleToUse, data, legendtitle, group = data$colour) +
       geom_point(size = 2, aes(color = colour, return = RP, loss = Loss, type = Summary_Level)) +

@@ -355,6 +355,8 @@ summarytab <- function(input, output, session,
       outputsAAL <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("output", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
       # AAL plot
       plotAALtmp <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
+    } else {
+      outputsAAL <- plotAALtmp <- NULL
     }
 
     # read OEP & AEP files
@@ -408,10 +410,11 @@ summarytab <- function(input, output, session,
       mod_locations <- 0
     }
 
-    exposure_rep <- session$userData$data_hub$get_ana_dataset_content(id = selectAnaID,
-                                                      dataset_identifier = "exposure_summary_report.json",
-                                                      type = "input")
-
+    exposure_rep <- session$userData$data_hub$get_ana_dataset_content(
+      id = selectAnaID,
+      dataset_identifier = "exposure_summary_report.json",
+      type = "input"
+    )
 
     # summary DF
     SpecificationRows <- c("exposure location count", "total TIV", "modelled locations", names(model_settings))
