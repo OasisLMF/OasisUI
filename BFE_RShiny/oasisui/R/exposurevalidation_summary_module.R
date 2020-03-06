@@ -85,12 +85,16 @@ exposurevalidationsummary <- function(input,
 
   # Params and Reactive Values -------------------------------------------------
   result <- reactiveValues(
-    # dataframe summary
+    # dataframe summary for selectInputs
     summary_validation_tbl = NULL,
+    #dataframe summary for totals
+    summary_total_tbl = NULL,
     # summary for all perils
     summary_tbl = NULL,
     # list perils
-    perils = NULL
+    perils = NULL,
+    # list of perils options
+    peril_choices = NULL
   )
 
   type_to_plot <- c("number of locations", "tiv")
@@ -109,13 +113,17 @@ exposurevalidationsummary <- function(input,
 
       peril_id <- unique(keys_errors$PerilID)
       if (is.null(result$perils)) {
-        peril_choices <- "no perils available for summary"
+        result$peril_choices <- "no perils available for summary"
       } else if (!is.null(result$perils) && length(peril_id) == 0) {
-        peril_choices <- result$perils
+        result$peril_choices <- result$perils
       } else {
-        peril_choices <- paste0(result$perils, " (", peril_id, ")")
+        result$peril_choices <- paste0(result$perils, " (", peril_id, ")")
       }
-      updateSelectInput(session, inputId = "input_peril", choices = peril_choices, selected = peril_choices)
+      #remove "total" entry in peril choices
+      peril_choices_not_filter <- result$peril_choices
+      peril_choices_filter <- peril_choices_not_filter[-which(peril_choices_not_filter == "total")]
+
+      updateSelectInput(session, inputId = "input_peril", choices = peril_choices_filter, selected = peril_choices_filter)
       # TODO: if above leaves input_peril the same, we still want to call .reloadSummary once
     }
   })
@@ -124,14 +132,15 @@ exposurevalidationsummary <- function(input,
   observeEvent(input$input_peril, {
     if (!is.na(input$input_peril) && input$input_peril != "") {
       .reloadSummary(input_peril = input$input_peril)
+      .reloadSummary_total(choices_peril = result$peril_choices)
     }
   })
 
   # Summary table --------------------------------------------------------------
   output$dt_total_validation <- renderDT(
-    if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
+    if (!is.null(result$summary_total_tbl) && nrow(result$summary_total_tbl) > 0) {
       # filter for only entries related to the total peril
-      sum_tot_filter <- result$summary_validation_tbl %>% filter(peril == "total")
+      sum_tot_filter <- result$summary_total_tbl %>% filter(peril == "total")
       # insert commas at thousands
       sum_tot_filter$modelled <- add_commas(sum_tot_filter$modelled)
       sum_tot_filter$`not-modelled` <- add_commas(sum_tot_filter$`not-modelled`)
@@ -253,7 +262,7 @@ exposurevalidationsummary <- function(input,
     # p
   }
 
-  # reload summary table
+  # reload summary table for selectInput
   .reloadSummary <- function(input_peril) {
     logMessage(".reloadSummary called")
     # Clean up df
@@ -262,14 +271,31 @@ exposurevalidationsummary <- function(input,
     if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0 && !is.null(input_peril)) {
       # match inputs to perils
       perils_match <- unlist(lapply(seq(1, length(result$perils)), function(x) {
-        y <- grep(result$perils[x], input$input_peril)
-        which(input$input_peril[y] == result$summary_tbl$peril)
+        y <- grep(result$perils[x], input_peril)
+        which(input_peril[y] == result$summary_tbl$peril)
       }))
       result$summary_validation_tbl <- result$summary_tbl[perils_match,]
     } else {
       result$summary_validation_tbl <- NULL
     }
     result$summary_validation_tbl
+  }
+
+  #create summary table for totals
+  .reloadSummary_total <- function(choices_peril) {
+    logMessage(".reloadSummary called")
+    # Clean up df
+    result$summary_total_tbl <- NULL
+    # Build df
+    if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0 && !is.null(choices_peril)) {
+      # match inputs to perils
+        y <- grep("total", result$peril_choices)
+        perils_match <-which(result$peril_choices[y] == result$summary_tbl$peril)
+      result$summary_total_tbl <- result$summary_tbl[perils_match,]
+    } else {
+      result$summary_total_tbl <- NULL
+    }
+    result$summary_total_tbl
   }
 
   invisible()
