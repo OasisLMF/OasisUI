@@ -344,18 +344,6 @@ summarytab <- function(input, output, session,
     AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(),
                        filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
     if (!is.null(AAL)) {
-      # infer params
-      tiv <- AAL %>%
-        filter(grepl("exposure_value", variable)) %>%
-        separate(variable, into = c("variables", "report", "perspective"), sep = "\\.") %>%
-        mutate(type = case_when(as.character(type) == "1" ~ " (Analytical)",
-                                as.character(type) == "2" ~ " (Sample)",
-                                TRUE ~ as.character(type)),
-               value = as.character(value),
-               variables = case_when(variables == "exposure_value" ~ paste0("exposure TIV ", perspective, type),
-                                     TRUE ~ variables)) %>%
-        select(variables, value) %>%
-        unique()
       # AAL output
       outputsAALtmp <- AAL %>%
         select(-c("summary_id")) %>%
@@ -368,11 +356,9 @@ summarytab <- function(input, output, session,
       # AAL plot
       plotAALtmp <- data.frame("Specification" = outputsAALtmp$type, "Value" = outputsAALtmp$value, "Type" = rep("AALplot", nrow(outputsAALtmp)), stringsAsFactors = FALSE)
     } else {
-      tiv <- data.frame(variables = NULL,
-                        value = NULL)
-      outputsAAL <- NULL
-      plotAALtmp <- NULL
+      outputsAAL <- plotAALtmp <- NULL
     }
+
     # read OEP & AEP files
     leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty",
                            nonkeycols = c("summary_id", "return_period", "type"),
@@ -424,10 +410,16 @@ summarytab <- function(input, output, session,
       mod_locations <- 0
     }
 
+    exposure_rep <- session$userData$data_hub$get_ana_dataset_content(
+      id = selectAnaID,
+      dataset_identifier = "exposure_summary_report.json",
+      type = "input"
+    )
+
     # summary DF
-    SpecificationRows <- c("exposure location count", tiv$variables, "modelled locations", names(model_settings))
-    ValueRows <- unlist(c(locnum, tiv$value, mod_locations, model_params_lst))
-    TypeRows <- c("input", rep("input", nrow(tiv)), "input", rep("param", length(model_settings)))
+    SpecificationRows <- c("exposure location count", "total TIV", "modelled locations", names(model_settings))
+    ValueRows <- unlist(c(locnum, exposure_rep$total$portfolio$tiv, mod_locations, model_params_lst))
+    TypeRows <- c("input", "input", "input", rep("param", length(model_settings)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
 
@@ -500,6 +492,7 @@ summarytab <- function(input, output, session,
 #' @param ylabel label y axis
 #' @param titleToUse plot title
 #' @param data dataset to plot
+#' @param group Used to create line plot with factors.
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 labs
@@ -517,8 +510,8 @@ summarytab <- function(input, output, session,
 # colour : column for the aes col
 # flag multipleplots generates grid over col gridcol
 
-basicplot <- function(xlabel, ylabel, titleToUse, data) {
-  p <- ggplot(data, aes(x = xaxis, y = value)) +
+basicplot <- function(xlabel, ylabel, titleToUse, data, group) {
+  p <- ggplot(data, aes(x = xaxis, y = value, group = group)) +
     labs(title = titleToUse, x = xlabel, y = ylabel) +
     theme(
       plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
@@ -559,7 +552,7 @@ basicplot <- function(xlabel, ylabel, titleToUse, data) {
 barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
   Perspective <- data$xaxis
   Loss <- add_commas(data$value*1000000)
-  p <- basicplot(xlabel, ylabel, titleToUse, data) +
+  p <- basicplot(xlabel, ylabel, titleToUse, data, group = Loss) +
     geom_bar(position = "dodge", stat = "identity", aes(fill = colour, prsp = Perspective, loss = Loss))
 
   if (multipleplots) {
@@ -596,10 +589,11 @@ linePlot <- function(xlabel, ylabel, titleToUse, data) {
   #convert value back to the full length from Millions scale
   Loss <- add_commas(data$value*1000000)
   Report <- data$colour
-  p <- basicplot(xlabel, ylabel, titleToUse, data) +
-    geom_line(size = 1, aes(color = colour)) +
-    geom_point(size = 2, aes(color = Report, return = RP, loss = Loss)) +
-    scale_x_continuous(labels = comma) +
-    scale_y_continuous(labels = comma)
+  data$xaxis <- as.factor(add_commas(data$xaxis))
+
+  p <- basicplot(xlabel, ylabel, titleToUse, data, group = Report) +
+    geom_point(size = 2, aes(color = Report, return = RP, loss = Loss), guides = FALSE) +
+    geom_line(size = 1, aes(color = colour))
+
   ggplotly(p, tooltip = c("colour", "return", "loss"))
 }

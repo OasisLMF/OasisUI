@@ -826,8 +826,8 @@ panelOutputModule <- function(input, output, session,
   # value : column for aes y
   # colour : column for the aes col
   # flag multipleplots generates grid over col gridcol
-  .basicplot <- function(xlabel, ylabel, titleToUse, data, legendtitle) {
-    p <- ggplot(data, aes(x = xaxis, y = value, col = colour)) +
+  .basicplot <- function(xlabel, ylabel, titleToUse, data, legendtitle, group) {
+    p <- ggplot(data, aes(x = xaxis, y = value, col = colour, group = group)) +
       labs(title = titleToUse, x = xlabel, y = ylabel, col = legendtitle) +
       theme(
         plot.title = element_text(color = "grey45", size = 14, face = "bold.italic", hjust = 0.5),
@@ -870,16 +870,14 @@ panelOutputModule <- function(input, output, session,
 
   # Line plot
   .linePlotDF <- function(xlabel, ylabel, titleToUse, data, legendtitle, multipleplots = FALSE) {
-    p <- .basicplot(xlabel, ylabel, titleToUse, data, legendtitle)
     # add commas to numeric entries and rename them for more user-friendly tooltip
-    RP <- add_commas(data$xaxis)
-    Loss <- add_commas(data$value*1000000)
+    data$xaxis <- as.factor(add_commas(data$xaxis))
+    RP <- data$xaxis
+    Loss <- add_commas(data$value * 1000000)
     Summary_Level <- add_commas(data$colour)
-    p <- p +
-      geom_line(size = 1) +
+    p <- .basicplot(xlabel, ylabel, titleToUse, data, legendtitle, group = data$colour) +
       geom_point(size = 2, aes(color = colour, return = RP, loss = Loss, type = Summary_Level)) +
-      scale_x_continuous(labels = comma) +
-      scale_y_continuous(labels = comma)
+      geom_line(size = 1)
     p <- .multiplot(p, multipleplots)
     ggplotly(p, tooltip = c("type", "return", "loss"))
   }
