@@ -20,6 +20,11 @@ exposurevalidationsummaryUI <- function(id) {
     fluidRow(div(oasisuiRefreshButton(ns("abuttonSumexposurerefresh")), style = "margin-right: 25px;")),
     fluidRow(
       column(12,
+             DTOutput(ns("dt_total_validation"))
+      )
+    ),
+    fluidRow(
+      column(12,
              selectInput(ns("input_peril"), label = "Pick peril", choices = NULL, multiple = TRUE)
       )
     ),
@@ -101,6 +106,7 @@ exposurevalidationsummary <- function(input,
       keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = analysisID(),
                                                                        dataset_identifier = "keys-errors.csv",
                                                                        type = "input")
+
       peril_id <- unique(keys_errors$PerilID)
       if (is.null(result$perils)) {
         peril_choices <- "no perils available for summary"
@@ -117,21 +123,52 @@ exposurevalidationsummary <- function(input,
   # Perils ---------------------------------------------------------------------
   observeEvent(input$input_peril, {
     if (!is.na(input$input_peril) && input$input_peril != "") {
-      .reloadSummary(input_peril = result$perils)
+      .reloadSummary(input_peril = input$input_peril)
     }
   })
 
   # Summary table --------------------------------------------------------------
-  output$dt_summary_validation <- renderDT(
+  output$dt_total_validation <- renderDT(
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
+      # filter for only entries related to the total peril
+      sum_tot_filter <- result$summary_validation_tbl %>% filter(peril == "total")
       # insert commas at thousands
-      result$summary_validation_tbl$all <- add_commas(result$summary_validation_tbl$all)
-      result$summary_validation_tbl$fail <- add_commas(result$summary_validation_tbl$fail)
-      result$summary_validation_tbl$nomatch <- add_commas(result$summary_validation_tbl$nomatch)
-      result$summary_validation_tbl$success <- add_commas(result$summary_validation_tbl$success)
+      sum_tot_filter$modelled <- add_commas(sum_tot_filter$modelled)
+      sum_tot_filter$`not-modelled` <- add_commas(sum_tot_filter$`not-modelled`)
+      sum_tot_filter$portfolio <- add_commas(sum_tot_filter$portfolio)
+
+      #drop unnecessary columns
+      drops <- c("all", "fail", "success", "nomatch")
+      sum_tot_filter <- sum_tot_filter[, !(names(c(sum_tot_filter)) %in% drops)]
 
       datatable(
-        result$summary_validation_tbl %>% capitalize_names_df(),
+        sum_tot_filter %>% capitalize_names_df(),
+        class = "oasisui-table display",
+        rownames = FALSE,
+        escape = FALSE,
+        selection = "none",
+        options = getTableOptions()
+      )
+    }
+  )
+
+  output$dt_summary_validation <- renderDT(
+    if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
+      # filter for all entries not related to the total peril
+      sum_val_filter <- result$summary_validation_tbl %>% filter(peril != "total")
+
+      # insert commas at thousands
+      sum_val_filter$all <- add_commas(sum_val_filter$all)
+      sum_val_filter$fail <- add_commas(sum_val_filter$fail)
+      sum_val_filter$nomatch <- add_commas(sum_val_filter$nomatch)
+      sum_val_filter$success <- add_commas(sum_val_filter$success)
+
+      #drop unnecessary columns
+      drops <- c("modelled", "not-modelled", "portfolio")
+      sum_val_filter <- sum_val_filter[, !(names(c(sum_val_filter)) %in% drops)]
+
+      datatable(
+        sum_val_filter %>% capitalize_names_df(),
         class = "oasisui-table display",
         rownames = FALSE,
         escape = FALSE,
@@ -184,8 +221,18 @@ exposurevalidationsummary <- function(input,
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
     n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
+    # leave only: Fail, Success and Nomatch statuses and remove peril "total
+    key_unwanted <- c("portfolio", "not-modelled", "modelled")
+    key_unwanted_list <- unlist(lapply(seq(1, length(key_unwanted)), function(x) {grep(key_unwanted[x], df$key)}))
+    if (length(key_unwanted_list) > 0) {
+      df <- df[-key_unwanted_list, ]
+    }
+    if (length(grep("total", df$peril) > 0)) {
+      df <- df[-grep("total", df$peril), ]
+    }
     status <- df$key
     percentage <- df$value
+
     p <- ggplot(data = df, aes(x = type, y = percentage, fill = status)) +
       theme(
         plot.title = element_blank(),
@@ -216,12 +263,13 @@ exposurevalidationsummary <- function(input,
       # match inputs to perils
       perils_match <- unlist(lapply(seq(1, length(result$perils)), function(x) {
         y <- grep(result$perils[x], input$input_peril)
-        which(result$perils[y] == result$summary_tbl$peril)
+        which(input$input_peril[y] == result$summary_tbl$peril)
       }))
       result$summary_validation_tbl <- result$summary_tbl[perils_match,]
     } else {
       result$summary_validation_tbl <- NULL
     }
+    result$summary_validation_tbl
   }
 
   invisible()
