@@ -231,9 +231,8 @@ exposurevalidationsummary <- function(input,
     n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
     # leave only: Fail, Success and Nomatch statuses and remove peril "total"
     key_unwanted <- c("portfolio", "not-modelled", "modelled")
-    key_unwanted_list <- unlist(lapply(key_unwanted, function(x) {grep(x, df$key)}))
-    if (length(key_unwanted_list) > 0) {
-      df <- df[-key_unwanted_list, ]
+    if (length(key_unwanted) > 0) {
+      df %>% filter(key %notin% key_unwanted)
     }
     if (length(grep("total", df$peril)) > 0) {
       df <- df[-grep("total", df$peril), ]
