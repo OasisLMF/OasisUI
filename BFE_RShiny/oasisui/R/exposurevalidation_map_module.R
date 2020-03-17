@@ -22,9 +22,12 @@ exposurevalidationmapUI <- function(id) {
       column(1,
              checkboxGroupInput(inputId = ns("chkgrp_perils"), label = "Pick peril")
       ),
-      column(11,
+      column(10,
              leafletOutput(ns("exposure_map")),
              hidden(div(id = ns("div_abuttonviewtbl"), oasisuiButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;")))
+      ),
+      column(1,
+             hidden(tableOutput(ns("exposure_circle")))
       )
     )
   )
@@ -48,6 +51,7 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
 #' @importFrom dplyr distinct
+#' @importFrom dplyr between
 #' @importFrom DT formatStyle
 #' @importFrom DT renderDT
 #' @importFrom DT datatable
@@ -60,9 +64,16 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom leaflet markerClusterOptions
 #' @importFrom leaflet awesomeIcons
 #' @importFrom leaflet renderLeaflet
+#' @importFrom leaflet addLayersControl
+#' @importFrom leaflet layersControlOptions
 #' @importFrom leaflet.extras addFullscreenControl
+#' @importFrom leaflet.extras addDrawToolbar
+#' @importFrom leaflet.extras editToolbarOptions
+#' @importFrom leaflet.extras selectedPathOptions
+#' @importFrom leaflet.extras drawRectangleOptions
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
+#' @importFrom geosphere destPoint
 #'
 #' @export
 exposurevalidationmap <- function(input,
@@ -193,6 +204,51 @@ exposurevalidationmap <- function(input,
     }
   })
 
+  observeEvent(input$exposure_map_click, {
+    show("exposure_circle")
+  })
+
+  observe({print(input$exposure_map_draw_new_feature$properties$radius)})
+  output$exposure_circle <- renderTable({
+    #get pins coordinates
+    long <- result$uploaded_locs_check_peril$Longitude
+    lat <- result$uploaded_locs_check_peril$Latitude
+
+    #get coordinates of the radius
+    p <- cbind(input$exposure_map_draw_new_feature$geometry$coordinates[[1]],
+               input$exposure_map_draw_new_feature$geometry$coordinates[[2]])
+
+    # calculate two rectangles within circle area
+    radius <- input$exposure_map_draw_new_feature$properties$radius
+    degrees_dist_1 <- c(90, 180, 270, 360)
+    circle_bounds_1 <- geosphere::destPoint(p, degrees_dist_1, radius)
+
+    degrees_dist_2 <- c(135, 225, 315, 405)
+    circle_bounds_2 <- geosphere::destPoint(p, degrees_dist_2, radius)
+
+    # calculate LocID and TIV for pins inside areas
+    locID_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
+      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
+           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
+          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
+           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2])))) {
+        result$uploaded_locs_check_peril$LocNumber[x]
+      }
+    }))
+
+    tiv_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
+      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
+           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
+          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
+           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2])))) {
+        result$uploaded_locs_check_peril$BuildingTIV[x]
+      }
+    }))
+
+    data.frame(LodID = locID_list,
+               TIV = tiv_list)
+  })
+
   # Refresh button -------------------------------------------------------------
   observeEvent(input$abuttonexposurerefresh, {
     # Get modeled locations
@@ -240,19 +296,34 @@ exposurevalidationmap <- function(input,
         markerColor = marker_colors[df$modeled]
       )
 
-    # color clusters red if any mark is red, and green if all marks are green.
-    # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
-    leaflet(df) %>%
-      addTiles() %>%
-      addAwesomeMarkers(
-        lng = ~longitude,
-        lat = ~latitude,
-        icon = icon_map,
-        clusterOptions = markerClusterOptions(),
-        group = "clustered",
-        clusterId = "cluster",
-        popup = ~popup) %>%
-      onRender("function(el,x) {
+      # color clusters red if any mark is red, and green if all marks are green.
+      # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
+      leaflet(df) %>%
+        addTiles() %>%
+        addAwesomeMarkers(
+          lng = ~longitude,
+          lat = ~latitude,
+          icon = icon_map,
+          clusterOptions = markerClusterOptions(),
+          group = "clustered",
+          clusterId = "cluster",
+          popup = ~popup) %>%
+        addDrawToolbar(
+          targetGroup = 'draw',
+          polylineOptions = FALSE,
+          polygonOptions = FALSE,
+          rectangleOptions = FALSE,
+          markerOptions = FALSE,
+          circleMarkerOptions = FALSE,
+          circleOptions = TRUE,
+          editOptions = editToolbarOptions(
+            selectedPathOptions = selectedPathOptions()
+          ),
+          singleFeature = TRUE
+        )  %>%
+        addLayersControl(overlayGroups = c('draw'), options =
+                           layersControlOptions(collapsed = FALSE)) %>%
+        onRender("function(el,x) {
                             map = this;
 
                             var style = document.createElement('style');
@@ -292,7 +363,7 @@ exposurevalidationmap <- function(input,
                             return L.divIcon({ html: '<div><span>'+count+'</span></div>', className: 'marker-cluster ' + style, iconSize: new L.Point(40, 40) });
                             }
       }") %>% # make map full screen
-      addFullscreenControl(pseudoFullscreen = TRUE)
+        addFullscreenControl(pseudoFullscreen = TRUE)
     }
   }
 
