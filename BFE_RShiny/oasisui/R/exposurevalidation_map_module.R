@@ -77,6 +77,7 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
 #' @importFrom geosphere destPoint
+#' @importFrom geosphere distm
 #'
 #' @export
 exposurevalidationmap <- function(input,
@@ -381,10 +382,10 @@ exposurevalidationmap <- function(input,
 
     # calculate two rectangles within circle area
     degrees_dist_1 <- c(90, 180, 270, 360)
-    circle_bounds_1 <- geosphere::destPoint(p, degrees_dist_1, radius)
+    circle_bounds_1 <- destPoint(p, degrees_dist_1, radius)
 
     degrees_dist_2 <- c(135, 225, 315, 405)
-    circle_bounds_2 <- geosphere::destPoint(p, degrees_dist_2, radius)
+    circle_bounds_2 <- destPoint(p, degrees_dist_2, radius)
 
     # calculate LocID and TIV for pins inside areas
     locID_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
