@@ -17,7 +17,9 @@ exposurevalidationmapUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    fluidRow(div(oasisuiRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;")),
+    fluidRow(#column(3, numericInput(ns("insert_radius"), "Radius (m)", value = NULL)),
+             column(12,
+                    div(oasisuiRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;"))),
     fluidRow(
       column(1,
              checkboxGroupInput(inputId = ns("chkgrp_perils"), label = "Pick peril")
@@ -25,10 +27,11 @@ exposurevalidationmapUI <- function(id) {
       column(10,
              leafletOutput(ns("exposure_map")),
              hidden(div(id = ns("div_abuttonviewtbl"), oasisuiButton(ns("abuttonviewtbl"), "Table", style = "margin-top:25px;margin-right:25px;float: right;")))
-      ),
-      column(1,
-             hidden(tableOutput(ns("exposure_circle")))
       )
+    ),
+    fluidRow(
+      column(2, hidden(tableOutput(ns("radius_circle")))),
+      column(5, hidden(tableOutput(ns("exposure_circle"))))
     )
   )
 }
@@ -95,7 +98,9 @@ exposurevalidationmap <- function(input,
     # peril codes
     perils_codes = NULL,
     # perils names
-    perils_names = NULL
+    perils_names = NULL,
+    # radius of drawn circle
+    circle_radius = NULL
   )
 
   # Modeled exposure and uploaded exposure ------------------------------------
@@ -204,49 +209,27 @@ exposurevalidationmap <- function(input,
     }
   })
 
-  observeEvent(input$exposure_map_click, {
+  # observeEvent(input$exposure_map_click, {
+  #   show("exposure_circle")
+  #   show("radius_circle")
+  # })
+
+  observeEvent(input$exposure_map_click$lat, {
+    # find distance between cliked point and closest radius, use that radius to output table
+    p_1 <- cbind(input$exposure_map_click$lng, input$exposure_map_click$lat)
+    dist_click <- unlist(lapply(seq(1, length(input$exposure_map_draw_all_features$features)), function(x) {
+      p_2 <- cbind(input$exposure_map_draw_all_features$features[[x]]$geometry$coordinates[[1]],
+                   input$exposure_map_draw_all_features$features[[x]]$geometry$coordinates[[2]])
+      geosphere::distm(p_1, p_2)
+    }))
+    min_dist <- grep(min(dist_click), dist_click)
+    radius <- input$exposure_map_draw_all_features$features[[min_dist]]$properties$radius
+    lat_click <- input$exposure_map_draw_all_features$features[[min_dist]]$geometry$coordinates[[2]]
+    long_click <- input$exposure_map_draw_all_features$features[[min_dist]]$geometry$coordinates[[1]]
+    output$exposure_circle <- renderTable({.DrawnCircles(radius, lat_click, long_click)})
+    output$radius_circle <- renderTable({.showRadius(radius)})
     show("exposure_circle")
-  })
-
-  observe({print(input$exposure_map_draw_new_feature$properties$radius)})
-  output$exposure_circle <- renderTable({
-    #get pins coordinates
-    long <- result$uploaded_locs_check_peril$Longitude
-    lat <- result$uploaded_locs_check_peril$Latitude
-
-    #get coordinates of the radius
-    p <- cbind(input$exposure_map_draw_new_feature$geometry$coordinates[[1]],
-               input$exposure_map_draw_new_feature$geometry$coordinates[[2]])
-
-    # calculate two rectangles within circle area
-    radius <- input$exposure_map_draw_new_feature$properties$radius
-    degrees_dist_1 <- c(90, 180, 270, 360)
-    circle_bounds_1 <- geosphere::destPoint(p, degrees_dist_1, radius)
-
-    degrees_dist_2 <- c(135, 225, 315, 405)
-    circle_bounds_2 <- geosphere::destPoint(p, degrees_dist_2, radius)
-
-    # calculate LocID and TIV for pins inside areas
-    locID_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
-      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
-           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
-          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
-           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2])))) {
-        result$uploaded_locs_check_peril$LocNumber[x]
-      }
-    }))
-
-    tiv_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
-      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
-           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
-          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
-           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2])))) {
-        result$uploaded_locs_check_peril$BuildingTIV[x]
-      }
-    }))
-
-    data.frame(LodID = locID_list,
-               TIV = tiv_list)
+    show("radius_circle")
   })
 
   # Refresh button -------------------------------------------------------------
@@ -257,6 +240,11 @@ exposurevalidationmap <- function(input,
       "Refreshing...",
       size = "s", t = 0.5
     )
+  })
+
+  # Insert new radius for circle -----------------------------------------------
+  observeEvent(input$insert_radius, {
+    result$circle_radius <- input$insert_radius
   })
 
   # Utils functions ------------------------------------------------------------
@@ -316,13 +304,13 @@ exposurevalidationmap <- function(input,
           markerOptions = FALSE,
           circleMarkerOptions = FALSE,
           circleOptions = TRUE,
+          singleFeature = FALSE,
           editOptions = editToolbarOptions(
             selectedPathOptions = selectedPathOptions()
-          ),
-          singleFeature = TRUE
+          )
         )  %>%
-        addLayersControl(overlayGroups = c('draw'), options =
-                           layersControlOptions(collapsed = FALSE)) %>%
+        addLayersControl(overlayGroups = c('draw'),
+                         options = layersControlOptions(collapsed = FALSE)) %>%
         onRender("function(el,x) {
                             map = this;
 
@@ -365,6 +353,84 @@ exposurevalidationmap <- function(input,
       }") %>% # make map full screen
         addFullscreenControl(pseudoFullscreen = TRUE)
     }
+  }
+
+  # Drawn circles infos, outputs and radius
+  .DrawnCircles <- function(radius = NULL, lat_click = NULL, long_click = NULL) {
+
+    #get pins coordinates
+    long <- result$uploaded_locs_check_peril$Longitude
+    lat <- result$uploaded_locs_check_peril$Latitude
+
+    p <- cbind(long_click, lat_click)
+
+    # #get coordinates of the radius
+    # if(is.null(input$exposure_map_draw_edited_features)) {
+    #   p <- cbind(input$exposure_map_draw_new_feature$geometry$coordinates[[1]],
+    #              input$exposure_map_draw_new_feature$geometry$coordinates[[2]])
+    #   radius <- input$exposure_map_draw_new_feature$properties$radius
+    # } else {
+    #   p <- cbind(input$exposure_map_draw_edited_features$features[[1]]$geometry$coordinates[[1]],
+    #              input$exposure_map_draw_edited_features$features[[1]]$geometry$coordinates[[2]])
+    #   radius <- input$exposure_map_draw_edited_features$features[[1]]$properties$radius
+    # }
+
+    # if (is.null(radius) || is.na(radius)) {
+    #   radius <- input$exposure_map_draw_new_feature$properties$radius
+    # }
+
+    # calculate two rectangles within circle area
+    degrees_dist_1 <- c(90, 180, 270, 360)
+    circle_bounds_1 <- geosphere::destPoint(p, degrees_dist_1, radius)
+
+    degrees_dist_2 <- c(135, 225, 315, 405)
+    circle_bounds_2 <- geosphere::destPoint(p, degrees_dist_2, radius)
+
+    # calculate LocID and TIV for pins inside areas
+    locID_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
+      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
+           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
+          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
+           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2])))) {
+        result$uploaded_locs_check_peril$LocNumber[x]
+      }
+    }))
+
+    tiv_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
+      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
+           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
+          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
+           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2])))) {
+        add_commas(result$uploaded_locs_check_peril$BuildingTIV[x])
+      }
+    }))
+
+    street_address <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
+      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
+           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
+          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
+           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2])))) {
+        result$uploaded_locs_check_peril$StreetAddress[x]
+      }
+    }))
+
+      data.frame(LodID = locID_list,
+                 TIV = tiv_list,
+                 `Street Address` = street_address)
+  }
+
+  .showRadius <- function(radius = NULL) {
+    # if(is.null(input$exposure_map_draw_edited_features)) {
+    #   p <- cbind(input$exposure_map_draw_new_feature$geometry$coordinates[[1]],
+    #              input$exposure_map_draw_new_feature$geometry$coordinates[[2]])
+    #   radius <- input$exposure_map_draw_new_feature$properties$radius
+    # } else {
+    #   p <- cbind(input$exposure_map_draw_edited_features$features[[1]]$geometry$coordinates[[1]],
+    #              input$exposure_map_draw_edited_features$features[[1]]$geometry$coordinates[[2]])
+    #   radius <- input$exposure_map_draw_edited_features$features[[1]]$properties$radius
+    # }
+
+    data.frame(`radius (m)` = add_commas(round(radius, 3)))
   }
 
   invisible()
