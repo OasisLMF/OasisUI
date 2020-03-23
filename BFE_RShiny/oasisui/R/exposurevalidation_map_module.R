@@ -69,6 +69,8 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet addLayersControl
 #' @importFrom leaflet layersControlOptions
+#' @importFrom leaflet leafletProxy
+#' @importFrom leaflet highlightOptions
 #' @importFrom leaflet.extras addFullscreenControl
 #' @importFrom leaflet.extras addDrawToolbar
 #' @importFrom leaflet.extras editToolbarOptions
@@ -243,7 +245,7 @@ exposurevalidationmap <- function(input,
                                                                                     opacity = 1))
   })
 
-  observeEvent(input$exposure_map_draw_all_features, {
+  observeEvent(input$exposure_map_draw_all_features, {?
     leafletProxy("exposure_map") %>% removeShape(layerId = "hilightCircle")
   })
 
