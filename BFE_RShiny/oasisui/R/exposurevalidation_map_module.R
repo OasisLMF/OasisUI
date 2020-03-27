@@ -246,7 +246,7 @@ exposurevalidationmap <- function(input,
     updateNumericInput(session, "damage_ratio", value = 100)
 
     if (is.null(input$damage_ratio)) {
-      result$damage <- input$damage_ratio
+      result$damage <- 100
     }
 
     circles_pins_tbl <- .showPinsInfo(radius = radius,
@@ -255,7 +255,10 @@ exposurevalidationmap <- function(input,
                                       ratio = result$damage)
 
     output$exposure_circle <- renderTable({
-      circles_pins_tbl
+      .showPinsInfo(radius = radius,
+                    lat_click = lat_click,
+                    long_click = long_click,
+                    ratio = result$damage)
     })
 
     output$radius_circle <- renderTable({
@@ -425,7 +428,7 @@ exposurevalidationmap <- function(input,
   }
 
   # Drawn circles infos, outputs and radius
-  .DrawnCircles <- function(radius = NULL, lat_click = NULL, long_click = NULL, ratio = NULL) {
+  .DrawnCircles <- function(radius, lat_click, long_click, ratio) {
 
     #get pins coordinates
     long <- result$uploaded_locs_check_peril$Longitude
@@ -473,7 +476,7 @@ exposurevalidationmap <- function(input,
            between(lat[x], min(circle_bounds_3[ ,2]), max(circle_bounds_3[ ,2]))) ||
           (between(long[x], min(circle_bounds_4[ ,1]), max(circle_bounds_4[ ,1])) &&
            between(lat[x], min(circle_bounds_4[ ,2]), max(circle_bounds_4[ ,2])))) {
-        result$uploaded_locs_check_peril$BuildingTIV[x] * ratio
+        result$uploaded_locs_check_peril$BuildingTIV[x] * (ratio/100)
       }
     }))
 
