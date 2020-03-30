@@ -228,66 +228,78 @@ exposurevalidationmap <- function(input,
   })
 
   observeEvent(input$exposure_map_click, {
+    # distance between click and closest isocenter
+    if (length(input$exposure_map_draw_all_features$features) > 0) {
+      p_1 <- cbind(input$exposure_map_click$lng, input$exposure_map_click$lat)
+      dist_click <- unlist(lapply(seq(1, length(input$exposure_map_draw_all_features$features)), function(x) {
+        p_2 <- cbind(input$exposure_map_draw_all_features$features[[x]]$geometry$coordinates[[1]],
+                     input$exposure_map_draw_all_features$features[[x]]$geometry$coordinates[[2]])
+        geosphere::distm(p_1, p_2)
+      }))
+      # highlight the circle that is the closest to the point of click
+      min_dist <- grep(min(dist_click), dist_click)
+      radius <- input$exposure_map_draw_all_features$features[[min_dist]]$properties$radius
+      lat_click <- input$exposure_map_draw_all_features$features[[min_dist]]$geometry$coordinates[[2]]
+      long_click <- input$exposure_map_draw_all_features$features[[min_dist]]$geometry$coordinates[[1]]
 
-    p_1 <- cbind(input$exposure_map_click$lng, input$exposure_map_click$lat)
-    dist_click <- unlist(lapply(seq(1, length(input$exposure_map_draw_all_features$features)), function(x) {
-      p_2 <- cbind(input$exposure_map_draw_all_features$features[[x]]$geometry$coordinates[[1]],
-                   input$exposure_map_draw_all_features$features[[x]]$geometry$coordinates[[2]])
-      geosphere::distm(p_1, p_2)
-    }))
-    # highlight the circle that is the closest to the point of click
-    min_dist <- grep(min(dist_click), dist_click)
-    radius <- input$exposure_map_draw_all_features$features[[min_dist]]$properties$radius
-    lat_click <- input$exposure_map_draw_all_features$features[[min_dist]]$geometry$coordinates[[2]]
-    long_click <- input$exposure_map_draw_all_features$features[[min_dist]]$geometry$coordinates[[1]]
+      #re-set damage ratio everytime the user re-clicks on the map
+      updateNumericInput(session, "damage_ratio", value = 100)
 
-    show("damage_ratio")
-    #re-set damage ratio everytime the user re-clicks on the map
-    updateNumericInput(session, "damage_ratio", value = 100)
+      if (is.null(input$damage_ratio)) {
+        result$damage <- 100
+      }
 
-    if (is.null(input$damage_ratio)) {
-      result$damage <- 100
-    }
+      circles_pins_tbl <- .showPinsInfo(radius = radius,
+                                        lat_click = lat_click,
+                                        long_click = long_click,
+                                        ratio = result$damage)
 
-    circles_pins_tbl <- .showPinsInfo(radius = radius,
-                                      lat_click = lat_click,
-                                      long_click = long_click,
-                                      ratio = result$damage)
+      output$exposure_circle <- renderTable({
+        .showPinsInfo(radius = radius,
+                      lat_click = lat_click,
+                      long_click = long_click,
+                      ratio = result$damage)
+      })
 
-    output$exposure_circle <- renderTable({
-      .showPinsInfo(radius = radius,
+      output$radius_circle <- renderTable({
+        .showRadius(radius = radius,
                     lat_click = lat_click,
                     long_click = long_click,
                     ratio = result$damage)
-    })
+      })
 
-    output$radius_circle <- renderTable({
-      .showRadius(radius = radius,
-                  lat_click = lat_click,
-                  long_click = long_click,
-                  ratio = result$damage)
-    })
+      # update file with only locations under circles
+      result$circle_locs <- do.call(rbind, lapply(seq_len(length(circles_pins_tbl$LocID)), function(x) {
+        result$uploaded_locs_check %>% filter(LocNumber == circles_pins_tbl$LocID[x])
+      }))
 
-    # update file with only locations under circles
-    result$circle_locs <- do.call(rbind, lapply(seq_len(length(circles_pins_tbl$LocID)), function(x) {
-      result$uploaded_locs_check %>% filter(LocNumber == circles_pins_tbl$LocID[x])
-    }))
+      leafletProxy("exposure_map") %>% addCircles(lng = long_click,
+                                                  lat = lat_click,
+                                                  radius = radius,
+                                                  layerId = "hilightCircle",
+                                                  highlightOptions = highlightOptions(color = "green",
+                                                                                      weight = 5,
+                                                                                      bringToFront = F,
+                                                                                      opacity = 1))
+      show("damage_ratio")
+      show("radius_circle")
+      show("exposure_circle")
+      show("exp_tivs")
 
-    show("radius_circle")
-    show("exposure_circle")
-    show("exp_tivs")
-    leafletProxy("exposure_map") %>% addCircles(lng = long_click,
-                                                lat = lat_click,
-                                                radius = radius,
-                                                layerId = "hilightCircle",
-                                                highlightOptions = highlightOptions(color = "green",
-                                                                                    weight = 5,
-                                                                                    bringToFront = F,
-                                                                                    opacity = 1))
+    } else {
+      hide("damage_ratio")
+      hide("radius_circle")
+      hide("exposure_circle")
+      hide("exp_tivs")
+    }
   })
 
   observeEvent(input$exposure_map_draw_all_features, {
     leafletProxy("exposure_map") %>% removeShape(layerId = "hilightCircle")
+    hide("damage_ratio")
+    hide("radius_circle")
+    hide("exposure_circle")
+    hide("exp_tivs")
   })
 
   # Export new TIV table to csv ------------------------------------------------
@@ -489,9 +501,13 @@ exposurevalidationmap <- function(input,
 
   .showPinsInfo <- function(radius, lat_click, long_click, ratio) {
     info_circles <- .DrawnCircles(radius, lat_click, long_click, ratio)
-    data.frame(LocID = info_circles$locID_list,
-               TIV = add_commas(info_circles$tiv_list),
-               "Street Address" = info_circles$street_address)
+    if(!is.null(info_circles$locID_list)) {
+      data.frame(LocID = info_circles$locID_list,
+                 TIV = add_commas(info_circles$tiv_list),
+                 "Street Address" = info_circles$street_address)
+    } else {
+      hide("damage_ratio")
+    }
   }
 
   .showRadius <- function(radius, lat_click, long_click, ratio) {
