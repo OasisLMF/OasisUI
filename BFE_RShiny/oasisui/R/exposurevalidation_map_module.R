@@ -17,7 +17,7 @@ exposurevalidationmapUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    fluidRow(#column(3, numericInput(ns("insert_radius"), "Radius (m)", value = NULL)),
+    fluidRow(
       column(12,
              div(oasisuiRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;"))),
     fluidRow(
@@ -314,11 +314,6 @@ exposurevalidationmap <- function(input,
     )
   })
 
-  # Insert new radius for circle -----------------------------------------------
-  # observeEvent(input$insert_radius, {
-  #   result$circle_radius <- input$insert_radius
-  # })
-
   # Utils functions ------------------------------------------------------------
   # dummy for exposure location comparison
   .reloadExposureValidation <- function() {
@@ -434,24 +429,20 @@ exposurevalidationmap <- function(input,
     long <- result$uploaded_locs_check_peril$Longitude
     lat <- result$uploaded_locs_check_peril$Latitude
 
-    p <- cbind(long_click, lat_click)
-
-    # if (is.null(radius) || is.na(radius)) {
-    #   radius <- input$exposure_map_draw_new_feature$properties$radius
-    # }
+    coord_df <- cbind(long_click, lat_click)
 
     # calculate two rectangles within circle area, 22.5 degrees of separation
     degrees_dist_1 <- c(90, 180, 270, 360)
-    circle_bounds_1 <- destPoint(p, degrees_dist_1, radius)
+    circle_bounds_1 <- destPoint(coord_df, degrees_dist_1, radius)
 
     degrees_dist_2 <- c(135, 225, 315, 405)
-    circle_bounds_2 <- destPoint(p, degrees_dist_2, radius)
+    circle_bounds_2 <- destPoint(coord_df, degrees_dist_2, radius)
 
     degrees_dist_3 <- c(112.5, 202.5, 292.5, 382.5)
-    circle_bounds_3 <- destPoint(p, degrees_dist_3, radius)
+    circle_bounds_3 <- destPoint(coord_df, degrees_dist_3, radius)
 
     degrees_dist_4 <- c(157.5, 247.5, 337.5, 427.5)
-    circle_bounds_4 <- destPoint(p, degrees_dist_4, radius)
+    circle_bounds_4 <- destPoint(coord_df, degrees_dist_4, radius)
 
     # calculate LocID and TIV for pins inside areas
     locID_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
