@@ -228,19 +228,21 @@ exposurevalidationmap <- function(input,
   })
 
   observeEvent(input$exposure_map_click, {
+    circles_features <- input$exposure_map_draw_all_features$features
+
     # distance between click and closest isocenter
-    if (length(input$exposure_map_draw_all_features$features) > 0) {
+    if (length(circles_features) > 0) {
       p_1 <- cbind(input$exposure_map_click$lng, input$exposure_map_click$lat)
-      dist_click <- unlist(lapply(seq(1, length(input$exposure_map_draw_all_features$features)), function(x) {
-        p_2 <- cbind(input$exposure_map_draw_all_features$features[[x]]$geometry$coordinates[[1]],
-                     input$exposure_map_draw_all_features$features[[x]]$geometry$coordinates[[2]])
-        geosphere::distm(p_1, p_2)
+      dist_click <- unlist(lapply(seq_len(length(circles_features)), function(x) {
+        p_2 <- cbind(circles_features[[x]]$geometry$coordinates[[1]],
+                     circles_features[[x]]$geometry$coordinates[[2]])
+        distm(p_1, p_2)
       }))
       # highlight the circle that is the closest to the point of click
       min_dist <- grep(min(dist_click), dist_click)
-      radius <- input$exposure_map_draw_all_features$features[[min_dist]]$properties$radius
-      lat_click <- input$exposure_map_draw_all_features$features[[min_dist]]$geometry$coordinates[[2]]
-      long_click <- input$exposure_map_draw_all_features$features[[min_dist]]$geometry$coordinates[[1]]
+      radius <- circles_features[[min_dist]]$properties$radius
+      lat_click <- circles_features[[min_dist]]$geometry$coordinates[[2]]
+      long_click <- circles_features[[min_dist]]$geometry$coordinates[[1]]
 
       #re-set damage ratio everytime the user re-clicks on the map
       updateNumericInput(session, "damage_ratio", value = 100)
@@ -437,7 +439,21 @@ exposurevalidationmap <- function(input,
   # Drawn circles infos, outputs and radius
   .DrawnCircles <- function(radius, lat_click, long_click, ratio) {
 
-    #get pins coordinates
+    # calculate LocID and TIV for pins inside areas
+    locID_list <- .is_within_bounds(result$uploaded_locs_check_peril$LocNumber, radius, lat_click, long_click, ratio)
+    tiv_list <- .is_within_bounds(result$uploaded_locs_check_peril$BuildingTIV * (ratio/100), radius, lat_click, long_click, ratio)
+    street_address <- .is_within_bounds(result$uploaded_locs_check_peril$StreetAddress, radius, lat_click, long_click, ratio)
+
+    list(locID_list = locID_list, tiv_list = tiv_list, street_address = street_address)
+  }
+
+  .between_min_max <- function(circle_bounds, coord) {
+    between(coord, min(circle_bounds), max(circle_bounds))
+  }
+
+  .is_within_bounds <- function(uploaded_locs_input, radius, lat_click, long_click, ratio) {
+
+    # get pins coordinates
     long <- result$uploaded_locs_check_peril$Longitude
     lat <- result$uploaded_locs_check_peril$Latitude
 
@@ -450,53 +466,24 @@ exposurevalidationmap <- function(input,
     degrees_dist_2 <- c(135, 225, 315, 405)
     circle_bounds_2 <- destPoint(coord_df, degrees_dist_2, radius)
 
-    degrees_dist_3 <- c(112.5, 202.5, 292.5, 382.5)
+    degrees_dist_3 <- degrees_dist_1 + 22.5
     circle_bounds_3 <- destPoint(coord_df, degrees_dist_3, radius)
 
-    degrees_dist_4 <- c(157.5, 247.5, 337.5, 427.5)
+    degrees_dist_4 <- degrees_dist_2 + 22.5
     circle_bounds_4 <- destPoint(coord_df, degrees_dist_4, radius)
 
-    # calculate LocID and TIV for pins inside areas
-    locID_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
-      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
-           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
-          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
-           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2]))) ||
-          (between(long[x], min(circle_bounds_3[ ,1]), max(circle_bounds_3[ ,1])) &&
-           between(lat[x], min(circle_bounds_3[ ,2]), max(circle_bounds_3[ ,2]))) ||
-          (between(long[x], min(circle_bounds_4[ ,1]), max(circle_bounds_4[ ,1])) &&
-           between(lat[x], min(circle_bounds_4[ ,2]), max(circle_bounds_4[ ,2])))) {
-        format(result$uploaded_locs_check_peril$LocNumber[x], big.mark = "", scientific = FALSE)
+    unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
+      if ((.between_min_max(circle_bounds_1[, 1], long[x]) &&
+           .between_min_max(circle_bounds_1[, 2], lat[x])) ||
+          (.between_min_max(circle_bounds_2[, 1], long[x]) &&
+           .between_min_max(circle_bounds_2[, 2], lat[x])) ||
+          (.between_min_max(circle_bounds_3[, 1], long[x]) &&
+           .between_min_max(circle_bounds_3[, 2], lat[x])) ||
+          (.between_min_max(circle_bounds_4[, 1], long[x]) &&
+           .between_min_max(circle_bounds_4[, 2], lat[x]))) {
+        uploaded_locs_input[x]
       }
     }))
-
-    tiv_list <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
-      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
-           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
-          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
-           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2]))) ||
-          (between(long[x], min(circle_bounds_3[ ,1]), max(circle_bounds_3[ ,1])) &&
-           between(lat[x], min(circle_bounds_3[ ,2]), max(circle_bounds_3[ ,2]))) ||
-          (between(long[x], min(circle_bounds_4[ ,1]), max(circle_bounds_4[ ,1])) &&
-           between(lat[x], min(circle_bounds_4[ ,2]), max(circle_bounds_4[ ,2])))) {
-        result$uploaded_locs_check_peril$BuildingTIV[x] * (ratio/100)
-      }
-    }))
-
-    street_address <- unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
-      if ((between(long[x], min(circle_bounds_1[ ,1]), max(circle_bounds_1[ ,1])) &&
-           between(lat[x], min(circle_bounds_1[ ,2]), max(circle_bounds_1[ ,2]))) ||
-          (between(long[x], min(circle_bounds_2[ ,1]), max(circle_bounds_2[ ,1])) &&
-           between(lat[x], min(circle_bounds_2[ ,2]), max(circle_bounds_2[ ,2]))) ||
-          (between(long[x], min(circle_bounds_3[ ,1]), max(circle_bounds_3[ ,1])) &&
-           between(lat[x], min(circle_bounds_3[ ,2]), max(circle_bounds_3[ ,2]))) ||
-          (between(long[x], min(circle_bounds_4[ ,1]), max(circle_bounds_4[ ,1])) &&
-           between(lat[x], min(circle_bounds_4[ ,2]), max(circle_bounds_4[ ,2])))) {
-        result$uploaded_locs_check_peril$StreetAddress[x]
-      }
-    }))
-
-    list(locID_list = locID_list, tiv_list = tiv_list, street_address = street_address)
   }
 
   .showPinsInfo <- function(radius, lat_click, long_click, ratio) {
@@ -507,6 +494,7 @@ exposurevalidationmap <- function(input,
                  "Street Address" = info_circles$street_address)
     } else {
       hide("damage_ratio")
+      invisible()
     }
   }
 
