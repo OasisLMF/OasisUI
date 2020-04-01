@@ -92,7 +92,7 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
           br(), strong("Error message: "), error_msg
         ))
       },
-      data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode, error_msg)
+      data$locnumber, tiv$total, data$streetaddress, data$postalcode, error_msg)
   } else {
     data$popup <- mapply(
       function(id, total, streetaddress, postalcode) {
