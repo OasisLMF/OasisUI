@@ -440,7 +440,7 @@ exposurevalidationmap <- function(input,
   .DrawnCircles <- function(radius, lat_click, long_click, ratio) {
 
     # calculate LocID and TIV for pins inside areas
-    locID_list <- .is_within_bounds(result$uploaded_locs_check_peril$LocNumber, radius, lat_click, long_click, ratio)
+    locID_list <- .is_within_bounds(format(result$uploaded_locs_check_peril$LocNumber, big.mark = "", scientific = FALSE), radius, lat_click, long_click, ratio)
     tiv_list <- .is_within_bounds(result$uploaded_locs_check_peril$BuildingTIV * (ratio/100), radius, lat_click, long_click, ratio)
     street_address <- .is_within_bounds(result$uploaded_locs_check_peril$StreetAddress, radius, lat_click, long_click, ratio)
 
