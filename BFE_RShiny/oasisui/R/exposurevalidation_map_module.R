@@ -290,8 +290,9 @@ exposurevalidationmap <- function(input,
         })
 
         # update file with only locations under circles
-        result$circle_locs <- do.call(rbind, lapply(seq_len(length(circles_pins_tbl$LocID)), function(x) {
-          result$uploaded_locs_check %>% filter(LocNumber == circles_pins_tbl$LocID[x])
+        info_circles <- .DrawnCircles(radius, lat_click, long_click, result$damage)
+        result$circle_locs <- do.call(rbind, lapply(seq_len(length(info_circles$locID_list)), function(x) {
+          result$uploaded_locs_check %>% filter(LocNumber == info_circles$locID_list[x])
         }))
 
         leafletProxy("exposure_map") %>% addCircles(lng = long_click,
