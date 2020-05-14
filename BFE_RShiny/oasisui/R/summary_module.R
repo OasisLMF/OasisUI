@@ -416,9 +416,15 @@ summarytab <- function(input, output, session,
       type = "input"
     )
 
+    # if total entry is not available, return NA in table
+    if (is.null(exposure_rep$total$portfolio$tiv)) {
+      perils_tiv <- "NA"
+    } else {
+      perils_tiv <- exposure_rep$total$portfolio$tiv
+    }
     # summary DF
     SpecificationRows <- c("exposure location count", "total TIV", "modelled locations", names(model_settings))
-    ValueRows <- unlist(c(locnum, exposure_rep$total$portfolio$tiv, mod_locations, model_params_lst))
+    ValueRows <- unlist(c(locnum, perils_tiv, mod_locations, model_params_lst))
     TypeRows <- c("input", "input", "input", rep("param", length(model_settings)))
     summary_df <- data.frame("Specification" = SpecificationRows, "Value" =  ValueRows, "Type" = TypeRows, stringsAsFactors = FALSE) %>%
       mutate(Specification = gsub(pattern = "_", replacement = " ", x = Specification))
