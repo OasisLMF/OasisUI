@@ -20,7 +20,9 @@ exposurevalidationmapUI <- function(id) {
     fluidRow(
       column(3,
              selectInput(ns("tot_tiv_param"), label = "Choose TIV by", choices = c("Circles", "Countries", "Regions")),
-             hidden(selectInput(ns("country_select"), label = "Select Country", choices = c("Bangladesh", "Philippines", "UK")))),
+             hidden(selectInput(ns("country_select"), label = "Select Country", choices = list("Bangladesh" = "BGD",
+                                                                                               "Philippines" = "PHL",
+                                                                                                "UK" = "GBR" )))),
       column(9,
              div(oasisuiRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;"))),
     fluidRow(
@@ -38,7 +40,7 @@ exposurevalidationmapUI <- function(id) {
       ),
       column(8,
              hidden(numericInput(ns("damage_ratio"), "Damage ratio (%)", value = 100, min = 0, max = 100)),
-             hidden(DT::dataTableOutput(ns("exposure_circle")))
+             hidden(DTOutput(ns("exposure_circle")))
       )
     ),
     fluidRow(column(2, hidden(downloadButton(ns("exp_tivs"), label = "Export to csv"))))
@@ -258,13 +260,9 @@ exposurevalidationmap <- function(input,
 
   # select rds file corresponding to Country
   observeEvent(input$country_select, {
-    if (input$country_select == "UK") {
-      result$regions_rds <- "~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/inst/app/geojson_data/gadm36_GBR_2_sp.rds"
-    } else if (input$country_select == "Bangladesh") {
-      result$regions_rds <- "~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/inst/app/geojson_data/gadm36_BGD_1_sp.rds"
-    } else {
-      result$regions_rds <- "~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/inst/app/geojson_data/gadm36_PHL_1_sp.rds"
-    }
+    hide("exposure_circle")
+    country <- input$country_select
+    result$regions_rds <- paste0("./www/shape_files/gadm36_", country, "_sp.rds")
   })
 
   observeEvent(input$exposure_map_click, {
@@ -293,7 +291,7 @@ exposurevalidationmap <- function(input,
           result$damage <- 100
         }
 
-        output$exposure_circle <- DT::renderDataTable({
+        output$exposure_circle <- renderDT({
           .showPinsInfo(radius = radius,
                          lat_click = lat_click,
                          long_click = long_click,
@@ -333,15 +331,14 @@ exposurevalidationmap <- function(input,
         hide("exp_tivs")
       }
     } else {
-      hide("exposure_circle")
       p_long <- input$exposure_map_click$lng
       p_lat <- input$exposure_map_click$lat
 
       if(input$tot_tiv_param == "Countries") {
 
         h <- revgeo(longitude = p_long, latitude = p_lat)
-        js_lite <- fromJSON("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/inst/app/geojson_data/world_coords.json")
-        js <- readOGR("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/inst/app/geojson_data/world_coords.json")
+        js_lite <- fromJSON("./www/shape_files/world_coords.json")
+        js <- readOGR("./www/shape_files/world_coords.json")
 
         country_num <- unlist(lapply(seq_len(length(js_lite$features[[2]][["name"]])), function(x) {
           if(grepl(js_lite$features[[2]][["name"]][[x]], h)) {
@@ -350,29 +347,30 @@ exposurevalidationmap <- function(input,
         }))
 
         if (is.null(country_num)) {
-
+          # if country_num is null, then do nothing
         } else {
           #get set of coordinates for selected country
-          if (class(js_lite$features$geometry$coordinates[[country_num]]) == "list") {
-            lati <- na.omit(unlist(lapply(seq_len(length(js_lite$features$geometry$coordinates[[country_num]])), function(x) {
-              coord_len <- length(js_lite$features$geometry$coordinates[[country_num]][[x]])
+          country_js <- js_lite$features$geometry$coordinates[[country_num]]
+          if (class(country_js) == "list") {
+            lati <- na.omit(unlist(lapply(seq_len(length(country_js)), function(x) {
+              coord_len <- length(country_js[[x]])
               half_len_1 <- (coord_len/2)+1
-              js_lite$features$geometry$coordinates[[country_num]][[x]][half_len_1:coord_len]
+              country_js[[x]][half_len_1:coord_len]
             })))
 
-            long <- na.omit(unlist(lapply(seq_len(length(js_lite$features$geometry$coordinates[[country_num]])), function(x) {
-              coord_len <- length(js_lite$features$geometry$coordinates[[country_num]][[x]])
+            long <- na.omit(unlist(lapply(seq_len(length(country_js)), function(x) {
+              coord_len <- length(country_js[[x]])
               half_len <- coord_len/2
-              js_lite$features$geometry$coordinates[[country_num]][[1]][1:half_len]
+              country_js[[1]][1:half_len]
             })))
           } else {
-            coord_len <- length(js_lite$features$geometry$coordinates[[country_num]])
+            coord_len <- length(country_js)
             half_len_1 <- (coord_len/2)+1
-            lati <- na.omit(js_lite$features$geometry$coordinates[[country_num]][half_len_1:coord_len])
+            lati <- na.omit(country_js[half_len_1:coord_len])
 
-            coord_len <- length(js_lite$features$geometry$coordinates[[country_num]])
+            coord_len <- length(country_js)
             half_len <- coord_len/2
-            long <- na.omit(js_lite$features$geometry$coordinates[[country_num]][1:half_len])
+            long <- na.omit(country_js[1:half_len])
           }
 
           # check for pins within country borders
@@ -384,7 +382,7 @@ exposurevalidationmap <- function(input,
             result$damage <- 100
           }
 
-          output$exposure_circle <- DT::renderDataTable({
+          output$exposure_circle <- renderDT({
             code <- js_lite$features[[2]][["name"]][[country_num]]
             .showCountryInfo(code, match_long, match_lat, result$damage, country_num, part = "country")
           })
@@ -429,7 +427,7 @@ exposurevalidationmap <- function(input,
           result$damage <- 100
         }
 
-        output$exposure_circle <- DT::renderDataTable({
+        output$exposure_circle <- renderDT({
           code <- regions@data$NAME_1[entry]
           .showCountryInfo(code, match_long, match_lat, result$damage, country_num, part = "region")
         })
@@ -584,7 +582,7 @@ exposurevalidationmap <- function(input,
       }") %>% # make map full screen
           addFullscreenControl(pseudoFullscreen = TRUE)
       } else if (input$tot_tiv_param == "Countries") {
-        js <- readOGR("~/RStudioProjects/OasisLMFUI/BFE_RShiny/oasisui/inst/app/geojson_data/world_coords.json")
+        js <- readOGR("./www/shape_files/world_coords.json")
 
         leaflet(js) %>%
           addPolygons(color = "black", fill = FALSE, weight = 2) %>%
@@ -708,7 +706,7 @@ exposurevalidationmap <- function(input,
       hide("damage_ratio")
     }
 
-    if( part == "country") {
+    if(part == "country") {
       DT::datatable(
         data.frame("Country" = code,
                    "Total TIV" = result$tot_country_tiv), options = list(dom = 't')
