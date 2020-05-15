@@ -155,7 +155,7 @@ exposurevalidationmap <- function(input,
           mutate(modeled = NA)
       } else {
         result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-          filter(peril_id %in% input$chkgrp_perils) %>%
+          # filter(peril_id %in% input$chkgrp_perils) %>%
           mutate(modeled = case_when(
             is.na(peril_id) ~ FALSE,
             peril_id %in% input$chkgrp_perils ~ TRUE,
