@@ -427,8 +427,14 @@ exposurevalidationmap <- function(input,
           result$damage <- 100
         }
 
+        if (input$country_select == "GBR") {
+          code_file <- regions@data$NAME_2
+        } else {
+          code_file <- regions@data$NAME_1
+        }
+
         output$exposure_circle <- renderDT({
-          code <- regions@data$NAME_1[entry]
+          code <- code_file[entry]
           .showCountryInfo(code, match_long, match_lat, result$damage, country_num, part = "region")
         })
 
