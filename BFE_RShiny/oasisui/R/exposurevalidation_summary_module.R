@@ -105,6 +105,7 @@ exposurevalidationsummary <- function(input,
   observeEvent({
     active()
     counter()
+    analysisID()
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
       result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
