@@ -497,7 +497,6 @@ exposurevalidationmap <- function(input,
   # Exposure validation map
   .createExposureValMap <- function(df) {
     marker_colors <- c('green', 'red')
-
     if (is.null(input$chkgrp_perils)) {
       icon_map <- NULL
       df <- df
@@ -519,10 +518,13 @@ exposurevalidationmap <- function(input,
         markerColor = marker_colors[df$modeled]
       )
       if (input$tot_tiv_param == "Circles") {
+        # df1 = data.frame(x = df$longitude, y = df$latitude)
+        # pts = st_as_sf(df1, coords = c("x", "y"), crs = 4326)
         # color clusters red if any mark is red, and green if all marks are green.
         # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
         leaflet(df) %>%
           addTiles() %>%
+          # addGlPoints(data = pts, popup = df$popup) %>%
           addAwesomeMarkers(
             lng = ~longitude,
             lat = ~latitude,
@@ -678,12 +680,12 @@ exposurevalidationmap <- function(input,
   .showPinsInfo <- function(radius, lat_click, long_click, ratio) {
     info_circles <- .DrawnCircles(radius, lat_click, long_click, ratio)
     if(!is.null(info_circles$locID_list) && !is.null(info_circles$street_address)) {
-      DT::datatable(data.frame(LocID = info_circles$locID_list,
+      datatable(data.frame(LocID = info_circles$locID_list,
                  TIV = add_commas(info_circles$tiv_list),
                  "Street Address" = info_circles$street_address)
       )
-    } else if(!is.null(info_circles$locID_list) && is.null(info_circles$street_address)) {
-      DT::datatable(data.frame(LocID = info_circles$locID_list,
+    } else if(!is.null(info_circles$locID_list)) {
+      datatable(data.frame(LocID = info_circles$locID_list,
                                TIV = add_commas(info_circles$tiv_list),
                                "Street Address" = rep("NA", length(info_circles$tiv_list)))
       )
@@ -713,12 +715,12 @@ exposurevalidationmap <- function(input,
     }
 
     if(part == "country") {
-      DT::datatable(
+      datatable(
         data.frame("Country" = code,
                    "Total TIV" = result$tot_country_tiv), options = list(dom = 't')
       )
     } else {
-      DT::datatable(
+      datatable(
         data.frame("Code" = code,
                    "Total TIV" = result$tot_country_tiv), options = list(dom = 't')
       )

@@ -56,6 +56,7 @@ createPlainMap <- function(df, session, paramID, step = NULL) {
 #'
 #' @export
 build_marker_data <- function(data, session, paramID, step = NULL) {
+
   names(data) <- tolower(names(data))
 
   # extract error messages in case status is "Fail"
@@ -82,28 +83,21 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
   # Popup data, must be a character vector of html code
   if (!is.null(step)) {
     # Include error message only if validation map
-    data$popup <- mapply(
-      function(id, total, streetaddress, postalcode, error_msg) {
-        as.character(div(
-          strong("Location ID: "), id,
-          br(), strong("TIV: "), total,
-          br(), strong("Street Address: "), streetaddress,
-          br(), strong("Postal code: "), postalcode,
-          br(), strong("Error message: "), error_msg
-        ))
-      },
-      data$locnumber, tiv$total, data$streetaddress, data$postalcode, error_msg)
+    data$popup <- paste0(
+      "<div>\n  <strong>Location ID: </strong>\n  ",
+      data$locnumber, "\n  <br/>\n  <strong>TIV: </strong>\n    ",
+      tiv$total,"\n  <br/>\n  <strong>Street Address: </strong>\n  ",
+      data$streetaddress, "\n  <br/>\n  <strong>Postal code: </strong>\n  ",
+      data$postalcode, "\n  <br/>\n  <strong>Error message: </strong>\n  ",
+      error_msg, "\n</div>")
   } else {
-    data$popup <- mapply(
-      function(id, total, streetaddress, postalcode) {
-        as.character(div(
-          strong("Location ID: "), id,
-          br(), strong("TIV: "), total,
-          br(), strong("Street Address: "), streetaddress,
-          br(), strong("Postal code: "), postalcode
-        ))
-      },
-      data$locnumber, tiv$total[[1]], data$streetaddress, data$postalcode)
+    data$popup <- paste0(
+      "<div>\n  <strong>Location ID: </strong>\n  ",
+      data$locnumber, "\n  <br/>\n  <strong>TIV: </strong>\n    ",
+      tiv$total,"\n  <br/>\n  <strong>Street Address: </strong>\n  ",
+      data$streetaddress, "\n  <br/>\n  <strong>Postal code: </strong>\n  ",
+      data$postalcode, "\n</div>"
+    )
   }
   data
 }
