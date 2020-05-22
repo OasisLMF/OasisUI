@@ -22,7 +22,7 @@ exposurevalidationmapUI <- function(id) {
              selectInput(ns("tot_tiv_param"), label = "Choose TIV by", choices = c("Circles", "Countries", "Regions")),
              hidden(selectInput(ns("country_select"), label = "Select Country", choices = list("Bangladesh" = "BGD",
                                                                                                "Philippines" = "PHL",
-                                                                                                "UK" = "GBR" )))),
+                                                                                               "UK" = "GBR" )))),
       column(9,
              div(oasisuiRefreshButton(ns("abuttonexposurerefresh")), style = "margin-right: 25px;"))),
     fluidRow(
@@ -291,11 +291,20 @@ exposurevalidationmap <- function(input,
           result$damage <- 100
         }
 
+        leafletProxy("exposure_map") %>% addCircles(lng = long_click,
+                                                    lat = lat_click,
+                                                    radius = radius,
+                                                    layerId = "hilightArea",
+                                                    highlightOptions = highlightOptions(color = "green",
+                                                                                        weight = 5,
+                                                                                        bringToFront = F,
+                                                                                        opacity = 1))
+
         output$exposure_circle <- renderDT({
           .showPinsInfo(radius = radius,
-                         lat_click = lat_click,
-                         long_click = long_click,
-                         ratio = result$damage)
+                        lat_click = lat_click,
+                        long_click = long_click,
+                        ratio = result$damage)
         })
 
         output$radius_circle <- renderTable({
@@ -311,14 +320,6 @@ exposurevalidationmap <- function(input,
           result$uploaded_locs_check %>% filter(LocNumber == info_circles$locID_list[x])
         }))
 
-        leafletProxy("exposure_map") %>% addCircles(lng = long_click,
-                                                    lat = lat_click,
-                                                    radius = radius,
-                                                    layerId = "hilightArea",
-                                                    highlightOptions = highlightOptions(color = "green",
-                                                                                        weight = 5,
-                                                                                        bringToFront = F,
-                                                                                        opacity = 1))
         show("damage_ratio")
         show("radius_circle")
         show("exposure_circle")
@@ -412,38 +413,38 @@ exposurevalidationmap <- function(input,
 
         } else {
 
-        country_num <- unlist(na.omit(country_num))
-        entry <- country_num[1]
-        set <- country_num[2]
-        lati <- regions@polygons[[entry]]@Polygons[[set]]@coords[,2]
-        long <- regions@polygons[[entry]]@Polygons[[set]]@coords[,1]
+          country_num <- unlist(na.omit(country_num))
+          entry <- country_num[1]
+          set <- country_num[2]
+          lati <- regions@polygons[[entry]]@Polygons[[set]]@coords[,2]
+          long <- regions@polygons[[entry]]@Polygons[[set]]@coords[,1]
 
-        # check for pins within country borders
-        match_lat <- grep(TRUE, between(result$uploaded_locs_check_peril$Latitude, min(lati), max(lati)))
-        match_long <- grep(TRUE, between(result$uploaded_locs_check_peril$Longitude, min(long), max(long)))
+          # check for pins within country borders
+          match_lat <- grep(TRUE, between(result$uploaded_locs_check_peril$Latitude, min(lati), max(lati)))
+          match_long <- grep(TRUE, between(result$uploaded_locs_check_peril$Longitude, min(long), max(long)))
 
-        # adjust TIV wrt damage ratio
-        if (is.null(input$damage_ratio)) {
-          result$damage <- 100
-        }
+          # adjust TIV wrt damage ratio
+          if (is.null(input$damage_ratio)) {
+            result$damage <- 100
+          }
 
-        if (input$country_select == "GBR") {
-          code_file <- regions@data$NAME_2
-        } else {
-          code_file <- regions@data$NAME_1
-        }
+          if (input$country_select == "GBR") {
+            code_file <- regions@data$NAME_2
+          } else {
+            code_file <- regions@data$NAME_1
+          }
 
-        output$exposure_circle <- renderDT({
-          code <- code_file[entry]
-          .showCountryInfo(code, match_long, match_lat, result$damage, country_num, part = "region")
-        })
+          output$exposure_circle <- renderDT({
+            code <- code_file[entry]
+            .showCountryInfo(code, match_long, match_lat, result$damage, country_num, part = "region")
+          })
 
-        leafletProxy("exposure_map") %>% addPolygons(lat = lati,
-                                                     lng = long, weight = 2,
-                                                     fillColor = "blue",
-                                                     layerId = "hilightArea")
-        show("damage_ratio")
-        show("exposure_circle")
+          leafletProxy("exposure_map") %>% addPolygons(lat = lati,
+                                                       lng = long, weight = 2,
+                                                       fillColor = "blue",
+                                                       layerId = "hilightArea")
+          show("damage_ratio")
+          show("exposure_circle")
 
         }
       }
@@ -518,13 +519,10 @@ exposurevalidationmap <- function(input,
         markerColor = marker_colors[df$modeled]
       )
       if (input$tot_tiv_param == "Circles") {
-        # df1 = data.frame(x = df$longitude, y = df$latitude)
-        # pts = st_as_sf(df1, coords = c("x", "y"), crs = 4326)
         # color clusters red if any mark is red, and green if all marks are green.
         # Reference https://stackoverflow.com/questions/47507854/coloring-clusters-by-markers-inside
         leaflet(df) %>%
           addTiles() %>%
-          # addGlPoints(data = pts, popup = df$popup) %>%
           addAwesomeMarkers(
             lng = ~longitude,
             lat = ~latitude,
@@ -608,7 +606,7 @@ exposurevalidationmap <- function(input,
           addFullscreenControl(pseudoFullscreen = TRUE)
       } else {
         regions <- readRDS(result$regions_rds)
-          leaflet(regions) %>%
+        leaflet(regions) %>%
           addPolygons(color = "black", fill = FALSE, weight = 2) %>%
           addTiles() %>%
           setView(lng = df$longitude[1],
@@ -628,13 +626,33 @@ exposurevalidationmap <- function(input,
 
   # Drawn circles infos, outputs and radius
   .DrawnCircles <- function(radius, lat_click, long_click, ratio) {
-
     # calculate LocID and TIV for pins inside areas
-    locID_list <- .is_within_bounds(format(result$uploaded_locs_check_peril$LocNumber, big.mark = "", scientific = FALSE), radius, lat_click, long_click, ratio)
-    tiv_list <- .is_within_bounds(result$uploaded_locs_check_peril$BuildingTIV * (ratio/100), radius, lat_click, long_click, ratio)
-    street_address <- .is_within_bounds(result$uploaded_locs_check_peril$StreetAddress, radius, lat_click, long_click, ratio)
+    if(is.null(result$uploaded_locs_check_peril$StreetAddress)) {
+      info <- .is_within_bounds(data.frame("LocNumber" = format(result$uploaded_locs_check_peril$LocNumber, big.mark = "",
+                                                                scientific = FALSE),
+                                           "TIV" = result$uploaded_locs_check_peril$BuildingTIV * (ratio/100)),
+                                radius, lat_click, long_click, ratio)
+    } else {
+      info <- .is_within_bounds(data.frame("LocNumber" = format(result$uploaded_locs_check_peril$LocNumber, big.mark = "",
+                                                                scientific = FALSE),
+                                           "TIV" = result$uploaded_locs_check_peril$BuildingTIV * (ratio/100),
+                                           "Address" = result$uploaded_locs_check_peril$StreetAddress),
+                                radius, lat_click, long_click, ratio)
+    }
+    locID_list <- unlist(lapply(seq_len(length(info)), function(x) {
+      info[[x]][["LocNumber"]]
+    }))
+    tiv_list <- unlist(lapply(seq_len(length(info)), function(x) {
+      info[[x]][["TIV"]]
+    }))
 
-    list(locID_list = locID_list, tiv_list = tiv_list, street_address = street_address)
+    street_address <- unlist(lapply(seq_len(length(info)), function(x) {
+      info[[x]][["Address"]]
+    }))
+
+    list(locID_list = locID_list,
+         tiv_list = tiv_list,
+         street_address = street_address)
   }
 
   .between_min_max <- function(circle_bounds, coord) {
@@ -662,7 +680,7 @@ exposurevalidationmap <- function(input,
     degrees_dist_4 <- degrees_dist_2 + 22.5
     circle_bounds_4 <- destPoint(coord_df, degrees_dist_4, radius)
 
-    unlist(lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
+    lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
       if ((.between_min_max(circle_bounds_1[, 1], long[x]) &&
            .between_min_max(circle_bounds_1[, 2], lat[x])) ||
           (.between_min_max(circle_bounds_2[, 1], long[x]) &&
@@ -671,23 +689,32 @@ exposurevalidationmap <- function(input,
            .between_min_max(circle_bounds_3[, 2], lat[x])) ||
           (.between_min_max(circle_bounds_4[, 1], long[x]) &&
            .between_min_max(circle_bounds_4[, 2], lat[x]))) {
-        uploaded_locs_input[x]
+        uploaded_locs_input[x,]
       }
-    }))
+    })
   }
 
   # show TIV table for pins under circle
   .showPinsInfo <- function(radius, lat_click, long_click, ratio) {
     info_circles <- .DrawnCircles(radius, lat_click, long_click, ratio)
+    if (length(info_circles$tiv_list) > 100) {
+      sorted_tivs <- sort(info_circles$tiv_list, decreasing = TRUE)[1:100]
+      sorted_entries <- unlist(lapply(sorted_tivs, function(x) {which(info_circles$tiv_list == x)}))
+      info_circles$tiv_list <- info_circles$tiv_list[sorted_entries]
+      info_circles$locID_list <- info_circles$locID_list[sorted_entries]
+      if (!is.null(info_circles$street_address)) {
+        info_circles$street_address <- info_circles$street_address[sorted_entries]
+      }
+    }
     if(!is.null(info_circles$locID_list) && !is.null(info_circles$street_address)) {
       datatable(data.frame(LocID = info_circles$locID_list,
-                 TIV = add_commas(info_circles$tiv_list),
-                 "Street Address" = info_circles$street_address)
+                           TIV = add_commas(info_circles$tiv_list),
+                           "Street Address" = info_circles$street_address)
       )
     } else if(!is.null(info_circles$locID_list)) {
       datatable(data.frame(LocID = info_circles$locID_list,
-                               TIV = add_commas(info_circles$tiv_list),
-                               "Street Address" = rep("NA", length(info_circles$tiv_list)))
+                           TIV = add_commas(info_circles$tiv_list),
+                           "Street Address" = rep("NA", length(info_circles$tiv_list)))
       )
     } else {
       hide("damage_ratio")
