@@ -36,11 +36,12 @@ exposurevalidationmapUI <- function(id) {
     ),
     fluidRow(
       column(4,
-             hidden(tableOutput(ns("radius_circle")))
+             hidden(tableOutput(ns("tiv_infos"))),
+             hidden(textOutput(ns("filtered_locs")))
       ),
       column(8,
              hidden(numericInput(ns("damage_ratio"), "Damage ratio (%)", value = 100, min = 0, max = 100)),
-             hidden(DTOutput(ns("exposure_circle")))
+             hidden(DTOutput(ns("exposure_table")))
       )
     ),
     fluidRow(column(2, hidden(downloadButton(ns("exp_tivs"), label = "Export to csv"))))
@@ -243,14 +244,16 @@ exposurevalidationmap <- function(input,
   observeEvent(input$tot_tiv_param, {
     if (input$tot_tiv_param == "Countries") {
       hide("damage_ratio")
-      hide("radius_circle")
-      hide("exposure_circle")
+      hide("filtered_locs")
+      hide("tiv_infos")
+      hide("exposure_table")
       hide("exp_tivs")
       hide("country_select")
     } else if (input$tot_tiv_param == "Regions") {
       hide("damage_ratio")
-      hide("radius_circle")
-      hide("exposure_circle")
+      hide("filtered_locs")
+      hide("tiv_infos")
+      hide("exposure_table")
       hide("exp_tivs")
       show("country_select")
     } else {
@@ -260,14 +263,14 @@ exposurevalidationmap <- function(input,
 
   # select rds file corresponding to Country
   observeEvent(input$country_select, {
-    hide("exposure_circle")
+    hide("exposure_table")
     country <- input$country_select
     result$regions_rds <- paste0("./www/shape_files/gadm36_", country, "_sp.rds")
   })
 
   observeEvent(input$exposure_map_click, {
     if (input$tot_tiv_param == "Circles") {
-      hide("exposure_circle")
+      hide("exposure_table")
       circles_features <- input$exposure_map_draw_all_features$features
 
       # distance between click and closest isocenter
@@ -300,18 +303,22 @@ exposurevalidationmap <- function(input,
                                                                                         bringToFront = F,
                                                                                         opacity = 1))
 
-        output$exposure_circle <- renderDT({
+        output$exposure_table <- renderDT({
           .showPinsInfo(radius = radius,
                         lat_click = lat_click,
                         long_click = long_click,
                         ratio = result$damage)
         })
 
-        output$radius_circle <- renderTable({
+        output$tiv_infos <- renderTable({
           .showRadius(radius = radius,
                       lat_click = lat_click,
                       long_click = long_click,
                       ratio = result$damage)
+        })
+
+        output$filtered_locs <- renderText({
+          "Only top 100 TIV locations are listed in the table."
         })
 
         # update file with only locations under circles
@@ -320,15 +327,22 @@ exposurevalidationmap <- function(input,
           result$uploaded_locs_check %>% filter(LocNumber == info_circles$locID_list[x])
         }))
 
+        if (length(info_circles$tiv_list) > 100) {
+          show("filtered_locs")
+        } else {
+          hide("filtered_locs")
+        }
+
         show("damage_ratio")
-        show("radius_circle")
-        show("exposure_circle")
+        show("tiv_infos")
+        show("exposure_table")
         show("exp_tivs")
 
       } else {
+        hide("filtered_locs")
         hide("damage_ratio")
-        hide("radius_circle")
-        hide("exposure_circle")
+        hide("tiv_infos")
+        hide("exposure_table")
         hide("exp_tivs")
       }
     } else {
@@ -383,7 +397,7 @@ exposurevalidationmap <- function(input,
             result$damage <- 100
           }
 
-          output$exposure_circle <- renderDT({
+          output$exposure_table <- renderDT({
             code <- js_lite$features[[2]][["name"]][[country_num]]
             .showCountryInfo(code, match_long, match_lat, result$damage, country_num, part = "country")
           })
@@ -394,7 +408,7 @@ exposurevalidationmap <- function(input,
                                                        fillColor = "blue",
                                                        layerId = "hilightArea")
           show("damage_ratio")
-          show("exposure_circle")
+          show("exposure_table")
         }
       } else {
         regions <- readRDS(result$regions_rds)
@@ -434,7 +448,7 @@ exposurevalidationmap <- function(input,
             code_file <- regions@data$NAME_1
           }
 
-          output$exposure_circle <- renderDT({
+          output$exposure_table <- renderDT({
             code <- code_file[entry]
             .showCountryInfo(code, match_long, match_lat, result$damage, country_num, part = "region")
           })
@@ -444,7 +458,7 @@ exposurevalidationmap <- function(input,
                                                        fillColor = "blue",
                                                        layerId = "hilightArea")
           show("damage_ratio")
-          show("exposure_circle")
+          show("exposure_table")
 
         }
       }
@@ -454,8 +468,9 @@ exposurevalidationmap <- function(input,
   observeEvent(input$exposure_map_draw_all_features, {
     leafletProxy("exposure_map") %>% removeShape(layerId = "hilightArea")
     hide("damage_ratio")
-    hide("radius_circle")
-    hide("exposure_circle")
+    hide("filtered_locs")
+    hide("tiv_infos")
+    hide("exposure_table")
     hide("exp_tivs")
   })
 
@@ -726,7 +741,8 @@ exposurevalidationmap <- function(input,
   .showRadius <- function(radius, lat_click, long_click, ratio) {
     info_circles <- .DrawnCircles(radius, lat_click, long_click, ratio)
     data.frame("Radius (m)" = add_commas(round(radius, 3)),
-               "Total TIV" = add_commas(sum(info_circles$tiv_list))
+               "Total TIV" = add_commas(sum(info_circles$tiv_list)),
+               "Total number of locations" = add_commas(length(info_circles$tiv_list))
     )
   }
 
