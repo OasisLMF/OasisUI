@@ -300,7 +300,7 @@ exposurevalidationmap <- function(input,
                                                     layerId = "hilightArea",
                                                     highlightOptions = highlightOptions(color = "green",
                                                                                         weight = 5,
-                                                                                        bringToFront = F,
+                                                                                        bringToFront = FALSE,
                                                                                         opacity = 1))
 
         output$exposure_table <- renderDT({
