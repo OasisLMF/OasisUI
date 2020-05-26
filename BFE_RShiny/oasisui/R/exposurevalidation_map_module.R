@@ -337,7 +337,6 @@ exposurevalidationmap <- function(input,
         show("tiv_infos")
         show("exposure_table")
         show("exp_tivs")
-
       } else {
         hide("filtered_locs")
         hide("damage_ratio")
