@@ -425,7 +425,6 @@ exposurevalidationmap <- function(input,
         if (is.null(country_num)) {
 
         } else {
-
           country_num <- unlist(na.omit(country_num))
           entry <- country_num[1]
           set <- country_num[2]
