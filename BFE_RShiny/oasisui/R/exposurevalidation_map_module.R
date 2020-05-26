@@ -242,21 +242,18 @@ exposurevalidationmap <- function(input,
   })
 
   observeEvent(input$tot_tiv_param, {
-    if (input$tot_tiv_param == "Countries") {
+    if (input$tot_tiv_param %in% c("Countries", "Regions")) {
       hide("damage_ratio")
       hide("filtered_locs")
       hide("tiv_infos")
       hide("exposure_table")
       hide("exp_tivs")
-      hide("country_select")
-    } else if (input$tot_tiv_param == "Regions") {
-      hide("damage_ratio")
-      hide("filtered_locs")
-      hide("tiv_infos")
-      hide("exposure_table")
-      hide("exp_tivs")
+    }
+
+    if (input$tot_tiv_param == "Regions") {
       show("country_select")
     } else {
+      hide("exposure_table")
       hide("country_select")
     }
   })
@@ -410,6 +407,7 @@ exposurevalidationmap <- function(input,
           show("exposure_table")
         }
       } else {
+        # code for regions
         regions <- readRDS(result$regions_rds)
         country_num <- unlist(lapply(seq_len(length(regions)), function (x) {
           lapply(seq_len(length(regions@polygons[[x]]@Polygons)), function (y) {
@@ -640,25 +638,20 @@ exposurevalidationmap <- function(input,
   # Drawn circles infos, outputs and radius
   .DrawnCircles <- function(radius, lat_click, long_click, ratio) {
     # calculate LocID and TIV for pins inside areas
-    if(is.null(result$uploaded_locs_check_peril$StreetAddress)) {
-      info <- .is_within_bounds(data.frame("LocNumber" = format(result$uploaded_locs_check_peril$LocNumber, big.mark = "",
-                                                                scientific = FALSE),
-                                           "TIV" = result$uploaded_locs_check_peril$BuildingTIV * (ratio/100)),
-                                radius, lat_click, long_click, ratio)
-    } else {
-      info <- .is_within_bounds(data.frame("LocNumber" = format(result$uploaded_locs_check_peril$LocNumber, big.mark = "",
-                                                                scientific = FALSE),
-                                           "TIV" = result$uploaded_locs_check_peril$BuildingTIV * (ratio/100),
-                                           "Address" = result$uploaded_locs_check_peril$StreetAddress),
-                                radius, lat_click, long_click, ratio)
+    df_info <- data.frame("LocNumber" = format(result$uploaded_locs_check_peril$LocNumber, big.mark = "",
+                                               scientific = FALSE),
+                          "TIV" = result$uploaded_locs_check_peril$BuildingTIV * (ratio/100))
+    if(!is.null(result$uploaded_locs_check_peril$StreetAddress)) {
+      df_info <- cbind(df_info, "Address" = result$uploaded_locs_check_peril$StreetAddress)
     }
+    info <- .is_within_bounds(df_info, radius, lat_click, long_click, ratio)
+
     locID_list <- unlist(lapply(seq_len(length(info)), function(x) {
       info[[x]][["LocNumber"]]
     }))
     tiv_list <- unlist(lapply(seq_len(length(info)), function(x) {
       info[[x]][["TIV"]]
     }))
-
     street_address <- unlist(lapply(seq_len(length(info)), function(x) {
       info[[x]][["Address"]]
     }))
@@ -711,8 +704,7 @@ exposurevalidationmap <- function(input,
   .showPinsInfo <- function(radius, lat_click, long_click, ratio) {
     info_circles <- .DrawnCircles(radius, lat_click, long_click, ratio)
     if (length(info_circles$tiv_list) > 100) {
-      sorted_tivs <- sort(info_circles$tiv_list, decreasing = TRUE)[1:100]
-      sorted_entries <- unlist(lapply(sorted_tivs, function(x) {which(info_circles$tiv_list == x)}))
+      sorted_entries <- order(info_circles$tiv_list, decreasing = TRUE)[1:100]
       info_circles$tiv_list <- info_circles$tiv_list[sorted_entries]
       info_circles$locID_list <- info_circles$locID_list[sorted_entries]
       if (!is.null(info_circles$street_address)) {
