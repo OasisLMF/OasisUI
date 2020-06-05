@@ -1,6 +1,12 @@
 OasisUI Changelog
 ==================
 
+`1.6.0`_
+--------
+* #188 - Fixed Ambiguous Labels and Output in Dashboard 
+* #217 - Added TIV in summary dashboard
+* #214 - Fix for dictionary parameters in model settings
+
 `1.5.1`_
 --------
 * Fix dashboard crash
@@ -149,6 +155,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
+.. _`1.6.0`:  https://github.com/OasisLMF/OasisUI/compare/1.5.1...1.6.0
 .. _`1.5.1`:  https://github.com/OasisLMF/OasisUI/compare/1.5.0...1.5.1
 .. _`1.5.0`:  https://github.com/OasisLMF/OasisUI/compare/1.4.1...1.5.0
 .. _`1.4.1`:  https://github.com/OasisLMF/OasisUI/compare/1.4.0...1.4.1
