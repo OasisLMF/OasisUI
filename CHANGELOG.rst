@@ -1,6 +1,10 @@
 OasisUI Changelog
 ==================
 
+`1.7.0`_
+--------
+* Update to exposure mapping 
+
 `1.6.0`_
 --------
 * #188 - Fixed Ambiguous Labels and Output in Dashboard 
@@ -155,6 +159,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
+.. _`1.7.0`:  https://github.com/OasisLMF/OasisUI/compare/1.6.0...1.7.0
 .. _`1.6.0`:  https://github.com/OasisLMF/OasisUI/compare/1.5.1...1.6.0
 .. _`1.5.1`:  https://github.com/OasisLMF/OasisUI/compare/1.5.0...1.5.1
 .. _`1.5.0`:  https://github.com/OasisLMF/OasisUI/compare/1.4.1...1.5.0
