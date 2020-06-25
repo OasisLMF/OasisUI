@@ -80,6 +80,8 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
     }
   }
 
+  data <- data %>% mutate("tiv_tot" = tiv$total)
+
   # Popup data, must be a character vector of html code
   if (!is.null(step)) {
     # Include error message only if validation map
@@ -105,25 +107,17 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
 
 # Extract error messages
 .keys_errors_msg <- function(data, session, paramID) {
-  keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = paramID,
-                                                                   dataset_identifier = "keys-errors.csv",
-                                                                   type = "input")
-  error_msg <- data.frame(message = 1:nrow(data))
+  keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = paramID)
   if (!is.null(keys_errors)) {
-    for (i in seq(1, nrow(data))) {
-      if (length(keys_errors$LocID[which(keys_errors$LocID == i)]) == 0) {
-        error_msg$message[i] <- NA
-      } else {
-        errors_list <- as.list(keys_errors$Message[which(keys_errors$LocID == i)])
-        errors_paste <- paste(lapply(seq(1, length(errors_list)), function (x) {
-          paste(keys_errors$PerilID[x], ":", errors_list[x], "/")
-        }), collapse = " ")
-        error_msg$message[i] <- errors_paste
-      }
+    message <- dplyr::group_by(keys_errors, LocID) %>%
+      dplyr::summarize(message = paste(paste(PerilID, ":", Message), collapse = " / "))
+    if (length(as.numeric(keys_errors$LocID)) > 0) {
+      errmessage <- dplyr::left_join(data, message, by = c("locnumber" = "LocID"))$message
+    } else {
+      errmessage <- rep_len(NA, nrow(data))
     }
   } else {
-    error_msg$message <- rep_len(NA, nrow(data))
+    errmessage <- rep_len(NA, nrow(data))
   }
-  error_msg$message
+  errmessage
 }
-

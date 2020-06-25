@@ -17,7 +17,6 @@
 #' @export
 check_loc <- function(analysisID, portfolioID, data_hub) {
   logMessage(".check_loc called")
-
   uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID) %>%
     mutate(loc_idx = seq(nrow(.)) - 1)
   modelled_locs <- data_hub$get_ana_dataset_content(id = analysisID, dataset_identifier = "lookup_success_file")
