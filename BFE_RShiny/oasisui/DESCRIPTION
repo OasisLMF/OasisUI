@@ -45,5 +45,5 @@ Suggests:
 Encoding: UTF-8
 URL: https://oasislmf.github.io/, https://github.com/OasisLMF/OasisUI
 BugReports: https://github.com/OasisLMF/OasisUI/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 VignetteBuilder: knitr

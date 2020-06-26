@@ -4,8 +4,14 @@
 \alias{oasisuiTableButton}
 \title{oasisuiTableButton}
 \usage{
-oasisuiTableButton(inputId, label, icon = NULL, width = NULL,
-  class = c("btn", "btn-secondary"), ...)
+oasisuiTableButton(
+  inputId,
+  label,
+  icon = NULL,
+  width = NULL,
+  class = c("btn", "btn-secondary"),
+  ...
+)
 }
 \arguments{
 \item{inputId}{widget id}

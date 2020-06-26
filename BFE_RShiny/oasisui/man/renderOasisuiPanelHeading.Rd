@@ -7,7 +7,7 @@
 renderOasisuiPanelHeading(expr, env = parent.frame(), ...)
 }
 \arguments{
-\item{expr}{An expression that returns a Shiny tag object, \code{\link{HTML}},
+\item{expr}{An expression that returns a Shiny tag object, \code{\link[shiny:HTML]{HTML()}},
 or a list of such objects.}
 
 \item{env}{The environment in which to evaluate \code{expr}.}

@@ -4,7 +4,9 @@
 \name{filesListDataNames}
 \alias{filesListDataNames}
 \title{filesListDataNames}
-\format{Named \code{list} of filesListData column names.}
+\format{
+Named \code{list} of filesListData column names.
+}
 \usage{
 filesListDataNames
 }

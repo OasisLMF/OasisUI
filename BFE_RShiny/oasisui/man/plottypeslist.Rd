@@ -4,7 +4,9 @@
 \name{plottypeslist}
 \alias{plottypeslist}
 \title{plottypeslist}
-\format{Named \code{list} of output plot options.}
+\format{
+Named \code{list} of output plot options.
+}
 \usage{
 plottypeslist
 }

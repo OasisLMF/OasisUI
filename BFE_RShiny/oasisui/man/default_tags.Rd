@@ -4,7 +4,9 @@
 \name{default_tags}
 \alias{default_tags}
 \title{Default Tags}
-\format{An object of class \code{character} of length 3.}
+\format{
+An object of class \code{character} of length 3.
+}
 \usage{
 default_tags
 }

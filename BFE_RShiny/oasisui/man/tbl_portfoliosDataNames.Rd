@@ -4,7 +4,9 @@
 \name{tbl_portfoliosDataNames}
 \alias{tbl_portfoliosDataNames}
 \title{tbl_portfoliosDataNames}
-\format{Named \code{list} of bl_portfoliosData column names.}
+\format{
+Named \code{list} of bl_portfoliosData column names.
+}
 \usage{
 tbl_portfoliosDataNames
 }

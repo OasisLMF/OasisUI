@@ -7,9 +7,16 @@
 \usage{
 def_out_configUI(id)
 
-def_out_config(input, output, session, analysisID = reactive(NULL),
-  analysisName = reactive(""), ana_flag = reactive("C"),
-  counter = reactive(NULL), active = reactive(TRUE))
+def_out_config(
+  input,
+  output,
+  session,
+  analysisID = reactive(NULL),
+  analysisName = reactive(""),
+  ana_flag = reactive("C"),
+  counter = reactive(NULL),
+  active = reactive(TRUE)
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

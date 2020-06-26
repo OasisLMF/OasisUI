@@ -7,9 +7,16 @@
 \usage{
 step3_configureOutputUI(id)
 
-step3_configureOutput(input, output, session, active = reactive(TRUE),
-  currstep = reactive(-1), portfolioID = reactive(""),
-  pfName = reactive(""), analysisID = reactive(NULL))
+step3_configureOutput(
+  input,
+  output,
+  session,
+  active = reactive(TRUE),
+  currstep = reactive(-1),
+  portfolioID = reactive(""),
+  pfName = reactive(""),
+  analysisID = reactive(NULL)
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

@@ -4,8 +4,14 @@
 \alias{oasisuiCheckboxButton}
 \title{oasisuiCheckboxButton}
 \usage{
-oasisuiCheckboxButton(inputId, label, icon = NULL, width = NULL,
-  class = c("btn"), ...)
+oasisuiCheckboxButton(
+  inputId,
+  label,
+  icon = NULL,
+  width = NULL,
+  class = c("btn"),
+  ...
+)
 }
 \arguments{
 \item{inputId}{widget id}

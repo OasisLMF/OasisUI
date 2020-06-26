@@ -4,8 +4,12 @@
 \alias{writefile}
 \title{write file}
 \usage{
-writefile(data, dataset_identifier = NULL, destdir = tempdir(),
-  file_towrite = NULL)
+writefile(
+  data,
+  dataset_identifier = NULL,
+  destdir = tempdir(),
+  file_towrite = NULL
+)
 }
 \arguments{
 \item{data}{object to write.}

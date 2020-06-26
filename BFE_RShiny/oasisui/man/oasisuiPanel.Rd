@@ -4,8 +4,15 @@
 \alias{oasisuiPanel}
 \title{Oasisui UI Panel}
 \usage{
-oasisuiPanel(id, ..., heading = NULL, footer = NULL,
-  status = "default", collapsible = FALSE, show = TRUE)
+oasisuiPanel(
+  id,
+  ...,
+  heading = NULL,
+  footer = NULL,
+  status = "default",
+  collapsible = FALSE,
+  show = TRUE
+)
 }
 \arguments{
 \item{id}{String ID of the panel.}

@@ -7,9 +7,14 @@
 \usage{
 outputfilesUI(id)
 
-outputfiles(input, output, session,
-  tbl_filesListDataana = reactive(NULL), anaId = reactive(NULL),
-  active = reactive(TRUE))
+outputfiles(
+  input,
+  output,
+  session,
+  tbl_filesListDataana = reactive(NULL),
+  anaId = reactive(NULL),
+  active = reactive(TRUE)
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
