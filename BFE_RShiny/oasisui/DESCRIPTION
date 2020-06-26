@@ -20,7 +20,7 @@ Imports:
   geojsonio (== 0.9.2), 
   geosphere (== 1.5.10),
   ggplot2 (== 3.3.0),
-  htmltools (== 0.3.6),
+  htmltools (== 0.4.0),
   htmlwidgets (== 1.5.1),
   httr (== 1.4.1),
   jsonlite (== 1.6.1),
@@ -35,10 +35,10 @@ Imports:
   shinycssloaders (== 0.3),
   shinyjs (== 1.1),
   shinyWidgets (== 0.5.1),
-  tibble (== 1.4.2),
+  tibble (== 3.0.1),
   tidyr (== 1.0.2),
   utils,
-  V8 (== 1.5)
+  V8 (== 3.0.2)
 Suggests:
   knitr,
   testthat
