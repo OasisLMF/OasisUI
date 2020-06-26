@@ -457,6 +457,11 @@ DataHub <- R6Class(
       }
       dataset_content
     },
+    # get lookup (keys) errors file
+    get_ana_errors_summary_content = function(id,  ...) {
+      query_response <- private$oasisapi$api_get_query(query_path = paste("analyses", id, "lookup_errors_file",  sep = "/"))
+      content(query_response$result)
+    },
     # invalidate analysis validation summary content
     invalidate_ana_validation_summary_content = function(id, dataset_identifier, type, ...) {
       self$invalidate_ana_dataset_header(id, dataset_identifier, type, ...)

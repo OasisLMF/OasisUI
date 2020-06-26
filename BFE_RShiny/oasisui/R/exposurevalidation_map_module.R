@@ -128,13 +128,16 @@ exposurevalidationmap <- function(input,
     # locations under circles
     circle_locs = NULL,
     # json regions file
-    regions_rds = NULL
+    regions_rds = NULL,
+    # filtered circles
+    info_circles = NULL
   )
 
   # Modeled exposure and uploaded exposure ------------------------------------
   observeEvent({
     counter()
     active()
+    analysisID()
   }, {
     if (length(active()) > 0 && active() && counter() > 0 && !is.null(analysisID())) {
       .reloadExposureValidation()
@@ -268,6 +271,7 @@ exposurevalidationmap <- function(input,
   observeEvent(input$exposure_map_click, {
     if (input$tot_tiv_param == "Circles") {
       hide("exposure_table")
+
       circles_features <- input$exposure_map_draw_all_features$features
 
       # distance between click and closest isocenter
@@ -284,13 +288,6 @@ exposurevalidationmap <- function(input,
         lat_click <- circles_features[[min_dist]]$geometry$coordinates[[2]]
         long_click <- circles_features[[min_dist]]$geometry$coordinates[[1]]
 
-        #re-set damage ratio everytime the user re-clicks on the map
-        updateNumericInput(session, "damage_ratio", value = 100)
-
-        if (is.null(input$damage_ratio)) {
-          result$damage <- 100
-        }
-
         leafletProxy("exposure_map") %>% addCircles(lng = long_click,
                                                     lat = lat_click,
                                                     radius = radius,
@@ -299,6 +296,12 @@ exposurevalidationmap <- function(input,
                                                                                         weight = 5,
                                                                                         bringToFront = FALSE,
                                                                                         opacity = 1))
+        #re-set damage ratio everytime the user re-clicks on the map
+        updateNumericInput(session, "damage_ratio", value = 100)
+
+        if (is.null(input$damage_ratio)) {
+          result$damage <- 100
+        }
 
         output$exposure_table <- renderDT({
           .showPinsInfo(radius = radius,
@@ -318,13 +321,10 @@ exposurevalidationmap <- function(input,
           "Only top 100 TIV locations are listed in the table."
         })
 
-        # update file with only locations under circles
-        info_circles <- .DrawnCircles(radius, lat_click, long_click, result$damage)
-        result$circle_locs <- do.call(rbind, lapply(seq_len(length(info_circles$locID_list)), function(x) {
-          result$uploaded_locs_check %>% filter(LocNumber == info_circles$locID_list[x])
-        }))
+        # # update file with only locations under circles
+        result$info_circles <- .DrawnCircles(radius, lat_click, long_click, result$damage)
 
-        if (length(info_circles$tiv_list) > 100) {
+        if (length(result$info_circles$tiv_list) > 100) {
           show("filtered_locs")
         } else {
           hide("filtered_locs")
@@ -471,6 +471,12 @@ exposurevalidationmap <- function(input,
   })
 
   # Export new TIV table to csv ------------------------------------------------
+  observeEvent(input$exp_tivs, {
+    result$circle_locs <- do.call(rbind, lapply(result$info_circles$locID_list, function(x) {
+      result$uploaded_locs_check %>% filter(LocNumber == x)
+    }))
+  })
+
   output$exp_tivs <- downloadHandler(
     # Filename to download
     filename =  function() {
@@ -520,8 +526,7 @@ exposurevalidationmap <- function(input,
         mutate(modeled = case_when(
           modeled == "TRUE" ~ 1,
           TRUE ~ 2
-        )) %>%
-        build_marker_data(session = session, paramID = analysisID(), step = "Validation Map")
+        )) %>% build_marker_data(session = session, paramID = analysisID(), step = "Validation Map")
 
       icon_map <- awesomeIcons(
         icon = 'map-marker-alt',
@@ -541,7 +546,8 @@ exposurevalidationmap <- function(input,
             clusterOptions = markerClusterOptions(),
             group = "clustered",
             clusterId = "cluster",
-            popup = ~popup) %>%
+            popup = ~popup
+          ) %>%
           addDrawToolbar(
             targetGroup = 'draw',
             polylineOptions = FALSE,
@@ -559,13 +565,10 @@ exposurevalidationmap <- function(input,
                            options = layersControlOptions(collapsed = FALSE)) %>%
           onRender("function(el,x) {
                             map = this;
-
                             var style = document.createElement('style');
                             style.type = 'text/css';
                             style.innerHTML = '.red, .red div { background-color: rgba(255,0,0,0.6); }'; // set both at the same time
                             document.getElementsByTagName('head')[0].appendChild(style);
-
-
                             var cluster = map.layerManager.getLayer('cluster','cluster');
                             cluster.options.iconCreateFunction = function(c) {
                             var markers = c.getAllChildMarkers();
@@ -575,25 +578,20 @@ exposurevalidationmap <- function(input,
                             'red': 2
                             };
                             var highestRank = 0; // defaults to the lowest level to start
-
                             markers.forEach(function(m) {
                             var color = m.options.icon.options.markerColor;
-
                             // check each marker to see if it is the highest value
                             if(priority[color] > highestRank) {
                             highestRank = priority[color];
                             }
                             })
-
                             var styles = [
                             'marker-cluster-small', // green
                             'marker-cluster-large',  // red
                             'red' // red
                             ]
-
                             var style = styles[highestRank];
                             var count = markers.length;
-
                             return L.divIcon({ html: '<div><span>'+count+'</span></div>', className: 'marker-cluster ' + style, iconSize: new L.Point(40, 40) });
                             }
       }") %>% # make map full screen
@@ -702,24 +700,24 @@ exposurevalidationmap <- function(input,
 
   # show TIV table for pins under circle
   .showPinsInfo <- function(radius, lat_click, long_click, ratio) {
-    info_circles <- .DrawnCircles(radius, lat_click, long_click, ratio)
-    if (length(info_circles$tiv_list) > 100) {
-      sorted_entries <- order(info_circles$tiv_list, decreasing = TRUE)[1:100]
-      info_circles$tiv_list <- info_circles$tiv_list[sorted_entries]
-      info_circles$locID_list <- info_circles$locID_list[sorted_entries]
-      if (!is.null(info_circles$street_address)) {
-        info_circles$street_address <- info_circles$street_address[sorted_entries]
+    info_circles_pins <- .DrawnCircles(radius, lat_click, long_click, ratio)
+    if (length(info_circles_pins$tiv_list) > 100) {
+      sorted_entries <- order(info_circles_pins$tiv_list, decreasing = TRUE)[1:100]
+      info_circles_pins$tiv_list <- info_circles_pins$tiv_list[sorted_entries]
+      info_circles_pins$locID_list <- info_circles_pins$locID_list[sorted_entries]
+      if (!is.null(info_circles_pins$street_address)) {
+        info_circles_pins$street_address <- info_circles_pins$street_address[sorted_entries]
       }
     }
-    if(!is.null(info_circles$locID_list) && !is.null(info_circles$street_address)) {
-      datatable(data.frame(LocID = info_circles$locID_list,
-                           TIV = add_commas(info_circles$tiv_list),
-                           "Street Address" = info_circles$street_address)
+    if(!is.null(info_circles_pins$locID_list) && !is.null(info_circles_pins$street_address)) {
+      datatable(data.frame(LocID = info_circles_pins$locID_list,
+                           TIV = add_commas(info_circles_pins$tiv_list),
+                           "Street Address" = info_circles_pins$street_address)
       )
-    } else if(!is.null(info_circles$locID_list)) {
-      datatable(data.frame(LocID = info_circles$locID_list,
-                           TIV = add_commas(info_circles$tiv_list),
-                           "Street Address" = rep("NA", length(info_circles$tiv_list)))
+    } else if(!is.null(info_circles_pins$locID_list)) {
+      datatable(data.frame(LocID = info_circles_pins$locID_list,
+                           TIV = add_commas(info_circles_pins$tiv_list),
+                           "Street Address" = rep("NA", length(info_circles_pins$tiv_list)))
       )
     } else {
       hide("damage_ratio")
@@ -729,10 +727,10 @@ exposurevalidationmap <- function(input,
 
   # show circle radius
   .showRadius <- function(radius, lat_click, long_click, ratio) {
-    info_circles <- .DrawnCircles(radius, lat_click, long_click, ratio)
+    info_circles_pins <- .DrawnCircles(radius, lat_click, long_click, ratio)
     data.frame("Radius (m)" = add_commas(round(radius, 3)),
-               "Total TIV" = add_commas(sum(info_circles$tiv_list)),
-               "Total number of locations" = add_commas(length(info_circles$tiv_list))
+               "Total TIV" = add_commas(sum(info_circles_pins$tiv_list)),
+               "Total number of locations" = add_commas(length(info_circles_pins$tiv_list))
     )
   }
 
