@@ -252,7 +252,7 @@ step2_chooseAnalysis <- function(input, output, session,
   })
 
   # Analyses table ------------------------------------------------------------
-  output$dt_analyses <- renderDT(
+  output$dt_analyses <- renderDT({
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- 1
       logMessage("re-rendering analysis table")
@@ -271,7 +271,8 @@ step2_chooseAnalysis <- function(input, output, session,
       )
     } else {
       nothingToShowTable("No analysis available")
-    })
+    }
+    }, server = FALSE)
 
   # Create Analyses Table Title
   output$paneltitle_CreateAnalysesTable <- renderUI({

@@ -233,7 +233,7 @@ step3_configureOutput <- function(input, output, session,
   )
 
   # Analyses Table ------------------------------------------------------------
-  output$dt_analyses <- renderDT(
+  output$dt_analyses <- renderDT({
     if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0) {
       index <- which(result$tbl_analysesData[, tbl_analysesDataNames$id] == analysisID())
       if (length(index) == 0 && is.null(analysisID())) {
@@ -258,7 +258,8 @@ step3_configureOutput <- function(input, output, session,
       )
     } else {
       nothingToShowTable(paste0("No analysis available"))
-    })
+    }
+    }, server = FALSE)
 
   # Analyses Table Title
   output$paneltitle_AnalysisTable <- renderUI({

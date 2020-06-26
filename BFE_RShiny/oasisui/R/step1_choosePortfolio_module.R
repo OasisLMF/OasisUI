@@ -302,7 +302,7 @@ step1_choosePortfolio <- function(input, output, session,
     } else {
       nothingToShowTable("No portfolio available")
     }
-  })
+  }, server = FALSE)
 
   # Portfolio Details Table ----------------------------------------------------
 
