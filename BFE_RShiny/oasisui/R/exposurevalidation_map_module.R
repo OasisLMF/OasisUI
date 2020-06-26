@@ -547,13 +547,6 @@ exposurevalidationmap <- function(input,
             group = "clustered",
             clusterId = "cluster",
             popup = ~popup
-            # popup = paste0(
-            #   "<div>\n  <strong>Location ID: </strong>\n  ",
-            #   df$locnumber, "\n  <br/>\n  <strong>TIV: </strong>\n    ",
-            #   df$tiv_tot,"\n  <br/>\n  <strong>Street Address: </strong>\n  ",
-            #   df$streetaddress, "\n  <br/>\n  <strong>Postal code: </strong>\n  ",
-            #   df$postalcode, "\n  <br/>\n  <strong>Error message: </strong>\n  ",
-            #   df$error_msg, "\n</div>")
           ) %>%
           addDrawToolbar(
             targetGroup = 'draw',

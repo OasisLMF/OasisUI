@@ -52,6 +52,10 @@ createPlainMap <- function(df, session, paramID, step = NULL) {
 #' @param paramID Chosen parameter ID.
 #' @param step Only important if user is in Validation Map. NULL by default.
 #'
+#' @importFrom dplyr left_join
+#' @importFrom dplyr group_by
+#' @importFrom dplyr summarize
+#'
 #' @return dataframe with popup information under "popup".
 #'
 #' @export
@@ -109,10 +113,10 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
 .keys_errors_msg <- function(data, session, paramID) {
   keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = paramID)
   if (!is.null(keys_errors)) {
-    message <- dplyr::group_by(keys_errors, LocID) %>%
-      dplyr::summarize(message = paste(paste(PerilID, ":", Message), collapse = " / "))
+    message <- group_by(keys_errors, LocID) %>%
+      summarize(message = paste(paste(PerilID, ":", Message), collapse = " / "))
     if (length(as.numeric(keys_errors$LocID)) > 0) {
-      errmessage <- dplyr::left_join(data, message, by = c("locnumber" = "LocID"))$message
+      errmessage <- left_join(data, message, by = c("locnumber" = "LocID"))$message
     } else {
       errmessage <- rep_len(NA, nrow(data))
     }
