@@ -110,9 +110,7 @@ exposurevalidationsummary <- function(input,
     if (length(active()) > 0 && active() && counter() > 0) {
       result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
       result$perils <- unique(result$summary_tbl$peril)
-      keys_errors <- session$userData$data_hub$get_ana_dataset_content(id = analysisID(),
-                                                                       dataset_identifier = "keys-errors.csv",
-                                                                       type = "input")
+      keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = analysisID())
 
       result$peril_id <- unique(keys_errors$PerilID)
       if (is.null(result$perils)) {
@@ -132,8 +130,9 @@ exposurevalidationsummary <- function(input,
   })
 
   # Perils ---------------------------------------------------------------------
-  observeEvent(input$input_peril, {
-    if (!is.na(input$input_peril) && input$input_peril != "") {
+  observeEvent({input$input_peril
+    result$summary_tbl}, {
+    if (!is.null(input$input_peril) && input$input_peril != "") {
       input_peril <- input$input_peril
       choices <- result$peril_choices
       .reloadSummary(input_peril)

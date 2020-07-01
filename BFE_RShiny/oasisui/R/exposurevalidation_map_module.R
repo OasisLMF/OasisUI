@@ -152,7 +152,8 @@ exposurevalidationmap <- function(input,
     }
   })
 
-  observeEvent(input$chkgrp_perils, ignoreNULL = FALSE, {
+  observeEvent({input$chkgrp_perils
+    result$uploaded_locs_check}, ignoreNULL = FALSE, {
     if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
       if (is.null(input$chkgrp_perils)) {
         result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
@@ -234,6 +235,7 @@ exposurevalidationmap <- function(input,
   # Map ------------------------------------------------------------------------
   output$exposure_map <- renderLeaflet({
     if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
+      result$uploaded_locs_check_peril <- result$uploaded_locs_check_peril[, colSums(is.na(result$uploaded_locs_check_peril)) != nrow(result$uploaded_locs_check_peril)]
       .createExposureValMap(result$uploaded_locs_check_peril)
     } else {
       NULL
