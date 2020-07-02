@@ -310,7 +310,7 @@ exposurevalidationmap <- function(input,
                         lat_click = lat_click,
                         long_click = long_click,
                         ratio = result$damage)
-        })
+        }, server = FALSE)
 
         output$tiv_infos <- renderTable({
           .showRadius(radius = radius,
