@@ -775,7 +775,7 @@ def_out_config <- function(input,
               model_match[[j]][["name"]]
             })
           }))
-          inputs_name[[param]] <- param_name
+          inputs_name[param] <- param_name
         }
         # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
       }
