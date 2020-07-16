@@ -121,17 +121,21 @@ exposurevalidationsummary <- function(input,
         result$peril_choices <- paste0(result$perils, " (", result$peril_id, ")")
       }
       # remove "total" entry in peril choices
-      peril_choices_filter <- result$peril_choices[-grep("total", result$perils)]
-        # peril_choices_filter <- result$peril_choices[result$peril_choices != "total"]
+      peril_choices_filter <- result$peril_choices[-grep("total", result$peril_choices)]
+      #peril_choices_filter <- result$peril_choices[result$peril_choices != "total"]
 
+      checkChange <- identical(input$input_peril, peril_choices_filter)
       updateSelectInput(session, inputId = "input_peril", choices = peril_choices_filter, selected = peril_choices_filter)
-      # TODO: if above leaves input_peril the same, we still want to call .reloadSummary once
+      # if above "updateSelectInput" leaves input_peril the same, we still want to call .reloadSummary once
+      if (checkChange) {
+        .reloadSummary(input$input_peril)
+        .reloadSummary_total(result$peril_choices)
+      }
     }
   })
 
   # Perils ---------------------------------------------------------------------
-  observeEvent({input$input_peril
-    result$summary_tbl}, {
+  observeEvent(input$input_peril, {
     if (!is.null(input$input_peril) && input$input_peril != "") {
       input_peril <- input$input_peril
       choices <- result$peril_choices
@@ -144,7 +148,7 @@ exposurevalidationsummary <- function(input,
   output$dt_total_validation <- renderDT(
     if (!is.null(result$summary_total_tbl) && nrow(result$summary_total_tbl) > 0) {
       # filter for only entries related to the total peril
-      sum_tot_filter <- result$summary_total_tbl %>% filter(peril == "total")
+      sum_tot_filter <- result$summary_total_tbl %>% filter(grepl("total", peril))
       # insert commas at thousands
       sum_tot_filter$modelled <- add_commas(sum_tot_filter$modelled)
       sum_tot_filter$`not-modelled` <- add_commas(sum_tot_filter$`not-modelled`)
@@ -168,7 +172,7 @@ exposurevalidationsummary <- function(input,
   output$dt_summary_validation <- renderDT(
     if (!is.null(result$summary_validation_tbl) && nrow(result$summary_validation_tbl) > 0) {
       # filter for all entries not related to the total peril
-      sum_val_filter <- result$summary_validation_tbl %>% filter(peril != "total")
+      sum_val_filter <- result$summary_validation_tbl %>% filter(!grepl("total", peril))
 
       # insert commas at thousands
       sum_val_filter$all <- add_commas(sum_val_filter$all)
@@ -236,9 +240,8 @@ exposurevalidationsummary <- function(input,
     n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
     # leave only: Fail, Success and Nomatch statuses and remove peril "total"
     key_unwanted <- c("portfolio", "not-modelled", "modelled")
-    if (length(key_unwanted) > 0) {
-      df %>% filter(key %notin% key_unwanted)
-    }
+    df <- df %>% filter(key %notin% key_unwanted)
+
     if (length(grep("total", df$peril)) > 0) {
       df <- df[-grep("total", df$peril), ]
     }
@@ -274,17 +277,20 @@ exposurevalidationsummary <- function(input,
     if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0 && !is.null(input_peril)) {
       # match inputs to perils
       peril_summary <- paste0(result$summary_tbl$peril, " (", result$peril_id, ")")
+      input_peril_s <- unlist(lapply(input_peril, function (x) {
+        y <- unlist(strsplit(x, split = " (", fixed = TRUE))[1]
+      }))
       perils_match <- unlist(lapply(seq_len(length(result$perils)), function(x) {
         grep(result$perils[x], input_peril)
       }))
       summary_match <- unlist(lapply(seq_len(length(perils_match)), function(x) {
         y <- perils_match[x]
-        grep(input_peril[y], peril_summary)
+        grep(input_peril_s[y], peril_summary)
       }))
       if (length(summary_match) == 0) {
         summary_match <- unlist(lapply(seq_len(length(perils_match)), function(x) {
           y <- perils_match[x]
-          which(input_peril[y] == peril_summary)
+          which(input_peril_s[y] == peril_summary)
         }))
       }
       result$summary_validation_tbl <- result$summary_tbl[summary_match, ]
@@ -305,6 +311,7 @@ exposurevalidationsummary <- function(input,
       tot <- grep("total", result$peril_choices)
       peril_summary <- paste0(result$summary_tbl$peril, " (", result$peril_id, ")")
       perils_match <- unlist(lapply(tot, function(x) {
+        result$peril_choices[x] <- unlist(strsplit(result$peril_choices[x], split = " (", fixed = TRUE))[1]
         grep(result$peril_choices[x], peril_summary)
       }))
       if (length(perils_match) == 0) {
