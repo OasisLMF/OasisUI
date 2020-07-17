@@ -280,19 +280,12 @@ exposurevalidationsummary <- function(input,
       input_peril_s <- unlist(lapply(input_peril, function (x) {
         y <- unlist(strsplit(x, split = " (", fixed = TRUE))[1]
       }))
-      perils_match <- unlist(lapply(seq_len(length(result$perils)), function(x) {
-        grep(result$perils[x], input_peril)
+      perils_match <- unlist(lapply(result$perils, function(x) {
+        grep(x, input_peril)
       }))
-      summary_match <- unlist(lapply(seq_len(length(perils_match)), function(x) {
-        y <- perils_match[x]
-        grep(input_peril_s[y], peril_summary)
+      summary_match <- unlist(lapply(perils_match, function(x) {
+        grep(input_peril_s[x], peril_summary)
       }))
-      if (length(summary_match) == 0) {
-        summary_match <- unlist(lapply(seq_len(length(perils_match)), function(x) {
-          y <- perils_match[x]
-          which(input_peril_s[y] == peril_summary)
-        }))
-      }
       result$summary_validation_tbl <- result$summary_tbl[summary_match, ]
     } else {
       result$summary_validation_tbl <- NULL
