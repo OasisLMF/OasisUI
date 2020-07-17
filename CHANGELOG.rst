@@ -1,6 +1,11 @@
 OasisUI Changelog
 ==================
 
+`1.8.0`_
+--------
+* Rendering speed improvements to validation mapping 
+* Fix in exposure summary table for displaying building TIV
+
 `1.7.0`_
 --------
 * Update to exposure mapping 
@@ -159,6 +164,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
+.. _`1.8.0`:  https://github.com/OasisLMF/OasisUI/compare/1.7.0...1.8.0
 .. _`1.7.0`:  https://github.com/OasisLMF/OasisUI/compare/1.6.0...1.7.0
 .. _`1.6.0`:  https://github.com/OasisLMF/OasisUI/compare/1.5.1...1.6.0
 .. _`1.5.1`:  https://github.com/OasisLMF/OasisUI/compare/1.5.0...1.5.1
