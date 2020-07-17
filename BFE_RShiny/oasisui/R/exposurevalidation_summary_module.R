@@ -290,7 +290,7 @@ exposurevalidationsummary <- function(input,
     } else {
       result$summary_validation_tbl <- NULL
     }
-    # invisible()
+    invisible()
   }
 
   # create summary table for totals
@@ -316,7 +316,7 @@ exposurevalidationsummary <- function(input,
     } else {
       result$summary_total_tbl <- NULL
     }
-    # invisible()
+    invisible()
   }
 
   invisible()
