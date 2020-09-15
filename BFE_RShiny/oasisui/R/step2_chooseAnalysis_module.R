@@ -22,7 +22,8 @@ step2_chooseAnalysisUI <- function(id) {
     hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
     hidden(div(id = ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
-    hidden(div(id = ns("panelModelDetails"), modeldetailsUI(ns("modeldetails"))))
+    hidden(div(id = ns("panelModelDetails"), modeldetailsUI(ns("modeldetails")))),
+    hidden(div(id = ns("panelBuildFly"), buildFlyUI(ns("buildFly"))))
   )
 }
 
@@ -154,7 +155,8 @@ panelModelTable <- function(id) {
     fluidRow(
       column(4,
              oasisuiButton(ns("abuttonmodeldetails"), "Show Model Details", style = "float:left") %>%
-               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonmodeldetails, placement = "right")),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonmodeldetails, placement = "right"),
+             oasisuiButton(ns("abuttonbuildfly"), "Customize model", style = "float:left")),
       column(6,
              br(),
              div(textInput(inputId = ns("anaName"), label = "Analysis Name"), style = "float:right;")),
@@ -324,6 +326,7 @@ step2_chooseAnalysis <- function(input, output, session,
       hide("panelModelTable")
       hide("panelAnalysisGenInputs")
       hide("panelModelDetails")
+      hide("panelBuildFly")
       input_generation_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
       if (input_generation_id$status == "Success") {
         oasisuiNotification(type = "message",
@@ -371,6 +374,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
+    hide("panelBuildFly")
   })
 
   observeEvent(input$abuttonConfirmDelIG, {
@@ -401,6 +405,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
+    hide("panelBuildFly")
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
   })
@@ -437,7 +442,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
-
+    hide("panelBuildFly")
     logMessage("showing panelAnalysisLog")
     show("panelAnalysisLog")
     .reloadAnaLog()
@@ -557,14 +562,26 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
+    hide("panelBuildFly")
     logMessage("showing panelModelDetails")
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
   })
 
+  observeEvent(input$abuttonbuildfly, {
+    hide("panelAnalysisDetails")
+    hide("panelAnalysisLog")
+    hide("panelAnalysisGenInputs")
+    logMessage("showing panelBuildFly")
+    show("panelBuildFly")
+    hide("panelModelDetails")
+    logMessage("showing panelBuildFly")
+  })
+
   #Hide panel if model id changes
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelModelDetails")
+    hide("panelBuildFly")
   })
 
   callModule(
@@ -577,11 +594,22 @@ step2_chooseAnalysis <- function(input, output, session,
     active = reactive(TRUE)
   )
 
+  callModule(
+    buildFly,
+    id = "buildFly",
+    modelID = reactive({result$modelID}),
+    counter = reactive({input$abuttonbuildfly}),
+    active = reactive(TRUE)
+  )
+
   # Create new Analysis --------------------------------------------------------
 
   observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
-      post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"), query_body = list(name = input$anaName, model = result$modelID), query_method = "POST")
+      post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"),
+                                                                                  query_body = list(name = input$anaName, model = result$modelID),
+                                                                                  query_method = "POST")
+
       logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", portfolioID(),
                         " name ", input$anaName,
                         " model ",  result$modelID))
@@ -596,6 +624,7 @@ step2_chooseAnalysis <- function(input, output, session,
     }
     hide("panelModelTable")
     hide("panelModelDetails")
+    hide("panelBuildFly")
   })
 
   # Enable and disable buttons -------------------------------------------------
@@ -624,10 +653,15 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttondelana")
       disable("abuttonstartcancIG")
       disable("abuttonmodeldetails")
+      disable("abuttonbuildfly")
       disable("abuttonpgotonextstep")
       disable("abuttonsubmit")
       if (length(input$dt_models_rows_selected) > 0) {
         enable("abuttonmodeldetails")
+      }
+      # TODO: change this to grep JBA model
+      if (length(input$dt_models_rows_selected) > 0 && input$dt_models_rows_selected == 1) {
+        enable("abuttonbuildfly")
       }
       if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         enable("abuttonshowlog")
@@ -697,6 +731,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
+    hide("panelBuildFly")
   }
 
   # show default analysis details
