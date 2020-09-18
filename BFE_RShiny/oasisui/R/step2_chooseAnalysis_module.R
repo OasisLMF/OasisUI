@@ -222,6 +222,8 @@ step2_chooseAnalysis <- function(input, output, session,
   result <- reactiveValues(
     # reactive for modelID
     modelID = "",
+    versionID = "",
+    supplierID = "",
     # reactive value for model table
     tbl_modelsData = NULL,
     # analyses table
@@ -231,7 +233,9 @@ step2_chooseAnalysis <- function(input, output, session,
     # analysis ID
     analysisID = NULL,
     # exposure_counter
-    exposure_counter = 0
+    exposure_counter = 0,
+    # analysis settings for step 2
+    analysis_settings_step_2 = NULL
   )
 
   # Panels Visualization -------------------------------------------------------
@@ -311,6 +315,8 @@ step2_chooseAnalysis <- function(input, output, session,
     portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_models_rows_selected)) {
         result$modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
+        result$versionID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$version_id]
+        result$supplierID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$supplier_id]
       } else {
         result$modelID <- ""
       }
@@ -327,8 +333,8 @@ step2_chooseAnalysis <- function(input, output, session,
       hide("panelAnalysisGenInputs")
       hide("panelModelDetails")
       hide("panelBuildFly")
-      input_generation_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
-      if (input_generation_id$status == "Success") {
+      input_generation <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
+      if (input_generation$status == "Success") {
         oasisuiNotification(type = "message",
                             paste0("Input generation for analysis id ", result$analysisID, " started."))
       } else {
@@ -594,10 +600,12 @@ step2_chooseAnalysis <- function(input, output, session,
     active = reactive(TRUE)
   )
 
-  callModule(
+  result$analysis_settings_step_2 <- callModule(
     buildFly,
     id = "buildFly",
     modelID = reactive({result$modelID}),
+    supplierID = reactive({result$supplierID}),
+    versionID = reactive({result$versionID}),
     counter = reactive({input$abuttonbuildfly}),
     active = reactive(TRUE)
   )
@@ -606,14 +614,67 @@ step2_chooseAnalysis <- function(input, output, session,
 
   observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
-      post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"),
-                                                                                  query_body = list(name = input$anaName, model = result$modelID),
+      post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", sep = "/"),
+                                                                                  query_body = list(name = input$anaName,
+                                                                                                    portfolio = portfolioID(),
+                                                                                                    model = result$modelID,
+                                                                                                    complex_model_data_files = list()),
                                                                                   query_method = "POST")
-
-      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", portfolioID(),
+      logMessage(paste0("Calling api_post_analyses with id ",
                         " name ", input$anaName,
-                        " model ",  result$modelID))
-      if (post_portfolios_create_analysis$status == "Success") {
+                        " model ",  result$modelID,
+                        " complex_model_data_files ", list()))
+      # post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"),
+      #                                                                             query_body = list(name = input$anaName, model = result$modelID),
+      #                                                                             query_method = "POST")
+      result$analysisID <- content(post_portfolios_create_analysis$result)$id
+      input_generation <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
+
+      logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
+
+      #TODO chnage to generalized JBA model grep
+      if(result$modelID == 2) {
+        browser()
+        post_analysis_settings <- session$userData$oasisapi$api_body_query(
+          query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
+          query_body = result$analysis_settings_step_2()[[1]]
+        )
+      } else {
+
+        ana_settings_step_2 <- list(analysis_settings = c(
+          list(
+            module_supplier_id = result$supplierID,
+            model_version_id = result$versionID,
+            number_of_samples = 0,
+            model_settings = list(),
+            gul_output = FALSE,
+            gul_summaries = list(
+              summarycalc = FALSE,
+              eltcalc = FALSE,
+              aalcalc = FALSE,
+              pltcalc = FALSE,
+              id = 1,
+              oed_fields = list(),
+              lec_output = FALSE,
+              leccalc = list(
+                return_period_file = FALSE,
+                full_uncertainty_aep = FALSE,
+                full_uncertainty_oep = FALSE,
+                wheatsheaf_aep = FALSE,
+                wheatsheaf_oep = FALSE,
+                wheatsheaf_mean_aep = FALSE,
+                wheatsheaf_mean_oep = FALSE,
+                sample_mean_aep = FALSE,
+                sample_mean_oep = FALSE
+              ))))
+        )
+        post_analysis_settings <- session$userData$oasisapi$api_body_query(
+          query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
+          query_body = ana_settings_step_2
+        )
+      }
+
+      if (post_portfolios_create_analysis$status == "Success" && input_generation$status == "Success") {
         oasisuiNotification(type = "message",
                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()

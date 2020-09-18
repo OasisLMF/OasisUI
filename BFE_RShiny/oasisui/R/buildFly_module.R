@@ -46,6 +46,8 @@ buildFly <- function(input,
                      output,
                      session,
                      modelID,
+                     supplierID,
+                     versionID,
                      counter,
                      active = reactive(TRUE)) {
 
@@ -57,7 +59,7 @@ buildFly <- function(input,
     # model settings entries names
     settings_names = NULL,
     # new settings selected from table
-    filtered_settings = NULL
+    filtered_analysis_settings = NULL
   )
 
   # Initialize -----------------------------------------------------------------
@@ -128,15 +130,15 @@ buildFly <- function(input,
     # extrapolate which are the corresponding entries of the selected items in table to the model settings
     filtered_entries <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
       lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-         if (any(new_settings %in% result$tbl_modelsDetails$model_settings[[x]][[y]])) {
-           c(x,y)
-         }
+        if (any(new_settings %in% result$tbl_modelsDetails$model_settings[[x]][[y]])) {
+          c(x,y)
+        }
       })
     }))
 
     # create new model settings with only selected entries from the table
     filtered_df <- data.frame(split(filtered_entries, rep(1:2, length = length(filtered_entries))))
-    result$filtered_settings <- lapply(seq_len(nrow(filtered_df)), function(x) {
+    filtered_settings <- lapply(seq_len(nrow(filtered_df)), function(x) {
       if(is.null(result$tbl_modelsDetails$model_settings[[filtered_df$X1[[x]]]]$name)) {
         result$tbl_modelsDetails$model_settings[[filtered_df$X1[[x]]]][[filtered_df$X2[[x]]]]
       } else {
@@ -144,15 +146,46 @@ buildFly <- function(input,
       }
     })
 
-    names(result$filtered_settings) <- names(result$tbl_modelsDetails$model_settings[filtered_df$X1])
+    names(filtered_settings) <- names(result$tbl_modelsDetails$model_settings[filtered_df$X1])
+    filtered_settings$event_occurrence_id <- filtered_settings$event_occurrence_id$default
+    filtered_settings$event_set <- filtered_settings$event_set$default
 
     hide("panel_build_Fly")
     logMessage("hiding panelBuildFly")
     oasisuiNotification(type = "message",
                         "Model settings filtered by chosen entries.")
+    gul_summaries <- list(
+      summarycalc = FALSE,
+      eltcalc = FALSE,
+      aalcalc = FALSE,
+      pltcalc = FALSE,
+      id = 1,
+      oed_fields = list(),
+      lec_output = FALSE,
+      leccalc = list(
+        return_period_file = FALSE,
+        full_uncertainty_aep = FALSE,
+        full_uncertainty_oep = FALSE,
+        wheatsheaf_aep = FALSE,
+        wheatsheaf_oep = FALSE,
+        wheatsheaf_mean_aep = FALSE,
+        wheatsheaf_mean_oep = FALSE,
+        sample_mean_aep = FALSE,
+        sample_mean_oep = FALSE
+      ))
+    result$filtered_analysis_settings <- list(analysis_settings = c(
+      list(
+        module_supplier_id = supplierID(),
+        model_version_id = versionID(),
+        number_of_samples = 0,
+        model_settings = filtered_settings,
+        gul_output = FALSE,
+        gul_summaries = list(gul_summaries)
+      )
+    ))
   })
 
-  moduleOutput <- reactive({result$filtered_settings})
+  moduleOutput <- reactive({result$filtered_analysis_settings})
 
   moduleOutput
 }
