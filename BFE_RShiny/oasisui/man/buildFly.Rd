@@ -7,7 +7,7 @@
 \usage{
 buildFlyUI(id)
 
-buildFly(input, output, session, modelID, counter,
+buildFly(input, output, session, modelID, supplierID, versionID, counter,
   active = reactive(TRUE))
 }
 \arguments{
