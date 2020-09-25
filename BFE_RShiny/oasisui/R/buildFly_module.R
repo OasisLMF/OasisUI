@@ -131,7 +131,6 @@ buildFly <- function(input,
   })
 
   observeEvent(input$dt_model_settings_rows_selected, ignoreNULL = FALSE, {
-    print(length(input$dt_model_settings_rows_selected))
     if (length(input$dt_model_settings_rows_selected) > 0) {
       enable("abuttonselsettings")
     } else {
