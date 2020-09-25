@@ -755,16 +755,19 @@ def_out_config <- function(input,
       boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {input[[paste0("boolean_parameters", x)]]})
       float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function(x) {input[[paste0("float_parameters", x)]]}))
       list_input <- unlist(lapply(grep("list_parameters", names(model_settings)), function(x) {input[[paste0("list_parameters", x)]]}))
+      dropdown_input <- unlist(lapply(grep("dropdown_parameters", names(model_settings)), function(x) {input[[paste0("dropdown_parameters", x)]]}))
 
       inputs_list <- list(string_input,
                           list_input,
                           dict_input,
-                          float_input)
+                          float_input,
+                          dropdown_input)
 
       params_list <- list("string_parameters",
                           "list_parameters",
                           "dictionary_parameters",
-                          "float_parameters")
+                          "float_parameters",
+                          "dropdown_parameters")
       # create list of re-ordered and grouped model inputs names
       inputs_name <- c()
       for (param in seq_len(length(params_list))) {
@@ -791,8 +794,9 @@ def_out_config <- function(input,
       }
 
       # set certain inputs in the right format
-      if (!is.null(list_input))
+      if (!is.null(list_input)) {
         list_input <- strsplit(list_input, ", ")
+      }
 
       # create model settings for analysis settings
       model_settings <- c(input$event_set,
@@ -802,7 +806,8 @@ def_out_config <- function(input,
                           string_input,
                           list_input,
                           dict_input,
-                          float_input)
+                          float_input,
+                          dropdown_input)
 
       # NULL or list() elements won't survive the c() above!
 

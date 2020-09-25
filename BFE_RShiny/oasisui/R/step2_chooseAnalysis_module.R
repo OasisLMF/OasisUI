@@ -624,17 +624,12 @@ step2_chooseAnalysis <- function(input, output, session,
                         " name ", input$anaName,
                         " model ",  result$modelID,
                         " complex_model_data_files ", list()))
-      # post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"),
-      #                                                                             query_body = list(name = input$anaName, model = result$modelID),
-      #                                                                             query_method = "POST")
+
       result$analysisID <- content(post_portfolios_create_analysis$result)$id
-      input_generation <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
 
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
 
-      #TODO chnage to generalized JBA model grep
-      if(result$modelID == 2) {
-        browser()
+      if(grepl("JBA", result$supplierID)) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
           query_body = result$analysis_settings_step_2()[[1]]
@@ -674,7 +669,9 @@ step2_chooseAnalysis <- function(input, output, session,
         )
       }
 
-      if (post_portfolios_create_analysis$status == "Success" && input_generation$status == "Success") {
+      input_generation <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
+
+      if (post_portfolios_create_analysis$status == "Success" && input_generation$status == "Success" && post_analysis_settings$status == "Success") {
         oasisuiNotification(type = "message",
                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()

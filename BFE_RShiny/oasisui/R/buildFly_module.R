@@ -68,6 +68,9 @@ buildFly <- function(input,
     counter()
   }, ignoreInit = TRUE, {
     show("panel_build_Fly")
+    if (!is.null(input$dt_model_settings_rows_selected)) {
+      selectRows(proxy = dataTableProxy("dt_model_settings"), selected = NULL)
+    }
   })
 
   output$paneltitle_BuildFly <- renderUI({
@@ -83,9 +86,10 @@ buildFly <- function(input,
   output$dt_model_settings <- renderDT({
 
     result$tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-      query_path = paste("models", modelID(), "settings", sep = "/"),
+        query_path = paste("models", modelID(), "settings", sep = "/"),
       query_method = "GET"
     )
+
     # get entries for table: name, description and default value(s)
     result$settings_names <- lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
       if(is.null(result$tbl_modelsDetails$model_settings[[x]]$name)) {
@@ -118,6 +122,7 @@ buildFly <- function(input,
     })
 
     df <- data.frame(names = unlist(result$settings_names), descr = unlist(settings_desc), value = unlist(settings_default))
+
     colnames(df) <- c("Model Settings", "Description", "Default")
     df
   })

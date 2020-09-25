@@ -134,6 +134,23 @@ advancedConfig_funs <- function(session, model_settings) {
     }
   }
 
+  #drop-down parameters
+  .dropdown_fun <- function(model_settings) {
+    if (length(grep("dropdown_parameters", names(model_settings))) > 0) {
+      lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
+        # lapply(seq_len(length(model_settings[[x]]$options)), function(y) {
+          selectInput(
+            inputId = ns(paste0("dropdown_parameters", x)),
+            label = model_settings[[x]]$name,
+            choices = lapply(seq_len(length(model_settings[[x]]$options)), function(y) {model_settings[[x]]$options[[y]]$id}),
+            selected = model_settings[[x]]$default,
+            multiple = TRUE
+          )
+        # })
+      })
+    }
+  }
+
   # # supported perils parameters
   # .perils_fun <- function(tbl_modelsDetails, model_settings) {
   #   if (length(grep("supported_perils", names(model_settings))) > 0) {
@@ -153,5 +170,6 @@ advancedConfig_funs <- function(session, model_settings) {
     .list_fun(model_settings),
     .dictionary_fun(model_settings),
     .boolean_params_fun(model_settings),
-    .float_fun(model_settings))
+    .float_fun(model_settings),
+    .dropdown_fun(model_settings))
 }
