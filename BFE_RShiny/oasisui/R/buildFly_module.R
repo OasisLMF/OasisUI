@@ -14,6 +14,7 @@ NULL
 #' @describeIn buildFly Returns the UI elements of the module.
 #'
 #' @importFrom DT DTOutput
+#' @importFrom shinyjs disabled
 #'
 #' @export
 buildFlyUI <- function(id) {
@@ -28,7 +29,7 @@ buildFlyUI <- function(id) {
       actionButton(inputId = ns("buttonhidebuildfly"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_model_settings")),
-    oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply Selection")
+    disabled(oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply Selection"))
   )
 }
 
@@ -40,6 +41,8 @@ buildFlyUI <- function(id) {
 #' @describeIn buildFly Allows user to build their own mode on the fly.
 #'
 #' @importFrom DT renderDT
+#' @importFrom shinyjs enable
+#' @importFrom shinyjs disable
 #'
 #' @export
 buildFly <- function(input,
@@ -125,6 +128,15 @@ buildFly <- function(input,
 
     colnames(df) <- c("Model Settings", "Description", "Default")
     df
+  })
+
+  observeEvent(input$dt_model_settings_rows_selected, ignoreNULL = FALSE, {
+    print(length(input$dt_model_settings_rows_selected))
+    if (length(input$dt_model_settings_rows_selected) > 0) {
+      enable("abuttonselsettings")
+    } else {
+      disable("abuttonselsettings")
+    }
   })
 
   observeEvent(input$abuttonselsettings, {
