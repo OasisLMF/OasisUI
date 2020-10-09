@@ -138,13 +138,10 @@ advancedConfig_funs <- function(session, model_settings) {
   .dropdown_fun <- function(model_settings) {
     if (length(grep("dropdown_parameters", names(model_settings))) > 0) {
       lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
-        # lapply(seq_len(length(model_settings[[x]]$options)), function(y) {
-          selectInput(
+          textInput(
             inputId = ns(paste0("dropdown_parameters", x)),
-            label = model_settings[[x]]$name,
-            choices = lapply(seq_len(length(model_settings[[x]]$options)), function(y) {model_settings[[x]]$options[[y]]$id}),
-            selected = model_settings[[x]]$default,
-            multiple = TRUE
+            label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default), sep = ": "),
+            value = model_settings[[x]]$default
           )
         # })
       })

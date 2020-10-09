@@ -737,12 +737,12 @@ def_out_config <- function(input,
     tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
     modelData <- session$userData$data_hub$return_tbl_modelData(modelID)
+    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID, "settings", sep = "/"),
+      query_method = "GET"
+    )
 
-    fetch_model_settings <- function(modelID) {
-      tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "settings", sep = "/"),
-        query_method = "GET"
-      )
+    fetch_model_settings <- function(modelID, tbl_modelsDetails) {
       model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
 
       string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {input[[paste0("string_parameters", x)]]}))
@@ -751,11 +751,21 @@ def_out_config <- function(input,
           setNames(input[[paste0("dictionary_parameters", x, y)]], names(model_settings[[x]]$default[y]))
         }))
       })
+
+      dropdown_input <- lapply(grep("dropdown_parameters", names(model_settings)), function(x) {input[[paste0("dropdown_parameters", x)]]})
+
       # below is purposedly list() rather than NULL in case there are none!
-      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {input[[paste0("boolean_parameters", x)]]})
+      boolean_input <- unlist(lapply(grep("boolean_parameters", names(model_settings)), function(x) {input[[paste0("boolean_parameters", x)]]}))
       float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function(x) {input[[paste0("float_parameters", x)]]}))
-      list_input <- unlist(lapply(grep("list_parameters", names(model_settings)), function(x) {input[[paste0("list_parameters", x)]]}))
-      dropdown_input <- unlist(lapply(grep("dropdown_parameters", names(model_settings)), function(x) {input[[paste0("dropdown_parameters", x)]]}))
+
+      list_input <- lapply(grep("list_parameters", names(model_settings)), function(x) {
+        if (length(strsplit(input[[paste0("list_parameters", x)]], ", ")[[1]]) == 0) {
+          list()
+        } else {
+          as.numeric(unlist(strsplit(input[[paste0("list_parameters", x)]], ", ")))
+          # unlist(strsplit(input[[paste0("list_parameters", x)]], ", "))
+        }
+      })
 
       inputs_list <- list(string_input,
                           list_input,
@@ -770,17 +780,34 @@ def_out_config <- function(input,
                           "dropdown_parameters")
       # create list of re-ordered and grouped model inputs names
       inputs_name <- c()
-      for (param in seq_len(length(params_list))) {
-        if (length(inputs_list[[param]]) > 0) {
-          param_name <- unlist(lapply(grep(params_list[param], names(model_settings)), function(i) {
-            model_match <- model_settings[i]
-            lapply(seq_len(length(model_match)), function(j) {
-              model_match[[j]][["name"]]
-            })
-          }))
-          inputs_name[param] <- param_name
+      if (!is.null(tbl_modelsDetails$model_configurable)) {
+        if (model_settings$model_configurable) {
+          for (param in seq_len(length(params_list))) {
+            if (length(inputs_list[[param]]) > 0) {
+              param_name <- lapply(grep(params_list[param], names(model_settings)), function(i) {
+                model_match <- model_settings[i]
+                lapply(seq_len(length(model_match)), function(j) {
+                  model_match[[j]][["name"]]
+                })
+              })
+              inputs_name[[param]] <- param_name
+            }
+            # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
+          }
         }
-        # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
+      } else {
+        for (param in seq_len(length(params_list))) {
+          if (length(inputs_list[[param]]) > 0) {
+            param_name <- unlist(lapply(grep(params_list[param], names(model_settings)), function(i) {
+              model_match <- model_settings[i]
+              lapply(seq_len(length(model_match)), function(j) {
+                model_match[[j]][["name"]]
+              })
+            }))
+            inputs_name[param] <- param_name
+          }
+          # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
+        }
       }
 
       # find boolean parameters names
@@ -794,9 +821,9 @@ def_out_config <- function(input,
       }
 
       # set certain inputs in the right format
-      if (!is.null(list_input)) {
-        list_input <- strsplit(list_input, ", ")
-      }
+      # if (!is.null(list_input)) {
+      #   list_input <- strsplit(list_input, ", ")
+      # }
 
       # create model settings for analysis settings
       model_settings <- c(input$event_set,
@@ -816,13 +843,25 @@ def_out_config <- function(input,
                            "event_occurrence_id",
                            boolean_name,
                            inputs_name)
-
       # remove all NA elements
-      if (any(sapply(names_full_list, is.na))) {
-        names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
+      if (!is.null(tbl_modelsDetails$model_configurable)) {
+        if (model_settings$model_configurable) {
+          names(model_settings) <- unlist(names_full_list)
+        }
       } else {
-        names(model_settings) <- names_full_list
+        if (any(sapply(names_full_list, is.na))) {
+          names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
+        } else {
+          names(model_settings) <- names_full_list
+        }
       }
+
+      # if (modelID == 451) {
+      #   remove_entries <- c(grep("hazard_intensity_scale_factors", names(model_settings)),
+      #                       grep("vulnerability_scale_factors", names(model_settings)))
+      #
+      #   model_settings <- model_settings[-remove_entries]
+      # }
 
       model_settings
     }
@@ -833,7 +872,7 @@ def_out_config <- function(input,
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
-      "model_version_id" = modelData[[tbl_modelsDataNames$model_id]],
+      "model_version_id" = modelData[[tbl_modelsDataNames$version_id]],
       "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
       "number_of_samples" = as.integer(input$tinputnoofsample),
       # potential new tag portfolio_id
@@ -951,9 +990,8 @@ def_out_config <- function(input,
         ri_output = "RI" %in% input$chkboxgrplosstypes,
         ri_summaries = fetch_summary("RI", input$chkboxgrplosstypes)
       ),
-      list(model_settings = fetch_model_settings(modelID = modelID))
+      list(model_settings = fetch_model_settings(modelID = modelID, tbl_modelsDetails))
     ))
-
     analysis_settings
   }
 

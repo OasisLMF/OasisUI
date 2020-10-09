@@ -636,33 +636,36 @@ step2_chooseAnalysis <- function(input, output, session,
         )
       } else {
 
+        gul_summaries <- list(
+          summarycalc = FALSE,
+          eltcalc = FALSE,
+          aalcalc = FALSE,
+          pltcalc = FALSE,
+          id = 1,
+          oed_fields = list(),
+          lec_output = FALSE,
+          leccalc = list(
+            return_period_file = FALSE,
+            full_uncertainty_aep = FALSE,
+            full_uncertainty_oep = FALSE,
+            wheatsheaf_aep = FALSE,
+            wheatsheaf_oep = FALSE,
+            wheatsheaf_mean_aep = FALSE,
+            wheatsheaf_mean_oep = FALSE,
+            sample_mean_aep = FALSE,
+            sample_mean_oep = FALSE
+          ))
+
         ana_settings_step_2 <- list(analysis_settings = c(
           list(
             module_supplier_id = result$supplierID,
             model_version_id = result$versionID,
             number_of_samples = 0,
-            model_settings = list(),
+            model_settings = NULL,
             gul_output = FALSE,
-            gul_summaries = list(
-              summarycalc = FALSE,
-              eltcalc = FALSE,
-              aalcalc = FALSE,
-              pltcalc = FALSE,
-              id = 1,
-              oed_fields = list(),
-              lec_output = FALSE,
-              leccalc = list(
-                return_period_file = FALSE,
-                full_uncertainty_aep = FALSE,
-                full_uncertainty_oep = FALSE,
-                wheatsheaf_aep = FALSE,
-                wheatsheaf_oep = FALSE,
-                wheatsheaf_mean_aep = FALSE,
-                wheatsheaf_mean_oep = FALSE,
-                sample_mean_aep = FALSE,
-                sample_mean_oep = FALSE
-              ))))
-        )
+            gul_summaries = list(gul_summaries))
+        ))
+
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
           query_body = ana_settings_step_2
@@ -677,7 +680,7 @@ step2_chooseAnalysis <- function(input, output, session,
         .reloadAnaData()
       } else {
         oasisuiNotification(type = "error",
-                            paste0("Analysis ", input$anaName, " could not be created."))
+                            paste0("Analysis ", input$anaName, " has returned an error."))
       }
     }
     hide("panelModelTable")
@@ -717,10 +720,19 @@ step2_chooseAnalysis <- function(input, output, session,
       if (length(input$dt_models_rows_selected) > 0) {
         enable("abuttonmodeldetails")
       }
-      # TODO: change this to grep JBA model
-      if (length(input$dt_models_rows_selected) > 0 && input$dt_models_rows_selected == 1) {
-        enable("abuttonbuildfly")
+
+      if (length(input$dt_models_rows_selected) > 0) {
+        model_settings <- session$userData$oasisapi$api_return_query_res(
+          query_path = paste("models", result$modelID, "settings", sep = "/"),
+          query_method = "GET"
+        )
+        if (length(model_settings) > 0 && !is.null(model_settings$model_configurable)) {
+          if (model_settings$model_configurable) {
+            enable("abuttonbuildfly")
+          }
+        }
       }
+
       if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         enable("abuttonshowlog")
         enable("abuttondelana")
