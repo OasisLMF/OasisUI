@@ -60,6 +60,10 @@ buildFly <- function(input,
     tbl_modelsDetails = NULL,
     # model settings entries names
     settings_names = NULL,
+    # model settings entries description
+    settings_desc = NULL,
+    # model settings entries default value
+    settings_default = NULL,
     # new settings selected from table
     filtered_analysis_settings = NULL,
     # changed values in data table
@@ -72,9 +76,42 @@ buildFly <- function(input,
     counter()
   }, ignoreInit = TRUE, {
     show("panel_build_Fly")
-    if (!is.null(input$dt_model_settings_rows_selected)) {
-      selectRows(proxy = dataTableProxy("dt_model_settings"), selected = NULL)
-    }
+    selectRows(proxy = dataTableProxy("dt_model_settings"), selected = NULL)
+    result$tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID(), "settings", sep = "/"),
+      query_method = "GET"
+    )
+
+    # get entries for table: name, description and default value(s)
+    result$settings_names <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
+      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$name)) {
+        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
+          result$tbl_modelsDetails$model_settings[[x]][[y]]$name
+        })
+      } else {
+        result$tbl_modelsDetails$model_settings[[x]]$name
+      }
+    }))
+
+    result$settings_desc <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
+      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$desc)) {
+        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
+          result$tbl_modelsDetails$model_settings[[x]][[y]]$desc
+        })
+      } else {
+        result$tbl_modelsDetails$model_settings[[x]]$desc
+      }
+    }))
+
+    result$settings_default <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
+      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$default)) {
+        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
+          paste(unlist(result$tbl_modelsDetails$model_settings[[x]][[y]]$default), collapse = ", ")
+        })
+      } else {
+        paste(unlist(result$tbl_modelsDetails$model_settings[[x]]$default), collapse = ", ")
+      }
+    }))
   })
 
   output$paneltitle_BuildFly <- renderUI({
@@ -88,44 +125,7 @@ buildFly <- function(input,
   })
 
   output$dt_model_settings <- renderDT({
-
-    result$tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-      query_path = paste("models", modelID(), "settings", sep = "/"),
-      query_method = "GET"
-    )
-
-    # get entries for table: name, description and default value(s)
-    result$settings_names <- lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$name)) {
-        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-          result$tbl_modelsDetails$model_settings[[x]][[y]]$name
-        })
-      } else {
-        result$tbl_modelsDetails$model_settings[[x]]$name
-      }
-    })
-
-    settings_desc <- lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$desc)) {
-        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-          result$tbl_modelsDetails$model_settings[[x]][[y]]$desc
-        })
-      } else {
-        result$tbl_modelsDetails$model_settings[[x]]$desc
-      }
-    })
-
-    settings_default <- lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$default)) {
-        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-          paste(unlist(result$tbl_modelsDetails$model_settings[[x]][[y]]$default), collapse = ", ")
-        })
-      } else {
-        paste(unlist(result$tbl_modelsDetails$model_settings[[x]]$default), collapse = ", ")
-      }
-    })
-
-    df <- data.frame(names = unlist(result$settings_names), descr = unlist(settings_desc), value = unlist(settings_default))
+    df <- data.frame(names = result$settings_names, descr = result$settings_desc, value = result$settings_default)
 
     colnames(df) <- c("Model Settings", "Description", "Default")
     df
@@ -133,10 +133,11 @@ buildFly <- function(input,
 
   #extrapolate changed cells
   observeEvent(input$dt_model_settings_cell_edit, {
+    result$settings_default[input$dt_model_settings_cell_edit$row] <<- input$dt_model_settings_cell_edit$value
 
     changed_val <- input$dt_model_settings_cell_edit$row
 
-    new_settings <- unlist(result$settings_names)[changed_val]
+    new_settings <- result$settings_names[changed_val]
 
     result$changed_entry <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
       lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
@@ -150,7 +151,7 @@ buildFly <- function(input,
   observeEvent(input$abuttonselsettings, {
     rows_selected <- input$dt_model_settings_rows_selected
 
-    new_settings <- unlist(result$settings_names)[rows_selected]
+    new_settings <- result$settings_names[rows_selected]
     x <- strsplit(result$changed_entry, " ")
 
     # change edited values in the table
