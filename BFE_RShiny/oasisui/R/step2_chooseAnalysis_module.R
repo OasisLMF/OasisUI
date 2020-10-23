@@ -620,6 +620,11 @@ step2_chooseAnalysis <- function(input, output, session,
                                                                                                     model = result$modelID,
                                                                                                     complex_model_data_files = list()),
                                                                                   query_method = "POST")
+      model_settings <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("models", result$modelID, "settings", sep = "/"),
+        query_method = "GET"
+      )
+
       logMessage(paste0("Calling api_post_analyses with id ",
                         " name ", input$anaName,
                         " model ",  result$modelID,
@@ -629,7 +634,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
 
-      if(grepl("JBA", result$supplierID)) {
+      if(length(model_settings) > 0 && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
           query_body = result$analysis_settings_step_2()[[1]]

@@ -14,7 +14,6 @@ NULL
 #' @describeIn buildFly Returns the UI elements of the module.
 #'
 #' @importFrom DT DTOutput
-#' @importFrom shinyjs disabled
 #'
 #' @export
 buildFlyUI <- function(id) {
@@ -29,7 +28,7 @@ buildFlyUI <- function(id) {
       actionButton(inputId = ns("buttonhidebuildfly"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_model_settings")),
-    disabled(oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply Selection"))
+    oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply Selection")
   )
 }
 
@@ -62,7 +61,9 @@ buildFly <- function(input,
     # model settings entries names
     settings_names = NULL,
     # new settings selected from table
-    filtered_analysis_settings = NULL
+    filtered_analysis_settings = NULL,
+    # changed values in data table
+    changed_entry = NULL
   )
 
   # Initialize -----------------------------------------------------------------
@@ -89,7 +90,7 @@ buildFly <- function(input,
   output$dt_model_settings <- renderDT({
 
     result$tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID(), "settings", sep = "/"),
+      query_path = paste("models", modelID(), "settings", sep = "/"),
       query_method = "GET"
     )
 
@@ -128,43 +129,41 @@ buildFly <- function(input,
 
     colnames(df) <- c("Model Settings", "Description", "Default")
     df
-  })
+  }, editable = TRUE, selection = "none")
 
-  observeEvent(input$dt_model_settings_rows_selected, ignoreNULL = FALSE, {
-    if (length(input$dt_model_settings_rows_selected) > 0) {
-      enable("abuttonselsettings")
-    } else {
-      disable("abuttonselsettings")
-    }
+  #extrapolate changed cells
+  observeEvent(input$dt_model_settings_cell_edit, {
+
+    changed_val <- input$dt_model_settings_cell_edit$row
+
+    new_settings <- unlist(result$settings_names)[changed_val]
+
+    result$changed_entry <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
+      lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
+        if (any(new_settings %in% result$tbl_modelsDetails$model_settings[[x]][[y]])) {
+          result$changed_entry <- c(result$changed_entry, paste(x,y, input$dt_model_settings_cell_edit$value))
+        }
+      })
+    }))
   })
 
   observeEvent(input$abuttonselsettings, {
     rows_selected <- input$dt_model_settings_rows_selected
 
     new_settings <- unlist(result$settings_names)[rows_selected]
+    x <- strsplit(result$changed_entry, " ")
 
-    # extrapolate which are the corresponding entries of the selected items in table to the model settings
-    filtered_entries <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-        if (any(new_settings %in% result$tbl_modelsDetails$model_settings[[x]][[y]])) {
-          c(x,y)
-        }
-      })
-    }))
+    # change edited values in the table
+    for (y in seq_len(length(x))) {
+      entry_1 <- as.numeric(x[[y]][[1]])
+      entry_2 <- as.numeric(x[[y]][[2]])
+      entry_val <- x[[y]][[3]]
+      result$tbl_modelsDetails$model_settings[[entry_1]][[entry_2]]$default <- entry_val
+    }
 
-    # create new model settings with only selected entries from the table
-    filtered_df <- data.frame(split(filtered_entries, rep(1:2, length = length(filtered_entries))))
-    filtered_settings <- lapply(seq_len(nrow(filtered_df)), function(x) {
-      if(is.null(result$tbl_modelsDetails$model_settings[[filtered_df$X1[[x]]]]$name)) {
-        result$tbl_modelsDetails$model_settings[[filtered_df$X1[[x]]]][[filtered_df$X2[[x]]]]
-      } else {
-        result$tbl_modelsDetails$model_settings[[filtered_df$X1[[x]]]]
-      }
-    })
-
-    names(filtered_settings) <- names(result$tbl_modelsDetails$model_settings[filtered_df$X1])
-    filtered_settings$event_occurrence_id <- filtered_settings$event_occurrence_id$default
-    filtered_settings$event_set <- filtered_settings$event_set$default
+    result$tbl_modelsDetails$model_settings$event_occurrence_id <- result$tbl_modelsDetails$model_settings$event_occurrence_id$default
+    result$tbl_modelsDetails$model_settings$event_set <- result$tbl_modelsDetails$model_settings$event_set$default
+    filtered_settings <- c("model_configurable"= TRUE, result$tbl_modelsDetails$model_settings)
 
     hide("panel_build_Fly")
     logMessage("hiding panelBuildFly")

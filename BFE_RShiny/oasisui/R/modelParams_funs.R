@@ -49,7 +49,7 @@ basicConfig_funs <- function(session, model_settings) {
   }
 
   tagList(.event_set_fun(model_settings),
-    .event_occurrence_fun(model_settings)
+          .event_occurrence_fun(model_settings)
   )
 }
 
@@ -59,15 +59,34 @@ basicConfig_funs <- function(session, model_settings) {
 #'
 #' @param session Current session.
 #' @param model_settings Model settings retrieved from the API.
+#' @param configurable Whether model is configurable or not
 #'
 #' @return List of UI elements (input/selector widgets).
 #'
 #' @export
-advancedConfig_funs <- function(session, model_settings) {
+advancedConfig_funs <- function(session, model_settings, configurable) {
   ns <- session$ns
+
+  result <- reactiveValues(
+    # filtered model settings for JBA FLY
+    model_settings_filtered = NULL
+  )
+
+  if (configurable) {
+    # events_dir_path and hazard_intensity_thresholds are not in the model settings
+    include_list <- c("events_dir_path", "event_subset", "min_rp", "hazard_intensity_thresholds",
+                      "hazard_intensity_scale_factors", "vulnerability_scale_factors")
+    include_entries <- unlist(lapply(include_list, function(x) {
+      grep(x, model_settings)
+    }))
+    result$model_settings_filtered <- model_settings[include_entries]
+  } else {
+    result$model_settings_filtered <- model_settings
+  }
+
   # string parameters
   .string_fun <- function(model_settings) {
-    if (length(grep("string_parameters", names(model_settings))) > 0) {
+    if (length(grep("string_parameters", names(result$model_settings_filtered))) > 0) {
       lapply(grep("string_parameters", names(model_settings)), function(x) {
         textInput(
           inputId = ns(paste0("string_parameters", x)),
@@ -80,7 +99,7 @@ advancedConfig_funs <- function(session, model_settings) {
 
   # list parameters
   .list_fun <- function(model_settings) {
-    if (length(grep("list_parameters", names(model_settings))) > 0) {
+    if (length(grep("list_parameters", names(result$model_settings_filtered))) > 0) {
       lapply(grep("list_parameters", names(model_settings)), function(x) {
         textInput(
           inputId = ns(paste0("list_parameters", x)),
@@ -93,7 +112,7 @@ advancedConfig_funs <- function(session, model_settings) {
 
   # dictionary parameters
   .dictionary_fun <- function(model_settings) {
-    if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
+    if (length(grep("dictionary_parameters", names(result$model_settings_filtered))) > 0) {
       lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
         lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
           textInput(
@@ -108,7 +127,7 @@ advancedConfig_funs <- function(session, model_settings) {
 
   # boolean parameters
   .boolean_params_fun <- function(model_settings) {
-    if (length(grep("boolean_parameters", names(model_settings))) > 0) {
+    if (length(grep("boolean_parameters", names(result$model_settings_filtered))) > 0) {
       lapply(grep("boolean_parameters", names(model_settings)), function(x) {
         checkboxInput(
           inputId = ns(paste0("boolean_parameters", x)),
@@ -121,7 +140,7 @@ advancedConfig_funs <- function(session, model_settings) {
 
   # float parameters
   .float_fun <- function(model_settings) {
-    if (length(grep("float_parameters", names(model_settings))) > 0) {
+    if (length(grep("float_parameters", names(result$model_settings_filtered))) > 0) {
       lapply(grep("float_parameters", names(model_settings)), function(x) {
         sliderInput(
           inputId = ns(paste0("float_parameters", x)),
@@ -136,13 +155,13 @@ advancedConfig_funs <- function(session, model_settings) {
 
   #drop-down parameters
   .dropdown_fun <- function(model_settings) {
-    if (length(grep("dropdown_parameters", names(model_settings))) > 0) {
+    if (length(grep("dropdown_parameters", names(result$model_settings_filtered))) > 0) {
       lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
-          textInput(
-            inputId = ns(paste0("dropdown_parameters", x)),
-            label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default), sep = ": "),
-            value = model_settings[[x]]$default
-          )
+        textInput(
+          inputId = ns(paste0("dropdown_parameters", x)),
+          label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default), sep = ": "),
+          value = model_settings[[x]]$default
+        )
         # })
       })
     }
@@ -164,9 +183,9 @@ advancedConfig_funs <- function(session, model_settings) {
   # }
 
   tagList(.string_fun(model_settings),
-    .list_fun(model_settings),
-    .dictionary_fun(model_settings),
-    .boolean_params_fun(model_settings),
-    .float_fun(model_settings),
-    .dropdown_fun(model_settings))
+          .list_fun(model_settings),
+          .dictionary_fun(model_settings),
+          .boolean_params_fun(model_settings),
+          .float_fun(model_settings),
+          .dropdown_fun(model_settings))
 }

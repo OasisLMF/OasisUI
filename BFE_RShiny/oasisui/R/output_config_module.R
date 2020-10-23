@@ -707,25 +707,39 @@ def_out_config <- function(input,
     # Model params
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
 
-    if (length(modelID) != 0) {
+    if (length(analysisID()) != 0) {
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
         query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
+      tbl_ana_settings <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("analyses", analysisID(), "settings", sep = "/"),
+        query_method = "GET"
+      )
+      configurable <- FALSE
+      model_settings <- NULL
       if (!is.null(tbl_modelsDetails)) {
         model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
+        model_settings_adv <- model_settings
+      }
 
-        if (length(names(model_settings)) > 0) {
-          # Basic model params
-          output$basic_model_param <- renderUI({
-            basicConfig_funs(session, model_settings)
-          })
-
-          # Advanced model params
-          output$advanced_model_param <- renderUI({
-            advancedConfig_funs(session, model_settings)
-          })
+      if (!is.null(tbl_ana_settings)) {
+        if (!is.null(tbl_ana_settings$model_settings$model_configurable) && tbl_ana_settings$model_settings$model_configurable) {
+          configurable <- TRUE
+          model_settings_adv <- tbl_ana_settings$model_settings %>% unlist(recursive = FALSE)
         }
+      }
+
+      if (length(names(model_settings)) > 0) {
+        # Basic model params
+        output$basic_model_param <- renderUI({
+          basicConfig_funs(session, model_settings)
+        })
+
+        # Advanced model params
+        output$advanced_model_param <- renderUI({
+          advancedConfig_funs(session, model_settings_adv, configurable)
+        })
       }
     }
   }
@@ -734,6 +748,7 @@ def_out_config <- function(input,
   .gen_analysis_settings <- function() {
     logMessage(".gen_analysis_settings called")
     # Predefined params
+
     tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
     modelData <- session$userData$data_hub$return_tbl_modelData(modelID)
@@ -741,29 +756,61 @@ def_out_config <- function(input,
       query_path = paste("models", modelID, "settings", sep = "/"),
       query_method = "GET"
     )
-
+    if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+      tbl_analysesDetails <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("analyses", analysisID(), "settings", sep = "/"),
+        query_method = "GET"
+      )
+      tbl_modelsDetails$model_settings <- tbl_analysesDetails$model_settings
+    }
     fetch_model_settings <- function(modelID, tbl_modelsDetails) {
       model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
+      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("string_parameters", x)]])) {
+          input[[paste0("string_parameters", x)]]
+        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+          model_settings[[x]][[y]]$default
+        }
+      }))
 
-      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {input[[paste0("string_parameters", x)]]}))
       dict_input <- lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
-        as.list(sapply(seq_len(length(model_settings[[x]]$default)), function(y) {
-          setNames(input[[paste0("dictionary_parameters", x, y)]], names(model_settings[[x]]$default[y]))
-        }))
+        if (!is.null(input[[paste0("dictionary_parameters", x)]])) {
+          setNames(input[[paste0("dictionary_parameters", x)]], names(model_settings[[x]]$default))
+        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+          setNames(model_settings[[x]]$default, names(model_settings[[x]]$default))
+        }
       })
 
-      dropdown_input <- lapply(grep("dropdown_parameters", names(model_settings)), function(x) {input[[paste0("dropdown_parameters", x)]]})
+      dropdown_input <- lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("dropdown_parameters", x)]])) {
+          input[[paste0("dropdown_parameters", x)]]
+        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+          model_settings[[x]]$default
+        }
+      })
 
       # below is purposedly list() rather than NULL in case there are none!
-      boolean_input <- unlist(lapply(grep("boolean_parameters", names(model_settings)), function(x) {input[[paste0("boolean_parameters", x)]]}))
-      float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function(x) {input[[paste0("float_parameters", x)]]}))
+      boolean_input <- unlist(lapply(grep("boolean_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("boolean_parameters", x)]])) {
+          input[[paste0("boolean_parameters", x)]]
+        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+          model_settings[[x]]$default
+        }
+      }))
+
+      float_input <- lapply(grep("float_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("float_parameters", x)]])) {
+          input[[paste0("float_parameters", x)]]
+        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+          model_settings[[x]]$default
+        }
+      })
 
       list_input <- lapply(grep("list_parameters", names(model_settings)), function(x) {
-        if (length(strsplit(input[[paste0("list_parameters", x)]], ", ")[[1]]) == 0) {
-          list()
-        } else {
+        if (!is.null(input[[paste0("list_parameters", x)]])) {
           as.numeric(unlist(strsplit(input[[paste0("list_parameters", x)]], ", ")))
-          # unlist(strsplit(input[[paste0("list_parameters", x)]], ", "))
+        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+          as.numeric(unlist(model_settings[[x]]$default))
         }
       })
 
@@ -780,22 +827,21 @@ def_out_config <- function(input,
                           "dropdown_parameters")
       # create list of re-ordered and grouped model inputs names
       inputs_name <- c()
-      if (!is.null(tbl_modelsDetails$model_configurable)) {
-        if (model_settings$model_configurable) {
-          for (param in seq_len(length(params_list))) {
-            if (length(inputs_list[[param]]) > 0) {
-              param_name <- lapply(grep(params_list[param], names(model_settings)), function(i) {
-                model_match <- model_settings[i]
-                lapply(seq_len(length(model_match)), function(j) {
-                  model_match[[j]][["name"]]
-                })
+      if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        for (param in seq_len(length(params_list))) {
+          if (length(inputs_list[[param]]) > 0) {
+            param_name <- lapply(grep(params_list[param], names(model_settings)), function(i) {
+              model_match <- model_settings[i]
+              lapply(seq_len(length(model_match)), function(j) {
+                model_match[[j]][["name"]]
               })
-              inputs_name[[param]] <- param_name
-            }
-            # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
+            })
+            inputs_name[[param]] <- param_name
           }
+          # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
         }
       } else {
+
         for (param in seq_len(length(params_list))) {
           if (length(inputs_list[[param]]) > 0) {
             param_name <- unlist(lapply(grep(params_list[param], names(model_settings)), function(i) {
@@ -809,6 +855,7 @@ def_out_config <- function(input,
           # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
         }
       }
+
 
       # find boolean parameters names
       if (length(boolean_input) > 0) {
@@ -844,10 +891,8 @@ def_out_config <- function(input,
                            boolean_name,
                            inputs_name)
       # remove all NA elements
-      if (!is.null(tbl_modelsDetails$model_configurable)) {
-        if (model_settings$model_configurable) {
-          names(model_settings) <- unlist(names_full_list)
-        }
+      if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        names(model_settings) <- unlist(names_full_list)
       } else {
         if (any(sapply(names_full_list, is.na))) {
           names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
@@ -856,13 +901,26 @@ def_out_config <- function(input,
         }
       }
 
-      # if (modelID == 451) {
-      #   remove_entries <- c(grep("hazard_intensity_scale_factors", names(model_settings)),
-      #                       grep("vulnerability_scale_factors", names(model_settings)))
-      #
-      #   model_settings <- model_settings[-remove_entries]
-      # }
-
+      # re-define model_seetings for FLY model according to standard model_settings configuration
+      if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        # -1 not to take into account the model parameters option
+        for (i in seq(length(tbl_modelsDetails$model_settings) - 1)) {
+          # do not consider model_configurable
+          j <- i + 1
+          for (k in seq(length(tbl_modelsDetails$model_settings[[j]]))) {
+            if (length(tbl_modelsDetails$model_settings[j]$event_set) == 1 || length(tbl_modelsDetails$model_settings[j]$event_occurrence_id)) {
+              corresp_model_set <- grep(names(tbl_modelsDetails$model_settings[j]), names(model_settings))
+              tbl_modelsDetails$model_settings[[j]][[k]] <- model_settings[[corresp_model_set]]
+            } else if (length(tbl_modelsDetails$model_settings[[j]][[k]]$default) > 0) {
+              corresp_model_set <- grep(tbl_modelsDetails$model_settings[[j]][[k]]$name, names(model_settings))
+              if (length(corresp_model_set) > 0) {
+                tbl_modelsDetails$model_settings[[j]][[k]]$default <- model_settings[[corresp_model_set]]
+              }
+            }
+          }
+        }
+        model_settings <- tbl_modelsDetails$model_settings
+      }
       model_settings
     }
 
@@ -980,6 +1038,12 @@ def_out_config <- function(input,
       }
     }
 
+    if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+      model_configurable <- TRUE
+    } else {
+      model_configurable <- FALSE
+    }
+
     analysis_settings <- list(analysis_settings = c(
       inputsettings,
       list(
@@ -990,7 +1054,7 @@ def_out_config <- function(input,
         ri_output = "RI" %in% input$chkboxgrplosstypes,
         ri_summaries = fetch_summary("RI", input$chkboxgrplosstypes)
       ),
-      list(model_settings = fetch_model_settings(modelID = modelID, tbl_modelsDetails))
+      list(model_settings = c(model_configurable = model_configurable, fetch_model_settings(modelID = modelID, tbl_modelsDetails)))
     ))
     analysis_settings
   }
