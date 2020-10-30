@@ -28,7 +28,7 @@ buildFlyUI <- function(id) {
       actionButton(inputId = ns("buttonhidebuildfly"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     DTOutput(ns("dt_model_settings")),
-    oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply Selection")
+    oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply")
   )
 }
 
@@ -124,12 +124,11 @@ buildFly <- function(input,
     logMessage("hiding panelBuildFly")
   })
 
-  output$dt_model_settings <- renderDT({
+  output$dt_model_settings <- renderDT(server=FALSE, {
     df <- data.frame(names = result$settings_names, descr = result$settings_desc, value = result$settings_default)
-
     colnames(df) <- c("Model Settings", "Description", "Default")
-    df
-  }, editable = TRUE, selection = "none")
+    datatable(df, editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none")
+  })
 
   #extrapolate changed cells
   observeEvent(input$dt_model_settings_cell_edit, {

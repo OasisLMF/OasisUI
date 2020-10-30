@@ -441,7 +441,6 @@ summarytab <- function(input, output, session,
     if (!is.null(plotleccalc)) {
       summary_df <- rbind(summary_df, plotleccalc)
     }
-
     return(summary_df)
   }
 
