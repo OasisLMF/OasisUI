@@ -752,7 +752,6 @@ def_out_config <- function(input,
         }
       }))
 
-      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {input[[paste0("string_parameters", x)]]}))
       dict_input <- lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("dictionary_parameters", x)]])) {
           setNames(input[[paste0("dictionary_parameters", x)]], names(model_settings[[x]]$default))
@@ -848,13 +847,9 @@ def_out_config <- function(input,
       # remove all NA elements
       if (any(sapply(names_full_list, is.na))) {
         names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
-      } else {
-        if (any(sapply(names_full_list, is.na))) {
-          names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
         } else if(length(model_settings) > 0) {
           names(model_settings) <- names_full_list
         }
-      }
 
       model_settings
     }
