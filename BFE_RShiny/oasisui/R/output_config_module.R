@@ -768,50 +768,68 @@ def_out_config <- function(input,
       string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("string_parameters", x)]])) {
           input[[paste0("string_parameters", x)]]
-        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        } else if (!is.null( model_settings[[x]][[y]]$default)) {
           model_settings[[x]][[y]]$default
         }
+        # } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        #   model_settings[[x]][[y]]$default
+        # }
       }))
 
       dict_input <- lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("dictionary_parameters", x)]])) {
           setNames(input[[paste0("dictionary_parameters", x)]], names(model_settings[[x]]$default))
-        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        } else if (!is.null(model_settings[[x]]$default)) {
           setNames(model_settings[[x]]$default, names(model_settings[[x]]$default))
         }
+        # } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        #   setNames(model_settings[[x]]$default, names(model_settings[[x]]$default))
+        # }
       })
 
       dropdown_input <- lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("dropdown_parameters", x)]])) {
           input[[paste0("dropdown_parameters", x)]]
-        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        } else if (!is.null(model_settings[[x]]$default)) {
           model_settings[[x]]$default
         }
+        # } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        #   model_settings[[x]]$default
+        # }
       })
 
       # below is purposedly list() rather than NULL in case there are none!
       boolean_input <- unlist(lapply(grep("boolean_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("boolean_parameters", x)]])) {
           input[[paste0("boolean_parameters", x)]]
-        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        } else if (!is.null(model_settings[[x]]$default)) {
           model_settings[[x]]$default
         }
+        # } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        #   model_settings[[x]]$default
+        # }
       }))
 
       float_input <- lapply(grep("float_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("float_parameters", x)]])) {
           input[[paste0("float_parameters", x)]]
-        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        } else if (!is.null(model_settings[[x]]$default)) {
           model_settings[[x]]$default
         }
+        # } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        #   model_settings[[x]]$default
+        # }
       })
 
       list_input <- lapply(grep("list_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("list_parameters", x)]])) {
           as.numeric(unlist(strsplit(input[[paste0("list_parameters", x)]], ", ")))
-        } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        } else if (!is.null(model_settings[[x]]$default)) {
           as.numeric(unlist(model_settings[[x]]$default))
         }
+        # } else if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+        #   as.numeric(unlist(model_settings[[x]]$default))
+        # }
       })
 
       inputs_list <- list(string_input,
@@ -867,11 +885,6 @@ def_out_config <- function(input,
         boolean_name <- NULL
       }
 
-      # set certain inputs in the right format
-      # if (!is.null(list_input)) {
-      #   list_input <- strsplit(list_input, ", ")
-      # }
-
       # create model settings for analysis settings
       model_settings <- c(input$event_set,
                           input$event_occurrence,
@@ -896,7 +909,7 @@ def_out_config <- function(input,
       } else {
         if (any(sapply(names_full_list, is.na))) {
           names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
-        } else {
+        } else if(length(model_settings) > 0) {
           names(model_settings) <- names_full_list
         }
       }

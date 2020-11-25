@@ -7,8 +7,8 @@
 \usage{
 buildFlyUI(id)
 
-buildFly(input, output, session, modelID, supplierID, versionID, counter,
-  active = reactive(TRUE))
+buildFly(input, output, session, modelID, supplierID, versionID,
+  analysisID, counter, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

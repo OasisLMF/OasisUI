@@ -232,6 +232,8 @@ step2_chooseAnalysis <- function(input, output, session,
     tbl_analysislog = NULL,
     # analysis ID
     analysisID = NULL,
+    # analysis name
+    analysisNAME = NULL,
     # exposure_counter
     exposure_counter = 0,
     # analysis settings for step 2
@@ -303,6 +305,7 @@ step2_chooseAnalysis <- function(input, output, session,
     portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_analyses_rows_selected)) {
         result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
+        result$analysisNAME <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
         logMessage(paste("updating result$analysisID in step2 to", result$analysisID))
       } else {
         result$analysisID <- NULL
@@ -603,9 +606,12 @@ step2_chooseAnalysis <- function(input, output, session,
   result$analysis_settings_step_2 <- callModule(
     buildFly,
     id = "buildFly",
+    portfolioID = reactive({portfolioID()}),
     modelID = reactive({result$modelID}),
     supplierID = reactive({result$supplierID}),
     versionID = reactive({result$versionID}),
+    analysisID = reactive({result$analysisID}),
+    analysisNAME = reactive({result$analysisNAME}),
     counter = reactive({input$abuttonbuildfly}),
     active = reactive(TRUE)
   )
