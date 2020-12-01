@@ -74,16 +74,12 @@ buildFly <- function(input,
   result <- reactiveValues(
     # reactive value for detail of model table
     tbl_modelsDetails = NULL,
-    # model settings entries names
-    settings_names = NULL,
-    # model settings entries description
-    settings_desc = NULL,
-    # model settings entries default value
-    settings_default = NULL,
+    # model settings tracking
+    settings_df = NULL,
+    # model settings table
+    settings_tbl = NULL,
     # new settings selected from table
     filtered_analysis_settings = NULL,
-    # changed values in data table
-    changed_entry = NULL,
     # table with list of data files
     tbl_files = NULL,
     # list of files to write in analysis settings
@@ -92,7 +88,7 @@ buildFly <- function(input,
     inputID = NULL,
     # Output IDs tables
     outputID = NULL,
-    #extrapolate filde ids
+    # extrapolate file ids
     file_ids = NULL
   )
 
@@ -111,8 +107,8 @@ buildFly <- function(input,
     result$list_files <- list()
 
     # get entries for table: name, description and default value(s)
-    result$settings_names <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$name)) {
+    settings_names <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
+      if (is.null(result$tbl_modelsDetails$model_settings[[x]]$name)) {
         lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
           result$tbl_modelsDetails$model_settings[[x]][[y]]$name
         })
@@ -121,8 +117,8 @@ buildFly <- function(input,
       }
     }))
 
-    result$settings_desc <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$desc)) {
+    settings_desc <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
+      if (is.null(result$tbl_modelsDetails$model_settings[[x]]$desc)) {
         lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
           result$tbl_modelsDetails$model_settings[[x]][[y]]$desc
         })
@@ -131,8 +127,8 @@ buildFly <- function(input,
       }
     }))
 
-    result$settings_default <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if(is.null(result$tbl_modelsDetails$model_settings[[x]]$default)) {
+    settings_default <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
+      if (is.null(result$tbl_modelsDetails$model_settings[[x]]$default)) {
         lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
           paste(unlist(result$tbl_modelsDetails$model_settings[[x]][[y]]$default), collapse = ", ")
         })
@@ -140,6 +136,13 @@ buildFly <- function(input,
         paste(unlist(result$tbl_modelsDetails$model_settings[[x]]$default), collapse = ", ")
       }
     }))
+
+    result$settings_df <- data.frame(names = settings_names, descr = settings_desc, value = settings_default,
+                                     changed = rep(FALSE, times = length(settings_names)), stringsAsFactors = FALSE)
+    tmp_df <- result$settings_df[, c("names", "descr", "value")]
+    colnames(tmp_df) <- c("Model Settings", "Description", "Default")
+    # output$dt_model_values depends (renders) on this one:
+    result$settings_tbl <- tmp_df
   })
 
   output$paneltitle_BuildFly <- renderUI({
@@ -151,27 +154,15 @@ buildFly <- function(input,
     logMessage("hiding panelBuildFly")
   })
 
-  output$dt_model_values <- renderDT(server=FALSE, {
-    df <- data.frame(names = result$settings_names, descr = result$settings_desc, value = result$settings_default)
-    colnames(df) <- c("Model Settings", "Description", "Default")
-    datatable(df, editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none")
+  output$dt_model_values <- renderDT(server = FALSE, {
+    datatable(result$settings_tbl, editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none")
   })
 
-  #extrapolate changed cells
+  # extrapolate changed cells
   observeEvent(input$dt_model_values_cell_edit, {
-    result$settings_default[input$dt_model_values_cell_edit$row] <<- input$dt_model_values_cell_edit$value
-
-    changed_val <- input$dt_model_values_cell_edit$row
-
-    new_settings <- result$settings_names[changed_val]
-
-    result$changed_entry <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-        if (any(new_settings %in% result$tbl_modelsDetails$model_settings[[x]][[y]])) {
-          result$changed_entry <- c(result$changed_entry, paste(x,y, input$dt_model_values_cell_edit$value))
-        }
-      })
-    }))
+    inp_celledit <- input$dt_model_values_cell_edit
+    result$settings_df[inp_celledit$row, "value"] <- inp_celledit$value
+    result$settings_df[inp_celledit$row, "changed"] <- TRUE
   })
 
   # dynamically create fileInputs and DTOutputs
@@ -263,19 +254,37 @@ buildFly <- function(input,
 
   # output new analysis settings with changed values
   observeEvent(input$abuttonselsettings, {
-      if (!is.null(result$changed_entry)) {
-        # new_settings <- result$settings_names[rows_selected]
-        new_settings <- result$settings_names
-        x <- strsplit(result$changed_entry, " ")
+    browser()
+    # update default choices for edited model settings
+    if (any(result$settings_df$changed)) {
+      # update_model_defaults <- function(settings_df, model_settings) {...}
+      # result$tbl_modelsDetails$model_settings <- update_model_defaults(result$settings_df, result$tbl_modelsDetails$model_settings)
+      new_settings <- result$settings_df %>% filter(changed)
+      res_mdlsettings <- result$tbl_modelsDetails$model_settings
 
-        # change edited values in the table
-        for (y in seq_len(length(x))) {
-          entry_1 <- as.numeric(x[[y]][[1]])
-          entry_2 <- as.numeric(x[[y]][[2]])
-          entry_val <- x[[y]][[3]]
-          result$tbl_modelsDetails$model_settings[[entry_1]][[entry_2]]$default <- entry_val
+      invisible(lapply(seq_len(length(names(res_mdlsettings))), function(x) {
+        if (is.null(res_mdlsettings[[x]]$name)) {
+          lapply(seq_len(length(res_mdlsettings[[x]])), function(y) {
+            findSetting <- new_settings$names %in% res_mdlsettings[[x]][[y]]
+            # (typically new_settings$names will match the name attribute, i.e. res_mdlsettings[[x]][[y]]$name)
+            if (any(findSetting)) {
+              result$tbl_modelsDetails$model_settings[[x]][[y]]$default <- new_settings$value[which(findSetting)]
+            }
+          })
+        } else {
+          # e.g. Event Occurrence
+          findSetting <- new_settings$names %in% res_mdlsettings[[x]]
+          if (any(findSetting)) {
+            result$tbl_modelsDetails$model_settings[[x]]$default <- new_settings$value[which(findSetting)]
+          }
         }
-      }
+      }))
+    }
+    # TODO: update result$tbl_modelsDetails$model_setting just once, do above and below in memory first (i.e. make a function as outlined above)
+    result$tbl_modelsDetails$model_settings$event_occurrence_id <- result$tbl_modelsDetails$model_settings$event_occurrence_id$default
+    result$tbl_modelsDetails$model_settings$event_set <- result$tbl_modelsDetails$model_settings$event_set$default
+
+    filtered_settings <- c("model_configurable" = TRUE, result$tbl_modelsDetails$model_settings)
 
     # #retrieve all files for analysis and place them under complex_model_data_files
     # list_data_files_names <- list()
@@ -297,10 +306,6 @@ buildFly <- function(input,
     #                                                                               model = modelID(),
     #                                                                               complex_model_data_files = get_file_ids),
     #                                                             query_method = "PATCH")
-
-    result$tbl_modelsDetails$model_settings$event_occurrence_id <- result$tbl_modelsDetails$model_settings$event_occurrence_id$default
-    result$tbl_modelsDetails$model_settings$event_set <- result$tbl_modelsDetails$model_settings$event_set$default
-    filtered_settings <- c("model_configurable" = TRUE, result$tbl_modelsDetails$model_settings)
 
     hide("panel_build_fly_actions")
     logMessage("hiding panelBuildFly")
@@ -374,7 +379,11 @@ buildFly <- function(input,
     .reloadtbl_modelsFiles()
     invisible()
   }
-  moduleOutput <- reactive({c(list(result$filtered_analysis_settings, unlist(result$file_ids)))})
+  moduleOutput <- list(
+    fullsettings = reactive({result$filtered_analysis_settings}),
+    fileids = reactive({unlist(result$file_ids)}),
+    changeddefaults = reactive({result$settings_df})
+  )
 
   moduleOutput
 }
