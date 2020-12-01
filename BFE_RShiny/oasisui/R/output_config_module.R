@@ -213,7 +213,8 @@ def_out_config <- function(input,
                            analysisName = reactive(""),
                            ana_flag = reactive("C"),
                            counter = reactive(NULL),
-                           active = reactive(TRUE)) {
+                           active = reactive(TRUE),
+                           flyModSettings = reactive(NULL)) {
   ns <- session$ns
 
   # max number rows for custom output params is 9, but set to 8 when counting from 0
@@ -757,6 +758,8 @@ def_out_config <- function(input,
       query_method = "GET"
     )
     if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+      print("flyModSettings in output_config_module:")
+      print(flyModSettings)
       tbl_analysesDetails <- session$userData$oasisapi$api_return_query_res(
         query_path = paste("analyses", analysisID(), "settings", sep = "/"),
         query_method = "GET"

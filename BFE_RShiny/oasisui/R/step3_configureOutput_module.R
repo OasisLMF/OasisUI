@@ -136,7 +136,8 @@ step3_configureOutput <- function(input, output, session,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
                                   pfName = reactive(""),
-                                  analysisID = reactive(NULL)
+                                  analysisID = reactive(NULL),
+                                  flyModSettings = reactive(NULL)
 ) {
 
   ns <- session$ns
@@ -316,7 +317,8 @@ step3_configureOutput <- function(input, output, session,
     analysisName = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]),
     ana_flag = reactive(result$ana_flag),
     counter = reactive({input$abuttonrunconfig}),
-    active = active
+    active = active,
+    flyModSettings = flyModSettings
   )
 
   # update ana flag
