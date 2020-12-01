@@ -650,7 +650,7 @@ step2_chooseAnalysis <- function(input, output, session,
       if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
-          query_body = sub_modules$buildFly$fullSettings()
+          query_body = sub_modules$buildFly$fullsettings()
         )
       } else {
         gul_summaries <- list(
@@ -689,7 +689,6 @@ step2_chooseAnalysis <- function(input, output, session,
         )
       }
       if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
-        browser()
         patch_analyses <- session$userData$oasisapi$api_patch_query(query_path = paste("analyses", result$analysisID, sep = "/"),
                                                                     query_body = list(name = result$analysisNAME,
                                                                                       portfolio = as.numeric(portfolioID()),
@@ -698,12 +697,13 @@ step2_chooseAnalysis <- function(input, output, session,
                                                                     query_method = "PATCH")
       }
 
+      #browser()
+
       input_generation <- session$userData$oasisapi$api_post_query(
         query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/")
       )
 
       if (input_generation$status == "Success" && patch_analyses$status == "Success") {
-        browser()
         oasisuiNotification(type = "message",
                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()

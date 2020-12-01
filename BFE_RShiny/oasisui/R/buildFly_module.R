@@ -255,7 +255,6 @@ buildFly <- function(input,
 
   # output new analysis settings with changed values
   observeEvent(input$abuttonselsettings, {
-    browser()
     # update default choices for edited model settings
     if (any(result$settings_df$changed)) {
       # update_model_defaults <- function(settings_df, model_settings) {...}
@@ -330,7 +329,8 @@ buildFly <- function(input,
         wheatsheaf_mean_oep = FALSE,
         sample_mean_aep = FALSE,
         sample_mean_oep = FALSE
-      ))
+      )
+    )
 
     result$filtered_analysis_settings <- list(analysis_settings = c(
       list(
