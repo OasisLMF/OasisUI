@@ -9,7 +9,8 @@ step3_configureOutputUI(id)
 
 step3_configureOutput(input, output, session, active = reactive(TRUE),
   currstep = reactive(-1), portfolioID = reactive(""),
-  pfName = reactive(""), analysisID = reactive(NULL))
+  pfName = reactive(""), analysisID = reactive(NULL),
+  flyModSettings = reactive(NULL))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
@@ -25,6 +26,8 @@ step3_configureOutput(input, output, session, active = reactive(TRUE),
 \item{pfName}{Name of selected portfolio.}
 
 \item{analysisID}{Selected analysis ID.}
+
+\item{flyModSettings}{Fly Model settings.}
 }
 \value{
 List of tags.

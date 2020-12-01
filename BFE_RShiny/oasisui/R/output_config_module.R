@@ -191,8 +191,7 @@ panelOutputParamsDetails <- function(id) {
 #' @param analysisName Selected analysis name.
 #' @param ana_flag Flag to know if the user is creating a new output configuration or rerunning an analysis.
 #' @param counter Counter to decide whether to clear output options and show some panel (?)
-#' @template params-module
-#' @template params-active
+#' @param flyModSettings Fly Model settings.
 #'
 #' @return ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.
 #' @return ana_post_status status of posting the analysis.

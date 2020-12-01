@@ -237,7 +237,9 @@ step2_chooseAnalysis <- function(input, output, session,
     # exposure_counter
     exposure_counter = 0,
     # analysis settings for step 2
-    analysis_settings_step_2 = NULL
+    #analysis_settings_step_2 = NULL,
+    # modified default model settings values in case of customizable (configurable) models
+    flyModSettings = NULL
   )
 
   # Panels Visualization -------------------------------------------------------
@@ -305,7 +307,6 @@ step2_chooseAnalysis <- function(input, output, session,
     portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_analyses_rows_selected)) {
         result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
-        result$analysisNAME <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]
         logMessage(paste("updating result$analysisID in step2 to", result$analysisID))
       } else {
         result$analysisID <- NULL
@@ -603,7 +604,8 @@ step2_chooseAnalysis <- function(input, output, session,
     active = reactive(TRUE)
   )
 
-  result$analysis_settings_step_2 <- callModule(
+  #result$analysis_settings_step_2 <- callModule(
+  sub_modules$buildFly <- callModule(
     buildFly,
     id = "buildFly",
     portfolioID = reactive({portfolioID()}),
@@ -611,13 +613,17 @@ step2_chooseAnalysis <- function(input, output, session,
     supplierID = reactive({result$supplierID}),
     versionID = reactive({result$versionID}),
     analysisID = reactive({result$analysisID}),
-    analysisNAME = reactive({result$analysisNAME}),
     counter = reactive({input$abuttonbuildfly}),
     active = reactive(TRUE)
   )
 
-  # Create new Analysis --------------------------------------------------------
+  observeEvent(sub_modules$buildFly$changeddefaults(), {
+    result$flyModSettings <- sub_modules$buildFly$changeddefaults()
+    logMessage(paste0("output of buildFly: updating result$flyModSettings"))
+  })
 
+
+  # Create new Analysis --------------------------------------------------------
   observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
       post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", sep = "/"),
@@ -637,16 +643,16 @@ step2_chooseAnalysis <- function(input, output, session,
                         " complex_model_data_files ", list()))
 
       result$analysisID <- content(post_portfolios_create_analysis$result)$id
+      result$analysisNAME <- content(post_portfolios_create_analysis$result)$name
 
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
 
-      if(length(model_settings) > 0 && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
+      if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
-          query_body = result$analysis_settings_step_2()[[1]]
+          query_body = sub_modules$buildFly$fullSettings()[[1]]
         )
       } else {
-
         gul_summaries <- list(
           summarycalc = FALSE,
           eltcalc = FALSE,
@@ -682,10 +688,21 @@ step2_chooseAnalysis <- function(input, output, session,
           query_body = ana_settings_step_2
         )
       }
+      if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
+        browser()
+        patch_analyses <- session$userData$oasisapi$api_patch_query(query_path = paste("analyses", result$analysisID, sep = "/"),
+                                                                    query_body = list(name = result$analysisNAME,
+                                                                                      portfolio = as.numeric(portfolioID()),
+                                                                                      model = result$modelID,
+                                                                                      complex_model_data_files = sub_modules$buildFly$fullSettings()[[2]]),
+                                                                    query_method = "PATCH")
+      }
 
-      input_generation <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
+      input_generation <- session$userData$oasisapi$api_post_query(query_path = paste(
+        "analyses", result$analysisID, "generate_inputs",  sep = "/"))
 
-      if (post_portfolios_create_analysis$status == "Success" && input_generation$status == "Success" && post_analysis_settings$status == "Success") {
+      if (input_generation$status == "Success" && patch_analyses$status == "Success") {
+        browser()
         oasisuiNotification(type = "message",
                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()
@@ -730,9 +747,7 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttonsubmit")
       if (length(input$dt_models_rows_selected) > 0) {
         enable("abuttonmodeldetails")
-      }
-
-      if (length(input$dt_models_rows_selected) > 0) {
+        # check whether model allows customization:
         model_settings <- session$userData$oasisapi$api_return_query_res(
           query_path = paste("models", result$modelID, "settings", sep = "/"),
           query_method = "GET"
@@ -880,7 +895,8 @@ step2_chooseAnalysis <- function(input, output, session,
   moduleOutput <- c(
     list(
       analysisID = reactive({result$analysisID}),
-      newstep = reactive({input$abuttonpgotonextstep})
+      newstep = reactive({input$abuttonpgotonextstep}),
+      flysettings = reactive({result$flyModSettings})
     )
   )
 

@@ -7,15 +7,23 @@
 \usage{
 buildFlyUI(id)
 
-buildFly(input, output, session, modelID, supplierID, versionID,
-  analysisID, counter, active = reactive(TRUE))
+buildFly(input, output, session, portfolioID, modelID, supplierID,
+  versionID, analysisID, counter, active = reactive(TRUE))
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
 
 \item{input, output, session}{Shiny input, output, and session objects.}
 
+\item{portfolioID}{Selected portfolio ID.}
+
 \item{modelID}{Selected model ID.}
+
+\item{supplierID}{Selected supplier model ID.}
+
+\item{versionID}{Selected model ID version.}
+
+\item{analysisID}{Selected analysis ID.}
 }
 \description{
 Shiny Module for showing fly details.

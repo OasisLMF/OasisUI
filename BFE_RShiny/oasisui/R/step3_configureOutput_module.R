@@ -113,6 +113,7 @@ panelAnalysisLogs <- function(id) {
 #' @param portfolioID Selected portfolio ID.
 #' @param analysisID Selected analysis ID.
 #' @param pfName Name of selected portfolio.
+#' @param flyModSettings Fly Model settings.
 #'
 #' @return dashboardAnaID id of selected run.
 #'

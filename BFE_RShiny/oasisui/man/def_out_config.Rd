@@ -9,13 +9,10 @@ def_out_configUI(id)
 
 def_out_config(input, output, session, analysisID = reactive(NULL),
   analysisName = reactive(""), ana_flag = reactive("C"),
-  counter = reactive(NULL), active = reactive(TRUE))
+  counter = reactive(NULL), active = reactive(TRUE),
+  flyModSettings = reactive(NULL))
 }
 \arguments{
-\item{id}{Namespace ID for the module.}
-
-\item{input, output, session}{Shiny input, output, and session objects.}
-
 \item{analysisID}{Selected analysis ID.}
 
 \item{analysisName}{Selected analysis name.}
@@ -24,7 +21,7 @@ def_out_config(input, output, session, analysisID = reactive(NULL),
 
 \item{counter}{Counter to decide whether to clear output options and show some panel (?)}
 
-\item{active}{reactive expression whether the module state should be updated.}
+\item{flyModSettings}{Fly Model settings.}
 }
 \value{
 ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.

@@ -34,37 +34,7 @@ buildFlyUI <- function(id) {
         DTOutput(ns("dt_model_values"))),
       tabPanel(
         title = "shp and csv files",
-        # DTOutput(ns("dt_model_files")),
-        fluidRow(uiOutput(ns("browsers_tables"))),
-        #   column(4,
-        #          fileInput(inputId = ns("damage_ratio_paths"), label = 'Damage Ratio Paths:', multiple = TRUE,
-        #                    accept = c('csv', 'comma-separated-values', '.csv')), DTOutput(ns("dt_damage_ratio"))),
-        #   column(4,
-        #          fileInput(inputId = ns("damage_ratio_lookup_paths"), label = 'Damage Ratio Lookup Paths:', multiple = TRUE,
-        #                    accept = c('csv', 'comma-separated-values', '.csv')), DTOutput(ns("dt_damage_ratio_lookup"))),
-        #   column(4,
-        #          fileInput(inputId = ns("disagg_locator_descriptions_paths"), label = 'Disagg Locator Desc Paths:', multiple = TRUE,
-        #                    accept = c('csv', 'comma-separated-values', '.csv')), DTOutput(ns("dt_disagg_locator_descriptions")))
-        # ),
-        # fluidRow(
-        #   column(4,
-        #          fileInput(inputId = ns("schema_file_paths"), label = 'Schema File Paths:', multiple = TRUE,
-        #                    accept = c('csv', 'comma-separated-values', '.csv')), DTOutput(ns("dt_schema_file"))),
-        #   column(4,
-        #          fileInput(inputId = ns("vuln_locator_shapefile_paths"), label = 'Vuln Locator shp Paths:', multiple = TRUE,
-        #                    accept = "shp"), DTOutput(ns("dt_vuln_locator_shapefile"))))
-        # fluidRow(
-        #   column(2, fileInput(inputId = ns("damage_ratio_paths"), label = 'Damage Ratio Paths:', multiple = TRUE,
-        #                       accept = c('csv', 'comma-separated-values', '.csv'))),
-        #   column(2, fileInput(inputId = ns("damage_ratio_lookup_paths"), label = 'Damage Ratio Lookup Paths:', multiple = TRUE,
-        #                       accept = c('csv', 'comma-separated-values', '.csv'))),
-        #   column(2, fileInput(inputId = ns("disagg_locator_descriptions_paths"), label = 'Disagg Locator Desc Paths:', multiple = TRUE,
-        #                       accept = c('csv', 'comma-separated-values', '.csv'))),
-        #   column(2, fileInput(inputId = ns("schema_file_paths"), label = 'Schema File Paths:', multiple = TRUE,
-        #                       accept = c('csv', 'comma-separated-values', '.csv'))),
-        #   column(2, fileInput(inputId = ns("vuln_locator_shapefile_paths"), label = 'Vuln Locator shp Paths:', multiple = TRUE,
-        #                       accept = "shp"))
-        # )
+        fluidRow(uiOutput(ns("browsers_tables")))
       )
     ),
     oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply")
@@ -74,7 +44,12 @@ buildFlyUI <- function(id) {
 
 # Model Details Server -------------------------------------------
 
+#'
+#' @param portfolioID Selected portfolio ID.
 #' @param modelID Selected model ID.
+#' @param supplierID Selected supplier model ID.
+#' @param versionID Selected model ID version.
+#' @param analysisID Selected analysis ID.
 #'
 #' @describeIn buildFly Allows user to build their own mode on the fly.
 #'
@@ -91,7 +66,6 @@ buildFly <- function(input,
                      supplierID,
                      versionID,
                      analysisID,
-                     analysisNAME,
                      counter,
                      active = reactive(TRUE)) {
 
@@ -114,10 +88,12 @@ buildFly <- function(input,
     tbl_files = NULL,
     # list of files to write in analysis settings
     list_files = NULL,
-    # FileInputs and DTOutputs
-    browsers_tables = NULL,
     # FileInputs IDs
-    inputID = NULL
+    inputID = NULL,
+    # Output IDs tables
+    outputID = NULL,
+    #extrapolate filde ids
+    file_ids = NULL
   )
 
   # Initialize -----------------------------------------------------------------
@@ -198,180 +174,42 @@ buildFly <- function(input,
     }))
   })
 
-  # # create tables for each "_paths" entry
-  # output$dt_damage_ratio <- renderDT(server=FALSE, {
-  #   entry <- grep("damage_ratio_paths", result$tbl_modelsDetails$data_settings$datafile_selectors)
-  #   cond <- result$tbl_modelsDetails$data_settings$datafile_selectors[[entry]]$allow_multiple
-  #   if (cond) {
-  #     select = "multiple"
-  #   } else {
-  #     select = "single"
-  #   }
-  #   tbl_files_filtered <- result$tbl_files %>% filter(file_description == "damage_ratio_paths")
-  #   df <- data.frame(id = tbl_files_filtered$id, names = tbl_files_filtered$filename)
-  #   # show last element of data frame first in table
-  #   df <- df[nrow(df):1, ]
-  #   colnames(df) <- c("ID", "Name")
-  #   datatable(df, selection = select)
-  # })
-  #
-  # # update list for damage ratio paths selection
-  # observeEvent(input$dt_damage_ratio_rows_selected, {
-  #   for (x in seq_len(length(input$dt_damage_ratio_rows_selected))) {
-  #     # because df is reversed, also order of row has to be reversed
-  #     entry <- (nrow(result$tbl_files)+1) - x
-  #     result$list_files$damage_ratio_paths[x] <- result$tbl_files[entry,]$filename
-  #     result$list_files$damage_ratio_paths <- result$list_files$damage_ratio_paths[!is.na(result$list_files$damage_ratio_paths)]
-  #   }
-  #   result$list_files$damage_ratio_paths <- unlist(result$list_files$damage_ratio_paths)
-  #   result$list_files
-  # })
-  #
-  # output$dt_damage_ratio_lookup <- renderDT(server=FALSE, {
-  #   entry <- grep("damage_ratio_lookup_paths", result$tbl_modelsDetails$data_settings$datafile_selectors)
-  #   cond <- result$tbl_modelsDetails$data_settings$datafile_selectors[[entry]]$allow_multiple
-  #   if (cond) {
-  #     select = "multiple"
-  #   } else {
-  #     select = "single"
-  #   }
-  #   tbl_files_filtered <- result$tbl_files %>% filter(file_description == "damage_ratio_lookup_paths")
-  #   df <- data.frame(id = tbl_files_filtered$id, names = tbl_files_filtered$filename)
-  #   # show last element of data frame first in table
-  #   df <- df[nrow(df):1, ]
-  #   colnames(df) <- c("ID", "Name")
-  #   datatable(df, selection = select)
-  # })
-  #
-  # observeEvent(input$dt_damage_ratio_lookup_rows_selected, {
-  #   for (x in seq_len(length(input$dt_damage_ratio_lookup_rows_selected))) {
-  #     # because df is reversed, also order of row has to be reversed
-  #     entry <- (nrow(result$tbl_files)+1) - x
-  #     result$list_files$damage_ratio_lookup_paths[x] <- result$tbl_files[entry,]$filename
-  #     result$list_files$damage_ratio_lookup_paths <-
-  #       result$list_files$damage_ratio_lookup_paths[!is.na(result$list_files$damage_ratio_lookup_paths)]
-  #   }
-  #   result$list_files$damage_ratio_lookup_paths <- unlist(result$list_files$damage_ratio_lookup_paths)
-  #   result$list_files
-  # })
-  #
-  # output$dt_disagg_locator_descriptions <- renderDT(server=FALSE, {
-  #   entry <- grep("disagg_locator_descriptions", result$tbl_modelsDetails$data_settings$datafile_selectors)
-  #   cond <- result$tbl_modelsDetails$data_settings$datafile_selectors[[entry]]$allow_multiple
-  #   if (cond) {
-  #     select = "multiple"
-  #   } else {
-  #     select = "single"
-  #   }
-  #   tbl_files_filtered <- result$tbl_files %>% filter(file_description == "disagg_locator_descriptions_paths")
-  #   df <- data.frame(id = tbl_files_filtered$id, names = tbl_files_filtered$filename)
-  #   # show last element of data frame first in table
-  #   df <- df[nrow(df):1, ]
-  #   colnames(df) <- c("ID", "Name")
-  #   datatable(df, selection = select)
-  # })
-  #
-  # observeEvent(input$dt_disagg_locator_descriptions_rows_selected, {
-  #   for (x in seq_len(length(input$dt_disagg_locator_descriptions_rows_selected))) {
-  #     # because df is reversed, also order of row has to be reversed
-  #     entry <- (nrow(result$tbl_files)+1) - x
-  #     result$list_files$disagg_locator_descriptions_paths[x] <- result$tbl_files[entry,]$filename
-  #     result$list_files$disagg_locator_descriptions_paths <-
-  #       result$list_files$disagg_locator_descriptions_paths[!is.na(result$list_files$disagg_locator_descriptions_paths)]
-  #   }
-  #   result$list_files$disagg_locator_descriptions_paths <- unlist(result$list_files$disagg_locator_descriptions_paths)
-  #   result$list_files
-  # })
-  #
-  # output$dt_schema_file <- renderDT(server=FALSE, {
-  #   entry <- grep("schema_file_paths", result$tbl_modelsDetails$data_settings$datafile_selectors)
-  #   cond <- result$tbl_modelsDetails$data_settings$datafile_selectors[[entry]]$allow_multiple
-  #   if (cond) {
-  #     select = "multiple"
-  #   } else {
-  #     select = "single"
-  #   }
-  #   tbl_files_filtered <- result$tbl_files %>% filter(file_description == "schema_file_paths")
-  #   df <- data.frame(id = tbl_files_filtered$id, names = tbl_files_filtered$filename)
-  #   # show last element of data frame first in table
-  #   df <- df[nrow(df):1, ]
-  #   colnames(df) <- c("ID", "Name")
-  #   datatable(df, selection = select)
-  # })
-  #
-  # observeEvent(input$dt_schema_file_rows_selected, {
-  #   for (x in seq_len(length(input$dt_schema_file_rows_selected))) {
-  #     # because df is reversed, also order of row has to be reversed
-  #     entry <- (nrow(result$tbl_files)+1) - x
-  #     result$list_files$schema_file_paths[x] <- result$tbl_files[entry,]$filename
-  #     result$list_files$schema_file_paths <- list(result$list_files$schema_file_paths[!is.na(result$list_files$schema_file_paths)])
-  #   }
-  #   result$list_files$schema_file_paths <- unlist(result$list_files$schema_file_paths)
-  #   result$list_files
-  # })
-  #
-  # output$dt_vuln_locator_shapefile <- renderDT(server=FALSE, {
-  #   entry <- grep("vuln_locator_shapefile_paths", result$tbl_modelsDetails$data_settings$datafile_selectors)
-  #   cond <- result$tbl_modelsDetails$data_settings$datafile_selectors[[entry]]$allow_multiple
-  #   if (cond) {
-  #     select = "multiple"
-  #   } else {
-  #     select = "single"
-  #   }
-  #   tbl_files_filtered <- result$tbl_files %>% filter(file_description == "vuln_locator_shapefile_paths")
-  #   df <- data.frame(id = tbl_files_filtered$id, names = tbl_files_filtered$filename)
-  #   # show last element of data frame first in table
-  #   df <- df[nrow(df):1, ]
-  #   colnames(df) <- c("ID", "Name")
-  #   datatable(df, selection = select)
-  # })
-  #
-  # observeEvent(input$dt_vuln_locator_shapefile_rows_selected, {
-  #   for (x in seq_len(length(input$dt_vuln_locator_shapefile_rows_selected))) {
-  #     # because df is reversed, also order of row has to be reversed
-  #     entry <- (nrow(result$tbl_files)+1) - x
-  #     result$list_files$vuln_locator_shapefile_paths[x] <- result$tbl_files[entry,]$filename
-  #     result$list_files$vuln_locator_shapefile_paths <- result$list_files$vuln_locator_shapefile_paths[
-  #       !is.na(result$list_files$vuln_locator_shapefile_paths)]
-  #   }
-  #   result$list_files$vuln_locator_shapefile_paths <- unlist(result$list_files$vuln_locator_shapefile_paths)
-  #   result$list_files
-  # })
-
   # dynamically create fileInputs and DTOutputs
   output$browsers_tables <- renderUI({
-    if (!is.null(result$tbl_modelsDetails$data_settings$datafile_selectors)) {
-      result$inputID <- lapply(seq_len(length(result$tbl_modelsDetails$data_settings$datafile_selectors)), function(i) {
-        result$tbl_modelsDetails$data_settings$datafile_selectors[[i]]$name
+    df_selectors <- result$tbl_modelsDetails$data_settings$datafile_selectors
+    if (!is.null(df_selectors)) {
+      result$inputID <- lapply(seq_len(length(df_selectors)), function(i) {
+        df_selectors[[i]]$name
       })
-      label_pre <- lapply(seq_len(length(result$tbl_modelsDetails$data_settings$datafile_selectors)), function(i) {
-        paste(strsplit(result$tbl_modelsDetails$data_settings$datafile_selectors[[i]]$name, "_"), " ")
+      label_pre <- lapply(seq_len(length(df_selectors)), function(i) {
+        paste(strsplit(df_selectors[[i]]$name, "_")[[1]], collapse = " ")
       })
-      accept <- lapply(seq_len(length(result$tbl_modelsDetails$data_settings$datafile_selectors)), function(i) {
-        paste0(".", unlist(result$tbl_modelsDetails$data_settings$datafile_selectors[[i]]$search_filters))
+      accept <- lapply(seq_len(length(df_selectors)), function(i) {
+        paste0(".", unlist(df_selectors[[i]]$search_filters))
       })
       result$outputID <- result$inputID
-      label <- paste(label_pre, sep = " ")
-      result$browsers_tables <- lapply(seq_len(length(result$tbl_modelsDetails$data_settings$datafile_selectors)), function(i) {
-        c(column(4, fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]], multiple = TRUE, accept = accept[i])),
-          column(4, DTOutput(ns(result$outputID[i]))))
-      })
+      ui_content <- list()
+      for (i in seq_len(length(df_selectors))) {
+        ui_content[[i * 2]] <- fluidRow(DTOutput(ns(paste0("dt_",result$outputID[i]))))
+        ui_content[[i * 2 - 1]] <- fluidRow(fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
+                                                      multiple = TRUE, accept = accept[i]))
+      }
+      tagList(ui_content)
     } else {
-      result$browsers_tables <- NULL
+      paste0("this model has no datafile selectors")
     }
-    result$browsers_tables
   })
 
   observeEvent(result$outputID, {
     lapply((seq_len(length(result$outputID))), function(i) {
-      output[[result$outputID[[i]]]] <- renderDT(server = FALSE, {
+      dt_output <- paste0("dt_", result$outputID[[i]])
+      output[[dt_output]] <- renderDT(server = FALSE, {
         cond <- result$tbl_modelsDetails$data_settings$datafile_selectors[[i]]$allow_multiple
         if (cond) {
           select = "multiple"
         } else {
           select = "single"
         }
-
         tbl_files_filtered <- result$tbl_files[c(grep(result$outputID[[i]], result$tbl_files$file_description)),]
         # tbl_files_filtered <- result$tbl_files %>% filter(file_description == result$outputID[[i]])
         df <- data.frame(id = tbl_files_filtered$id, names = tbl_files_filtered$filename)
@@ -383,133 +221,82 @@ buildFly <- function(input,
     })
   })
 
-  # TODO: access observeEvent when input[[result$inputID[[i]]]] is triggered
-  # observeEvent(input[[result$inputID[[1]]]], ignoreInit = TRUE, {
-  #   for (i in seq_len(nrow(input[[result$inputID[[1]]]]))) {
-  #     .uploadDamageFile(file_entry = result$inputID[[1]], file_name = input[[result$inputID[[1]]]][i,])
-  #   }
-  # })
+  observeEvent(result$inputID, {
+    h <- unlist(result$inputID)
+    lapply(seq_len(length(h)), function(i) {
+      observeEvent(input[[h[i]]], {
+        for (j in seq_len(nrow(input[[h[i]]]))) {
+          .uploadDamageFile(file_entry = h[i], file_name =input[[h[i]]][j,])
+        }
+      })
+    })
 
-  #TODO: should work for all output[[result$outputID[[i]]]], not just 1
-  # observeEvent(output[[result$outputID[[1]]]], {
-  #   browser()
-  # })
-
-  # output$dt_model_files <- renderDT(server=FALSE, {
-  #   result$tbl_files <- session$userData$data_hub$return_tbl_dataFiles(name = "")
-  #   df <- data.frame(id = result$tbl_files$id, names = result$tbl_files$filename, descr = result$tbl_files$file_description)
-  #   # show last element of data frame first in table
-  #   df <- df[nrow(df):1, ]
-  #   colnames(df) <- c("ID", "Name", "Description")
-  #   datatable(df, selection = "multiple")
-  # })
-
-  # observeEvent(input$dt_model_files_rows_selected, {
-  #   for (x in seq_len(length(input$dt_model_files_rows_selected))) {
-  #     # because df is reversed, also order of row has to be reversed
-  #     entry <- (nrow(result$tbl_files)+1) - x
-  #     if (result$tbl_files[entry,]$file_description == "damage_ratio_paths") {
-  #       result$list_files$damage_ratio_paths[x] <- result$tbl_files[entry,]$filename
-  #       result$list_files$damage_ratio_paths <- result$list_files$damage_ratio_paths[!is.na(result$list_files$damage_ratio_paths)]
-  #       if (length(result$list_files$damage_ratio_paths) > 1) {
-  #         result$list_files$damage_ratio_paths <- list(result$list_files$damage_ratio_paths)
-  #         # remove null elements in list
-  #         result$list_files$damage_ratio_paths <- as.list(unlist(result$list_files$damage_ratio_paths))
-  #       }
-  #     } else if (result$tbl_files[entry,]$file_description == "damage_ratio_lookup_paths") {
-  #       result$list_files$damage_ratio_lookup_paths[x] <- result$tbl_files[entry,]$filename
-  #       result$list_files$damage_ratio_lookup_paths <-
-  #         result$list_files$damage_ratio_lookup_paths[!is.na(result$list_files$damage_ratio_lookup_paths)]
-  #       if (length(result$list_files$damage_ratio_lookup_paths) > 1) {
-  #         result$list_files$damage_ratio_lookup_paths <- list(result$list_files$damage_ratio_lookup_paths)
-  #         # remove null elements in list
-  #         result$list_files$damage_ratio_lookup_paths <- as.list(unlist(result$list_files$damage_ratio_lookup_paths))
-  #       }
-  #     } else if (result$tbl_files[entry,]$file_description == "disagg_locator_descriptions_paths") {
-  #       result$list_files$disagg_locator_descriptions_paths[x] <- result$tbl_files[entry,]$filename
-  #       result$list_files$disagg_locator_descriptions_paths <-
-  #         result$list_files$disagg_locator_descriptions_paths[!is.na(result$list_files$disagg_locator_descriptions_paths)]
-  #       if (length(result$list_files$disagg_locator_descriptions_paths) > 1) {
-  #         result$list_files$disagg_locator_descriptions_paths <- list(result$list_files$disagg_locator_descriptions_paths)
-  #         # remove null elements in list
-  #         result$list_files$disagg_locator_descriptions_paths <- as.list(unlist(result$list_files$disagg_locator_descriptions_paths))
-  #       }
-  #     } else if (result$tbl_files[entry,]$file_description == "schema_file_paths") {
-  #       result$list_files$schema_file_paths[x] <- result$tbl_files[entry,]$filename
-  #       result$list_files$schema_file_paths <- list(result$list_files$schema_file_paths[!is.na(result$list_files$schema_file_paths)])
-  #       if (length(result$list_files$schema_file_paths) > 1) {
-  #         result$list_files$schema_file_paths <- list(result$list_files$schema_file_paths)
-  #         # remove null elements in list
-  #         result$list_files$schema_file_paths <- as.list(unlist(result$list_files$schema_file_paths))
-  #       }
-  #     }
-  #   }
-  #   result$list_files
-  # })
-
-  # # upload files in fileinputs
-  # observeEvent(input$damage_ratio_paths, ignoreInit = TRUE, {
-  #   for (i in seq_len(nrow(input$damage_ratio_paths))) {
-  #     .uploadDamageFile(file_entry = "damage_ratio_paths", file_name = input$damage_ratio_paths[i,])
-  #   }
-  # })
-  #
-  # observeEvent(input$damage_ratio_lookup_paths, ignoreInit = TRUE, {
-  #   for (i in seq_len(nrow(input$damage_ratio_lookup_paths))) {
-  #     .uploadDamageFile(file_entry = "damage_ratio_lookup_paths", file_name = input$damage_ratio_lookup_paths[i,])
-  #   }
-  # })
-  #
-  # observeEvent(input$disagg_locator_descriptions_paths, ignoreInit = TRUE, {
-  #   for (i in seq_len(nrow(input$disagg_locator_descriptions_paths))) {
-  #     .uploadDamageFile(file_entry = "disagg_locator_descriptions_paths", file_name = input$disagg_locator_descriptions_paths[i,])
-  #   }
-  # })
-  #
-  # observeEvent(input$schema_file_paths, ignoreInit = TRUE, {
-  #   for (i in seq_len(nrow(input$schema_file_paths))) {
-  #     .uploadDamageFile(file_entry = "schema_file_paths", file_name = input$schema_file_paths[i,])
-  #   }
-  # })
-  #
-  # observeEvent(input$vuln_locator_shapefile_paths, ignoreInit = TRUE, {
-  #   for (i in seq_len(nrow(input$vuln_locator_shapefile_paths))) {
-  #     .uploadDamageFile(file_entry = "vuln_locator_shapefile_paths", file_name = input$vuln_locator_shapefile_paths[i,])
-  #   }
-  # })
+    lapply(seq_len(length(h)), function(i) {
+      # for (i in seq_len(length(h))) {
+      input_dt <- paste0("dt_", h[i], "_rows_selected")
+      observeEvent(input[[input_dt]], {
+        result$file_ids <- lapply(seq_len(length(h)), function(i) {
+          input_dt <- paste0("dt_", h[i], "_rows_selected")
+          tbl <- result$tbl_files %>% filter(file_description == h[i])
+          file_name <- tbl[input[[input_dt]],][["id"]]
+        })
+        for (x in seq_len(length(input[[input_dt]]))) {
+          tbl <- result$tbl_files %>% filter(file_description == h[i])
+          file_name <- tbl[input[[input_dt]],][["filename"]][x]
+          # because df is reversed, also order of row has to be reversed
+          # entry <- (nrow(result$tbl_files)+1) - x
+          # result$list_files[[h[i]]][x] <- result$tbl_files[entry,]$filename
+          result$list_files[[h[i]]][x] <- file_name
+          result$list_files[[h[i]]] <- result$list_files[[h[i]]][!is.na(result$list_files[[h[i]]])]
+          if (length(result$list_files[[h[i]]] > 1)) {
+            result$list_files[[h[i]]] <- as.list(unlist(result$list_files[[h[i]]]))
+          } else {
+            result$list_files[[h[i]]] <- unlist(result$list_files[[h[i]]])
+          }
+        }
+        result$list_files
+      })
+      # result$list_files
+    })
+    # }
+  })
 
   # output new analysis settings with changed values
   observeEvent(input$abuttonselsettings, {
-    if (!is.null(result$changed_entry)) {
-      rows_selected <- input$dt_model_values_rows_selected
+      if (!is.null(result$changed_entry)) {
+        # new_settings <- result$settings_names[rows_selected]
+        new_settings <- result$settings_names
+        x <- strsplit(result$changed_entry, " ")
 
-      new_settings <- result$settings_names[rows_selected]
-      x <- strsplit(result$changed_entry, " ")
-
-      # change edited values in the table
-      for (y in seq_len(length(x))) {
-        entry_1 <- as.numeric(x[[y]][[1]])
-        entry_2 <- as.numeric(x[[y]][[2]])
-        entry_val <- x[[y]][[3]]
-        result$tbl_modelsDetails$model_settings[[entry_1]][[entry_2]]$default <- entry_val
+        # change edited values in the table
+        for (y in seq_len(length(x))) {
+          entry_1 <- as.numeric(x[[y]][[1]])
+          entry_2 <- as.numeric(x[[y]][[2]])
+          entry_val <- x[[y]][[3]]
+          result$tbl_modelsDetails$model_settings[[entry_1]][[entry_2]]$default <- entry_val
+        }
       }
-    }
-    #retrieve all files for analysis and place them under complex_model_data_files
-    list_data_files_names <- list(input$damage_ratio_lookup_paths$name,
-                                  input$damage_ratio_paths$name,
-                                  input$disagg_locator_descriptions_paths$name,
-                                  input$schema_file_paths$name,
-                                  input$vuln_locator_shapefile_paths$name)
-    get_file_ids <- lapply(unlist(list_data_files_names), function(x) {
-      file <- result$tbl_files %>% filter(filename == x)
-      file$id
-    })
-    patch_analyses <- session$userData$oasisapi$api_patch_query(query_path = paste("analyses", analysisID(), sep = "/"),
-                                                                query_body = list(name = analysisNAME(),
-                                                                                  portfolio = portfolioID(),
-                                                                                  model = modelID(),
-                                                                                  complex_model_data_files = get_file_ids),
-                                                                query_method = "PATCH")
+
+    # #retrieve all files for analysis and place them under complex_model_data_files
+    # list_data_files_names <- list()
+    # for (i in result$inputID) {
+    #   list_data_files_names[i] <- input[[i]][["name"]]
+    # }
+    # list_data_files_names <- list(input$damage_ratio_lookup_paths$name,
+    #                               input$damage_ratio_paths$name,
+    #                               input$disagg_locator_descriptions_paths$name,
+    #                               input$schema_file_paths$name,
+    #                               input$vuln_locator_shapefile_paths$name)
+    # get_file_ids <- lapply(unlist(list_data_files_names), function(x) {
+    #   file <- result$tbl_files %>% filter(filename == x)
+    #   file$id
+    # })
+    # patch_analyses <- session$userData$oasisapi$api_patch_query(query_path = paste("analyses", analysisID(), sep = "/"),
+    #                                                             query_body = list(name = analysisNAME(),
+    #                                                                               portfolio = portfolioID(),
+    #                                                                               model = modelID(),
+    #                                                                               complex_model_data_files = get_file_ids),
+    #                                                             query_method = "PATCH")
 
     result$tbl_modelsDetails$model_settings$event_occurrence_id <- result$tbl_modelsDetails$model_settings$event_occurrence_id$default
     result$tbl_modelsDetails$model_settings$event_set <- result$tbl_modelsDetails$model_settings$event_set$default
@@ -547,7 +334,7 @@ buildFly <- function(input,
         model_settings = c(filtered_settings, result$list_files),
         gul_output = FALSE,
         gul_summaries = list(gul_summaries)
-      ), result$list_files
+      )
     ))
   })
 
@@ -587,7 +374,7 @@ buildFly <- function(input,
     .reloadtbl_modelsFiles()
     invisible()
   }
-  moduleOutput <- reactive({result$filtered_analysis_settings})
+  moduleOutput <- reactive({c(list(result$filtered_analysis_settings, unlist(result$file_ids)))})
 
   moduleOutput
 }
