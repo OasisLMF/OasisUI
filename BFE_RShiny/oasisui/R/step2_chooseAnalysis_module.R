@@ -650,7 +650,7 @@ step2_chooseAnalysis <- function(input, output, session,
       if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
-          query_body = sub_modules$buildFly$fullSettings()[[1]]
+          query_body = sub_modules$buildFly$fullSettings()
         )
       } else {
         gul_summaries <- list(
@@ -694,12 +694,13 @@ step2_chooseAnalysis <- function(input, output, session,
                                                                     query_body = list(name = result$analysisNAME,
                                                                                       portfolio = as.numeric(portfolioID()),
                                                                                       model = result$modelID,
-                                                                                      complex_model_data_files = sub_modules$buildFly$fullSettings()[[2]]),
+                                                                                      complex_model_data_files = sub_modules$buildFly$fileids()),
                                                                     query_method = "PATCH")
       }
 
-      input_generation <- session$userData$oasisapi$api_post_query(query_path = paste(
-        "analyses", result$analysisID, "generate_inputs",  sep = "/"))
+      input_generation <- session$userData$oasisapi$api_post_query(
+        query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/")
+      )
 
       if (input_generation$status == "Success" && patch_analyses$status == "Success") {
         browser()

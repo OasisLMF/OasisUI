@@ -105,6 +105,7 @@ buildFly <- function(input,
     )
     result$tbl_files <- session$userData$data_hub$return_tbl_dataFiles(name = "")
     result$list_files <- list()
+    result$file_ids <- list()
 
     # get entries for table: name, description and default value(s)
     settings_names <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
@@ -181,9 +182,9 @@ buildFly <- function(input,
       result$outputID <- result$inputID
       ui_content <- list()
       for (i in seq_len(length(df_selectors))) {
-        ui_content[[i * 2]] <- fluidRow(DTOutput(ns(paste0("dt_",result$outputID[i]))))
-        ui_content[[i * 2 - 1]] <- fluidRow(fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
-                                                      multiple = TRUE, accept = accept[i]))
+        ui_content[[i * 2]] <- fluidRow(column(12, DTOutput(ns(paste0("dt_",result$outputID[i])))))
+        ui_content[[i * 2 - 1]] <- fluidRow(column(12, fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
+                                                      multiple = TRUE, accept = accept[i])))
       }
       tagList(ui_content)
     } else {
@@ -217,7 +218,7 @@ buildFly <- function(input,
     lapply(seq_len(length(h)), function(i) {
       observeEvent(input[[h[i]]], {
         for (j in seq_len(nrow(input[[h[i]]]))) {
-          .uploadDamageFile(file_entry = h[i], file_name =input[[h[i]]][j,])
+          .uploadDamageFile(file_entry = h[i], file_name = input[[h[i]]][j, ])
         }
       })
     })
@@ -226,26 +227,26 @@ buildFly <- function(input,
       # for (i in seq_len(length(h))) {
       input_dt <- paste0("dt_", h[i], "_rows_selected")
       observeEvent(input[[input_dt]], {
-        result$file_ids <- lapply(seq_len(length(h)), function(i) {
-          input_dt <- paste0("dt_", h[i], "_rows_selected")
-          tbl <- result$tbl_files %>% filter(file_description == h[i])
-          file_name <- tbl[input[[input_dt]],][["id"]]
-        })
-        for (x in seq_len(length(input[[input_dt]]))) {
-          tbl <- result$tbl_files %>% filter(file_description == h[i])
-          file_name <- tbl[input[[input_dt]],][["filename"]][x]
-          # because df is reversed, also order of row has to be reversed
-          # entry <- (nrow(result$tbl_files)+1) - x
-          # result$list_files[[h[i]]][x] <- result$tbl_files[entry,]$filename
-          result$list_files[[h[i]]][x] <- file_name
-          result$list_files[[h[i]]] <- result$list_files[[h[i]]][!is.na(result$list_files[[h[i]]])]
-          if (length(result$list_files[[h[i]]] > 1)) {
-            result$list_files[[h[i]]] <- as.list(unlist(result$list_files[[h[i]]]))
-          } else {
-            result$list_files[[h[i]]] <- unlist(result$list_files[[h[i]]])
-          }
+        #browser()
+        # TODO: RSc check order of table
+        tbl <- result$tbl_files %>% filter(file_description == h[i])
+        file_ids <- tbl[input[[input_dt]], "id"]
+        result$file_ids[[i]] <- file_ids
+        # result$file_ids <- lapply(seq_len(length(h)), function(i) {
+        #   input_dt <- paste0("dt_", h[i], "_rows_selected")
+        #   tbl <- result$tbl_files %>% filter(file_description == h[i])
+        #   tbl[input[[input_dt]], "id"]
+        # })
+        file_names <- tbl[input[[input_dt]], "filename"]
+        # because df is reversed, also order of row has to be reversed
+        # entry <- (nrow(result$tbl_files)+1) - x
+        # result$list_files[[h[i]]][x] <- result$tbl_files[entry,]$filename
+        result$list_files[[h[i]]] <- file_names
+        result$list_files[[h[i]]] <- result$list_files[[h[i]]][!is.na(result$list_files[[h[i]]])]
+        if (length(result$list_files[[h[i]]]) > 1) {
+          result$list_files[[h[i]]] <- as.list(result$list_files[[h[i]]])
         }
-        result$list_files
+        # print(result$list_files)
       })
       # result$list_files
     })
