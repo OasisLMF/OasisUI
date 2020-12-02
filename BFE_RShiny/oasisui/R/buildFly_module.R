@@ -203,7 +203,6 @@ buildFly <- function(input,
           select = "single"
         }
         tbl_files_filtered <- result$tbl_files[c(grep(result$outputID[[i]], result$tbl_files$file_description)),]
-        # tbl_files_filtered <- result$tbl_files %>% filter(file_description == result$outputID[[i]])
         df <- data.frame(id = tbl_files_filtered$id, names = tbl_files_filtered$filename)
         # show last element of data frame first in table
         df <- df[nrow(df):1, ]
@@ -224,41 +223,27 @@ buildFly <- function(input,
     })
 
     lapply(seq_len(length(h)), function(i) {
-      # for (i in seq_len(length(h))) {
       input_dt <- paste0("dt_", h[i], "_rows_selected")
       observeEvent(input[[input_dt]], {
-        #browser()
         # TODO: RSc check order of table
         tbl <- result$tbl_files %>% filter(file_description == h[i])
         file_ids <- tbl[input[[input_dt]], "id"]
         result$file_ids[[i]] <- file_ids
-        # result$file_ids <- lapply(seq_len(length(h)), function(i) {
-        #   input_dt <- paste0("dt_", h[i], "_rows_selected")
-        #   tbl <- result$tbl_files %>% filter(file_description == h[i])
-        #   tbl[input[[input_dt]], "id"]
-        # })
         file_names <- tbl[input[[input_dt]], "filename"]
         # because df is reversed, also order of row has to be reversed
-        # entry <- (nrow(result$tbl_files)+1) - x
-        # result$list_files[[h[i]]][x] <- result$tbl_files[entry,]$filename
         result$list_files[[h[i]]] <- file_names
         result$list_files[[h[i]]] <- result$list_files[[h[i]]][!is.na(result$list_files[[h[i]]])]
         if (length(result$list_files[[h[i]]]) > 1) {
           result$list_files[[h[i]]] <- as.list(result$list_files[[h[i]]])
         }
-        # print(result$list_files)
       })
-      # result$list_files
     })
-    # }
   })
 
   # output new analysis settings with changed values
   observeEvent(input$abuttonselsettings, {
     # update default choices for edited model settings
     if (any(result$settings_df$changed)) {
-      # update_model_defaults <- function(settings_df, model_settings) {...}
-      # result$tbl_modelsDetails$model_settings <- update_model_defaults(result$settings_df, result$tbl_modelsDetails$model_settings)
       new_settings <- result$settings_df %>% filter(changed)
       res_mdlsettings <- result$tbl_modelsDetails$model_settings
 
@@ -285,27 +270,6 @@ buildFly <- function(input,
     result$tbl_modelsDetails$model_settings$event_set <- result$tbl_modelsDetails$model_settings$event_set$default
 
     filtered_settings <- c("model_configurable" = TRUE, result$tbl_modelsDetails$model_settings)
-
-    # #retrieve all files for analysis and place them under complex_model_data_files
-    # list_data_files_names <- list()
-    # for (i in result$inputID) {
-    #   list_data_files_names[i] <- input[[i]][["name"]]
-    # }
-    # list_data_files_names <- list(input$damage_ratio_lookup_paths$name,
-    #                               input$damage_ratio_paths$name,
-    #                               input$disagg_locator_descriptions_paths$name,
-    #                               input$schema_file_paths$name,
-    #                               input$vuln_locator_shapefile_paths$name)
-    # get_file_ids <- lapply(unlist(list_data_files_names), function(x) {
-    #   file <- result$tbl_files %>% filter(filename == x)
-    #   file$id
-    # })
-    # patch_analyses <- session$userData$oasisapi$api_patch_query(query_path = paste("analyses", analysisID(), sep = "/"),
-    #                                                             query_body = list(name = analysisNAME(),
-    #                                                                               portfolio = portfolioID(),
-    #                                                                               model = modelID(),
-    #                                                                               complex_model_data_files = get_file_ids),
-    #                                                             query_method = "PATCH")
 
     hide("panel_build_fly_actions")
     logMessage("hiding panelBuildFly")

@@ -689,11 +689,12 @@ step2_chooseAnalysis <- function(input, output, session,
         )
       }
       if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
-        patch_analyses <- session$userData$oasisapi$api_patch_query(query_path = paste("analyses", result$analysisID, sep = "/"),
+        fileids <- as.list(sub_modules$buildFly$fileids())
+        patch_analyses <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", result$analysisID, sep = "/"),
                                                                     query_body = list(name = result$analysisNAME,
                                                                                       portfolio = as.numeric(portfolioID()),
                                                                                       model = result$modelID,
-                                                                                      complex_model_data_files = sub_modules$buildFly$fileids()),
+                                                                                      complex_model_data_files = fileids),
                                                                     query_method = "PATCH")
       }
 
