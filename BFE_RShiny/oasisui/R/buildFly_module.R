@@ -225,8 +225,8 @@ buildFly <- function(input,
     lapply(seq_len(length(h)), function(i) {
       input_dt <- paste0("dt_", h[i], "_rows_selected")
       observeEvent(input[[input_dt]], {
-        # TODO: RSc check order of table
         tbl <- result$tbl_files %>% filter(file_description == h[i])
+        tbl <- tbl[nrow(tbl):1,]
         file_ids <- tbl[input[[input_dt]], "id"]
         result$file_ids[[i]] <- file_ids
         file_names <- tbl[input[[input_dt]], "filename"]
