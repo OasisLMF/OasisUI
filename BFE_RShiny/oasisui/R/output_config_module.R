@@ -744,17 +744,53 @@ def_out_config <- function(input,
         query_method = "GET"
       )
       model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
+      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("string_parameters", x)]])) {
+          input[[paste0("string_parameters", x)]]
+        } else if (!is.null( model_settings[[x]][[y]]$default)) {
+          model_settings[[x]][[y]]$default
+        }
+      }))
 
-      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {input[[paste0("string_parameters", x)]]}))
       dict_input <- lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
-        as.list(sapply(seq_len(length(model_settings[[x]]$default)), function(y) {
-          setNames(input[[paste0("dictionary_parameters", x, y)]], names(model_settings[[x]]$default[y]))
-        }))
+        if (!is.null(input[[paste0("dictionary_parameters", x)]])) {
+          setNames(input[[paste0("dictionary_parameters", x)]], names(model_settings[[x]]$default))
+        } else if (!is.null(model_settings[[x]]$default)) {
+          setNames(model_settings[[x]]$default, names(model_settings[[x]]$default))
+        }
+      })
+
+      dropdown_input <- lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("dropdown_parameters", x)]])) {
+          input[[paste0("dropdown_parameters", x)]]
+        } else if (!is.null(model_settings[[x]]$default)) {
+          model_settings[[x]]$default
+        }
       })
       # below is purposedly list() rather than NULL in case there are none!
-      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {input[[paste0("boolean_parameters", x)]]})
-      float_input <- unlist(lapply(grep("float_parameters", names(model_settings)), function(x) {input[[paste0("float_parameters", x)]]}))
-      list_input <- unlist(lapply(grep("list_parameters", names(model_settings)), function(x) {input[[paste0("list_parameters", x)]]}))
+      boolean_input <- unlist(lapply(grep("boolean_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("boolean_parameters", x)]])) {
+          input[[paste0("boolean_parameters", x)]]
+        } else if (!is.null(model_settings[[x]]$default)) {
+          model_settings[[x]]$default
+        }
+      }))
+
+      float_input <- lapply(grep("float_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("float_parameters", x)]])) {
+          input[[paste0("float_parameters", x)]]
+        } else if (!is.null(model_settings[[x]]$default)) {
+          model_settings[[x]]$default
+        }
+      })
+
+      list_input <- lapply(grep("list_parameters", names(model_settings)), function(x) {
+        if (!is.null(input[[paste0("list_parameters", x)]])) {
+          as.numeric(unlist(strsplit(input[[paste0("list_parameters", x)]], ", ")))
+        } else if (!is.null(model_settings[[x]]$default)) {
+          as.numeric(unlist(model_settings[[x]]$default))
+        }
+      })
 
       inputs_list <- list(string_input,
                           list_input,
@@ -790,10 +826,6 @@ def_out_config <- function(input,
         boolean_name <- NULL
       }
 
-      # set certain inputs in the right format
-      if (!is.null(list_input))
-        list_input <- strsplit(list_input, ", ")
-
       # create model settings for analysis settings
       model_settings <- c(input$event_set,
                           input$event_occurrence,
@@ -815,9 +847,9 @@ def_out_config <- function(input,
       # remove all NA elements
       if (any(sapply(names_full_list, is.na))) {
         names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
-      } else {
-        names(model_settings) <- names_full_list
-      }
+        } else if(length(model_settings) > 0) {
+          names(model_settings) <- names_full_list
+        }
 
       model_settings
     }
