@@ -1,6 +1,11 @@
 OasisUI Changelog
 ==================
 
+`1.8.1`_
+--------
+* [#236](https://github.com/OasisLMF/OasisUI/issues/236) - Added Environment variable to increase max file size upload
+* [#237](https://github.com/OasisLMF/OasisUI/issues/237) - Fix, advanced run time option defaults not being picked up
+
 `1.8.0`_
 --------
 * Rendering speed improvements to validation mapping 
@@ -164,6 +169,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
+.. _`1.8.1`:  https://github.com/OasisLMF/OasisUI/compare/1.8.0...1.8.1
 .. _`1.8.0`:  https://github.com/OasisLMF/OasisUI/compare/1.7.0...1.8.0
 .. _`1.7.0`:  https://github.com/OasisLMF/OasisUI/compare/1.6.0...1.7.0
 .. _`1.6.0`:  https://github.com/OasisLMF/OasisUI/compare/1.5.1...1.6.0
