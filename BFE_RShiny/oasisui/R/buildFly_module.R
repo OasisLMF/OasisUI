@@ -108,33 +108,44 @@ buildFly <- function(input,
     result$file_ids <- list()
 
     # get entries for table: name, description and default value(s)
-    settings_names <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if (is.null(result$tbl_modelsDetails$model_settings[[x]]$name)) {
-        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-          result$tbl_modelsDetails$model_settings[[x]][[y]]$name
+    tbl_mdl_settings <- result$tbl_modelsDetails$model_settings
+    # drop "parameter_groups" (and potentially other unknown entries):
+    subset_settings <- names(tbl_mdl_settings) %in% c("event_set",
+                                                      "event_occurrence_id",
+                                                      "string_parameters",
+                                                      "boolean_parameters",
+                                                      "float_parameters",
+                                                      "list_parameters",
+                                                      "dictionary_parameters",
+                                                      "dropdown_parameters")
+    tbl_mdl_settings <- tbl_mdl_settings[subset_settings]
+    settings_names <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
+      if (is.null(tbl_mdl_settings[[x]]$name)) {
+        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
+          tbl_mdl_settings[[x]][[y]]$name
         })
       } else {
-        result$tbl_modelsDetails$model_settings[[x]]$name
+        tbl_mdl_settings[[x]]$name
       }
     }))
 
-    settings_desc <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if (is.null(result$tbl_modelsDetails$model_settings[[x]]$desc)) {
-        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-          result$tbl_modelsDetails$model_settings[[x]][[y]]$desc
+    settings_desc <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
+      if (is.null(tbl_mdl_settings[[x]]$desc)) {
+        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
+          tbl_mdl_settings[[x]][[y]]$desc
         })
       } else {
-        result$tbl_modelsDetails$model_settings[[x]]$desc
+        tbl_mdl_settings[[x]]$desc
       }
     }))
 
-    settings_default <- unlist(lapply(seq_len(length(names(result$tbl_modelsDetails$model_settings))), function(x) {
-      if (is.null(result$tbl_modelsDetails$model_settings[[x]]$default)) {
-        lapply(seq_len(length(result$tbl_modelsDetails$model_settings[[x]])), function(y) {
-          paste(unlist(result$tbl_modelsDetails$model_settings[[x]][[y]]$default), collapse = ", ")
+    settings_default <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
+      if (is.null(tbl_mdl_settings[[x]]$default)) {
+        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
+          paste(unlist(tbl_mdl_settings[[x]][[y]]$default), collapse = ", ")
         })
       } else {
-        paste(unlist(result$tbl_modelsDetails$model_settings[[x]]$default), collapse = ", ")
+        paste(unlist(tbl_mdl_settings[[x]]$default), collapse = ", ")
       }
     }))
 
@@ -265,11 +276,119 @@ buildFly <- function(input,
         }
       }))
     }
-    # TODO: update result$tbl_modelsDetails$model_setting just once, do above and below in memory first (i.e. make a function as outlined above)
-    result$tbl_modelsDetails$model_settings$event_occurrence_id <- result$tbl_modelsDetails$model_settings$event_occurrence_id$default
-    result$tbl_modelsDetails$model_settings$event_set <- result$tbl_modelsDetails$model_settings$event_set$default
 
-    filtered_settings <- c("model_configurable" = TRUE, result$tbl_modelsDetails$model_settings)
+    # TODO: update result$tbl_modelsDetails$model_setting just once, do above and below in memory first (i.e. make a function as outlined above)
+    #result$tbl_modelsDetails$model_settings$event_occurrence_id <- result$tbl_modelsDetails$model_settings$event_occurrence_id$default
+    #result$tbl_modelsDetails$model_settings$event_set <- result$tbl_modelsDetails$model_settings$event_set$default
+    # replace all settings similarly with just default values
+    fetch_model_settings <- function(model_settings) {
+      model_settings <- model_settings %>% unlist(recursive = FALSE)
+      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$default)) {
+          model_settings[[x]]$default
+        }
+      }))
+
+      dict_input <- lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$default)) {
+          setNames(model_settings[[x]]$default, names(model_settings[[x]]$default))
+        }
+      })
+
+      dropdown_input <- lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$default)) {
+          model_settings[[x]]$default
+        }
+      })
+
+      # below is purposedly list() rather than NULL in case there are none (i.e. not doing unlist() on purpose)!
+      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$default)) {
+          as.logical(model_settings[[x]]$default)
+        }
+      })
+
+      float_input <- lapply(grep("float_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$default)) {
+          model_settings[[x]]$default
+        }
+      })
+
+      list_input <- lapply(grep("list_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$default)) {
+          model_settings[[x]]$default
+        }
+      })
+
+      inputs_list <- list(string_input,
+                          list_input,
+                          dict_input,
+                          float_input,
+                          dropdown_input)
+
+      params_list <- list("string_parameters",
+                          "list_parameters",
+                          "dictionary_parameters",
+                          "float_parameters",
+                          "dropdown_parameters")
+
+      # create list of re-ordered and grouped model inputs names
+      inputs_name <- list()
+      for (param in seq_len(length(params_list))) {
+        if (length(inputs_list[[param]]) > 0) {
+          param_name <- unlist(lapply(grep(params_list[[param]], names(model_settings)), function(i) {
+            model_settings[[i]][["name"]]
+          }))
+          inputs_name[[param]] <- param_name
+        }
+        # if a param is NULL and skipped, it will result in a NULL entry in the inputs_name list that will be removed by the unlist below
+      }
+      inputs_name <- unlist(inputs_name)
+
+      # find boolean parameters names
+      if (length(boolean_input) > 0) {
+        boolean_name <- lapply(seq_len(length(boolean_input)), function(i) {
+          model_match <- model_settings[grep("boolean_parameters", names(model_settings))][[i]]
+          model_match[["name"]]
+        })
+      } else {
+        boolean_name <- NULL
+      }
+
+      # create model settings for analysis settings
+      model_settings_out <- c(model_settings$event_set.default,
+                          model_settings$event_occurrence_id.default,
+                          # note that boolean_input is a list, making sure that the result of this c() is a flat list!
+                          boolean_input,
+                          string_input,
+                          list_input,
+                          dict_input,
+                          float_input,
+                          dropdown_input)
+      # NULL or list() elements won't survive the c() above!
+
+      # create list/vector of names for model settings
+      names_full_list <- c("event_set",
+                           "event_occurrence_id",
+                           boolean_name,
+                           inputs_name)
+
+      if (any(sapply(names_full_list, is.na))) {
+        names(model_settings_out) <- names_full_list[-which(sapply(names_full_list, is.na))]
+      } else if(length(model_settings_out) > 0) {
+        names(model_settings_out) <- names_full_list
+      }
+
+      model_settings_out
+    }
+
+    core_model_settings <- fetch_model_settings(result$tbl_modelsDetails$model_settings)
+
+    browser()
+    # core_model_settings <- core_model_settings[-c(5,6)] # scale factors don't work.
+    # core_model_settings <- core_model_settings[-c(15)] # Global:Europe doesn't work, whereas Global does
+
+    filtered_settings <- c("model_configurable" = TRUE, core_model_settings)
 
     hide("panel_build_fly_actions")
     logMessage("hiding panelBuildFly")

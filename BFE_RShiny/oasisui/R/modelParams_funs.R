@@ -67,102 +67,108 @@ basicConfig_funs <- function(session, model_settings) {
 advancedConfig_funs <- function(session, model_settings, configurable) {
   ns <- session$ns
 
-  result <- reactiveValues(
-    # filtered model settings for JBA FLY
-    model_settings_filtered = NULL
-  )
-
-  if (configurable) {
-    # events_dir_path and hazard_intensity_thresholds are not in the model settings
-    include_list <- c("events_dir_path", "event_subset", "min_rp", "hazard_intensity_thresholds",
-                      "hazard_intensity_scale_factors", "vulnerability_scale_factors")
-    include_entries <- unlist(lapply(include_list, function(x) {
-      grep(x, model_settings)
-    }))
-    result$model_settings_filtered <- model_settings[include_entries]
-  } else {
-    result$model_settings_filtered <- model_settings
-  }
+  # if (configurable) {
+  #   # events_dir_path and hazard_intensity_thresholds are not in the model settings.
+  #   # hazard_intensity_threshold is though, switching to that.
+  #   # this set needs to be data-driven, use the field "used_for"
+  #   include_list <- c("events_dir_path", "event_subset", "min_rp", "hazard_intensity_threshold",
+  #                     "hazard_intensity_scale_factors", "vulnerability_scale_factors")
+  #   include_entries <- unlist(lapply(include_list, function(x) {
+  #     grep(x, model_settings)
+  #   }))
+  #   model_settings <- model_settings[include_entries]
+  # }
 
   # string parameters
   .string_fun <- function(model_settings) {
-    if (length(grep("string_parameters", names(result$model_settings_filtered))) > 0) {
+    if (length(grep("string_parameters", names(model_settings))) > 0) {
       lapply(grep("string_parameters", names(model_settings)), function(x) {
-        textInput(
-          inputId = ns(paste0("string_parameters", x)),
-          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          value = model_settings[[x]]$default
-        )
+        if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
+          textInput(
+            inputId = ns(paste0("string_parameters", x)),
+            label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+            value = model_settings[[x]]$default
+          )
+        }
       })
     }
   }
 
   # list parameters
   .list_fun <- function(model_settings) {
-    if (length(grep("list_parameters", names(result$model_settings_filtered))) > 0) {
+    if (length(grep("list_parameters", names(model_settings))) > 0) {
       lapply(grep("list_parameters", names(model_settings)), function(x) {
-        textInput(
-          inputId = ns(paste0("list_parameters", x)),
-          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          value = paste(unlist(model_settings[[x]]$default), collapse = ", ")
-        )
+        if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
+          textInput(
+            inputId = ns(paste0("list_parameters", x)),
+            label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+            value = paste(unlist(model_settings[[x]]$default), collapse = ", ")
+          )
+        }
       })
     }
   }
 
   # dictionary parameters
   .dictionary_fun <- function(model_settings) {
-    if (length(grep("dictionary_parameters", names(result$model_settings_filtered))) > 0) {
+    if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
       lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
-        lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
-          textInput(
-            inputId = ns(paste0("dictionary_parameters", x, y)),
-            label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default[y]), sep = ": "),
-            value = model_settings[[x]]$default[[y]]
-          )
-        })
+        if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
+          lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
+            textInput(
+              inputId = ns(paste0("dictionary_parameters", x, y)),
+              label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default[y]), sep = ": "),
+              value = model_settings[[x]]$default[[y]]
+            )
+          })
+        }
       })
     }
   }
 
   # boolean parameters
   .boolean_params_fun <- function(model_settings) {
-    if (length(grep("boolean_parameters", names(result$model_settings_filtered))) > 0) {
+    if (length(grep("boolean_parameters", names(model_settings))) > 0) {
       lapply(grep("boolean_parameters", names(model_settings)), function(x) {
-        checkboxInput(
-          inputId = ns(paste0("boolean_parameters", x)),
-          label = gsub("_", " ", model_settings[[x]]$name) %>% capitalize_first_letter(),
-          value = model_settings[[x]]$default
-        )
+        if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
+          checkboxInput(
+            inputId = ns(paste0("boolean_parameters", x)),
+            label = gsub("_", " ", model_settings[[x]]$name) %>% capitalize_first_letter(),
+            value = model_settings[[x]]$default
+          )
+        }
       })
     }
   }
 
   # float parameters
   .float_fun <- function(model_settings) {
-    if (length(grep("float_parameters", names(result$model_settings_filtered))) > 0) {
+    if (length(grep("float_parameters", names(model_settings))) > 0) {
       lapply(grep("float_parameters", names(model_settings)), function(x) {
-        sliderInput(
-          inputId = ns(paste0("float_parameters", x)),
-          label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-          min = model_settings[[x]]$min,
-          max = model_settings[[x]]$max,
-          value = model_settings[[x]]$default
-        )
+        if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
+          sliderInput(
+            inputId = ns(paste0("float_parameters", x)),
+            label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
+            min = model_settings[[x]]$min,
+            max = model_settings[[x]]$max,
+            value = model_settings[[x]]$default
+          )
+        }
       })
     }
   }
 
-  #drop-down parameters
+  # drop-down parameters
   .dropdown_fun <- function(model_settings) {
-    if (length(grep("dropdown_parameters", names(result$model_settings_filtered))) > 0) {
+    if (length(grep("dropdown_parameters", names(model_settings))) > 0) {
       lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
-        textInput(
-          inputId = ns(paste0("dropdown_parameters", x)),
-          label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default), sep = ": "),
-          value = model_settings[[x]]$default
-        )
-        # })
+        if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
+          textInput(
+            inputId = ns(paste0("dropdown_parameters", x)),
+            label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default), sep = ": "),
+            value = model_settings[[x]]$default
+          )
+        }
       })
     }
   }
