@@ -384,7 +384,13 @@ buildFly <- function(input,
 
     core_model_settings <- fetch_model_settings(result$tbl_modelsDetails$model_settings)
 
-    browser()
+
+    core_model_settings_rm <- c(grep("hazard_intensity_scale_factors", names(core_model_settings)),
+                                     grep("vulnerability_scale_factors", names(core_model_settings)))
+    core_model_settings <- core_model_settings[-core_model_settings_rm]
+    if (!is.null(core_model_settings$models_to_use) && core_model_settings$models_to_use == "Global:Europe") {
+      core_model_settings$models_to_use <- "Global"
+    }
     # core_model_settings <- core_model_settings[-c(5,6)] # scale factors don't work.
     # core_model_settings <- core_model_settings[-c(15)] # Global:Europe doesn't work, whereas Global does
 
