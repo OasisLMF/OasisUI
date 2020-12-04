@@ -653,25 +653,7 @@ step2_chooseAnalysis <- function(input, output, session,
           query_body = sub_modules$buildFly$fullsettings()
         )
       } else {
-        gul_summaries <- list(
-          summarycalc = FALSE,
-          eltcalc = FALSE,
-          aalcalc = FALSE,
-          pltcalc = FALSE,
-          id = 1,
-          oed_fields = list(),
-          lec_output = FALSE,
-          leccalc = list(
-            return_period_file = FALSE,
-            full_uncertainty_aep = FALSE,
-            full_uncertainty_oep = FALSE,
-            wheatsheaf_aep = FALSE,
-            wheatsheaf_oep = FALSE,
-            wheatsheaf_mean_aep = FALSE,
-            wheatsheaf_mean_oep = FALSE,
-            sample_mean_aep = FALSE,
-            sample_mean_oep = FALSE
-          ))
+        gul_summaries <- summary_template
 
         ana_settings_step_2 <- list(analysis_settings = c(
           list(

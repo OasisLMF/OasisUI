@@ -829,14 +829,14 @@ def_out_config <- function(input,
         }
       })
 
-      # below is purposedly list() rather than NULL in case there are none!
-      boolean_input <- unlist(lapply(grep("boolean_parameters", names(model_settings)), function(x) {
+      # below is purposedly list() rather than NULL in case there are none (i.e. not doing unlist() on purpose)!
+      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("boolean_parameters", x)]])) {
           input[[paste0("boolean_parameters", x)]]
         } else if (!is.null(model_settings[[x]]$default)) {
-          model_settings[[x]]$default
+          as.logical(model_settings[[x]]$default)
         }
-      }))
+      })
 
       float_input <- lapply(grep("float_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("float_parameters", x)]])) {
@@ -848,9 +848,9 @@ def_out_config <- function(input,
 
       list_input <- lapply(grep("list_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("list_parameters", x)]])) {
-          as.numeric(unlist(strsplit(input[[paste0("list_parameters", x)]], ", ")))
+          as.list(strsplit(input[[paste0("list_parameters", x)]], ", ")[[1]])
         } else if (!is.null(model_settings[[x]]$default)) {
-          as.numeric(unlist(model_settings[[x]]$default))
+          model_settings[[x]]$default
         }
       })
 
@@ -867,36 +867,17 @@ def_out_config <- function(input,
                           "dropdown_parameters")
 
       # create list of re-ordered and grouped model inputs names
-      inputs_name <- c()
-      # if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
-      #   for (param in seq_len(length(params_list))) {
-      #     if (length(inputs_list[[param]]) > 0) {
-      #       param_name <- lapply(grep(params_list[param], names(model_settings)), function(i) {
-      #         model_match <- model_settings[i]
-      #         lapply(seq_len(length(model_match)), function(j) {
-      #           model_match[[j]][["name"]]
-      #         })
-      #       })
-      #       inputs_name[[param]] <- param_name
-      #     }
-      #     # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
-      #   }
-      # } else {
-
-        for (param in seq_len(length(params_list))) {
-          if (length(inputs_list[[param]]) > 0) {
-            param_name <- unlist(lapply(grep(params_list[param], names(model_settings)), function(i) {
-              model_match <- model_settings[i]
-              lapply(seq_len(length(model_match)), function(j) {
-                model_match[[j]][["name"]]
-              })
-            }))
-            inputs_name[param] <- param_name
-          }
-          # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
+      inputs_name <- list()
+      for (param in seq_len(length(params_list))) {
+        if (length(inputs_list[[param]]) > 0) {
+          param_name <- unlist(lapply(grep(params_list[[param]], names(model_settings)), function(i) {
+            model_settings[[i]][["name"]]
+          }))
+          inputs_name[[param]] <- param_name
         }
-      # }
-
+        # if a param is NULL and skipped, it will result in a NULL entry in the inputs_name list that will be removed by the unlist below
+      }
+      inputs_name <- unlist(inputs_name)
 
       # find boolean parameters names
       if (length(boolean_input) > 0) {
@@ -918,7 +899,6 @@ def_out_config <- function(input,
                           dict_input,
                           float_input,
                           dropdown_input)
-
       # NULL or list() elements won't survive the c() above!
 
       # create list/vector of names for model settings
@@ -927,36 +907,12 @@ def_out_config <- function(input,
                            boolean_name,
                            inputs_name)
       # remove all NA elements
-      # if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
-      #   names(model_settings) <- unlist(names_full_list)
-      # } else {
-        if (any(sapply(names_full_list, is.na))) {
-          names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
-        } else if(length(model_settings) > 0) {
-          names(model_settings) <- names_full_list
-        }
-      # }
+      if (any(sapply(names_full_list, is.na))) {
+        names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
+      } else if(length(model_settings) > 0) {
+        names(model_settings) <- names_full_list
+      }
 
-      # re-define model_seetings for FLY model according to standard model_settings configuration
-      # if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
-      #   # -1 not to take into account the model parameters option
-      #   for (i in seq(length(tbl_modelsDetails$model_settings) - 1)) {
-      #     # do not consider model_configurable
-      #     j <- i + 1
-      #     for (k in seq(length(tbl_modelsDetails$model_settings[[j]]))) {
-      #       if (length(tbl_modelsDetails$model_settings[j]$event_set) == 1 || length(tbl_modelsDetails$model_settings[j]$event_occurrence_id)) {
-      #         corresp_model_set <- grep(names(tbl_modelsDetails$model_settings[j]), names(model_settings))
-      #         tbl_modelsDetails$model_settings[[j]][[k]] <- model_settings[[corresp_model_set]]
-      #       } else if (length(tbl_modelsDetails$model_settings[[j]][[k]]$default) > 0) {
-      #         corresp_model_set <- grep(tbl_modelsDetails$model_settings[[j]][[k]]$name, names(model_settings))
-      #         if (length(corresp_model_set) > 0) {
-      #           tbl_modelsDetails$model_settings[[j]][[k]]$default <- model_settings[[corresp_model_set]]
-      #         }
-      #       }
-      #     }
-      #   }
-      #   model_settings <- tbl_modelsDetails$model_settings
-      # }
       model_settings
     }
 
@@ -978,27 +934,6 @@ def_out_config <- function(input,
 
     fetch_summary <- function(prsp, checked) {
       if (prsp %in% checked) {
-        summary_template <- list(
-          summarycalc = FALSE,
-          eltcalc = FALSE,
-          aalcalc = FALSE,
-          pltcalc = FALSE,
-          id = 1,
-          oed_fields = list(),
-          lec_output = FALSE,
-          leccalc = list(
-            return_period_file = FALSE,
-            full_uncertainty_aep = FALSE,
-            full_uncertainty_oep = FALSE,
-            wheatsheaf_aep = FALSE,
-            wheatsheaf_oep = FALSE,
-            wheatsheaf_mean_aep = FALSE,
-            wheatsheaf_mean_oep = FALSE,
-            sample_mean_aep = FALSE,
-            sample_mean_oep = FALSE
-          )
-        )
-
         p <- which(result$out_params_review$perspective == prsp)
         review_prsp <- result$out_params_review[p, ]
         # convert factors to char

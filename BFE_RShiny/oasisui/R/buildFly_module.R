@@ -400,26 +400,7 @@ buildFly <- function(input,
     logMessage("hiding panelBuildFly")
     oasisuiNotification(type = "message",
                         "Model settings filtered by chosen entries.")
-    gul_summaries <- list(
-      summarycalc = FALSE,
-      eltcalc = FALSE,
-      aalcalc = FALSE,
-      pltcalc = FALSE,
-      id = 1,
-      oed_fields = list(),
-      lec_output = FALSE,
-      leccalc = list(
-        return_period_file = FALSE,
-        full_uncertainty_aep = FALSE,
-        full_uncertainty_oep = FALSE,
-        wheatsheaf_aep = FALSE,
-        wheatsheaf_oep = FALSE,
-        wheatsheaf_mean_aep = FALSE,
-        wheatsheaf_mean_oep = FALSE,
-        sample_mean_aep = FALSE,
-        sample_mean_oep = FALSE
-      )
-    )
+    gul_summaries <- summary_template
 
     result$filtered_analysis_settings <- list(analysis_settings = c(
       list(

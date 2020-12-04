@@ -90,3 +90,29 @@ plottypeslist <- list(
 #                               "xlabel" = c("RP"),
 #                               "ylabel" = c("Loss")
 # )
+
+# Summary template for analysis settings -------------------------------
+#' summary_template
+#' @description List defining the structure of a "summary output" in the analysis settings.
+#' @format Named \code{list} of output options.
+#' @export
+summary_template <- list(
+  summarycalc = FALSE,
+  eltcalc = FALSE,
+  aalcalc = FALSE,
+  pltcalc = FALSE,
+  id = 1,
+  oed_fields = list(),
+  lec_output = FALSE,
+  leccalc = list(
+    return_period_file = FALSE,
+    full_uncertainty_aep = FALSE,
+    full_uncertainty_oep = FALSE,
+    wheatsheaf_aep = FALSE,
+    wheatsheaf_oep = FALSE,
+    wheatsheaf_mean_aep = FALSE,
+    wheatsheaf_mean_oep = FALSE,
+    sample_mean_aep = FALSE,
+    sample_mean_oep = FALSE
+  )
+)
