@@ -22,6 +22,9 @@ ENV REF_BRANCH=${REF_BRANCH:-master}
 RUN R -e "install.packages('remotes')" && \
     # installing package shinyjs from github fixing reference to commit 473a54b
     R -e "remotes::install_github('daattali/shinyjs', ref = '473a54b', upgrade = 'always')" && \
+    R -e "remotes::install_github('rstudio/htmltools', ref = 'v0.5.0', dependencies = FALSE, upgrade = 'always')" && \
+    R -e "remotes::install_github('ramnathv/htmlwidgets', ref = 'v1.5.2', dependencies = FALSE, upgrade = 'always')" && \
+    R -e "remotes::install_github('rstudio/DT', ref = 'v0.16', dependencies = FALSE, upgrade = 'always')" && \
     R -e "remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
     rm -rf /var/lib/apt/lists/*
 
