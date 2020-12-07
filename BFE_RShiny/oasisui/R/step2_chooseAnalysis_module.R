@@ -162,7 +162,8 @@ panelModelTable <- function(id) {
              div(textInput(inputId = ns("anaName"), label = "Analysis Name"), style = "float:right;")),
       column(2,
              br(),
-             oasisuiButton(ns("abuttonsubmit"), "Submit", style = "float:right; margin-top:25px;")
+             oasisuiButton(ns("abuttonsubmit"), "Submit", style = "float:right; margin-top:25px;")  %>%
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonsubmit, placement = "right")
       )
     )
   )
@@ -585,6 +586,8 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelBuildFly")
     show("panelBuildFly")
     hide("panelModelDetails")
+    hide("anaName")
+    hide("abuttonsubmit")
     logMessage("showing panelBuildFly")
   })
 
@@ -617,6 +620,12 @@ step2_chooseAnalysis <- function(input, output, session,
     active = reactive(TRUE)
   )
 
+  observeEvent(sub_modules$buildFly$fullsettings(), {
+    if (!is.null(sub_modules$buildFly$fullsettings())) {
+      show("anaName")
+      show("abuttonsubmit")
+    }
+  })
   observeEvent(sub_modules$buildFly$changeddefaults(), {
     result$flyModSettings <- sub_modules$buildFly$changeddefaults()
     logMessage(paste0("output of buildFly: updating result$flyModSettings"))

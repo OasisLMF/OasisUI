@@ -720,13 +720,13 @@ def_out_config <- function(input,
       model_settings <- NULL
       if (!is.null(tbl_modelsDetails)) {
         subset_settings <- names(tbl_modelsDetails$model_settings) %in% c("event_set",
-                                                                 "event_occurrence_id",
-                                                                 "string_parameters",
-                                                                 "boolean_parameters",
-                                                                 "float_parameters",
-                                                                 "list_parameters",
-                                                                 "dictionary_parameters",
-                                                                 "dropdown_parameters")
+                                                                          "event_occurrence_id",
+                                                                          "string_parameters",
+                                                                          "boolean_parameters",
+                                                                          "float_parameters",
+                                                                          "list_parameters",
+                                                                          "dictionary_parameters",
+                                                                          "dropdown_parameters")
         # this is e.g. to drop "parameter_groups" or other custom entries that are not supported by the Oasis UI
         model_settings <- tbl_modelsDetails$model_settings[subset_settings] %>% unlist(recursive = FALSE)
       }
@@ -800,8 +800,6 @@ def_out_config <- function(input,
     # utility function
     fetch_model_settings <- function(model_settings, ana_mdlsettings) {
       model_settings <- model_settings %>% unlist(recursive = FALSE)
-      browser()
-      # TODO: fix as in buildFly!!
       # this function is supposed to work despite extra entries in model_settings, like e.g. "parameter_groups",
       # as long as they don't match the pattern "parameters"
       model_settings <- .update_mdlsettings_defaults_with_anavalues(model_settings, ana_mdlsettings)
@@ -913,6 +911,18 @@ def_out_config <- function(input,
         names(model_settings) <- names_full_list
       }
 
+      names_ana_model <- names(ana_mdlsettings)
+      for (i in seq_len(length(names(model_settings)))) {
+        for (j in seq_len(length(names(ana_mdlsettings)))) {
+          if (names(ana_mdlsettings)[j] == names(model_settings)[i]) {
+            names_ana_model[j] <- "NA"
+          }
+        }
+      }
+      names_ana_model <- names_ana_model[-grep("NA", names_ana_model)]
+      for (i in names_ana_model) {
+        model_settings <- c(model_settings, ana_mdlsettings[i])
+      }
       model_settings
     }
 

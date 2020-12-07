@@ -14,6 +14,7 @@ NULL
 #' @describeIn buildFly Returns the UI elements of the module.
 #'
 #' @importFrom DT DTOutput
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 buildFlyUI <- function(id) {
@@ -30,20 +31,22 @@ buildFlyUI <- function(id) {
     tabsetPanel(
       id = ns("panel_build_Fly"),
       tabPanel(
-        title = "Model values",
+        title = "Model Values",
         DTOutput(ns("dt_model_values"))),
       tabPanel(
-        title = "shp and csv files",
+        title = "File Uploads",
         fluidRow(uiOutput(ns("browsers_tables")))
       )
     ),
-    oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply")
+    oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply") %>%
+      bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonselsettings, placement = "right")
   )
 }
 
 
 # Model Details Server -------------------------------------------
 
+#' buildFly
 #'
 #' @param portfolioID Selected portfolio ID.
 #' @param modelID Selected model ID.
@@ -56,6 +59,8 @@ buildFlyUI <- function(id) {
 #' @importFrom DT renderDT
 #' @importFrom shinyjs enable
 #' @importFrom shinyjs disable
+#' @importFrom shinyjs show
+#' @importFrom shinyjs hide
 #'
 #' @export
 buildFly <- function(input,
@@ -167,7 +172,8 @@ buildFly <- function(input,
   })
 
   output$dt_model_values <- renderDT(server = FALSE, {
-    datatable(result$settings_tbl, editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none")
+    datatable(result$settings_tbl, caption = "Double click on Default values to edit",
+              editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none")
   })
 
   # extrapolate changed cells
@@ -188,13 +194,17 @@ buildFly <- function(input,
         paste(strsplit(df_selectors[[i]]$name, "_")[[1]], collapse = " ")
       })
       accept <- lapply(seq_len(length(df_selectors)), function(i) {
-        paste0(".", unlist(df_selectors[[i]]$search_filters))
+        ext <- paste0(".", unlist(df_selectors[[i]]$search_filters))
+        if (ext == ".shp") {
+          ext <- NULL
+        }
+        ext
       })
       result$outputID <- result$inputID
       ui_content <- list()
       for (i in seq_len(length(df_selectors))) {
-        ui_content[[i * 2]] <- fluidRow(column(12, DTOutput(ns(paste0("dt_",result$outputID[i])))))
-        ui_content[[i * 2 - 1]] <- fluidRow(column(12, fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
+        ui_content[[i * 2]] <- fluidRow(column(1), column(10, DTOutput(ns(paste0("dt_",result$outputID[i])))))
+        ui_content[[i * 2 - 1]] <- fluidRow(column(1), column(10, fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
                                                       multiple = TRUE, accept = accept[i])))
       }
       tagList(ui_content)
@@ -249,6 +259,14 @@ buildFly <- function(input,
         }
       })
     })
+  })
+
+  observeEvent(input$panel_build_Fly, {
+    if (input$panel_build_Fly == "File Uploads") {
+      hide("abuttonselsettings")
+    } else if (input$panel_build_Fly == "Model Values") {
+      show("abuttonselsettings")
+    }
   })
 
   # output new analysis settings with changed values
@@ -383,16 +401,6 @@ buildFly <- function(input,
     }
 
     core_model_settings <- fetch_model_settings(result$tbl_modelsDetails$model_settings)
-
-
-    core_model_settings_rm <- c(grep("hazard_intensity_scale_factors", names(core_model_settings)),
-                                     grep("vulnerability_scale_factors", names(core_model_settings)))
-    core_model_settings <- core_model_settings[-core_model_settings_rm]
-    if (!is.null(core_model_settings$models_to_use) && core_model_settings$models_to_use == "Global:Europe") {
-      core_model_settings$models_to_use <- "Global"
-    }
-    # core_model_settings <- core_model_settings[-c(5,6)] # scale factors don't work.
-    # core_model_settings <- core_model_settings[-c(15)] # Global:Europe doesn't work, whereas Global does
 
     filtered_settings <- c("model_configurable" = TRUE, core_model_settings)
 
