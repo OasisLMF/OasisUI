@@ -4,14 +4,12 @@
 \alias{advancedConfig_funs}
 \title{Advanced Output Configuration functions}
 \usage{
-advancedConfig_funs(session, model_settings, configurable)
+advancedConfig_funs(session, model_settings)
 }
 \arguments{
 \item{session}{Current session.}
 
 \item{model_settings}{Model settings retrieved from the API.}
-
-\item{configurable}{Whether model is configurable or not}
 }
 \value{
 List of UI elements (input/selector widgets).

@@ -586,8 +586,8 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelBuildFly")
     show("panelBuildFly")
     hide("panelModelDetails")
-    hide("anaName")
-    hide("abuttonsubmit")
+    disable("anaName")
+    disable("abuttonsubmit")
     logMessage("showing panelBuildFly")
   })
 
@@ -656,7 +656,8 @@ step2_chooseAnalysis <- function(input, output, session,
 
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
 
-      if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
+      if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) &&
+          model_settings$model_configurable && !is.null(sub_modules$buildFly$fullsettings())) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
           query_body = sub_modules$buildFly$fullsettings()
@@ -711,8 +712,13 @@ step2_chooseAnalysis <- function(input, output, session,
   #Make submit button dependent of analysis name
   observeEvent({
     input$dt_models_rows_selected
-    input$anaName}, ignoreInit = TRUE, {
-      if (length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
+    input$anaName
+    sub_modules$buildFly$fullsettings()}, ignoreInit = TRUE, {
+      if (result$tbl_analysesData[input$dt_models_rows_selected,]$model == 451 && !is.null(sub_modules$buildFly$fullsettings()) &&
+          length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
+        enable("abuttonsubmit")
+      } else if (result$tbl_analysesData[input$dt_models_rows_selected,]$model != 451 &&
+                 length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
         enable("abuttonsubmit")
       } else {
         disable("abuttonsubmit")

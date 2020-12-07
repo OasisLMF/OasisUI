@@ -59,25 +59,12 @@ basicConfig_funs <- function(session, model_settings) {
 #'
 #' @param session Current session.
 #' @param model_settings Model settings retrieved from the API.
-#' @param configurable Whether model is configurable or not
 #'
 #' @return List of UI elements (input/selector widgets).
 #'
 #' @export
-advancedConfig_funs <- function(session, model_settings, configurable) {
+advancedConfig_funs <- function(session, model_settings) {
   ns <- session$ns
-
-  # if (configurable) {
-  #   # events_dir_path and hazard_intensity_thresholds are not in the model settings.
-  #   # hazard_intensity_threshold is though, switching to that.
-  #   # this set needs to be data-driven, use the field "used_for"
-  #   include_list <- c("events_dir_path", "event_subset", "min_rp", "hazard_intensity_threshold",
-  #                     "hazard_intensity_scale_factors", "vulnerability_scale_factors")
-  #   include_entries <- unlist(lapply(include_list, function(x) {
-  #     grep(x, model_settings)
-  #   }))
-  #   model_settings <- model_settings[include_entries]
-  # }
 
   # string parameters
   .string_fun <- function(model_settings) {

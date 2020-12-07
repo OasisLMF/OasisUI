@@ -104,62 +104,10 @@ buildFly <- function(input,
   }, ignoreInit = TRUE, {
     show("panel_build_fly_actions")
     selectRows(proxy = dataTableProxy("dt_model_values"), selected = NULL)
-    result$tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-      query_path = paste("models", modelID(), "settings", sep = "/"),
-      query_method = "GET"
-    )
-    result$tbl_files <- session$userData$data_hub$return_tbl_dataFiles(name = "")
-    result$list_files <- list()
-    result$file_ids <- list()
-
-    # get entries for table: name, description and default value(s)
-    tbl_mdl_settings <- result$tbl_modelsDetails$model_settings
-    # drop "parameter_groups" (and potentially other unknown entries):
-    subset_settings <- names(tbl_mdl_settings) %in% c("event_set",
-                                                      "event_occurrence_id",
-                                                      "string_parameters",
-                                                      "boolean_parameters",
-                                                      "float_parameters",
-                                                      "list_parameters",
-                                                      "dictionary_parameters",
-                                                      "dropdown_parameters")
-    tbl_mdl_settings <- tbl_mdl_settings[subset_settings]
-    settings_names <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
-      if (is.null(tbl_mdl_settings[[x]]$name)) {
-        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
-          tbl_mdl_settings[[x]][[y]]$name
-        })
-      } else {
-        tbl_mdl_settings[[x]]$name
-      }
-    }))
-
-    settings_desc <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
-      if (is.null(tbl_mdl_settings[[x]]$desc)) {
-        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
-          tbl_mdl_settings[[x]][[y]]$desc
-        })
-      } else {
-        tbl_mdl_settings[[x]]$desc
-      }
-    }))
-
-    settings_default <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
-      if (is.null(tbl_mdl_settings[[x]]$default)) {
-        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
-          paste(unlist(tbl_mdl_settings[[x]][[y]]$default), collapse = ", ")
-        })
-      } else {
-        paste(unlist(tbl_mdl_settings[[x]]$default), collapse = ", ")
-      }
-    }))
-
-    result$settings_df <- data.frame(names = settings_names, descr = settings_desc, value = settings_default,
-                                     changed = rep(FALSE, times = length(settings_names)), stringsAsFactors = FALSE)
-    tmp_df <- result$settings_df[, c("names", "descr", "value")]
-    colnames(tmp_df) <- c("Model Settings", "Description", "Default")
-    # output$dt_model_values depends (renders) on this one:
-    result$settings_tbl <- tmp_df
+    # initialize table selection to NULL every time panel is opened
+    result$settings_df <- NULL
+    result$tbl_modelsDetails <- NULL
+    .reloadtbl_modelsValue()
   })
 
   output$paneltitle_BuildFly <- renderUI({
@@ -172,7 +120,7 @@ buildFly <- function(input,
   })
 
   output$dt_model_values <- renderDT(server = FALSE, {
-    datatable(result$settings_tbl, caption = "Double click on Default values to edit",
+    datatable(.reloadtbl_modelsValue(), caption = "Double click on Default values to edit",
               editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none")
   })
 
@@ -421,6 +369,66 @@ buildFly <- function(input,
       )
     ))
   })
+
+  .reloadtbl_modelsValue <- function() {
+    result$tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID(), "settings", sep = "/"),
+      query_method = "GET"
+    )
+    result$tbl_files <- session$userData$data_hub$return_tbl_dataFiles(name = "")
+    result$list_files <- list()
+    result$file_ids <- list()
+
+    # get entries for table: name, description and default value(s)
+    tbl_mdl_settings <- result$tbl_modelsDetails$model_settings
+    # drop "parameter_groups" (and potentially other unknown entries):
+    subset_settings <- names(tbl_mdl_settings) %in% c("event_set",
+                                                      "event_occurrence_id",
+                                                      "string_parameters",
+                                                      "boolean_parameters",
+                                                      "float_parameters",
+                                                      "list_parameters",
+                                                      "dictionary_parameters",
+                                                      "dropdown_parameters")
+    tbl_mdl_settings <- tbl_mdl_settings[subset_settings]
+    settings_names <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
+      if (is.null(tbl_mdl_settings[[x]]$name)) {
+        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
+          tbl_mdl_settings[[x]][[y]]$name
+        })
+      } else {
+        tbl_mdl_settings[[x]]$name
+      }
+    }))
+
+    settings_desc <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
+      if (is.null(tbl_mdl_settings[[x]]$desc)) {
+        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
+          tbl_mdl_settings[[x]][[y]]$desc
+        })
+      } else {
+        tbl_mdl_settings[[x]]$desc
+      }
+    }))
+
+    settings_default <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
+      if (is.null(tbl_mdl_settings[[x]]$default)) {
+        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
+          paste(unlist(tbl_mdl_settings[[x]][[y]]$default), collapse = ", ")
+        })
+      } else {
+        paste(unlist(tbl_mdl_settings[[x]]$default), collapse = ", ")
+      }
+    }))
+
+    result$settings_df <- data.frame(names = settings_names, descr = settings_desc, value = settings_default,
+                                     changed = rep(FALSE, times = length(settings_names)), stringsAsFactors = FALSE)
+    tmp_df <- result$settings_df[, c("names", "descr", "value")]
+    colnames(tmp_df) <- c("Model Settings", "Description", "Default")
+    # output$dt_model_values depends (renders) on this one:
+    result$settings_tbl <- tmp_df
+    result$settings_tbl
+  }
 
   # Reload files table
   .reloadtbl_modelsFiles <- function() {

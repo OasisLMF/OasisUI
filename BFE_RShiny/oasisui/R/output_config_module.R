@@ -749,7 +749,7 @@ def_out_config <- function(input,
 
         # Advanced model params
         output$advanced_model_param <- renderUI({
-          advancedConfig_funs(session, model_settings, configurable)
+          advancedConfig_funs(session, model_settings)
         })
       }
     }
@@ -757,7 +757,7 @@ def_out_config <- function(input,
 
   # utility used in the function above
   .update_mdlsettings_defaults_with_anavalues <- function(model_settings, ana_mdlsettings) {
-    if (!is.null(ana_mdlsettings)) {
+    if (length(ana_mdlsettings) > 0) {
       # basic params
       model_settings$event_set.default <- ana_mdlsettings$event_set
       model_settings$event_occurrence_id.default <- ana_mdlsettings$event_occurrence_id
