@@ -176,7 +176,7 @@ buildFly <- function(input,
         # show last element of data frame first in table
         df <- df[nrow(df):1, ]
         colnames(df) <- c("ID", "Name")
-        datatable(df, selection = select)
+        datatable(df, selection = select, rownames = FALSE)
       })
     })
   })

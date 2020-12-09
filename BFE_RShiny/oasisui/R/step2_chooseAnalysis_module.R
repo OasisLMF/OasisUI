@@ -622,8 +622,7 @@ step2_chooseAnalysis <- function(input, output, session,
 
   observeEvent(sub_modules$buildFly$fullsettings(), {
     if (!is.null(sub_modules$buildFly$fullsettings())) {
-      show("anaName")
-      show("abuttonsubmit")
+      enable("anaName")
     }
   })
   observeEvent(sub_modules$buildFly$changeddefaults(), {
