@@ -643,13 +643,14 @@ DataHub <- R6Class(
     },
     # return data files filtered by name
     return_tbl_dataFiles = function(name) {
-      tbl_portfoliosData <-  private$oasisapi$return_df("data_files",  api_param = list(filename = name))
-      if (!is.null(tbl_portfoliosData) && nrow(tbl_portfoliosData) > 0 && is.null(tbl_portfoliosData$detail)) {
-        print(tbl_portfoliosData)
+      tbl_dataFiles <- private$oasisapi$return_df("data_files",  api_param = list(filename = name))
+      if (!is.null(tbl_dataFiles) && nrow(tbl_dataFiles) > 0) {
+        # no action needed
+        # print(tbl_dataFiles)
       } else {
-        tbl_portfoliosDetailsStatus <- NULL
+        tbl_dataFiles <- NULL
       }
-      tbl_portfoliosData
+      tbl_dataFiles
     }
   )
 )

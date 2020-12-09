@@ -156,7 +156,8 @@ panelModelTable <- function(id) {
       column(4,
              oasisuiButton(ns("abuttonmodeldetails"), "Show Model Details", style = "float:left") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonmodeldetails, placement = "right"),
-             oasisuiButton(ns("abuttonbuildfly"), "Customize model", style = "float:left")),
+             oasisuiButton(ns("abuttonbuildfly"), "Customize model", style = "float:left") %>%
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonbuildfly, placement = "right")),
       column(6,
              br(),
              div(textInput(inputId = ns("anaName"), label = "Analysis Name"), style = "float:right;")),
@@ -237,8 +238,6 @@ step2_chooseAnalysis <- function(input, output, session,
     analysisNAME = NULL,
     # exposure_counter
     exposure_counter = 0,
-    # analysis settings for step 2
-    #analysis_settings_step_2 = NULL,
     # modified default model settings values in case of customizable (configurable) models
     flyModSettings = NULL
   )
@@ -591,7 +590,7 @@ step2_chooseAnalysis <- function(input, output, session,
     logMessage("showing panelBuildFly")
   })
 
-  #Hide panel if model id changes
+  # Hide panel if model id changes
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelModelDetails")
     hide("panelBuildFly")
@@ -607,7 +606,6 @@ step2_chooseAnalysis <- function(input, output, session,
     active = reactive(TRUE)
   )
 
-  #result$analysis_settings_step_2 <- callModule(
   sub_modules$buildFly <- callModule(
     buildFly,
     id = "buildFly",
@@ -621,10 +619,12 @@ step2_chooseAnalysis <- function(input, output, session,
   )
 
   observeEvent(sub_modules$buildFly$fullsettings(), {
+    logMessage(paste0("output of buildFly: fullsettings observeEvent triggered"))
     if (!is.null(sub_modules$buildFly$fullsettings())) {
       enable("anaName")
     }
   })
+
   observeEvent(sub_modules$buildFly$changeddefaults(), {
     result$flyModSettings <- sub_modules$buildFly$changeddefaults()
     logMessage(paste0("output of buildFly: updating result$flyModSettings"))
@@ -686,8 +686,6 @@ step2_chooseAnalysis <- function(input, output, session,
                                                                    query_method = "PATCH")
       }
 
-      #browser()
-
       input_generation <- session$userData$oasisapi$api_post_query(
         query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/")
       )
@@ -708,23 +706,18 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Enable and disable buttons -------------------------------------------------
 
-  #Make submit button dependent of analysis name
+  # make submit button dependent on analysis name
   observeEvent({
     input$dt_models_rows_selected
-    input$anaName
-    sub_modules$buildFly$fullsettings()}, ignoreInit = TRUE, {
-      if (result$tbl_analysesData[input$dt_models_rows_selected,]$model == 451 && !is.null(sub_modules$buildFly$fullsettings()) &&
-          length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
-        enable("abuttonsubmit")
-      } else if (result$tbl_analysesData[input$dt_models_rows_selected,]$model != 451 &&
-                 length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
+    input$anaName}, ignoreInit = TRUE, {
+      if (length(input$dt_models_rows_selected) > 0 && !is.null(input$anaName) && input$anaName != "") {
         enable("abuttonsubmit")
       } else {
         disable("abuttonsubmit")
       }
     })
 
-  #note initialization causes the buttons to be enabled on app lounch if tables are empty
+  # note initialization causes the buttons to be enabled on app lounch if tables are empty
   observeEvent({
     result$tbl_analysesData
     input$dt_analyses_rows_selected
@@ -738,6 +731,7 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttonstartcancIG")
       disable("abuttonmodeldetails")
       disable("abuttonbuildfly")
+      enable("anaName")
       disable("abuttonpgotonextstep")
       disable("abuttonsubmit")
       if (length(input$dt_models_rows_selected) > 0) {
@@ -750,6 +744,10 @@ step2_chooseAnalysis <- function(input, output, session,
         if (length(model_settings) > 0 && !is.null(model_settings$model_configurable)) {
           if (model_settings$model_configurable) {
             enable("abuttonbuildfly")
+            # need to click "Customize" before being allowed to proceed
+            disable("anaName")
+            # we remove a potentially pre-entered name to make sure that the submit button is disabled
+            .clearinputanaName()
           }
         }
       }
@@ -775,7 +773,7 @@ step2_chooseAnalysis <- function(input, output, session,
       }
     })
 
-  #Not allowed creation of an analysis for an incomplete portfolio
+  # Not allowed creation of an analysis for an incomplete portfolio
   observeEvent({
     portfolioID()
     pfstatus()}, {
@@ -859,8 +857,8 @@ step2_chooseAnalysis <- function(input, output, session,
     invisible()
   }
 
-  #clear text input
-  .clearinputanaName <- function(){
+  # clear text input
+  .clearinputanaName <- function() {
     updateTextInput(session = session, inputId = "anaName", value = "")
   }
 

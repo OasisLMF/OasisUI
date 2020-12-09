@@ -120,7 +120,7 @@ buildFly <- function(input,
   })
 
   output$dt_model_values <- renderDT(server = FALSE, {
-    datatable(.reloadtbl_modelsValue(), caption = "Double click on Default values to edit",
+    datatable(result$settings_tbl, caption = "Double click on Default values to edit",
               editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none")
   })
 
