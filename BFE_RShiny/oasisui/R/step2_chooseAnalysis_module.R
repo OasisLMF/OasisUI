@@ -121,7 +121,7 @@ panelAnalysisLog <- function(id) {
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     div(class = "panel", style = 'overflow-y: scroll; max-height: 200px; min-height: 30px;',
-        textOutput(ns("text_analysislog"))
+        htmlOutput(ns("text_analysislog"))
     ),
     hidden(downloadButton(ns("download_log"), label = "Download"))
   )
@@ -489,7 +489,7 @@ step2_chooseAnalysis <- function(input, output, session,
     }
   })
 
-  output$text_analysislog <- renderText({
+  output$text_analysislog <- renderUI({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
       if (!is.null(result$tbl_analysislog)) {
@@ -866,7 +866,9 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
     if (!is.null(result$analysisID)) {
-      result$tbl_analysislog <- session$userData$oasisapi$return_df(paste("analyses", result$analysisID, "input_generation_traceback_file", sep = "/"))
+      result$tbl_analysislog <- session$userData$oasisapi$return_df(paste("analyses", result$analysisID,
+                                                                          "input_generation_traceback_file", sep = "/"))
+      result$tbl_analysislog <- HTML(paste0(result$tbl_analysislog))
     } else {
       result$tbl_analysislog <-  NULL
     }

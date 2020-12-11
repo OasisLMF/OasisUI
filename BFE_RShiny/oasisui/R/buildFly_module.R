@@ -26,6 +26,8 @@ buildFlyUI <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_BuildFly"), inline = TRUE),
+      oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply", style = "float: right;") %>%
+        bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonselsettings, placement = "right"),
       actionButton(inputId = ns("buttonhidebuildfly"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     tabsetPanel(
@@ -37,9 +39,7 @@ buildFlyUI <- function(id) {
         title = "File Uploads",
         fluidRow(uiOutput(ns("browsers_tables")))
       )
-    ),
-    oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply") %>%
-      bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonselsettings, placement = "right")
+    )
   )
 }
 
