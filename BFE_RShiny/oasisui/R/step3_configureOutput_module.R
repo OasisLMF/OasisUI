@@ -524,7 +524,7 @@ step3_configureOutput <- function(input, output, session,
     if (!is.null(result$anaID)) {
         result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste("analyses", result$anaID, "run_traceback_file",
                                                                              sep = "/"))
-        result$tbl_analysisrunlog <- HTML(paste0(result$tbl_analysisrunlog))
+        result$tbl_analysisrunlog <- pre(HTML(result$tbl_analysisrunlog))
     } else {
       result$tbl_analysisrunlog <-  NULL
     }

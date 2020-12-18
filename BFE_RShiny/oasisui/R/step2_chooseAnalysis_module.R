@@ -868,7 +868,7 @@ step2_chooseAnalysis <- function(input, output, session,
     if (!is.null(result$analysisID)) {
       result$tbl_analysislog <- session$userData$oasisapi$return_df(paste("analyses", result$analysisID,
                                                                           "input_generation_traceback_file", sep = "/"))
-      result$tbl_analysislog <- HTML(paste0(result$tbl_analysislog))
+      result$tbl_analysislog <- pre(HTML(result$tbl_analysislog))
     } else {
       result$tbl_analysislog <-  NULL
     }

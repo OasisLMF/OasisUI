@@ -26,9 +26,9 @@ buildFlyUI <- function(id) {
     heading = tagAppendChildren(
       h4(""),
       uiOutput(ns("paneltitle_BuildFly"), inline = TRUE),
+      actionButton(inputId = ns("buttonhidebuildfly"), label = NULL, icon = icon("times"), style = "float: right;"),
       oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply", style = "float: right;") %>%
-        bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonselsettings, placement = "right"),
-      actionButton(inputId = ns("buttonhidebuildfly"), label = NULL, icon = icon("times"), style = "float: right;")
+        bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonselsettings, placement = "right")
     ),
     tabsetPanel(
       id = ns("panel_build_Fly"),
@@ -121,7 +121,7 @@ buildFly <- function(input,
 
   output$dt_model_values <- renderDT(server = FALSE, {
     datatable(result$settings_tbl, caption = "Double click on Default values to edit",
-              editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none")
+              editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none", rownames = FALSE)
   })
 
   # extrapolate changed cells
@@ -143,9 +143,6 @@ buildFly <- function(input,
       })
       accept <- lapply(seq_len(length(df_selectors)), function(i) {
         ext <- paste0(".", unlist(df_selectors[[i]]$search_filters))
-        if (ext == ".shp") {
-          ext <- NULL
-        }
         ext
       })
       result$outputID <- result$inputID
@@ -153,7 +150,7 @@ buildFly <- function(input,
       for (i in seq_len(length(df_selectors))) {
         ui_content[[i * 2]] <- fluidRow(column(1), column(10, DTOutput(ns(paste0("dt_",result$outputID[i])))))
         ui_content[[i * 2 - 1]] <- fluidRow(column(1), column(10, fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
-                                                      multiple = TRUE, accept = accept[i])))
+                                                                            multiple = TRUE, accept = accept[i])))
       }
       tagList(ui_content)
     } else {
@@ -207,14 +204,6 @@ buildFly <- function(input,
         }
       })
     })
-  })
-
-  observeEvent(input$panel_build_Fly, {
-    if (input$panel_build_Fly == "File Uploads") {
-      hide("abuttonselsettings")
-    } else if (input$panel_build_Fly == "Model Values") {
-      show("abuttonselsettings")
-    }
   })
 
   # output new analysis settings with changed values
@@ -323,14 +312,14 @@ buildFly <- function(input,
 
       # create model settings for analysis settings
       model_settings_out <- c(model_settings$event_set.default,
-                          model_settings$event_occurrence_id.default,
-                          # note that boolean_input is a list, making sure that the result of this c() is a flat list!
-                          boolean_input,
-                          string_input,
-                          list_input,
-                          dict_input,
-                          float_input,
-                          dropdown_input)
+                              model_settings$event_occurrence_id.default,
+                              # note that boolean_input is a list, making sure that the result of this c() is a flat list!
+                              boolean_input,
+                              string_input,
+                              list_input,
+                              dict_input,
+                              float_input,
+                              dropdown_input)
       # NULL or list() elements won't survive the c() above!
 
       # create list/vector of names for model settings
@@ -391,6 +380,12 @@ buildFly <- function(input,
                                                       "dictionary_parameters",
                                                       "dropdown_parameters")
     tbl_mdl_settings <- tbl_mdl_settings[subset_settings]
+    order_list <- unlist(lapply(seq_len(length(result$tbl_modelsDetails$model_settings$parameter_groups)), function(x) {
+      unlist(lapply(seq_len(length(result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$presentation_order)), function(y) {
+        result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$presentation_order[[y]]
+      }))
+    }))
+
     settings_names <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
       if (is.null(tbl_mdl_settings[[x]]$name)) {
         lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
@@ -401,6 +396,18 @@ buildFly <- function(input,
       }
     }))
 
+    reorder_names <- intersect(order_list, settings_names)
+    if (length(reorder_names) != length(settings_names)) {
+      extras <- unlist(lapply(settings_names, function(x) {
+        if (x %notin% reorder_names) {
+          grep(x, settings_names)
+        }
+      }))
+    } else {
+      extras <- NULL
+    }
+    reorder_nums <- unlist(lapply(reorder_names, function(x) {grep(x, settings_names)}))
+
     settings_desc <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
       if (is.null(tbl_mdl_settings[[x]]$desc)) {
         lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
@@ -410,6 +417,18 @@ buildFly <- function(input,
         tbl_mdl_settings[[x]]$desc
       }
     }))
+    reorder_desc <- c(settings_desc[extras], settings_desc[reorder_nums])
+
+    settings_tooltip <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
+      if (is.null(tbl_mdl_settings[[x]]$tooltip)) {
+        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
+          tbl_mdl_settings[[x]][[y]]$tooltip
+        })
+      } else {
+        tbl_mdl_settings[[x]]$tooltip
+      }
+    }))
+    reorder_tooltip <- c(settings_tooltip[extras], settings_tooltip[reorder_nums])
 
     settings_default <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
       if (is.null(tbl_mdl_settings[[x]]$default)) {
@@ -420,11 +439,12 @@ buildFly <- function(input,
         paste(unlist(tbl_mdl_settings[[x]]$default), collapse = ", ")
       }
     }))
+    reorder_default <- c(settings_default[extras], settings_default[reorder_nums])
 
-    result$settings_df <- data.frame(names = settings_names, descr = settings_desc, value = settings_default,
+    result$settings_df <- data.frame(names = settings_names, descr = reorder_desc, tooltip = reorder_tooltip, value = reorder_default,
                                      changed = rep(FALSE, times = length(settings_names)), stringsAsFactors = FALSE)
-    tmp_df <- result$settings_df[, c("names", "descr", "value")]
-    colnames(tmp_df) <- c("Model Settings", "Description", "Default")
+    tmp_df <- result$settings_df[, c("names", "descr", "tooltip", "value")]
+    colnames(tmp_df) <- c("Setting Name", "Description", "Tooltip", "Default")
     # output$dt_model_values depends (renders) on this one:
     result$settings_tbl <- tmp_df
     result$settings_tbl
