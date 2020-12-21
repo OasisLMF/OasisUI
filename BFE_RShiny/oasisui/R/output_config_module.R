@@ -815,7 +815,7 @@ def_out_config <- function(input,
         if (!is.null(input[[paste0("dictionary_parameters", x)]])) {
           setNames(input[[paste0("dictionary_parameters", x)]], names(model_settings[[x]]$default))
         } else if (!is.null(model_settings[[x]]$default)) {
-          setNames(model_settings[[x]]$default, names(model_settings[[x]]$default))
+          model_settings[[x]]$default
         }
       })
 

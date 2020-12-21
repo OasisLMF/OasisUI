@@ -219,14 +219,24 @@ buildFly <- function(input,
             findSetting <- new_settings$names %in% res_mdlsettings[[x]][[y]]
             # (typically new_settings$names will match the name attribute, i.e. res_mdlsettings[[x]][[y]]$name)
             if (any(findSetting)) {
-              result$tbl_modelsDetails$model_settings[[x]][[y]]$default <- new_settings$value[which(findSetting)]
+              if (is.list(res_mdlsettings[[x]][[y]]$default) && !is.null(names(res_mdlsettings[[x]][[y]]$default))) {
+                # dict parameters case
+                result$tbl_modelsDetails$model_settings[[x]][[y]]$default <- jsonlite::fromJSON(new_settings$value[which(findSetting)])
+              } else {
+                if (is.list(res_mdlsettings[[x]][[y]]$default)) {
+                  # list parameters case
+                  result$tbl_modelsDetails$model_settings[[x]][[y]]$default <- as.list(strsplit(new_settings$value[which(findSetting)], split = ",  ")[[1]])
+                } else {
+                  result$tbl_modelsDetails$model_settings[[x]][[y]]$default <- strsplit(new_settings$value[which(findSetting)], split = ",  ")[[1]]
+                }
+              }
             }
           })
         } else {
           # e.g. Event Occurrence
           findSetting <- new_settings$names %in% res_mdlsettings[[x]]
           if (any(findSetting)) {
-            result$tbl_modelsDetails$model_settings[[x]]$default <- new_settings$value[which(findSetting)]
+            result$tbl_modelsDetails$model_settings[[x]]$default <- strsplit(new_settings$value[which(findSetting)], split = ",  ")[[1]]
           }
         }
       }))
@@ -246,7 +256,7 @@ buildFly <- function(input,
 
       dict_input <- lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
         if (!is.null(model_settings[[x]]$default)) {
-          setNames(model_settings[[x]]$default, names(model_settings[[x]]$default))
+          model_settings[[x]]$default
         }
       })
 
@@ -433,10 +443,18 @@ buildFly <- function(input,
     settings_default <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
       if (is.null(tbl_mdl_settings[[x]]$default)) {
         lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
-          paste(unlist(tbl_mdl_settings[[x]][[y]]$default), collapse = ", ")
+          dflt <- tbl_mdl_settings[[x]][[y]]$default
+          if (is.list(dflt) && !is.null(names(dflt))) {
+            paste(jsonlite::toJSON(dflt))
+          } else {
+            # below works on a list same as on a vector
+            paste(dflt, collapse = ",  ")
+          }
         })
       } else {
-        paste(unlist(tbl_mdl_settings[[x]]$default), collapse = ", ")
+        # e.g. event set and event occurrence
+        # below works on a list same as on a vector
+        paste(tbl_mdl_settings[[x]]$default, collapse = ",  ")
       }
     }))
     reorder_default <- c(settings_default[extras], settings_default[reorder_nums])
