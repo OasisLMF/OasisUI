@@ -120,6 +120,7 @@ buildFly <- function(input,
   })
 
   output$dt_model_values <- renderDT(server = FALSE, {
+    .reloadtbl_modelsValue()
     datatable(result$settings_tbl, caption = "Double click on Default values to edit",
               editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none", rownames = FALSE)
   })
@@ -406,17 +407,18 @@ buildFly <- function(input,
       }
     }))
 
-    reorder_names <- intersect(order_list, settings_names)
-    if (length(reorder_names) != length(settings_names)) {
+    intersect_n <- intersect(order_list, settings_names)
+    if (length(intersect_n) != length(settings_names)) {
       extras <- unlist(lapply(settings_names, function(x) {
-        if (x %notin% reorder_names) {
+        if (x %notin% intersect_n) {
           grep(x, settings_names)
         }
       }))
     } else {
       extras <- NULL
     }
-    reorder_nums <- unlist(lapply(reorder_names, function(x) {grep(x, settings_names)}))
+    reorder_nums <- unlist(lapply(intersect_n, function(x) {grep(x, settings_names)}))
+    reorder_names <- c(settings_names[extras], settings_names[reorder_nums])
 
     settings_desc <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
       if (is.null(tbl_mdl_settings[[x]]$desc)) {
@@ -459,7 +461,7 @@ buildFly <- function(input,
     }))
     reorder_default <- c(settings_default[extras], settings_default[reorder_nums])
 
-    result$settings_df <- data.frame(names = settings_names, descr = reorder_desc, tooltip = reorder_tooltip, value = reorder_default,
+    result$settings_df <- data.frame(names = reorder_names, descr = reorder_desc, tooltip = reorder_tooltip, value = reorder_default,
                                      changed = rep(FALSE, times = length(settings_names)), stringsAsFactors = FALSE)
     tmp_df <- result$settings_df[, c("names", "descr", "tooltip", "value")]
     colnames(tmp_df) <- c("Setting Name", "Description", "Tooltip", "Default")

@@ -628,6 +628,9 @@ step2_chooseAnalysis <- function(input, output, session,
   observeEvent(sub_modules$buildFly$changeddefaults(), {
     result$flyModSettings <- sub_modules$buildFly$changeddefaults()
     logMessage(paste0("output of buildFly: updating result$flyModSettings"))
+    if (!is.null(sub_modules$buildFly$fullsettings())) {
+      enable("anaName")
+    }
   })
 
 
