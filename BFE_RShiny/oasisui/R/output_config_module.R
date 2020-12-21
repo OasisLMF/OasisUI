@@ -1019,12 +1019,6 @@ def_out_config <- function(input,
       }
     }
 
-    if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
-      model_configurable <- TRUE
-    } else {
-      model_configurable <- FALSE
-    }
-
     analysis_settings <- list(analysis_settings = c(
       inputsettings,
       list(
@@ -1035,7 +1029,7 @@ def_out_config <- function(input,
         ri_output = "RI" %in% input$chkboxgrplosstypes,
         ri_summaries = fetch_summary("RI", input$chkboxgrplosstypes)
       ),
-      list(model_settings = c(model_configurable = model_configurable, fetch_model_settings(tbl_modelsDetails$model_settings, ana_mdlsettings)))
+      list(model_settings = c(fetch_model_settings(tbl_modelsDetails$model_settings, ana_mdlsettings)))
     ))
     analysis_settings
   }

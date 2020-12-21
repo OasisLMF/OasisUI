@@ -61,7 +61,6 @@ oasisuiTable <- function(input, output, session,
   ns <- session$ns
 
   output$dt_oasisuiTable <- renderDT({
-
     if (!is.null(data())) {
       tbl_oasisuiTable <- data()
     } else {
@@ -82,7 +81,7 @@ oasisuiTable <- function(input, output, session,
                                   escape = escape)
       )
     } else {
-      if (length(tbl_oasisuiTable) < 10) {
+      if (nrow(tbl_oasisuiTable) < 10) {
         dt <- datatable(tbl_oasisuiTable, options = list(dom = 't'))
       } else {
         dt <- datatable(tbl_oasisuiTable, options = list(dom = 'p'))
