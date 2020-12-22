@@ -149,7 +149,7 @@ buildFly <- function(input,
       result$outputID <- result$inputID
       ui_content <- list()
       for (i in seq_len(length(df_selectors))) {
-        ui_content[[i * 2]] <- fluidRow(column(1), column(10, DTOutput(ns(paste0("dt_",result$outputID[i])))))
+        ui_content[[i * 2]] <- fluidRow(column(1), column(10, DTOutput(ns(paste0("dt_", result$outputID[i])))))
         ui_content[[i * 2 - 1]] <- fluidRow(column(1), column(10, fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
                                                                             multiple = TRUE, accept = accept[i])))
       }
@@ -173,18 +173,30 @@ buildFly <- function(input,
         df <- data.frame(id = tbl_files_filtered$id, names = tbl_files_filtered$filename)
         # show last element of data frame first in table
         df <- df[nrow(df):1, ]
-        colnames(df) <- c("ID", "Name")
-        datatable(df, selection = select, rownames = FALSE)
+        if (length(df) > 0) {
+          colnames(df) <- c("ID", "Name")
+          datatable(df, selection = select, rownames = FALSE)
+        } else {
+          datatable(data.frame("ID" = character(0), "Name" = character(0)), rownames = FALSE)
+        }
       })
     })
   })
 
   observeEvent(result$inputID, {
     h <- unlist(result$inputID)
+    df_selectors <- result$tbl_modelsDetails$data_settings$datafile_selectors
     lapply(seq_len(length(h)), function(i) {
+      check_ext <- paste0(".", unlist(df_selectors[[i]]$search_filters))
       observeEvent(input[[h[i]]], {
         for (j in seq_len(nrow(input[[h[i]]]))) {
-          .uploadDamageFile(file_entry = h[i], file_name = input[[h[i]]][j, ])
+          for (k in check_ext) {
+            if (grepl(k, input[[h[i]]][j]$name)) {
+              .uploadDamageFile(file_entry = h[i], file_name = input[[h[i]]][j, ])
+            } else {
+              oasisuiNotification(type = "error", paste("Extension not supported."))
+            }
+          }
         }
       })
     })
