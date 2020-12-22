@@ -107,6 +107,7 @@ buildFly <- function(input,
     # initialize table selection to NULL every time panel is opened
     result$settings_df <- NULL
     result$tbl_modelsDetails <- NULL
+    result$settings_tbl <- NULL
     .reloadtbl_modelsValue()
   })
 
@@ -120,7 +121,6 @@ buildFly <- function(input,
   })
 
   output$dt_model_values <- renderDT(server = FALSE, {
-    .reloadtbl_modelsValue()
     datatable(result$settings_tbl, caption = "Double click on Default values to edit",
               editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none", rownames = FALSE)
   })
