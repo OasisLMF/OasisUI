@@ -34,6 +34,7 @@ buildFlyUI <- function(id) {
       id = ns("panel_build_Fly"),
       tabPanel(
         title = "Model Values",
+        numericInput(ns("inputnumsamples"), label = "Number of Samples:", value = 0),
         DTOutput(ns("dt_model_values"))),
       tabPanel(
         title = "File Uploads",
@@ -191,7 +192,7 @@ buildFly <- function(input,
       observeEvent(input[[h[i]]], {
         for (j in seq_len(nrow(input[[h[i]]]))) {
           for (k in check_ext) {
-            if (grepl(k, input[[h[i]]][j]$name)) {
+            if (grepl(k, input[[h[i]]][j,]$name)) {
               .uploadDamageFile(file_entry = h[i], file_name = input[[h[i]]][j, ])
             } else {
               oasisuiNotification(type = "error", paste("Extension not supported."))
@@ -374,7 +375,7 @@ buildFly <- function(input,
       list(
         module_supplier_id = supplierID(),
         model_version_id = versionID(),
-        number_of_samples = 0,
+        number_of_samples = input$inputnumsamples,
         model_settings = c(filtered_settings, result$list_files),
         gul_output = FALSE,
         gul_summaries = list(gul_summaries)
