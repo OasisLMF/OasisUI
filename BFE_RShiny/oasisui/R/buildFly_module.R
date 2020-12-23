@@ -191,12 +191,10 @@ buildFly <- function(input,
       check_ext <- paste0(".", unlist(df_selectors[[i]]$search_filters))
       observeEvent(input[[h[i]]], {
         for (j in seq_len(nrow(input[[h[i]]]))) {
-          for (k in check_ext) {
-            if (grepl(k, input[[h[i]]][j,]$name)) {
-              .uploadDamageFile(file_entry = h[i], file_name = input[[h[i]]][j, ])
-            } else {
-              oasisuiNotification(type = "error", paste("Extension not supported."))
-            }
+          if (paste0(".", tools::file_ext(input[[h[i]]][j,]$name)) %in% check_ext) {
+            .uploadDamageFile(file_entry = h[i], file_name = input[[h[i]]][j, ])
+          } else {
+            oasisuiNotification(type = "error", paste("Extension not supported."))
           }
         }
       })
