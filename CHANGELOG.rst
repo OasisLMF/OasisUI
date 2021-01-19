@@ -1,6 +1,10 @@
 OasisUI Changelog
 ==================
 
+`1.8.2`_
+--------
+* [#243](https://github.com/OasisLMF/OasisUI/issues/243) - Fix fallback for Max upload filesize
+
 `1.8.1`_
 --------
 * [#236](https://github.com/OasisLMF/OasisUI/issues/236) - Added Environment variable to increase max file size upload
