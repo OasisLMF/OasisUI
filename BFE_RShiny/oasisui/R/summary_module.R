@@ -108,7 +108,7 @@ summarytab <- function(input, output, session,
       # Initialize variables
       SummaryData1 <- NULL
       SummaryData2 <- NULL
-      SummaryData <- NULL
+      # SummaryData <- NULL
 
       if (!is.null(selectAnaID1()) && portfolioID1() != "" && !is.null(tbl_filesListDataana1())) {
         SummaryData1 <- .getSummary(selectAnaID1(), portfolioID1())
