@@ -23,7 +23,7 @@ step2_chooseAnalysisUI <- function(id) {
     hidden(div(id = ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
     hidden(div(id = ns("panelModelDetails"), modeldetailsUI(ns("modeldetails")))),
-    hidden(div(id = ns("panelBuildFly"), buildFlyUI(ns("buildFly"))))
+    hidden(div(id = ns("panelBuildCustom"), buildCustomUI(ns("buildCustom"))))
   )
 }
 
@@ -156,8 +156,8 @@ panelModelTable <- function(id) {
       column(4,
              oasisuiButton(ns("abuttonmodeldetails"), "Show Model Details", style = "float:left") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonmodeldetails, placement = "right"),
-             oasisuiButton(ns("abuttonbuildfly"), "Customize model", style = "float:left") %>%
-               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonbuildfly, placement = "right")),
+             oasisuiButton(ns("abuttonbuildcustom"), "Customize model", style = "float:left") %>%
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonbuildcustom, placement = "right")),
       column(6,
              br(),
              div(textInput(inputId = ns("anaName"), label = "Analysis Name"), style = "float:right;")),
@@ -239,7 +239,7 @@ step2_chooseAnalysis <- function(input, output, session,
     # exposure_counter
     exposure_counter = 0,
     # modified default model settings values in case of customizable (configurable) models
-    flyModSettings = NULL
+    customModSettings = NULL
   )
 
   # Panels Visualization -------------------------------------------------------
@@ -336,7 +336,7 @@ step2_chooseAnalysis <- function(input, output, session,
       hide("panelModelTable")
       hide("panelAnalysisGenInputs")
       hide("panelModelDetails")
-      hide("panelBuildFly")
+      hide("panelBuildCustom")
       input_generation <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
       if (input_generation$status == "Success") {
         oasisuiNotification(type = "message",
@@ -384,7 +384,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
-    hide("panelBuildFly")
+    hide("panelBuildCustom")
   })
 
   observeEvent(input$abuttonConfirmDelIG, {
@@ -415,7 +415,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
-    hide("panelBuildFly")
+    hide("panelBuildCustom")
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
   })
@@ -452,7 +452,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
-    hide("panelBuildFly")
+    hide("panelBuildCustom")
     logMessage("showing panelAnalysisLog")
     show("panelAnalysisLog")
     .reloadAnaLog()
@@ -572,28 +572,28 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
-    hide("panelBuildFly")
+    hide("panelBuildCustom")
     logMessage("showing panelModelDetails")
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
   })
 
-  observeEvent(input$abuttonbuildfly, {
+  observeEvent(input$abuttonbuildcustom, {
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
-    logMessage("showing panelBuildFly")
-    show("panelBuildFly")
+    logMessage("showing panelBuildCustom")
+    show("panelBuildCustom")
     hide("panelModelDetails")
     disable("anaName")
     disable("abuttonsubmit")
-    logMessage("showing panelBuildFly")
+    logMessage("showing panelBuildCustom")
   })
 
   # Hide panel if model id changes
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelModelDetails")
-    hide("panelBuildFly")
+    hide("panelBuildCustom")
   })
 
   callModule(
@@ -606,29 +606,29 @@ step2_chooseAnalysis <- function(input, output, session,
     active = reactive(TRUE)
   )
 
-  sub_modules$buildFly <- callModule(
-    buildFly,
-    id = "buildFly",
+  sub_modules$buildCustom <- callModule(
+    buildCustom,
+    id = "buildCustom",
     portfolioID = reactive({portfolioID()}),
     modelID = reactive({result$modelID}),
     supplierID = reactive({result$supplierID}),
     versionID = reactive({result$versionID}),
     analysisID = reactive({result$analysisID}),
-    counter = reactive({input$abuttonbuildfly}),
+    counter = reactive({input$abuttonbuildcustom}),
     active = reactive(TRUE)
   )
 
-  observeEvent(sub_modules$buildFly$fullsettings(), {
-    logMessage(paste0("output of buildFly: fullsettings observeEvent triggered"))
-    if (!is.null(sub_modules$buildFly$fullsettings())) {
+  observeEvent(sub_modules$buildCustom$fullsettings(), {
+    logMessage(paste0("output of buildCustom: fullsettings observeEvent triggered"))
+    if (!is.null(sub_modules$buildCustom$fullsettings())) {
       enable("anaName")
     }
   })
 
-  observeEvent(sub_modules$buildFly$changeddefaults(), {
-    result$flyModSettings <- sub_modules$buildFly$changeddefaults()
-    logMessage(paste0("output of buildFly: updating result$flyModSettings"))
-    if (!is.null(sub_modules$buildFly$fullsettings())) {
+  observeEvent(sub_modules$buildCustom$changeddefaults(), {
+    result$customModSettings <- sub_modules$buildCustom$changeddefaults()
+    logMessage(paste0("output of buildCustom: updating result$customModSettings"))
+    if (!is.null(sub_modules$buildCustom$fullsettings())) {
       enable("anaName")
     }
   })
@@ -659,10 +659,10 @@ step2_chooseAnalysis <- function(input, output, session,
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
 
       if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) &&
-          model_settings$model_configurable && !is.null(sub_modules$buildFly$fullsettings())) {
+          model_settings$model_configurable && !is.null(sub_modules$buildCustom$fullsettings())) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
-          query_body = sub_modules$buildFly$fullsettings()
+          query_body = sub_modules$buildCustom$fullsettings()
         )
       } else {
         gul_summaries <- summary_template
@@ -683,7 +683,7 @@ step2_chooseAnalysis <- function(input, output, session,
         )
       }
       if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
-        fileids <- as.list(sub_modules$buildFly$fileids())
+        fileids <- as.list(sub_modules$buildCustom$fileids())
         patch_analyses <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", result$analysisID, sep = "/"),
                                                                    query_body = list(complex_model_data_files = fileids),
                                                                    query_method = "PATCH")
@@ -704,7 +704,7 @@ step2_chooseAnalysis <- function(input, output, session,
     }
     hide("panelModelTable")
     hide("panelModelDetails")
-    hide("panelBuildFly")
+    hide("panelbuildCustom")
   })
 
   # Enable and disable buttons -------------------------------------------------
@@ -733,7 +733,7 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttondelana")
       disable("abuttonstartcancIG")
       disable("abuttonmodeldetails")
-      disable("abuttonbuildfly")
+      disable("abuttonbuildcustom")
       enable("anaName")
       disable("abuttonpgotonextstep")
       disable("abuttonsubmit")
@@ -746,7 +746,7 @@ step2_chooseAnalysis <- function(input, output, session,
         )
         if (length(model_settings) > 0 && !is.null(model_settings$model_configurable)) {
           if (model_settings$model_configurable) {
-            enable("abuttonbuildfly")
+            enable("abuttonbuildcustom")
             # need to click "Customize" before being allowed to proceed
             disable("anaName")
             # we remove a potentially pre-entered name to make sure that the submit button is disabled
@@ -823,7 +823,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
-    hide("panelBuildFly")
+    hide("panelBuildCustom")
   }
 
   # show default analysis details
@@ -894,7 +894,7 @@ step2_chooseAnalysis <- function(input, output, session,
     list(
       analysisID = reactive({result$analysisID}),
       newstep = reactive({input$abuttonpgotonextstep}),
-      flysettings = reactive({result$flyModSettings})
+      customsettings = reactive({result$customModSettings})
     )
   )
 

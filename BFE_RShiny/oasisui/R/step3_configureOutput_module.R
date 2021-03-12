@@ -113,7 +113,7 @@ panelAnalysisLogs <- function(id) {
 #' @param portfolioID Selected portfolio ID.
 #' @param analysisID Selected analysis ID.
 #' @param pfName Name of selected portfolio.
-#' @param flyModSettings Fly Model settings.
+#' @param customModSettings Customizable Model settings.
 #'
 #' @return dashboardAnaID id of selected run.
 #'
@@ -138,7 +138,7 @@ step3_configureOutput <- function(input, output, session,
                                   portfolioID = reactive(""),
                                   pfName = reactive(""),
                                   analysisID = reactive(NULL),
-                                  flyModSettings = reactive(NULL)
+                                  customModSettings = reactive(NULL)
 ) {
 
   ns <- session$ns
@@ -319,7 +319,7 @@ step3_configureOutput <- function(input, output, session,
     ana_flag = reactive(result$ana_flag),
     counter = reactive({input$abuttonrunconfig}),
     active = active,
-    flyModSettings = flyModSettings
+    customModSettings = customModSettings
   )
 
   # update ana flag

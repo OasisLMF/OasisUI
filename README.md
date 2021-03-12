@@ -8,6 +8,9 @@ Web-based application client for managing exposure data and operating modelling 
   * Python Flask server providing services for interacting with exposure and output data
   * SQL server database
 
+## YouTube UI Walkthrough
+[![Oasis UI Walkthrough](https://img.youtube.com/vi/tHRetuhpQzA/0.jpg)](https://www.youtube.com/watch?v=tHRetuhpQzA)
+
 ## First Steps
 
 ### Simple environment

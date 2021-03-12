@@ -191,7 +191,7 @@ panelOutputParamsDetails <- function(id) {
 #' @param analysisName Selected analysis name.
 #' @param ana_flag Flag to know if the user is creating a new output configuration or rerunning an analysis.
 #' @param counter Counter to decide whether to clear output options and show some panel (?)
-#' @param flyModSettings Fly Model settings.
+#' @param customModSettings Customizable Model settings.
 #'
 #' @return ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.
 #' @return ana_post_status status of posting the analysis.
@@ -213,7 +213,7 @@ def_out_config <- function(input,
                            ana_flag = reactive("C"),
                            counter = reactive(NULL),
                            active = reactive(TRUE),
-                           flyModSettings = reactive(NULL)) {
+                           customModSettings = reactive(NULL)) {
   ns <- session$ns
 
   # max number rows for custom output params is 9, but set to 8 when counting from 0
@@ -786,8 +786,8 @@ def_out_config <- function(input,
       query_method = "GET"
     )
     if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
-      print("flyModSettings in output_config_module:")
-      print(flyModSettings())
+      print("customModSettings in output_config_module:")
+      print(customModSettings())
       tbl_ana_settings <- session$userData$oasisapi$api_return_query_res(
         query_path = paste("analyses", analysisID(), "settings", sep = "/"),
         query_method = "GET"

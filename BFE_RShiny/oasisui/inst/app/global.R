@@ -4,8 +4,10 @@
 
 library(oasisui, warn.conflicts = FALSE)
 
-#Extend max uploadable file size from default 5MB to 40MB
-options(shiny.maxRequestSize = 400*1024^2)
+#Extend max uploadable file size from default 400MB, with option to read size in MB from env
+env_upload = as.integer(Sys.getenv("MAX_UPLOAD_SIZE", unset = 400))
+if (is.na(env_upload) || env_upload < 400) {upload_size = 400} else {upload_size = env_upload}
+options(shiny.maxRequestSize = upload_size*1024^2)
 
 ### logger ---------------------------------------------------------------------
 loginfo("testing logger", logger = "oasisui.module")

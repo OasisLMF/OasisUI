@@ -1,37 +1,37 @@
 # Shared Module documentation --------------------------------------------------
 #' Hazard Map Module
 #'
-#' Shiny Module for showing fly details.
+#' Shiny Module for showing customized details.
 #'
 #' @template params-module
 #'
-#' @name buildFly
+#' @name buildCustom
 NULL
 
 
-# Build Fly UI -----------------------------------------------
+# Build Custom UI -----------------------------------------------
 
-#' @describeIn buildFly Returns the UI elements of the module.
+#' @describeIn BuildCustom Returns the UI elements of the module.
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
-buildFlyUI <- function(id) {
+buildCustomUI <- function(id) {
 
   ns <- NS(id)
   oasisuiPanel(
-    ns("panel_build_fly_actions"),
+    ns("panel_build_custom_actions"),
     collapsible = FALSE,
     heading = tagAppendChildren(
       h4(""),
-      uiOutput(ns("paneltitle_BuildFly"), inline = TRUE),
-      actionButton(inputId = ns("buttonhidebuildfly"), label = NULL, icon = icon("times"), style = "float: right;"),
+      uiOutput(ns("paneltitle_BuildCustom"), inline = TRUE),
+      actionButton(inputId = ns("buttonhidebuildcustom"), label = NULL, icon = icon("times"), style = "float: right;"),
       oasisuiButton(inputId = ns("abuttonselsettings"), label = "Apply", style = "float: right;") %>%
         bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonselsettings, placement = "right")
     ),
     tabsetPanel(
-      id = ns("panel_build_Fly"),
+      id = ns("panel_build_Custom"),
       tabPanel(
         title = "Model Values",
         numericInput(ns("inputnumsamples"), label = "Number of Samples:", value = 0),
@@ -47,7 +47,7 @@ buildFlyUI <- function(id) {
 
 # Model Details Server -------------------------------------------
 
-#' buildFly
+#' buildCustom
 #'
 #' @param portfolioID Selected portfolio ID.
 #' @param modelID Selected model ID.
@@ -55,7 +55,7 @@ buildFlyUI <- function(id) {
 #' @param versionID Selected model ID version.
 #' @param analysisID Selected analysis ID.
 #'
-#' @describeIn buildFly Allows user to build their own mode on the fly.
+#' @describeIn buildCustom Allows user to build their own mode on the fly.
 #'
 #' @importFrom DT renderDT
 #' @importFrom shinyjs enable
@@ -64,7 +64,7 @@ buildFlyUI <- function(id) {
 #' @importFrom shinyjs hide
 #'
 #' @export
-buildFly <- function(input,
+buildCustom <- function(input,
                      output,
                      session,
                      portfolioID,
@@ -103,7 +103,7 @@ buildFly <- function(input,
     active()
     counter()
   }, ignoreInit = TRUE, {
-    show("panel_build_fly_actions")
+    show("panel_build_custom_actions")
     selectRows(proxy = dataTableProxy("dt_model_values"), selected = NULL)
     # initialize table selection to NULL every time panel is opened
     result$settings_df <- NULL
@@ -112,13 +112,13 @@ buildFly <- function(input,
     .reloadtbl_modelsValue()
   })
 
-  output$paneltitle_BuildFly <- renderUI({
+  output$paneltitle_BuildCustom <- renderUI({
     "Change values in the model"
   })
 
-  observeEvent(input$buttonhidebuildfly, {
-    hide("panel_build_fly_actions")
-    logMessage("hiding panelBuildFly")
+  observeEvent(input$buttonhidebuildcustom, {
+    hide("panel_build_custom_actions")
+    logMessage("hiding panelBuildCustom")
   })
 
   output$dt_model_values <- renderDT(server = FALSE, {
@@ -363,8 +363,8 @@ buildFly <- function(input,
 
     filtered_settings <- c("model_configurable" = TRUE, core_model_settings)
 
-    hide("panel_build_fly_actions")
-    logMessage("hiding panelBuildFly")
+    hide("panel_build_custom_actions")
+    logMessage("hiding panelBuildCustom")
     oasisuiNotification(type = "message",
                         "Model settings filtered by chosen entries.")
     gul_summaries <- summary_template

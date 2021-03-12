@@ -53,7 +53,7 @@ singleAna <- function(input, output, session,
     # Portfolio status
     pfstatus = "",
     # modified default model settings values in case of customizable (configurable) models
-    flyModSettings = NULL
+    customModSettings = NULL
   )
 
   # Panels switch --------------------------------------------------------------
@@ -115,14 +115,14 @@ singleAna <- function(input, output, session,
     portfolioID =  reactive({input$portfolioID}),
     pfName = reactive({result$pfName}),
     analysisID = reactive({result$anaID}),
-    flyModSettings = reactive({result$flyModSettings})
+    customModSettings = reactive({result$customModSettings})
   )
 
   # Sub-Modules output ---------------------------------------------------------
-  # > Fly settings -------------------------------------------------------------
-  observeEvent(submodulesList$step2_chooseAnalysis$flysettings(), {
-    result$flyModSettings <- submodulesList$step2_chooseAnalysis$flysettings()
-    logMessage(paste0("output of step2: updating result$flyModSettings"))
+  # > Customizable settings -------------------------------------------------------------
+  observeEvent(submodulesList$step2_chooseAnalysis$customsettings(), {
+    result$customModSettings <- submodulesList$step2_chooseAnalysis$customsettings()
+    logMessage(paste0("output of step2: updating result$customModSettings"))
   })
 
   # > Navigation ---------------------------------------------------------------

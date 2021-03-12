@@ -48,7 +48,7 @@ defineSingleAna_tooltips <- list(
   abuttonpfsubmit = "Submit new portfolio",
   abuttondeletepf = "Delete selected portfolio",
   abuttonmodeldetails = "Show details for selected model",
-  abuttonbuildfly = "Customize parameters and datafiles of model",
+  abuttonbuildcustom = "Customize parameters and datafiles of model",
   abuttonexecuteanarun = "Execute run with given output configuration",
   abuttonshowlog = "Show log for selected analysis",
   abuttondisplayoutput = "Visualize outputs of selected analysis",
