@@ -91,7 +91,7 @@ panelAnalysisLogs <- function(id) {
       actionButton(inputId = ns("abuttonhidelog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     div(class = "panel", style = 'overflow-y: scroll; max-height: 200px; min-height: 30px;',
-        textOutput(ns("text_analysesrunlog"))
+        htmlOutput(ns("text_analysesrunlog"))
     ),
     hidden(downloadButton(ns("download_log"), label = "Download"))
   )
@@ -113,6 +113,7 @@ panelAnalysisLogs <- function(id) {
 #' @param portfolioID Selected portfolio ID.
 #' @param analysisID Selected analysis ID.
 #' @param pfName Name of selected portfolio.
+#' @param customModSettings Customizable Model settings.
 #'
 #' @return dashboardAnaID id of selected run.
 #'
@@ -136,7 +137,8 @@ step3_configureOutput <- function(input, output, session,
                                   currstep = reactive(-1),
                                   portfolioID = reactive(""),
                                   pfName = reactive(""),
-                                  analysisID = reactive(NULL)
+                                  analysisID = reactive(NULL),
+                                  customModSettings = reactive(NULL)
 ) {
 
   ns <- session$ns
@@ -316,7 +318,8 @@ step3_configureOutput <- function(input, output, session,
     analysisName = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]),
     ana_flag = reactive(result$ana_flag),
     counter = reactive({input$abuttonrunconfig}),
-    active = active
+    active = active,
+    customModSettings = customModSettings
   )
 
   # update ana flag
@@ -407,7 +410,7 @@ step3_configureOutput <- function(input, output, session,
   })
 
   ### Log Table
-  output$text_analysesrunlog <- renderText({
+  output$text_analysesrunlog <- renderUI({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
       if (!is.null(result$tbl_analysisrunlog)){
@@ -519,7 +522,9 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
     if (!is.null(result$anaID)) {
-      result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste("analyses", result$anaID, "run_traceback_file", sep = "/"))
+        result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste("analyses", result$anaID, "run_traceback_file",
+                                                                             sep = "/"))
+        result$tbl_analysisrunlog <- pre(HTML(result$tbl_analysisrunlog))
     } else {
       result$tbl_analysisrunlog <-  NULL
     }

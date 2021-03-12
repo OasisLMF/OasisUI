@@ -89,6 +89,7 @@ anainputs <- function(input,
   observeEvent({
     active()
     result$counter
+    analysisID()
   }, ignoreInit = TRUE, {
     if (length(active()) > 0 && active() && !is.null(analysisID()) && !is.na(result$counter) &&  result$counter != "" &&  result$counter != 0 && !is.null(result$counter)) {
       if (!refresh_opt) {

@@ -391,7 +391,8 @@ step1_choosePortfolio <- function(input, output, session,
     idxSel <- 1
     pageSel <- 1
     if (result$portfolio_flag == "C") {
-      post_portfolios <- session$userData$oasisapi$api_body_query(query_path = "portfolios", query_body = list(name = input$tinputpfName), query_method = "POST")
+      post_portfolios <- session$userData$oasisapi$api_body_query(query_path = "portfolios", query_body = list(name = input$tinputpfName),
+                                                                  query_method = "POST")
       if (post_portfolios$status == "Success") {
         oasisuiNotification(type = "message",
                             paste0("Portfolio ", input$tinputpfName, " created."))

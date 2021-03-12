@@ -640,6 +640,17 @@ DataHub <- R6Class(
         tbl_analysesData <- NULL
       }
       tbl_analysesData
+    },
+    # return data files filtered by name
+    return_tbl_dataFiles = function(name) {
+      tbl_dataFiles <- private$oasisapi$return_df("data_files",  api_param = list(filename = name))
+      if (!is.null(tbl_dataFiles) && nrow(tbl_dataFiles) > 0) {
+        # no action needed
+        # print(tbl_dataFiles)
+      } else {
+        tbl_dataFiles <- NULL
+      }
+      tbl_dataFiles
     }
   )
 )

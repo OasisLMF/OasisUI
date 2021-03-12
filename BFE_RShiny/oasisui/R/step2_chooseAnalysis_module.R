@@ -22,7 +22,8 @@ step2_chooseAnalysisUI <- function(id) {
     hidden(div(id = ns("panelAnalysisDetails"), panelAnalysisDetails(id))),
     hidden(div(id = ns("panelAnalysisLog"), panelAnalysisLog(id))),
     hidden(div(id = ns("panelModelTable"), panelModelTable(id))),
-    hidden(div(id = ns("panelModelDetails"), modeldetailsUI(ns("modeldetails"))))
+    hidden(div(id = ns("panelModelDetails"), modeldetailsUI(ns("modeldetails")))),
+    hidden(div(id = ns("panelBuildCustom"), buildCustomUI(ns("buildCustom"))))
   )
 }
 
@@ -120,7 +121,7 @@ panelAnalysisLog <- function(id) {
       actionButton(inputId = ns("buttonhideanalog"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     div(class = "panel", style = 'overflow-y: scroll; max-height: 200px; min-height: 30px;',
-        textOutput(ns("text_analysislog"))
+        htmlOutput(ns("text_analysislog"))
     ),
     hidden(downloadButton(ns("download_log"), label = "Download"))
   )
@@ -154,13 +155,16 @@ panelModelTable <- function(id) {
     fluidRow(
       column(4,
              oasisuiButton(ns("abuttonmodeldetails"), "Show Model Details", style = "float:left") %>%
-               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonmodeldetails, placement = "right")),
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonmodeldetails, placement = "right"),
+             oasisuiButton(ns("abuttonbuildcustom"), "Customize model", style = "float:left") %>%
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonbuildcustom, placement = "right")),
       column(6,
              br(),
              div(textInput(inputId = ns("anaName"), label = "Analysis Name"), style = "float:right;")),
       column(2,
              br(),
-             oasisuiButton(ns("abuttonsubmit"), "Submit", style = "float:right; margin-top:25px;")
+             oasisuiButton(ns("abuttonsubmit"), "Submit", style = "float:right; margin-top:25px;")  %>%
+               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonsubmit, placement = "right")
       )
     )
   )
@@ -220,6 +224,8 @@ step2_chooseAnalysis <- function(input, output, session,
   result <- reactiveValues(
     # reactive for modelID
     modelID = "",
+    versionID = "",
+    supplierID = "",
     # reactive value for model table
     tbl_modelsData = NULL,
     # analyses table
@@ -228,8 +234,12 @@ step2_chooseAnalysis <- function(input, output, session,
     tbl_analysislog = NULL,
     # analysis ID
     analysisID = NULL,
+    # analysis name
+    analysisNAME = NULL,
     # exposure_counter
-    exposure_counter = 0
+    exposure_counter = 0,
+    # modified default model settings values in case of customizable (configurable) models
+    customModSettings = NULL
   )
 
   # Panels Visualization -------------------------------------------------------
@@ -309,6 +319,8 @@ step2_chooseAnalysis <- function(input, output, session,
     portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_models_rows_selected)) {
         result$modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
+        result$versionID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$version_id]
+        result$supplierID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$supplier_id]
       } else {
         result$modelID <- ""
       }
@@ -324,8 +336,9 @@ step2_chooseAnalysis <- function(input, output, session,
       hide("panelModelTable")
       hide("panelAnalysisGenInputs")
       hide("panelModelDetails")
-      input_generation_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
-      if (input_generation_id$status == "Success") {
+      hide("panelBuildCustom")
+      input_generation <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/"))
+      if (input_generation$status == "Success") {
         oasisuiNotification(type = "message",
                             paste0("Input generation for analysis id ", result$analysisID, " started."))
       } else {
@@ -371,6 +384,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
+    hide("panelBuildCustom")
   })
 
   observeEvent(input$abuttonConfirmDelIG, {
@@ -401,6 +415,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
+    hide("panelBuildCustom")
     logMessage("showing panelAnalysisDetails")
     show("panelAnalysisDetails")
   })
@@ -437,7 +452,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
-
+    hide("panelBuildCustom")
     logMessage("showing panelAnalysisLog")
     show("panelAnalysisLog")
     .reloadAnaLog()
@@ -474,7 +489,7 @@ step2_chooseAnalysis <- function(input, output, session,
     }
   })
 
-  output$text_analysislog <- renderText({
+  output$text_analysislog <- renderUI({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
       if (!is.null(result$tbl_analysislog)) {
@@ -557,14 +572,28 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelAnalysisDetails")
     hide("panelAnalysisLog")
     hide("panelAnalysisGenInputs")
+    hide("panelBuildCustom")
     logMessage("showing panelModelDetails")
     show("panelModelDetails")
     logMessage("showing panelModelDetails")
   })
 
-  #Hide panel if model id changes
+  observeEvent(input$abuttonbuildcustom, {
+    hide("panelAnalysisDetails")
+    hide("panelAnalysisLog")
+    hide("panelAnalysisGenInputs")
+    logMessage("showing panelBuildCustom")
+    show("panelBuildCustom")
+    hide("panelModelDetails")
+    disable("anaName")
+    disable("abuttonsubmit")
+    logMessage("showing panelBuildCustom")
+  })
+
+  # Hide panel if model id changes
   observeEvent(input$dt_models_rows_selected, ignoreNULL = FALSE, {
     hide("panelModelDetails")
+    hide("panelBuildCustom")
   })
 
   callModule(
@@ -577,30 +606,110 @@ step2_chooseAnalysis <- function(input, output, session,
     active = reactive(TRUE)
   )
 
-  # Create new Analysis --------------------------------------------------------
+  sub_modules$buildCustom <- callModule(
+    buildCustom,
+    id = "buildCustom",
+    portfolioID = reactive({portfolioID()}),
+    modelID = reactive({result$modelID}),
+    supplierID = reactive({result$supplierID}),
+    versionID = reactive({result$versionID}),
+    analysisID = reactive({result$analysisID}),
+    counter = reactive({input$abuttonbuildcustom}),
+    active = reactive(TRUE)
+  )
 
+  observeEvent(sub_modules$buildCustom$fullsettings(), {
+    logMessage(paste0("output of buildCustom: fullsettings observeEvent triggered"))
+    if (!is.null(sub_modules$buildCustom$fullsettings())) {
+      enable("anaName")
+    }
+  })
+
+  observeEvent(sub_modules$buildCustom$changeddefaults(), {
+    result$customModSettings <- sub_modules$buildCustom$changeddefaults()
+    logMessage(paste0("output of buildCustom: updating result$customModSettings"))
+    if (!is.null(sub_modules$buildCustom$fullsettings())) {
+      enable("anaName")
+    }
+  })
+
+
+  # Create new Analysis --------------------------------------------------------
   observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
-      post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("portfolios", portfolioID(), "create_analysis", sep = "/"), query_body = list(name = input$anaName, model = result$modelID), query_method = "POST")
-      logMessage(paste0("Calling api_post_portfolios_create_analysis with id ", portfolioID(),
+      post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", sep = "/"),
+                                                                                  query_body = list(name = input$anaName,
+                                                                                                    portfolio = portfolioID(),
+                                                                                                    model = result$modelID,
+                                                                                                    complex_model_data_files = list()),
+                                                                                  query_method = "POST")
+      model_settings <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("models", result$modelID, "settings", sep = "/"),
+        query_method = "GET"
+      )
+
+      logMessage(paste0("Calling api_post_analyses with id ",
                         " name ", input$anaName,
-                        " model ",  result$modelID))
-      if (post_portfolios_create_analysis$status == "Success") {
+                        " model ",  result$modelID,
+                        " complex_model_data_files ", list()))
+
+      result$analysisID <- content(post_portfolios_create_analysis$result)$id
+      result$analysisNAME <- content(post_portfolios_create_analysis$result)$name
+
+      logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
+
+      if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) &&
+          model_settings$model_configurable && !is.null(sub_modules$buildCustom$fullsettings())) {
+        post_analysis_settings <- session$userData$oasisapi$api_body_query(
+          query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
+          query_body = sub_modules$buildCustom$fullsettings()
+        )
+      } else {
+        gul_summaries <- summary_template
+
+        ana_settings_step_2 <- list(analysis_settings = c(
+          list(
+            module_supplier_id = result$supplierID,
+            model_version_id = result$versionID,
+            number_of_samples = 0,
+            model_settings = NULL,
+            gul_output = FALSE,
+            gul_summaries = list(gul_summaries))
+        ))
+
+        post_analysis_settings <- session$userData$oasisapi$api_body_query(
+          query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
+          query_body = ana_settings_step_2
+        )
+      }
+      if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
+        fileids <- as.list(sub_modules$buildCustom$fileids())
+        patch_analyses <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", result$analysisID, sep = "/"),
+                                                                   query_body = list(complex_model_data_files = fileids),
+                                                                   query_method = "PATCH")
+      }
+
+      input_generation <- session$userData$oasisapi$api_post_query(
+        query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/")
+      )
+
+      if (input_generation$status == "Success" && patch_analyses$status == "Success") {
         oasisuiNotification(type = "message",
                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()
       } else {
         oasisuiNotification(type = "error",
-                            paste0("Analysis ", input$anaName, " could not be created."))
+                            paste0("Analysis ", input$anaName, " has returned an error."))
       }
     }
     hide("panelModelTable")
     hide("panelModelDetails")
+    hide("panelbuildCustom")
   })
 
   # Enable and disable buttons -------------------------------------------------
 
-  #Make submit button dependent of analysis name
+  # make submit button dependent on analysis name
   observeEvent({
     input$dt_models_rows_selected
     input$anaName}, ignoreInit = TRUE, {
@@ -611,7 +720,7 @@ step2_chooseAnalysis <- function(input, output, session,
       }
     })
 
-  #note initialization causes the buttons to be enabled on app lounch if tables are empty
+  # note initialization causes the buttons to be enabled on app lounch if tables are empty
   observeEvent({
     result$tbl_analysesData
     input$dt_analyses_rows_selected
@@ -624,11 +733,28 @@ step2_chooseAnalysis <- function(input, output, session,
       disable("abuttondelana")
       disable("abuttonstartcancIG")
       disable("abuttonmodeldetails")
+      disable("abuttonbuildcustom")
+      enable("anaName")
       disable("abuttonpgotonextstep")
       disable("abuttonsubmit")
       if (length(input$dt_models_rows_selected) > 0) {
         enable("abuttonmodeldetails")
+        # check whether model allows customization:
+        model_settings <- session$userData$oasisapi$api_return_query_res(
+          query_path = paste("models", result$modelID, "settings", sep = "/"),
+          query_method = "GET"
+        )
+        if (length(model_settings) > 0 && !is.null(model_settings$model_configurable)) {
+          if (model_settings$model_configurable) {
+            enable("abuttonbuildcustom")
+            # need to click "Customize" before being allowed to proceed
+            disable("anaName")
+            # we remove a potentially pre-entered name to make sure that the submit button is disabled
+            .clearinputanaName()
+          }
+        }
       }
+
       if (!is.null(result$tbl_analysesData) && nrow(result$tbl_analysesData) > 0 && length(input$dt_analyses_rows_selected) > 0 && max(input$dt_analyses_rows_selected) <= nrow(result$tbl_analysesData)) {
         enable("abuttonshowlog")
         enable("abuttondelana")
@@ -650,7 +776,7 @@ step2_chooseAnalysis <- function(input, output, session,
       }
     })
 
-  #Not allowed creation of an analysis for an incomplete portfolio
+  # Not allowed creation of an analysis for an incomplete portfolio
   observeEvent({
     portfolioID()
     pfstatus()}, {
@@ -697,6 +823,7 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelTable")
     hide("panelAnalysisGenInputs")
     hide("panelModelDetails")
+    hide("panelBuildCustom")
   }
 
   # show default analysis details
@@ -733,8 +860,8 @@ step2_chooseAnalysis <- function(input, output, session,
     invisible()
   }
 
-  #clear text input
-  .clearinputanaName <- function(){
+  # clear text input
+  .clearinputanaName <- function() {
     updateTextInput(session = session, inputId = "anaName", value = "")
   }
 
@@ -742,7 +869,9 @@ step2_chooseAnalysis <- function(input, output, session,
   .reloadAnaLog <- function() {
     logMessage(".reloadAnaLog called")
     if (!is.null(result$analysisID)) {
-      result$tbl_analysislog <- session$userData$oasisapi$return_df(paste("analyses", result$analysisID, "input_generation_traceback_file", sep = "/"))
+      result$tbl_analysislog <- session$userData$oasisapi$return_df(paste("analyses", result$analysisID,
+                                                                          "input_generation_traceback_file", sep = "/"))
+      result$tbl_analysislog <- pre(HTML(result$tbl_analysislog))
     } else {
       result$tbl_analysislog <-  NULL
     }
@@ -764,7 +893,8 @@ step2_chooseAnalysis <- function(input, output, session,
   moduleOutput <- c(
     list(
       analysisID = reactive({result$analysisID}),
-      newstep = reactive({input$abuttonpgotonextstep})
+      newstep = reactive({input$abuttonpgotonextstep}),
+      customsettings = reactive({result$customModSettings})
     )
   )
 

@@ -434,7 +434,6 @@ panelOutputModule <- function(input, output, session,
             if (length(which(data$type == 2)) != 0) {
               data$type <- data$type %>% replace(which(data$type == 2), "Sample")
             }
-
             data <- data %>%
               filter(return_period %in% as.numeric(input$pltrtnprd)) %>%
               filter(type == input$calctypes)
@@ -487,6 +486,8 @@ panelOutputModule <- function(input, output, session,
         show("outputplot")
         hide("outputleaflet")
       } else if (inputplottype() == "loss for return period map" &&
+                 (input$pltrtnprd != "" &&
+                 input$calctypes != "") &&
                  (length(input$pltrtnprd) > 0 &&
                   length(input$calctypes) > 0 &&
                   length(chkbox$chkboxgrplosstypes()) == 1)) {
@@ -644,6 +645,7 @@ panelOutputModule <- function(input, output, session,
       if (inputplottype() == "loss for return period map") {
         if (TRUE %in% grepl("locnumber", filesListData()$summary_level)) {
           # filter for values related to locnumber
+          #TODO: introduce if statement in case return_period is not there
           data <- data %>% filter(return_period == input$pltrtnprd)
         }
       } else {

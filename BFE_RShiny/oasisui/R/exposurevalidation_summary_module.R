@@ -237,7 +237,8 @@ exposurevalidationsummary <- function(input,
   .plot_stack_hist <- function(df) {
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
-    n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
+    # n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
+    n_plots_row <- length(unique(df$peril))
     # leave only: Fail, Success and Nomatch statuses and remove peril "total"
     key_unwanted <- c("portfolio", "not-modelled", "modelled")
     df <- df %>% filter(key %notin% key_unwanted)
@@ -262,7 +263,7 @@ exposurevalidationsummary <- function(input,
         legend.position = "right"
       ) +
       geom_bar(position = "stack", stat = "identity") +
-      scale_fill_manual(values = c("fail" = "#f29c24", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E")) +
+      # scale_fill_manual(values = c("fail" = "#f29c24", "success" = "#128e37", "nomatch" = "#1f77b4", "match" = "#FF7F0E")) +
       scale_y_continuous(breaks = brks, labels = lbs) +
       facet_wrap(df$peril, ncol = n_plots_row)
     # p
