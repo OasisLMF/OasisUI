@@ -243,9 +243,15 @@ DataHub <- R6Class(
     get_pf_dataset_content = function(id, dataset_identifier, ...) {
       dataset_content <- content(private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result)
       if (is.null(names(dataset_content))) {
-        dataset_content <- strsplit(dataset_content, split = "\n") %>%
-          as.data.frame(stringsAsFactors = FALSE)
-        colnames(dataset_content) <- dataset_content[1, ]
+        if (class(dataset_content) == "raw") {
+          dataset_content <- as.data.frame(dataset_content)
+          colnames(dataset_content) <- dataset_content[1, ]
+        } else {
+          dataset_content <- strsplit(dataset_content, split = "\n") %>%
+            as.data.frame(stringsAsFactors = FALSE)
+          colnames(dataset_content) <- dataset_content[1, ]
+        }
+
       } else {
         dataset_content <- bind_rows(dataset_content) %>%
           as.data.frame()
