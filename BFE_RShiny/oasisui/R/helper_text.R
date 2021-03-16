@@ -48,6 +48,7 @@ defineSingleAna_tooltips <- list(
   abuttonpfsubmit = "Submit new portfolio",
   abuttondeletepf = "Delete selected portfolio",
   abuttonmodeldetails = "Show details for selected model",
+  abuttonbuildcustom = "Customize parameters and datafiles of model",
   abuttonexecuteanarun = "Execute run with given output configuration",
   abuttonshowlog = "Show log for selected analysis",
   abuttondisplayoutput = "Visualize outputs of selected analysis",
@@ -60,7 +61,9 @@ defineSingleAna_tooltips <- list(
   download_out_params_review_tbl = "Download output parameters review.",
   clearselection = "Clear all fields",
   addBtn = "Add new summary levels and reports",
-  removeBtn = "Remove summary levels and reports"
+  removeBtn = "Remove summary levels and reports",
+  abuttonsubmit = "Submit new analysis",
+  abuttonselsettings = "Apply model changes"
 )
 
 ### Dashboard ------------------------------------------------------------------

@@ -191,8 +191,7 @@ panelOutputParamsDetails <- function(id) {
 #' @param analysisName Selected analysis name.
 #' @param ana_flag Flag to know if the user is creating a new output configuration or rerunning an analysis.
 #' @param counter Counter to decide whether to clear output options and show some panel (?)
-#' @template params-module
-#' @template params-active
+#' @param customModSettings Customizable Model settings.
 #'
 #' @return ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.
 #' @return ana_post_status status of posting the analysis.
@@ -213,7 +212,8 @@ def_out_config <- function(input,
                            analysisName = reactive(""),
                            ana_flag = reactive("C"),
                            counter = reactive(NULL),
-                           active = reactive(TRUE)) {
+                           active = reactive(TRUE),
+                           customModSettings = reactive(NULL)) {
   ns <- session$ns
 
   # max number rows for custom output params is 9, but set to 8 when counting from 0
@@ -707,48 +707,107 @@ def_out_config <- function(input,
     # Model params
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
 
-    if (length(modelID) != 0) {
+    if (length(analysisID()) != 0) {
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
         query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
+      tbl_ana_settings <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("analyses", analysisID(), "settings", sep = "/"),
+        query_method = "GET"
+      )
+      configurable <- FALSE
+      model_settings <- NULL
       if (!is.null(tbl_modelsDetails)) {
-        model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
+        subset_settings <- names(tbl_modelsDetails$model_settings) %in% c("event_set",
+                                                                          "event_occurrence_id",
+                                                                          "string_parameters",
+                                                                          "boolean_parameters",
+                                                                          "float_parameters",
+                                                                          "list_parameters",
+                                                                          "dictionary_parameters",
+                                                                          "dropdown_parameters")
+        # this is e.g. to drop "parameter_groups" or other custom entries that are not supported by the Oasis UI
+        model_settings <- tbl_modelsDetails$model_settings[subset_settings] %>% unlist(recursive = FALSE)
+      }
 
-        if (length(names(model_settings)) > 0) {
-          # Basic model params
-          output$basic_model_param <- renderUI({
-            basicConfig_funs(session, model_settings)
-          })
-
-          # Advanced model params
-          output$advanced_model_param <- renderUI({
-            advancedConfig_funs(session, model_settings)
-          })
+      if (!is.null(tbl_ana_settings)) {
+        ana_mdlsettings <- tbl_ana_settings$model_settings
+        if (!is.null(ana_mdlsettings$model_configurable) && ana_mdlsettings$model_configurable) {
+          configurable <- TRUE
         }
+        # if configurable is FALSE, and we are not in the "re-run" case, then the ana_mdlsettings will be NULL
+        # (see post_analysis_settings in step2_chooseAnalysis_module)
+        model_settings <- .update_mdlsettings_defaults_with_anavalues(model_settings, ana_mdlsettings)
+      }
+
+      if (length(names(model_settings)) > 0) {
+        # Basic model params
+        output$basic_model_param <- renderUI({
+          basicConfig_funs(session, model_settings)
+        })
+
+        # Advanced model params
+        output$advanced_model_param <- renderUI({
+          advancedConfig_funs(session, model_settings)
+        })
       }
     }
+  }
+
+  # utility used in the function above
+  .update_mdlsettings_defaults_with_anavalues <- function(model_settings, ana_mdlsettings) {
+    if (length(ana_mdlsettings) > 0) {
+      # basic params
+      model_settings$event_set.default <- ana_mdlsettings$event_set
+      model_settings$event_occurrence_id.default <- ana_mdlsettings$event_occurrence_id
+      # rest
+      generic_params <- grepl("parameters", names(model_settings))
+      model_settings[generic_params] <- lapply(model_settings[generic_params], function(x) {
+        matchName <- match(x$name, names(ana_mdlsettings))
+        # in case a model setting is not included in the analysis settings then we simply keep the default value from the model settings
+        if (!is.na(matchName)) x$default <- ana_mdlsettings[[matchName]]
+        x
+      })
+    }
+    model_settings
   }
 
   # Generate analysis settings -------------------------------------------------
   .gen_analysis_settings <- function() {
     logMessage(".gen_analysis_settings called")
+
     # Predefined params
     tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
     modelData <- session$userData$data_hub$return_tbl_modelData(modelID)
-
-    fetch_model_settings <- function(modelID) {
-      tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "settings", sep = "/"),
+    tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID, "settings", sep = "/"),
+      query_method = "GET"
+    )
+    if (!is.null(tbl_modelsDetails$model_configurable) && tbl_modelsDetails$model_configurable) {
+      print("customModSettings in output_config_module:")
+      print(customModSettings())
+      tbl_ana_settings <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("analyses", analysisID(), "settings", sep = "/"),
         query_method = "GET"
       )
-      model_settings <- tbl_modelsDetails$model_settings %>% unlist(recursive = FALSE)
+      ana_mdlsettings <- tbl_ana_settings$model_settings
+    } else {
+      ana_mdlsettings <- NULL
+    }
+
+    # utility function
+    fetch_model_settings <- function(model_settings, ana_mdlsettings) {
+      model_settings <- model_settings %>% unlist(recursive = FALSE)
+      # this function is supposed to work despite extra entries in model_settings, like e.g. "parameter_groups",
+      # as long as they don't match the pattern "parameters"
+      model_settings <- .update_mdlsettings_defaults_with_anavalues(model_settings, ana_mdlsettings)
       string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("string_parameters", x)]])) {
           input[[paste0("string_parameters", x)]]
-        } else if (!is.null( model_settings[[x]][[y]]$default)) {
-          model_settings[[x]][[y]]$default
+        } else if (!is.null(model_settings[[x]]$default)) {
+          model_settings[[x]]$default
         }
       }))
 
@@ -756,7 +815,7 @@ def_out_config <- function(input,
         if (!is.null(input[[paste0("dictionary_parameters", x)]])) {
           setNames(input[[paste0("dictionary_parameters", x)]], names(model_settings[[x]]$default))
         } else if (!is.null(model_settings[[x]]$default)) {
-          setNames(model_settings[[x]]$default, names(model_settings[[x]]$default))
+          model_settings[[x]]$default
         }
       })
 
@@ -767,14 +826,15 @@ def_out_config <- function(input,
           model_settings[[x]]$default
         }
       })
-      # below is purposedly list() rather than NULL in case there are none!
-      boolean_input <- unlist(lapply(grep("boolean_parameters", names(model_settings)), function(x) {
+
+      # below is purposedly list() rather than NULL in case there are none (i.e. not doing unlist() on purpose)!
+      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("boolean_parameters", x)]])) {
           input[[paste0("boolean_parameters", x)]]
         } else if (!is.null(model_settings[[x]]$default)) {
-          model_settings[[x]]$default
+          as.logical(model_settings[[x]]$default)
         }
-      }))
+      })
 
       float_input <- lapply(grep("float_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("float_parameters", x)]])) {
@@ -786,35 +846,36 @@ def_out_config <- function(input,
 
       list_input <- lapply(grep("list_parameters", names(model_settings)), function(x) {
         if (!is.null(input[[paste0("list_parameters", x)]])) {
-          as.numeric(unlist(strsplit(input[[paste0("list_parameters", x)]], ", ")))
+          as.list(strsplit(input[[paste0("list_parameters", x)]], ", ")[[1]])
         } else if (!is.null(model_settings[[x]]$default)) {
-          as.numeric(unlist(model_settings[[x]]$default))
+          model_settings[[x]]$default
         }
       })
 
       inputs_list <- list(string_input,
                           list_input,
                           dict_input,
-                          float_input)
+                          float_input,
+                          dropdown_input)
 
       params_list <- list("string_parameters",
                           "list_parameters",
                           "dictionary_parameters",
-                          "float_parameters")
+                          "float_parameters",
+                          "dropdown_parameters")
+
       # create list of re-ordered and grouped model inputs names
-      inputs_name <- c()
+      inputs_name <- list()
       for (param in seq_len(length(params_list))) {
         if (length(inputs_list[[param]]) > 0) {
-          param_name <- unlist(lapply(grep(params_list[param], names(model_settings)), function(i) {
-            model_match <- model_settings[i]
-            lapply(seq_len(length(model_match)), function(j) {
-              model_match[[j]][["name"]]
-            })
+          param_name <- unlist(lapply(grep(params_list[[param]], names(model_settings)), function(i) {
+            model_settings[[i]][["name"]]
           }))
-          inputs_name[param] <- param_name
+          inputs_name[[param]] <- param_name
         }
-        # if a param is NULL and skipped, it will result in an NA in the inputs_name vector
+        # if a param is NULL and skipped, it will result in a NULL entry in the inputs_name list that will be removed by the unlist below
       }
+      inputs_name <- unlist(inputs_name)
 
       # find boolean parameters names
       if (length(boolean_input) > 0) {
@@ -834,8 +895,8 @@ def_out_config <- function(input,
                           string_input,
                           list_input,
                           dict_input,
-                          float_input)
-
+                          float_input,
+                          dropdown_input)
       # NULL or list() elements won't survive the c() above!
 
       # create list/vector of names for model settings
@@ -843,14 +904,25 @@ def_out_config <- function(input,
                            "event_occurrence_id",
                            boolean_name,
                            inputs_name)
-
       # remove all NA elements
       if (any(sapply(names_full_list, is.na))) {
         names(model_settings) <- names_full_list[-which(sapply(names_full_list, is.na))]
-        } else if(length(model_settings) > 0) {
-          names(model_settings) <- names_full_list
-        }
+      } else if(length(model_settings) > 0) {
+        names(model_settings) <- names_full_list
+      }
 
+      names_ana_model <- names(ana_mdlsettings)
+      for (i in seq_len(length(names(model_settings)))) {
+        for (j in seq_len(length(names(ana_mdlsettings)))) {
+          if (names(ana_mdlsettings)[j] == names(model_settings)[i]) {
+            names_ana_model[j] <- "NA"
+          }
+        }
+      }
+      names_ana_model <- names_ana_model[-grep("NA", names_ana_model)]
+      for (i in names_ana_model) {
+        model_settings <- c(model_settings, ana_mdlsettings[i])
+      }
       model_settings
     }
 
@@ -860,7 +932,7 @@ def_out_config <- function(input,
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
-      "model_version_id" = modelData[[tbl_modelsDataNames$model_id]],
+      "model_version_id" = modelData[[tbl_modelsDataNames$version_id]],
       "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
       "number_of_samples" = as.integer(input$tinputnoofsample),
       # potential new tag portfolio_id
@@ -872,27 +944,6 @@ def_out_config <- function(input,
 
     fetch_summary <- function(prsp, checked) {
       if (prsp %in% checked) {
-        summary_template <- list(
-          summarycalc = FALSE,
-          eltcalc = FALSE,
-          aalcalc = FALSE,
-          pltcalc = FALSE,
-          id = 1,
-          oed_fields = list(),
-          lec_output = FALSE,
-          leccalc = list(
-            return_period_file = FALSE,
-            full_uncertainty_aep = FALSE,
-            full_uncertainty_oep = FALSE,
-            wheatsheaf_aep = FALSE,
-            wheatsheaf_oep = FALSE,
-            wheatsheaf_mean_aep = FALSE,
-            wheatsheaf_mean_oep = FALSE,
-            sample_mean_aep = FALSE,
-            sample_mean_oep = FALSE
-          )
-        )
-
         p <- which(result$out_params_review$perspective == prsp)
         review_prsp <- result$out_params_review[p, ]
         # convert factors to char
@@ -978,9 +1029,8 @@ def_out_config <- function(input,
         ri_output = "RI" %in% input$chkboxgrplosstypes,
         ri_summaries = fetch_summary("RI", input$chkboxgrplosstypes)
       ),
-      list(model_settings = fetch_model_settings(modelID = modelID))
+      list(model_settings = c(fetch_model_settings(tbl_modelsDetails$model_settings, ana_mdlsettings)))
     ))
-
     analysis_settings
   }
 

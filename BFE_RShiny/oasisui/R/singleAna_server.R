@@ -51,7 +51,9 @@ singleAna <- function(input, output, session,
     # List of Portfolio IDs
     pfChoices = NULL,
     # Portfolio status
-    pfstatus = ""
+    pfstatus = "",
+    # modified default model settings values in case of customizable (configurable) models
+    customModSettings = NULL
   )
 
   # Panels switch --------------------------------------------------------------
@@ -112,10 +114,17 @@ singleAna <- function(input, output, session,
     currstep = reactive(workflowSteps$step()),
     portfolioID =  reactive({input$portfolioID}),
     pfName = reactive({result$pfName}),
-    analysisID = reactive({result$anaID})
+    analysisID = reactive({result$anaID}),
+    customModSettings = reactive({result$customModSettings})
   )
 
   # Sub-Modules output ---------------------------------------------------------
+  # > Customizable settings -------------------------------------------------------------
+  observeEvent(submodulesList$step2_chooseAnalysis$customsettings(), {
+    result$customModSettings <- submodulesList$step2_chooseAnalysis$customsettings()
+    logMessage(paste0("output of step2: updating result$customModSettings"))
+  })
+
   # > Navigation ---------------------------------------------------------------
   observeEvent(submodulesList$step3_configureOutput$navigationstate(), ignoreInit = TRUE, {
     if (!is.null(submodulesList$step3_configureOutput$navigationstate())) {
