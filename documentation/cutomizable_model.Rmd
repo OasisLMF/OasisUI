@@ -8,12 +8,12 @@ output: pdf_document
 New implementations to the OASIS UI workflow have been made to allow users to edit model features upon analysis creation. Previous versions only allowed for model settings to be decided upon model creation, without any possibilities for further changes.
 The new edits make it possible to customize model values and select files associated with a model. The new model settings will be saved in the model_settings portion of the analysis settings and will not modify the standard model settings used to initially create the model.
 
-In order for a model to be customizable, the original model settings have to include the option: "model_configurable": [true]. If this option is set to [false] or does not exist, the model settings cannot be modified and the workflow proceeds as in previous versions of the UI. 
+In order for a model to be customisable, the original model settings have to include the option: "model_configurable": [true]. If this option is set to [false] or does not exist, the model settings cannot be modified and the workflow proceeds as in previous versions of the UI. 
 
 Otherwise starting from the "Choose Analysis" step, additional tasks need to completed: 
 
 1. Click on "Create Analysis"
-3. Select the customizable model from the models table.
+3. Select the customisable model from the models table.
 4. The button "Customize model" will be enabled. It opens a window underneath with two tabs.
 5. "Model Values" tab:
   a. Specify number of samples in text box
