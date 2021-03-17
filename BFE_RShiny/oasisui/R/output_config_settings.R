@@ -8,7 +8,9 @@ output_options <- list(
   # granularities = c("LOB", "Location", "County","State", "Policy", "Portfolio"),
   losstypes = c("GUL", "IL", "RI"),
   # reports feasible in plot output:
-  variables = c("Full Sample", "PLT", "AAL", "LEC Wheatsheaf OEP", "LEC Wheatsheaf AEP", "LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP", "ELT"),
+  variables = c("Full Sample", "ELT", "LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP",
+                "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP", "LEC Mean Wheatsheaf AEP",
+                "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP", "AAL","PLT"),
   # order = c(6,2,3,4,1,5),
   variables_default = c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE),
   # default empty string is interpreted as aggregation should happen across everything, i.e. without any specific summary level
@@ -21,9 +23,14 @@ output_options <- list(
 #' @format \code{data.frame} of variables for output configuration.
 #' @export
 varsdf <- data.frame(
-  vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEPWheatsheaf', 'OEPWheatsheaf', 'MeanAEPWheatsheaf', 'MeanOEPWheatsheaf', 'SampleMeanAEP', 'SampleMeanOEP', 'AAL', 'PLT'),
-  labels = c("Full Sample", "ELT", "LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP", "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP", "LEC Mean Wheatsheaf AEP", "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP", "AAL","PLT"),
-  fields = c('summarycalc', 'eltcalc', 'full_uncertainty_aep', 'full_uncertainty_oep', 'wheatsheaf_aep',  'wheatsheaf_oep', 'wheatsheaf_mean_aep', 'wheatsheaf_mean_oep', 'sample_mean_aep', 'sample_mean_oep',  'aalcalc', 'pltcalc'),
+  vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEPWheatsheaf', 'OEPWheatsheaf',
+           'MeanAEPWheatsheaf', 'MeanOEPWheatsheaf', 'SampleMeanAEP', 'SampleMeanOEP', 'AAL', 'PLT'),
+  labels = c("Full Sample", "ELT", "LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP",
+             "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP", "LEC Mean Wheatsheaf AEP",
+             "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP", "AAL","PLT"),
+  fields = c('summarycalc', 'eltcalc', 'full_uncertainty_aep', 'full_uncertainty_oep',
+             'wheatsheaf_aep',  'wheatsheaf_oep', 'wheatsheaf_mean_aep', 'wheatsheaf_mean_oep',
+             'sample_mean_aep', 'sample_mean_oep',  'aalcalc', 'pltcalc'),
   # defaultChoice = c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE),
   lec_output = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE),
   stringsAsFactors = FALSE
