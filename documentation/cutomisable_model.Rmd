@@ -1,0 +1,31 @@
+---
+title: "Customizable model"
+author: "Nicoletta Farabullini"
+date: "04/01/2021"
+output: pdf_document
+---
+
+Oasis have updated their user interface (UI) to accommodate the “FLY” technology developed by JBA Risk Management Ltd for their global flood model which is available on the Oasis platform. 
+This innovative approach to model customisation allows the user to specify what features of the model to include at the “create analysis” stage and before executing the model. 
+
+This model customisation ensures that only the selected model settings are applied. This reduces the demand on the platform when running the model, limits the required space and enhances performance.
+
+Implementing this customisation requires the original model settings to include the option in the model_settings json file: "model_configurable": [true]. If this option is set to [false] or does not exist, the model settings cannot be modified and the workflow proceeds as in previous versions of the UI.
+
+The steps below outline the process of selecting the FLY model settings.
+
+Starting from the "Choose Analysis" step, additional tasks need to completed:
+
+	1. Click on "Create Analysis"
+	2. Select the customisable model from the models table.
+	3. The button "Customise model" will be enabled. It opens a window underneath with two tabs.
+	4. "Model Values" tab:
+  		a. Specify number of samples in text box
+  		b. The table lists all the model settings, double click on the Default column to change values. All values will be included in the analysis settings regardless of whether edited or not.
+	5. "File Uploads" tab:
+  		a. This panel has different files categories, which are directly imported from the data_settings section of the model settings. Files can be uploaded using the Browse buttons and selected from the tables. Note: only the selected files will be included in the analysis settings.
+	6. Click "Apply" to save all of the changes
+	7. Give a name to the analysis and submit
+	8. Proceed to "Configure Output & Run"
+
+Some of the model settings are also transferred to the "Configure Output & Run" step in the "Model Parameters" panel: Event Set, Event Occurrence, Number of Samples, Loss Threshold, Hazard Intensity Threshold, Min Rp, event_subset. If one parameter is changed in step 2 and appears in step 3, the modified version will be shown in the latter. These parameters can be further modified here and changes are overwritten in the analysis settings.
