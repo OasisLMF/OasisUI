@@ -11,6 +11,7 @@ node {
         [$class: 'StringParameterDefinition',  name: 'BASE_TAG', defaultValue: 'latest'],
         [$class: 'BooleanParameterDefinition', name: 'PURGE', value: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', name: 'PUBLISH', value: Boolean.valueOf(false)],
+        [$class: 'BooleanParameterDefinition', name: 'PRE_RELEASE', value: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', name: 'AUTO_MERGE', defaultValue: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', name: 'SLACK_MESSAGE', value: Boolean.valueOf(false)]
       ])
@@ -49,7 +50,11 @@ node {
     app_docker="docker/Dockerfile.oasisui_app"
     app_image="coreoasis/oasisui_app"
 
-
+     //make sure release candidate versions are tagged correctly                                                                              
+     if (params.PUBLISH && params.PRE_RELEASE && ! params.RELEASE_TAG.matches('^(\\d+\\.)(\\d+\\.)(\\*|\\d+)rc(\\d+)$')) { 
+         sh "echo release candidates must be tagged {version}rc{N}, example: 1.0.0rc1"
+         sh "exit 1"
+     } 
 
     try {
         // CLONE REPOS
@@ -117,6 +122,9 @@ node {
                     stage ('Publish: Shiny Proxy') {
                         dir(source_workspace) {
                             sh PIPELINE + " push_image ${proxy_image} ${env.TAG_RELEASE}"
+                            if (! params.PRE_RELEASE){
+                                sh PIPELINE + " push_image ${proxy_image} latest"
+                            }   
                         }
                     }
                  },
@@ -124,6 +132,9 @@ node {
                     stage ('Publish: Shiny App') {
                         dir(source_workspace) {
                             sh PIPELINE + " push_image ${app_image} ${env.TAG_RELEASE}"
+                            if (! params.PRE_RELEASE){
+                                sh PIPELINE + " push_image ${app_image} latest"
+                            }   
                         }
                     }
                  }
@@ -146,7 +157,7 @@ node {
                 json_request['name'] = RELEASE_TAG
                 json_request['body'] = ""
                 json_request['draft'] = false
-                json_request['prerelease'] = false
+                json_request['prerelease'] = params.PRE_RELEASE
                 writeJSON file: 'gh_request.json', json: json_request
                 sh 'curl -XPOST -H "Authorization:token ' + gh_token + "\" --data @gh_request.json https://api.github.com/repos/$repo/releases > gh_response.json"
             }
