@@ -2,7 +2,7 @@ OasisUI Changelog
 ==================
 
 
-`1.9.0rc1`_
+`1.9.0`_
 --------
 * [#252](https://github.com/OasisLMF/OasisUI/issues/252) - Run Reports list updated
 * [#250](https://github.com/OasisLMF/OasisUI/issues/250) - Added new workflow for Complex models 
@@ -181,7 +181,7 @@ OasisUI Changelog
 * Hotfix - Change in keys_server response `coverage` -> `coverage_type`
 
 
-.. _`1.9.0rc1`:  https://github.com/OasisLMF/OasisUI/compare/1.8.2...1.9.0rc1
+.. _`1.9.0`:  https://github.com/OasisLMF/OasisUI/compare/1.8.2...1.9.0
 .. _`1.8.2`:  https://github.com/OasisLMF/OasisUI/compare/1.8.1...1.8.2
 .. _`1.8.1`:  https://github.com/OasisLMF/OasisUI/compare/1.8.0...1.8.1
 .. _`1.8.0`:  https://github.com/OasisLMF/OasisUI/compare/1.7.0...1.8.0
