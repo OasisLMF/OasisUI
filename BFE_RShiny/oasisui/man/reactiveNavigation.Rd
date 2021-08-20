@@ -16,8 +16,7 @@ outputNavigation(state, force_react = TRUE)
 
 getNavigation(output)
 
-observeModuleNavigation(state, modules, force_react = TRUE,
-  logger = NULL)
+observeModuleNavigation(state, modules, force_react = TRUE, logger = NULL)
 }
 \arguments{
 \item{value}{Desired value of the navigation state.}
@@ -72,12 +71,12 @@ from a list of (sub-) modules (\code{observeModuleNavigation()}) allows flexible
 modular configurations with arbitrarily nested modules.
 
 Enabling navigation in the sever (or a module's server function) boils down
-to:\preformatted{# [...]
+to:\if{html}{\out{<div class="r">}}\preformatted{# [...]
 # initialize the reactive navigation state
 navigation_state <- reactiveNavigation()
 # [...]
 # observe what is relevant for the update of the navigation state
-observeEvent(..., {updateNavigation(navigation_state, new_value)})
+observeEvent(..., \{updateNavigation(navigation_state, new_value)\})
 # possibly observe the navigation coming from a list of (sub)modules outputs
 observeModuleNavigation(navigation_state, modules)
 # [...]
@@ -90,14 +89,14 @@ result <- c(
 # get the reactive value when needed (typically in the top-level server)
 getNavigation(outputNavigation(navigation_state))
 [...]
-}
+}\if{html}{\out{</div>}}
 }
 \examples{
 if (interactive()) {
   library(shiny)
   nav_states <- LETTERS[1:8]
   prefixlog <- function(prefix, logger = message) {
-    function(...) cat(prefix, ">", ..., "\\n", sep = "")
+    function(...) cat(prefix, ">", ..., "\n", sep = "")
   }
   # navigation button module ----
   navigationButtonUI <- function(id, nav_to) {
@@ -110,7 +109,7 @@ if (interactive()) {
   navigationButton <- function(input, output, session, nav_to) {
     navigation_state <- reactiveNavigation()
     observeEvent(input$action, {
-      cat("Navigate to", nav_to, "\\n")
+      cat("Navigate to", nav_to, "\n")
       updateNavigation(navigation_state, nav_to)
     })
     outputNavigation(navigation_state)
@@ -150,7 +149,7 @@ if (interactive()) {
     # observe and return navigation
     navigation_state <- reactiveNavigation()
     observeEvent(input$main_slider, {
-      cat("Navigate to", input$main_slider, "\\n")
+      cat("Navigate to", input$main_slider, "\n")
       updateNavigation(navigation_state, input$main_slider)
     })
     outputNavigation(navigation_state)

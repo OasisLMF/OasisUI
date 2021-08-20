@@ -7,8 +7,17 @@
 \usage{
 modeldetailsUI(id)
 
-modeldetails(input, output, session, analysisID, modelID, portfolioID,
-  file_pins, counter, active = reactive(TRUE))
+modeldetails(
+  input,
+  output,
+  session,
+  analysisID,
+  modelID,
+  portfolioID,
+  file_pins,
+  counter,
+  active = reactive(TRUE)
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

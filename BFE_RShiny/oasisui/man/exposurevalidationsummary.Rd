@@ -7,9 +7,14 @@
 \usage{
 exposurevalidationsummaryUI(id)
 
-exposurevalidationsummary(input, output, session,
-  analysisID = reactive(NULL), counter = reactive(NULL),
-  active = reactive(TRUE))
+exposurevalidationsummary(
+  input,
+  output,
+  session,
+  analysisID = reactive(NULL),
+  counter = reactive(NULL),
+  active = reactive(TRUE)
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

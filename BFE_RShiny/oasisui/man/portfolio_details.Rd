@@ -7,9 +7,16 @@
 \usage{
 portfolio_detailsUI(id)
 
-portfolio_details(input, output, session, refresh_opt = TRUE,
-  portfolioID, portfolioName, counter = reactive(NULL),
-  active = reactive(TRUE))
+portfolio_details(
+  input,
+  output,
+  session,
+  refresh_opt = TRUE,
+  portfolioID,
+  portfolioName,
+  counter = reactive(NULL),
+  active = reactive(TRUE)
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

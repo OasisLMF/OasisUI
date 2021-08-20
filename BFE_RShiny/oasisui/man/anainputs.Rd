@@ -7,8 +7,15 @@
 \usage{
 anainputsUI(id, heading = NULL, collapsible = FALSE, show = FALSE)
 
-anainputs(input, output, session, analysisID, refresh_opt = TRUE,
-  counter = reactive(NULL), active = reactive(TRUE))
+anainputs(
+  input,
+  output,
+  session,
+  analysisID,
+  refresh_opt = TRUE,
+  counter = reactive(NULL),
+  active = reactive(TRUE)
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

@@ -4,8 +4,18 @@
 \alias{buildCustom}
 \title{Hazard Map Module}
 \usage{
-buildCustom(input, output, session, portfolioID, modelID, supplierID,
-  versionID, analysisID, counter, active = reactive(TRUE))
+buildCustom(
+  input,
+  output,
+  session,
+  portfolioID,
+  modelID,
+  supplierID,
+  versionID,
+  analysisID,
+  counter,
+  active = reactive(TRUE)
+)
 }
 \arguments{
 \item{input, output, session}{Shiny input, output, and session objects.}

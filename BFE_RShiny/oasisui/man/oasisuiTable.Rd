@@ -7,10 +7,20 @@
 \usage{
 oasisuiTableUI(id)
 
-oasisuiTable(input, output, session, data, selection = "none",
-  escape = TRUE, scrollX = TRUE, filter = FALSE, rownames = TRUE,
-  preselRow = reactive({     NULL }), maxrowsperpage = 10,
-  simple = FALSE)
+oasisuiTable(
+  input,
+  output,
+  session,
+  data,
+  selection = "none",
+  escape = TRUE,
+  scrollX = TRUE,
+  filter = FALSE,
+  rownames = TRUE,
+  preselRow = reactive({     NULL }),
+  maxrowsperpage = 10,
+  simple = FALSE
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

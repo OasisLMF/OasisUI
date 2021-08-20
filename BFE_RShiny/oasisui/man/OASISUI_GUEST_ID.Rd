@@ -4,7 +4,9 @@
 \name{OASISUI_GUEST_ID}
 \alias{OASISUI_GUEST_ID}
 \title{OASISUI_GUEST_ID}
-\format{An object of class \code{character} of length 1.}
+\format{
+An object of class \code{character} of length 1.
+}
 \usage{
 OASISUI_GUEST_ID
 }

@@ -10,7 +10,7 @@ oasisuiRefreshButton(id, width = NULL)
 \item{id}{ID of the button}
 
 \item{width}{The width of the input, e.g. \code{'400px'}, or \code{'100\%'};
-see \code{\link{validateCssUnit}}.}
+see \code{\link[shiny:reexports]{validateCssUnit()}}.}
 }
 \description{
 oasisuiRefreshButton

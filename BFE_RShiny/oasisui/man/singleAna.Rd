@@ -5,9 +5,15 @@
 \alias{singleAnaUI}
 \title{singleAna}
 \usage{
-singleAna(input, output, session, active = reactive(TRUE),
-  selectAnaID = reactive(NULL), selectPortfolioID = reactive(""),
-  preselPanel = reactive(1))
+singleAna(
+  input,
+  output,
+  session,
+  active = reactive(TRUE),
+  selectAnaID = reactive(NULL),
+  selectPortfolioID = reactive(""),
+  preselPanel = reactive(1)
+)
 
 singleAnaUI(id)
 }

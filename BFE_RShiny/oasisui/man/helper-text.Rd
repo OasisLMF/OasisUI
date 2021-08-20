@@ -8,8 +8,18 @@
 \alias{defineSingleAna_tooltips}
 \alias{dashboard_tooltips}
 \title{Helper text}
-\format{Each object is a named list of character strings, the names
-  corresponding to the button IDs.}
+\format{
+Each object is a named list of character strings, the names
+  corresponding to the button IDs.
+
+An object of class \code{list} of length 1.
+
+An object of class \code{list} of length 13.
+
+An object of class \code{list} of length 25.
+
+An object of class \code{list} of length 2.
+}
 \usage{
 file_Viewer_tooltips
 

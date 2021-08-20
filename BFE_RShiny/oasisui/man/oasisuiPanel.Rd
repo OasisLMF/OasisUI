@@ -4,8 +4,15 @@
 \alias{oasisuiPanel}
 \title{Oasisui UI Panel}
 \usage{
-oasisuiPanel(id, ..., heading = NULL, footer = NULL,
-  status = "default", collapsible = FALSE, show = TRUE)
+oasisuiPanel(
+  id,
+  ...,
+  heading = NULL,
+  footer = NULL,
+  status = "default",
+  collapsible = FALSE,
+  show = TRUE
+)
 }
 \arguments{
 \item{id}{String ID of the panel.}
@@ -30,7 +37,7 @@ The UI definition of the panel.
 Oasisui UI panel with collapsing capabilities.
 }
 \details{
-Adapted from \code{\link[shinyWidgets:panel]{shinyWidgets::panel()}} including IDs and collapsible
+Adapted from \code{\link[shinyWidgets:bootstrap-utils]{shinyWidgets::panel()}} including IDs and collapsible
 (inspired by \code{bsCollapsePanel} from the \code{shinyBS} package).
 }
 \examples{

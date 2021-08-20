@@ -4,8 +4,14 @@
 \alias{oasisuiTableButton}
 \title{oasisuiTableButton}
 \usage{
-oasisuiTableButton(inputId, label, icon = NULL, width = NULL,
-  class = c("btn", "btn-secondary"), ...)
+oasisuiTableButton(
+  inputId,
+  label,
+  icon = NULL,
+  width = NULL,
+  class = c("btn", "btn-secondary"),
+  ...
+)
 }
 \arguments{
 \item{inputId}{widget id}
@@ -24,5 +30,5 @@ oasisuiTableButton(inputId, label, icon = NULL, width = NULL,
 Button widget (UI element).
 }
 \description{
-Modified version of the primary \code{\link[oasisui:oasisuiButton]{oasisui::oasisuiButton()}}.
+Modified version of the primary \code{\link[=oasisuiButton]{oasisuiButton()}}.
 }
