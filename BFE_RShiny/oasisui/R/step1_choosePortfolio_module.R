@@ -494,19 +494,19 @@ step1_choosePortfolio <- function(input, output, session,
     # Re-setting fileInputs
     output$SLFile_ui <- renderUI({
       fileInput(inputId = ns("SLFile"), label = 'Location file:',
-                accept = c('csv', 'comma-separated-values', '.csv'))
+                accept = c('csv', 'comma-separated-values', '.csv', '.parquet'))
     })
     output$SAFile_ui <- renderUI({
       fileInput(inputId = ns("SAFile"), label = 'Account file:',
-                accept = c('csv', 'comma-separated-values', '.csv'))
+                accept = c('csv', 'comma-separated-values', '.csv', '.parquet'))
     })
     output$SRFile_ui <- renderUI({
       fileInput(inputId = ns("SRFile"), label = 'RI info file:',
-                accept = c('csv', 'comma-separated-values', '.csv'))
+                accept = c('csv', 'comma-separated-values', '.csv', '.parquet'))
     })
     output$SRSFile_ui <- renderUI({
       fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
-                accept = c('csv', 'comma-separated-values', '.csv'))
+                accept = c('csv', 'comma-separated-values', '.csv', '.parquet'))
     })
   })
 
@@ -525,19 +525,19 @@ step1_choosePortfolio <- function(input, output, session,
   # Rendering of fileInputs
   output$SLFile_ui <- renderUI({
     fileInput(inputId = ns("SLFile"), label = 'Location file:',
-              accept = c('csv', 'comma-separated-values', '.csv'))
+              accept = c('csv', 'comma-separated-values', '.csv', '.parquet'))
   })
   output$SAFile_ui <- renderUI({
     fileInput(inputId = ns("SAFile"), label = 'Account file:',
-              accept = c('csv', 'comma-separated-values', '.csv'))
+              accept = c('csv', 'comma-separated-values', '.csv', '.parquet'))
   })
   output$SRFile_ui <- renderUI({
     fileInput(inputId = ns("SRFile"), label = 'RI info file:',
-              accept = c('csv', 'comma-separated-values', '.csv'))
+              accept = c('csv', 'comma-separated-values', '.csv', '.parquet'))
   })
   output$SRSFile_ui <- renderUI({
     fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
-              accept = c('csv', 'comma-separated-values', '.csv'))
+              accept = c('csv', 'comma-separated-values', '.csv', '.parquet'))
   })
 
   observeEvent(input$SLFile, ignoreInit = TRUE, {

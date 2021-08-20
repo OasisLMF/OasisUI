@@ -93,8 +93,10 @@ ViewFilesInTable <- function(input, output, session,
   result <- reactiveValues(
     #df to show in table
     tbl_filesListData_wButtons = NULL,
-    #View output file content
+    #View output file content csv
     currentFile = NULL,
+    #View output file content parquet
+    currentFileP = NULL,
     # Filepath of file to view
     currfilepath = NULL,
     #content of curr file
@@ -188,7 +190,8 @@ ViewFilesInTable <- function(input, output, session,
   output$FLdownloadexcel <- downloadHandler(
     filename = "file.csv",
     content = function(file) {
-      session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename, file_towrite = file)
+      session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename,
+                                           file_towrite = file)
     }
   )
 
@@ -268,6 +271,7 @@ ViewFilesInTable <- function(input, output, session,
         oasisuiButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(oasisuiButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
         downloadButton(ns("FVEdownloadexcel"), label = "Export"),
+        downloadButton(ns("FVEdownloadparquet"), label = "Export Parquet"),
         style = "display: inline"),
 
       hidden(oasisuiPanel(
@@ -341,6 +345,14 @@ ViewFilesInTable <- function(input, output, session,
     }
   )
 
+  output$FVEdownloadparquet <- downloadHandler(
+    filename = function(){result$currentFileP},
+    content = function(file) {
+      session$userData$data_hub$write_parquet_file(data = result$tbl_fileData, dataset_identifier = result$currentFileP,
+                                              file_towrite = file)
+    }
+  )
+
   # Panel Map
   observeEvent(input$abuttonhidemapFVExposureSelected, {
     hide("oasisuiPanelmapFVExposureSelected")
@@ -363,9 +375,11 @@ ViewFilesInTable <- function(input, output, session,
       if (!is.null(result$tbl_fileData)) {
         filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
         filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
+        result$currentFileP <- paste0(result$currentFile, ".parquet")
         result$currentFile <- paste0(result$currentFile, ".csv")
         # Show buttons
         if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
+          names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
           output$plainmap <- renderLeaflet({
             createPlainMap(result$tbl_fileData, session = session, paramID = param(), step = NULL)
           })

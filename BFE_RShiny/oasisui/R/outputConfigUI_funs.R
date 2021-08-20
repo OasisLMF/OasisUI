@@ -105,7 +105,8 @@ rerunUI <- function(session, analysisID, tag, oed_field) {
 
     # reports
     choices_rep_final <- lapply(seq(1:length(prsp_sum)), function(x) {
-      not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
+      not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc", "ord_output")
+      # not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
       names_reports <- as.list(names(prsp_sum[[x]]))
       names_reports <- names_reports[-which(names_reports %in% not_include)]
       if (length(names(prsp_sum[[x]]$leccalc)) > 0) {

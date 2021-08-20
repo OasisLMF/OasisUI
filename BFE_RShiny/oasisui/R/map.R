@@ -35,8 +35,9 @@ createPlainMap <- function(df, session, paramID, step = NULL) {
     addMarkers(lng = ~longitude,
                lat = ~latitude,
                icon = icon_map,
-               clusterOptions = markerClusterOptions(maxClusterRadius = 50),
-               popup = ~popup) %>% # make map full screen
+               clusterOptions = markerClusterOptions(maxClusterRadius = 50)#,
+               # popup = popup
+               ) %>% # make map full screen
     addFullscreenControl(pseudoFullscreen = TRUE)
 }
 
@@ -112,7 +113,7 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
 # Extract error messages
 .keys_errors_msg <- function(data, session, paramID) {
   keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = paramID)
-  if (!is.null(keys_errors)) {
+  if (!is.null(keys_errors) && is.null(keys_errors$detail)) {
     message <- group_by(keys_errors, LocID) %>%
       summarize(message = paste(paste(PerilID, ":", Message), collapse = " / "))
     if (length(as.numeric(keys_errors$LocID)) > 0) {

@@ -63,12 +63,12 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
 #'
 #' @rdname write_file
 #'
-#' @description Writes ojbect in the correct format.
+#' @description Writes object in the correct format.
 #'
 #' @param data object to write.
 #' @param dataset_identifier name and relative path of file to write
 #' @param destdir path where to write file.
-#' @param file_towrite name of file where to wirte data.
+#' @param file_towrite name of file where to write data.
 #'
 #' @importFrom data.table fread
 #' @importFrom jsonlite read_json
@@ -86,6 +86,29 @@ writefile <- function(data, dataset_identifier = NULL, destdir = tempdir(), file
   } else {
     fwrite(data, file_towrite, row.names = FALSE, quote = TRUE)
   }
+  file_towrite
+}
+
+#' write parquet
+#'
+#' @rdname write_parquet
+#'
+#' @description Writes object in the correct format.
+#'
+#' @param data object to write.
+#' @param dataset_identifier name and relative path of file to write
+#' @param destdir path where to write file.
+#' @param file_towrite name of file where to write data.
+#'
+#' @importFrom arrow write_parquet
+#'
+#' @export
+
+writeParquet <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL) {
+  if (is.null(file_towrite)) {
+    file_towrite <- file.path(destdir, dataset_identifier)
+  }
+  write_parquet(data, dataset_identifier)
   file_towrite
 }
 
