@@ -36,7 +36,7 @@ varsdf <- data.frame(
              "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP", "AAL","PLT",
              "ELT Quantile", "ELT Moment", "PLT Sample", "PLT Quantile", "PLT Moment", "ALT Period", "ELT Sample",
              "EPT Full Uncertainty AEP", "EPT Full Uncertainty OEP", "EPT Mean Sample AEP", "EPT Mean Sample OEP",
-             "EPT per Sample Mean AEP", "EPT per Sample Mean OEP", "Psept AEP", "Psept OEP"),
+             "EPT Sample Mean AEP", "EPT Sample Mean OEP", "Psept AEP", "Psept OEP"),
   fields = c('summarycalc', 'eltcalc', 'full_uncertainty_aep', 'full_uncertainty_oep',
              'wheatsheaf_aep',  'wheatsheaf_oep', 'wheatsheaf_mean_aep', 'wheatsheaf_mean_oep',
              'sample_mean_aep', 'sample_mean_oep',  'aalcalc', 'pltcalc', 'elt_sample', 'elt_quantile',

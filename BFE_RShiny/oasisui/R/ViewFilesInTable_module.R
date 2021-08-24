@@ -98,7 +98,7 @@ ViewFilesInTable <- function(input, output, session,
     #View output file content parquet
     currentFileP = NULL,
     # Display file category in file name
-    fielCategory = NULL,
+    fileCategory = NULL,
     # Filepath of file to view
     currfilepath = NULL,
     #content of curr file
@@ -372,7 +372,7 @@ ViewFilesInTable <- function(input, output, session,
 
     # Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
-    result$fielCategory <- result$currentFile
+    result$fileCategory <- result$currentFile
     if (result$currentFile %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
       result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
       if (!is.null(result$tbl_fileData)) {
@@ -418,7 +418,7 @@ ViewFilesInTable <- function(input, output, session,
                  h5("File Name")
           ),
           column(10,
-                 p(result$fielCategory, style = "margin-top: 10px;")
+                 p(result$fileCategory, style = "margin-top: 10px;")
           )
         ),
         fluidRow(
