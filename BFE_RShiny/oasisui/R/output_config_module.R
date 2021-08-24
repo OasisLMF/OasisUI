@@ -498,7 +498,7 @@ def_out_config <- function(input,
       id = ns("panel_OutputParamsReview"),
       heading = h4("Output Parameters Review"),
       oasisuiTableUI(ns("out_params_review_tbl")),
-      downloadButton(ns("download_out_params_review_tbl"), label = "Export to csv") %>%
+      downloadButton(ns("download_out_params_review_tbl"), label = "CSV") %>%
         bs_embed_tooltip(
           title = defineSingleAna_tooltips$download_out_params_review_tbl,
           placement = "right"

@@ -159,6 +159,15 @@ ViewFilesInTable <- function(input, output, session,
     }
   )
 
+  observeEvent(result$currentFile, {
+    if (!grepl(".json", result$currentFile)) {
+      show("FVEdownloadparquet")
+      show("FVEdownloadexcel")
+    } else {
+      show("FVEdownloadjson")
+    }
+  })
+
   # Download zip Files ----------------------------------------------------------
 
   # Download zip button
@@ -272,8 +281,9 @@ ViewFilesInTable <- function(input, output, session,
       fluidRow(
         oasisuiButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(oasisuiButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
-        downloadButton(ns("FVEdownloadexcel"), label = "Export"),
-        downloadButton(ns("FVEdownloadparquet"), label = "Export Parquet"),
+        hidden(downloadButton(ns("FVEdownloadexcel"), label = "CSV")),
+        hidden(downloadButton(ns("FVEdownloadparquet"), label = "Parquet")),
+        hidden(downloadButton(ns("FVEdownloadjson"), label = "JSON")),
         style = "display: inline"),
 
       hidden(oasisuiPanel(
@@ -354,6 +364,13 @@ ViewFilesInTable <- function(input, output, session,
                                               file_towrite = file)
     }
   )
+  # Export to .json
+  output$FVEdownloadjson <- downloadHandler(
+    filename = function(){result$currentFile},
+    content = function(file) {
+      session$userData$data_hub$write_file(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
+    }
+  )
 
   # Panel Map
   observeEvent(input$abuttonhidemapFVExposureSelected, {
@@ -373,12 +390,13 @@ ViewFilesInTable <- function(input, output, session,
     # Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
     result$fileCategory <- result$currentFile
+    result$currentFileP <- paste0(result$fileCategory, ".parquet")
     if (result$fileCategory %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
       result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$fileCategory)
       if (!is.null(result$tbl_fileData)) {
         filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$fileCategory)
         filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$fileCategory)
-        result$currentFileP <- paste0(result$fileCategory, ".parquet")
+        # result$currentFileP <- paste0(result$fileCategory, ".parquet")
         result$currentFile <- paste0(result$fileCategory, ".csv")
         # Show buttons
         if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
