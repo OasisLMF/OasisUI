@@ -93,7 +93,7 @@ writefile <- function(data, dataset_identifier = NULL, destdir = tempdir(), file
 #'
 #' @rdname write_parquet
 #'
-#' @description Writes object in the correct format.
+#' @description Writes object in parquet format.
 #'
 #' @param data object to write.
 #' @param dataset_identifier name and relative path of file to write
@@ -103,12 +103,11 @@ writefile <- function(data, dataset_identifier = NULL, destdir = tempdir(), file
 #' @importFrom arrow write_parquet
 #'
 #' @export
-
 writeParquet <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL) {
   if (is.null(file_towrite)) {
     file_towrite <- file.path(destdir, dataset_identifier)
   }
-  write_parquet(data, dataset_identifier)
+  write_parquet(data, file_towrite)
   file_towrite
 }
 

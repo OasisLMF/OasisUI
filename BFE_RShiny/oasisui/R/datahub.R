@@ -488,8 +488,7 @@ DataHub <- R6Class(
       fs
     },
     write_parquet_file = function(data, dataset_identifier, file_towrite = NULL, ...) {
-      extension_parquet <- gsub(".csv", ".parquet", dataset_identifier)
-      fs <- writeParquet(data, extension_parquet, destdir = private$user_destdir, file_towrite)
+      fs <- writeParquet(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
       fs
     },
     # > Helper methods ----

@@ -21,5 +21,5 @@ writeParquet(
 \item{file_towrite}{name of file where to write data.}
 }
 \description{
-Writes object in the correct format.
+Writes object in parquet format.
 }

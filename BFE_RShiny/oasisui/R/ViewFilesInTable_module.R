@@ -346,7 +346,7 @@ ViewFilesInTable <- function(input, output, session,
       session$userData$data_hub$write_file(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
     }
   )
-
+  # Export to .parquet
   output$FVEdownloadparquet <- downloadHandler(
     filename = function(){result$currentFileP},
     content = function(file) {
@@ -373,13 +373,13 @@ ViewFilesInTable <- function(input, output, session,
     # Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
     result$fileCategory <- result$currentFile
-    if (result$currentFile %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
-      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
+    if (result$fileCategory %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
+      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$fileCategory)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
-        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
-        result$currentFileP <- paste0(result$currentFile, ".parquet")
-        result$currentFile <- paste0(result$currentFile, ".csv")
+        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$fileCategory)
+        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$fileCategory)
+        result$currentFileP <- paste0(result$fileCategory, ".parquet")
+        result$currentFile <- paste0(result$fileCategory, ".csv")
         # Show buttons
         if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
           names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
@@ -392,10 +392,10 @@ ViewFilesInTable <- function(input, output, session,
         }
       }
     } else {
-      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$fileCategory, type = folderpath)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
-        filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+        filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$fileCategory, type = folderpath)
+        filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$fileCategory, type = folderpath)
       }
       # Show buttons
       if ("latitude" %in% tolower(names(result$tbl_fileData))) {
