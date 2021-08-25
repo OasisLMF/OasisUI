@@ -125,6 +125,7 @@
 #' @importFrom tidyr separate
 #' @importFrom tidyr spread
 #' @importFrom tidyr gather
+#' @importFrom arrow read_parquet
 #'
 #' @export
 
@@ -241,7 +242,15 @@ DataHub <- R6Class(
     # dataset_identifier is location/account/reinsurance_info/reinsurance_source
     # If file does not exist, returns df details: Not Found
     get_pf_dataset_content = function(id, dataset_identifier, ...) {
-      dataset_content <- content(private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result)
+      # check if file has the parquet extension (i.e. is not csv). If yes, process differently then csv
+      if (!grepl("csv",
+                private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result[3]$headers$`content-type`)) {
+
+        dataset_content <- read_parquet(content(private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result))
+      } else {
+        dataset_content <- content(private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result)
+      }
+
       if (is.null(names(dataset_content))) {
         if (class(dataset_content) == "raw") {
           dataset_content <- as.data.frame(dataset_content)
@@ -476,6 +485,14 @@ DataHub <- R6Class(
     # > Write file ----
     write_file = function(data, dataset_identifier, file_towrite = NULL, ...) {
       fs <- writefile(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
+      fs
+    },
+    write_parquet_file = function(data, dataset_identifier, file_towrite = NULL, ...) {
+      fs <- writeParquet(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
+      fs
+    },
+    write_file_json = function(data, dataset_identifier, file_towrite = NULL, ...) {
+      fs <- writefileJSON(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
       fs
     },
     # > Helper methods ----

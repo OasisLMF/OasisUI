@@ -4,7 +4,9 @@
 \name{Status_details}
 \alias{Status_details}
 \title{Status Details}
-\format{Named \code{list} of Staus details.}
+\format{
+Named \code{list} of Staus details.
+}
 \usage{
 Status_details
 }

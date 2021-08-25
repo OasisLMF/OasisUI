@@ -7,10 +7,17 @@
 \usage{
 def_out_configUI(id)
 
-def_out_config(input, output, session, analysisID = reactive(NULL),
-  analysisName = reactive(""), ana_flag = reactive("C"),
-  counter = reactive(NULL), active = reactive(TRUE),
-  customModSettings = reactive(NULL))
+def_out_config(
+  input,
+  output,
+  session,
+  analysisID = reactive(NULL),
+  analysisName = reactive(""),
+  ana_flag = reactive("C"),
+  counter = reactive(NULL),
+  active = reactive(TRUE),
+  customModSettings = reactive(NULL)
+)
 }
 \arguments{
 \item{analysisID}{Selected analysis ID.}

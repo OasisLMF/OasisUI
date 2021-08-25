@@ -4,7 +4,9 @@
 \name{varsdf}
 \alias{varsdf}
 \title{varsdf}
-\format{\code{data.frame} of variables for output configuration.}
+\format{
+\code{data.frame} of variables for output configuration.
+}
 \usage{
 varsdf
 }

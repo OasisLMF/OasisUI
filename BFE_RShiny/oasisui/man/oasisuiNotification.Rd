@@ -4,8 +4,11 @@
 \alias{oasisuiNotification}
 \title{oasisuiNotification}
 \usage{
-oasisuiNotification(ui, type = c("default", "message", "warning",
-  "error"), ...)
+oasisuiNotification(
+  ui,
+  type = c("default", "message", "warning", "error"),
+  ...
+)
 }
 \arguments{
 \item{ui}{Content of message.}

@@ -498,7 +498,7 @@ def_out_config <- function(input,
       id = ns("panel_OutputParamsReview"),
       heading = h4("Output Parameters Review"),
       oasisuiTableUI(ns("out_params_review_tbl")),
-      downloadButton(ns("download_out_params_review_tbl"), label = "Export to csv") %>%
+      downloadButton(ns("download_out_params_review_tbl"), label = "CSV") %>%
         bs_embed_tooltip(
           title = defineSingleAna_tooltips$download_out_params_review_tbl,
           placement = "right"
@@ -999,6 +999,7 @@ def_out_config <- function(input,
           # update requested reports for summary level that is being iterated
           idx_item <- review_prsp$summary_level == fields_to_add[item]
           keep <- review_prsp[idx_item, "report"]
+          #TODO: check which ord reports are needed for plot and expand lec_list
           lec_list <- c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP",
                         "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP", "LEC Mean Wheatsheaf AEP",
                         "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP")

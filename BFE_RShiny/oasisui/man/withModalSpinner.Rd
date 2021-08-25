@@ -4,8 +4,13 @@
 \alias{withModalSpinner}
 \title{Modal window spinner}
 \usage{
-withModalSpinner(expr, info, spinner = icon("spinner", "fa-spin"),
-  size = "m", t = 0)
+withModalSpinner(
+  expr,
+  info,
+  spinner = icon("spinner", "fa-spin"),
+  size = "m",
+  t = 0
+)
 }
 \arguments{
 \item{expr}{The \code{expression} to be evaluated.}

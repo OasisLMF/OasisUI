@@ -59,36 +59,71 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
   data
 }
 
-#' write file
+#' write CSV
 #'
-#' @rdname write_file
+#' @rdname writefile
 #'
-#' @description Writes ojbect in the correct format.
+#' @description Writes object in CSV format.
 #'
 #' @param data object to write.
 #' @param dataset_identifier name and relative path of file to write
 #' @param destdir path where to write file.
-#' @param file_towrite name of file where to wirte data.
+#' @param file_towrite name of file where to write data.
 #'
-#' @importFrom data.table fread
-#' @importFrom jsonlite read_json
-#' @importFrom utils tail
+#' @importFrom data.table fwrite
 #'
 #' @export
-
-writefile <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL){
+writefile <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL) {
   if (is.null(file_towrite)) {
     file_towrite <- file.path(destdir, dataset_identifier)
   }
-  extension <-  strsplit(dataset_identifier, split = "\\.") %>% unlist() %>% tail(n = 1)
-  if (extension == "json") {
-    write(toJSON(data, pretty = TRUE), file_towrite)
-  } else {
-    fwrite(data, file_towrite, row.names = FALSE, quote = TRUE)
-  }
+  fwrite(data, file_towrite, row.names = FALSE, quote = TRUE)
   file_towrite
 }
 
+#' write parquet
+#'
+#' @rdname write_parquet
+#'
+#' @description Writes object in parquet format.
+#'
+#' @param data object to write.
+#' @param dataset_identifier name and relative path of file to write
+#' @param destdir path where to write file.
+#' @param file_towrite name of file where to write data.
+#'
+#' @importFrom arrow write_parquet
+#'
+#' @export
+writeParquet <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL) {
+  if (is.null(file_towrite)) {
+    file_towrite <- file.path(destdir, dataset_identifier)
+  }
+  write_parquet(data, file_towrite)
+  file_towrite
+}
+
+#' write file JSON
+#'
+#' @rdname writefileJSON
+#'
+#' @description Writes object in JSON format.
+#'
+#' @param data object to write.
+#' @param dataset_identifier name and relative path of file to write
+#' @param destdir path where to write file.
+#' @param file_towrite name of file where to write data.
+#'
+#' @importFrom jsonlite toJSON
+#'
+#' @export
+writefileJSON <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL) {
+  if (is.null(file_towrite)) {
+    file_towrite <- file.path(destdir, dataset_identifier)
+  }
+  write(toJSON(data, pretty = TRUE), file_towrite)
+  file_towrite
+}
 
 #' simplify_path
 #'

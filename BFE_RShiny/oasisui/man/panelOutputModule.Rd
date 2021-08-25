@@ -7,8 +7,15 @@
 \usage{
 panelOutputModuleUI(id)
 
-panelOutputModule(input, output, session, portfId, anaID,
-  filesListData = reactive(NULL), active)
+panelOutputModule(
+  input,
+  output,
+  session,
+  portfId,
+  anaID,
+  filesListData = reactive(NULL),
+  active
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

@@ -7,8 +7,14 @@
 \title{Compare Analyses Definition Module Server ---------------------------------------
 visualizationCBR}
 \usage{
-visualizationCBR(input, output, session, active = reactive(TRUE),
-  preselAnaId = reactive(NULL), anaID = reactive(NULL))
+visualizationCBR(
+  input,
+  output,
+  session,
+  active = reactive(TRUE),
+  preselAnaId = reactive(NULL),
+  anaID = reactive(NULL)
+)
 
 visualizationCBRUI(id)
 }

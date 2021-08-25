@@ -4,9 +4,8 @@
 \name{OasisAPI}
 \alias{OasisAPI}
 \title{OasisAPI}
-\format{\code{\link{R6Class}} object.}
-\usage{
-OasisAPI
+\format{
+\code{\link{R6Class}} object.
 }
 \value{
 Object of \code{\link{R6Class}} with methods for connecting to Oasis API.
@@ -70,4 +69,287 @@ oasisapi$method(arg)
 }
 }
 
-\keyword{datasets}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-new}{\code{OasisAPI$new()}}
+\item \href{#method-get_http_type}{\code{OasisAPI$get_http_type()}}
+\item \href{#method-api_init}{\code{OasisAPI$api_init()}}
+\item \href{#method-get_conn_init}{\code{OasisAPI$get_conn_init()}}
+\item \href{#method-get_url}{\code{OasisAPI$get_url()}}
+\item \href{#method-api_get_healthcheck}{\code{OasisAPI$api_get_healthcheck()}}
+\item \href{#method-api_handle_response}{\code{OasisAPI$api_handle_response()}}
+\item \href{#method-api_fetch_response}{\code{OasisAPI$api_fetch_response()}}
+\item \href{#method-api_post_access_token}{\code{OasisAPI$api_post_access_token()}}
+\item \href{#method-set_tokens}{\code{OasisAPI$set_tokens()}}
+\item \href{#method-get_access_token}{\code{OasisAPI$get_access_token()}}
+\item \href{#method-get_refresh_token}{\code{OasisAPI$get_refresh_token()}}
+\item \href{#method-api_post_refresh_token}{\code{OasisAPI$api_post_refresh_token()}}
+\item \href{#method-get_version}{\code{OasisAPI$get_version()}}
+\item \href{#method-api_basic_query}{\code{OasisAPI$api_basic_query()}}
+\item \href{#method-api_query}{\code{OasisAPI$api_query()}}
+\item \href{#method-api_get_query}{\code{OasisAPI$api_get_query()}}
+\item \href{#method-api_post_query}{\code{OasisAPI$api_post_query()}}
+\item \href{#method-api_delete_query}{\code{OasisAPI$api_delete_query()}}
+\item \href{#method-api_patch_query}{\code{OasisAPI$api_patch_query()}}
+\item \href{#method-api_post_file_query}{\code{OasisAPI$api_post_file_query()}}
+\item \href{#method-api_body_query}{\code{OasisAPI$api_body_query()}}
+\item \href{#method-api_return_query_res}{\code{OasisAPI$api_return_query_res()}}
+\item \href{#method-return_df}{\code{OasisAPI$return_df()}}
+\item \href{#method-api_get_analyses_tar}{\code{OasisAPI$api_get_analyses_tar()}}
+\item \href{#method-clone}{\code{OasisAPI$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$new(httptype = "application/json", host, port, version, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_http_type"></a>}}
+\if{latex}{\out{\hypertarget{method-get_http_type}{}}}
+\subsection{Method \code{get_http_type()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$get_http_type()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_init"></a>}}
+\if{latex}{\out{\hypertarget{method-api_init}{}}}
+\subsection{Method \code{api_init()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_init(host, port, scheme = c("http", "https"), ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_conn_init"></a>}}
+\if{latex}{\out{\hypertarget{method-get_conn_init}{}}}
+\subsection{Method \code{get_conn_init()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$get_conn_init()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_url"></a>}}
+\if{latex}{\out{\hypertarget{method-get_url}{}}}
+\subsection{Method \code{get_url()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$get_url()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_get_healthcheck"></a>}}
+\if{latex}{\out{\hypertarget{method-api_get_healthcheck}{}}}
+\subsection{Method \code{api_get_healthcheck()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_get_healthcheck(...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_handle_response"></a>}}
+\if{latex}{\out{\hypertarget{method-api_handle_response}{}}}
+\subsection{Method \code{api_handle_response()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_handle_response(response)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_fetch_response"></a>}}
+\if{latex}{\out{\hypertarget{method-api_fetch_response}{}}}
+\subsection{Method \code{api_fetch_response()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_fetch_response(meth, args, logMessage = print, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_post_access_token"></a>}}
+\if{latex}{\out{\hypertarget{method-api_post_access_token}{}}}
+\subsection{Method \code{api_post_access_token()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_post_access_token(user, pwd, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_tokens"></a>}}
+\if{latex}{\out{\hypertarget{method-set_tokens}{}}}
+\subsection{Method \code{set_tokens()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$set_tokens(user, pwd, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_access_token"></a>}}
+\if{latex}{\out{\hypertarget{method-get_access_token}{}}}
+\subsection{Method \code{get_access_token()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$get_access_token()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_refresh_token"></a>}}
+\if{latex}{\out{\hypertarget{method-get_refresh_token}{}}}
+\subsection{Method \code{get_refresh_token()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$get_refresh_token()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_post_refresh_token"></a>}}
+\if{latex}{\out{\hypertarget{method-api_post_refresh_token}{}}}
+\subsection{Method \code{api_post_refresh_token()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_post_refresh_token()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_version"></a>}}
+\if{latex}{\out{\hypertarget{method-get_version}{}}}
+\subsection{Method \code{get_version()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$get_version()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_basic_query"></a>}}
+\if{latex}{\out{\hypertarget{method-api_basic_query}{}}}
+\subsection{Method \code{api_basic_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_basic_query(
+  query_path_basic,
+  query_list = NULL,
+  query_method,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_query"></a>}}
+\if{latex}{\out{\hypertarget{method-api_query}{}}}
+\subsection{Method \code{api_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_query(query_path, query_list = NULL, query_method, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_get_query"></a>}}
+\if{latex}{\out{\hypertarget{method-api_get_query}{}}}
+\subsection{Method \code{api_get_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_get_query(query_path, query_list = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_post_query"></a>}}
+\if{latex}{\out{\hypertarget{method-api_post_query}{}}}
+\subsection{Method \code{api_post_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_post_query(query_path, query_list = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_delete_query"></a>}}
+\if{latex}{\out{\hypertarget{method-api_delete_query}{}}}
+\subsection{Method \code{api_delete_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_delete_query(query_path, query_list = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_patch_query"></a>}}
+\if{latex}{\out{\hypertarget{method-api_patch_query}{}}}
+\subsection{Method \code{api_patch_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_patch_query(query_path, query_list = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_post_file_query"></a>}}
+\if{latex}{\out{\hypertarget{method-api_post_file_query}{}}}
+\subsection{Method \code{api_post_file_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_post_file_query(query_path, query_body = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_body_query"></a>}}
+\if{latex}{\out{\hypertarget{method-api_body_query}{}}}
+\subsection{Method \code{api_body_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_body_query(
+  query_path,
+  query_body = NULL,
+  query_method = "POST",
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_return_query_res"></a>}}
+\if{latex}{\out{\hypertarget{method-api_return_query_res}{}}}
+\subsection{Method \code{api_return_query_res()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_return_query_res(query_path, query_list = NULL, query_method, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_df"></a>}}
+\if{latex}{\out{\hypertarget{method-return_df}{}}}
+\subsection{Method \code{return_df()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$return_df(query_path, api_param = "", query_method = "GET")}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-api_get_analyses_tar"></a>}}
+\if{latex}{\out{\hypertarget{method-api_get_analyses_tar}{}}}
+\subsection{Method \code{api_get_analyses_tar()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$api_get_analyses_tar(id, label, dest = tempfile(fileext = ".tar"))}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}

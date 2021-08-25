@@ -7,8 +7,16 @@
 \usage{
 outputplotsUI(id)
 
-outputplots(input, output, session, selectPortfID, selectAnaID, n_panels,
-  filesListData = reactive(NULL), active)
+outputplots(
+  input,
+  output,
+  session,
+  selectPortfID,
+  selectAnaID,
+  n_panels,
+  filesListData = reactive(NULL),
+  active
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}
