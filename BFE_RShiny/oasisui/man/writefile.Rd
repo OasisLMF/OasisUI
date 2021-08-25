@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_hub_helper_funcs.R
 \name{writefile}
 \alias{writefile}
-\title{write file}
+\title{write CSV}
 \usage{
 writefile(
   data,
