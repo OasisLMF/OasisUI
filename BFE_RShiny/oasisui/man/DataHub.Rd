@@ -153,6 +153,7 @@ data_hub$get_pf_data_list(id)
 \item \href{#method-invalidate_ana_validation_summary_content}{\code{DataHub$invalidate_ana_validation_summary_content()}}
 \item \href{#method-write_file}{\code{DataHub$write_file()}}
 \item \href{#method-write_parquet_file}{\code{DataHub$write_parquet_file()}}
+\item \href{#method-write_file_json}{\code{DataHub$write_file_json()}}
 \item \href{#method-get_analyses_tar}{\code{DataHub$get_analyses_tar()}}
 \item \href{#method-get_analyses_inputs_tar}{\code{DataHub$get_analyses_inputs_tar()}}
 \item \href{#method-get_analyses_outputs_tar}{\code{DataHub$get_analyses_outputs_tar()}}
@@ -565,6 +566,15 @@ data_hub$get_pf_data_list(id)
 \subsection{Method \code{write_parquet_file()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataHub$write_parquet_file(data, dataset_identifier, file_towrite = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-write_file_json"></a>}}
+\if{latex}{\out{\hypertarget{method-write_file_json}{}}}
+\subsection{Method \code{write_file_json()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$write_file_json(data, dataset_identifier, file_towrite = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 }

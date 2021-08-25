@@ -368,7 +368,7 @@ ViewFilesInTable <- function(input, output, session,
   output$FVEdownloadjson <- downloadHandler(
     filename = function(){result$currentFile},
     content = function(file) {
-      session$userData$data_hub$write_file(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
+      session$userData$data_hub$write_file_json(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
     }
   )
 

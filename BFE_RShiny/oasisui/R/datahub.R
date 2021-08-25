@@ -491,6 +491,10 @@ DataHub <- R6Class(
       fs <- writeParquet(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
       fs
     },
+    write_file_json = function(data, dataset_identifier, file_towrite = NULL, ...) {
+      fs <- writefileJSON(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
+      fs
+    },
     # > Helper methods ----
     get_analyses_tar = function(id, label, destdir = tempdir()) {
       dest <- tempfile(tmpdir = destdir, fileext = ".tar")
