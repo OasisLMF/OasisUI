@@ -1,7 +1,8 @@
 FROM rocker/r-ver:4.0.5
 # -> ubuntu 20.04
-# -> don't use latest R release, since that will keep getting linked with later build-dates and packagemanager
-# -> sets repository to packagemanager for specific build date of R version, being the last date CRAN distributed that R version
+# -> don't use latest R release, since that will keep getting linked with later build-dates and RStudio packagemanager
+# -> sets repository to RStudio packagemanager for specific build date of R version, being 2021-05-17 for R 4.0.5
+# (see https://github.com/rocker-org/rocker-versioned2/blob/master/dockerfiles/r-ver_4.0.5.Dockerfile for reference)
 # -> installs R to /usr/local/lib/R
 
 RUN apt-get update && \
@@ -21,6 +22,8 @@ apt-get install -y --no-install-recommends libnode-dev libcairo2-dev libxt-dev l
 ARG REF_BRANCH
 ENV REF_BRANCH=${REF_BRANCH:-master}
 RUN R -e "install.packages('remotes')" && \
+    # installing older version of package shinyjs from GitHub
+    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')" && \
     R -e "remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
     rm -rf /var/lib/apt/lists/*
 
