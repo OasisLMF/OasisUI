@@ -1,6 +1,15 @@
 OasisUI Changelog
 ==================
 
+`1.10.0`_
+ ---------
+* [#256](https://github.com/OasisLMF/OasisUI/pull/256) - Add Github templates
+* [#257](https://github.com/OasisLMF/OasisUI/pull/257) - Add automated Changelog creation in build script 
+* [#261](https://github.com/OasisLMF/OasisUI/pull/261) - Feature/258-259-260-changes
+* [#262](https://github.com/OasisLMF/OasisUI/pull/262) - Feature/258 259 260 changes
+* [#255](https://github.com/OasisLMF/OasisUI/pull/255) - Ci/pre release
+.. _`1.10.0`:  https://github.com/OasisLMF/OasisUI/compare/1.9.0...1.10.0
+
 `1.10.0rc1`_
  ---------
 * [#256](https://github.com/OasisLMF/OasisUI/pull/256) - Add Github templates
