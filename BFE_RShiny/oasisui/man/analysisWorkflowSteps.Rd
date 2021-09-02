@@ -4,7 +4,9 @@
 \name{analysisWorkflowSteps}
 \alias{analysisWorkflowSteps}
 \title{analysisWorkflowSteps}
-\format{An object of class \code{list} of length 3.}
+\format{
+An object of class \code{list} of length 3.
+}
 \usage{
 analysisWorkflowSteps
 }

@@ -236,7 +236,9 @@ step1_choosePortfolio <- function(input, output, session,
     # reactive value for the portfolio table
     tbl_portfoliosData = NULL,
     # flag to know if the user is creating or amending a portfolio
-    portfolio_flag = "C"
+    portfolio_flag = "C",
+    # acceptedfile extensions in file upload
+    accepted_ext = NULL
   )
 
   #Set Params
@@ -268,6 +270,7 @@ step1_choosePortfolio <- function(input, output, session,
     disable("abuttonamendpf")
     disable("abuttonpgotonextstep")
     disable("abuttonuploadsourcefiles")
+    result$accepted_ext = c('csv', 'comma-separated-values', '.csv', '.parquet')
     if (length(input$dt_Portfolios_rows_selected) > 0) {
       enable("abuttonpfdetails")
       enable("abuttondeletepf")
@@ -494,19 +497,19 @@ step1_choosePortfolio <- function(input, output, session,
     # Re-setting fileInputs
     output$SLFile_ui <- renderUI({
       fileInput(inputId = ns("SLFile"), label = 'Location file:',
-                accept = c('csv', 'comma-separated-values', '.csv'))
+                accept = result$accepted_ext)
     })
     output$SAFile_ui <- renderUI({
       fileInput(inputId = ns("SAFile"), label = 'Account file:',
-                accept = c('csv', 'comma-separated-values', '.csv'))
+                accept = result$accepted_ext)
     })
     output$SRFile_ui <- renderUI({
       fileInput(inputId = ns("SRFile"), label = 'RI info file:',
-                accept = c('csv', 'comma-separated-values', '.csv'))
+                accept = result$accepted_ext)
     })
     output$SRSFile_ui <- renderUI({
       fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
-                accept = c('csv', 'comma-separated-values', '.csv'))
+                accept = result$accepted_ext)
     })
   })
 
@@ -525,19 +528,19 @@ step1_choosePortfolio <- function(input, output, session,
   # Rendering of fileInputs
   output$SLFile_ui <- renderUI({
     fileInput(inputId = ns("SLFile"), label = 'Location file:',
-              accept = c('csv', 'comma-separated-values', '.csv'))
+              accept = result$accepted_ext)
   })
   output$SAFile_ui <- renderUI({
     fileInput(inputId = ns("SAFile"), label = 'Account file:',
-              accept = c('csv', 'comma-separated-values', '.csv'))
+              accept = result$accepted_ext)
   })
   output$SRFile_ui <- renderUI({
     fileInput(inputId = ns("SRFile"), label = 'RI info file:',
-              accept = c('csv', 'comma-separated-values', '.csv'))
+              accept = result$accepted_ext)
   })
   output$SRSFile_ui <- renderUI({
     fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
-              accept = c('csv', 'comma-separated-values', '.csv'))
+              accept = result$accepted_ext)
   })
 
   observeEvent(input$SLFile, ignoreInit = TRUE, {

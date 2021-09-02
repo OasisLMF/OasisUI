@@ -7,9 +7,16 @@
 \usage{
 ViewFilesInTableUI(id, includechkbox = FALSE)
 
-ViewFilesInTable(input, output, session, tbl_filesListData, param = NULL,
-  file_column = "files", folderpath = "output",
-  includechkbox = FALSE)
+ViewFilesInTable(
+  input,
+  output,
+  session,
+  tbl_filesListData,
+  param = NULL,
+  file_column = "files",
+  folderpath = "output",
+  includechkbox = FALSE
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

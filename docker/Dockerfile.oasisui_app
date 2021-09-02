@@ -1,14 +1,16 @@
-FROM rocker/r-ver:3.5.1
-# -> debian stretch (9)
-# -> don't use latest R release, since that will keep getting linked with later build-dates and MRAN snapshots
-# -> sets repository to MRAN for specific build date of R version, being the last date CRAN distributed that R version
+FROM rocker/r-ver:4.0.5
+# -> ubuntu 20.04
+# -> don't use latest R release, since that will keep getting linked with later build-dates and RStudio packagemanager
+# -> sets repository to RStudio packagemanager for specific build date of R version, being 2021-05-17 for R 4.0.5
+# (see https://github.com/rocker-org/rocker-versioned2/blob/master/dockerfiles/r-ver_4.0.5.Dockerfile for reference)
 # -> installs R to /usr/local/lib/R
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libv8-3.14-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils libjq-dev gdal-bin proj-bin libgdal-dev libudunits2-dev && \
+apt-get install -y --no-install-recommends libnode-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils libjq-dev gdal-bin proj-bin libgdal-dev libudunits2-dev && \
     # if desired, add tools such as: sudo, vim, wget, curl, procps
     # library necessary for dependency of geojsonio
     apt-get install -y libprotobuf-dev protobuf-compiler  && \
+    apt-get install -y tzdata && \
     rm -rf /var/lib/apt/lists/*
 
 # libcairo2-dev and libxt-dev needed for Cairo, e.g. graphics
@@ -20,12 +22,8 @@ RUN apt-get update && \
 ARG REF_BRANCH
 ENV REF_BRANCH=${REF_BRANCH:-master}
 RUN R -e "install.packages('remotes')" && \
-    # installing package shinyjs from github fixing reference to commit 473a54b
-    R -e "remotes::install_github('daattali/shinyjs', ref = '473a54b', upgrade = 'always')" && \
-    # dependencies via options()$repos == MRAN:
-    R -e "remotes::install_github('rstudio/htmltools', ref = 'v0.5.0', dependencies = c('Depends', 'Imports', 'LinkingTo'), upgrade = 'always')" && \
-    R -e "remotes::install_github('ramnathv/htmlwidgets', ref = 'v1.5.2', dependencies = c('Depends', 'Imports', 'LinkingTo'), upgrade = 'always')" && \
-    R -e "remotes::install_github('rstudio/DT', ref = 'v0.16', dependencies = c('Depends', 'Imports', 'LinkingTo'), upgrade = 'always')" && \
+    # installing older version of package shinyjs from GitHub
+    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')" && \
     R -e "remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
     rm -rf /var/lib/apt/lists/*
 

@@ -1,8 +1,8 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y default-jre-headless iproute
+    apt-get install -y default-jre-headless iproute2
 
 COPY ./shinyproxy/shinyproxy-1.1.0.jar ./
 COPY ./shinyproxy/application.yml ./

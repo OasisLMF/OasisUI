@@ -7,9 +7,16 @@
 \usage{
 step2_chooseAnalysisUI(id)
 
-step2_chooseAnalysis(input, output, session, active = reactive(TRUE),
-  currstep = reactive(-1), portfolioID = reactive({     "" }),
-  pfName = reactive({     "" }), pfstatus = reactive({     "" }))
+step2_chooseAnalysis(
+  input,
+  output,
+  session,
+  active = reactive(TRUE),
+  currstep = reactive(-1),
+  portfolioID = reactive({     "" }),
+  pfName = reactive({     "" }),
+  pfstatus = reactive({     "" })
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

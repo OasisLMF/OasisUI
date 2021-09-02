@@ -6,8 +6,14 @@
 \alias{visualizationBBRUI}
 \title{visualizationBBR}
 \usage{
-visualizationBBR(input, output, session, preselAnaId = reactive(NULL),
-  anaID = reactive(NULL), active = reactive(TRUE))
+visualizationBBR(
+  input,
+  output,
+  session,
+  preselAnaId = reactive(NULL),
+  anaID = reactive(NULL),
+  active = reactive(TRUE)
+)
 
 visualizationBBRUI(id)
 }

@@ -4,7 +4,9 @@
 \name{Status}
 \alias{Status}
 \title{Status Icons}
-\format{Named \code{list} of Staus icons.}
+\format{
+Named \code{list} of Staus icons.
+}
 \usage{
 Status
 }

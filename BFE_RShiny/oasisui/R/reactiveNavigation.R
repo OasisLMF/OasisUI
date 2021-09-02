@@ -141,7 +141,7 @@ getNavigation <- function(output) {
 observeModuleNavigation <- function(state, modules, force_react = TRUE,
                                     logger = NULL) {
   lapply(modules, function(module) {
-    observeEvent(getNavigation(module)(), {
+    observeEvent(module$.navigate_to(), {
       .navigate_to <- getNavigation(module)()
       if (!is.null(.navigate_to)) {
         if (!is.null(logger)) logger(paste0(" => ", .navigate_to))

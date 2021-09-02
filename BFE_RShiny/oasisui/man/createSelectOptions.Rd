@@ -4,8 +4,7 @@
 \alias{createSelectOptions}
 \title{createSelectOptions}
 \usage{
-createSelectOptions(df, label = NA, value = "0", labelCol = 2,
-  valueCol = 1)
+createSelectOptions(df, label = NA, value = "0", labelCol = 2, valueCol = 1)
 }
 \arguments{
 \item{df}{\code{data.frame}.}

@@ -44,7 +44,7 @@ exposurevalidationmapUI <- function(id) {
              hidden(DTOutput(ns("exposure_table")))
       )
     ),
-    fluidRow(column(2, hidden(downloadButton(ns("exp_tivs"), label = "Export to csv"))))
+    fluidRow(column(2, hidden(downloadButton(ns("exp_tivs"), label = "CSV"))))
   )
 }
 
@@ -192,7 +192,7 @@ exposurevalidationmap <- function(input,
         h4("Validated Exposure by Peril")),
       fluidRow(
         DTOutput(ns("dt_output_uploaded_lock_check")),
-        downloadButton(ns("exp_downloadexcel"), label = "Export to csv"),
+        downloadButton(ns("exp_downloadexcel"), label = "CSV"),
         style = "display: inline")
     )
   )

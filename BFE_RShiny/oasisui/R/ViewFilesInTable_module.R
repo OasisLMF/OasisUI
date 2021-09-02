@@ -93,8 +93,12 @@ ViewFilesInTable <- function(input, output, session,
   result <- reactiveValues(
     #df to show in table
     tbl_filesListData_wButtons = NULL,
-    #View output file content
+    #View output file content csv
     currentFile = NULL,
+    #View output file content parquet
+    currentFileP = NULL,
+    # Display file category in file name
+    fileCategory = NULL,
     # Filepath of file to view
     currfilepath = NULL,
     #content of curr file
@@ -155,6 +159,15 @@ ViewFilesInTable <- function(input, output, session,
     }
   )
 
+  observeEvent(result$currentFile, {
+    if (!grepl(".json", result$currentFile)) {
+      show("FVEdownloadparquet")
+      show("FVEdownloadexcel")
+    } else {
+      show("FVEdownloadjson")
+    }
+  })
+
   # Download zip Files ----------------------------------------------------------
 
   # Download zip button
@@ -188,7 +201,8 @@ ViewFilesInTable <- function(input, output, session,
   output$FLdownloadexcel <- downloadHandler(
     filename = "file.csv",
     content = function(file) {
-      session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename, file_towrite = file)
+      session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename,
+                                           file_towrite = file)
     }
   )
 
@@ -267,7 +281,9 @@ ViewFilesInTable <- function(input, output, session,
       fluidRow(
         oasisuiButton(inputId = ns("abuttonview"), label = "Content", icon = icon("file")),
         hidden(oasisuiButton(inputId = ns("abuttonmap"), label = "Map", icon = icon("map"))),
-        downloadButton(ns("FVEdownloadexcel"), label = "Export"),
+        hidden(downloadButton(ns("FVEdownloadexcel"), label = "CSV")),
+        hidden(downloadButton(ns("FVEdownloadparquet"), label = "Parquet")),
+        hidden(downloadButton(ns("FVEdownloadjson"), label = "JSON")),
         style = "display: inline"),
 
       hidden(oasisuiPanel(
@@ -340,6 +356,21 @@ ViewFilesInTable <- function(input, output, session,
       session$userData$data_hub$write_file(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
     }
   )
+  # Export to .parquet
+  output$FVEdownloadparquet <- downloadHandler(
+    filename = function(){result$currentFileP},
+    content = function(file) {
+      session$userData$data_hub$write_parquet_file(data = result$tbl_fileData, dataset_identifier = result$currentFileP,
+                                              file_towrite = file)
+    }
+  )
+  # Export to .json
+  output$FVEdownloadjson <- downloadHandler(
+    filename = function(){result$currentFile},
+    content = function(file) {
+      session$userData$data_hub$write_file_json(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
+    }
+  )
 
   # Panel Map
   observeEvent(input$abuttonhidemapFVExposureSelected, {
@@ -358,14 +389,18 @@ ViewFilesInTable <- function(input, output, session,
 
     # Get dataframe
     result$currentFile <- result$tbl_filesListData_wButtons[idx, file_column] %>% as.character()
-    if (result$currentFile %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
-      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$currentFile)
+    result$fileCategory <- result$currentFile
+    result$currentFileP <- paste0(result$fileCategory, ".parquet")
+    if (result$fileCategory %in% c("location_file", "accounts_file", "reinsurance_info_file", "reinsurance_scope_file")) {
+      result$tbl_fileData <- session$userData$data_hub$get_pf_dataset_content(id = param(), dataset_identifier = result$fileCategory)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$currentFile)
-        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$currentFile)
-        result$currentFile <- paste0(result$currentFile, ".csv")
+        filecolumns <- session$userData$data_hub$get_pf_dataset_header(id = param(), dataset_identifier = result$fileCategory)
+        filerows <- session$userData$data_hub$get_pf_dataset_nrow(id = param(), dataset_identifier = result$fileCategory)
+        # result$currentFileP <- paste0(result$fileCategory, ".parquet")
+        result$currentFile <- paste0(result$fileCategory, ".csv")
         # Show buttons
         if ("latitude" %in% tolower(names(result$tbl_fileData)) && !is.null(result$tbl_fileData)) {
+          names(result$tbl_fileData) <- tolower(names(result$tbl_fileData))
           output$plainmap <- renderLeaflet({
             createPlainMap(result$tbl_fileData, session = session, paramID = param(), step = NULL)
           })
@@ -375,10 +410,10 @@ ViewFilesInTable <- function(input, output, session,
         }
       }
     } else {
-      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+      result$tbl_fileData <- session$userData$data_hub$get_ana_dataset_content(id = param(), dataset_identifier = result$fileCategory, type = folderpath)
       if (!is.null(result$tbl_fileData)) {
-        filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$currentFile, type = folderpath)
-        filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$currentFile, type = folderpath)
+        filecolumns <- session$userData$data_hub$get_ana_dataset_header(id = param(), dataset_identifier = result$fileCategory, type = folderpath)
+        filerows <- session$userData$data_hub$get_ana_dataset_nrow(id = param(), dataset_identifier = result$fileCategory, type = folderpath)
       }
       # Show buttons
       if ("latitude" %in% tolower(names(result$tbl_fileData))) {
@@ -401,7 +436,7 @@ ViewFilesInTable <- function(input, output, session,
                  h5("File Name")
           ),
           column(10,
-                 p(result$currentFile, style = "margin-top: 10px;")
+                 p(result$fileCategory, style = "margin-top: 10px;")
           )
         ),
         fluidRow(

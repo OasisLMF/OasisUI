@@ -7,8 +7,14 @@
 \usage{
 step1_choosePortfolioUI(id)
 
-step1_choosePortfolio(input, output, session, active = reactive(TRUE),
-  currstep = reactive(-1), portfolioID = reactive(""))
+step1_choosePortfolio(
+  input,
+  output,
+  session,
+  active = reactive(TRUE),
+  currstep = reactive(-1),
+  portfolioID = reactive("")
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

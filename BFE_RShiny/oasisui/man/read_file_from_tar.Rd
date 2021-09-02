@@ -4,8 +4,12 @@
 \alias{read_file_from_tar}
 \title{untar file}
 \usage{
-read_file_from_tar(tarfile, dataset_identifier, destdir = tempdir(),
-  nrows = Inf)
+read_file_from_tar(
+  tarfile,
+  dataset_identifier,
+  destdir = tempdir(),
+  nrows = Inf
+)
 }
 \arguments{
 \item{tarfile}{path to tar bundle.}

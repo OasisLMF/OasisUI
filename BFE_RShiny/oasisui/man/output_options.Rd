@@ -4,7 +4,9 @@
 \name{output_options}
 \alias{output_options}
 \title{output_options}
-\format{Named \code{list} of output options.}
+\format{
+Named \code{list} of output options.
+}
 \usage{
 output_options
 }

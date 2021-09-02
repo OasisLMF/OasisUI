@@ -4,9 +4,8 @@
 \name{DataHub}
 \alias{DataHub}
 \title{DataHub}
-\format{\code{\link{R6Class}} object.}
-\usage{
-DataHub
+\format{
+\code{\link{R6Class}} object.
 }
 \value{
 Object of \code{\link{R6Class}} with methods for Oasis files lists and Datatasets explorations.
@@ -107,4 +106,599 @@ data_hub$get_pf_data_list(id)
 }
 }
 
-\keyword{datasets}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-new}{\code{DataHub$new()}}
+\item \href{#method-terminate}{\code{DataHub$terminate()}}
+\item \href{#method-get_user_destdir}{\code{DataHub$get_user_destdir()}}
+\item \href{#method-get_oed_peril_codes_mapping}{\code{DataHub$get_oed_peril_codes_mapping()}}
+\item \href{#method-get_pf_data_list}{\code{DataHub$get_pf_data_list()}}
+\item \href{#method-invalidate_pf_data_list}{\code{DataHub$invalidate_pf_data_list()}}
+\item \href{#method-get_model_data_list}{\code{DataHub$get_model_data_list()}}
+\item \href{#method-get_model_hazard_data_list}{\code{DataHub$get_model_hazard_data_list()}}
+\item \href{#method-get_ana_inputs_data_list}{\code{DataHub$get_ana_inputs_data_list()}}
+\item \href{#method-get_ana_outputs_data_list}{\code{DataHub$get_ana_outputs_data_list()}}
+\item \href{#method-invalidate_ana_inputs_data_list}{\code{DataHub$invalidate_ana_inputs_data_list()}}
+\item \href{#method-invalidate_ana_outputs_data_list}{\code{DataHub$invalidate_ana_outputs_data_list()}}
+\item \href{#method-get_pf_dataset_content}{\code{DataHub$get_pf_dataset_content()}}
+\item \href{#method-invalidate_pf_dataset_content}{\code{DataHub$invalidate_pf_dataset_content()}}
+\item \href{#method-get_pf_location_content}{\code{DataHub$get_pf_location_content()}}
+\item \href{#method-invalidate_pf_location_content}{\code{DataHub$invalidate_pf_location_content()}}
+\item \href{#method-get_pf_dataset_header}{\code{DataHub$get_pf_dataset_header()}}
+\item \href{#method-invalidate_pf_dataset_header}{\code{DataHub$invalidate_pf_dataset_header()}}
+\item \href{#method-get_pf_dataset_nrow}{\code{DataHub$get_pf_dataset_nrow()}}
+\item \href{#method-invalidate_pf_dataset_nrow}{\code{DataHub$invalidate_pf_dataset_nrow()}}
+\item \href{#method-invalidate_model_resource_dataset_content}{\code{DataHub$invalidate_model_resource_dataset_content()}}
+\item \href{#method-get_model_hazard_dataset_content}{\code{DataHub$get_model_hazard_dataset_content()}}
+\item \href{#method-invalidate_model_hazard_dataset_content}{\code{DataHub$invalidate_model_hazard_dataset_content()}}
+\item \href{#method-get_ana_dataset_content}{\code{DataHub$get_ana_dataset_content()}}
+\item \href{#method-invalidate_ana_dataset_content}{\code{DataHub$invalidate_ana_dataset_content()}}
+\item \href{#method-get_ana_inputs_dataset_content}{\code{DataHub$get_ana_inputs_dataset_content()}}
+\item \href{#method-invalidate_ana_inputs_dataset_content}{\code{DataHub$invalidate_ana_inputs_dataset_content()}}
+\item \href{#method-get_ana_outputs_dataset_content}{\code{DataHub$get_ana_outputs_dataset_content()}}
+\item \href{#method-invalidate_ana_outputs_dataset_content}{\code{DataHub$invalidate_ana_outputs_dataset_content()}}
+\item \href{#method-get_ana_dataset_header}{\code{DataHub$get_ana_dataset_header()}}
+\item \href{#method-invalidate_ana_dataset_header}{\code{DataHub$invalidate_ana_dataset_header()}}
+\item \href{#method-get_ana_dataset_nrow}{\code{DataHub$get_ana_dataset_nrow()}}
+\item \href{#method-invalidate_ana_dataset_nrow}{\code{DataHub$invalidate_ana_dataset_nrow()}}
+\item \href{#method-get_ana_dataset_size}{\code{DataHub$get_ana_dataset_size()}}
+\item \href{#method-invalidate_ana_dataset_size}{\code{DataHub$invalidate_ana_dataset_size()}}
+\item \href{#method-get_ana_oed_summary_levels}{\code{DataHub$get_ana_oed_summary_levels()}}
+\item \href{#method-invalidate_ana_oed_summay_levels}{\code{DataHub$invalidate_ana_oed_summay_levels()}}
+\item \href{#method-get_ana_settings_content}{\code{DataHub$get_ana_settings_content()}}
+\item \href{#method-invalidate_ana_settings_content}{\code{DataHub$invalidate_ana_settings_content()}}
+\item \href{#method-get_ana_validation_summary_content}{\code{DataHub$get_ana_validation_summary_content()}}
+\item \href{#method-get_ana_errors_summary_content}{\code{DataHub$get_ana_errors_summary_content()}}
+\item \href{#method-invalidate_ana_validation_summary_content}{\code{DataHub$invalidate_ana_validation_summary_content()}}
+\item \href{#method-write_file}{\code{DataHub$write_file()}}
+\item \href{#method-write_parquet_file}{\code{DataHub$write_parquet_file()}}
+\item \href{#method-write_file_json}{\code{DataHub$write_file_json()}}
+\item \href{#method-get_analyses_tar}{\code{DataHub$get_analyses_tar()}}
+\item \href{#method-get_analyses_inputs_tar}{\code{DataHub$get_analyses_inputs_tar()}}
+\item \href{#method-get_analyses_outputs_tar}{\code{DataHub$get_analyses_outputs_tar()}}
+\item \href{#method-return_tbl_portfolioDetails}{\code{DataHub$return_tbl_portfolioDetails()}}
+\item \href{#method-return_tbl_portfoliosData}{\code{DataHub$return_tbl_portfoliosData()}}
+\item \href{#method-return_tbl_modelsData}{\code{DataHub$return_tbl_modelsData()}}
+\item \href{#method-return_tbl_modelData}{\code{DataHub$return_tbl_modelData()}}
+\item \href{#method-return_analyses_input_file_wicons_df}{\code{DataHub$return_analyses_input_file_wicons_df()}}
+\item \href{#method-return_tbl_analysesData_nice}{\code{DataHub$return_tbl_analysesData_nice()}}
+\item \href{#method-return_tbl_analysesData}{\code{DataHub$return_tbl_analysesData()}}
+\item \href{#method-return_tbl_dataFiles}{\code{DataHub$return_tbl_dataFiles()}}
+\item \href{#method-clone}{\code{DataHub$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$new(user, destdir = tempdir(), oasisapi)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-terminate"></a>}}
+\if{latex}{\out{\hypertarget{method-terminate}{}}}
+\subsection{Method \code{terminate()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$terminate()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_user_destdir"></a>}}
+\if{latex}{\out{\hypertarget{method-get_user_destdir}{}}}
+\subsection{Method \code{get_user_destdir()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_user_destdir()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_oed_peril_codes_mapping"></a>}}
+\if{latex}{\out{\hypertarget{method-get_oed_peril_codes_mapping}{}}}
+\subsection{Method \code{get_oed_peril_codes_mapping()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_oed_peril_codes_mapping()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_pf_data_list"></a>}}
+\if{latex}{\out{\hypertarget{method-get_pf_data_list}{}}}
+\subsection{Method \code{get_pf_data_list()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_pf_data_list(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_pf_data_list"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_pf_data_list}{}}}
+\subsection{Method \code{invalidate_pf_data_list()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_pf_data_list(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_model_data_list"></a>}}
+\if{latex}{\out{\hypertarget{method-get_model_data_list}{}}}
+\subsection{Method \code{get_model_data_list()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_model_data_list(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_model_hazard_data_list"></a>}}
+\if{latex}{\out{\hypertarget{method-get_model_hazard_data_list}{}}}
+\subsection{Method \code{get_model_hazard_data_list()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_model_hazard_data_list(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_inputs_data_list"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_inputs_data_list}{}}}
+\subsection{Method \code{get_ana_inputs_data_list()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_inputs_data_list(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_outputs_data_list"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_outputs_data_list}{}}}
+\subsection{Method \code{get_ana_outputs_data_list()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_outputs_data_list(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_inputs_data_list"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_inputs_data_list}{}}}
+\subsection{Method \code{invalidate_ana_inputs_data_list()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_inputs_data_list(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_outputs_data_list"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_outputs_data_list}{}}}
+\subsection{Method \code{invalidate_ana_outputs_data_list()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_outputs_data_list(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_pf_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_pf_dataset_content}{}}}
+\subsection{Method \code{get_pf_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_pf_dataset_content(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_pf_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_pf_dataset_content}{}}}
+\subsection{Method \code{invalidate_pf_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_pf_dataset_content(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_pf_location_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_pf_location_content}{}}}
+\subsection{Method \code{get_pf_location_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_pf_location_content(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_pf_location_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_pf_location_content}{}}}
+\subsection{Method \code{invalidate_pf_location_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_pf_location_content(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_pf_dataset_header"></a>}}
+\if{latex}{\out{\hypertarget{method-get_pf_dataset_header}{}}}
+\subsection{Method \code{get_pf_dataset_header()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_pf_dataset_header(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_pf_dataset_header"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_pf_dataset_header}{}}}
+\subsection{Method \code{invalidate_pf_dataset_header()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_pf_dataset_header(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_pf_dataset_nrow"></a>}}
+\if{latex}{\out{\hypertarget{method-get_pf_dataset_nrow}{}}}
+\subsection{Method \code{get_pf_dataset_nrow()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_pf_dataset_nrow(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_pf_dataset_nrow"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_pf_dataset_nrow}{}}}
+\subsection{Method \code{invalidate_pf_dataset_nrow()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_pf_dataset_nrow(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_model_resource_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_model_resource_dataset_content}{}}}
+\subsection{Method \code{invalidate_model_resource_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_model_resource_dataset_content(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_model_hazard_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_model_hazard_dataset_content}{}}}
+\subsection{Method \code{get_model_hazard_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_model_hazard_dataset_content(id, filename, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_model_hazard_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_model_hazard_dataset_content}{}}}
+\subsection{Method \code{invalidate_model_hazard_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_model_hazard_dataset_content(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_dataset_content}{}}}
+\subsection{Method \code{get_ana_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_dataset_content(id, dataset_identifier, type = "", ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_dataset_content}{}}}
+\subsection{Method \code{invalidate_ana_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_dataset_content(id, dataset_identifier, type, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_inputs_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_inputs_dataset_content}{}}}
+\subsection{Method \code{get_ana_inputs_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_inputs_dataset_content(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_inputs_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_inputs_dataset_content}{}}}
+\subsection{Method \code{invalidate_ana_inputs_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_inputs_dataset_content(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_outputs_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_outputs_dataset_content}{}}}
+\subsection{Method \code{get_ana_outputs_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_outputs_dataset_content(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_outputs_dataset_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_outputs_dataset_content}{}}}
+\subsection{Method \code{invalidate_ana_outputs_dataset_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_outputs_dataset_content(id, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_dataset_header"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_dataset_header}{}}}
+\subsection{Method \code{get_ana_dataset_header()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_dataset_header(id, type, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_dataset_header"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_dataset_header}{}}}
+\subsection{Method \code{invalidate_ana_dataset_header()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_dataset_header(id, type, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_dataset_nrow"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_dataset_nrow}{}}}
+\subsection{Method \code{get_ana_dataset_nrow()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_dataset_nrow(id, type, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_dataset_nrow"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_dataset_nrow}{}}}
+\subsection{Method \code{invalidate_ana_dataset_nrow()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_dataset_nrow(id, type, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_dataset_size"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_dataset_size}{}}}
+\subsection{Method \code{get_ana_dataset_size()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_dataset_size(id, type, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_dataset_size"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_dataset_size}{}}}
+\subsection{Method \code{invalidate_ana_dataset_size()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_dataset_size(id, type, dataset_identifier, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_oed_summary_levels"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_oed_summary_levels}{}}}
+\subsection{Method \code{get_ana_oed_summary_levels()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_oed_summary_levels(id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_oed_summay_levels"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_oed_summay_levels}{}}}
+\subsection{Method \code{invalidate_ana_oed_summay_levels()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_oed_summay_levels(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_settings_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_settings_content}{}}}
+\subsection{Method \code{get_ana_settings_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_settings_content(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_settings_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_settings_content}{}}}
+\subsection{Method \code{invalidate_ana_settings_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_settings_content(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_validation_summary_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_validation_summary_content}{}}}
+\subsection{Method \code{get_ana_validation_summary_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_validation_summary_content(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_errors_summary_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_errors_summary_content}{}}}
+\subsection{Method \code{get_ana_errors_summary_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_errors_summary_content(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-invalidate_ana_validation_summary_content"></a>}}
+\if{latex}{\out{\hypertarget{method-invalidate_ana_validation_summary_content}{}}}
+\subsection{Method \code{invalidate_ana_validation_summary_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$invalidate_ana_validation_summary_content(
+  id,
+  dataset_identifier,
+  type,
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-write_file"></a>}}
+\if{latex}{\out{\hypertarget{method-write_file}{}}}
+\subsection{Method \code{write_file()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$write_file(data, dataset_identifier, file_towrite = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-write_parquet_file"></a>}}
+\if{latex}{\out{\hypertarget{method-write_parquet_file}{}}}
+\subsection{Method \code{write_parquet_file()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$write_parquet_file(data, dataset_identifier, file_towrite = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-write_file_json"></a>}}
+\if{latex}{\out{\hypertarget{method-write_file_json}{}}}
+\subsection{Method \code{write_file_json()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$write_file_json(data, dataset_identifier, file_towrite = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_analyses_tar"></a>}}
+\if{latex}{\out{\hypertarget{method-get_analyses_tar}{}}}
+\subsection{Method \code{get_analyses_tar()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_analyses_tar(id, label, destdir = tempdir())}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_analyses_inputs_tar"></a>}}
+\if{latex}{\out{\hypertarget{method-get_analyses_inputs_tar}{}}}
+\subsection{Method \code{get_analyses_inputs_tar()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_analyses_inputs_tar(id, destdir = tempdir())}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_analyses_outputs_tar"></a>}}
+\if{latex}{\out{\hypertarget{method-get_analyses_outputs_tar}{}}}
+\subsection{Method \code{get_analyses_outputs_tar()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_analyses_outputs_tar(id, destdir = tempdir())}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_tbl_portfolioDetails"></a>}}
+\if{latex}{\out{\hypertarget{method-return_tbl_portfolioDetails}{}}}
+\subsection{Method \code{return_tbl_portfolioDetails()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$return_tbl_portfolioDetails(id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_tbl_portfoliosData"></a>}}
+\if{latex}{\out{\hypertarget{method-return_tbl_portfoliosData}{}}}
+\subsection{Method \code{return_tbl_portfoliosData()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$return_tbl_portfoliosData(name = "", Status, tbl_portfoliosDataNames)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_tbl_modelsData"></a>}}
+\if{latex}{\out{\hypertarget{method-return_tbl_modelsData}{}}}
+\subsection{Method \code{return_tbl_modelsData()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$return_tbl_modelsData(supplier_id = "", tbl_modelsDataNames)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_tbl_modelData"></a>}}
+\if{latex}{\out{\hypertarget{method-return_tbl_modelData}{}}}
+\subsection{Method \code{return_tbl_modelData()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$return_tbl_modelData(id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_analyses_input_file_wicons_df"></a>}}
+\if{latex}{\out{\hypertarget{method-return_analyses_input_file_wicons_df}{}}}
+\subsection{Method \code{return_analyses_input_file_wicons_df()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$return_analyses_input_file_wicons_df(id, Status)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_tbl_analysesData_nice"></a>}}
+\if{latex}{\out{\hypertarget{method-return_tbl_analysesData_nice}{}}}
+\subsection{Method \code{return_tbl_analysesData_nice()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$return_tbl_analysesData_nice(
+  tbl_analysesData,
+  admin_mode,
+  Status,
+  tbl_modelsDataNames,
+  tbl_portfoliosDataNames,
+  tbl_analysesDataNames
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_tbl_analysesData"></a>}}
+\if{latex}{\out{\hypertarget{method-return_tbl_analysesData}{}}}
+\subsection{Method \code{return_tbl_analysesData()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$return_tbl_analysesData(name = "", Status, tbl_analysesDataNames)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-return_tbl_dataFiles"></a>}}
+\if{latex}{\out{\hypertarget{method-return_tbl_dataFiles}{}}}
+\subsection{Method \code{return_tbl_dataFiles()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$return_tbl_dataFiles(name)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}

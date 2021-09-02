@@ -4,7 +4,9 @@
 \name{summary_template}
 \alias{summary_template}
 \title{summary_template}
-\format{Named \code{list} of output options.}
+\format{
+Named \code{list} of output options.
+}
 \usage{
 summary_template
 }

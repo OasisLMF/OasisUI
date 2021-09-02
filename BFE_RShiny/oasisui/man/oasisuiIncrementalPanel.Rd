@@ -5,13 +5,29 @@
 \alias{oasisuiIncrementalPanelUI}
 \title{oasisuiIncrementalPanel}
 \usage{
-oasisuiIncrementalPanel(input, output, session, panels_state,
-  new_content_IDs, new_content_fun, ..., new_headings = NULL,
-  collapsible = FALSE, show = TRUE)
+oasisuiIncrementalPanel(
+  input,
+  output,
+  session,
+  panels_state,
+  new_content_IDs,
+  new_content_fun,
+  ...,
+  new_headings = NULL,
+  collapsible = FALSE,
+  show = TRUE
+)
 
-oasisuiIncrementalPanelUI(id, ..., heading = NULL, footer = NULL,
-  status = "default", collapsible = FALSE, show = TRUE,
-  removable = TRUE)
+oasisuiIncrementalPanelUI(
+  id,
+  ...,
+  heading = NULL,
+  footer = NULL,
+  status = "default",
+  collapsible = FALSE,
+  show = TRUE,
+  removable = TRUE
+)
 }
 \arguments{
 \item{input, output, session}{Shiny input, output, and session objects.}

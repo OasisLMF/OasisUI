@@ -4,7 +4,9 @@
 \name{tbl_modelsDataNames}
 \alias{tbl_modelsDataNames}
 \title{tbl_modelsDataNames}
-\format{Named \code{list} of tbl_modelsData column names.}
+\format{
+Named \code{list} of tbl_modelsData column names.
+}
 \usage{
 tbl_modelsDataNames
 }

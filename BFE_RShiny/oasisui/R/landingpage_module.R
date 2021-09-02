@@ -27,7 +27,7 @@ landingPageUI <- function(id) {
         bs_embed_tooltip(title = landing_page_tooltips$abuttongotoana, placement = "right"),
       oasisuiTableButton(inputId = ns("abuttondelana"), label = "Delete Analysis") %>%
         bs_embed_tooltip(title = landing_page_tooltips$abuttondelana, placement = "right"),
-      downloadButton(ns("downloadexcel_ana"), label = "Export to csv") %>%
+      downloadButton(ns("downloadexcel_ana"), label = "CSV") %>%
         bs_embed_tooltip(title = landing_page_tooltips$downloadexcel_ana, placement = "right")
     )
   )

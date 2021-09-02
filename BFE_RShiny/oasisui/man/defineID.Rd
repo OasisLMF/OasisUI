@@ -7,8 +7,15 @@
 \usage{
 defineIDUI(id, w, batch = FALSE)
 
-defineID(input, output, session, preselAnaId = reactive(NULL),
-  anaID = reactive(NULL), batch = FALSE, active = reactive(TRUE))
+defineID(
+  input,
+  output,
+  session,
+  preselAnaId = reactive(NULL),
+  anaID = reactive(NULL),
+  batch = FALSE,
+  active = reactive(TRUE)
+)
 }
 \arguments{
 \item{id}{Namespace ID for the module.}

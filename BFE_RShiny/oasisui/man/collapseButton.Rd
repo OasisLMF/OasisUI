@@ -14,7 +14,7 @@ collapseButton(id, id_collapse, ..., width = NULL, collapsed = FALSE)
 \item{...}{Named attributes to be applied to the button or link.}
 
 \item{width}{The width of the input, e.g. \code{'400px'}, or \code{'100\%'};
-see \code{\link{validateCssUnit}}.}
+see \code{\link[shiny:reexports]{validateCssUnit()}}.}
 
 \item{collapsed}{Initial state of the button.}
 }

@@ -4,8 +4,16 @@
 \alias{callIncrementalPanelModules}
 \title{callIncrementalPanelModules}
 \usage{
-callIncrementalPanelModules(IDs, ID_0, contentIDs, contentUI,
-  headings = NULL, collapsible = FALSE, show = TRUE, ns = identity)
+callIncrementalPanelModules(
+  IDs,
+  ID_0,
+  contentIDs,
+  contentUI,
+  headings = NULL,
+  collapsible = FALSE,
+  show = TRUE,
+  ns = identity
+)
 }
 \arguments{
 \item{IDs}{Character vector of IDs to be used for the content of
@@ -31,9 +39,9 @@ initially shown as not collapsed.}
 \value{
 A \code{list} with components:
 \itemize{
-\item \code{$state}: The reactive state of the panels (see
+\item \verb{$state}: The reactive state of the panels (see
 \code{\link[=oasisuiIncrementalPanel]{oasisuiIncrementalPanel()}}).
-\item \code{$remove_all}: A Function to remove all panels.
+\item \verb{$remove_all}: A Function to remove all panels.
 }
 }
 \description{

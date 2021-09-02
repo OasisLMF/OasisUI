@@ -4,8 +4,14 @@
 \alias{oasisuiButton}
 \title{oasisuiButton}
 \usage{
-oasisuiButton(inputId, label, icon = NULL, width = NULL,
-  class = c("btn", "btn-primary"), ...)
+oasisuiButton(
+  inputId,
+  label,
+  icon = NULL,
+  width = NULL,
+  class = c("btn", "btn-primary"),
+  ...
+)
 }
 \arguments{
 \item{inputId}{widget id}
