@@ -569,13 +569,28 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Show/hide Model Details Panel
   observeEvent(input$abuttonmodeldetails, {
-    hide("panelAnalysisDetails")
-    hide("panelAnalysisLog")
-    hide("panelAnalysisGenInputs")
-    hide("panelBuildCustom")
-    logMessage("showing panelModelDetails")
-    show("panelModelDetails")
-    logMessage("showing panelModelDetails")
+    model_settings <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", result$modelID, "settings", sep = "/"),
+      query_method = "GET"
+    )
+    if (model_settings$detail == "Not found.") {
+      disable("anaName")
+      showModal(modalDialog(
+        "No model settings file present for this model",
+        easyClose = TRUE,
+        footer = tagList(
+          modalButton("Ok")
+        )
+      ))
+    } else {
+      hide("panelAnalysisDetails")
+      hide("panelAnalysisLog")
+      hide("panelAnalysisGenInputs")
+      hide("panelBuildCustom")
+      logMessage("showing panelModelDetails")
+      show("panelModelDetails")
+      logMessage("showing panelModelDetails")
+    }
   })
 
   observeEvent(input$abuttonbuildcustom, {
@@ -744,6 +759,9 @@ step2_chooseAnalysis <- function(input, output, session,
           query_path = paste("models", result$modelID, "settings", sep = "/"),
           query_method = "GET"
         )
+        if (!is.null(model_settings$detail) && model_settings$detail == "Not found.") {
+          disable("anaName")
+        }
         if (length(model_settings) > 0 && !is.null(model_settings$model_configurable)) {
           if (model_settings$model_configurable) {
             enable("abuttonbuildcustom")

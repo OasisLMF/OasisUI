@@ -76,7 +76,7 @@ panelModelParams <- function(id) {
         div(
           id = ns("configureAnaParamsAdvanced"),
           align = "left",
-          numericInput(ns("tinputnoofsample"), label = "Number of Samples:", value = 10),
+          numericInput(ns("tinputnoofsample"), label = "Number of Samples:", value = 9),
           numericInput(ns("tinputthreshold"), label = "Loss Threshold:", value = 0),
           uiOutput(ns("advanced_model_param")),
           oasisuiButton(inputId = ns("abuttonbasic"), label = "Basic")

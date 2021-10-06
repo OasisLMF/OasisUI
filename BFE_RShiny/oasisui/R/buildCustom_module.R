@@ -34,7 +34,7 @@ buildCustomUI <- function(id) {
       id = ns("panel_build_Custom"),
       tabPanel(
         title = "Model Values",
-        numericInput(ns("inputnumsamples"), label = "Number of Samples:", value = 0),
+        numericInput(ns("inputnumsamples"), label = "Number of Samples:", value = 9),
         DTOutput(ns("dt_model_values"))),
       tabPanel(
         title = "File Uploads",
@@ -478,6 +478,20 @@ buildCustom <- function(input,
     colnames(tmp_df) <- c("Setting Name", "Description", "Tooltip", "Default")
     # output$dt_model_values depends (renders) on this one:
     result$settings_tbl <- tmp_df
+    for (i in seq_len(length(result$settings_tbl$Default))) {
+      if (gregexpr(pattern ="\\{", result$settings_tbl$Default[i])[[1]][1] > 0) {
+        x <- result$settings_tbl$Default[i]
+        x <- gsub("\\{", "", x)
+        x <- gsub("\\}", "", x)
+        result$settings_tbl$Default[i] <- x
+      }
+      if (gregexpr(pattern ="\\[", result$settings_tbl$Default[i])[[1]][1] > 0) {
+        x <- result$settings_tbl$Default[i]
+        x <- gsub("\\[", "", x)
+        x <- gsub("\\]", "", x)
+        result$settings_tbl$Default[i] <- x
+      }
+    }
     result$settings_tbl
   }
 

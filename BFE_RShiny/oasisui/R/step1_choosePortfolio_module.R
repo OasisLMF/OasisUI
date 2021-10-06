@@ -118,15 +118,23 @@ panelDefinePortfolio <- function(id) {
       actionButton(inputId = ns("abuttonhidedefpfpanel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
     fluidRow(
-      column(4,
-             textInput(inputId = ns("tinputpfName"), label = "Portfolio Name")),
-      br(),
-      column(2,
+      column(12,
+             textInput(inputId = ns("tinputpfName"), label = "Portfolio Name"),
              oasisuiButton(ns("abuttonpfsubmit"), "Submit") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfsubmit, placement = "right"), style = "float:right"
       )
     )
   )
+  # fluidRow(
+  #   column(4,
+  #          textInput(inputId = ns("tinputpfName"), label = "Portfolio Name")),
+  #   br(),
+  #   column(2,
+  #          oasisuiButton(ns("abuttonpfsubmit"), "Submit") %>%
+  #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfsubmit, placement = "right"), style = "float:right"
+  #   )
+  # )
+  # )
 }
 
 

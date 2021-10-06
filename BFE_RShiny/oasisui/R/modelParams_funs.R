@@ -60,6 +60,8 @@ basicConfig_funs <- function(session, model_settings) {
 #' @param session Current session.
 #' @param model_settings Model settings retrieved from the API.
 #'
+#' @importFrom shinyBS bsPopover
+#'
 #' @return List of UI elements (input/selector widgets).
 #'
 #' @export
@@ -70,12 +72,31 @@ advancedConfig_funs <- function(session, model_settings) {
   .string_fun <- function(model_settings) {
     if (length(grep("string_parameters", names(model_settings))) > 0) {
       lapply(grep("string_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$tooltip)) {
+          tooltip_tex <- model_settings[[x]]$tooltip
+        } else {
+          tooltip_tex <- model_settings[[x]]$name
+        }
+        if (!is.null(model_settings[[x]]$desc)) {
+          label_widget <- model_settings[[x]]$desc
+        } else {
+          label_widget <- gsub("_", " ", model_settings[[x]]$name)
+        }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          textInput(
-            inputId = ns(paste0("string_parameters", x)),
-            label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-            value = model_settings[[x]]$default
-          )
+          fluidRow(
+            column(10,
+                   textInput(
+                     inputId = ns(paste0("string_parameters", x)),
+                     label = div(paste0(label_widget, ":") %>% capitalize_first_letter()),
+                     value = model_settings[[x]]$default
+                   )),
+            column(1,
+                   actionButton(paste0("tooltip_string_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
+                   bsPopover(id = paste0("tooltip_string_", x), title = "",
+                             content = tooltip_tex,
+                             placement = "right",
+                             trigger = "focus",
+                             options = list(container = "body"))))
         }
       })
     }
@@ -85,11 +106,31 @@ advancedConfig_funs <- function(session, model_settings) {
   .list_fun <- function(model_settings) {
     if (length(grep("list_parameters", names(model_settings))) > 0) {
       lapply(grep("list_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$tooltip)) {
+          tooltip_tex <- model_settings[[x]]$tooltip
+        } else {
+          tooltip_tex <- model_settings[[x]]$name
+        }
+        if (!is.null(model_settings[[x]]$desc)) {
+          label_widget <- model_settings[[x]]$desc
+        } else {
+          label_widget <- gsub("_", " ", model_settings[[x]]$name)
+        }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          textInput(
-            inputId = ns(paste0("list_parameters", x)),
-            label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-            value = paste(unlist(model_settings[[x]]$default), collapse = ", ")
+          fluidRow(
+            column(10,
+                   textInput(
+                     inputId = ns(paste0("list_parameters", x)),
+                     label = paste0(label_widget, ":") %>% capitalize_first_letter(),
+                     value = paste(unlist(model_settings[[x]]$default), collapse = ", ")
+                   )),
+            column(1,
+                   actionButton(paste0("tooltip_list_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
+                   bsPopover(id = paste0("tooltip_list_", x), title = "",
+                             content = tooltip_tex,
+                             placement = "right",
+                             trigger = "focus",
+                             options = list(container = "body")))
           )
         }
       })
@@ -101,11 +142,31 @@ advancedConfig_funs <- function(session, model_settings) {
     if (length(grep("dictionary_parameters", names(model_settings))) > 0) {
       lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
+          if (!is.null(model_settings[[x]]$tooltip)) {
+            tooltip_tex <- model_settings[[x]]$tooltip
+          } else {
+            tooltip_tex <- model_settings[[x]]$name
+          }
+          if (!is.null(model_settings[[x]]$desc)) {
+            label_widget <- model_settings[[x]]$desc
+          } else {
+            label_widget <- model_settings[[x]]$name
+          }
           lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
-            textInput(
-              inputId = ns(paste0("dictionary_parameters", x, y)),
-              label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default[y]), sep = ": "),
-              value = model_settings[[x]]$default[[y]]
+            fluidRow(
+              column(10,
+                     textInput(
+                       inputId = ns(paste0("dictionary_parameters", x, y)),
+                       label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default[y]), sep = ": "),
+                       value = model_settings[[x]]$default[[y]]
+                     )),
+              column(
+                1,actionButton(paste0("tooltip_dict_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
+                bsPopover(id = paste0("tooltip_dict_", x), title = "",
+                          content = tooltip_tex,
+                          placement = "right",
+                          trigger = "focus",
+                          options = list(container = "body")))
             )
           })
         }
@@ -117,11 +178,31 @@ advancedConfig_funs <- function(session, model_settings) {
   .boolean_params_fun <- function(model_settings) {
     if (length(grep("boolean_parameters", names(model_settings))) > 0) {
       lapply(grep("boolean_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$tooltip)) {
+          tooltip_tex <- model_settings[[x]]$tooltip
+        } else {
+          tooltip_tex <- model_settings[[x]]$name
+        }
+        if (!is.null(model_settings[[x]]$desc)) {
+          label_widget <- model_settings[[x]]$desc
+        } else {
+          label_widget <- gsub("_", " ", model_settings[[x]]$name)
+        }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          checkboxInput(
-            inputId = ns(paste0("boolean_parameters", x)),
-            label = gsub("_", " ", model_settings[[x]]$name) %>% capitalize_first_letter(),
-            value = model_settings[[x]]$default
+          fluidRow(
+            column(10,
+                   checkboxInput(
+                     inputId = ns(paste0("boolean_parameters", x)),
+                     label = label_widget %>% capitalize_first_letter(),
+                     value = model_settings[[x]]$default
+                   )),
+            column(1,
+                   actionButton(paste0("tooltip_bool_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
+                   bsPopover(id = paste0("tooltip_bool_", x), title = "",
+                             content = tooltip_tex,
+                             placement = "right",
+                             trigger = "focus",
+                             options = list(container = "body")))
           )
         }
       })
@@ -132,13 +213,33 @@ advancedConfig_funs <- function(session, model_settings) {
   .float_fun <- function(model_settings) {
     if (length(grep("float_parameters", names(model_settings))) > 0) {
       lapply(grep("float_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$tooltip)) {
+          tooltip_tex <- model_settings[[x]]$tooltip
+        } else {
+          tooltip_tex <- model_settings[[x]]$name
+        }
+        if (!is.null(model_settings[[x]]$desc)) {
+          label_widget <- model_settings[[x]]$desc
+        } else {
+          label_widget <- gsub("_", " ", model_settings[[x]]$name)
+        }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          sliderInput(
-            inputId = ns(paste0("float_parameters", x)),
-            label = paste0(gsub("_", " ", model_settings[[x]]$name), ":") %>% capitalize_first_letter(),
-            min = model_settings[[x]]$min,
-            max = model_settings[[x]]$max,
-            value = model_settings[[x]]$default
+          fluidRow(
+            column(10,
+                   sliderInput(
+                     inputId = ns(paste0("float_parameters", x)),
+                     label = paste0(label_widget, ":") %>% capitalize_first_letter(),
+                     min = model_settings[[x]]$min,
+                     max = model_settings[[x]]$max,
+                     value = model_settings[[x]]$default
+                   )),
+            column(
+              1,actionButton(paste0("tooltip_float_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
+              bsPopover(id = paste0("tooltip_float_", x), title = "",
+                        content = tooltip_tex,
+                        placement = "right",
+                        trigger = "focus",
+                        options = list(container = "body")))
           )
         }
       })
@@ -149,11 +250,35 @@ advancedConfig_funs <- function(session, model_settings) {
   .dropdown_fun <- function(model_settings) {
     if (length(grep("dropdown_parameters", names(model_settings))) > 0) {
       lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
+        if (!is.null(model_settings[[x]]$tooltip)) {
+          tooltip_tex <- model_settings[[x]]$tooltip
+        } else {
+          tooltip_tex <- model_settings[[x]]$name
+        }
+        if (!is.null(model_settings[[x]]$desc)) {
+          label_widget <- model_settings[[x]]$desc
+        } else {
+          label_widget <- gsub("_", " ", model_settings[[x]]$name)
+        }
+        list_values <- lapply(seq_len(length(model_settings[[x]]$options)), function (y) {
+          model_settings[[x]]$options[[y]]$id
+        })
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          textInput(
-            inputId = ns(paste0("dropdown_parameters", x)),
-            label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default), sep = ": "),
-            value = model_settings[[x]]$default
+          fluidRow(
+            column(10,
+                   selectInput(
+                     inputId = ns(paste0("dropdown_parameters", x)),
+                     label = paste0(label_widget, sep = ": "),
+                     choices = list_values,
+                     selected = model_settings[[x]]$default
+                   )),
+            column(1,
+                   actionButton(paste0("tooltip_dropdown_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
+                   bsPopover(id = paste0("tooltip_dropdown_", x), title = "",
+                             content = tooltip_tex,
+                             placement = "right",
+                             trigger = "focus",
+                             options = list(container = "body")))
           )
         }
       })
