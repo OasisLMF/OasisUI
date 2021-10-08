@@ -147,11 +147,6 @@ advancedConfig_funs <- function(session, model_settings) {
           } else {
             tooltip_tex <- model_settings[[x]]$name
           }
-          if (!is.null(model_settings[[x]]$desc)) {
-            label_widget <- model_settings[[x]]$desc
-          } else {
-            label_widget <- model_settings[[x]]$name
-          }
           lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
             fluidRow(
               column(10,
@@ -270,7 +265,8 @@ advancedConfig_funs <- function(session, model_settings) {
                      inputId = ns(paste0("dropdown_parameters", x)),
                      label = paste0(label_widget, sep = ": "),
                      choices = list_values,
-                     selected = model_settings[[x]]$default
+                     selected = model_settings[[x]]$default,
+                     multiple = TRUE
                    )),
             column(1,
                    actionButton(paste0("tooltip_dropdown_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),

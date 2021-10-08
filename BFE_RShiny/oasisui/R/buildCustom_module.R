@@ -347,6 +347,7 @@ buildCustom <- function(input,
       # create list/vector of names for model settings
       names_full_list <- c("event_set",
                            "event_occurrence_id",
+                           "number_of_samples",
                            boolean_name,
                            inputs_name)
 
@@ -395,6 +396,7 @@ buildCustom <- function(input,
     # drop "parameter_groups" (and potentially other unknown entries):
     subset_settings <- names(tbl_mdl_settings) %in% c("event_set",
                                                       "event_occurrence_id",
+                                                      "number_of_samples",
                                                       "string_parameters",
                                                       "boolean_parameters",
                                                       "float_parameters",
@@ -407,6 +409,7 @@ buildCustom <- function(input,
         result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$presentation_order[[y]]
       }))
     }))
+    subset_settings$number_of_samples <- input$inputnumsamples
 
     settings_names <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
       if (is.null(tbl_mdl_settings[[x]]$name)) {

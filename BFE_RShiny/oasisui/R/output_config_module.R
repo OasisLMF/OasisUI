@@ -721,6 +721,7 @@ def_out_config <- function(input,
       if (!is.null(tbl_modelsDetails)) {
         subset_settings <- names(tbl_modelsDetails$model_settings) %in% c("event_set",
                                                                           "event_occurrence_id",
+                                                                          "number_of_samples",
                                                                           "string_parameters",
                                                                           "boolean_parameters",
                                                                           "float_parameters",
@@ -746,10 +747,10 @@ def_out_config <- function(input,
         output$basic_model_param <- renderUI({
           basicConfig_funs(session, model_settings)
         })
-
         # Advanced model params
+        updateNumericInput(session, "tinputnoofsample", value = tbl_ana_settings$number_of_samples)
         output$advanced_model_param <- renderUI({
-          advancedConfig_funs(session, model_settings)
+            advancedConfig_funs(session, model_settings)
         })
       }
     }
@@ -902,6 +903,7 @@ def_out_config <- function(input,
       # create list/vector of names for model settings
       names_full_list <- c("event_set",
                            "event_occurrence_id",
+                           "number_of_samples",
                            boolean_name,
                            inputs_name)
       # remove all NA elements
