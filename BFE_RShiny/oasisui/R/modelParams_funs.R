@@ -60,7 +60,8 @@ basicConfig_funs <- function(session, model_settings) {
 #' @param session Current session.
 #' @param model_settings Model settings retrieved from the API.
 #'
-#' @importFrom shinyBS bsPopover
+#' @importFrom bsplus bs_embed_popover
+#' @importFrom bsplus use_bs_popover
 #'
 #' @return List of UI elements (input/selector widgets).
 #'
@@ -83,7 +84,7 @@ advancedConfig_funs <- function(session, model_settings) {
           label_widget <- gsub("_", " ", model_settings[[x]]$name)
         }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          fluidRow(
+          fluidRow(use_bs_popover(),
             column(10,
                    textInput(
                      inputId = ns(paste0("string_parameters", x)),
@@ -91,12 +92,14 @@ advancedConfig_funs <- function(session, model_settings) {
                      value = model_settings[[x]]$default
                    )),
             column(1,
-                   actionButton(paste0("tooltip_string_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
-                   bsPopover(id = paste0("tooltip_string_", x), title = "",
-                             content = tooltip_tex,
-                             placement = "right",
-                             trigger = "focus",
-                             options = list(container = "body"))))
+                   actionButton(ns(paste0("tooltip_string_", x)), "", icon = icon("info"),
+                                style='padding:4px; font-size:80%') %>%
+                     bs_embed_popover(
+                       title = NULL,
+                       content = tooltip_tex
+                     )
+            )
+          )
         }
       })
     }
@@ -117,7 +120,7 @@ advancedConfig_funs <- function(session, model_settings) {
           label_widget <- gsub("_", " ", model_settings[[x]]$name)
         }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          fluidRow(
+          fluidRow(use_bs_popover(),
             column(10,
                    textInput(
                      inputId = ns(paste0("list_parameters", x)),
@@ -125,12 +128,13 @@ advancedConfig_funs <- function(session, model_settings) {
                      value = paste(unlist(model_settings[[x]]$default), collapse = ", ")
                    )),
             column(1,
-                   actionButton(paste0("tooltip_list_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
-                   bsPopover(id = paste0("tooltip_list_", x), title = "",
-                             content = tooltip_tex,
-                             placement = "right",
-                             trigger = "focus",
-                             options = list(container = "body")))
+                   actionButton(ns(paste0("tooltip_list_", x)), "", icon = icon("info"),
+                                style='padding:4px; font-size:80%') %>%
+                     bs_embed_popover(
+                       title = NULL,
+                       content = tooltip_tex
+                     )
+            )
           )
         }
       })
@@ -148,20 +152,21 @@ advancedConfig_funs <- function(session, model_settings) {
             tooltip_tex <- model_settings[[x]]$name
           }
           lapply(seq_len(length(model_settings[[x]]$default)), function(y) {
-            fluidRow(
+            fluidRow(use_bs_popover(),
               column(10,
                      textInput(
                        inputId = ns(paste0("dictionary_parameters", x, y)),
                        label = paste(model_settings[[x]]$name, names(model_settings[[x]]$default[y]), sep = ": "),
                        value = model_settings[[x]]$default[[y]]
                      )),
-              column(
-                1,actionButton(paste0("tooltip_dict_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
-                bsPopover(id = paste0("tooltip_dict_", x), title = "",
-                          content = tooltip_tex,
-                          placement = "right",
-                          trigger = "focus",
-                          options = list(container = "body")))
+              column(1,
+                     actionButton(ns(paste0("tooltip_dict_", x)), "", icon = icon("info"),
+                                  style='padding:4px; font-size:80%') %>%
+                       bs_embed_popover(
+                         title = NULL,
+                         content = tooltip_tex
+                       )
+              )
             )
           })
         }
@@ -184,7 +189,7 @@ advancedConfig_funs <- function(session, model_settings) {
           label_widget <- gsub("_", " ", model_settings[[x]]$name)
         }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          fluidRow(
+          fluidRow(use_bs_popover(),
             column(10,
                    checkboxInput(
                      inputId = ns(paste0("boolean_parameters", x)),
@@ -192,12 +197,13 @@ advancedConfig_funs <- function(session, model_settings) {
                      value = model_settings[[x]]$default
                    )),
             column(1,
-                   actionButton(paste0("tooltip_bool_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
-                   bsPopover(id = paste0("tooltip_bool_", x), title = "",
-                             content = tooltip_tex,
-                             placement = "right",
-                             trigger = "focus",
-                             options = list(container = "body")))
+                   actionButton(ns(paste0("tooltip_bool_", x)), "", icon = icon("info"),
+                                style='padding:4px; font-size:80%')  %>%
+                     bs_embed_popover(
+                       title = NULL,
+                       content = tooltip_tex
+                     )
+            )
           )
         }
       })
@@ -219,22 +225,24 @@ advancedConfig_funs <- function(session, model_settings) {
           label_widget <- gsub("_", " ", model_settings[[x]]$name)
         }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          fluidRow(
-            column(10,
-                   sliderInput(
-                     inputId = ns(paste0("float_parameters", x)),
-                     label = paste0(label_widget, ":") %>% capitalize_first_letter(),
-                     min = model_settings[[x]]$min,
-                     max = model_settings[[x]]$max,
-                     value = model_settings[[x]]$default
-                   )),
-            column(
-              1,actionButton(paste0("tooltip_float_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
-              bsPopover(id = paste0("tooltip_float_", x), title = "",
-                        content = tooltip_tex,
-                        placement = "right",
-                        trigger = "focus",
-                        options = list(container = "body")))
+          fluidRow(use_bs_popover(),
+                   column(10,
+                          sliderInput(
+                            inputId = ns(paste0("float_parameters", x)),
+                            label = paste0(label_widget, ":") %>% capitalize_first_letter(),
+                            min = model_settings[[x]]$min,
+                            max = model_settings[[x]]$max,
+                            value = model_settings[[x]]$default
+                          )
+                   ),
+                   column(1,
+                          actionButton(ns(paste0("tooltip_float_", x)), "", icon = icon("info"),
+                                       style='padding:4px; font-size:80%') %>%
+                            bs_embed_popover(
+                              title = NULL,
+                              content = tooltip_tex
+                            )
+                   )
           )
         }
       })
@@ -259,22 +267,23 @@ advancedConfig_funs <- function(session, model_settings) {
           model_settings[[x]]$options[[y]]$id
         })
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
-          fluidRow(
-            column(10,
-                   selectInput(
-                     inputId = ns(paste0("dropdown_parameters", x)),
-                     label = paste0(label_widget, sep = ": "),
-                     choices = list_values,
-                     selected = model_settings[[x]]$default,
-                     multiple = TRUE
-                   )),
-            column(1,
-                   actionButton(paste0("tooltip_dropdown_", x), "", icon = icon("info"), style='padding:4px; font-size:80%'),
-                   bsPopover(id = paste0("tooltip_dropdown_", x), title = "",
-                             content = tooltip_tex,
-                             placement = "right",
-                             trigger = "focus",
-                             options = list(container = "body")))
+          fluidRow(use_bs_popover(),
+                   column(10,
+                          selectInput(
+                            inputId = ns(paste0("dropdown_parameters", x)),
+                            label = paste0(label_widget, sep = ": "),
+                            choices = list_values,
+                            selected = model_settings[[x]]$default,
+                            multiple = TRUE
+                          )),
+                   column(1,
+                          actionButton(ns(paste0("tooltip_dropdown_", x)), "", icon = icon("info"),
+                                       style='padding:4px; font-size:80%') %>%
+                            bs_embed_popover(
+                              title = NULL,
+                              content = tooltip_tex
+                            )
+                   )
           )
         }
       })
