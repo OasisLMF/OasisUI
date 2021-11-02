@@ -891,6 +891,7 @@ def_out_config <- function(input,
       # create model settings for analysis settings
       model_settings <- c(input$event_set,
                           input$event_occurrence,
+                          input$tinputnoofsample,
                           # note that boolean_input is a list, making sure that the result of this c() is a flat list!
                           boolean_input,
                           string_input,
