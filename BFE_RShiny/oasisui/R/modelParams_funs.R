@@ -12,45 +12,50 @@ basicConfig_funs <- function(session, model_settings) {
   ns <- session$ns
   # Event set
   .event_set_fun <- function(model_settings) {
-    selectChoices <- lapply(model_settings$event_set.options, function(x) {
-      x$id
-    })
-    names(selectChoices) <- sapply(model_settings$event_set.options, function(x) {
-      x$desc
-    })
-    doHide <- length(model_settings$event_set.options) < 2
-    style <- if (doHide) "display: none" else ""
-    selectInput(
-      inputId = ns("event_set"),
-      label = "Event Set:",
-      choices = selectChoices,
-      selected = model_settings$event_set.default,
-      multiple = FALSE
-    ) %>% tagAppendAttributes(id = ns("eventset_ctnr"), style = style)
+    if (is.null(model_settings$event_set.used_for) || model_settings$event_set.used_for == "losses") {
+      selectChoices <- lapply(model_settings$event_set.options, function(x) {
+        x$id
+      })
+      names(selectChoices) <- sapply(model_settings$event_set.options, function(x) {
+        x$desc
+      })
+      doHide <- length(model_settings$event_set.options) < 2
+      style <- if (doHide) "display: none" else ""
+      selectInput(
+        inputId = ns("event_set"),
+        label = "Event Set:",
+        choices = selectChoices,
+        selected = model_settings$event_set.default,
+        multiple = FALSE
+      ) %>% tagAppendAttributes(id = ns("eventset_ctnr"))
+    }
   }
 
   # Event occurrence
   .event_occurrence_fun <- function(model_settings) {
-    selectChoices <- lapply(model_settings$event_occurrence_id.options, function(x) {
-      x$id
-    })
-    names(selectChoices) <- sapply(model_settings$event_occurrence_id.options, function(x) {
-      x$desc
-    })
-    doHide <- length(model_settings$event_occurrence_id.options) < 2
-    style <- if (doHide) "display: none" else ""
-    selectInput(
-      inputId = ns("event_occurrence"),
-      label = "Event Occurrence:",
-      choices = selectChoices,
-      selected = model_settings$event_occurrence_id.default,
-      multiple = FALSE
-    ) %>% tagAppendAttributes(id = ns("eventoccurrence_ctnr"), style = style)
+    if (is.null(model_settings$event_occurrence_id.used_for) || model_settings$event_occurrence_id.used_for == "losses") {
+      selectChoices <- lapply(model_settings$event_occurrence_id.options, function(x) {
+        x$id
+      })
+      names(selectChoices) <- sapply(model_settings$event_occurrence_id.options, function(x) {
+        x$desc
+      })
+      doHide <- length(model_settings$event_occurrence_id.options) < 2
+      style <- if (doHide) "display: none" else ""
+      selectInput(
+        inputId = ns("event_occurrence"),
+        label = "Event Occurrence:",
+        choices = selectChoices,
+        selected = model_settings$event_occurrence_id.default,
+        multiple = FALSE
+      ) %>% tagAppendAttributes(id = ns("eventoccurrence_ctnr"))
+    }
   }
 
   tagList(.event_set_fun(model_settings),
           .event_occurrence_fun(model_settings)
   )
+
 }
 
 #' Advanced Output Configuration functions
@@ -68,7 +73,6 @@ basicConfig_funs <- function(session, model_settings) {
 #' @export
 advancedConfig_funs <- function(session, model_settings) {
   ns <- session$ns
-
   # string parameters
   .string_fun <- function(model_settings) {
     if (length(grep("string_parameters", names(model_settings))) > 0) {
@@ -335,40 +339,44 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
   # account for event_set and event_occurrence_id which are outside of the other parameters
   .event_set_fun_g <- function(model_settings) {
     if (length(grep("event_set", ls_param_group)) > 0) {
-      selectChoices <- lapply(model_settings$event_set$options, function(x) {
-        x$id
-      })
-      names(selectChoices) <- sapply(model_settings$event_set$options, function(x) {
-        x$desc
-      })
-      doHide <- length(model_settings$event_set$options) < 2
-      style <- if (doHide) "display: none" else ""
-      selectInput(
-        inputId = ns("event_set_g"),
-        label = "Event Set:",
-        choices = selectChoices,
-        selected = model_settings$event_set$default,
-        multiple = FALSE
-      ) %>% tagAppendAttributes(id = ns("eventset_ctnr"), style = style)
+      if (is.null(model_settings$event_set$used_for) || model_settings$event_set$used_for == ui_step) {
+        selectChoices <- lapply(model_settings$event_set$options, function(x) {
+          x$id
+        })
+        names(selectChoices) <- sapply(model_settings$event_set$options, function(x) {
+          x$desc
+        })
+        doHide <- length(model_settings$event_set$options) < 2
+        style <- if (doHide) "display: none" else ""
+        selectInput(
+          inputId = ns("event_set_g"),
+          label = "Event Set:",
+          choices = selectChoices,
+          selected = model_settings$event_set$default,
+          multiple = FALSE
+        ) %>% tagAppendAttributes(id = ns("eventset_ctnr"), style = style)
+      }
     }
   }
   .event_occurrence_fun_g <- function(model_settings) {
     if (length(grep("event_occurrence_id", ls_param_group)) > 0) {
-      selectChoices <- lapply(model_settings$event_occurrence_id$options, function(x) {
-        x$id
-      })
-      names(selectChoices) <- sapply(model_settings$event_occurrence_id$options, function(x) {
-        x$desc
-      })
-      doHide <- length(model_settings$event_occurrence_id$options) < 2
-      style <- if (doHide) "display: none" else ""
-      selectInput(
-        inputId = ns("event_occurrence_g"),
-        label = "Event Occurrence:",
-        choices = selectChoices,
-        selected = model_settings$event_occurrence_id$default,
-        multiple = FALSE
-      ) %>% tagAppendAttributes(id = ns("eventoccurrence_ctnr"), style = style)
+      if (is.null(model_settings$event_occurrence_id$used_for) || model_settings$event_occurrence_id$used_for == ui_step) {
+        selectChoices <- lapply(model_settings$event_occurrence_id$options, function(x) {
+          x$id
+        })
+        names(selectChoices) <- sapply(model_settings$event_occurrence_id$options, function(x) {
+          x$desc
+        })
+        doHide <- length(model_settings$event_occurrence_id$options) < 2
+        style <- if (doHide) "display: none" else ""
+        selectInput(
+          inputId = ns("event_occurrence_g"),
+          label = "Event Occurrence:",
+          choices = selectChoices,
+          selected = model_settings$event_occurrence_id$default,
+          multiple = FALSE
+        ) %>% tagAppendAttributes(id = ns("eventoccurrence_ctnr"), style = style)
+      }
     }
   }
 
@@ -390,7 +398,7 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
           }
           if (is.null(model_settings[[x]][[y]]$used_for) || model_settings[[x]][[y]]$used_for == ui_step) {
             fluidRow(use_bs_popover(),
-                     column(10,
+                     column(4,
                             textInput(
                               inputId = ns(paste0("string_parameters", y)),
                               label = div(paste0(label_widget, ":") %>% capitalize_first_letter()),
@@ -429,7 +437,7 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
           }
           if (is.null(model_settings[[x]][[y]]$used_for) || model_settings[[x]][[y]]$used_for == ui_step) {
             fluidRow(use_bs_popover(),
-                     column(10,
+                     column(4,
                             textInput(
                               inputId = ns(paste0("list_parameters", y)),
                               label = paste0(label_widget, ":") %>% capitalize_first_letter(),
@@ -464,7 +472,7 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
             }
             lapply(seq_len(length(model_settings[[x]][[y]]$default)), function(z) {
               fluidRow(use_bs_popover(),
-                       column(10,
+                       column(4,
                               textInput(
                                 inputId = ns(paste0("dictionary_parameters", y, z)),
                                 label = paste(model_settings[[x]][[y]]$desc, names(model_settings[[x]][[y]]$default[z]),
@@ -505,7 +513,7 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
           }
           if (is.null(model_settings[[x]][[y]]$used_for) || model_settings[[x]][[y]]$used_for == ui_step) {
             fluidRow(use_bs_popover(),
-                     column(10,
+                     column(4,
                             checkboxInput(
                               inputId = ns(paste0("boolean_parameters", y)),
                               label = label_widget %>% capitalize_first_letter(),
@@ -544,7 +552,7 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
           }
           if (is.null(model_settings[[x]][[y]]$used_for) || model_settings[[x]][[y]]$used_for == ui_step) {
             fluidRow(use_bs_popover(),
-                     column(10,
+                     column(4,
                             sliderInput(
                               inputId = ns(paste0("float_parameters", y)),
                               label = paste0(label_widget, ":") %>% capitalize_first_letter(),
@@ -589,7 +597,7 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
           })
           if (is.null(model_settings[[x]][[y]]$used_for) || model_settings[[x]][[y]]$used_for == ui_step) {
             fluidRow(use_bs_popover(),
-                     column(10,
+                     column(4,
                             selectInput(
                               inputId = ns(paste0("dropdown_parameters", y)),
                               label = paste0(label_widget, sep = ": "),

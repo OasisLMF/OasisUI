@@ -688,7 +688,7 @@ step2_chooseAnalysis <- function(input, output, session,
           list(
             module_supplier_id = result$supplierID,
             model_version_id = result$versionID,
-            number_of_samples = 0,
+            number_of_samples = 10,
             model_settings = NULL,
             gul_output = FALSE,
             gul_summaries = list(gul_summaries))

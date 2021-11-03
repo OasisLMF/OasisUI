@@ -125,13 +125,37 @@ buildCustom <- function(input,
   # render dynamically multiple tabs for Model Values section
   output$tabs_BuildCustom <- renderUI({
     nTabs <- length(result$tbl_modelsDetails$model_settings$parameter_groups)
-    myTabs = lapply(seq_len(nTabs), function (x) {
-      tabPanel(
-        title = result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$name,
-        Global_funs(session, result$tbl_modelsDetails$model_settings, "generation",
-                    result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$presentation_order)
+    if (nTabs == 0) {
+      # in case parameter_group is not available, create only one tab
+      param_group <- as.list(
+        c(
+          names(result$tbl_modelsDetails$model_settings[1:2]),
+          unlist(
+            lapply(result$tbl_modelsDetails$model_settings[3:length(result$tbl_modelsDetails$model_settings)], function(x) {
+              sapply(x, function(y) {
+                y$name
+              })
+            }))
+        )
       )
-    })
+      names(param_group) <- NULL
+      myTabs = lapply(1, function (x) {
+        tabPanel(
+          title = "Model Parameters",
+          Global_funs(session, result$tbl_modelsDetails$model_settings, "generation",
+                      param_group)
+        )
+      })
+    } else {
+      myTabs = lapply(seq_len(nTabs), function (x) {
+        tabPanel(
+          title = result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$name,
+          Global_funs(session, result$tbl_modelsDetails$model_settings, "generation",
+                      result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$presentation_order)
+        )
+      })
+    }
+
     do.call(tabsetPanel, myTabs)
   })
 
