@@ -604,7 +604,6 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
     disable("anaName")
     disable("abuttonsubmit")
-    logMessage("showing panelBuildCustom")
   })
 
   # Hide panel if model id changes
@@ -699,8 +698,11 @@ step2_chooseAnalysis <- function(input, output, session,
           query_body = ana_settings_step_2
         )
       }
+
       if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
+
         fileids <- as.list(sub_modules$buildCustom$fileids())
+
         patch_analyses <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", result$analysisID, sep = "/"),
                                                                    query_body = list(complex_model_data_files = fileids),
                                                                    query_method = "PATCH")

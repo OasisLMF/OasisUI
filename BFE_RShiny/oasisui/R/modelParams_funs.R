@@ -388,6 +388,10 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
         if (length(grep(model_settings[[x]][[y]]$name, ls_param_group)) > 0) {
           if (!is.null(model_settings[[x]][[y]]$tooltip)) {
             tooltip_tex <- model_settings[[x]][[y]]$tooltip
+            # limit number of characters in tooltip box
+            if (nchar(tooltip_tex) > 100) {
+              tooltip_tex <- paste0(substr(tooltip_tex, start = 1, stop = 100), "...")
+            }
           } else {
             tooltip_tex <- model_settings[[x]][[y]]$name
           }
@@ -427,6 +431,10 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
         if (length(grep(model_settings[[x]][[y]]$name, ls_param_group)) > 0) {
           if (!is.null(model_settings[[x]][[y]]$tooltip)) {
             tooltip_tex <- model_settings[[x]][[y]]$tooltip
+            # limit number of characters in tooltip box
+            if (nchar(tooltip_tex) > 100) {
+              tooltip_tex <- paste0(substr(tooltip_tex, start = 1, stop = 100), "...")
+            }
           } else {
             tooltip_tex <- model_settings[[x]][[y]]$name
           }
@@ -467,6 +475,10 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
           if (is.null(model_settings[[x]][[y]]$used_for) || model_settings[[x]][[y]]$used_for == ui_step) {
             if (!is.null(model_settings[[x]][[y]]$tooltip)) {
               tooltip_tex <- model_settings[[x]][[y]]$tooltip
+              # limit number of characters in tooltip box
+              if (nchar(tooltip_tex) > 100) {
+                tooltip_tex <- paste0(substr(tooltip_tex, start = 1, stop = 100), "...")
+              }
             } else {
               tooltip_tex <- model_settings[[x]][[y]]$name
             }
@@ -503,6 +515,10 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
         if (length(grep(model_settings[[x]][[y]]$name, ls_param_group)) > 0) {
           if (!is.null(model_settings[[x]][[y]]$tooltip)) {
             tooltip_tex <- model_settings[[x]][[y]]$tooltip
+            # limit number of characters in tooltip box
+            if (nchar(tooltip_tex) > 100) {
+              tooltip_tex <- paste0(substr(tooltip_tex, start = 1, stop = 100), "...")
+            }
           } else {
             tooltip_tex <- model_settings[[x]][[y]]$name
           }
@@ -542,6 +558,10 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
         if (length(grep(model_settings[[x]][[y]]$name, ls_param_group)) > 0) {
           if (!is.null(model_settings[[x]][[y]]$tooltip)) {
             tooltip_tex <- model_settings[[x]][[y]]$tooltip
+            # limit number of characters in tooltip box
+            if (nchar(tooltip_tex) > 100) {
+              tooltip_tex <- paste0(substr(tooltip_tex, start = 1, stop = 100), "...")
+            }
           } else {
             tooltip_tex <- model_settings[[x]][[y]]$name
           }
@@ -584,6 +604,10 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
         if (length(grep(model_settings[[x]][[y]]$name, ls_param_group)) > 0) {
           if (!is.null(model_settings[[x]][[y]]$tooltip)) {
             tooltip_tex <- model_settings[[x]][[y]]$tooltip
+            # limit number of characters in tooltip box
+            if (nchar(tooltip_tex) > 100) {
+              tooltip_tex <- paste0(substr(tooltip_tex, start = 1, stop = 100), "...")
+            }
           } else {
             tooltip_tex <- model_settings[[x]][[y]]$name
           }

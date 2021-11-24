@@ -96,7 +96,8 @@ buildCustom <- function(input,
     # Output IDs tables
     outputID = NULL,
     # extrapolate file ids
-    file_ids = NULL
+    file_ids = list(),
+    list_files = list()
   )
 
   # Initialize -----------------------------------------------------------------
@@ -177,8 +178,10 @@ buildCustom <- function(input,
       ui_content <- list()
       for (i in seq_len(length(df_selectors))) {
         ui_content[[i * 2]] <- fluidRow(column(1), column(10, DTOutput(ns(paste0("dt_", result$outputID[i])))))
-        ui_content[[i * 2 - 1]] <- fluidRow(column(1), column(10, fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
-                                                                            multiple = TRUE, accept = accept[i])))
+        ui_content[[i * 2 - 1]] <- fluidRow(column(1),
+                                            column(10, fileInput(inputId = ns(result$inputID[i]),
+                                                                 label = label_pre[[i]],
+                                                                 multiple = TRUE, accept = accept[i])))
       }
       tagList(ui_content)
     } else {
@@ -225,11 +228,11 @@ buildCustom <- function(input,
         }
       })
     })
+    .reloadtbl_modelsFiles()
   })
 
   # output new analysis settings with changed values through tabs
   observeEvent(input$abuttonselsettings, {
-
     fetch_model_settings <- function(model_settings) {
 
       n_string <- grep("string_parameters", names(model_settings))
@@ -289,13 +292,13 @@ buildCustom <- function(input,
 
       n_list <- grep("list_parameters", names(model_settings))
       list_input <- lapply(seq_len(length(model_settings[n_list]$list_parameters)), function(x) {
-        sapply(seq_len(length(model_settings[n_list]$list_parameters[[x]]$default)), function(z) {
-          if (!is.null(input[[paste0("list_parameters", x)]])) {
-            result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default[z] <-
+        if (!is.null(input[[paste0("list_parameters", x)]])) {
+          sapply(seq_len(length(input[[paste0("list_parameters", x)]])), function(z) {
+            result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default <-
               input[[paste0("list_parameters", x)]]
-          }
-          result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default[z]
-        })
+            result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default
+          })
+        }
       })
 
       inputs_list <- list(string_input,
@@ -350,7 +353,7 @@ buildCustom <- function(input,
       names_full_list <- c("event_set",
                            "event_occurrence_id",
                            "number_of_samples",
-                           boolean_name,
+                           # boolean_name,
                            inputs_name)
 
       if (any(sapply(names_full_list, is.na))) {
@@ -371,6 +374,24 @@ buildCustom <- function(input,
     oasisuiNotification(type = "message",
                         "Model settings filtered by chosen entries.")
     gul_summaries <- summary_template
+
+    h <- unlist(result$inputID)
+    lapply(seq_len(length(h)), function(i) {
+      input_dt <- paste0("dt_", h[i], "_rows_selected")
+      if (!is.null(input[[input_dt]])) {
+        tbl <- result$tbl_files %>% filter(file_description == h[i])
+        tbl <- tbl[nrow(tbl):1,]
+        file_ids <- tbl[input[[input_dt]], "id"]
+        result$file_ids[[i]] <- file_ids
+        file_names <- tbl[input[[input_dt]], "filename"]
+        # because df is reversed, also order of row has to be reversed
+        result$list_files[[h[i]]] <- file_names
+        result$list_files[[h[i]]] <- result$list_files[[h[i]]][!is.na(result$list_files[[h[i]]])]
+        if (length(result$list_files[[h[i]]]) > 1) {
+          result$list_files[[h[i]]] <- as.list(result$list_files[[h[i]]])
+        }
+      }
+    })
 
     result$filtered_analysis_settings <- list(analysis_settings = c(
       list(
@@ -428,6 +449,7 @@ buildCustom <- function(input,
     .reloadtbl_modelsFiles()
     invisible()
   }
+
   moduleOutput <- list(
     fullsettings = reactive({result$filtered_analysis_settings}),
     fileids = reactive({unlist(result$file_ids)}),
