@@ -293,11 +293,9 @@ buildCustom <- function(input,
       n_list <- grep("list_parameters", names(model_settings))
       list_input <- lapply(seq_len(length(model_settings[n_list]$list_parameters)), function(x) {
         if (!is.null(input[[paste0("list_parameters", x)]])) {
-          sapply(seq_len(length(input[[paste0("list_parameters", x)]])), function(z) {
-            result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default <-
-              input[[paste0("list_parameters", x)]]
-            result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default
-          })
+          result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default <-
+            as.list(strsplit(input[[paste0("list_parameters", x)]], ",")[[1]])
+          result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default
         }
       })
 
