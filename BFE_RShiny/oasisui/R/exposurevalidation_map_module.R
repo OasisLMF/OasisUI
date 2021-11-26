@@ -517,12 +517,19 @@ exposurevalidationmap <- function(input,
   # Exposure validation map
   .createExposureValMap <- function(df) {
     marker_colors <- c('green', 'red')
+
+    if ("Latitude" %in% colnames(df)) {
+      df_lat <- grep("Latitude", colnames(df))
+      df_long <- grep("Longitude", colnames(df))
+      colnames(df)[df_lat] <- capitalize_first_letter(colnames(df)[df_lat])
+      colnames(df)[df_long] <- capitalize_first_letter(colnames(df)[df_long])
+    }
     if (is.null(input$chkgrp_perils)) {
       icon_map <- NULL
       df <- df
       leaflet(df) %>%
         addTiles() %>%
-        leaflet::setView(mean(df$Longitude), mean(df$Latitude), zoom = 20)
+        leaflet::setView(mean(df$longitude), mean(df$latitude), zoom = 20)
     } else {
       df <- df %>%
         mutate(modeled = case_when(

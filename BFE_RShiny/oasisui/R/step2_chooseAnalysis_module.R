@@ -653,6 +653,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Create new Analysis --------------------------------------------------------
   observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
+
       post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", sep = "/"),
                                                                                   query_body = list(name = input$anaName,
                                                                                                     portfolio = portfolioID(),
@@ -673,7 +674,7 @@ step2_chooseAnalysis <- function(input, output, session,
       result$analysisNAME <- content(post_portfolios_create_analysis$result)$name
 
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
-
+      # browser()
       if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) &&
           model_settings$model_configurable && !is.null(sub_modules$buildCustom$fullsettings())) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
@@ -699,7 +700,7 @@ step2_chooseAnalysis <- function(input, output, session,
         )
       }
 
-      if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
+      if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success" && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
 
         fileids <- as.list(sub_modules$buildCustom$fileids())
 
@@ -712,7 +713,7 @@ step2_chooseAnalysis <- function(input, output, session,
         query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/")
       )
 
-      if (input_generation$status == "Success" && patch_analyses$status == "Success") {
+      if (input_generation$status == "Success") {
         oasisuiNotification(type = "message",
                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()
