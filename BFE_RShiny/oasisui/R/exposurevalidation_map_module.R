@@ -158,7 +158,10 @@ exposurevalidationmap <- function(input,
         if (is.null(input$chkgrp_perils)) {
           result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
             mutate(modeled = NA)
-          names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
+          if (grepl(".x", names(result$uploaded_locs_check_peril))) {
+            names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
+          }
+          names(result$uploaded_locs_check_peril) <- tolower(names(result$uploaded_locs_check_peril))
         } else {
           result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
             # filter(peril_id %in% input$chkgrp_perils) %>%
@@ -170,7 +173,10 @@ exposurevalidationmap <- function(input,
             filter(!is.na(modeled)) %>%
             select(-peril_id) %>%
             distinct()
-          names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
+          if (grepl(".x", names(result$uploaded_locs_check_peril))) {
+            names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
+          }
+          names(result$uploaded_locs_check_peril) <- tolower(names(result$uploaded_locs_check_peril))
         }
       }
     })
@@ -520,13 +526,9 @@ exposurevalidationmap <- function(input,
   # Exposure validation map
   .createExposureValMap <- function(df) {
     marker_colors <- c('green', 'red')
-
-    if ("Latitude" %in% colnames(df)) {
-      df_lat <- grep("Latitude", colnames(df))
-      df_long <- grep("Longitude", colnames(df))
-      colnames(df)[df_lat] <- capitalize_first_letter(colnames(df)[df_lat])
-      colnames(df)[df_long] <- capitalize_first_letter(colnames(df)[df_long])
-    }
+    # if ("Latitude" %in% colnames(df)) {
+    # colnames(df) <- tolower(colnames(df))
+    # }
     if (is.null(input$chkgrp_perils)) {
       icon_map <- NULL
       df <- df
@@ -648,7 +650,6 @@ exposurevalidationmap <- function(input,
   # Drawn circles infos, outputs and radius
   .DrawnCircles <- function(radius, lat_click, long_click, ratio) {
     # calculate LocID and TIV for pins inside areas
-
     df_info <- data.frame("LocNumber" = format(result$uploaded_locs_check_peril$locnumber, big.mark = "",
                                                scientific = FALSE),
                           "TIV" = result$uploaded_locs_check_peril$buildingtiv * (ratio/100))
