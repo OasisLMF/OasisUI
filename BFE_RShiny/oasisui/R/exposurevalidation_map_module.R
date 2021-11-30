@@ -154,24 +154,26 @@ exposurevalidationmap <- function(input,
 
   observeEvent({input$chkgrp_perils
     result$uploaded_locs_check}, ignoreNULL = FALSE, {
-    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-      if (is.null(input$chkgrp_perils)) {
-        result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-          mutate(modeled = NA)
-      } else {
-        result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-          # filter(peril_id %in% input$chkgrp_perils) %>%
-          mutate(modeled = case_when(
-            is.na(peril_id) ~ FALSE,
-            peril_id %in% input$chkgrp_perils ~ TRUE,
-            TRUE ~ NA)
-          ) %>%
-          filter(!is.na(modeled)) %>%
-          select(-peril_id) %>%
-          distinct()
+      if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+        if (is.null(input$chkgrp_perils)) {
+          result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
+            mutate(modeled = NA)
+          names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
+        } else {
+          result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
+            # filter(peril_id %in% input$chkgrp_perils) %>%
+            mutate(modeled = case_when(
+              is.na(peril_id) ~ FALSE,
+              peril_id %in% input$chkgrp_perils ~ TRUE,
+              TRUE ~ NA)
+            ) %>%
+            filter(!is.na(modeled)) %>%
+            select(-peril_id) %>%
+            distinct()
+          names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
+        }
       }
-    }
-  })
+    })
 
   # Show/Hide table button -----------------------------------------------------
   observeEvent(result$uploaded_locs_check_peril, ignoreNULL = FALSE, {
@@ -272,6 +274,7 @@ exposurevalidationmap <- function(input,
 
   observeEvent(input$exposure_map_click, {
     if (input$tot_tiv_param == "Circles") {
+
       hide("exposure_table")
 
       circles_features <- input$exposure_map_draw_all_features$features
@@ -387,8 +390,8 @@ exposurevalidationmap <- function(input,
           }
 
           # check for pins within country borders
-          match_lat <- grep(TRUE, between(result$uploaded_locs_check_peril$Latitude, min(unlist(lati)), max(unlist(lati))))
-          match_long <- grep(TRUE, between(result$uploaded_locs_check_peril$Longitude, min(unlist(long)), max(unlist(long))))
+          match_lat <- grep(TRUE, between(result$uploaded_locs_check_peril$latitude, min(unlist(lati)), max(unlist(lati))))
+          match_long <- grep(TRUE, between(result$uploaded_locs_check_peril$longitude, min(unlist(long)), max(unlist(long))))
 
           # adjust TIV wrt damage ratio
           if (is.null(input$damage_ratio)) {
@@ -432,8 +435,8 @@ exposurevalidationmap <- function(input,
           long <- regions@polygons[[entry]]@Polygons[[set]]@coords[,1]
 
           # check for pins within country borders
-          match_lat <- grep(TRUE, between(result$uploaded_locs_check_peril$Latitude, min(lati), max(lati)))
-          match_long <- grep(TRUE, between(result$uploaded_locs_check_peril$Longitude, min(long), max(long)))
+          match_lat <- grep(TRUE, between(result$uploaded_locs_check_peril$latitude, min(lati), max(lati)))
+          match_long <- grep(TRUE, between(result$uploaded_locs_check_peril$longitude, min(long), max(long)))
 
           # adjust TIV wrt damage ratio
           if (is.null(input$damage_ratio)) {
@@ -645,11 +648,12 @@ exposurevalidationmap <- function(input,
   # Drawn circles infos, outputs and radius
   .DrawnCircles <- function(radius, lat_click, long_click, ratio) {
     # calculate LocID and TIV for pins inside areas
-    df_info <- data.frame("LocNumber" = format(result$uploaded_locs_check_peril$LocNumber, big.mark = "",
+
+    df_info <- data.frame("LocNumber" = format(result$uploaded_locs_check_peril$locnumber, big.mark = "",
                                                scientific = FALSE),
-                          "TIV" = result$uploaded_locs_check_peril$BuildingTIV * (ratio/100))
-    if(!is.null(result$uploaded_locs_check_peril$StreetAddress)) {
-      df_info <- cbind(df_info, "Address" = result$uploaded_locs_check_peril$StreetAddress)
+                          "TIV" = result$uploaded_locs_check_peril$buildingtiv * (ratio/100))
+    if(!is.null(result$uploaded_locs_check_peril$streetaddress)) {
+      df_info <- cbind(df_info, "Address" = result$uploaded_locs_check_peril$streetaddress)
     }
     info <- .is_within_bounds(df_info, radius, lat_click, long_click, ratio)
 
@@ -675,8 +679,8 @@ exposurevalidationmap <- function(input,
   .is_within_bounds <- function(uploaded_locs_input, radius, lat_click, long_click, ratio) {
 
     # get pins coordinates
-    long <- result$uploaded_locs_check_peril$Longitude
-    lat <- result$uploaded_locs_check_peril$Latitude
+    long <- result$uploaded_locs_check_peril$longitude
+    lat <- result$uploaded_locs_check_peril$latitude
 
     coord_df <- cbind(long_click, lat_click)
 
@@ -693,7 +697,7 @@ exposurevalidationmap <- function(input,
     degrees_dist_4 <- degrees_dist_2 + 22.5
     circle_bounds_4 <- destPoint(coord_df, degrees_dist_4, radius)
 
-    lapply(seq_len(length(result$uploaded_locs_check_peril$Longitude)), function(x) {
+    lapply(seq_len(length(result$uploaded_locs_check_peril$longitude)), function(x) {
       if ((.between_min_max(circle_bounds_1[, 1], long[x]) &&
            .between_min_max(circle_bounds_1[, 2], lat[x])) ||
           (.between_min_max(circle_bounds_2[, 1], long[x]) &&
@@ -747,7 +751,7 @@ exposurevalidationmap <- function(input,
   .showCountryInfo <- function(code, match_long, match_lat, ratio, country_num, part) {
     if(length(match_long) > 0 && length(match_lat) > 0) {
       result$tot_country_tiv <- add_commas(sum(unlist(lapply(seq_len(length(match_long)), function (x) {
-        result$uploaded_locs_check_peril$BuildingTIV[x]
+        result$uploaded_locs_check_peril$buildingtiv[x]
       }))) * (ratio/100))
     } else {
       result$tot_country_tiv <- "No locations in this country"
