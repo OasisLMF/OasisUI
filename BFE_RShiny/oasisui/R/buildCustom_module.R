@@ -351,7 +351,7 @@ buildCustom <- function(input,
       names_full_list <- c("event_set",
                            "event_occurrence_id",
                            "number_of_samples",
-                           # boolean_name,
+                           boolean_name,
                            inputs_name)
 
       if (any(sapply(names_full_list, is.na))) {
@@ -388,6 +388,7 @@ buildCustom <- function(input,
         if (length(result$list_files[[h[i]]]) > 1) {
           result$list_files[[h[i]]] <- as.list(result$list_files[[h[i]]])
         }
+        result$list_files[[h[i]]]
       }
     })
 
