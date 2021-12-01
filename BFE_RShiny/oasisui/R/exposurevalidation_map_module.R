@@ -155,6 +155,7 @@ exposurevalidationmap <- function(input,
   observeEvent({input$chkgrp_perils
     result$uploaded_locs_check}, ignoreNULL = FALSE, {
       if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+
         if (is.null(input$chkgrp_perils)) {
           result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
             mutate(modeled = NA)
@@ -529,6 +530,7 @@ exposurevalidationmap <- function(input,
     # if ("Latitude" %in% colnames(df)) {
     # colnames(df) <- tolower(colnames(df))
     # }
+
     if (is.null(input$chkgrp_perils)) {
       icon_map <- NULL
       df <- df

@@ -449,7 +449,7 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
                             textInput(
                               inputId = ns(paste0("list_parameters", y)),
                               label = paste0(label_widget, ":") %>% capitalize_first_letter(),
-                              value = paste(unlist(model_settings[[x]][[y]]$default), collapse = ", ")
+                              value = paste(unlist(model_settings[[x]][[y]]$default), collapse = " , ")
                             )),
                      column(1,
                             actionButton(ns(paste0("tooltip_list_", y)), "", icon = icon("info"),
