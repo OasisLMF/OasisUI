@@ -935,8 +935,8 @@ def_out_config <- function(input,
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
-      "model_version_id" = modelData[[tbl_modelsDataNames$version_id]],
-      "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
+      "model_name_id" = modelData[[tbl_modelsDataNames$model_id]],
+      "model_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
       "number_of_samples" = as.integer(input$tinputnoofsample),
       # potential new tag portfolio_id
       "prog_id" = as.integer(session$userData$oasisapi$api_return_query_res(query_path = paste("analyses", analysisID(), sep = "/"),
