@@ -1,6 +1,13 @@
 OasisUI Changelog
 ==================
 
+`1.11.0`_
+ ---------
+* [#256](https://github.com/OasisLMF/OasisUI/pull/256) - Add Github templates
+* [#228, #223](https://github.com/OasisLMF/OasisUI/pull/263) - Feature/various issues
+* [#265](https://github.com/OasisLMF/OasisUI/pull/265) - Update analysis setting names
+.. _`1.11.0`:  https://github.com/OasisLMF/OasisUI/compare/1.10.0...1.11.0
+
 `1.10.0`_
  ---------
 * [#256](https://github.com/OasisLMF/OasisUI/pull/256) - Add Github templates
