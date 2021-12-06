@@ -34,8 +34,9 @@ buildCustomUI <- function(id) {
       id = ns("panel_build_Custom"),
       tabPanel(
         title = "Model Values",
-        numericInput(ns("inputnumsamples"), label = "Number of Samples:", value = 0),
-        DTOutput(ns("dt_model_values"))),
+        numericInput(ns("inputnumsamples"), label = "Number of Samples:", value = 9),
+        uiOutput(ns("tabs_BuildCustom"), inline = TRUE)
+      ),
       tabPanel(
         title = "File Uploads",
         fluidRow(uiOutput(ns("browsers_tables")))
@@ -65,15 +66,15 @@ buildCustomUI <- function(id) {
 #'
 #' @export
 buildCustom <- function(input,
-                     output,
-                     session,
-                     portfolioID,
-                     modelID,
-                     supplierID,
-                     versionID,
-                     analysisID,
-                     counter,
-                     active = reactive(TRUE)) {
+                        output,
+                        session,
+                        portfolioID,
+                        modelID,
+                        supplierID,
+                        versionID,
+                        analysisID,
+                        counter,
+                        active = reactive(TRUE)) {
 
   ns <- session$ns
 
@@ -95,7 +96,8 @@ buildCustom <- function(input,
     # Output IDs tables
     outputID = NULL,
     # extrapolate file ids
-    file_ids = NULL
+    file_ids = list(),
+    list_files = list()
   )
 
   # Initialize -----------------------------------------------------------------
@@ -104,12 +106,12 @@ buildCustom <- function(input,
     counter()
   }, ignoreInit = TRUE, {
     show("panel_build_custom_actions")
-    selectRows(proxy = dataTableProxy("dt_model_values"), selected = NULL)
     # initialize table selection to NULL every time panel is opened
     result$settings_df <- NULL
     result$tbl_modelsDetails <- NULL
     result$settings_tbl <- NULL
     .reloadtbl_modelsValue()
+
   })
 
   output$paneltitle_BuildCustom <- renderUI({
@@ -121,16 +123,41 @@ buildCustom <- function(input,
     logMessage("hiding panelBuildCustom")
   })
 
-  output$dt_model_values <- renderDT(server = FALSE, {
-    datatable(result$settings_tbl, caption = "Double click on Default values to edit",
-              editable = list(target = 'cell', disable = list(columns = c(1,2))), selection = "none", rownames = FALSE)
-  })
+  # render dynamically multiple tabs for Model Values section
+  output$tabs_BuildCustom <- renderUI({
+    nTabs <- length(result$tbl_modelsDetails$model_settings$parameter_groups)
+    if (nTabs == 0) {
+      # in case parameter_group is not available, create only one tab
+      param_group <- as.list(
+        c(
+          names(result$tbl_modelsDetails$model_settings[1:2]),
+          unlist(
+            lapply(result$tbl_modelsDetails$model_settings[3:length(result$tbl_modelsDetails$model_settings)], function(x) {
+              sapply(x, function(y) {
+                y$name
+              })
+            }))
+        )
+      )
+      names(param_group) <- NULL
+      myTabs = lapply(1, function (x) {
+        tabPanel(
+          title = "Model Parameters",
+          Global_funs(session, result$tbl_modelsDetails$model_settings, "generation",
+                      param_group)
+        )
+      })
+    } else {
+      myTabs = lapply(seq_len(nTabs), function (x) {
+        tabPanel(
+          title = result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$name,
+          Global_funs(session, result$tbl_modelsDetails$model_settings, "generation",
+                      result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$presentation_order)
+        )
+      })
+    }
 
-  # extrapolate changed cells
-  observeEvent(input$dt_model_values_cell_edit, {
-    inp_celledit <- input$dt_model_values_cell_edit
-    result$settings_df[inp_celledit$row, "value"] <- inp_celledit$value
-    result$settings_df[inp_celledit$row, "changed"] <- TRUE
+    do.call(tabsetPanel, myTabs)
   })
 
   # dynamically create fileInputs and DTOutputs
@@ -151,8 +178,10 @@ buildCustom <- function(input,
       ui_content <- list()
       for (i in seq_len(length(df_selectors))) {
         ui_content[[i * 2]] <- fluidRow(column(1), column(10, DTOutput(ns(paste0("dt_", result$outputID[i])))))
-        ui_content[[i * 2 - 1]] <- fluidRow(column(1), column(10, fileInput(inputId = ns(result$inputID[i]), label = label_pre[[i]],
-                                                                            multiple = TRUE, accept = accept[i])))
+        ui_content[[i * 2 - 1]] <- fluidRow(column(1),
+                                            column(10, fileInput(inputId = ns(result$inputID[i]),
+                                                                 label = label_pre[[i]],
+                                                                 multiple = TRUE, accept = accept[i])))
       }
       tagList(ui_content)
     } else {
@@ -199,101 +228,74 @@ buildCustom <- function(input,
         }
       })
     })
-
-    lapply(seq_len(length(h)), function(i) {
-      input_dt <- paste0("dt_", h[i], "_rows_selected")
-      observeEvent(input[[input_dt]], {
-        tbl <- result$tbl_files %>% filter(file_description == h[i])
-        tbl <- tbl[nrow(tbl):1,]
-        file_ids <- tbl[input[[input_dt]], "id"]
-        result$file_ids[[i]] <- file_ids
-        file_names <- tbl[input[[input_dt]], "filename"]
-        # because df is reversed, also order of row has to be reversed
-        result$list_files[[h[i]]] <- file_names
-        result$list_files[[h[i]]] <- result$list_files[[h[i]]][!is.na(result$list_files[[h[i]]])]
-        if (length(result$list_files[[h[i]]]) > 1) {
-          result$list_files[[h[i]]] <- as.list(result$list_files[[h[i]]])
-        }
-      })
-    })
+    .reloadtbl_modelsFiles()
   })
 
-  # output new analysis settings with changed values
+  # output new analysis settings with changed values through tabs
   observeEvent(input$abuttonselsettings, {
-    # update default choices for edited model settings
-    if (any(result$settings_df$changed)) {
-      new_settings <- result$settings_df %>% filter(changed)
-      res_mdlsettings <- result$tbl_modelsDetails$model_settings
-
-      invisible(lapply(seq_len(length(names(res_mdlsettings))), function(x) {
-        if (is.null(res_mdlsettings[[x]]$name)) {
-          lapply(seq_len(length(res_mdlsettings[[x]])), function(y) {
-            findSetting <- new_settings$names %in% res_mdlsettings[[x]][[y]]
-            # (typically new_settings$names will match the name attribute, i.e. res_mdlsettings[[x]][[y]]$name)
-            if (any(findSetting)) {
-              if (is.list(res_mdlsettings[[x]][[y]]$default) && !is.null(names(res_mdlsettings[[x]][[y]]$default))) {
-                # dict parameters case
-                result$tbl_modelsDetails$model_settings[[x]][[y]]$default <- jsonlite::fromJSON(new_settings$value[which(findSetting)])
-              } else {
-                if (is.list(res_mdlsettings[[x]][[y]]$default)) {
-                  # list parameters case
-                  result$tbl_modelsDetails$model_settings[[x]][[y]]$default <- as.list(strsplit(new_settings$value[which(findSetting)], split = ",  ")[[1]])
-                } else {
-                  result$tbl_modelsDetails$model_settings[[x]][[y]]$default <- strsplit(new_settings$value[which(findSetting)], split = ",  ")[[1]]
-                }
-              }
-            }
-          })
-        } else {
-          # e.g. Event Occurrence
-          findSetting <- new_settings$names %in% res_mdlsettings[[x]]
-          if (any(findSetting)) {
-            result$tbl_modelsDetails$model_settings[[x]]$default <- strsplit(new_settings$value[which(findSetting)], split = ",  ")[[1]]
-          }
-        }
-      }))
-    }
-
-    # TODO: update result$tbl_modelsDetails$model_setting just once, do above and below in memory first (i.e. make a function as outlined above)
-    #result$tbl_modelsDetails$model_settings$event_occurrence_id <- result$tbl_modelsDetails$model_settings$event_occurrence_id$default
-    #result$tbl_modelsDetails$model_settings$event_set <- result$tbl_modelsDetails$model_settings$event_set$default
-    # replace all settings similarly with just default values
     fetch_model_settings <- function(model_settings) {
-      model_settings <- model_settings %>% unlist(recursive = FALSE)
-      string_input <- unlist(lapply(grep("string_parameters", names(model_settings)), function(x) {
-        if (!is.null(model_settings[[x]]$default)) {
-          model_settings[[x]]$default
-        }
-      }))
 
-      dict_input <- lapply(grep("dictionary_parameters", names(model_settings)), function(x) {
-        if (!is.null(model_settings[[x]]$default)) {
-          model_settings[[x]]$default
-        }
+      n_string <- grep("string_parameters", names(model_settings))
+      string_input <- lapply(seq_len(length(model_settings[n_string]$string_parameters)), function(x) {
+        sapply(seq_len(length(model_settings[n_string]$string_parameters[[x]]$default)), function(z) {
+          if (!is.null(input[[paste0("string_parameters", x, z)]])) {
+            result$tbl_modelsDetails$model_settings$string_parameters[[x]]$default[z] <-
+              input[[paste0("string_parameters", x, z)]]
+          }
+          result$tbl_modelsDetails$model_settings$string_parameters[[x]]$default[z]
+        })
       })
 
-      dropdown_input <- lapply(grep("dropdown_parameters", names(model_settings)), function(x) {
-        if (!is.null(model_settings[[x]]$default)) {
-          model_settings[[x]]$default
-        }
+      n_dict <- grep("dictionary_parameters", names(model_settings))
+      dict_input <- lapply(seq_len(length(model_settings[n_dict]$dictionary_parameters)), function(x) {
+        sapply(seq_len(length(model_settings[n_dict]$dictionary_parameters[[x]]$default)), function(z) {
+          if (!is.null(input[[paste0("dictionary_parameters", x, z)]])) {
+            result$tbl_modelsDetails$model_settings$dictionary_parameters[[x]]$default[z] <-
+              input[[paste0("dictionary_parameters", x, z)]]
+          }
+          result$tbl_modelsDetails$model_settings$dictionary_parameters[[x]]$default[z]
+        })
       })
 
-      # below is purposedly list() rather than NULL in case there are none (i.e. not doing unlist() on purpose)!
-      boolean_input <- lapply(grep("boolean_parameters", names(model_settings)), function(x) {
-        if (!is.null(model_settings[[x]]$default)) {
-          as.logical(model_settings[[x]]$default)
-        }
+      n_dropdown <- grep("dropdown_parameters", names(model_settings))
+      dropdown_input <- lapply(seq_len(length(model_settings[n_dropdown]$dropdown_parameters)), function(x) {
+        sapply(seq_len(length(model_settings[n_dropdown]$dropdown_parameters[[x]]$default)), function(z) {
+          if (!is.null(input[[paste0("dropdown_parameters", x)]])) {
+            result$tbl_modelsDetails$model_settings$dropdown_parameters[[x]]$default[z] <-
+              input[[paste0("dropdown_parameters", x)]]
+          }
+          result$tbl_modelsDetails$model_settings$dropdown_parameters[[x]]$default[z]
+        })
       })
 
-      float_input <- lapply(grep("float_parameters", names(model_settings)), function(x) {
-        if (!is.null(model_settings[[x]]$default)) {
-          model_settings[[x]]$default
-        }
+      n_bool <- grep("boolean_parameters", names(model_settings))
+      boolean_input <- lapply(seq_len(length(model_settings[n_bool]$boolean_parameters)), function(x) {
+        sapply(seq_len(length(model_settings[n_bool]$boolean_parameters[[x]]$default)), function(z) {
+          if (!is.null(input[[paste0("boolean_parameters", x)]])) {
+            result$tbl_modelsDetails$model_settings$boolean_parameters[[x]]$default[z] <-
+              input[[paste0("boolean_parameters", x)]]
+          }
+          unlist(result$tbl_modelsDetails$model_settings$boolean_parameters[[x]]$default[z])
+        })
       })
 
-      list_input <- lapply(grep("list_parameters", names(model_settings)), function(x) {
-        if (!is.null(model_settings[[x]]$default)) {
-          model_settings[[x]]$default
+      n_float <- grep("float_parameters", names(model_settings))
+      float_input <- lapply(seq_len(length(model_settings[n_float]$float_parameters)), function(x) {
+        sapply(seq_len(length(model_settings[n_float]$float_parameters[[x]]$default)), function(z) {
+          if (!is.null(input[[paste0("float_parameters", x)]])) {
+            result$tbl_modelsDetails$model_settings$float_parameters[[x]]$default[z] <-
+              input[[paste0("float_parameters", x)]]
+          }
+          result$tbl_modelsDetails$model_settings$float_parameters[[x]]$default[z]
+        })
+      })
+
+      n_list <- grep("list_parameters", names(model_settings))
+      list_input <- lapply(seq_len(length(model_settings[n_list]$list_parameters)), function(x) {
+        if (!is.null(input[[paste0("list_parameters", x)]])) {
+          result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default <-
+            as.list(strsplit(input[[paste0("list_parameters", x)]], ",")[[1]])
+          result$tbl_modelsDetails$model_settings$list_parameters[[x]]$default
         }
       })
 
@@ -313,19 +315,20 @@ buildCustom <- function(input,
       inputs_name <- list()
       for (param in seq_len(length(params_list))) {
         if (length(inputs_list[[param]]) > 0) {
-          param_name <- unlist(lapply(grep(params_list[[param]], names(model_settings)), function(i) {
-            model_settings[[i]][["name"]]
+          n_param <- grep(params_list[[param]], names(model_settings))
+          param_name <- unlist(lapply(seq_len(length(model_settings[n_param][[1]])), function(i) {
+            # model_settings[i][[1]][[param]][["name"]]
+            model_settings[n_param][[1]][[i]][["name"]]
           }))
           inputs_name[[param]] <- param_name
         }
         # if a param is NULL and skipped, it will result in a NULL entry in the inputs_name list that will be removed by the unlist below
       }
       inputs_name <- unlist(inputs_name)
-
       # find boolean parameters names
       if (length(boolean_input) > 0) {
         boolean_name <- lapply(seq_len(length(boolean_input)), function(i) {
-          model_match <- model_settings[grep("boolean_parameters", names(model_settings))][[i]]
+          model_match <- model_settings[grep("boolean_parameters", names(model_settings))]$boolean_parameters[[i]]
           model_match[["name"]]
         })
       } else {
@@ -333,8 +336,9 @@ buildCustom <- function(input,
       }
 
       # create model settings for analysis settings
-      model_settings_out <- c(model_settings$event_set.default,
-                              model_settings$event_occurrence_id.default,
+      model_settings_out <- c(input$event_set_g,
+                              input$event_occurrence_g,
+                              input$inputnumsamples,
                               # note that boolean_input is a list, making sure that the result of this c() is a flat list!
                               boolean_input,
                               string_input,
@@ -343,10 +347,10 @@ buildCustom <- function(input,
                               float_input,
                               dropdown_input)
       # NULL or list() elements won't survive the c() above!
-
       # create list/vector of names for model settings
       names_full_list <- c("event_set",
                            "event_occurrence_id",
+                           "number_of_samples",
                            boolean_name,
                            inputs_name)
 
@@ -369,10 +373,29 @@ buildCustom <- function(input,
                         "Model settings filtered by chosen entries.")
     gul_summaries <- summary_template
 
+    h <- unlist(result$inputID)
+    lapply(seq_len(length(h)), function(i) {
+      input_dt <- paste0("dt_", h[i], "_rows_selected")
+      if (!is.null(input[[input_dt]])) {
+        tbl <- result$tbl_files %>% filter(file_description == h[i])
+        tbl <- tbl[nrow(tbl):1,]
+        file_ids <- tbl[input[[input_dt]], "id"]
+        result$file_ids[[i]] <- file_ids
+        file_names <- tbl[input[[input_dt]], "filename"]
+        # because df is reversed, also order of row has to be reversed
+        result$list_files[[h[i]]] <- file_names
+        result$list_files[[h[i]]] <- result$list_files[[h[i]]][!is.na(result$list_files[[h[i]]])]
+        if (length(result$list_files[[h[i]]]) > 1) {
+          result$list_files[[h[i]]] <- as.list(result$list_files[[h[i]]])
+        }
+        result$list_files[[h[i]]]
+      }
+    })
+
     result$filtered_analysis_settings <- list(analysis_settings = c(
       list(
-        module_supplier_id = supplierID(),
-        model_version_id = versionID(),
+        model_supplier_id = supplierID(),
+        model_name_id = modelID(),
         number_of_samples = input$inputnumsamples,
         model_settings = c(filtered_settings, result$list_files),
         gul_output = FALSE,
@@ -386,98 +409,6 @@ buildCustom <- function(input,
       query_path = paste("models", modelID(), "settings", sep = "/"),
       query_method = "GET"
     )
-    result$tbl_files <- session$userData$data_hub$return_tbl_dataFiles(name = "")
-    result$list_files <- list()
-    result$file_ids <- list()
-
-    # get entries for table: name, description and default value(s)
-    tbl_mdl_settings <- result$tbl_modelsDetails$model_settings
-    # drop "parameter_groups" (and potentially other unknown entries):
-    subset_settings <- names(tbl_mdl_settings) %in% c("event_set",
-                                                      "event_occurrence_id",
-                                                      "string_parameters",
-                                                      "boolean_parameters",
-                                                      "float_parameters",
-                                                      "list_parameters",
-                                                      "dictionary_parameters",
-                                                      "dropdown_parameters")
-    tbl_mdl_settings <- tbl_mdl_settings[subset_settings]
-    order_list <- unlist(lapply(seq_len(length(result$tbl_modelsDetails$model_settings$parameter_groups)), function(x) {
-      unlist(lapply(seq_len(length(result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$presentation_order)), function(y) {
-        result$tbl_modelsDetails$model_settings$parameter_groups[[x]]$presentation_order[[y]]
-      }))
-    }))
-
-    settings_names <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
-      if (is.null(tbl_mdl_settings[[x]]$name)) {
-        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
-          tbl_mdl_settings[[x]][[y]]$name
-        })
-      } else {
-        tbl_mdl_settings[[x]]$name
-      }
-    }))
-
-    intersect_n <- intersect(order_list, settings_names)
-    if (length(intersect_n) != length(settings_names)) {
-      extras <- unlist(lapply(settings_names, function(x) {
-        if (x %notin% intersect_n) {
-          grep(x, settings_names)
-        }
-      }))
-    } else {
-      extras <- NULL
-    }
-    reorder_nums <- unlist(lapply(intersect_n, function(x) {grep(x, settings_names)}))
-    reorder_names <- c(settings_names[extras], settings_names[reorder_nums])
-
-    settings_desc <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
-      if (is.null(tbl_mdl_settings[[x]]$desc)) {
-        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
-          tbl_mdl_settings[[x]][[y]]$desc
-        })
-      } else {
-        tbl_mdl_settings[[x]]$desc
-      }
-    }))
-    reorder_desc <- c(settings_desc[extras], settings_desc[reorder_nums])
-
-    settings_tooltip <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
-      if (is.null(tbl_mdl_settings[[x]]$tooltip)) {
-        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
-          tbl_mdl_settings[[x]][[y]]$tooltip
-        })
-      } else {
-        tbl_mdl_settings[[x]]$tooltip
-      }
-    }))
-    reorder_tooltip <- c(settings_tooltip[extras], settings_tooltip[reorder_nums])
-
-    settings_default <- unlist(lapply(seq_len(length(names(tbl_mdl_settings))), function(x) {
-      if (is.null(tbl_mdl_settings[[x]]$default)) {
-        lapply(seq_len(length(tbl_mdl_settings[[x]])), function(y) {
-          dflt <- tbl_mdl_settings[[x]][[y]]$default
-          if (is.list(dflt) && !is.null(names(dflt))) {
-            paste(jsonlite::toJSON(dflt))
-          } else {
-            # below works on a list same as on a vector
-            paste(dflt, collapse = ",  ")
-          }
-        })
-      } else {
-        # e.g. event set and event occurrence
-        # below works on a list same as on a vector
-        paste(tbl_mdl_settings[[x]]$default, collapse = ",  ")
-      }
-    }))
-    reorder_default <- c(settings_default[extras], settings_default[reorder_nums])
-
-    result$settings_df <- data.frame(names = reorder_names, descr = reorder_desc, tooltip = reorder_tooltip, value = reorder_default,
-                                     changed = rep(FALSE, times = length(settings_names)), stringsAsFactors = FALSE)
-    tmp_df <- result$settings_df[, c("names", "descr", "tooltip", "value")]
-    colnames(tmp_df) <- c("Setting Name", "Description", "Tooltip", "Default")
-    # output$dt_model_values depends (renders) on this one:
-    result$settings_tbl <- tmp_df
     result$settings_tbl
   }
 
@@ -517,6 +448,7 @@ buildCustom <- function(input,
     .reloadtbl_modelsFiles()
     invisible()
   }
+
   moduleOutput <- list(
     fullsettings = reactive({result$filtered_analysis_settings}),
     fileids = reactive({unlist(result$file_ids)}),

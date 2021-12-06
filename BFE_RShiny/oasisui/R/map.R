@@ -112,12 +112,23 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
 
 # Extract error messages
 .keys_errors_msg <- function(data, session, paramID) {
+  keys_success <- session$userData$data_hub$get_ana_success_summary_content(paramID)
   keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = paramID)
-  if (!is.null(keys_errors) && is.null(keys_errors$detail)) {
-    message <- group_by(keys_errors, LocID) %>%
-      summarize(message = paste(paste(PerilID, ":", Message), collapse = " / "))
-    if (length(as.numeric(keys_errors$LocID)) > 0) {
-      errmessage <- left_join(data, message, by = c("locnumber" = "LocID"))$message
+  # unify names cases for merging
+  names(keys_success) <- tolower(names(keys_success))
+  names(keys_errors) <- tolower(names(keys_errors))
+
+  if (!is.null(keys_errors) && is.null(keys_errors$detail) && !is.null(keys_success)) {
+    if (length(as.numeric(keys_errors$locid)) > 0) {
+      key_chain <- left_join(keys_success, keys_errors, by = c("loc_id" = "locid"))
+      message <- group_by(key_chain, loc_id) %>%
+        summarize(message = paste(paste(perilid, ":", message), collapse = " / "))
+      if (grepl("locnumber.x", names(data))) {
+        names(data) <- gsub(".x", "", names(data))
+      }
+      data$locnumber <- as.character(data$locnumber)
+      message$loc_id <- as.character(message$loc_id)
+      errmessage <- left_join(data, message, by = c("locnumber" = "loc_id"))$message
     } else {
       errmessage <- rep_len(NA, nrow(data))
     }

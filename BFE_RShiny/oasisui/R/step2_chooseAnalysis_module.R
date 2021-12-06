@@ -569,13 +569,30 @@ step2_chooseAnalysis <- function(input, output, session,
 
   # Show/hide Model Details Panel
   observeEvent(input$abuttonmodeldetails, {
-    hide("panelAnalysisDetails")
-    hide("panelAnalysisLog")
-    hide("panelAnalysisGenInputs")
-    hide("panelBuildCustom")
-    logMessage("showing panelModelDetails")
-    show("panelModelDetails")
-    logMessage("showing panelModelDetails")
+    model_settings <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", result$modelID, "settings", sep = "/"),
+      query_method = "GET"
+    )
+    if (length(model_settings$detail) > 0) {
+      if (model_settings$detail == "Not found.") {
+        disable("anaName")
+        showModal(modalDialog(
+          "No model settings file present for this model",
+          easyClose = TRUE,
+          footer = tagList(
+            modalButton("Ok")
+          )
+        ))
+      }
+    } else {
+      hide("panelAnalysisDetails")
+      hide("panelAnalysisLog")
+      hide("panelAnalysisGenInputs")
+      hide("panelBuildCustom")
+      logMessage("showing panelModelDetails")
+      show("panelModelDetails")
+      logMessage("showing panelModelDetails")
+    }
   })
 
   observeEvent(input$abuttonbuildcustom, {
@@ -587,7 +604,6 @@ step2_chooseAnalysis <- function(input, output, session,
     hide("panelModelDetails")
     disable("anaName")
     disable("abuttonsubmit")
-    logMessage("showing panelBuildCustom")
   })
 
   # Hide panel if model id changes
@@ -637,6 +653,7 @@ step2_chooseAnalysis <- function(input, output, session,
   # Create new Analysis --------------------------------------------------------
   observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
+
       post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", sep = "/"),
                                                                                   query_body = list(name = input$anaName,
                                                                                                     portfolio = portfolioID(),
@@ -657,7 +674,7 @@ step2_chooseAnalysis <- function(input, output, session,
       result$analysisNAME <- content(post_portfolios_create_analysis$result)$name
 
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
-
+      # browser()
       if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) &&
           model_settings$model_configurable && !is.null(sub_modules$buildCustom$fullsettings())) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
@@ -669,9 +686,9 @@ step2_chooseAnalysis <- function(input, output, session,
 
         ana_settings_step_2 <- list(analysis_settings = c(
           list(
-            module_supplier_id = result$supplierID,
-            model_version_id = result$versionID,
-            number_of_samples = 0,
+            model_supplier_id = result$supplierID,
+            model_name_id = result$modelID,
+            number_of_samples = 10,
             model_settings = NULL,
             gul_output = FALSE,
             gul_summaries = list(gul_summaries))
@@ -682,8 +699,11 @@ step2_chooseAnalysis <- function(input, output, session,
           query_body = ana_settings_step_2
         )
       }
-      if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
+
+      if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success" && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
+
         fileids <- as.list(sub_modules$buildCustom$fileids())
+
         patch_analyses <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", result$analysisID, sep = "/"),
                                                                    query_body = list(complex_model_data_files = fileids),
                                                                    query_method = "PATCH")
@@ -693,7 +713,7 @@ step2_chooseAnalysis <- function(input, output, session,
         query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/")
       )
 
-      if (input_generation$status == "Success" && patch_analyses$status == "Success") {
+      if (input_generation$status == "Success") {
         oasisuiNotification(type = "message",
                             paste0("Analysis ", input$anaName, " created."))
         .reloadAnaData()
@@ -744,6 +764,9 @@ step2_chooseAnalysis <- function(input, output, session,
           query_path = paste("models", result$modelID, "settings", sep = "/"),
           query_method = "GET"
         )
+        if (!is.null(model_settings$detail) && model_settings$detail == "Not found.") {
+          disable("anaName")
+        }
         if (length(model_settings) > 0 && !is.null(model_settings$model_configurable)) {
           if (model_settings$model_configurable) {
             enable("abuttonbuildcustom")

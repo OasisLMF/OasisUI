@@ -76,7 +76,7 @@ panelModelParams <- function(id) {
         div(
           id = ns("configureAnaParamsAdvanced"),
           align = "left",
-          numericInput(ns("tinputnoofsample"), label = "Number of Samples:", value = 10),
+          numericInput(ns("tinputnoofsample"), label = "Number of Samples:", value = 9),
           numericInput(ns("tinputthreshold"), label = "Loss Threshold:", value = 0),
           uiOutput(ns("advanced_model_param")),
           oasisuiButton(inputId = ns("abuttonbasic"), label = "Basic")
@@ -721,6 +721,7 @@ def_out_config <- function(input,
       if (!is.null(tbl_modelsDetails)) {
         subset_settings <- names(tbl_modelsDetails$model_settings) %in% c("event_set",
                                                                           "event_occurrence_id",
+                                                                          "number_of_samples",
                                                                           "string_parameters",
                                                                           "boolean_parameters",
                                                                           "float_parameters",
@@ -746,10 +747,10 @@ def_out_config <- function(input,
         output$basic_model_param <- renderUI({
           basicConfig_funs(session, model_settings)
         })
-
         # Advanced model params
+        updateNumericInput(session, "tinputnoofsample", value = tbl_ana_settings$number_of_samples)
         output$advanced_model_param <- renderUI({
-          advancedConfig_funs(session, model_settings)
+            advancedConfig_funs(session, model_settings)
         })
       }
     }
@@ -890,6 +891,7 @@ def_out_config <- function(input,
       # create model settings for analysis settings
       model_settings <- c(input$event_set,
                           input$event_occurrence,
+                          input$tinputnoofsample,
                           # note that boolean_input is a list, making sure that the result of this c() is a flat list!
                           boolean_input,
                           string_input,
@@ -902,6 +904,7 @@ def_out_config <- function(input,
       # create list/vector of names for model settings
       names_full_list <- c("event_set",
                            "event_occurrence_id",
+                           "number_of_samples",
                            boolean_name,
                            inputs_name)
       # remove all NA elements
@@ -932,8 +935,8 @@ def_out_config <- function(input,
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
-      "model_version_id" = modelData[[tbl_modelsDataNames$version_id]],
-      "module_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
+      "model_name_id" = modelData[[tbl_modelsDataNames$model_id]],
+      "model_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
       "number_of_samples" = as.integer(input$tinputnoofsample),
       # potential new tag portfolio_id
       "prog_id" = as.integer(session$userData$oasisapi$api_return_query_res(query_path = paste("analyses", analysisID(), sep = "/"),
