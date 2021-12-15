@@ -318,6 +318,20 @@ OasisAPI <- R6Class(
         if (length(content_lst) > 1 || length(content_lst[[1]]) > 1) {
           non_null_content_lst <- lapply(content_lst, Filter, f = Negate(is.null))
           non_null_content_lst <- Filter(Negate(is.null), non_null_content_lst)
+          for (i in seq_len(length(non_null_content_lst))) {
+            if (!is.null(non_null_content_lst[[i]]$groups)) {
+              grep_groups <- grep("groups", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_groups]
+            }
+            if (!is.null(non_null_content_lst[[i]]$analysis_chunks)) {
+              grep_chunks <- grep("analysis_chunks", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_chunks]
+            }
+            if (!is.null(non_null_content_lst[[i]]$sub_task_error_ids)) {
+              grep_sub_errors<- grep("sub_task_error_ids", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_sub_errors]
+            }
+          }
           df <- bind_rows(non_null_content_lst) %>%
             as.data.frame()
         } else if (length(content_lst) == 1 && length(content_lst[[1]]) == 1 && any(grepl("/", content_lst[[1]]))){
