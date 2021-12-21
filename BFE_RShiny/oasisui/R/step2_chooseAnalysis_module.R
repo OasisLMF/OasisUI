@@ -687,7 +687,7 @@ step2_chooseAnalysis <- function(input, output, session,
         ana_settings_step_2 <- list(analysis_settings = c(
           list(
             model_supplier_id = result$supplierID,
-            model_name_id = result$modelID,
+            model_name_id = result$versionID,
             number_of_samples = 10,
             model_settings = NULL,
             gul_output = FALSE,

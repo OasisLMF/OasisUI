@@ -395,7 +395,7 @@ buildCustom <- function(input,
     result$filtered_analysis_settings <- list(analysis_settings = c(
       list(
         model_supplier_id = supplierID(),
-        model_name_id = modelID(),
+        model_name_id = versionID(),
         number_of_samples = input$inputnumsamples,
         model_settings = c(filtered_settings, result$list_files),
         gul_output = FALSE,
