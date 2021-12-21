@@ -53,7 +53,7 @@ buildCustomUI <- function(id) {
 #' @param portfolioID Selected portfolio ID.
 #' @param modelID Selected model ID.
 #' @param supplierID Selected supplier model ID.
-#' @param versionID Selected model ID version.
+#' @param nameID Selected model ID version.
 #' @param analysisID Selected analysis ID.
 #'
 #' @describeIn buildCustom Allows user to build their own mode on the fly.
@@ -71,7 +71,7 @@ buildCustom <- function(input,
                         portfolioID,
                         modelID,
                         supplierID,
-                        versionID,
+                        nameID,
                         analysisID,
                         counter,
                         active = reactive(TRUE)) {
@@ -395,7 +395,7 @@ buildCustom <- function(input,
     result$filtered_analysis_settings <- list(analysis_settings = c(
       list(
         model_supplier_id = supplierID(),
-        model_name_id = versionID(),
+        model_name_id = nameID(),
         number_of_samples = input$inputnumsamples,
         model_settings = c(filtered_settings, result$list_files),
         gul_output = FALSE,

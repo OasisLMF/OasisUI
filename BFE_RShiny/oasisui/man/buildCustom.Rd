@@ -11,7 +11,7 @@ buildCustom(
   portfolioID,
   modelID,
   supplierID,
-  versionID,
+  nameID,
   analysisID,
   counter,
   active = reactive(TRUE)
@@ -26,7 +26,7 @@ buildCustom(
 
 \item{supplierID}{Selected supplier model ID.}
 
-\item{versionID}{Selected model ID version.}
+\item{nameID}{Selected model name ID.}
 
 \item{analysisID}{Selected analysis ID.}
 
