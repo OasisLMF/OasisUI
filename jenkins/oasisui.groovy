@@ -87,6 +87,13 @@ node {
             }
         )
 
+        stage('Set version number'){
+            dir(source_workspace){
+                sh "sed -i 's/Version*/Version: ${params.RELEASE_TAG}/g' BFE_RShiny/oasisui/DESCRIPTION"  
+            }
+            //sh "sed -i 's/FROM.*/FROM python:3.8/g' docker/Dockerfile.mdk-tester"
+        }
+
         // DOCKER BUILD
         parallel(
             build_proxy: {
