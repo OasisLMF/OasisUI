@@ -1,6 +1,14 @@
 OasisUI Changelog
 ==================
 
+`1.11.1`_
+ ---------
+* [#228, #223](https://github.com/OasisLMF/OasisUI/pull/263) - Feature/various issues
+* [#265](https://github.com/OasisLMF/OasisUI/pull/265) - Update analysis setting names
+* [#267](https://github.com/OasisLMF/OasisUI/pull/270) - Automaticly update version number on Jenkins build 
+* [#272](https://github.com/OasisLMF/OasisUI/pull/274) - analysis_settings generation is incorrectly setting 'model_name_id'
+.. _`1.11.1`:  https://github.com/OasisLMF/OasisUI/compare/1.11.0...1.11.1
+
 `1.11.0`_
  ---------
 * [#256](https://github.com/OasisLMF/OasisUI/pull/256) - Add Github templates
