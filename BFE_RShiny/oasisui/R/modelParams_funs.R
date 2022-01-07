@@ -228,10 +228,10 @@ advancedConfig_funs <- function(session, model_settings) {
         } else {
           label_widget <- gsub("_", " ", model_settings[[x]]$name)
         }
-        if (!is.null(model_settings[[x]][[y]]$stepsize)) {
-          step_size <- model_settings[[x]][[y]]$stepsize
+        if (!is.null(model_settings[[x]]$stepsize)) {
+          step_size <- model_settings[[x]]$stepsize
         } else {
-          step_size <- model_settings[[x]][[y]]$default
+          step_size <- model_settings[[x]]$default
         }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
           fluidRow(use_bs_popover(),
