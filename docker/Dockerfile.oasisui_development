@@ -36,7 +36,7 @@ RUN echo 'Sys.getenv("API_IP")' > /home/rstudio/.Rprofile && \
     echo 'Sys.getenv("ADMIN_MODE")' >> /home/rstudio/.Rprofile && \
     echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
 
-ENV API_IP=""
+ENV API_IP="127.0.0.1"
 ENV API_PORT="8000"
 ENV API_VERSION="v1"
 ENV API_SHARE_FILEPATH="./downloads"
