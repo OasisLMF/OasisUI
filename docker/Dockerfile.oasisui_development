@@ -1,0 +1,26 @@
+FROM rocker/verse:4.0.5
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnode-dev \
+    libcairo2-dev \
+    libxt-dev \
+    libcurl4-gnutls-dev \
+    libssl-dev \
+    libssh2-1-dev \
+    libxml2-dev \
+    apt-utils \
+    libjq-dev \
+    gdal-bin \
+    proj-bin \
+    libgdal-dev \
+    libudunits2-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+
+RUN R -e "install.packages('remotes')" && \
+    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')"
+
+RUN R -e "install.packages(c('arrow', 'bsplus', 'DT', 'data.table', 'dplyr', 'geojsonio', 'geosphere', 'ggplot2', 'htmltools', 'htmlwidgets', 'httr', 'jsonlite', 'leaflet', 'leaflet.extras', 'plotly', 'readr', 'revgeo', 'rgdal', 'R6', 'scales', 'shiny', 'shinycssloaders', 'shinyWidgets', 'tibble', 'tidyr', 'utils', 'V8'))"
