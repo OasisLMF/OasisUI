@@ -1,7 +1,6 @@
 #!/bin/bash
 
 SHARED_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-R_VER=4.0.5
 R_PROJECT_FILE=$SHARED_DIR/'oasisui_dev.Rproj'
 R_CONTAINER_NAME='rstudio_oasisui'
 
@@ -35,7 +34,6 @@ docker stop $R_CONTAINER_NAME && docker rm $R_CONTAINER_NAME
 docker build -f docker/Dockerfile.oasisui_development -t oasisui_dev .
 
 docker run -d \
-  #-p 127.0.0.1:$(echo $R_VER | sed 's/[.]//g')0:8787 \
   -e DISABLE_AUTH=true \
   -e USERID=$UID \
   -v $SHARED_DIR:/home/rstudio/oasisui \

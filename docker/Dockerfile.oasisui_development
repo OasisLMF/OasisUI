@@ -1,6 +1,6 @@
 FROM rocker/verse:4.0.5
 
-# Install apt dependencies for OasisUI 
+# Install apt dependencies for OasisUI
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libnode-dev \
     libcairo2-dev \
@@ -20,21 +20,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-
 # Install R dependencies
+COPY ./BFE_RShiny/oasisui/DESCRIPTION ./BFE_RShiny/oasisui/DESCRIPTION
 RUN R -e "install.packages('remotes')" && \
     R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')"
-RUN R -e "install.packages(c('arrow', 'bsplus', 'DT', 'data.table', 'dplyr', 'geojsonio', 'geosphere', 'ggplot2', 'htmltools', 'htmlwidgets', 'httr', 'jsonlite', 'leaflet', 'leaflet.extras', 'plotly', 'readr', 'revgeo', 'rgdal', 'R6', 'scales', 'shiny', 'shinycssloaders', 'shinyWidgets', 'tibble', 'tidyr', 'utils', 'V8'))"
+RUN R -e 'devtools::install(pkg = "./BFE_RShiny/oasisui", dependencies = TRUE)'
 
-
-# Create .Rprofile and set default values 
-RUN echo 'Sys.getenv("API_IP")' > /home/rstudio/.Rprofile && \
-    echo 'Sys.getenv("API_PORT")' >> /home/rstudio/.Rprofile && \
-    echo 'Sys.getenv("API_VERSION")' >> /home/rstudio/.Rprofile && \
-    echo 'Sys.getenv("API_SHARE_FILEPATH")' >> /home/rstudio/.Rprofile && \
-    echo 'Sys.getenv("OASIS_ENVIRONMENT")' >> /home/rstudio/.Rprofile && \
-    echo 'Sys.getenv("ADMIN_MODE")' >> /home/rstudio/.Rprofile && \
-    echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
+# Create .Rprofile and set default values
+RUN echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
 
 ENV API_IP="127.0.0.1"
 ENV API_PORT="8000"
