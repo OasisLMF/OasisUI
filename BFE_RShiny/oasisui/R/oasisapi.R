@@ -336,6 +336,10 @@ OasisAPI <- R6Class(
               grep_sub_errors<- grep("sub_task_error_ids", names(non_null_content_lst[[i]]))
               non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_sub_errors]
             }
+            if (!is.null(non_null_content_lst[[i]]$lookup_chunks)) {
+              grep_sub_errors<- grep("lookup_chunks", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_sub_errors]
+            }
           }
           df <- bind_rows(non_null_content_lst) %>%
             as.data.frame()
