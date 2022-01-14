@@ -674,7 +674,7 @@ step2_chooseAnalysis <- function(input, output, session,
       result$analysisNAME <- content(post_portfolios_create_analysis$result)$name
 
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
-      # browser()
+
       if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) &&
           model_settings$model_configurable && !is.null(sub_modules$buildCustom$fullsettings())) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
