@@ -224,7 +224,7 @@ step2_chooseAnalysis <- function(input, output, session,
   result <- reactiveValues(
     # reactive for modelID
     modelID = "",
-    versionID = "",
+    nameID = "",
     supplierID = "",
     # reactive value for model table
     tbl_modelsData = NULL,
@@ -319,7 +319,7 @@ step2_chooseAnalysis <- function(input, output, session,
     portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_models_rows_selected)) {
         result$modelID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$id]
-        result$versionID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$version_id]
+        result$nameID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$model_id]
         result$supplierID <- result$tbl_modelsData[input$dt_models_rows_selected, tbl_modelsDataNames$supplier_id]
       } else {
         result$modelID <- ""
@@ -628,7 +628,7 @@ step2_chooseAnalysis <- function(input, output, session,
     portfolioID = reactive({portfolioID()}),
     modelID = reactive({result$modelID}),
     supplierID = reactive({result$supplierID}),
-    versionID = reactive({result$versionID}),
+    nameID = reactive({result$nameID}),
     analysisID = reactive({result$analysisID}),
     counter = reactive({input$abuttonbuildcustom}),
     active = reactive(TRUE)
@@ -687,7 +687,7 @@ step2_chooseAnalysis <- function(input, output, session,
         ana_settings_step_2 <- list(analysis_settings = c(
           list(
             model_supplier_id = result$supplierID,
-            model_name_id = result$modelID,
+            model_name_id = result$nameID,
             number_of_samples = 10,
             model_settings = NULL,
             gul_output = FALSE,
