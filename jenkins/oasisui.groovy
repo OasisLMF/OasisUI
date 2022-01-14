@@ -87,6 +87,12 @@ node {
             }
         )
 
+        stage('Set version number'){
+            dir(source_workspace){
+                sh "sed -i 's/^Version:.*/Version: ${params.RELEASE_TAG}/g' BFE_RShiny/oasisui/DESCRIPTION"
+            }
+        }
+
         // DOCKER BUILD
         parallel(
             build_proxy: {
@@ -106,11 +112,6 @@ node {
         )
 
         // ToDO add testing here
-        //stage('Run Oasisui') {
-        //    dir('oasis_build') {
-        //        sh PIPELINE + " run_ui"
-        //    }
-        //}
 
         //Optionaly Publish to docker hub stage
         if (params.PUBLISH){

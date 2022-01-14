@@ -1,0 +1,37 @@
+FROM rocker/verse:4.0.5
+
+# Install apt dependencies for OasisUI
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnode-dev \
+    libcairo2-dev \
+    libxt-dev \
+    libcurl4-gnutls-dev \
+    libssl-dev \
+    libssh2-1-dev \
+    libxml2-dev \
+    apt-utils \
+    libjq-dev \
+    gdal-bin \
+    proj-bin \
+    libgdal-dev \
+    libudunits2-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install R dependencies
+COPY ./BFE_RShiny/oasisui/DESCRIPTION ./BFE_RShiny/oasisui/DESCRIPTION
+RUN R -e "install.packages('remotes')" && \
+    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')"
+RUN R -e 'devtools::install(pkg = "./BFE_RShiny/oasisui", dependencies = TRUE)'
+
+# Create .Rprofile and set default values
+RUN echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
+
+ENV API_IP="127.0.0.1"
+ENV API_PORT="8000"
+ENV API_VERSION="v1"
+ENV API_SHARE_FILEPATH="./downloads"
+ENV OASIS_ENVIRONMENT="dev"
+ENV ADMIN_MODE="admin"
