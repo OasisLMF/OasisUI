@@ -52,7 +52,7 @@ panelAnalysisTable <- function(id) {
                         div(id = ns("divAnalysisButtons"),
                             oasisuiTableButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
                               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttoncancelana, placement = "right"),
-                            oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+                            oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Run Log") %>%
                               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowlog, placement = "right")
                         ))
         ),

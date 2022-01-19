@@ -55,7 +55,7 @@ panelCreateAnalysesTable <- function(id) {
       column(12,
              oasisuiTableButton(inputId = ns("abuttonstartcancIG"), label = "Generate Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonstartcancIG, placement = "right"),
-             oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+             oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show IG Log") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowlog, placement = "right"),
              oasisuiTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowanadetails, placement = "right")
