@@ -22,7 +22,8 @@ check_loc <- function(analysisID, portfolioID, data_hub) {
   uploaded_locs <- data_hub$get_pf_location_content(id = portfolioID) %>%
     mutate(loc_idx = seq(nrow(.)) - 1)
   modelled_locs <- data_hub$get_ana_dataset_content(id = analysisID, dataset_identifier = "lookup_success_file")
-
+  intersect_names <- setdiff(intersect(names(modelled_locs), names(uploaded_locs)), "loc_idx")
+  modelled_locs <- modelled_locs[, !(names(modelled_locs) %in% intersect_names)]
   uploaded_locs_check <- full_join(uploaded_locs, modelled_locs, by = "loc_idx") %>%
     select(-one_of(names(modelled_locs %>% select(-"peril_id")))) %>%
     distinct()

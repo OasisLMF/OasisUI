@@ -702,9 +702,10 @@ panelOutputModule <- function(input, output, session,
       if (inputplottype() == "loss for return period map") {
         loss <- which(between(data$loss, min(as.numeric(input$pltlosses)), max(as.numeric(input$pltlosses))))
         pf_loc_content <- session$userData$data_hub$get_pf_location_content(id = portfId())
-        lat <- pf_loc_content$Latitude[loss]
-        long <- pf_loc_content$Longitude[loss]
-        loc_num <- pf_loc_content$LocNumber[loss]
+        names(pf_loc_content) <- tolower(names(pf_loc_content))
+        lat <- pf_loc_content$latitude[loss]
+        long <- pf_loc_content$longitude[loss]
+        loc_num <- pf_loc_content$locnumber[loss]
 
         popup <- lapply(seq(1, length(data$loss[loss])), function(x) {
           as.character(div(

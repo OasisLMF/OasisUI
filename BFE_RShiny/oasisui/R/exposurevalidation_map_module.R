@@ -485,6 +485,7 @@ exposurevalidationmap <- function(input,
   # Export new TIV table to csv ------------------------------------------------
   observeEvent(input$exp_tivs, {
     result$circle_locs <- do.call(rbind, lapply(result$info_circles$locID_list, function(x) {
+      #TODO
       result$uploaded_locs_check %>% filter(LocNumber == x)
     }))
   })
