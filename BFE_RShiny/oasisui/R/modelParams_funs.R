@@ -228,6 +228,11 @@ advancedConfig_funs <- function(session, model_settings) {
         } else {
           label_widget <- gsub("_", " ", model_settings[[x]]$name)
         }
+        if (!is.null(model_settings[[x]]$stepsize)) {
+          step_size <- model_settings[[x]]$stepsize
+        } else {
+          step_size <- model_settings[[x]]$default
+        }
         if (is.null(model_settings[[x]]$used_for) || model_settings[[x]]$used_for == "losses") {
           fluidRow(use_bs_popover(),
                    column(10,
@@ -236,6 +241,7 @@ advancedConfig_funs <- function(session, model_settings) {
                             label = paste0(label_widget, ":") %>% capitalize_first_letter(),
                             min = model_settings[[x]]$min,
                             max = model_settings[[x]]$max,
+                            step = step_size,
                             value = model_settings[[x]]$default
                           )
                    ),
@@ -570,6 +576,11 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
           } else {
             label_widget <- gsub("_", " ", model_settings[[x]][[y]]$name)
           }
+          if (!is.null(model_settings[[x]][[y]]$stepsize)) {
+            step_size <- model_settings[[x]][[y]]$stepsize
+          } else {
+            step_size <- model_settings[[x]][[y]]$default
+          }
           if (is.null(model_settings[[x]][[y]]$used_for) || model_settings[[x]][[y]]$used_for == ui_step) {
             fluidRow(use_bs_popover(),
                      column(4,
@@ -578,6 +589,7 @@ Global_funs <- function(session, model_settings, ui_step, ls_param_group) {
                               label = paste0(label_widget, ":") %>% capitalize_first_letter(),
                               min = model_settings[[x]][[y]]$min,
                               max = model_settings[[x]][[y]]$max,
+                              step = step_size,
                               value = model_settings[[x]][[y]]$default
                             )
                      ),

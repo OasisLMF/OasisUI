@@ -54,7 +54,6 @@ portfolio_details <- function(input,
                               active = reactive(TRUE)) {
 
   ns <- session$ns
-
   # Reactive Values ------------------------------------------------------------
   result <- reactiveValues(
     dt_uploaded = NULL
@@ -102,6 +101,6 @@ portfolio_details <- function(input,
   # Reload uploaded inputs table -----------------------------------------------
   .reloadtbl_portfolioDetails <- function() {
     logMessage(".reloadtbl_portfolioDetails called")
-          result$dt_uploaded  <- arrange(session$userData$data_hub$get_pf_data_list(portfolioID()), files)
+    result$dt_uploaded  <- arrange(session$userData$data_hub$get_pf_data_list(portfolioID()))
   }
 }

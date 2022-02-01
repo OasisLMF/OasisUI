@@ -95,6 +95,7 @@ OasisAPI <- R6Class(
     access_token = NULL, # String for API log in; default is NULL
     refresh_token = NULL, # String for API access token refresh; default is NULL
     version = NULL, # Parameter for API connection; default is NULL
+    subpath = NULL, # Parameter in case that there is no port
     conn_init = NULL # Structure with the api connection info; default is NULL
   ),
   # Public ----
@@ -110,17 +111,21 @@ OasisAPI <- R6Class(
     },
     api_init = function(host, port, scheme = c("http", "https"), ...) {
       stopifnot(length(host) == 1)
+      subpath <- paste(unlist(strsplit(host, "/"))[-1], collapse = "/")
       stopifnot(length(port) == 1)
+      url = paste0(scheme[1], "://", host)
+      if (port != "") url = paste0(url, ":", port)
       conn_init <- structure(
         list(
           host = host,
           port = port,
           scheme = scheme[1],
-          url = paste0(scheme[1], "://", host, ":", port)
+          url = url
         ),
         class = c("apisettings")
       )
       private$url <- conn_init$url
+      private$subpath <- subpath
       private$conn_init <- conn_init
     },
     # > get conn_init ----
@@ -139,7 +144,7 @@ OasisAPI <- R6Class(
           config = add_headers(
             Accept = private$httptype
           ),
-          path = "healthcheck/"
+          path = paste(private$subpath, "healthcheck/", sep = "/")
         ),
         error = function(e) {
           stop(paste("Health check failed:", e$message))
@@ -173,7 +178,7 @@ OasisAPI <- R6Class(
       response <- do.call(meth, eval(args, envir = sys.parent()))
       token_invalid <- status_code(response) == 401L
       # probably expired
-      if (token_invalid) {
+      if (token_invalid || status_code(response) == 403L) {
         logMessage("api: refreshing stale OAuth token")
         res <- self$api_post_refresh_token()
         if (res$status == "Success") {
@@ -194,7 +199,7 @@ OasisAPI <- R6Class(
         ),
         body = list(username = user, password = pwd),
         encode = "json",
-        path = "access_token/"
+        path = paste(private$subpath, "access_token/", sep = "/")
       )
 
       self$api_handle_response(response)
@@ -225,7 +230,7 @@ OasisAPI <- R6Class(
           Authorization = sprintf("Bearer %s", self$get_refresh_token())
         ),
         encode = "json",
-        path = "refresh_token/"
+        path = paste(private$subpath, "refresh_token/", sep = "/")
       )
 
       self$api_handle_response(response)
@@ -242,7 +247,7 @@ OasisAPI <- R6Class(
           Accept = private$httptype,
           Authorization = sprintf("Bearer %s", private$access_token)
         ),
-        path = paste(query_path_basic, "", sep = "/"),
+        path = paste(private$subpath, query_path_basic, "", sep = "/"),
         query = query_list
       ))
       response <- self$api_fetch_response(query_method, request_list)
@@ -256,7 +261,7 @@ OasisAPI <- R6Class(
           Accept = private$httptype,
           Authorization = sprintf("Bearer %s", private$access_token)
         ),
-        path = paste(private$version, query_path, "", sep = "/"),
+        path = paste(private$subpath, private$version, query_path, "", sep = "/"),
         query = query_list
       ))
       response <- self$api_fetch_response(query_method, request_list)
@@ -283,7 +288,7 @@ OasisAPI <- R6Class(
         ),
         body = list(file = upload_file(query_body)),
         encode = "multipart",
-        path = paste(private$version, query_path, "", sep = "/")
+        path = paste(private$subpath, private$version, query_path, "", sep = "/")
       ))
       response <- self$api_fetch_response("POST", request_list)
       self$api_handle_response(response)
@@ -297,7 +302,7 @@ OasisAPI <- R6Class(
         ),
         body = query_body,
         encode = "json",
-        path = paste(private$version, query_path, "", sep = "/")
+        path = paste(private$subpath, private$version, query_path, "", sep = "/")
       ))
       response <- self$api_fetch_response(query_method, request_list)
       self$api_handle_response(response)
@@ -313,11 +318,29 @@ OasisAPI <- R6Class(
         if (length(content_lst[[1]]) > 1) {
           content_lst <- lapply(content_lst, function(x) {lapply(x, showname)})
         } else {
-          content_lst <- lapply(content_lst, showname)
+          content_lst <- list(lapply(content_lst, showname))
         }
         if (length(content_lst) > 1 || length(content_lst[[1]]) > 1) {
           non_null_content_lst <- lapply(content_lst, Filter, f = Negate(is.null))
           non_null_content_lst <- Filter(Negate(is.null), non_null_content_lst)
+          for (i in seq_len(length(non_null_content_lst))) {
+            if (!is.null(non_null_content_lst[[i]]$groups)) {
+              grep_groups <- grep("groups", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_groups]
+            }
+            if (!is.null(non_null_content_lst[[i]]$analysis_chunks)) {
+              grep_chunks <- grep("analysis_chunks", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_chunks]
+            }
+            if (!is.null(non_null_content_lst[[i]]$sub_task_error_ids)) {
+              grep_sub_errors<- grep("sub_task_error_ids", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_sub_errors]
+            }
+            if (!is.null(non_null_content_lst[[i]]$lookup_chunks)) {
+              grep_sub_errors<- grep("lookup_chunks", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_sub_errors]
+            }
+          }
           df <- bind_rows(non_null_content_lst) %>%
             as.data.frame()
         } else if (length(content_lst) == 1 && length(content_lst[[1]]) == 1 && any(grepl("/", content_lst[[1]]))){
@@ -338,7 +361,7 @@ OasisAPI <- R6Class(
           Accept = private$httptype,
           Authorization = sprintf("Bearer %s",private$access_token)
         ),
-        path = paste(private$version, "analyses", id, label, "", sep = "/"),
+        path = paste(private$subpath, private$version, "analyses", id, label, "", sep = "/"),
         write_disk(dest, overwrite = TRUE)
       ))
       response <- self$api_fetch_response("GET", request_list)

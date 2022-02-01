@@ -52,7 +52,7 @@ panelAnalysisTable <- function(id) {
                         div(id = ns("divAnalysisButtons"),
                             oasisuiTableButton(inputId = ns("abuttoncancelana"), label = "Cancel Analysis Run") %>%
                               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttoncancelana, placement = "right"),
-                            oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+                            oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Run Log") %>%
                               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowlog, placement = "right")
                         ))
         ),
@@ -524,7 +524,7 @@ step3_configureOutput <- function(input, output, session,
     if (!is.null(result$anaID)) {
         result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste("analyses", result$anaID, "run_traceback_file",
                                                                              sep = "/"))
-        result$tbl_analysisrunlog <- pre(HTML(result$tbl_analysisrunlog))
+        result$tbl_analysisrunlog <- pre(HTML(result$tbl_analysisrunlog[[1]]))
     } else {
       result$tbl_analysisrunlog <-  NULL
     }

@@ -55,7 +55,7 @@ panelCreateAnalysesTable <- function(id) {
       column(12,
              oasisuiTableButton(inputId = ns("abuttonstartcancIG"), label = "Generate Inputs") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonstartcancIG, placement = "right"),
-             oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show Log") %>%
+             oasisuiTableButton(inputId = ns("abuttonshowlog"), label = "Show IG Log") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowlog, placement = "right"),
              oasisuiTableButton(inputId = ns("abuttonshowanadetails"), label = "Show Details") %>%
                bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonshowanadetails, placement = "right")
@@ -674,7 +674,7 @@ step2_chooseAnalysis <- function(input, output, session,
       result$analysisNAME <- content(post_portfolios_create_analysis$result)$name
 
       logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
-      # browser()
+
       if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) &&
           model_settings$model_configurable && !is.null(sub_modules$buildCustom$fullsettings())) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(

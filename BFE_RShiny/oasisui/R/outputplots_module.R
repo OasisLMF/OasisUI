@@ -289,30 +289,30 @@ panelOutputModule <- function(input, output, session,
 
   observeEvent({inputplottype()
     input$chkboxgrplosstypes}, {
-    result$Title <- ""
-    output$outputplot <- renderPlotly(NULL)
-    if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
-      show("chkboxuncertainty")
-    } else {
-      updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
-      hide("chkboxuncertainty")
-    }
+      result$Title <- ""
+      output$outputplot <- renderPlotly(NULL)
+      if (length(plottypeslist[[inputplottype()]]$uncertaintycols) > 0) {
+        show("chkboxuncertainty")
+      } else {
+        updateCheckboxInput(session = session, inputId = "chkboxuncertainty", value = FALSE)
+        hide("chkboxuncertainty")
+      }
 
-    if (inputplottype() == "loss for return period map" && length(input$chkboxgrplosstypes) > 1) {
-      showModal(modalDialog(
-        title = "Attention",
-        "Only one perspective is allowed for this plot selection",
-        footer = tagList(
-          modalButton("Ok")
-        )
-      ))
-      disable("abuttondraw")
-      # updateCheckboxGroupInput(session = session, inputId = "chkboxgrplosstypes", selected = NULL)
-    } else if (length(input$chkboxgrplosstypes) == 1) {
-      enable("abuttondraw")
-    }
+      if (inputplottype() == "loss for return period map" && length(input$chkboxgrplosstypes) > 1) {
+        showModal(modalDialog(
+          title = "Attention",
+          "Only one perspective is allowed for this plot selection",
+          footer = tagList(
+            modalButton("Ok")
+          )
+        ))
+        disable("abuttondraw")
+        # updateCheckboxGroupInput(session = session, inputId = "chkboxgrplosstypes", selected = NULL)
+      } else if (length(input$chkboxgrplosstypes) == 1) {
+        enable("abuttondraw")
+      }
 
-  })
+    })
 
   observeEvent({anaID()
     inputplottype()}, {
@@ -353,8 +353,8 @@ panelOutputModule <- function(input, output, session,
         multiple <- TRUE
       }
 
-      idx_r <- unlist(idx_r)
-      report <- lapply(idx_r, function(x) {filesListData()$report[x]})
+      idx_r_unlist <- unlist(idx_r)
+      report <- lapply(idx_r_unlist, function(x) {filesListData()$report[x]})
 
       output$reports_ui <- renderUI({
         selectInput(
@@ -367,12 +367,14 @@ panelOutputModule <- function(input, output, session,
       })
 
       # remove summary info file from list as it does not have a type
-      not_sum_info <- filesListData()$files[-grep("summary-info", filesListData()$files)][1]
       # Retrieve types from API
-      types_list <- unique(session$userData$data_hub$get_ana_outputs_dataset_content(
-        id = anaID(),
-        dataset_identifier = not_sum_info)$type
-      )
+      types_list <- unique(unlist(lapply(idx_r_unlist, function(x) {
+        session$userData$data_hub$get_ana_outputs_dataset_content(
+          id = anaID(),
+          dataset_identifier = filesListData()$files[[x]])$type
+
+      })
+      ))
 
       # replace type 1 and 2 with Analytical and Sample resplectively
       types_list <- types_list %>% replace(which(types_list == 1), "Analytical")
@@ -487,7 +489,7 @@ panelOutputModule <- function(input, output, session,
         hide("outputleaflet")
       } else if (inputplottype() == "loss for return period map" &&
                  (input$pltrtnprd != "" &&
-                 input$calctypes != "") &&
+                  input$calctypes != "") &&
                  (length(input$pltrtnprd) > 0 &&
                   length(input$calctypes) > 0 &&
                   length(chkbox$chkboxgrplosstypes()) == 1)) {
@@ -700,9 +702,10 @@ panelOutputModule <- function(input, output, session,
       if (inputplottype() == "loss for return period map") {
         loss <- which(between(data$loss, min(as.numeric(input$pltlosses)), max(as.numeric(input$pltlosses))))
         pf_loc_content <- session$userData$data_hub$get_pf_location_content(id = portfId())
-        lat <- pf_loc_content$Latitude[loss]
-        long <- pf_loc_content$Longitude[loss]
-        loc_num <- pf_loc_content$LocNumber[loss]
+        names(pf_loc_content) <- tolower(names(pf_loc_content))
+        lat <- pf_loc_content$latitude[loss]
+        long <- pf_loc_content$longitude[loss]
+        loc_num <- pf_loc_content$locnumber[loss]
 
         popup <- lapply(seq(1, length(data$loss[loss])), function(x) {
           as.character(div(

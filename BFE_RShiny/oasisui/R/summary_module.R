@@ -377,7 +377,8 @@ summarytab <- function(input, output, session,
     Location <- session$userData$data_hub$get_pf_location_content(id = portfolioID)
     if (!is.null(Location)) {
       # infer params
-      locnum <- length(unique(Location$LocNumber))
+      names(Location) <- tolower(names(Location))
+      locnum <- length(unique(Location$locnumber))
     } else {
       locnum <- 0
     }
@@ -397,8 +398,9 @@ summarytab <- function(input, output, session,
     if (!is.null(tbl_lookup$supported_perils)) {
       # extract the whole files with locations and perils
       locations_all <- check_loc(selectAnaID, portfolioID, data_hub = session$userData$data_hub)
+      names(locations_all) <- tolower(names(locations_all))
       # distinguish for unique location
-      locs_unique <- distinct(locations_all, LocNumber, .keep_all = TRUE)
+      locs_unique <- distinct(locations_all, locnumber, .keep_all = TRUE)
       # filter by peril
       mod_locations_filter <- lapply(seq(1, length(tbl_lookup$supported_perils)), function(x) {
         perils_id <- tbl_lookup$supported_perils[[x]][["id"]]
