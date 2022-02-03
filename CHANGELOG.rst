@@ -1,6 +1,12 @@
 OasisUI Changelog
 ==================
 
+`1.11.2`_
+ ---------
+* [#275](https://github.com/OasisLMF/OasisUI/pull/275) - Rstudio build image
+* [#271](https://github.com/OasisLMF/OasisUI/pull/271) - Feature/new api
+.. _`1.11.2`:  https://github.com/OasisLMF/OasisUI/compare/1.11.1...1.11.2
+
 `1.11.1`_
  ---------
 * [#228, #223](https://github.com/OasisLMF/OasisUI/pull/263) - Feature/various issues
