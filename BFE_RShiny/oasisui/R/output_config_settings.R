@@ -8,14 +8,35 @@ output_options <- list(
   # granularities = c("LOB", "Location", "County","State", "Policy", "Portfolio"),
   losstypes = c("GUL", "IL", "RI"),
   # reports feasible in plot output:
-  variables = c("Full Sample", "ELT", "LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP",
-                "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP", "LEC Mean Wheatsheaf AEP",
-                "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP", "AAL","PLT", "ELT Sample",
-                "ELT Quantile", "ELT Moment", "PLT Sample", "PLT Quantile", "PLT Moment", "ALT Period",
-                "EPT Full Uncertainty AEP", "EPT Full Uncertainty OEP", "EPT Mean Sample AEP", "EPT Mean Sample OEP",
-                "EPT per Sample Mean AEP", "EPT per Sample Mean OEP", "Psept AEP", "Psept OEP"),
+  variables = c("Full Sample", "ELT",
+                "LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP",
+                "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP",
+                "LEC Mean Wheatsheaf AEP", "LEC Mean Wheatsheaf OEP",
+                "LEC Sample Mean AEP", "LEC Sample Mean OEP",
+                "AAL", "PLT",
+                "ELT Sample", "ELT Quantile", "ELT Moment",
+                "PLT Sample", "PLT Quantile", "PLT Moment",
+                "ALT Period",
+                "EPT Full Uncertainty AEP", "EPT Full Uncertainty OEP",
+                "EPT Mean Sample AEP", "EPT Mean Sample OEP",
+                "EPT per Sample Mean AEP", "EPT per Sample Mean OEP",
+                "Psept AEP", "Psept OEP"),
+
   # order = c(6,2,3,4,1,5),
-  variables_default = c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE),
+  variables_default = c(FALSE, FALSE,
+                        TRUE, TRUE,
+                        FALSE, FALSE,
+                        FALSE, FALSE,
+                        FALSE, FALSE,
+                        TRUE, FALSE
+                        FALSE, FALSE, FALSE,
+                        FALSE, FALSE, FALSE,
+                        FALSE,
+                        FALSE, FALSE,
+                        FALSE, FALSE,
+                        FALSE, FALSE,
+                        FALSE, FALSE),
+
   # default empty string is interpreted as aggregation should happen across everything, i.e. without any specific summary level
   # REF: perhaps to be changed to "All Risks" and replace string with default_level elsewhere
   default_level = ""
