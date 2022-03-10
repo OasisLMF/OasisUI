@@ -1,6 +1,9 @@
 OasisUI Changelog
 ==================
 
+* [#276](https://github.com/OasisLMF/OasisUI/pull/278) - Summary output parameters contains too many reports
+.. _`1.11.3`:  https://github.com/OasisLMF/OasisUI/compare/1.11.2...1.11.3
+
 `1.11.2`_
  ---------
 * [#275](https://github.com/OasisLMF/OasisUI/pull/275) - Rstudio build image
