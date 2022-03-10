@@ -28,7 +28,7 @@ output_options <- list(
                         FALSE, FALSE,
                         FALSE, FALSE,
                         FALSE, FALSE,
-                        TRUE, FALSE
+                        TRUE, FALSE,
                         FALSE, FALSE, FALSE,
                         FALSE, FALSE, FALSE,
                         FALSE,
