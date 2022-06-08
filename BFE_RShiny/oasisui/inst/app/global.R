@@ -16,11 +16,17 @@ loginfo("testing logger", logger = "oasisui.module")
 
 APISettings <- APIgetenv(server = "API_IP",
                          port = "API_PORT",
+                         scheme = "API_HTTPS",
                          version = "API_VERSION",
                          share_filepath = "API_SHARE_FILEPATH")
 
 options(oasisui.settings.api.server = APISettings$server)
 options(oasisui.settings.api.port = APISettings$port)
+if (isTRUE(as.logical(APISettings$scheme))) {
+  options(oasisui.settings.api.scheme = "https")
+} else {
+  options(oasisui.settings.api.scheme = "http")
+}
 options(oasisui.settings.api.httptype = "application/json")
 options(oasisui.settings.api.version = APISettings$version)
 options(oasisui.settings.api.share_filepath = APISettings$share_filepath)
