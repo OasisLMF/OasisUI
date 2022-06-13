@@ -17,7 +17,12 @@ clean_downloadedData()
 server <- function(input, output, session) {
 
   #initialize oasisapi R6 classes for managing connection to API in OasisUI
-  session$userData$oasisapi <- OasisAPI$new(host = getOption("oasisui.settings.api.server"), port = getOption("oasisui.settings.api.port"), version = getOption("oasisui.settings.api.version"))
+  session$userData$oasisapi <- OasisAPI$new(
+    host = getOption("oasisui.settings.api.server"),
+    port = getOption("oasisui.settings.api.port"),
+    scheme = getOption("oasisui.settings.api.scheme"),
+    version = getOption("oasisui.settings.api.version")
+  )
 
   #per-session health check
   loginfo(paste("oasisui API server:", session$userData$oasisapi$get_url()), logger = "oasisui.module")

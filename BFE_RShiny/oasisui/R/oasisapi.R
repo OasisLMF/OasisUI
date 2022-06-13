@@ -101,9 +101,9 @@ OasisAPI <- R6Class(
   # Public ----
   public = list(
     # > Initialize ----
-    initialize = function(httptype = "application/json", host, port, version, ...){
+    initialize = function(httptype = "application/json", host, port, version, scheme = c("http", "https"), ...) {
       private$httptype <- httptype
-      self$api_init(host, port)
+      self$api_init(host, port, scheme[1])
       private$version <- version
     },
     get_http_type = function(){
