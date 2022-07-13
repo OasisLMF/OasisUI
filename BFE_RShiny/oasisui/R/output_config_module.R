@@ -28,8 +28,8 @@ def_out_configUI <- function(id) {
     fluidRow(
       column(
         4,
-        panelSettingsTemplates(id),
-        panelModelParams(id)
+        panelModelParams(id),
+        panelSettingsTemplates(id)
       ),
       column(
         8,
@@ -158,19 +158,21 @@ panelOutputParams <- function(id) {
       column(
         4,
         br(),
-        actionButton(
-          ns(paste0("abuttonchoosetag")),
-          label = "Copy",
-          icon = icon("list-alt"),
-          style = " color: rgb(71, 73, 73);
-                    background-color: white;
-                    padding: 0px;
-                    font-size: 24px;
-                    background-image: none;
-                    border: none;
-          "
-        ) %>%
-          bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
+        hidden(
+          actionButton(
+            ns(paste0("abuttonchoosetag")),
+            label = "Copy",
+            icon = icon("list-alt"),
+            style = " color: rgb(71, 73, 73);
+                      background-color: white;
+                      padding: 0px;
+                      font-size: 24px;
+                      background-image: none;
+                      border: none;
+            "
+          ) %>%
+            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonchoosetag, placement = "right")
+        )
       )
     )
   ))
@@ -274,7 +276,9 @@ def_out_config <- function(input,
       perspective = c(),
       summary_level = c(),
       report = c()
-    )
+    ),
+    # settings templates data
+    tbl_settingtemplates = NULL
   )
 
   # inserted fields
@@ -653,7 +657,7 @@ def_out_config <- function(input,
     output$summary_levels_reports_ui <- renderUI({
       dynamicUI_btns(session, analysisID(), "R", tag = input$sintag, oed_field_react())
     })
-    .updateOutputConfig(analysis_settings, result$ana_flag)
+    .updateOutputConfig(analysis_settings, ana_flag = "R")
     logMessage("template settings applied")
   })
 
@@ -724,6 +728,7 @@ def_out_config <- function(input,
       if (post_settings_template$status != "Success")
         oasisuiNotification(type = "error",
                             "Couldn't save current analysis settings as template.")
+      .update_settings_template_lists(modelID)
     }
     removeModal()
   })
@@ -754,12 +759,15 @@ def_out_config <- function(input,
   # delete settings templates
   observeEvent(input$abuttondeltemplate, {
     print(paste(input$dt_settingtemplates_rows_selected, collapse = " ************* "))
+    templateIDs <- result$tbl_settingtemplates[input$dt_settingtemplates_rows_selected, ]$id
+    print(paste(templateIDs, collapse = " ************* "))
     # delete_template_ids <- lapply(templateIDs, function(x) {
     #   session$userData$oasisapi$api_delete_query(
     #     query_path = paste("models", modelID, "setting_templates", x, sep = "/")
     #   )
     # })
     # logMessage(paste("deleted template(s)", paste(delete_template_ids, collapse = ", ")))
+    # .update_settings_template_lists(modelID)
   })
 
   # manage settings templates
@@ -881,37 +889,8 @@ def_out_config <- function(input,
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
 
     if (length(analysisID()) != 0) {
-      # update list of analysis settings templates given model ID of analysis
-      tbl_settings_templates <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("models", modelID, "setting_templates", sep = "/"),
-        query_method = "GET"
-      )
-      tbl_settings_templates <- do.call("bind_rows", tbl_settings_templates)
-      # if there are no setting templates this will be a 0x0 tibble
-      # if there are none with content, there won't be any `file_url` column since the values for that field will be NULL
-      if ("file_url" %in% names(tbl_settings_templates)) {
-        # prepare table for managing templates
-        output$dt_settingtemplates <- renderDT(
-          datatable(
-            tbl_settings_templates %>% capitalize_names_df(),
-            class = "oasisui-table display",
-            rownames = FALSE,
-            escape = FALSE,
-            selection = list(mode = "multiple", selected = c()),
-            options = getTableOptions()
-          )
-        )
-        # applicable selection
-        tbl_settings_templates_valid <- tbl_settings_templates %>%
-          filter(!is.na(file_url))  # if some templates have no content associated
-        # get IDs into the values for later
-        choicesList <- setNames(as.list(paste(modelID, tbl_settings_templates_valid$id, sep = "-")),
-                                tbl_settings_templates_valid$name)
-        updateSelectInput(inputId = "sintempl",
-                          choices = choicesList,
-                          selected = choicesList[1],
-                          session = session)
-      }
+      # settings templates
+      .update_settings_template_lists(modelID)
 
       # model details and ana settings
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
@@ -979,6 +958,55 @@ def_out_config <- function(input,
     }
     model_settings
   }
+
+  # utility used in the functions above and below
+  .update_settings_template_lists <- function(modelID) {
+    # update list of analysis settings templates given model ID of analysis
+    tbl_settings_templates <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("models", modelID, "setting_templates", sep = "/"),
+      query_method = "GET"
+    )
+    tbl_settings_templates <- do.call("bind_rows", tbl_settings_templates)
+    # if there are no setting templates this will be a 0x0 tibble
+    # if there are none with content, there won't be any `file_url` column since the values for that field will be NULL
+    result$tbl_settingtemplates <- tbl_settings_templates
+    if ("file_url" %in% names(tbl_settings_templates)) {
+      # applicable selection
+      tbl_settings_templates_valid <- tbl_settings_templates %>%
+        filter(!is.na(file_url))  # if some templates have no content associated
+      # get IDs into the values for later
+      choicesList <- setNames(as.list(paste(modelID, tbl_settings_templates_valid$id, sep = "-")),
+                              tbl_settings_templates_valid$name)
+      updateSelectInput(inputId = "sintempl",
+                        choices = choicesList,
+                        selected = choicesList[1],
+                        session = session)
+    } else {
+      updateSelectInput(inputId = "sintempl",
+                        choices = NULL,
+                        session = session)
+    }
+    invisible()
+  }
+
+  # prepare table for managing templates
+  output$dt_settingtemplates <- renderDT(
+    datatable(
+      result$tbl_settingtemplates %>% capitalize_names_df(),
+      class = "oasisui-table display",
+      rownames = FALSE,
+      escape = FALSE,
+      selection = list(mode = "multiple", selected = c()),
+      options = getTableOptions()
+    )
+  )
+
+  # utility to refresh the dropdown and table with settings templates only
+  # .updateTemplateLists <- function() {
+  #   tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+  #   modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+  #   .update_settings_template_lists(modelID)
+  # }
 
   # Generate analysis settings -------------------------------------------------
   .gen_analysis_settings <- function() {
