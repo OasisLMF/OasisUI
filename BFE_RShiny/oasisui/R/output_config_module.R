@@ -26,8 +26,11 @@ def_out_configUI <- function(id) {
       )
     ),
     fluidRow(
-      column(4,
-             panelModelParams(id)),
+      column(
+        4,
+        panelSettingsTemplates(id),
+        panelModelParams(id)
+      ),
       column(
         8,
         fluidRow(panelOutputParams(id)),
@@ -37,14 +40,52 @@ def_out_configUI <- function(id) {
     fluidRow(column(
       12,
       oasisuiButton(
+        inputId = ns("abuttonsavesettings"),
+        label = "Save as Template"
+      ) %>%
+        bs_embed_tooltip(
+          title = defineSingleAna_tooltips$abuttonsavesettings,
+          placement = "right"
+        ),
+      oasisuiButton(
         inputId = ns("abuttonexecuteanarun"),
         label = "Execute Run"
-      ), align = "right"
+      ),
+      align = "right"
     )) %>%
       bs_embed_tooltip(
         title = defineSingleAna_tooltips$abuttonexecuteanarun,
         placement = "right"
       )
+  )
+}
+
+#' panelSettingsTemplates
+#'
+#' @rdname panelSettingsTemplates
+#'
+#' @description Function wrapping sub-panel to select previous analysis settings.
+#'
+#' @template params-module-ui
+#'
+#' @importFrom shinyjs hidden
+#'
+#' @export
+panelSettingsTemplates <- function(id) {
+  ns <- NS(id)
+  tagList(
+    oasisuiPanel(
+      collapsible = FALSE,
+      id = ns("panel_SettingsTemplates"),
+      heading = h4("Settings Templates"),
+      selectInput(
+        inputId = ns("sintempl"),
+        label = "Template",
+        choices = NULL
+      ),
+      oasisuiButton(inputId = ns("abuttonapply"), label = "Apply"),
+      oasisuiButton(inputId = ns("abuttonmanage"), label = "Manage")
+    )
   )
 }
 
@@ -86,7 +127,6 @@ panelModelParams <- function(id) {
   )
 }
 
-
 #' panelOutputParams
 #'
 #' @rdname panelOutputParams
@@ -120,7 +160,7 @@ panelOutputParams <- function(id) {
         br(),
         actionButton(
           ns(paste0("abuttonchoosetag")),
-          label = NULL,
+          label = "Copy",
           icon = icon("list-alt"),
           style = " color: rgb(71, 73, 73);
                     background-color: white;
@@ -190,7 +230,7 @@ panelOutputParamsDetails <- function(id) {
 #' @param analysisID Selected analysis ID.
 #' @param analysisName Selected analysis name.
 #' @param ana_flag Flag to know if the user is creating a new output configuration or rerunning an analysis.
-#' @param counter Counter to decide whether to clear output options and show some panel (?)
+#' @param counter Counter to decide whether to clear output options and show the output config panel
 #' @param customModSettings Customizable Model settings.
 #'
 #' @return ana_flag flag to know if the user is creating a new output configuration or rerunning an analysis.
@@ -201,8 +241,10 @@ panelOutputParamsDetails <- function(id) {
 #' @importFrom shinyjs disabled
 #' @importFrom shinyjs enable
 #' @importFrom dplyr filter
+#' @importFrom dplyr bind_rows
 #' @importFrom dplyr distinct
 #' @importFrom jsonlite write_json
+#' @importFrom stats setNames
 #'
 #' @export
 def_out_config <- function(input,
@@ -277,7 +319,7 @@ def_out_config <- function(input,
 
   # Select Tag from another analysis -------------------------------------------
 
-  # > Modal Dialogue
+  # > Modal Dialog
   AnaList <- modalDialog(
     easyClose = TRUE,
     size = "l",
@@ -326,8 +368,7 @@ def_out_config <- function(input,
       anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
       analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
 
-      if (!is.null(analysis_settings$detail) &&
-          analysis_settings$detail == "Not found.") {
+      if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
         oasisuiNotification(
           type = "error",
           paste0(
@@ -340,7 +381,7 @@ def_out_config <- function(input,
         )
       } else {
         logMessage(paste0(
-          "appling the output configuration of analysis ",
+          "applying the output configuration of analysis ",
           anaName,
           " id ",
           anaID
@@ -509,8 +550,10 @@ def_out_config <- function(input,
   observeEvent(result$out_params_review, {
     if (nrow(result$out_params_review) == 0) {
       disable("abuttonexecuteanarun")
+      disable("abuttonsavesettings")
     } else {
       enable("abuttonexecuteanarun")
+      enable("abuttonsavesettings")
     }
   })
 
@@ -592,6 +635,136 @@ def_out_config <- function(input,
       query_body = analysis_settingsList[[1]]
     )
     result$ana_post_status <- post_analysis_settings$status
+  })
+
+  # Apply settings from template
+  observeEvent(input$abuttonapply, {
+    logMessage("applying template settings")
+    # "modelID-templateID"
+    query_ids <- strsplit(input$sintempl, "-")[[1]]
+    modelID <- query_ids[1]
+    templateID <- query_ids[2]
+    # fetch analysis settings
+    dataset_content <- session$userData$oasisapi$api_get_query(
+      query_path = paste("models", modelID, "setting_templates", templateID, "content", sep = "/")
+    )
+    analysis_settings <- content(dataset_content$result)
+    # re-set configuration to previous selection
+    output$summary_levels_reports_ui <- renderUI({
+      dynamicUI_btns(session, analysisID(), "R", tag = input$sintag, oed_field_react())
+    })
+    .updateOutputConfig(analysis_settings, result$ana_flag)
+    logMessage("template settings applied")
+  })
+
+  # > Modal dialog for saving template settings
+  TemplateName <- modalDialog(
+    title = "Save Settings as Template",
+    easyClose = TRUE,
+    size = "m",
+    textInput(
+      inputId = ns("tplName"),
+      label = "Template Name",
+      placeholder = "Mandatory Name"
+    ),
+    textInput(
+      inputId = ns("tplDesc"),
+      label = "Template Description",
+      placeholder = "Optional"
+    ),
+    footer = tagList(
+      oasisuiButton(
+        ns("abuttonsavetemplate"),
+        label = "Save",
+        align = "left"
+      ),
+      actionButton(ns("abuttontplcancel"),
+                   label = "Cancel", align = "right")
+    )
+  )
+
+  # > close modal
+  observeEvent(input$abuttontplcancel, {
+    removeModal()
+  })
+
+  # save settings as template
+  observeEvent(input$abuttonsavesettings, {
+    showModal(TemplateName)
+  })
+
+  observeEvent(input$abuttonsavetemplate, {
+    analysis_settingsList <- .gen_analysis_settings()
+    # post analysis settings as template
+    .getModelID <- function() {
+      tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+      modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+      modelID
+    }
+    # retrieve modelID
+    modelID <- .getModelID()
+    # get name + description from user
+    # create and retrieve new ID for settings template
+    query_res <- session$userData$oasisapi$api_body_query(
+      query_path = paste("models", modelID, "setting_templates", sep = "/"),
+      query_body = list(name = input$tplName, description = input$tplDesc),
+      query_method = "POST"
+    )
+    templateID <- content(query_res$result)$id
+    if (is.null(templateID)) {
+      oasisuiNotification(type = "error",
+                          "Couldn't create template ID. Please check that the name is valid.")
+    } else {
+      # post content
+      post_settings_template <- session$userData$oasisapi$api_body_query(
+        query_path = paste("models", modelID, "setting_templates", templateID, "content", sep = "/"),
+        query_body = analysis_settingsList[[1]],
+        query_method = "POST"
+      )
+      if (post_settings_template$status != "Success")
+        oasisuiNotification(type = "error",
+                            "Couldn't save current analysis settings as template.")
+    }
+    removeModal()
+  })
+
+  # > Modal dialog for managing template settings
+  TemplateList <- modalDialog(
+    title = "Manage Settings Templates",
+    easyClose = TRUE,
+    size = "l",
+    # table
+    DTOutput(ns("dt_settingtemplates")),
+    footer = tagList(
+      oasisuiButton(
+        ns("abuttondeltemplate"),
+        label = "Delete",
+        align = "left"
+      ),
+      actionButton(ns("abuttontplcancel"),
+                   label = "Cancel", align = "right")
+    )
+  )
+
+  # > close modal
+  # observeEvent(input$abuttontplcancel, {
+  #   removeModal()
+  # })
+
+  # delete settings templates
+  observeEvent(input$abuttondeltemplate, {
+    print(paste(input$dt_settingtemplates_rows_selected, collapse = " ************* "))
+    # delete_template_ids <- lapply(templateIDs, function(x) {
+    #   session$userData$oasisapi$api_delete_query(
+    #     query_path = paste("models", modelID, "setting_templates", x, sep = "/")
+    #   )
+    # })
+    # logMessage(paste("deleted template(s)", paste(delete_template_ids, collapse = ", ")))
+  })
+
+  # manage settings templates
+  observeEvent(input$abuttonmanage, {
+    showModal(TemplateList)
   })
 
   # show advanced view
@@ -708,6 +881,39 @@ def_out_config <- function(input,
     modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
 
     if (length(analysisID()) != 0) {
+      # update list of analysis settings templates given model ID of analysis
+      tbl_settings_templates <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("models", modelID, "setting_templates", sep = "/"),
+        query_method = "GET"
+      )
+      tbl_settings_templates <- do.call("bind_rows", tbl_settings_templates)
+      # if there are no setting templates this will be a 0x0 tibble
+      # if there are none with content, there won't be any `file_url` column since the values for that field will be NULL
+      if ("file_url" %in% names(tbl_settings_templates)) {
+        # prepare table for managing templates
+        output$dt_settingtemplates <- renderDT(
+          datatable(
+            tbl_settings_templates %>% capitalize_names_df(),
+            class = "oasisui-table display",
+            rownames = FALSE,
+            escape = FALSE,
+            selection = list(mode = "multiple", selected = c()),
+            options = getTableOptions()
+          )
+        )
+        # applicable selection
+        tbl_settings_templates_valid <- tbl_settings_templates %>%
+          filter(!is.na(file_url))  # if some templates have no content associated
+        # get IDs into the values for later
+        choicesList <- setNames(as.list(paste(modelID, tbl_settings_templates_valid$id, sep = "-")),
+                                tbl_settings_templates_valid$name)
+        updateSelectInput(inputId = "sintempl",
+                          choices = choicesList,
+                          selected = choicesList[1],
+                          session = session)
+      }
+
+      # model details and ana settings
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
         query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
