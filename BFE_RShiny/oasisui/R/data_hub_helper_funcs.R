@@ -35,10 +35,11 @@ untar_list <- function(tarfile, to_strip = NULL){
 #'
 #' @importFrom data.table fread
 #' @importFrom jsonlite read_json
+#' @importFrom arrow read_parquet
 #' @importFrom utils tail
 #'
 #' @export
-read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(), nrows = Inf){
+read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(), nrows = Inf) {
   untar(tarfile, files = dataset_identifier, exdir = destdir)
   data = NULL
   if (file.exists(file.path(destdir, dataset_identifier))) {
@@ -51,19 +52,39 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
       }
     } else if (extension == "json") {
       data <- read_json(file.path(destdir, dataset_identifier))
-    } else{
+    } else if (extension == "parquet") {
+      data <- read_parquet(file.path(destdir, dataset_identifier))
+    } else {
       data <- scan(file.path(destdir, dataset_identifier), what = "", sep = "\n")
     }
-    file.remove(file.path(destdir, dataset_identifier)) #remove extracted file after reading
+    file.remove(file.path(destdir, dataset_identifier))  # remove extracted file after reading
   }
   data
 }
 
-#' write CSV
+#' write file
 #'
 #' @rdname writefile
 #'
-#' @description Writes object in CSV format.
+#' @description Writes object in respective format.
+#'
+#' @export
+writefile <- function(data, dataset_identifier = NULL, ...) {
+  extension <-  strsplit(dataset_identifier, split = "\\.") %>% unlist() %>% tail(n = 1)
+  switch(extension,
+         csv = writeCsv(data, dataset_identifier, ...),
+         json = writefileJSON(data, dataset_identifier, ...),
+         parquet = writeParquet(data, dataset_identifier, ...),
+         # below default is meant for txt mainly
+         writeTxt(data, dataset_identifier, ...)
+        )
+}
+
+#' write csv
+#'
+#' @rdname writefile
+#'
+#' @description Writes object in csv format.
 #'
 #' @param data object to write.
 #' @param dataset_identifier name and relative path of file to write
@@ -73,7 +94,7 @@ read_file_from_tar <- function(tarfile, dataset_identifier, destdir = tempdir(),
 #' @importFrom data.table fwrite
 #'
 #' @export
-writefile <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL) {
+writeCsv <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL) {
   if (is.null(file_towrite)) {
     file_towrite <- file.path(destdir, dataset_identifier)
   }
@@ -103,11 +124,26 @@ writeParquet <- function(data, dataset_identifier = NULL, destdir = tempdir(), f
   file_towrite
 }
 
-#' write file JSON
+#' write txt
+#'
+#' @rdname writefile
+#'
+#' @description Writes object in txt format.
+#'
+#' @export
+writeTxt <- function(data, dataset_identifier = NULL, destdir = tempdir(), file_towrite = NULL) {
+  if (is.null(file_towrite)) {
+    file_towrite <- file.path(destdir, dataset_identifier)
+  }
+  writeLines(data, con = file_towrite)
+  file_towrite
+}
+
+#' write file json
 #'
 #' @rdname writefileJSON
 #'
-#' @description Writes object in JSON format.
+#' @description Writes object in json format.
 #'
 #' @param data object to write.
 #' @param dataset_identifier name and relative path of file to write

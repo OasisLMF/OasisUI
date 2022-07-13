@@ -83,6 +83,10 @@
 #' \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
 #' > Write file
 #' \item{\code{write_file()}}{Write data into a file file_towrite}
+#' \item{\code{write_csv_file()}}{Write data into a file file_towrite}
+#' \item{\code{write_parquet_file()}}{Write data into a file file_towrite}
+#' \item{\code{write_txt_file()}}{Write data into a file file_towrite}
+#' \item{\code{write_file_json()}}{Write data into a file file_towrite}
 #' > Helper methods ----
 #' \item{\code{get_analyses_tar(id, label, destdir = tempdir())}}{Extract input/output tar.}
 #' \item{\code{get_analyses_inputs_tar(id, destdir = tempdir())}}{Extract input tar.}
@@ -242,13 +246,13 @@ DataHub <- R6Class(
     # dataset_identifier is location/account/reinsurance_info/reinsurance_source
     # If file does not exist, returns df details: Not Found
     get_pf_dataset_content = function(id, dataset_identifier, ...) {
+      dataset_res <- private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result
       # check if file has the parquet extension (i.e. is not csv). If yes, process differently then csv
-      if (!grepl("csv",
-                private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result[3]$headers$`content-type`)) {
-
-        dataset_content <- read_parquet(content(private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result))
+      if (!grepl("csv", dataset_res[3]$headers$`content-type`)) {
+        dataset_content <- read_parquet(content(dataset_res))
       } else {
-        dataset_content <- content(private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result)
+        # NOTE: the call to `content` below is going to print "Column specification" with the cols(...) specs to the console!
+        dataset_content <- content(dataset_res)
       }
 
       if (is.null(names(dataset_content))) {
@@ -363,7 +367,7 @@ DataHub <- R6Class(
     # extract a outputs file content given an analysis id
     get_ana_outputs_dataset_content = function(id, dataset_identifier, ...) {
       tarfile <- self$get_analyses_outputs_tar(id, destdir =  private$user_destdir)
-      #necessary step because outputs comes with subfolder
+      # necessary step because outputs comes with subfolder
       dataset_identifier <- file.path("output", dataset_identifier)
       dataset_content <- NULL
       if (file.exists(tarfile)) {
@@ -492,8 +496,16 @@ DataHub <- R6Class(
       fs <- writefile(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
       fs
     },
+    write_csv_file = function(data, dataset_identifier, file_towrite = NULL, ...) {
+      fs <- writeCsv(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
+      fs
+    },
     write_parquet_file = function(data, dataset_identifier, file_towrite = NULL, ...) {
       fs <- writeParquet(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
+      fs
+    },
+    write_txt_file = function(data, dataset_identifier, file_towrite = NULL, ...) {
+      fs <- writeTxt(data, dataset_identifier, destdir = private$user_destdir, file_towrite)
       fs
     },
     write_file_json = function(data, dataset_identifier, file_towrite = NULL, ...) {
