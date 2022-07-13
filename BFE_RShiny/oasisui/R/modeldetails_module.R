@@ -1,5 +1,5 @@
 # Shared Module documentation --------------------------------------------------
-#' Hazard Map Module
+#' Model Details Module
 #'
 #' Shiny Module for showing model details.
 #'

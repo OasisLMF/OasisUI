@@ -136,7 +136,7 @@ exposurevalidationsummary <- function(input,
 
   # Perils ---------------------------------------------------------------------
   observeEvent(input$input_peril, {
-    if (!is.null(input$input_peril) && input$input_peril != "") {
+    if (!is.null(input$input_peril) && all(input$input_peril != "")) {
       input_peril <- input$input_peril
       choices <- result$peril_choices
       .reloadSummary(input_peril)
@@ -277,6 +277,7 @@ exposurevalidationsummary <- function(input,
     # Build df
     if (!is.null(result$summary_tbl) && length(result$summary_tbl) > 0 && !is.null(input_peril)) {
       # match inputs to perils
+  #browser()
       peril_summary <- paste0(result$summary_tbl$peril, " (", result$peril_id, ")")
       input_peril_s <- unlist(lapply(input_peril, function (x) {
         y <- unlist(strsplit(x, split = " (", fixed = TRUE))[1]
@@ -289,6 +290,7 @@ exposurevalidationsummary <- function(input,
       }))
       result$summary_validation_tbl <- result$summary_tbl[summary_match, ]
     } else {
+      # stays NULL
       result$summary_validation_tbl <- NULL
     }
     invisible()

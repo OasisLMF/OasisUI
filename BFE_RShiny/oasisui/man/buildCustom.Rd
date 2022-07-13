@@ -2,8 +2,11 @@
 % Please edit documentation in R/buildCustom_module.R
 \name{buildCustom}
 \alias{buildCustom}
-\title{Hazard Map Module}
+\alias{buildCustomUI}
+\title{Custom Model Module}
 \usage{
+buildCustomUI(id)
+
 buildCustom(
   input,
   output,
@@ -18,6 +21,8 @@ buildCustom(
 )
 }
 \arguments{
+\item{id}{Namespace ID for the module.}
+
 \item{input, output, session}{Shiny input, output, and session objects.}
 
 \item{portfolioID}{Selected portfolio ID.}
@@ -26,17 +31,17 @@ buildCustom(
 
 \item{supplierID}{Selected supplier model ID.}
 
-\item{nameID}{Selected model name ID.}
+\item{nameID}{Selected model ID version.}
 
 \item{analysisID}{Selected analysis ID.}
-
-\item{id}{Namespace ID for the module.}
 }
 \description{
 Shiny Module for showing customized details.
 }
 \section{Functions}{
 \itemize{
+\item \code{buildCustomUI}: Returns the UI elements of the module.
+
 \item \code{buildCustom}: Allows user to build their own mode on the fly.
 }}
 

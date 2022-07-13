@@ -3,7 +3,7 @@
 \name{modeldetails}
 \alias{modeldetails}
 \alias{modeldetailsUI}
-\title{Hazard Map Module}
+\title{Model Details Module}
 \usage{
 modeldetailsUI(id)
 

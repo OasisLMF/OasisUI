@@ -360,7 +360,7 @@ step2_chooseAnalysis <- function(input, output, session,
     paste0('Cancel input generation for id ', AnaId, ', ', AnaName)
   })
 
-  .cancelIGModal <- function(){
+  .cancelIGModal <- function() {
     ns <- session$ns
     modalDialog(label = "cancelIGModal",
                 title = uiOutput(ns("cancelIGModaltitle"), inline = TRUE),

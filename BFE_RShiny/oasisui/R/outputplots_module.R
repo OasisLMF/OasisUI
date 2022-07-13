@@ -202,7 +202,6 @@ panelOutputModuleUI <- function(id) {
 #' @importFrom ggplot2 label_value
 #' @importFrom plotly ggplotly
 #' @importFrom plotly renderPlotly
-#' @importFrom data.table fread
 #' @importFrom leaflet leaflet
 #' @importFrom leaflet addTiles
 #' @importFrom leaflet renderLeaflet

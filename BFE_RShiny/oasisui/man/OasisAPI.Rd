@@ -105,7 +105,14 @@ oasisapi$method(arg)
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$new(httptype = "application/json", host, port, version, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OasisAPI$new(
+  httptype = "application/json",
+  host,
+  port,
+  version,
+  scheme = c("http", "https"),
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 }

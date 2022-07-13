@@ -413,9 +413,10 @@ step3_configureOutput <- function(input, output, session,
   output$text_analysesrunlog <- renderUI({
     if (length(input$dt_analyses_rows_selected) > 0) {
       logMessage("re-rendering analysis log table")
-      if (!is.null(result$tbl_analysisrunlog)){
+      if (!is.null(result$tbl_analysisrunlog)) {
+        # NOTE: for larger log files this is a bit slow in rendering...
         result$tbl_analysisrunlog
-      } else{
+      } else {
         paste0("No log files associated with analysis ID ", ifelse(!is.null(result$anaID), result$anaID, "NULL"))
       }
     }
