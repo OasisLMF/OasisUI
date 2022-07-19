@@ -63,11 +63,12 @@ dynamicUI <- function(session, analysisID, tag, n_field, oed_field) {
 #' @param analysisID Current analysis ID.
 #' @param tag Current tag.
 #' @param oed_field Oed fields.
+#' @param analysisSettings Analysis settings for case where we re-run from settings template.
 #'
 #' @return UI element.
 #'
 #' @export
-rerunUI <- function(session, analysisID, tag, oed_field) {
+rerunUI <- function(session, analysisID, tag, oed_field, analysisSettings = NULL) {
 
   ns <- session$ns
 
@@ -79,9 +80,13 @@ rerunUI <- function(session, analysisID, tag, oed_field) {
   # inserted fields
   inserted <- reactiveValues(val = 0)
 
-  # retrieve run information from API
-  out_cnfg_tbl <- session$userData$data_hub$get_ana_settings_content(
-    analysisID, oasisapi = session$userData$oasisapi)
+  if (is.null(analysisSettings)) {
+    # retrieve run information from API
+    out_cnfg_tbl <- session$userData$data_hub$get_ana_settings_content(
+      analysisID, oasisapi = session$userData$oasisapi)
+  } else {
+    out_cnfg_tbl <- analysisSettings
+  }
 
   if (length(out_cnfg_tbl$gul_summaries) > 0 ||
       length(out_cnfg_tbl$il_summaries) > 0 ||
@@ -125,6 +130,10 @@ rerunUI <- function(session, analysisID, tag, oed_field) {
     if (out_cnfg_tbl$gul_output) {
       choices_prsp <- c(choices_prsp, "GUL")
     }
+    # RSc: TODO below could be NULL in cornercase of switching between portfolios
+    # (implying switching between analyses in addition obviously), whereas gul_output
+    # is typically there as a minimum default. so maybe check il_output and ri_output
+    # for NULL additionally.
     if (out_cnfg_tbl$il_output) {
       choices_prsp <- c(choices_prsp, "IL")
     }
@@ -133,7 +142,6 @@ rerunUI <- function(session, analysisID, tag, oed_field) {
     }
     # update checkboxes selection
     updateCheckboxGroupInput(session, "chkboxgrplosstypes", selected = choices_prsp)
-
   }
 
   # first set of fields corresponds to 0, so if we e.g. have 3 in total, then we have added 2
@@ -215,11 +223,12 @@ rerunUI <- function(session, analysisID, tag, oed_field) {
 #' @param ana_flag Analysis flag.
 #' @param tag Current tag.
 #' @param oed_field Oed fields.
+#' @param analysisSettings Analysis settings for case where we re-run from settings template.
 #'
 #' @return UI element.
 #'
 #' @export
-dynamicUI_btns <- function(session, analysisID, ana_flag, tag, oed_field) {
+dynamicUI_btns <- function(session, analysisID, ana_flag, tag, oed_field, analysisSettings = NULL) {
   ns <- session$ns
   if (tag == default_tags[2] || tag == default_tags[3]) {
     tagList(fluidRow(
@@ -231,11 +240,7 @@ dynamicUI_btns <- function(session, analysisID, ana_flag, tag, oed_field) {
       column(2,
              br(),
              disabled(
-               actionButton(
-                 ns("removeBtn"),
-                 label = "",
-                 icon = icon("times")
-               ) %>%
+               actionButton(ns("removeBtn"), label = "", icon = icon("times")) %>%
                  bs_embed_tooltip(title = defineSingleAna_tooltips$removeBtn, placement = "right")
              )
       ),
@@ -243,7 +248,7 @@ dynamicUI_btns <- function(session, analysisID, ana_flag, tag, oed_field) {
              if (ana_flag == "C") {
                dynamicUI(session, analysisID, tag, 0, oed_field)
              } else if (ana_flag == "R") {
-               rerunUI(session, analysisID, tag, oed_field)
+               rerunUI(session, analysisID, tag, oed_field, analysisSettings)
              }
       )
     ),

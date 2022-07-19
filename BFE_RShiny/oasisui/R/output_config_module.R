@@ -366,8 +366,7 @@ def_out_config <- function(input,
         input$sinoutputoptions
       )
     )
-    if (length(input$sinoutputoptions) > 0 &&
-        input$sinoutputoptions != "") {
+    if (length(input$sinoutputoptions) > 0 && input$sinoutputoptions != "") {
       anaName <- strsplit(input$sinoutputoptions, split = " / ")[[1]][2]
       anaID <- strsplit(input$sinoutputoptions, split = " / ")[[1]][1]
       analysis_settings <- session$userData$data_hub$get_ana_settings_content(anaID, oasisapi = session$userData$oasisapi)
@@ -377,25 +376,20 @@ def_out_config <- function(input,
           type = "error",
           paste0(
             "No output configuration associated to analysis ",
-            anaName,
-            " id ",
-            anaID,
-            "."
+            anaName, " id ", anaID, "."
           )
         )
       } else {
         logMessage(paste0(
           "applying the output configuration of analysis ",
-          anaName,
-          " id ",
-          anaID
+          anaName, " id ", anaID
         ))
       }
       # re-set configuration to previous selection
       output$summary_levels_reports_ui <- renderUI({
         dynamicUI_btns(session, anaID, "R", tag = input$sintag, oed_field_react())
       })
-      .updateOutputConfig(analysis_settings, result$ana_flag)
+      .updateOutputConfig(analysis_settings, "O")
     }
     removeModal()
   })
@@ -416,25 +410,19 @@ def_out_config <- function(input,
     if (length(analysisID()) > 0) {
       if (result$ana_flag == "R") {
         analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
-        if (!is.null(analysis_settings$detail) &&
-            analysis_settings$detail == "Not found.") {
+        if (!is.null(analysis_settings$detail) && analysis_settings$detail == "Not found.") {
           oasisuiNotification(
             type = "error",
             paste0(
               "No output configuration associated to analysis ",
-              analysisName(),
-              " id ",
-              analysisID(),
-              "."
+              analysisName(), " id ", analysisID(), "."
             )
           )
         } else {
           logMessage(
             paste0(
               "applying the output configuration of analysis ",
-              analysisName(),
-              " id ",
-              analysisID()
+              analysisName(), " id ", analysisID()
             )
           )
         }
@@ -649,15 +637,19 @@ def_out_config <- function(input,
     modelID <- query_ids[1]
     templateID <- query_ids[2]
     # fetch analysis settings
+    # api_return_query_res
     dataset_content <- session$userData$oasisapi$api_get_query(
       query_path = paste("models", modelID, "setting_templates", templateID, "content", sep = "/")
     )
     analysis_settings <- content(dataset_content$result)
-    # re-set configuration to previous selection
+    # re-set configuration to previous selection:
+    # model params (and set tag to custom)
+    .updateOutputConfig(analysis_settings, ana_flag = "O")
+    # output configuration
     output$summary_levels_reports_ui <- renderUI({
-      dynamicUI_btns(session, analysisID(), "R", tag = input$sintag, oed_field_react())
+      dynamicUI_btns(session, analysisID(), "R", tag = input$sintag, oed_field_react(), analysis_settings)
     })
-    .updateOutputConfig(analysis_settings, ana_flag = "R")
+
     logMessage("template settings applied")
   })
 
@@ -700,11 +692,6 @@ def_out_config <- function(input,
   observeEvent(input$abuttonsavetemplate, {
     analysis_settingsList <- .gen_analysis_settings()
     # post analysis settings as template
-    .getModelID <- function() {
-      tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
-      modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
-      modelID
-    }
     # retrieve modelID
     modelID <- .getModelID()
     # get name + description from user
@@ -758,16 +745,22 @@ def_out_config <- function(input,
 
   # delete settings templates
   observeEvent(input$abuttondeltemplate, {
-    print(paste(input$dt_settingtemplates_rows_selected, collapse = " ************* "))
-    templateIDs <- result$tbl_settingtemplates[input$dt_settingtemplates_rows_selected, ]$id
-    print(paste(templateIDs, collapse = " ************* "))
-    # delete_template_ids <- lapply(templateIDs, function(x) {
-    #   session$userData$oasisapi$api_delete_query(
-    #     query_path = paste("models", modelID, "setting_templates", x, sep = "/")
-    #   )
-    # })
-    # logMessage(paste("deleted template(s)", paste(delete_template_ids, collapse = ", ")))
-    # .update_settings_template_lists(modelID)
+    if (is.null(input$dt_settingtemplates_rows_selected)) {
+      logMessage("nothing selected. need to select rows to mark them up for deletion.")
+    } else {
+      modelID <- .getModelID()
+      templateIDs <- result$tbl_settingtemplates[input$dt_settingtemplates_rows_selected, ]$id
+      delete_template_ids <- lapply(templateIDs, function(tpl_id) {
+        session$userData$oasisapi$api_delete_query(
+          query_path = paste("models", modelID, "setting_templates", tpl_id, sep = "/")
+        )
+      })
+      logMessage(paste(
+        "deleted template(s) ...  ",
+        paste(templateIDs, sapply(delete_template_ids, function(x) x$status), sep = ": ", collapse = ", ")
+      ))
+      .update_settings_template_lists(modelID)
+    }
   })
 
   # manage settings templates
@@ -862,12 +855,13 @@ def_out_config <- function(input,
   # re-set Rerun panel to previous selection
   .updateOutputConfig <- function(analysis_settings, ana_flag) {
     logMessage(".updateOutputConfig called")
-    if (ana_flag == "R") {
+    if (ana_flag %in% c("R", "O")) {
       # In case of Rerun, tag is set to Custom
+      # Same for Other, which means copy from prev. analysis or copy from setting template
       chosen_tag <- default_tags[3]
       # update Number of samples and Threshold in model params panel
       if (is.null(analysis_settings$detail) || analysis_settings$detail != "Not found.") {
-        .clearOutputOptions(ana_flag)
+        .clearOutputOptions(ana_flag, analysis_settings)
       }
     } else {
       # In case of Output Configuration, tag is set to Summary
@@ -879,7 +873,14 @@ def_out_config <- function(input,
                       session = session)
   }
 
-  .clearOutputOptions <- function(ana_flag) {
+  # utility to retrieve model ID from current analysis
+  .getModelID <- function() {
+    tbl_analysesData <- session$userData$data_hub$return_tbl_analysesData(Status = Status, tbl_analysesDataNames = tbl_analysesDataNames)
+    modelID <- tbl_analysesData[tbl_analysesData[, tbl_analysesDataNames$id] == analysisID(), tbl_analysesDataNames$model]
+    modelID
+  }
+
+  .clearOutputOptions <- function(ana_flag, ana_settings = NULL) {
     # this is actually a function that takes care of the model parameters panel of the output configuration. possibly rename it.
     logMessage(".clearOutputOptions called")
 
@@ -890,17 +891,26 @@ def_out_config <- function(input,
 
     if (length(analysisID()) != 0) {
       # settings templates
-      .update_settings_template_lists(modelID)
+      if (ana_flag != "O") .update_settings_template_lists(modelID)
 
-      # model details and ana settings
+      # model details from model of current analysis
       tbl_modelsDetails <- session$userData$oasisapi$api_return_query_res(
         query_path = paste("models", modelID, "settings", sep = "/"),
         query_method = "GET"
       )
-      tbl_ana_settings <- session$userData$oasisapi$api_return_query_res(
-        query_path = paste("analyses", analysisID(), "settings", sep = "/"),
-        query_method = "GET"
-      )
+      # ana settings can be passed in 3 cases:
+      # - rerun same analysis
+      # - copy settings from other analysis (this functionality is hidden as of July 2022,
+      #   --> see "abuttonchoosetag")
+      # - copy settings from setting templates (new functionality as of July 2022)
+      if (is.null(ana_settings)) {
+        tbl_ana_settings <- session$userData$oasisapi$api_return_query_res(
+          query_path = paste("analyses", analysisID(), "settings", sep = "/"),
+          query_method = "GET"
+        )
+      } else {
+        tbl_ana_settings <- ana_settings
+      }
       configurable <- FALSE
       model_settings <- NULL
       if (!is.null(tbl_modelsDetails)) {
