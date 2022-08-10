@@ -393,11 +393,11 @@ step3_configureOutput <- function(input, output, session,
   output$download_log <- downloadHandler(
     filename = "analysis_run_log.txt",
     content = function(file) {
-      fwrite(result$tbl_analysisrunlog,
-             file,
-             row.names = FALSE,
-             col.names = FALSE,
-             quote = FALSE)
+      session$userData$data_hub$write_file(
+        # go back from the <pre> tag (for rendering) to character for output
+        data = result$tbl_analysisrunlog$children[[1]],
+        dataset_identifier = "analysis_run_log.txt",
+        file_towrite = file)
     }
   )
 
@@ -523,8 +523,9 @@ step3_configureOutput <- function(input, output, session,
   .reloadAnaRunLog <- function() {
     logMessage(".reloadAnaRunLog called")
     if (!is.null(result$anaID)) {
-        result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(paste("analyses", result$anaID, "run_traceback_file",
-                                                                             sep = "/"))
+        result$tbl_analysisrunlog <- session$userData$oasisapi$return_df(
+          paste("analyses", result$anaID, "run_traceback_file", sep = "/")
+        )
         result$tbl_analysisrunlog <- pre(HTML(result$tbl_analysisrunlog[[1]]))
     } else {
       result$tbl_analysisrunlog <-  NULL
