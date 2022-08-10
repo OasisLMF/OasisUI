@@ -26,7 +26,7 @@ def_out_config(
 
 \item{ana_flag}{Flag to know if the user is creating a new output configuration or rerunning an analysis.}
 
-\item{counter}{Counter to decide whether to clear output options and show some panel (?)}
+\item{counter}{Counter to decide whether to clear output options and show the output config panel}
 
 \item{customModSettings}{Customizable Model settings.}
 }

@@ -81,6 +81,10 @@ DATASETS
 \item{\code{invalidate_ana_validation_summary_content(id)}}{invalidate analysis validation summary content}
 > Write file
 \item{\code{write_file()}}{Write data into a file file_towrite}
+\item{\code{write_csv_file()}}{Write data into a file file_towrite}
+\item{\code{write_parquet_file()}}{Write data into a file file_towrite}
+\item{\code{write_txt_file()}}{Write data into a file file_towrite}
+\item{\code{write_file_json()}}{Write data into a file file_towrite}
 > Helper methods ----
 \item{\code{get_analyses_tar(id, label, destdir = tempdir())}}{Extract input/output tar.}
 \item{\code{get_analyses_inputs_tar(id, destdir = tempdir())}}{Extract input tar.}
@@ -150,9 +154,12 @@ data_hub$get_pf_data_list(id)
 \item \href{#method-invalidate_ana_settings_content}{\code{DataHub$invalidate_ana_settings_content()}}
 \item \href{#method-get_ana_validation_summary_content}{\code{DataHub$get_ana_validation_summary_content()}}
 \item \href{#method-get_ana_errors_summary_content}{\code{DataHub$get_ana_errors_summary_content()}}
+\item \href{#method-get_ana_success_summary_content}{\code{DataHub$get_ana_success_summary_content()}}
 \item \href{#method-invalidate_ana_validation_summary_content}{\code{DataHub$invalidate_ana_validation_summary_content()}}
 \item \href{#method-write_file}{\code{DataHub$write_file()}}
+\item \href{#method-write_csv_file}{\code{DataHub$write_csv_file()}}
 \item \href{#method-write_parquet_file}{\code{DataHub$write_parquet_file()}}
+\item \href{#method-write_txt_file}{\code{DataHub$write_txt_file()}}
 \item \href{#method-write_file_json}{\code{DataHub$write_file_json()}}
 \item \href{#method-get_analyses_tar}{\code{DataHub$get_analyses_tar()}}
 \item \href{#method-get_analyses_inputs_tar}{\code{DataHub$get_analyses_inputs_tar()}}
@@ -538,6 +545,15 @@ data_hub$get_pf_data_list(id)
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_ana_success_summary_content"></a>}}
+\if{latex}{\out{\hypertarget{method-get_ana_success_summary_content}{}}}
+\subsection{Method \code{get_ana_success_summary_content()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$get_ana_success_summary_content(id, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-invalidate_ana_validation_summary_content"></a>}}
 \if{latex}{\out{\hypertarget{method-invalidate_ana_validation_summary_content}{}}}
 \subsection{Method \code{invalidate_ana_validation_summary_content()}}{
@@ -561,11 +577,29 @@ data_hub$get_pf_data_list(id)
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-write_csv_file"></a>}}
+\if{latex}{\out{\hypertarget{method-write_csv_file}{}}}
+\subsection{Method \code{write_csv_file()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$write_csv_file(data, dataset_identifier, file_towrite = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-write_parquet_file"></a>}}
 \if{latex}{\out{\hypertarget{method-write_parquet_file}{}}}
 \subsection{Method \code{write_parquet_file()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DataHub$write_parquet_file(data, dataset_identifier, file_towrite = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-write_txt_file"></a>}}
+\if{latex}{\out{\hypertarget{method-write_txt_file}{}}}
+\subsection{Method \code{write_txt_file()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DataHub$write_txt_file(data, dataset_identifier, file_towrite = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 }

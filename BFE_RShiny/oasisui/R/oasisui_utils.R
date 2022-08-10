@@ -33,7 +33,6 @@ capitalize_first_letter <- function(x) {
         sep = "", collapse = " ")
 }
 
-
 #' Capitalize names of a dataframe
 #'
 #' @rdname capitalize_names_df
@@ -90,7 +89,6 @@ nothingToShowTable <- function(contentMessage = "No data found"){
 getTableOptions <- function(scrollX = TRUE,
                             maxrowsperpage = 5,
                             escape = TRUE) {
-
   options <- list(
     search = list(caseInsensitive = TRUE),
     searchHighlight = TRUE,

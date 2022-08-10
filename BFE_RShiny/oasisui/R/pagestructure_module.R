@@ -45,21 +45,25 @@ pagestructure <- function(input, output, session,
   })
 
   observe({
-    output$sidebar <-
-      renderUI(pagestructureSidebar(ns, state$collapsed))
+    output$sidebar <- renderUI(pagestructureSidebar(ns, state$collapsed))
   })
 
 
   ### Navigation Menu ----------------------------------------------------------
 
-  observeEvent(input$abuttondefineanasingle, {
+  observeEvent(input$abuttondefineanasingle, ignoreInit = TRUE, {
     updateNavigation(navigation_state, "SA")
-    toggleDropdownButton(ns("abuttonanalysis"))
+    # RSc: check this?! somehow not working properly anymore.
+    toggleDropdownButton(ns("abuttonanalysis"), session = session)
+    # input$abuttonanalysis_state
+    # session$sendInputMessage(paste0(inputId, "_state"), list(id = inputId))
+    # session$sendInputMessage(paste0(ns("abuttonanalysis"), "_state"), list(id = ns("abuttonanalysis")))
+    # session$sendInputMessage(ns("abuttonanalysis"), list("aria-expanded" = "false"))
   })
 
-  observeEvent(input$abuttondefineanabatch, {
+  observeEvent(input$abuttondefineanabatch, ignoreInit = TRUE, {
     updateNavigation(navigation_state, "BA")
-    toggleDropdownButton(ns("abuttonanalysis"))
+    toggleDropdownButton(ns("abuttonanalysis"), session = session)
   })
 
   observeEvent(input$abuttonbrowseSBR, {

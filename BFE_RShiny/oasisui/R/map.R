@@ -79,7 +79,9 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
   tiv <- data.frame(total = rep_len(0, nrow(data)))
   tiv_var <- 0
   for (i in grep("tiv", names(data))) {
-    if(length(i) > 0 && !is.na(data[[i]])) {
+    if (length(data[[i]]) > 0 && !all(is.na(data[[i]]))) {
+      # should we check for individual NAs and set to zero for the summation below?
+      # doesn't seem to be an issue atm.
       tiv_var <- tiv_var + data[[i]]
       tiv$total <- add_commas(tiv_var)
     }
@@ -118,6 +120,7 @@ build_marker_data <- function(data, session, paramID, step = NULL) {
   names(keys_success) <- tolower(names(keys_success))
   names(keys_errors) <- tolower(names(keys_errors))
 
+  # note below may throw a "Warning: Unknown or uninitialised column: `detail`."
   if (!is.null(keys_errors) && is.null(keys_errors$detail) && !is.null(keys_success)) {
     if (length(as.numeric(keys_errors$locid)) > 0) {
       key_chain <- left_join(keys_success, keys_errors, by = c("loc_id" = "locid"))

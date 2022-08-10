@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_hub_helper_funcs.R
 \name{writefileJSON}
 \alias{writefileJSON}
-\title{write file JSON}
+\title{write file json}
 \usage{
 writefileJSON(
   data,
@@ -21,5 +21,5 @@ writefileJSON(
 \item{file_towrite}{name of file where to write data.}
 }
 \description{
-Writes object in JSON format.
+Writes object in json format.
 }

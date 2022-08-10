@@ -2,9 +2,20 @@
 % Please edit documentation in R/data_hub_helper_funcs.R
 \name{writefile}
 \alias{writefile}
-\title{write CSV}
+\alias{writeCsv}
+\alias{writeTxt}
+\title{write file}
 \usage{
-writefile(
+writefile(data, dataset_identifier = NULL, ...)
+
+writeCsv(
+  data,
+  dataset_identifier = NULL,
+  destdir = tempdir(),
+  file_towrite = NULL
+)
+
+writeTxt(
   data,
   dataset_identifier = NULL,
   destdir = tempdir(),
@@ -21,5 +32,9 @@ writefile(
 \item{file_towrite}{name of file where to write data.}
 }
 \description{
-Writes object in CSV format.
+Writes object in respective format.
+
+Writes object in csv format.
+
+Writes object in txt format.
 }

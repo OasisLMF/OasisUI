@@ -33,6 +33,7 @@ pagestructureSidebar <- function(ns = identity, collapsed = FALSE) {
                    label = if (!collapsed) "Single Analysis" else "Single",
                    icon = if (collapsed) icon("cog", lib = "glyphicon"),
                    align = "left",  width = "100%") %>%
+                   #`data-toggle` = "collapse", `data-target` = paste0("#", ns("abuttonanalysis"))),
         bs_embed_tooltip(title = landing_page_tooltips$abuttondefineanasingle, placement = "right"),
       oasisuiButton(ns("abuttondefineanabatch"),
                    label = if (!collapsed) "Batch Analysis" else "Batch",

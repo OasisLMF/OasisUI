@@ -4,7 +4,14 @@
 \alias{dynamicUI_btns}
 \title{Dynamic UI with buttons}
 \usage{
-dynamicUI_btns(session, analysisID, ana_flag, tag, oed_field)
+dynamicUI_btns(
+  session,
+  analysisID,
+  ana_flag,
+  tag,
+  oed_field,
+  analysisSettings = NULL
+)
 }
 \arguments{
 \item{session}{Current session.}
@@ -16,6 +23,8 @@ dynamicUI_btns(session, analysisID, ana_flag, tag, oed_field)
 \item{tag}{Current tag.}
 
 \item{oed_field}{Oed fields.}
+
+\item{analysisSettings}{Analysis settings for case where we re-run from settings template.}
 }
 \value{
 UI element.

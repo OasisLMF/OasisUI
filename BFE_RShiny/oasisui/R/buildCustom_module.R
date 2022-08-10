@@ -1,5 +1,5 @@
 # Shared Module documentation --------------------------------------------------
-#' Hazard Map Module
+#' Custom Model Module
 #'
 #' Shiny Module for showing customized details.
 #'
@@ -11,7 +11,7 @@ NULL
 
 # Build Custom UI -----------------------------------------------
 
-#' @describeIn BuildCustom Returns the UI elements of the module.
+#' @describeIn buildCustom Returns the UI elements of the module.
 #'
 #' @importFrom DT DTOutput
 #' @importFrom bsplus bs_embed_tooltip

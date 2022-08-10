@@ -228,7 +228,8 @@ singleAna <- function(input, output, session,
     result$tbl_portfoliosData_rowselected <- match(result$portfolioID, result$pfChoices)
     result$pfName <- result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$name]
     pfstatus <- ""
-    if (!is.na(result$tbl_portfoliosData_rowselected) && !is.na(result$tbl_portfoliosData) && length(result$tbl_portfoliosData_rowselected) > 0) {
+    # result$tbl_portfoliosData should probably not be checked for NA but something else
+    if (!is.na(result$tbl_portfoliosData_rowselected) && !all(is.na(result$tbl_portfoliosData)) && length(result$tbl_portfoliosData_rowselected) > 0) {
       if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$status] == Status$Completed) {
         pfstatus <- "- Status: Completed"
       } else if (result$tbl_portfoliosData[result$tbl_portfoliosData_rowselected, tbl_portfoliosDataNames$status] == Status$Processing) {

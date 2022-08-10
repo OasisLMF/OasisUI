@@ -66,8 +66,6 @@ ViewFilesInTableUI <- function(id, includechkbox = FALSE) {
 #' @importFrom dplyr contains
 #' @importFrom leaflet renderLeaflet
 #' @importFrom leaflet leafletOutput
-#' @importFrom data.table fwrite
-#' @importFrom data.table fread
 #' @importFrom utils count.fields
 #' @importFrom utils zip
 #' @importFrom utils tail
@@ -189,7 +187,6 @@ ViewFilesInTable <- function(input, output, session,
           fpath <- session$userData$data_hub$write_file(data = fileData, dataset_identifier = filename)
           fs <- c(fs, fpath)
         }
-
       }
       zip(zipfile = fname, files = fs)
       # if (file.exists(paste0(fname, currfolder))) file.rename(paste0(fname, ".zip"), fname)
@@ -201,8 +198,9 @@ ViewFilesInTable <- function(input, output, session,
   output$FLdownloadexcel <- downloadHandler(
     filename = "file.csv",
     content = function(file) {
-      session$userData$data_hub$write_file(data = result$tbl_filesListData_wButton, dataset_identifier = filename,
-                                           file_towrite = file)
+      session$userData$data_hub$write_csv_file(data = result$tbl_filesListData_wButton,
+                                               dataset_identifier = filename,
+                                               file_towrite = file)
     }
   )
 
@@ -353,7 +351,7 @@ ViewFilesInTable <- function(input, output, session,
   output$FVEdownloadexcel <- downloadHandler(
     filename = function(){result$currentFile},
     content = function(file) {
-      session$userData$data_hub$write_file(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
+      session$userData$data_hub$write_csv_file(data = result$tbl_fileData, dataset_identifier = result$currentFile, file_towrite = file)
     }
   )
   # Export to .parquet

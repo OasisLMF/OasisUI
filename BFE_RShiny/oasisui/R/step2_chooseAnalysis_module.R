@@ -360,7 +360,7 @@ step2_chooseAnalysis <- function(input, output, session,
     paste0('Cancel input generation for id ', AnaId, ', ', AnaName)
   })
 
-  .cancelIGModal <- function(){
+  .cancelIGModal <- function() {
     ns <- session$ns
     modalDialog(label = "cancelIGModal",
                 title = uiOutput(ns("cancelIGModaltitle"), inline = TRUE),
@@ -468,16 +468,15 @@ step2_chooseAnalysis <- function(input, output, session,
     paste("Logs for analysis", analysisID, AnaName)
   })
 
-
   # Export to .csv
   output$download_log <- downloadHandler(
     filename = "analysis_inputs_log.txt",
     content = function(file) {
-      fwrite(result$tbl_analysislog,
-             file,
-             row.names = FALSE,
-             col.names = FALSE,
-             quote = FALSE)
+      session$userData$data_hub$write_file(
+        # go back from the <pre> tag (for rendering) to character for output
+        data = result$tbl_analysislog$children[[1]],
+        dataset_identifier = "analysis_inputs_log.txt",
+        file_towrite = file)
     }
   )
 
@@ -894,7 +893,7 @@ step2_chooseAnalysis <- function(input, output, session,
     if (!is.null(result$analysisID)) {
       result$tbl_analysislog <- session$userData$oasisapi$return_df(paste("analyses", result$analysisID,
                                                                           "input_generation_traceback_file", sep = "/"))
-      result$tbl_analysislog <- pre(HTML(result$tbl_analysislog))
+      result$tbl_analysislog <- pre(HTML(result$tbl_analysislog[[1]]))
     } else {
       result$tbl_analysislog <-  NULL
     }

@@ -16,7 +16,7 @@ An object of class \code{list} of length 1.
 
 An object of class \code{list} of length 13.
 
-An object of class \code{list} of length 25.
+An object of class \code{list} of length 26.
 
 An object of class \code{list} of length 2.
 }

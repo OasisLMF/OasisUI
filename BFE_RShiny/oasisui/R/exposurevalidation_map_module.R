@@ -63,6 +63,7 @@ exposurevalidationmapUI <- function(id) {
 #' @param portfolioID Selected portfolio ID.
 #' @param counter Reactive value to trigger inputs download.
 #'
+#' @importFrom data.table fwrite
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
 #' @importFrom dplyr distinct
@@ -155,11 +156,10 @@ exposurevalidationmap <- function(input,
   observeEvent({input$chkgrp_perils
     result$uploaded_locs_check}, ignoreNULL = FALSE, {
       if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-
         if (is.null(input$chkgrp_perils)) {
           result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
             mutate(modeled = NA)
-          if (grepl(".x", names(result$uploaded_locs_check_peril))) {
+          if (any(grepl(".x", names(result$uploaded_locs_check_peril)))) {
             names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
           }
           names(result$uploaded_locs_check_peril) <- tolower(names(result$uploaded_locs_check_peril))
@@ -174,7 +174,7 @@ exposurevalidationmap <- function(input,
             filter(!is.na(modeled)) %>%
             select(-peril_id) %>%
             distinct()
-          if (grepl(".x", names(result$uploaded_locs_check_peril))) {
+          if (any(grepl(".x", names(result$uploaded_locs_check_peril)))) {
             names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
           }
           names(result$uploaded_locs_check_peril) <- tolower(names(result$uploaded_locs_check_peril))
@@ -200,7 +200,7 @@ exposurevalidationmap <- function(input,
       fluidRow(
         h4("Validated Exposure by Peril")),
       fluidRow(
-        DTOutput(ns("dt_output_uploaded_lock_check")),
+        DTOutput(ns("dt_output_uploaded_loc_check")),
         downloadButton(ns("exp_downloadexcel"), label = "CSV"),
         style = "display: inline")
     )
@@ -220,7 +220,7 @@ exposurevalidationmap <- function(input,
   )
 
   # Tabular data ---------------------------------------------------------------
-  output$dt_output_uploaded_lock_check <- renderDT(
+  output$dt_output_uploaded_loc_check <- renderDT(
     if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
       datatable(
         result$uploaded_locs_check_peril %>%
@@ -485,8 +485,7 @@ exposurevalidationmap <- function(input,
   # Export new TIV table to csv ------------------------------------------------
   observeEvent(input$exp_tivs, {
     result$circle_locs <- do.call(rbind, lapply(result$info_circles$locID_list, function(x) {
-      #TODO
-      result$uploaded_locs_check %>% filter(LocNumber == x)
+      result$uploaded_locs_check %>% filter(locnumber == x)
     }))
   })
 
@@ -656,7 +655,7 @@ exposurevalidationmap <- function(input,
     df_info <- data.frame("LocNumber" = format(result$uploaded_locs_check_peril$locnumber, big.mark = "",
                                                scientific = FALSE),
                           "TIV" = result$uploaded_locs_check_peril$buildingtiv * (ratio/100))
-    if(!is.null(result$uploaded_locs_check_peril$streetaddress)) {
+    if (!is.null(result$uploaded_locs_check_peril$streetaddress)) {
       df_info <- cbind(df_info, "Address" = result$uploaded_locs_check_peril$streetaddress)
     }
     info <- .is_within_bounds(df_info, radius, lat_click, long_click, ratio)

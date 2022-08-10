@@ -4,14 +4,16 @@
 \alias{Global_funs}
 \title{Global Model Settings parameters function}
 \usage{
-Global_funs(session, model_settings, ui_step)
+Global_funs(session, model_settings, ui_step, ls_param_group)
 }
 \arguments{
 \item{session}{Current session.}
 
 \item{model_settings}{Model settings retrieved from the API.}
 
-\item{ui_step}{Step 2}
+\item{ui_step}{Step 2.}
+
+\item{ls_param_group}{Parameter groups.}
 }
 \value{
 List of UI elements (input/selector widgets).
