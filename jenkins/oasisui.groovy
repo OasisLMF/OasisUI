@@ -12,6 +12,7 @@ node {
         [$class: 'BooleanParameterDefinition', description: "Purge docker images",              name: 'PURGE', value: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', description: "Create release if checked",        name: 'PUBLISH', value: Boolean.valueOf(false)],
         [$class: 'BooleanParameterDefinition', description: "Mark as pre-released software",    name: 'PRE_RELEASE', value: Boolean.valueOf(true)],
+        [$class: 'StringParameterDefinition',  description: "CVE Rating that fails a build",    name: 'SCAN_IMAGE_VULNERABILITIES', defaultValue: "HIGH,CRITICAL"],
         [$class: 'BooleanParameterDefinition', description: "Perform a gitflow merge",          name: 'AUTO_MERGE', defaultValue: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', description: "Send build status to slack",       name: 'SLACK_MESSAGE', value: Boolean.valueOf(false)]
       ])
@@ -31,6 +32,10 @@ node {
     String source_git_url   = "git@github.com:OasisLMF/${source_name}.git"
     String source_workspace = "ui_workspace"
     String source_sh        = '/buildscript/utils.sh'
+
+    // CVE scan vars
+    String mnt_docker_socket = "-v /var/run/docker.sock:/var/run/docker.sock"
+    String mnt_output_report = "-v ${env.WORKSPACE}/${source_workspace}/image_reports:/tmp"
 
 
     //env.PYTHON_ENV_DIR = "${script_dir}/pyth-env"           // Virtualenv location
@@ -111,7 +116,31 @@ node {
             }
         )
 
-        // ToDO add testing here
+        // Scan for CVE
+        if (params.SCAN_IMAGE_VULNERABILITIES.replaceAll(" \\s","")){
+            parallel(
+                scan_app_image: {
+                    stage('Scan: UI app'){
+                        dir(source_workspace) {
+                            withCredentials([string(credentialsId: 'github-tkn-read', variable: 'gh_token')]) {
+                                sh "docker run -e GITHUB_TOKEN=${gh_token} ${mnt_docker_socket} ${mnt_output_report} aquasec/trivy image --security-checks vuln,config --exit-code 1 --severity ${params.SCAN_IMAGE_VULNERABILITIES} --output /tmp/cve_app_image.txt ${app_image}:${env.TAG_RELEASE}"
+                            }
+                        }
+                    }
+                },
+                scan_proxy_image: {
+                    stage('Scan: UI proxy'){
+                        dir(source_workspace) {
+                            // Scan for CVE
+                            withCredentials([string(credentialsId: 'github-tkn-read', variable: 'gh_token')]) {
+                                sh "docker run -e GITHUB_TOKEN=${gh_token} ${mnt_docker_socket} ${mnt_output_report} aquasec/trivy image --security-checks vuln,config --exit-code 1 --severity ${params.SCAN_IMAGE_VULNERABILITIES} --output /tmp/cve_proxy_image.txt ${proxy_image}:${env.TAG_RELEASE}"
+                            }
+                        }
+                    }
+                }
+            )
+        }
+
 
         //Optionaly Publish to docker hub stage
         if (params.PUBLISH){
@@ -193,6 +222,14 @@ node {
         dir(build_workspace) {
             sh PIPELINE + " purge_image ${proxy_image} ${env.TAG_RELEASE}"
             sh PIPELINE + " purge_image ${app_image} ${env.TAG_RELEASE}"
+        }
+
+        //Store Docker image reports
+        if (params.SCAN_IMAGE_VULNERABILITIES.replaceAll(" \\s","")){
+            dir(oasis_workspace){
+                archiveArtifacts artifacts: 'image_reports/**/*.*'
+            }
+
         }
 
         //Notify Slack
