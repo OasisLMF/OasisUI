@@ -98,6 +98,7 @@ panelSettingsTemplates <- function(id) {
 #' @template params-module-ui
 #'
 #' @importFrom shinyjs hidden
+#' @importFrom bsplus bs_embed_tooltip
 #'
 #' @export
 panelModelParams <- function(id) {
@@ -119,6 +120,13 @@ panelModelParams <- function(id) {
           align = "left",
           numericInput(ns("tinputnoofsample"), label = "Number of Samples:", value = 9),
           numericInput(ns("tinputthreshold"), label = "Loss Threshold:", value = 0),
+          # 239: additional output cfg options (not part of modelsettings!)
+          textInput(ns("tinputreturnperiods"), label = "Return Periods:", value = "") %>%
+            bs_embed_tooltip(title = defineSingleAna_tooltips$tinputreturnperiods, placement = "right"),
+          textInput(ns("tinputeventids"), label = "Event IDs:", value = "") %>%
+            bs_embed_tooltip(title = defineSingleAna_tooltips$tinputreturnperiods, placement = "right"),
+          textInput(ns("tinputquantiles"), label = "Quantiles:", value = "") %>%
+            bs_embed_tooltip(title = defineSingleAna_tooltips$tinputquantiles, placement = "right"),
           uiOutput(ns("advanced_model_param")),
           oasisuiButton(inputId = ns("abuttonbasic"), label = "Basic")
         )
@@ -1179,6 +1187,10 @@ def_out_config <- function(input,
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
+      # 239: insert additional output cfg options at the desired spot
+      "return_periods" = as.integer(strsplit(gsub(" ", "", input$tinputreturnperiods), ",")[[1]]),
+      "event_ids" = as.integer(strsplit(gsub(" ", "", input$tinputeventids), ",")[[1]]),
+      "quantiles" = as.numeric(strsplit(gsub(" ", "", input$tinputquantiles), ",")[[1]]),
       "model_name_id" = modelData[[tbl_modelsDataNames$model_id]],
       "model_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
       "number_of_samples" = as.integer(input$tinputnoofsample),
@@ -1188,6 +1200,14 @@ def_out_config <- function(input,
       # potential new tag environment_tag
       "source_tag" = getOption("oasisui.settings.oasis_environment")
     )
+    # 239: set to NULL if the lists are empty (i.e. exclude the fields from the analysis settings)
+    # this cannot be done directly above because elements that are assigned NULL during list creation will actually remain in the list with NULL values
+    if (length(inputsettings$return_periods) == 0)
+      inputsettings$return_periods <- NULL
+    if (length(inputsettings$event_ids) == 0)
+      inputsettings$event_ids <- NULL
+    if (length(inputsettings$quantiles) == 0)
+      inputsettings$quantiles <- NULL
 
     fetch_summary <- function(prsp, checked) {
       if (prsp %in% checked) {
@@ -1246,7 +1266,7 @@ def_out_config <- function(input,
           # update requested reports for summary level that is being iterated
           idx_item <- review_prsp$summary_level == fields_to_add[item]
           keep <- review_prsp[idx_item, "report"]
-          #TODO: check which ord reports are needed for plot and expand lec_list
+          # TODO: check which ord reports are needed for plot and expand lec_list
           lec_list <- c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP",
                         "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP", "LEC Mean Wheatsheaf AEP",
                         "LEC Mean Wheatsheaf OEP", "LEC Sample Mean AEP", "LEC Sample Mean OEP")
