@@ -226,7 +226,7 @@ node {
 
         //Store Docker image reports
         if (params.SCAN_IMAGE_VULNERABILITIES.replaceAll(" \\s","")){
-            dir(oasis_workspace){
+            dir(source_workspace){
                 archiveArtifacts artifacts: 'image_reports/**/*.*'
             }
 
