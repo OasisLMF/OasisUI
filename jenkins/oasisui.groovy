@@ -123,7 +123,8 @@ node {
                     stage('Scan: UI app'){
                         dir(source_workspace) {
                             withCredentials([string(credentialsId: 'github-tkn-read', variable: 'gh_token')]) {
-                                sh "docker run -e GITHUB_TOKEN=${gh_token} ${mnt_docker_socket} ${mnt_output_report} aquasec/trivy image --security-checks vuln,config --exit-code 1 --severity ${params.SCAN_IMAGE_VULNERABILITIES} --output /tmp/cve_app_image.txt ${app_image}:${env.TAG_RELEASE}"
+                                sh "docker run -e GITHUB_TOKEN=${gh_token} ${mnt_docker_socket} ${mnt_output_report} aquasec/trivy image  --output /tmp/cve_app_image.txt ${app_image}:${env.TAG_RELEASE}"
+                                sh "docker run -e GITHUB_TOKEN=${gh_token} ${mnt_docker_socket} ${mnt_output_report} aquasec/trivy image --security-checks vuln --exit-code 1 --severity ${params.SCAN_IMAGE_VULNERABILITIES} ${app_image}:${env.TAG_RELEASE}"
                             }
                         }
                     }
