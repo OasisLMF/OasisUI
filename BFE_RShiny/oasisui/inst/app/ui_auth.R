@@ -89,7 +89,8 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
     ), # End of fluidRow
 
     # Footer ----
-    if (Sys.getenv("HIDE_UI_VERSION", unset = TRUE)) {
+    hide_footer = getOption("oasisui.settings.hide_footer")
+    if (! hide_footer) {
         fillRow(
           em(paste("OasisUI", as.character(utils::packageVersion("oasisui"))), class = "oasisui-footer"),
           a(href = "https://shiny.rstudio.com/",
