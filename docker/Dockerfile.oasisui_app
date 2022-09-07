@@ -48,6 +48,7 @@ EXPOSE 3838
 # ENV API_SHARE_FILEPATH=./downloads
 # ENV OASIS_ENVIRONMENT=oasis_localhost
 # ENV MAX_UPLOAD_SIZE=500
+# ENV HIDE_UI_VERSION=FALSE
 
 # Launch Oasisui
 CMD ["R", "-e", "oasisui::runOasisui()"]
