@@ -5,7 +5,7 @@ FROM rocker/r-ver:4.0.5
 # (see https://github.com/rocker-org/rocker-versioned2/blob/master/dockerfiles/r-ver_4.0.5.Dockerfile for reference)
 # -> installs R to /usr/local/lib/R
 
-RUN apt-get update && \
+RUN apt-get update && apt-get upgrade -y && \
 apt-get install -y --no-install-recommends libnode-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils libjq-dev gdal-bin proj-bin libgdal-dev libudunits2-dev && \
     # if desired, add tools such as: sudo, vim, wget, curl, procps
     # library necessary for dependency of geojsonio
