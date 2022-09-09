@@ -1,0 +1,14 @@
+version: '3'                                                                                                                  
+services:
+  user-interface:
+    image: coreoasis/oasisui_app:latest
+    network_mode: "host"
+    environment:
+     - API_IP=localhost
+     - API_PORT=8000
+     - API_VERSION=v1
+     - API_SHARE_FILEPATH=./downloads
+     - OASIS_ENVIRONMENT=oasis_localhost
+#     - HIDE_FOOTER_VERSION=TRUE  
+    ports:
+     - 8080:3838 
