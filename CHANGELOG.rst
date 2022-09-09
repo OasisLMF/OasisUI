@@ -1,6 +1,16 @@
 OasisUI Changelog
 ==================
 
+`1.11.4`_
+ ---------
+* [#281, #266, #284, #279](https://github.com/OasisLMF/OasisUI/pull/289) - Feature/284 reuse settings plus bugfixes
+* [#288](https://github.com/OasisLMF/OasisUI/pull/293) - Update rocker image 
+* [#295](https://github.com/OasisLMF/OasisUI/pull/295) - Option to hide footer version information 
+* [#285](https://github.com/OasisLMF/OasisUI/pull/285) - enable connecting to API behind https URL
+.. _`1.11.4`:  https://github.com/OasisLMF/OasisUI/compare/1.11.3...1.11.4
+
+`1.11.3`_
+ ---------
 * [#276](https://github.com/OasisLMF/OasisUI/pull/278) - Summary output parameters contains too many reports
 .. _`1.11.3`:  https://github.com/OasisLMF/OasisUI/compare/1.11.2...1.11.3
 
