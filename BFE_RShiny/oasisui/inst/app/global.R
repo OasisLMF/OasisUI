@@ -32,5 +32,6 @@ options(oasisui.settings.api.version = APISettings$version)
 options(oasisui.settings.api.share_filepath = APISettings$share_filepath)
 
 options(oasisui.settings.admin.mode = Sys.getenv("ADMIN_MODE"))
+options(oasisui.settings.hide_footer = Sys.getenv("HIDE_FOOTER_VERSION", unset = FALSE))
 
 options(oasisui.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))

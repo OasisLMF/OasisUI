@@ -89,14 +89,15 @@ authUI <- function(WidthSide = 3, WidthMain = 9) {
     ), # End of fluidRow
 
     # Footer ----
-    fillRow(
-      em(paste("OasisUI", as.character(utils::packageVersion("oasisui"))), class = "oasisui-footer"),
-      a(href = "https://shiny.rstudio.com/",
-        em("Powered by RShiny",
-           class = "rshiny-footer"),
-        align = "left")
-    )
-
+    if(getOption("oasisui.settings.hide_footer") == FALSE) {
+        fillRow(
+          em(paste("OasisUI", as.character(utils::packageVersion("oasisui"))), class = "oasisui-footer"),
+          a(href = "https://shiny.rstudio.com/",
+            em("Powered by RShiny",
+               class = "rshiny-footer"),
+            align = "left")
+        )
+    }
   )
 
 }
