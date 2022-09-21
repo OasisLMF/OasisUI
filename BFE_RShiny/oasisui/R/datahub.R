@@ -130,6 +130,10 @@
 #' @importFrom tidyr spread
 #' @importFrom tidyr gather
 #' @importFrom arrow read_parquet
+#' @importFrom readr write_file
+#' @importFrom readr read_csv
+#' @importFrom utils unzip
+#' @importFrom geojsonio geojson_read
 #'
 #' @export
 
@@ -137,9 +141,9 @@ DataHub <- R6Class(
   "DataHub",
   # Private ----
   private = list(
-    user = "", # string identifying the user
-    user_destdir = "", # user specific destdir
-    oasisapi = NULL # oasisapi as stored in session$userData$oasisapi
+    user = "",  # string identifying the user
+    user_destdir = "",  # user specific destdir
+    oasisapi = NULL  # oasisapi as stored in session$userData$oasisapi
   ),
   public = list(
     # Initialize ----
@@ -241,7 +245,7 @@ DataHub <- R6Class(
     },
 
     # DATASETS ----
-    # > PORTFLIO METHODS ----
+    # > PORTFOLIO METHODS ----
     # extract a source file (location/account...) content given a portfolio id
     # dataset_identifier is location/account/reinsurance_info/reinsurance_source
     # If file does not exist, returns df details: Not Found
@@ -249,9 +253,22 @@ DataHub <- R6Class(
       dataset_res <- private$oasisapi$api_get_query(paste("portfolios", id, dataset_identifier, sep = "/"))$result
       # check if file has the parquet extension (i.e. is not csv). If yes, process differently then csv
       if (!grepl("csv", dataset_res[3]$headers$`content-type`)) {
-        dataset_content <- read_parquet(content(dataset_res))
+        if (grepl("zip", dataset_res[3]$headers$`content-type`)) {
+          path_zipfile <- tempfile(tmpdir = private$user_destdir, fileext = ".zipp")
+          # do not use "zip" as the extension above because base' open() function used inside readr::write_file() will fail
+          # on an attempt to unzip() the file...
+          readr::write_file(content(dataset_res), path_zipfile)
+          destdir <- file.path(private$user_destdir, "unzip")
+          utils::unzip(path_zipfile, exdir = destdir)
+          pf_sourcefile <- file.path(destdir, list.files(destdir)[1])  # should be just a single file inside
+          # NOTE: `read_csv` below is going to print "Column specification" with the cols(...) specs to the console!
+          dataset_content <- readr::read_csv(pf_sourcefile)
+        } else {
+          # parquet
+          dataset_content <- read_parquet(content(dataset_res))
+        }
       } else {
-        # NOTE: the call to `content` below is going to print "Column specification" with the cols(...) specs to the console!
+        # NOTE: the call to `content` below is going to print (via readr) "Column specification" with the cols(...) specs to the console!
         dataset_content <- content(dataset_res)
       }
 
@@ -264,7 +281,6 @@ DataHub <- R6Class(
             as.data.frame(stringsAsFactors = FALSE)
           colnames(dataset_content) <- dataset_content[1, ]
         }
-
       } else {
         dataset_content <- bind_rows(dataset_content) %>%
           as.data.frame()
@@ -315,11 +331,11 @@ DataHub <- R6Class(
       invisible()
     },
     # extract model hazard resource file given model id
-    get_model_hazard_dataset_content = function(id,filename, ...) {
+    get_model_hazard_dataset_content = function(id, filename, ...) {
       mapfile_content <- NULL
       if (!is.null(id)) {
         mapfile <- private$oasisapi$api_return_query_res(query_path = paste("data_files", id, "content", sep = "/"), query_method = "GET")
-        path_mapfile <- file.path(private$user_destdir,filename)
+        path_mapfile <- file.path(private$user_destdir, filename)
         readr::write_file(mapfile, path_mapfile)
         mapfile_content <- geojsonio::geojson_read(path_mapfile, what = "sp")
       }
@@ -702,20 +718,26 @@ DataHub <- R6Class(
   x <- as.character(x)
   x <- strsplit(x, split = "[.]")[[1]][1]
   y <- unlist(strsplit(x, split = "_"))
-  report <-  paste(y[3:(length(y))], collapse = "_")
-  g_idx <- as.integer(gsub("S", "", y[2]))
-  g_oed <- analysis_settings[[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
-  if (length(g_oed) == 0) {
-    # logMessage("g_oed is NULL in .addDescription")
-    g_oed <- "All Risks"
+
+  if (y[1] == "analysis") {
+    # the analysis settings json has been added to the output files although it doesn't follow the naming convention used thus far.
+    z <- data.frame("perspective" = y[1], "summary_level" = "Analysis", "report" = "Analysis Settings", stringsAsFactors = FALSE)
   } else {
-    g_oed <- unlist(g_oed)
+    report <- paste(y[3:(length(y))], collapse = "_")
+    z <- reportToVar()[[report]]
+    if (is.null(z))
+      z <- "Summary Info"
+    g_idx <- as.integer(gsub("S", "", y[2]))
+    g_oed <- analysis_settings[[paste0(y[1], "_summaries")]][[g_idx]][["oed_fields"]]
+    if (length(g_oed) == 0) {
+      # logMessage("g_oed is NULL in .addDescription")
+      g_oed <- "All Risks"
+    } else {
+      g_oed <- unlist(g_oed)
+    }
+    g <- g_oed
+    z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = z, stringsAsFactors = FALSE)
   }
-  g <- g_oed
-  z <- reportToVar()[[report]]
-  if (is.null(z))
-    z <- "Summary Info"
-  z <- data.frame("perspective" = y[1], "summary_level" = toString(g), "report" = z, stringsAsFactors = FALSE)
   z
 }
 
