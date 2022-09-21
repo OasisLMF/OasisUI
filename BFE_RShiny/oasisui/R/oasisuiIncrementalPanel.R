@@ -62,7 +62,7 @@ oasisuiIncrementalPanel <- function(input, output, session, panels_state,
   })
   observeEvent(input$del_ok, {
     removeModal()
-    cat("delete", id, "\n")
+    cat("oasisuiIncrementalPanel: delete", id, "\n")
     removeUI(sprintf("#%s", id), immediate = TRUE)
     panels_state[[id]] <- FALSE
   })
@@ -162,7 +162,7 @@ callIncrementalPanelModules <- function(IDs, ID_0,
     remove_all = function() {
       state_vec <- unlist(reactiveValuesToList(panels_state))
       IDs <- names(state_vec)[state_vec]
-      cat("delete", IDs, "\n")
+      cat("callIncrementalPanelModules: delete", IDs, "\n")
       lapply(IDs, function(id) {
         removeUI(sprintf("#%s", id), immediate = TRUE)
         panels_state[[id]] <- FALSE
