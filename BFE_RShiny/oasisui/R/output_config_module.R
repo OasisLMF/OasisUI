@@ -1154,8 +1154,11 @@ def_out_config <- function(input,
       # NULL or list() elements won't survive the c() above!
 
       # create list/vector of names for model settings
-      names_full_list <- c("event_set",
-                           "event_occurrence_id",
+      # 291 - allow event_set and event_occurrence_id to be missing for certain models, in which case we will simply have no basic params:
+      names_full_list <- c()
+      if (!is.null(input$event_set)) names_full_list <- c(names_full_list, "event_set")
+      if (!is.null(input$event_occurrence)) names_full_list <- c(names_full_list, "event_occurrence_id")
+      names_full_list <- c(names_full_list,
                            "number_of_samples",
                            boolean_name,
                            inputs_name)
