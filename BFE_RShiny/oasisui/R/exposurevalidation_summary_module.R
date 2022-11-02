@@ -223,9 +223,9 @@ exposurevalidationsummary <- function(input,
   .extract_df_plot <- function(df) {
     df <- df %>%
       filter(type %in% type_to_plot) %>%
-      mutate(fail = 100*fail/all,
-             success = 100*success/all,
-             nomatch = 100*nomatch/all,
+      mutate(fail = 100 * fail / all,
+             success = 100 * success / all,
+             nomatch = 100 * nomatch / all,
              all = NULL) %>%
       gather(key, value, factor_key = TRUE, -c(peril, type)) %>%
       mutate(peril = as.factor(peril),
@@ -237,17 +237,21 @@ exposurevalidationsummary <- function(input,
   .plot_stack_hist <- function(df) {
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
-    # n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
-    n_plots_row <- length(unique(df$peril))
+
     # leave only: Fail, Success and Nomatch statuses and remove peril "total"
     key_unwanted <- c("portfolio", "not-modelled", "modelled")
     df <- df %>% filter(key %notin% key_unwanted)
+    # 280: after more detailed keys had been added to the API, the exclusions
+    # above weren't sufficient anymore. Pick fail, success and nomatch
+    # explicitly as done in .extract_df_plot().
+    df <- df %>% filter(key %in% c("fail", "success", "nomatch"))
 
     if (length(grep("total", df$peril)) > 0) {
       df <- df[-grep("total", df$peril), ]
     }
     status <- df$key
     percentage <- df$value
+    n_plots_row <- length(unique(df$peril))
 
     p <- ggplot(data = df, aes(x = type, y = percentage, fill = status)) +
       theme(
