@@ -14,10 +14,18 @@
 showname <- function(x) {
   if (length(x) > 1) {
     y <- x$name
+    # 282
+    if (is.null(y)) y <- paste(unlist(x), collapse = ", ")
   } else if (length(x) == 0) {
     y <- "Not Available"
   } else {
-    y <- x
+    # length of 1
+    if (is.list(x)) {
+      # 282
+      y <- paste(unlist(x), collapse = ", ")
+    } else {
+      y <- x
+    }
   }
   y
 }
