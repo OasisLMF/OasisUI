@@ -106,7 +106,8 @@ plottypeslist <- list(
     "x" = c("type"),
     "keycols" = c("mean"),
     "uncertaintycols" = c("standard_deviation"),
-    "referencecols" = c("exposure_value"),
+    # 277: prevent crash due to no more existing reference col "exposure_value"
+    "referencecols" = c(),
     "xtickslabels" = c("Numerically Integrated", "Sample Statistics"),
     "extracols" = c("X", "summary_id"),
     "plottype" = "bar",

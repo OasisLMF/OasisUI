@@ -419,7 +419,7 @@ panelOutputModule <- function(input, output, session,
           if (length(grep("locnumber", filesListData$summary_level)) > 0) {
             filesToPlot <- filesListData %>% filter(grepl("locnumber", filesListData$summary_level))
             filesToPlot <- filesToPlot$files[-grep("summary-info", filesToPlot$files)]
-            #filter by report
+            # filter by report
             if (length(filesToPlot) > 1) {
               if (grepl("aep", tolower(input$pltreports))) {
                 filesToPlot <- filesToPlot[grep("aep", filesToPlot)]
@@ -462,7 +462,7 @@ panelOutputModule <- function(input, output, session,
   }, ignoreNULL = FALSE, {
     #if losstype = GUL then policy inactive
     if ("GUL" %in% chkbox$chkboxgrplosstypes()) {
-      #TODO: GUL does not have policy, more feedback required for development
+      # TODO: GUL does not have policy, more feedback required for development
       SumLevel <- result$SumLevel[which(result$SumLevel != "Policy")]
     } else {
       SumLevel <- result$SumLevel
@@ -539,6 +539,8 @@ panelOutputModule <- function(input, output, session,
     # >> Plot parameters
     key <- plottypeslist[[inputplottype()]]$keycols
     uncertainty <- plottypeslist[[inputplottype()]]$uncertaintycols
+    # 277: this referencecols feature seems unused now, possibly this was added
+    # in early days to have both analytical and sample means in one AAL plot?
     reference <- plottypeslist[[inputplottype()]]$referencecols
     keycols <- c(key, uncertainty, reference)
     x <- plottypeslist[[inputplottype()]]$x
@@ -608,7 +610,7 @@ panelOutputModule <- function(input, output, session,
       for (i in seq(nrow(filesToPlot))) {
         currfileData <- .readFile(filesToPlot$files[i])
         if (nrow(currfileData) > 0) {
-          # Change column names for joining by adding an extension representing the losstype the variable or the granularity to comapre
+          # Change column names for joining by adding an extension representing the losstype, the variable or the granularity to compare
           nonkey <- names(currfileData)[ !(names(currfileData) %in% keycols)]
           gridcol <- names(currfileData)[ !(names(currfileData) %in% keycols) &
                                             !(names(currfileData) %in% extracols) &
@@ -622,7 +624,7 @@ panelOutputModule <- function(input, output, session,
             newnamekey <- paste0(k, ".", extension)
             names(currfileData)[names(currfileData) == k] <- newnamekey
           }
-          #Join data
+          # Join data
           if (is.null(fileData)) {
             fileData <- currfileData
           } else {
@@ -646,7 +648,7 @@ panelOutputModule <- function(input, output, session,
       if (inputplottype() == "loss for return period map") {
         if (TRUE %in% grepl("locnumber", filesListData()$summary_level)) {
           # filter for values related to locnumber
-          #TODO: introduce if statement in case return_period is not there
+          # TODO: introduce if statement in case return_period is not there
           data <- data %>% filter(return_period == input$pltrtnprd)
         }
       } else {
@@ -688,7 +690,8 @@ panelOutputModule <- function(input, output, session,
         if (length(uncertainty) > 0) {
           data <- data %>% rename("uncertainty" = uncertainty)
         }
-        # rename column for refernece. Not all files will have it
+        # rename column for reference. Not all files will have it
+        # 277: looks unused / obsolete now.
         if (length(reference) > 0) {
           data <- data %>% rename("reference" = reference)
         }
@@ -905,7 +908,7 @@ panelOutputModule <- function(input, output, session,
     data$uncertainty <- add_commas(data$uncertainty)
     data$reference <- add_commas(data$reference)
 
-    #rename tooltip entries
+    # rename tooltip entries
     "Summary_Level" <- data$colour
     "Type" <- data$xaxis
     "Loss" <- add_commas(data$value*1000000)
