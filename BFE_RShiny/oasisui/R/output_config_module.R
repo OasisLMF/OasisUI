@@ -1190,10 +1190,12 @@ def_out_config <- function(input,
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
-      # 239: insert additional output cfg options at the desired spot
-      "return_periods" = as.integer(strsplit(gsub(" ", "", input$tinputreturnperiods), ",")[[1]]),
-      "event_ids" = as.integer(strsplit(gsub(" ", "", input$tinputeventids), ",")[[1]]),
-      "quantiles" = as.numeric(strsplit(gsub(" ", "", input$tinputquantiles), ",")[[1]]),
+      # 239: insert additional output cfg options at the desired spot.
+      # these are explicitly lists because a single element would be converted
+      # differently to json otherwise
+      "return_periods" = as.list(as.integer(strsplit(gsub(" ", "", input$tinputreturnperiods), ",")[[1]])),
+      "event_ids" = as.list(as.integer(strsplit(gsub(" ", "", input$tinputeventids), ",")[[1]])),
+      "quantiles" = as.list(as.numeric(strsplit(gsub(" ", "", input$tinputquantiles), ",")[[1]])),
       "model_name_id" = modelData[[tbl_modelsDataNames$model_id]],
       "model_supplier_id" = modelData[[tbl_modelsDataNames$supplier_id]],
       "number_of_samples" = as.integer(input$tinputnoofsample),
