@@ -1,0 +1,42 @@
+name: OasisUI Build
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      ...
+
+  workflow_call:
+    inputs:
+      ...
+
+
+env:
+
+
+
+jobs:
+  shiny_app:
+    runs-on: ubuntu-latest
+    steps:
+    
+    #Clone repo 
+
+    #docker build
+
+    #Trivy Scan 
+
+    #Image push - temp location  
+
+  shiny_proxy:
+    runs-on: ubuntu-latest
+    steps:
+
+    #Clone repo 
+
+    #docker build
+
+    #Trivy Scan 
+
+    #Image push - temp location  
+
