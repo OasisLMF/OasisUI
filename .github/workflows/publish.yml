@@ -118,13 +118,13 @@ jobs:
     - name: Pull and Tag app_image
       run: |
         docker pull ${{ needs.images.outputs.app_image }}
-        docker tag ${{ needs.images.outputs.app_image }} coreoasis/oasisui_app:${{ RELEASE_TAG }}
+        docker tag ${{ needs.images.outputs.app_image }} coreoasis/oasisui_app:${{ env.RELEASE_TAG }}
         docker tag ${{ needs.images.outputs.app_image }} coreoasis/oasisui_app:latest
 
     - name: Pull and tag proxy_image
       run: |
         docker pull ${{ needs.images.outputs.proxy_image }}
-        docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:${{ RELEASE_TAG }}
+        docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:${{ env.RELEASE_TAG }}
         docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:latest
 
     # --- Create Changelog / notes --- #
