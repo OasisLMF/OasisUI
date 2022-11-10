@@ -77,7 +77,7 @@ on:
 jobs:
   shiny_app:
     env:
-      IMAGE_TAG: 'oasisui_app-'${{ github.sha }}
+      IMAGE_TAG: 'oasisui_app-${{ github.sha }}'
       IMAGE_REPO: 'coreoasis/github-actions'
       DOCKERFILE: 'docker/Dockerfile.oasisui_app'
       SEVERITY: 'CRITICAL,HIGH'
@@ -125,7 +125,7 @@ jobs:
   shiny_proxy:
     runs-on: ubuntu-latest
     env:
-      IMAGE_TAG: 'oasisui_proxy-'${{ github.sha }}
+      IMAGE_TAG: 'oasisui_proxy-${{ github.sha }}'
       IMAGE_REPO: 'coreoasis/github-actions'
       DOCKERFILE: 'docker/Dockerfile.oasisui_proxy'
       SEVERITY: 'CRITICAL,HIGH'
@@ -134,7 +134,7 @@ jobs:
     steps:
     - name: Set inputs
       if: github.event_name != 'push'
-      run: | 
+      run: |
         echo "SEVERITY=${{ inputs.cve_severity }}" >> $GITHUB_ENV
         [[ -z "${{ inputs.proxy_image_tag }}" ]] || echo "IMAGE_TAG=${{ inputs.proxy_image_tag }}" >> $GITHUB_ENV
         [[ -z "${{ inputs.proxy_image_repo }}" ]] || echo "IMAGE_REPO=${{ inputs.proxy_image_repo }}" >> $GITHUB_ENV
@@ -145,12 +145,10 @@ jobs:
       env:
        GITHUB_CONTEXT: ${{ toJson(github) }}
 
-    #Clone repo
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.ref_name }}
 
-    #docker build
     - name: Docker Build
       run: |
         docker build -f ${{ env.DOCKERFILE }} -t ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }} .
