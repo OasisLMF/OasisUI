@@ -17,4 +17,4 @@ sed -i "s|%OASIS_ENVIRONMENT%|$OASIS_ENVIRONMENT|g" settings.env
 sed -i "s|%MAX_UPLOAD_SIZE%|$MAX_UPLOAD_SIZE|g" settings.env
 sed -i "s|%HIDE_FOOTER_VERSION%|$HIDE_FOOTER_VERSION|g" settings.env
 
-java -jar shinyproxy-1.1.0.jar
+java -jar shinyproxy.jar
