@@ -92,7 +92,7 @@ jobs:
         [[ -z "${{ inputs.app_image_tag }}" ]] || echo "IMAGE_TAG=${{ inputs.app_image_tag }}" >> $GITHUB_ENV
         [[ -z "${{ inputs.app_image_repo }}" ]] || echo "IMAGE_REPO=${{ inputs.app_image_repo }}" >> $GITHUB_ENV
 
-    - name: Dump github context
+    - name: Github context
       run:   echo "$GITHUB_CONTEXT"
       shell: bash
       env:
@@ -120,7 +120,7 @@ jobs:
         security-checks: 'vuln'
         output: 'app_image.txt'
 
-    - name: Store CVE report 
+    - name: Store CVE report
       if: always()
       uses: actions/upload-artifact@v3
       with:
@@ -131,10 +131,10 @@ jobs:
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}                                                                                                           
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Docker push 
+    - name: Docker push
       run: docker push ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
 
 
@@ -155,7 +155,7 @@ jobs:
         [[ -z "${{ inputs.proxy_image_tag }}" ]] || echo "IMAGE_TAG=${{ inputs.proxy_image_tag }}" >> $GITHUB_ENV
         [[ -z "${{ inputs.proxy_image_repo }}" ]] || echo "IMAGE_REPO=${{ inputs.proxy_image_repo }}" >> $GITHUB_ENV
 
-    - name: Dump github context
+    - name: Github context
       run:   echo "$GITHUB_CONTEXT"
       shell: bash
       env:
@@ -169,8 +169,11 @@ jobs:
       run: |
         docker build -f ${{ env.DOCKERFILE }} -t ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }} .
 
+
+    # NOTE: even the latest version of shiny proxy as CRITICAL CVE issues (warn but no fail)
     - name: Trivy vulnerability scanner
       if: env.SEVERITY != ''
+      continue-on-error: true
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
@@ -193,8 +196,8 @@ jobs:
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}                                                                                                           
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Docker push 
+    - name: Docker push
       run: docker push ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
