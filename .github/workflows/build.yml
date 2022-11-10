@@ -120,7 +120,23 @@ jobs:
         security-checks: 'vuln'
         output: 'app_image.txt'
 
-    #Image push - temp location
+    - name: Store CVE report 
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: app_image_scan
+        path: ./app_image.txt
+        retention-days: 3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}                                                                                                           
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Docker push 
+      run: docker push ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+
 
   shiny_proxy:
     runs-on: ubuntu-latest
@@ -166,4 +182,19 @@ jobs:
         security-checks: 'vuln'
         output: 'proxy_image.txt'
 
+    - name: Store CVE report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: proxy_image_scan
+        path: ./proxy_image.txt
+        retention-days: 3
 
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}                                                                                                           
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Docker push 
+      run: docker push ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
