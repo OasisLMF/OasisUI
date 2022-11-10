@@ -164,8 +164,8 @@ jobs:
     # --- Push Images --- #
     - name: Push images
       run: |
-        docker push coreoasis/oasisui_proxy:${{ RELEASE_TAG }}
-        docker push coreoasis/oasisui_ui:${{ RELEASE_TAG }}
+        docker push coreoasis/oasisui_proxy:${{ env.RELEASE_TAG }}
+        docker push coreoasis/oasisui_ui:${{ env.RELEASE_TAG }}
 
 
     - name: Push images (Production)
