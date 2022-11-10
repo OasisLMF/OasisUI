@@ -63,14 +63,14 @@ on:
         default: ''
         type: string
 
-#    outputs:
-#      app_image_ref:
-#        description:
-#        value: ${{ jobs.shiny_app.outputs. ___ }}
-#
-#      proxy_image_ref:
-#        description:
-#        value: ${{ jobs.shiny_proxy.outputs. ___ }}
+    outputs:
+      app_image:
+        description:
+        value: ${{ jobs.shiny_app.outputs.image }}
+
+      proxy_image:
+        description:
+        value: ${{ jobs.shiny_proxy.outputs. ___ }}
 
 
 
@@ -83,7 +83,7 @@ jobs:
       SEVERITY: 'CRITICAL,HIGH'
     runs-on: ubuntu-latest
     outputs:
-      app_image_ref: ${{ steps. ___ .outputs. ___ }}
+      image: ${{ steps.docker_push.outputs.image }}
     steps:
     - name: Set inputs
       if: github.event_name != 'push'
@@ -129,14 +129,18 @@ jobs:
         retention-days: 3
 
     - name: Login to Docker Hub
+      if: inputs.docker_push == 'true'
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Docker push
-      run: docker push ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
-
+      id: docker_push
+      if: inputs.docker_push == 'true'
+      run: |
+        docker push ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+        echo "image=${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
   shiny_proxy:
     runs-on: ubuntu-latest
@@ -146,7 +150,7 @@ jobs:
       DOCKERFILE: 'docker/Dockerfile.oasisui_proxy'
       SEVERITY: 'CRITICAL,HIGH'
     outputs:
-      proxy_image_ref: ${{ steps. ___ .outputs. ___ }}
+      image: ${{ steps.docker_push.outputs.image }}
     steps:
     - name: Set inputs
       if: github.event_name != 'push'
@@ -168,7 +172,6 @@ jobs:
     - name: Docker Build
       run: |
         docker build -f ${{ env.DOCKERFILE }} -t ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }} .
-
 
     # NOTE: even the latest version of shiny proxy as CRITICAL CVE issues (warn but no fail)
     - name: Trivy vulnerability scanner
@@ -194,10 +197,15 @@ jobs:
         retention-days: 3
 
     - name: Login to Docker Hub
+      if: inputs.docker_push == 'true'
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Docker push
-      run: docker push ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+      id: docker_push
+      if: inputs.docker_push == 'true'
+      run: |
+        docker push ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+        echo "image=${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
