@@ -59,7 +59,7 @@ jobs:
     #docker build
     - name: 
       run: |
-        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ step.create_tag.outputs.image_tag }} .
+        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ steps.create_tag.outputs.image_tag }} .
 
 
     #Trivy Scan 
@@ -97,7 +97,7 @@ jobs:
     #docker build
     - name: 
       run: |
-        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ step.create_tag.outputs.image_tag }} .
+        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ steps.create_tag.outputs.image_tag }} .
 
     #Trivy Scan 
 
