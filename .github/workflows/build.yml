@@ -51,18 +51,29 @@ jobs:
         ref: ${{ github.ref_name }}
 
     - name: Create image tag 
-      id: create_tag
+      id: git_ref
       run: |
-        COMMIT=$(git rev-parse --short HEAD)
-        echo "image_tag=${{ env.IMAGE_NAME }}-$COMMIT" >> $GITHUB_OUTPUT
+        #COMMIT=$(git rev-parse --short HEAD)
+        #echo "image_tag=${{ env.IMAGE_NAME }}-$COMMIT" >> $GITHUB_OUTPUT
+        echo "tag=${{ env.IMAGE_NAME }}-${{ github.sha }}" >> $GITHUB_OUTPUT
 
     #docker build
-    - name: 
+    - name: Docker Build 
       run: |
-        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ steps.create_tag.outputs.image_tag }} .
-
+        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ steps.git_ref.outputs.tag }} .
 
     #Trivy Scan 
+    - name: Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.TMP_REPO }}:${{ steps.git_ref.outputs.tag }}
+        format: 'table'
+        scan-type: 'image'
+        exit-code: '1'
+        ignore-unfixed: true
+        severity: 'CRITICAL,HIGH'
+        #output: 'cve_app_image.txt' 
+        #vuln-type: 'os,library'
 
     #Image push - temp location  
 
@@ -87,19 +98,31 @@ jobs:
       with:
         ref: ${{ github.ref_name }}
 
-
     - name: Create image tag 
-      id: create_tag
+      id: git_ref
       run: |
-        COMMIT=$(git rev-parse --short HEAD)
-        echo "image_tag=${{ env.IMAGE_NAME }}-$COMMIT" >> $GITHUB_OUTPUT
+        #COMMIT=$(git rev-parse --short HEAD)
+        #echo "image_tag=${{ env.IMAGE_NAME }}-$COMMIT" >> $GITHUB_OUTPUT
+        echo "tag=${{ env.IMAGE_NAME }}-${{ github.sha }}" >> $GITHUB_OUTPUT
 
     #docker build
-    - name: 
+    - name: Docker Build 
       run: |
-        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ steps.create_tag.outputs.image_tag }} .
+        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ steps.git_ref.outputs.tag }} .
 
     #Trivy Scan 
+    - name: Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.TMP_REPO }}:${{ steps.git_ref.outputs.tag }}
+        format: 'table'
+        scan-type: 'image'
+        exit-code: '1'
+        ignore-unfixed: true
+        severity: 'CRITICAL,HIGH'
+        #output: 'cve_app_image.txt' 
+        #vuln-type: 'os,library'
+
 
     #Image push - temp location  
 
