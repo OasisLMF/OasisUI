@@ -4,25 +4,63 @@ on:
   push:
   workflow_dispatch:
     inputs:
-      ...
+      docker_push: 
+        description: 'Push the docker image to dockerhub and outout reference'
+        required: false
+        default: 'false'
 
   workflow_call:
     inputs:
-      ...
-
-
-env:
+      docker_push: 
+        description: 'Push the docker image to dockerhub and outout reference'
+        required: false
+        default: 'false'
+        type: string
+ 
+#    outputs:
+#      app_image_ref:
+#        description:
+#        value: ${{ jobs.shiny_app.outputs. ___ }}
+#
+#      proxy_image_ref:
+#        description:
+#        value: ${{ jobs.shiny_proxy.outputs. ___ }}
 
 
 
 jobs:
   shiny_app:
+    env:
+      IMAGE_NAME: 'oasisui_app'
+      TMP_REPO: 'coreoasis/github-actions' 
+      DOCKERFILE: 'docker/Dockerfile.oasisui_app' 
     runs-on: ubuntu-latest
+    outputs:
+      app_image_ref: ${{ steps. ___ .outputs. ___ }}
     steps:
-    
+
+    - name: Dump github context
+      run:   echo "$GITHUB_CONTEXT"
+      shell: bash
+      env:
+       GITHUB_CONTEXT: ${{ toJson(github) }}
+
     #Clone repo 
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name }}
+
+    - name: Create image tag 
+      id: create_tag
+      run: |
+        COMMIT=$(git rev-parse --short HEAD)
+        echo "image_tag=${{ env.IMAGE_NAME }}-$COMMIT" >> $GITHUB_OUTPUT
 
     #docker build
+    - name: 
+      run: |
+        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ step.create_tag.outputs.image_tag }} .
+
 
     #Trivy Scan 
 
@@ -30,11 +68,36 @@ jobs:
 
   shiny_proxy:
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: 'oasisui_proxy'
+      TMP_REPO: 'coreoasis/github-actions' 
+      DOCKERFILE: 'docker/Dockerfile.oasisui_proxy' 
+    outputs:
+      proxy_image_ref: ${{ steps. ___ .outputs. ___ }}
     steps:
 
+    - name: Dump github context
+      run:   echo "$GITHUB_CONTEXT"
+      shell: bash
+      env:
+       GITHUB_CONTEXT: ${{ toJson(github) }}
+
     #Clone repo 
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name }}
+
+
+    - name: Create image tag 
+      id: create_tag
+      run: |
+        COMMIT=$(git rev-parse --short HEAD)
+        echo "image_tag=${{ env.IMAGE_NAME }}-$COMMIT" >> $GITHUB_OUTPUT
 
     #docker build
+    - name: 
+      run: |
+        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ step.create_tag.outputs.image_tag }} .
 
     #Trivy Scan 
 
