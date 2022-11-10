@@ -36,6 +36,7 @@ jobs:
       if: inputs.app_version != ''
       uses: actions/checkout@v3
       with:
+        ref: ${{ github.ref_name }}
         fetch-depth: 0
 
     - name: Setup github user
