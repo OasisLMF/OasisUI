@@ -7,7 +7,7 @@ on:
       release_tag:
         description: 'Release tag: "{n}.{n}.{n}" e.g. 3.0.0,  for Pre-Release  "{n}.{n}.{n}rc{n}"'
         required: true
-     prev_release_tag:
+      prev_release_tag:
         description: 'The last release, used for generating the changelog and release notes'
         required: true
       pre_release:
