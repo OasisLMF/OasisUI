@@ -7,6 +7,9 @@ on:
       release_tag:
         description: 'Release tag: "{n}.{n}.{n}" e.g. 3.0.0,  for Pre-Release  "{n}.{n}.{n}rc{n}"'
         required: true
+     prev_release_tag:
+        description: 'The last release, used for generating the changelog and release notes'
+        required: true
       pre_release:
         description: 'Mark GitHub release as pre-release: [true, false]'
         required: true
@@ -14,11 +17,14 @@ on:
 
 env:
   #RELEASE_TAG: ${{ inputs.release_tag }}
+  #RELEASE_TAG: ${{ inputs.release_tag }}
+  #PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
   #PRE_RELEASE: ${{ inputs.pre_release }}
   BUILD_SCRIPTS: "master"    # build scripts branch
 
   #TESTING
   RELEASE_TAG: '1.11.5rc1'
+  PREV_RELEASE_TAG: '1.11.3'
   PRE_RELEASE: 'true'
 
 
