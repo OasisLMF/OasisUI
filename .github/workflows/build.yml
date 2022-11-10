@@ -4,28 +4,65 @@ on:
   push:
   workflow_dispatch:
     inputs:
-      docker_push: 
+      docker_push:
         description: 'Push the docker image to dockerhub and outout reference'
         required: false
         default: 'false'
-     cve_severity: 
+      cve_severity:
         description: 'Severities of vulnerabilities to scanned for, fails build if any found'
         required: false
         default: 'CRITICAL,HIGH'
+      #app_image_repo:
+      #  description: 'Docker hub image repository'
+      #  required: false
+      #  default: 'coreoasis/github-actions'
+      #app_image_tag:
+      #  description: 'Docker tag for image'
+      #  required: false
+      #  default: ''
+      #proxy_image_repo:
+      #  description: 'Docker hub image repository'
+      #  required: false
+      #  default: 'coreoasis/github-actions'
+      #proxy_image_tag:
+      #  description: 'Docker tag for image'
+      #  required: false
+      #  default: ''
+
 
   workflow_call:
     inputs:
-      docker_push: 
+      docker_push:
         description: 'Push the docker image to dockerhub and outout reference'
         required: false
         default: 'false'
         type: string
-     cve_severity: 
+      cve_severity:
         description: 'Severities of vulnerabilities to scanned for, fails build if any found'
         required: false
         default: 'CRITICAL,HIGH'
         type: string
- 
+      app_image_repo:
+        description: 'Docker hub image repository'
+        required: false
+        default: 'coreoasis/github-actions'
+        type: string
+      app_image_tag:
+        description: 'Docker tag for image'
+        required: false
+        default: ''
+        type: string
+      proxy_image_repo:
+        description: 'Docker hub image repository'
+        required: false
+        default: 'coreoasis/github-actions'
+        type: string
+      proxy_image_tag:
+        description: 'Docker tag for image'
+        required: false
+        default: ''
+        type: string
+
 #    outputs:
 #      app_image_ref:
 #        description:
@@ -40,17 +77,20 @@ on:
 jobs:
   shiny_app:
     env:
-      IMAGE_NAME: 'oasisui_app'
-      TMP_REPO: 'coreoasis/github-actions' 
-      DOCKERFILE: 'docker/Dockerfile.oasisui_app' 
+      IMAGE_TAG: 'oasisui_app-'${{ github.sha }}
+      IMAGE_REPO: 'coreoasis/github-actions'
+      DOCKERFILE: 'docker/Dockerfile.oasisui_app'
       SEVERITY: 'CRITICAL,HIGH'
     runs-on: ubuntu-latest
     outputs:
       app_image_ref: ${{ steps. ___ .outputs. ___ }}
     steps:
-    - name: Set input - cve_severity
+    - name: Set inputs
       if: github.event_name != 'push'
-      run: echo "SEVERITY=${{ inputs.cve_severity }}" >> $GITHUB_ENV    
+      run: |
+        echo "SEVERITY=${{ inputs.cve_severity }}" >> $GITHUB_ENV
+        [[ -z "${{ inputs.app_image_tag }}" ]] || echo "IMAGE_TAG=${{ inputs.app_image_tag }}" >> $GITHUB_ENV
+        [[ -z "${{ inputs.app_image_repo }}" ]] || echo "IMAGE_REPO=${{ inputs.app_image_repo }}" >> $GITHUB_ENV
 
     - name: Dump github context
       run:   echo "$GITHUB_CONTEXT"
@@ -58,53 +98,46 @@ jobs:
       env:
        GITHUB_CONTEXT: ${{ toJson(github) }}
 
-    #Clone repo 
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.ref_name }}
 
-    - name: Create image tag 
-      id: git_ref
+    - name: Docker Build
       run: |
-        #COMMIT=$(git rev-parse --short HEAD)
-        #echo "image_tag=${{ env.IMAGE_NAME }}-$COMMIT" >> $GITHUB_OUTPUT
-        echo "tag=${{ env.IMAGE_NAME }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }} .
 
-    #docker build
-    - name: Docker Build 
-      run: |
-        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ steps.git_ref.outputs.tag }} .
-
-    #Trivy Scan 
+    #Trivy Scan
     - name: Trivy vulnerability scanner
       if: env.SEVERITY != ''
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ env.TMP_REPO }}:${{ steps.git_ref.outputs.tag }}
+        image-ref: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
         format: 'table'
         scan-type: 'image'
         exit-code: '1'
         ignore-unfixed: true
         severity: ${{ env.SEVERITY }}
         security-checks: 'vuln'
-        #output: 'cve_app_image.txt' 
-        #vuln-type: 'os,library'
+        output: 'app_image.txt'
 
-    #Image push - temp location  
+    #Image push - temp location
 
   shiny_proxy:
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: 'oasisui_proxy'
-      TMP_REPO: 'coreoasis/github-actions' 
-      DOCKERFILE: 'docker/Dockerfile.oasisui_proxy' 
+      IMAGE_TAG: 'oasisui_proxy-'${{ github.sha }}
+      IMAGE_REPO: 'coreoasis/github-actions'
+      DOCKERFILE: 'docker/Dockerfile.oasisui_proxy'
       SEVERITY: 'CRITICAL,HIGH'
     outputs:
       proxy_image_ref: ${{ steps. ___ .outputs. ___ }}
     steps:
-    - name: Set input - cve_severity
+    - name: Set inputs
       if: github.event_name != 'push'
-      run: echo "SEVERITY=${{ inputs.cve_severity }}" >> $GITHUB_ENV    
+      run: | 
+        echo "SEVERITY=${{ inputs.cve_severity }}" >> $GITHUB_ENV
+        [[ -z "${{ inputs.proxy_image_tag }}" ]] || echo "IMAGE_TAG=${{ inputs.proxy_image_tag }}" >> $GITHUB_ENV
+        [[ -z "${{ inputs.proxy_image_repo }}" ]] || echo "IMAGE_REPO=${{ inputs.proxy_image_repo }}" >> $GITHUB_ENV
 
     - name: Dump github context
       run:   echo "$GITHUB_CONTEXT"
@@ -112,37 +145,27 @@ jobs:
       env:
        GITHUB_CONTEXT: ${{ toJson(github) }}
 
-    #Clone repo 
+    #Clone repo
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.ref_name }}
 
-    - name: Create image tag 
-      id: git_ref
-      run: |
-        #COMMIT=$(git rev-parse --short HEAD)
-        #echo "image_tag=${{ env.IMAGE_NAME }}-$COMMIT" >> $GITHUB_OUTPUT
-        echo "tag=${{ env.IMAGE_NAME }}-${{ github.sha }}" >> $GITHUB_OUTPUT
-
     #docker build
-    - name: Docker Build 
+    - name: Docker Build
       run: |
-        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.TMP_REPO }}:${{ steps.git_ref.outputs.tag }} .
+        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }} .
 
-    #Trivy Scan 
     - name: Trivy vulnerability scanner
       if: env.SEVERITY != ''
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ env.TMP_REPO }}:${{ steps.git_ref.outputs.tag }}
+        image-ref: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
         format: 'table'
         scan-type: 'image'
         exit-code: '1'
         ignore-unfixed: true
         severity: ${{ env.SEVERITY }}
         security-checks: 'vuln'
-        #output: 'cve_app_image.txt' 
-        #vuln-type: 'os,library'
+        output: 'proxy_image.txt'
 
 
-    #Image push - temp location  
