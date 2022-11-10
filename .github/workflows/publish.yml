@@ -27,7 +27,8 @@ jobs:
     uses: ./.github/workflows/version.yml
     secrets: inherit
     with:
-      app_version: ${{ env.release_tag }}
+      #app_version: ${{ env.release_tag }}
+      app_version: '1.11.5rc1'
 
   images:
     uses: ./.github/workflows/build.yml
@@ -51,7 +52,7 @@ jobs:
     steps:
     # --- Release guards --- #
     - name: is branch valid for release
-      if: ${{ !startsWith(github.ref_name , 'release/') }}
+      if: ${{ !startsWith(github.ref_name , 'release/') && env.PRE_RELEASE == 'true' }}
       run: |
         echo "Releases must be trigged on branch named 'release/x.x.x'"
         exit 1
@@ -190,3 +191,34 @@ jobs:
         body_path: ./RELEASE.md
         draft: false
         prerelease: ${{ env.PRE_RELEASE }}
+
+    # --- Slack notify --- #
+    - name: slack message vars
+      id: slack_vars
+      run: |
+        HEAD=$(echo "*${{ github.event.repository.name}} Release* (${{ env.RELEASE_TAG }})")
+        DATE=$(date)
+        TITLE=$(echo "• TESTING <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
+        JOB_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        echo "heading=$HEAD" >> $GITHUB_OUTPUT
+        echo "run_date=$DATE" >> $GITHUB_OUTPUT
+        echo "title=$TITLE" >> $GITHUB_OUTPUT
+        echo "run_url=$JOB_URL" >> $GITHUB_OUTPUT
+        echo "run_id=${{ github.run_id }}"  >> $GITHUB_OUTPUT
+        echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        echo "run_status=${{ job.status }}" >> $GITHUB_OUTPUT
+
+  # --- Notify Slack --- #
+  slack:
+    uses: ./.github/workflows/notify.yml
+    secrets: inherit
+    needs: release
+    with:
+      heading: ${{ needs.release.outputs.heading }}
+      title: ${{ needs.release.outputs.title }}
+      build_branch: ${{ needs.release.outputs.build_branch }}
+      run_url: ${{ needs.release.outputs.run_url }}
+      run_id: ${{ needs.release.outputs.run_id }}
+      run_status: ${{ needs.release.outputs.run_status }}
+      run_date: ${{ needs.release.outputs.run_date }}
+
