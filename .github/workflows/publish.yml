@@ -170,14 +170,14 @@ jobs:
     - name: Push images
       run: |
         docker push coreoasis/oasisui_proxy:${{ env.RELEASE_TAG }}
-        docker push coreoasis/oasisui_ui:${{ env.RELEASE_TAG }}
+        docker push coreoasis/oasisui_app:${{ env.RELEASE_TAG }}
 
 
     - name: Push images (Production)
       if: env.PRE_RELEASE == 'false'
       run: |
         docker push coreoasis/oasisui_proxy:latest
-        docker push coreoasis/oasisui_ui:latest
+        docker push coreoasis/oasisui_app:latest
 
     # --- Create Release --- #
     - name: Push changes
