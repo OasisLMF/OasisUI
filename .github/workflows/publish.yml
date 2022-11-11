@@ -88,15 +88,6 @@ jobs:
         ref: ${{ github.ref_name }}
         fetch-depth: 0
 
-    - name: Check tag matches version set
-      run: |
-        BUILD_VER=$(grep '^Version:' BFE_RShiny/oasisui/DESCRIPTION | awk -F": " '{print $2}')
-        RELEASE_VER=${{ env.RELEASE_TAG }}
-        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
-        if [[ "$ERROR_CODE" == 1 ]]; then
-            echo "BUILD_VER: $BUILD_VER stored in 'BFE_RShiny/oasisui/DESCRIPTION' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
-        fi
-
     - name: Tag Release
       env:
         GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
@@ -123,6 +114,19 @@ jobs:
         docker pull ${{ needs.images.outputs.proxy_image }}
         docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:${{ env.RELEASE_TAG }}
         docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:latest
+
+    - name: Check tag matches image
+      run: |
+        container_id=$(docker create "${{ needs.images.outputs.app_image }}")
+        docker cp "$container_id:/usr/local/lib/R/site-library/oasisui/DESCRIPTION" "./IMAGE_DESCRIPTION"
+        docker rm "$container_id"
+
+        BUILD_VER=$(grep '^Version:' ./IMAGE_DESCRIPTION | awk -F": " '{print $2}')
+        RELEASE_VER=${{ env.RELEASE_TAG }}
+        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
+        if [[ "$ERROR_CODE" == 1 ]]; then
+            echo "BUILD_VER: $BUILD_VER stored in image '${{ needs.images.outputs.app_image }}' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
+        fi
 
     # --- Create Changelog / notes --- #
     - name: Setup Changelog builder
