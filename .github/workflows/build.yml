@@ -104,7 +104,8 @@ jobs:
 
     - name: Docker Build
       run: |
-        docker build -f ${{ env.DOCKERFILE }} -t ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }} .
+        echo "Build from Branch ${{ github.ref_name }}"
+        docker build -f ${{ env.DOCKERFILE }} --pull --build-arg REF_BRANCH=${{ github.ref_name }}  -t ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }} .
 
     #Trivy Scan
     - name: Trivy vulnerability scanner
