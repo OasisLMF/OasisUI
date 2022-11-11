@@ -19,7 +19,7 @@ For tutorials on running the Oasis Stack locally see: (The full stack is require
 * [Linux - Installation Guide](https://www.youtube.com/watch?v=OFLTpGGEM10)
 
 
-## Testing
+## Testing and development 
 
 The script `./run_rstudio.sh` deploys and runs a development version of OasisUI, it runs using an [RStudio Server](https://documentation.dnanexus.com/getting-started/developer-tutorials/web-app-let-tutorials/running-rstudio-server).
 1. run the script open the url [http://localhost:8787/](http://localhost:8787/) in a browser. 
