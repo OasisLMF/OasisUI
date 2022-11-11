@@ -98,11 +98,11 @@ jobs:
 
     - name: Check tag matches version set
       run: |
-        BUILD_VER=$(grep '^Version:' BFE_RShiny/oasisui/DESCRIPTION | awk -F": /" '{print $2}')
+        BUILD_VER=$(grep '^Version:' BFE_RShiny/oasisui/DESCRIPTION | awk -F": " '{print $2}')
         RELEASE_VER=${{ env.RELEASE_TAG }}
         [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
         if [[ "$ERROR_CODE" == 1 ]]; then
-            echo "PACKAGE_VER: $BUILD_VER stored in 'BFE_RShiny/oasisui/DESCRIPTION' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
+            echo "BUILD_VER: $BUILD_VER stored in 'BFE_RShiny/oasisui/DESCRIPTION' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
         fi
 
     - name: Tag Release
