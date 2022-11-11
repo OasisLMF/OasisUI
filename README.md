@@ -1,60 +1,35 @@
 <img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
 
-[![Build Status](https://ci.oasislmfdev.org/buildStatus/icon?job=oasis_ui/master)](https://ci.oasislmfdev.org/view/Oasis/job/oasis_ui/job/master/)
+[![OasisUI Build](https://github.com/OasisLMF/OasisUI/actions/workflows/build.yml/badge.svg?branch=master&event=push)](https://github.com/OasisLMF/OasisUI/actions/workflows/build.yml)
 
 # Oasis UI
 Web-based application client for managing exposure data and operating modelling workflows.There are three components:
-  * Shiny UI application 
-  * Python Flask server providing services for interacting with exposure and output data
-  * SQL server database
+  * Shiny UI application (This repository)
+  * Python Django server providing services for interacting with exposure and output data
+  * PostgreSQL server database
 
 ## YouTube UI Walkthrough
 [![Oasis UI Walkthrough](https://img.youtube.com/vi/tHRetuhpQzA/0.jpg)](https://www.youtube.com/watch?v=tHRetuhpQzA)
 
-## First Steps
+## Deploying
 
-### Simple environment
+To try out the OasisUI run the docker installation script `./install.sh` from [OasisEvaluation](https://github.com/OasisLMF/OasisEvaluation).
+For tutorials on running the Oasis Stack locally see: (The full stack is required for the UI to work) 
+* [Windows 10 - Installation Guide](https://www.youtube.com/watch?v=SxRt5E-Y5Sw)
+* [Linux - Installation Guide](https://www.youtube.com/watch?v=OFLTpGGEM10)
 
-TODO
 
-## Development
+## Testing
 
-### GitFlow
+The script `./run_rstudio.sh` deploys and runs a development version of OasisUI, it runs using an [RStudio Server](https://documentation.dnanexus.com/getting-started/developer-tutorials/web-app-let-tutorials/running-rstudio-server).
+1. run the script open the url [http://localhost:8787/](http://localhost:8787/) in a browser. 
+2. Load the project file 
+![Load Project](.img/dev_load_project.png?raw=true "Load RStudio Project")
+3. From the build menu, select `Clean and Rebuild`
+![Build App](.img/dev_build_oasisui.png?raw=true "Build Application")
 
-We use the GitFlow model described <A href="http://nvie.com/posts/a-successful-git-branching-model"> here </A>.
-
-The main idea is that the central repo holds two main branches with an infinite lifetime:
-
-* master: main branch where the source code of HEAD always reflects a production-ready state
-* develop: main branch where the source code of HEAD always reflects a state with the latest delivered development changes for the next release. This is where our automatic builds are built from.
-
-When the source code in the develop branch reaches a stable point and is ready to be released, all of the changes should be merged back into master. 
-Feature branchs should be used for new features and fixes, then a Pull Request isues to merge into develop.
-
-### Dependencies
-
-TODO
-
-### Testing
-
-TODO
-
-### Deploying
-
-The Oasis CI system builds and deploys the following Docker images to DockerHub:
-
-* <a href="https://hub.docker.com/r/coreoasis/flamingo_server">coreoasis/flamingo_server</a>
-* <a href="https://hub.docker.com/r/coreoasis/shiny_proxy">coreoasis/shiny_proxy</a>
-
-Note that the Dockerfiles cannot be used directly as there are version stubs that get substitued at build time by the CI system.
-
-TODO DB setup
-
-## Documentation
-* <a href="https://github.com/OasisLMF/OasisUI/issues">Issues</a>
-* <a href="https://github.com/OasisLMF/OasisUI/releases">Releases</a>
-* <a href="https://oasislmf.github.io">General Oasis documentation</a>
-* <a href="https://oasislmf.github.io/getting_started/using_the_oasis_ui.html">Using the Oasis UI</a>
+4. In the R console enter `> oasisui::runOasisui()`, this will run the OasisUI in a new window 
+![Run App](.img/dev_run_oasisui.png?raw=true "Run Application")
 
 ## License
 The code in this project is licensed under BSD 3-clause license.
