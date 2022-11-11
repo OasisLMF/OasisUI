@@ -1,7 +1,6 @@
 name: OasisUI Release
 
 on:
-  push: # TESTING
   workflow_dispatch:
     inputs:
       release_tag:
@@ -16,16 +15,10 @@ on:
         default: 'false'
 
 env:
-  #RELEASE_TAG: ${{ inputs.release_tag }}
-  #RELEASE_TAG: ${{ inputs.release_tag }}
-  #PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
-  #PRE_RELEASE: ${{ inputs.pre_release }}
+  RELEASE_TAG: ${{ inputs.release_tag }}
+  PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
+  PRE_RELEASE: ${{ inputs.pre_release }}
   BUILD_SCRIPTS: "master"    # build scripts branch
-
-  #TESTING
-  RELEASE_TAG: '1.11.5rc1'
-  PREV_RELEASE_TAG: '1.11.3'
-  PRE_RELEASE: 'true'
 
 
 jobs:
@@ -33,8 +26,7 @@ jobs:
     uses: ./.github/workflows/version.yml
     secrets: inherit
     with:
-      #app_version: ${{ env.release_tag }}
-      app_version: '1.11.5rc1'
+      app_version: ${{ env.release_tag }}
 
   images:
     uses: ./.github/workflows/build.yml
@@ -151,8 +143,8 @@ jobs:
           --to-tag ${{ env.RELEASE_TAG }} \
           --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
-          --output-path ./CHANGELOG.rst
-          #--apply-milestone
+          --output-path ./CHANGELOG.rst \
+          --apply-milestone
         git add ./CHANGELOG.rst
         git commit -m 'Update changelog'
 
@@ -203,7 +195,7 @@ jobs:
       run: |
         HEAD=$(echo "*${{ github.event.repository.name}} Release* (${{ env.RELEASE_TAG }})")
         DATE=$(date)
-        TITLE=$(echo "• TESTING <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
+        TITLE=$(echo "• <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
         JOB_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         echo "heading=$HEAD" >> $GITHUB_OUTPUT
         echo "run_date=$DATE" >> $GITHUB_OUTPUT
@@ -226,4 +218,3 @@ jobs:
       run_id: ${{ needs.release.outputs.run_id }}
       run_status: ${{ needs.release.outputs.run_status }}
       run_date: ${{ needs.release.outputs.run_date }}
-
