@@ -1,0 +1,65 @@
+# Commit a new version to branch
+
+name: UI Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description:
+        required: true
+        default: ''
+
+  workflow_call:
+    inputs:
+      app_version:
+        description:
+        required: true
+        default: ''
+        type: string
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    env:
+      ver_file: 'BFE_RShiny/oasisui/DESCRIPTION'
+      ver_regex: '^Version:'
+    steps:
+
+    - name: Check input is valid semvar
+      if: inputs.app_version != ''
+      run: |
+        VALID=$(echo ${{ inputs.app_version }} | grep -oPc "^(\d+)\.(\d+)\.(\d+)rc(\d+)|(\d+)\.(\d+)\.(\d+)$")
+        [[ "$VALID" -eq "1" ]] || exit 1
+
+    - name: Checkout
+      if: inputs.app_version != ''
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name }}
+        fetch-depth: 0
+
+    - name: Setup github user
+      if: inputs.app_version != ''
+      run: |
+        git config --global user.email ${{ env.GIT_EMAIL }}
+        git config --global user.name ${{ env.GIT_USERNAME }}
+        git config --global pull.ff only
+      env:
+        GIT_EMAIL: ${{ secrets.BUILD_GIT_EMAIL }}
+        GIT_USERNAME: ${{ secrets.BUILD_GIT_USERNAME }}
+
+    - name: Write version
+      if: inputs.app_version != ''
+      run: |
+        CURRENT_VER=$(grep ${{ env.ver_regex }} ${{ env.ver_file }} | awk -F": " '{print $2}')
+        sed -i 's|'$CURRENT_VER'|'${{ inputs.app_version }}'|g' ${{ env.ver_file }}
+        git add ${{ env.ver_file }}
+        # Only commit if something changed
+        [[ -z $(git status -s) ]] || git commit -m "Set UI to version ${{ inputs.app_version }}"
+
+    - name: Push
+      if: inputs.app_version != ''
+      run: git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}

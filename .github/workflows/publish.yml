@@ -1,0 +1,233 @@
+name: OasisUI Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag: "{n}.{n}.{n}" e.g. 3.0.0,  for Pre-Release  "{n}.{n}.{n}rc{n}"'
+        required: true
+      prev_release_tag:
+        description: 'The last release, used for generating the changelog and release notes'
+        required: true
+      pre_release:
+        description: 'Mark GitHub release as pre-release: [true, false]'
+        required: true
+        default: 'false'
+
+env:
+  RELEASE_TAG: ${{ inputs.release_tag }}
+  PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
+  PRE_RELEASE: ${{ inputs.pre_release }}
+  BUILD_SCRIPTS: "master"    # build scripts branch
+
+
+jobs:
+  update:
+    uses: ./.github/workflows/version.yml
+    secrets: inherit
+    with:
+      app_version: ${{ env.release_tag }}
+
+  images:
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    needs: update
+    with:
+      docker_push: 'true'
+
+  release:
+    runs-on: ubuntu-latest
+    needs: images
+    outputs:
+      heading: ${{ steps.slack_vars.outputs.heading }}
+      title: ${{ steps.slack_vars.outputs.title }}
+      build_branch: ${{ steps.slack_vars.outputs.branch }}
+      run_url: ${{ steps.slack_vars.outputs.run_url }}
+      run_id: ${{ steps.slack_vars.outputs.run_id }}
+      run_status: ${{ steps.slack_vars.outputs.run_status }}
+      run_date: ${{ steps.slack_vars.outputs.run_date }}
+
+    steps:
+    # --- Release guards --- #
+    - name: is branch valid for release
+      if: ${{ !startsWith(github.ref_name , 'release/') && env.PRE_RELEASE == 'false' }}
+      run: |
+        echo "Releases must be trigged on branch named 'release/x.x.x'"
+        exit 1
+
+    - name: Check tag is valid for release
+      if: env.PRE_RELEASE == 'false'
+      run: |
+        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^(\d+)\.(\d+)\.(\d+)$")
+        if [[ ! "$VALID" == 1 ]]; then
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
+            exit 1
+        fi
+    - name: Check tag is valid for pre-release
+      if: env.PRE_RELEASE == 'true'
+      run: |
+        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^(\d+)\.(\d+)\.(\d+)rc(\d+)$")
+        if [[ ! "$VALID" == 1 ]]; then
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
+            exit 1
+        fi
+
+    # --- Tag release --- #
+    - name: Setup github user
+      run: |
+        git config --global user.email ${{ env.GIT_EMAIL }}
+        git config --global user.name ${{ env.GIT_USERNAME }}
+        git config --global pull.ff only
+      env:
+        GIT_EMAIL: ${{ secrets.BUILD_GIT_EMAIL }}
+        GIT_USERNAME: ${{ secrets.BUILD_GIT_USERNAME }}
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name }}
+        fetch-depth: 0
+
+    - name: Tag Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      run: |
+        git checkout ${{ github.ref_name }}
+        git tag ${{ env.RELEASE_TAG }}
+
+
+    # --- Tag images --- #
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Pull and Tag app_image
+      run: |
+        docker pull ${{ needs.images.outputs.app_image }}
+        docker tag ${{ needs.images.outputs.app_image }} coreoasis/oasisui_app:${{ env.RELEASE_TAG }}
+        docker tag ${{ needs.images.outputs.app_image }} coreoasis/oasisui_app:latest
+
+    - name: Pull and tag proxy_image
+      run: |
+        docker pull ${{ needs.images.outputs.proxy_image }}
+        docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:${{ env.RELEASE_TAG }}
+        docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:latest
+
+    - name: Check tag matches (Repo)
+      run: |
+        BUILD_VER=$(grep '^Version:' BFE_RShiny/oasisui/DESCRIPTION | awk -F": " '{print $2}')
+        RELEASE_VER=${{ env.RELEASE_TAG }}
+        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
+        if [[ "$ERROR_CODE" == 1 ]]; then
+            echo "BUILD_VER: $BUILD_VER stored in Repo 'BFE_RShiny/oasisui/DESCRIPTION' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
+        fi
+
+    - name: Check tag matches (image)
+      run: |
+        container_id=$(docker create "${{ needs.images.outputs.app_image }}")
+        docker cp "$container_id:/usr/local/lib/R/site-library/oasisui/DESCRIPTION" "./IMAGE_DESCRIPTION"
+        docker rm "$container_id"
+
+        BUILD_VER=$(grep '^Version:' ./IMAGE_DESCRIPTION | awk -F": " '{print $2}')
+        RELEASE_VER=${{ env.RELEASE_TAG }}
+        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
+        if [[ "$ERROR_CODE" == 1 ]]; then
+            echo "BUILD_VER: $BUILD_VER stored in image '${{ needs.images.outputs.app_image }}' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
+        fi
+
+    # --- Create Changelog / notes --- #
+    - name: Setup Changelog builder
+      working-directory: ${{ github.workspace }}
+      run: |
+        BASE_URL="https://raw.githubusercontent.com/OasisLMF/build/${{ env.BUILD_SCRIPTS }}/buildscript"
+        pip install -r $BASE_URL/requirments_changelog.txt
+        wget $BASE_URL/auto_changelog.py
+        chmod +x auto_changelog.py
+
+    - name: Create changelog
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      run: |
+        ${{ github.workspace }}/auto_changelog.py build-changelog \
+          --repo OasisUI \
+          --from-tag ${{ env.PREV_RELEASE_TAG }} \
+          --to-tag ${{ env.RELEASE_TAG }} \
+          --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
+          --local-repo-path ./ \
+          --output-path ./CHANGELOG.rst \
+          --apply-milestone
+        git add ./CHANGELOG.rst
+        git commit -m 'Update changelog'
+
+    - name: Create Release notes
+      run: |
+        ${{ github.workspace }}/auto_changelog.py build-release \
+          --repo OasisUI \
+          --from-tag ${{ env.PREV_RELEASE_TAG }} \
+          --to-tag ${{ env.RELEASE_TAG }} \
+          --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
+          --local-repo-path ./ \
+          --output-path ./RELEASE.md
+
+    # --- Push Images --- #
+    - name: Push images
+      run: |
+        docker push coreoasis/oasisui_proxy:${{ env.RELEASE_TAG }}
+        docker push coreoasis/oasisui_app:${{ env.RELEASE_TAG }}
+
+
+    - name: Push images (Production)
+      if: env.PRE_RELEASE == 'false'
+      run: |
+        docker push coreoasis/oasisui_proxy:latest
+        docker push coreoasis/oasisui_app:latest
+
+    # --- Create Release --- #
+    - name: Push changes
+      run: |
+        git push origin ${{ env.RELEASE_TAG  }}
+        git push
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      with:
+        tag_name: ${{ env.RELEASE_TAG }}
+        release_name: Release ${{ env.RELEASE_TAG }}
+        body_path: ./RELEASE.md
+        draft: false
+        prerelease: ${{ env.PRE_RELEASE }}
+
+    # --- Slack notify --- #
+    - name: slack message vars
+      id: slack_vars
+      run: |
+        HEAD=$(echo "*${{ github.event.repository.name}} Release* (${{ env.RELEASE_TAG }})")
+        DATE=$(date)
+        TITLE=$(echo "• <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
+        JOB_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        echo "heading=$HEAD" >> $GITHUB_OUTPUT
+        echo "run_date=$DATE" >> $GITHUB_OUTPUT
+        echo "title=$TITLE" >> $GITHUB_OUTPUT
+        echo "run_url=$JOB_URL" >> $GITHUB_OUTPUT
+        echo "run_id=${{ github.run_id }}"  >> $GITHUB_OUTPUT
+        echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        echo "run_status=${{ job.status }}" >> $GITHUB_OUTPUT
+
+  # --- Notify Slack --- #
+  slack:
+    uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@master
+    secrets: inherit
+    needs: release
+    with:
+      heading: ${{ needs.release.outputs.heading }}
+      title: ${{ needs.release.outputs.title }}
+      build_branch: ${{ needs.release.outputs.build_branch }}
+      run_url: ${{ needs.release.outputs.run_url }}
+      run_id: ${{ needs.release.outputs.run_id }}
+      run_status: ${{ needs.release.outputs.run_status }}
+      run_date: ${{ needs.release.outputs.run_date }}
