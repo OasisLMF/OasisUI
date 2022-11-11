@@ -8,8 +8,11 @@ Web-based application client for managing exposure data and operating modelling 
   * Python Django server providing services for interacting with exposure and output data
   * PostgreSQL server database
 
-## YouTube UI Walkthrough
-[![Oasis UI Walkthrough](https://img.youtube.com/vi/tHRetuhpQzA/0.jpg)](https://www.youtube.com/watch?v=tHRetuhpQzA)
+## Usage and documentation 
+For a detailed guide on using the OasisUI see [Oasis_UI_Guide.pdf](documentation/Oasis_UI_Guide.pdf)
+
+### YouTube Guide
+[![Oasis UI - Walkthrough](.img/video_thumbnail.png)](https://www.youtube.com/watch?v=tHRetuhpQzA)
 
 ## Deploying
 
