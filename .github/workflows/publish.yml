@@ -26,7 +26,7 @@ jobs:
     uses: ./.github/workflows/version.yml
     secrets: inherit
     with:
-      app_version: ${{ env.release_tag }}
+      app_version: ${{ inputs.release_tag }}
 
   images:
     uses: ./.github/workflows/build.yml
