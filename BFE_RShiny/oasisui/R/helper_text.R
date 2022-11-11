@@ -64,7 +64,9 @@ defineSingleAna_tooltips <- list(
   addBtn = "Add new summary levels and reports",
   removeBtn = "Remove summary levels and reports",
   abuttonsubmit = "Submit new analysis",
-  abuttonselsettings = "Apply model changes"
+  abuttonselsettings = "Apply model changes",
+  tinputreturnperiods = "Comma-separated numeric values",
+  tinputquantiles = "Comma-separated numeric values between 0 and 1"
 )
 
 ### Dashboard ------------------------------------------------------------------

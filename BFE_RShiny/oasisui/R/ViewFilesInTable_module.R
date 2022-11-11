@@ -109,27 +109,33 @@ ViewFilesInTable <- function(input, output, session,
     if (length(filesListData) > 0) {
       names(filesListData) <- tolower(names(filesListData))
       if (includechkbox) {
-        filesListData <- cbind(data.frame(selected = .shinyInput(oasisuiCheckboxButton,"srows_", nrow(filesListData), Label = NULL,
-                                                                 hidden = FALSE,
-                                                                 style = "background-color: white;
-                                                                          border-color: black;
-                                                                          color: white;
-                                                                          font-size: 10px;
-                                                                          text-shadow: none;
-                                                                          padding: 0px;
-                                                                          height: 16px;
-                                                                          width: 16px;",
-                                                                 icon = icon("check"),
-                                                                 onclick = paste0('Shiny.onInputChange(\"',ns("select_sbutton"),'\",  this.id)')
-        )),
-        filesListData)
+        filesListData <- cbind(
+          data.frame(selected = .shinyInput(oasisuiCheckboxButton,
+                                            "srows_",
+                                            nrow(filesListData),
+                                            Label = NULL,
+                                            hidden = FALSE,
+                                            style = "background-color: white;
+                                                    border-color: black;
+                                                    color: white;
+                                                    font-size: 10px;
+                                                    text-shadow: none;
+                                                    padding: 0px;
+                                                    height: 16px;
+                                                    width: 16px;",
+                                            icon = icon("check"),
+                                            onclick = paste0('Shiny.onInputChange(\"', ns("select_sbutton"), '\",  this.id)'))),
+          filesListData)
       }
-      filesListData <- cbind(filesListData,
-                             data.frame(view = .shinyInput(actionButton,
-                                                           "vrows_", nrow(filesListData),
-                                                           Label = "View", hidden = TRUE,
-                                                           onclick = paste0('Shiny.onInputChange(\"',ns("select_vbutton"),'\",  this.id)'),
-                                                           onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
+      filesListData <- cbind(
+        filesListData,
+        data.frame(view = .shinyInput(actionButton,
+                                      "vrows_",
+                                      nrow(filesListData),
+                                      Label = "View",
+                                      hidden = TRUE,
+                                      onclick = paste0('Shiny.onInputChange(\"', ns("select_vbutton"), '\",  this.id)'),
+                                      onmousedown = 'event.preventDefault(); event.stopPropagation(); return false;')))
       result$tbl_filesListData_wButtons <- filesListData
     } else {
       result$tbl_filesListData_wButtons <- NULL
@@ -196,6 +202,7 @@ ViewFilesInTable <- function(input, output, session,
   # Download file-- ------------------------------------------------------------
   # Export to .csv
   output$FLdownloadexcel <- downloadHandler(
+    # RSc: is this still working?
     filename = "file.csv",
     content = function(file) {
       session$userData$data_hub$write_csv_file(data = result$tbl_filesListData_wButton,
@@ -209,10 +216,12 @@ ViewFilesInTable <- function(input, output, session,
     if (length(input$dt_outputFL_rows_selected) > 0) {
       enable("FLdownloadzip")
       lapply(input$dt_outputFL_rows_selected, function(i) {
-        session$sendCustomMessage(type = 'resetcolorOasis', message =  session$ns( paste0("srows_", i)))
+        session$sendCustomMessage(type = 'resetcolorOasis', message =  session$ns(paste0("srows_", i)))
         show(paste0("vrows_", i))
         if (!is.null(result$tbl_filesListData_wButtons[i, "name"]) && result$tbl_filesListData_wButtons[i, "name"] == "Not Available") {
           disable(paste0("vrows_", i))
+          # 266: avoid download error for non-available files
+          disable("FLdownloadzip")
         }
       })
       lapply(setdiff(input$dt_outputFL_rows_current, input$dt_outputFL_rows_selected), function(i) {
@@ -244,7 +253,7 @@ ViewFilesInTable <- function(input, output, session,
     }
   })
 
-  #update checkboxes according to selectAll button
+  # update checkboxes according to selectAll button
   observeEvent(input$chkboxselectall, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (!is.null(result$tbl_filesListData_wButtons)) {
       if (!is.null(input$chkboxselectall) && input$chkboxselectall) {
@@ -460,7 +469,7 @@ ViewFilesInTable <- function(input, output, session,
 
   # Helper functions -----------------------------------------------------------
 
-  # utility function to add to buttons in table
+  # utility function to create a column with buttons that can be added to a table
   .shinyInput <- function(FUN, id, num, Label = NULL, hidden = FALSE,  ...) {
     inputs <- character(num)
     for (i in seq_len(num)) {

@@ -33,8 +33,11 @@ summarytabUI <- function(id) {
       ),
       column(6,
              plotlyOutput(ns("summaryGULOutputPlot")),
+             br(),
              plotlyOutput(ns("summaryAALOutputPlot")),
+             br(),
              plotlyOutput(ns("summaryILOutputPlot")),
+             br(),
              plotlyOutput(ns("summaryRIOutputPlot"))
       )
     )
@@ -558,8 +561,10 @@ basicplot <- function(xlabel, ylabel, titleToUse, data, group) {
 
 barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
   Perspective <- data$xaxis
-  Loss <- add_commas(data$value*1000000)
+  Loss <- add_commas(data$value * 1000000)
+
   p <- basicplot(xlabel, ylabel, titleToUse, data, group = Loss) +
+    # below throws warnings about unknown aesthetics, which are however used by plotly to prettify the mouse-over labels
     geom_bar(position = "dodge", stat = "identity", aes(fill = colour, prsp = Perspective, loss = Loss))
 
   if (multipleplots) {
@@ -567,7 +572,6 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
   }
   ggplotly(p, tooltip = c("colour", "prsp", "loss"))
 }
-
 
 #' linePlot structure
 #' @title linePlot
@@ -594,11 +598,12 @@ barPlot <- function(xlabel, ylabel, titleToUse, data, multipleplots){
 linePlot <- function(xlabel, ylabel, titleToUse, data) {
   RP <- add_commas(data$xaxis)
   #convert value back to the full length from Millions scale
-  Loss <- add_commas(data$value*1000000)
+  Loss <- add_commas(data$value * 1000000)
   Report <- data$colour
   data$xaxis <- as.factor(add_commas(data$xaxis))
 
   p <- basicplot(xlabel, ylabel, titleToUse, data, group = Report) +
+    # below throws warnings about unknown aesthetics, which are however used by plotly to prettify the mouse-over labels
     geom_point(size = 2, aes(color = Report, return = RP, loss = Loss), guides = FALSE) +
     geom_line(size = 1, aes(color = colour))
 

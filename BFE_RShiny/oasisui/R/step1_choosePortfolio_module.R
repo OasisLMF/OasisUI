@@ -382,7 +382,7 @@ step1_choosePortfolio <- function(input, output, session,
     .defaultCreateProg()
     # TODO: review where/when/how this should be set
     result$portfolio_flag <- "A"
-    #clear fields
+    # clear fields
     .updatePortfolioName()
     show("panelDefinePortfolio")
     logMessage("showing panelDefinePortfolio")
@@ -647,12 +647,15 @@ step1_choosePortfolio <- function(input, output, session,
       if (length(input$dt_Portfolios_rows_selected) > 0) {
         # note that dt_Portfolios allows single row selection only
         pfID <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
-        # #If incomplete show panel to link files
-        currStatus <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$status]
-        if (!is.na(currStatus) && currStatus == Status$Processing) {
+        # if incomplete show panel to link files
+        #currStatus <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$status]
+        #if (!is.na(currStatus) && currStatus == Status$Processing) {
+        # 287: re-show the panel to upload source files in any case (to avoid
+        # having to re-open it when first uploading location file, which will lead
+        # to the analysis status being ready)
           .clearUploadFiles()
           show("panelLinkFiles")
-        }
+        #}
         if (pfID != result$portfolioID) {
           logMessage(paste("updating portfolioID because selection in portfolio table changed to", pfID))
           # re-selecting the same programme ID in the drop-down would not re-trigger
@@ -732,7 +735,11 @@ step1_choosePortfolio <- function(input, output, session,
         oasisuiNotification(type = "error",
                             paste("File link failed."))
       }
+      # we do this reload to get the portfoliosData table updated (i.e. the status of the portfolio may have changed to "ready")
       .reloadtbl_portfoliosData()
+      # panelLinkFiles gets hidden as part of the reload above but is shown again if the status of the portfolio is not "ready"
+      # (i.e. if there is no linked location file yet)
+      # we cannot change this by doing show("panelLinkFiles") here, it would happen before the reactive hiding above
     }
     invisible()
   }
