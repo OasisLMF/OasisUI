@@ -115,7 +115,16 @@ jobs:
         docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:${{ env.RELEASE_TAG }}
         docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:latest
 
-    - name: Check tag matches image
+    - name: Check tag matches (Repo)
+      run: |
+        BUILD_VER=$(grep '^Version:' BFE_RShiny/oasisui/DESCRIPTION | awk -F": " '{print $2}')
+        RELEASE_VER=${{ env.RELEASE_TAG }}
+        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
+        if [[ "$ERROR_CODE" == 1 ]]; then
+            echo "BUILD_VER: $BUILD_VER stored in Repo 'BFE_RShiny/oasisui/DESCRIPTION' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
+        fi
+
+    - name: Check tag matches (image)
       run: |
         container_id=$(docker create "${{ needs.images.outputs.app_image }}")
         docker cp "$container_id:/usr/local/lib/R/site-library/oasisui/DESCRIPTION" "./IMAGE_DESCRIPTION"
