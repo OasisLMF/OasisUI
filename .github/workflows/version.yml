@@ -1,6 +1,4 @@
-# Commit a new version to branch
-
-name: UI Version
+name: OasisUI Version
 
 on:
   workflow_dispatch:
