@@ -1,0 +1,24 @@
+shiny:
+  proxy:
+    title: Oasis Oasisui
+    #logo-url: http://www.openanalytics.eu/sites/www.openanalytics.eu/themes/oa/logo.png
+    #logo-url: https://www.boatoasis.com/uploads/9/2/9/3/92934216/published/boatlogo-nobg.png?1483977780
+    landing-page: /
+    heartbeat-rate: 10000
+    heartbeat-timeout: 60000
+    port: 8080
+    authentication: none
+    docker:
+      internal-networking: true
+  apps:
+  - name: BFE_RShiny
+    display-name: Oasisui
+    docker-cmd: ["R", "-e", "oasisui::runOasisui()"]
+    #docker-volumes: [ "%OASISUI_SHARE_FILEPATH_ON_HOST%:/var/www/oasis/Files" ]
+    docker-image: %UI_DOCKER_IMAGE%
+    docker-env-file: settings.env
+    docker-network: shiny-net
+
+logging:
+  file:
+    shinyproxy.log
