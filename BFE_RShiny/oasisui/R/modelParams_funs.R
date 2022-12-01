@@ -13,7 +13,7 @@ basicConfig_funs <- function(session, model_settings) {
   # Event set
   .event_set_fun <- function(model_settings) {
     # 291 - allow event_set and event_occurrence_id to be missing for certain models, in which case we will simply have no basic params:
-    if (!is.null(model_settings$event_set.name) && is.null(model_settings$event_set.used_for) || model_settings$event_set.used_for == "losses") {
+    if (!is.null(model_settings$event_set.name) && (is.null(model_settings$event_set.used_for) || model_settings$event_set.used_for == "losses")) {
       selectChoices <- lapply(model_settings$event_set.options, function(x) {
         x$id
       })
@@ -34,7 +34,7 @@ basicConfig_funs <- function(session, model_settings) {
 
   # Event occurrence
   .event_occurrence_fun <- function(model_settings) {
-    if (!is.null(model_settings$event_occurrence_id.name) && is.null(model_settings$event_occurrence_id.used_for) || model_settings$event_occurrence_id.used_for == "losses") {
+    if (!is.null(model_settings$event_occurrence_id.name) && (is.null(model_settings$event_occurrence_id.used_for) || model_settings$event_occurrence_id.used_for == "losses")) {
       selectChoices <- lapply(model_settings$event_occurrence_id.options, function(x) {
         x$id
       })
