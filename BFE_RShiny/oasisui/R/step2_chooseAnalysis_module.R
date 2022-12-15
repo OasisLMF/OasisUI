@@ -243,14 +243,23 @@ step2_chooseAnalysis <- function(input, output, session,
   )
 
   # Panels Visualization -------------------------------------------------------
-  observeEvent({
-    currstep()
-    portfolioID()}, {
+  observeEvent(currstep(), {
       .hideDivs()
       if (currstep() == 2) {
         .defaultAssociateModel()
         .reloadAnaData()
         .defaultAnalysisDetails()
+        .reloadtbl_modelsData()
+      }
+    })
+
+  observeEvent(portfolioID(), {
+      .hideDivs()
+      if (currstep() == 2) {
+        .defaultAssociateModel()
+        .reloadAnaData()
+        # below is redundant when switching portfolio, because that must lead to an update of the analysis ID, which already triggers below function separately.
+        # .defaultAnalysisDetails()
         .reloadtbl_modelsData()
       }
     })
@@ -306,8 +315,11 @@ step2_chooseAnalysis <- function(input, output, session,
     nrow(result$tbl_analysesData)
     portfolioID()}, ignoreNULL = FALSE, {
       if (!is.null(input$dt_analyses_rows_selected)) {
+        # switching to a portfolio that does not contain any analyses will still initially result in the above being 1 rather than NULL,
+        # in which case result$analysisID would become NA.
         result$analysisID <- result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]
         logMessage(paste("updating result$analysisID in step2 to", result$analysisID))
+        if (is.na(result$analysisID)) result$analysisID <- NULL
       } else {
         result$analysisID <- NULL
       }
@@ -430,7 +442,7 @@ step2_chooseAnalysis <- function(input, output, session,
       }
     })
 
-  observeEvent(input$abuttonshowanadetails,{
+  observeEvent(input$abuttonshowanadetails, {
     result$exposure_counter <- result$exposure_counter + input$abuttonshowanadetails
   })
 
@@ -700,12 +712,11 @@ step2_chooseAnalysis <- function(input, output, session,
       }
 
       if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success" && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
-
         fileids <- as.list(sub_modules$buildCustom$fileids())
-
         patch_analyses <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", result$analysisID, sep = "/"),
                                                                    query_body = list(complex_model_data_files = fileids),
                                                                    query_method = "PATCH")
+        # content(patch_analyses$result)
       }
 
       input_generation <- session$userData$oasisapi$api_post_query(
