@@ -108,28 +108,39 @@ exposurevalidationsummary <- function(input,
     analysisID()
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
-      result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
-      result$perils <- unique(result$summary_tbl$peril)
-      keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = analysisID())
-
-      result$peril_id <- unique(keys_errors$PerilID)
-      if (is.null(result$perils)) {
-        result$peril_choices <- "no perils available for summary"
-      } else if (!is.null(result$perils) && length(result$peril_id) == 0) {
-        result$peril_choices <- result$perils
+      # note this will remain TRUE as the active tab when switching to step 3!
+      # We should get the analysis first to check the status and only continue
+      # if the status is > than NEW, otherwise subsequent queries won't work.
+      anaStatus <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("analyses", analysisID(), sep = "/"),
+        query_method = "GET"
+      )[["status"]]
+      if (anaStatus == "NEW") {
+        # chill
       } else {
-        result$peril_choices <- paste0(result$perils, " (", result$peril_id, ")")
-      }
-      # remove "total" entry in peril choices
-      peril_choices_filter <- result$peril_choices[-grep("total", result$peril_choices)]
-      #peril_choices_filter <- result$peril_choices[result$peril_choices != "total"]
+        result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
+        result$perils <- unique(result$summary_tbl$peril)
+        keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = analysisID())
 
-      checkChange <- identical(input$input_peril, peril_choices_filter)
-      updateSelectInput(session, inputId = "input_peril", choices = peril_choices_filter, selected = peril_choices_filter)
-      # if above "updateSelectInput" leaves input_peril the same, we still want to call .reloadSummary once
-      if (checkChange) {
-        .reloadSummary(input$input_peril)
-        .reloadSummary_total(result$peril_choices)
+        result$peril_id <- unique(keys_errors$PerilID)  # just for adding labels if available
+        if (is.null(result$perils)) {
+          result$peril_choices <- "no perils available for summary"
+        } else if (!is.null(result$perils) && length(result$peril_id) == 0) {
+          result$peril_choices <- result$perils
+        } else {
+          result$peril_choices <- paste0(result$perils, " (", result$peril_id, ")")
+        }
+        # remove "total" entry in peril choices
+        peril_choices_filter <- result$peril_choices[-grep("total", result$peril_choices)]
+        #peril_choices_filter <- result$peril_choices[result$peril_choices != "total"]
+
+        checkChange <- identical(input$input_peril, peril_choices_filter)
+        updateSelectInput(session, inputId = "input_peril", choices = peril_choices_filter, selected = peril_choices_filter)
+        # if above "updateSelectInput" leaves input_peril the same, we still want to call .reloadSummary once
+        if (checkChange) {
+          .reloadSummary(input$input_peril)
+          .reloadSummary_total(result$peril_choices)
+        }
       }
     }
   })
@@ -155,7 +166,7 @@ exposurevalidationsummary <- function(input,
       sum_tot_filter$portfolio <- add_commas(sum_tot_filter$portfolio)
 
       # drop unnecessary columns
-      drops <- c("all", "fail", "success", "nomatch")
+      drops <- c("all", "fail", "fail_ap", "fail_v", "success", "nomatch", "notatrisk", "noreturn")
       sum_tot_filter <- sum_tot_filter[, !(names(sum_tot_filter) %in% drops)]
 
       datatable(
