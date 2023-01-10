@@ -222,12 +222,15 @@ step3_configureOutput <- function(input, output, session,
           if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] == "ready") {
             enable("abuttonrunconfig")
             updateActionButton(session, inputId = "abuttonrunconfig", label = "Output Configuration")
+            result$ana_flag <- "C"
           } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status_detailed] %in%
                      c("run completed", "run error")) {
             enable("abuttonrunconfig")
             updateActionButton(session, inputId = "abuttonrunconfig", label = "Rerun")
+            result$ana_flag <- "R"
           } else {
             updateActionButton(session, inputId = "abuttonrunconfig", label = "Output Configuration")
+            result$ana_flag <- "C"
           }
         }
       }
@@ -294,7 +297,6 @@ step3_configureOutput <- function(input, output, session,
     #should use /v1/analyses/{id}/cancel/
     delete_analyses_id <- session$userData$oasisapi$api_post_query(query_path = paste("analyses", analsisID, "cancel",  sep = "/"))
 
-
     if (delete_analyses_id$status == "Success") {
       oasisuiNotification(type = "message",
                           paste0("Analysis id ", analysisID, " cancelled."))
@@ -314,7 +316,8 @@ step3_configureOutput <- function(input, output, session,
   sub_modules$def_out_config <- callModule(
     def_out_config,
     id = "def_out_config",
-    analysisID = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]),
+    #analysisID = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$id]),
+    analysisID = reactive(result$anaID),
     analysisName = reactive(result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$name]),
     ana_flag = reactive(result$ana_flag),
     counter = reactive({input$abuttonrunconfig}),
@@ -336,12 +339,12 @@ step3_configureOutput <- function(input, output, session,
         hide("panelAnalysisLogs")
         show("panelDefineOutputs")
         logMessage("showing panelDefineOutputs")
-        result$ana_flag <- "C"
+        #result$ana_flag <- "C"
       } else if (result$tbl_analysesData[input$dt_analyses_rows_selected, tbl_analysesDataNames$status] %in% c(Status$Completed, Status$Failed)) {
         hide("panelAnalysisLogs")
         show("panelDefineOutputs")
         logMessage("showing panelDefineOutputs")
-        result$ana_flag <- "R"
+        #result$ana_flag <- "R"
       }
     }
   })
@@ -453,7 +456,9 @@ step3_configureOutput <- function(input, output, session,
   # Allow display output option only if run successful. Otherwise default view is logs
   observeEvent({
     input$dt_analyses_rows_selected
-    result$tbl_analysesData
+    result$tbl_analysesData  # TODO cornercase: the trigger above won't work switching from dt_analyses_rows_selected == 1 to a new portfolio / tbl_analysesData, which will also result in dt_analyses_rows_selected == 1.
+    # however, we end up triggering this event twice in cases where both are changing... so if tbl_analysesData changes, and dt_analyses_rows_selected was 1 from before (and usually still is at this point), then skip this trigger (assuming the new tbl_analysesData has rows)
+    # --> also consider if tbl_analysesData changes, and dt_analyses_rows_selected was 0 from before (pf without any analysis), in case we switch to another pf without any analysis...
   }, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
       logMessage(paste("input$dt_analyses_rows_selected is changed to:", input$dt_analyses_rows_selected))
