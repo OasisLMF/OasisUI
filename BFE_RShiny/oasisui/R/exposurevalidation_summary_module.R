@@ -108,28 +108,39 @@ exposurevalidationsummary <- function(input,
     analysisID()
   }, {
     if (length(active()) > 0 && active() && counter() > 0) {
-      result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
-      result$perils <- unique(result$summary_tbl$peril)
-      keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = analysisID())
-
-      result$peril_id <- unique(keys_errors$PerilID)
-      if (is.null(result$perils)) {
-        result$peril_choices <- "no perils available for summary"
-      } else if (!is.null(result$perils) && length(result$peril_id) == 0) {
-        result$peril_choices <- result$perils
+      # note this will remain TRUE as the active tab when switching to step 3!
+      # We should get the analysis first to check the status and only continue
+      # if the status is > than NEW, otherwise subsequent queries won't work.
+      anaStatus <- session$userData$oasisapi$api_return_query_res(
+        query_path = paste("analyses", analysisID(), sep = "/"),
+        query_method = "GET"
+      )[["status"]]
+      if (anaStatus == "NEW") {
+        # chill
       } else {
-        result$peril_choices <- paste0(result$perils, " (", result$peril_id, ")")
-      }
-      # remove "total" entry in peril choices
-      peril_choices_filter <- result$peril_choices[-grep("total", result$peril_choices)]
-      #peril_choices_filter <- result$peril_choices[result$peril_choices != "total"]
+        result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())
+        result$perils <- unique(result$summary_tbl$peril)
+        keys_errors <- session$userData$data_hub$get_ana_errors_summary_content(id = analysisID())
 
-      checkChange <- identical(input$input_peril, peril_choices_filter)
-      updateSelectInput(session, inputId = "input_peril", choices = peril_choices_filter, selected = peril_choices_filter)
-      # if above "updateSelectInput" leaves input_peril the same, we still want to call .reloadSummary once
-      if (checkChange) {
-        .reloadSummary(input$input_peril)
-        .reloadSummary_total(result$peril_choices)
+        result$peril_id <- unique(keys_errors$PerilID)  # just for adding labels if available
+        if (is.null(result$perils)) {
+          result$peril_choices <- "no perils available for summary"
+        } else if (!is.null(result$perils) && length(result$peril_id) == 0) {
+          result$peril_choices <- result$perils
+        } else {
+          result$peril_choices <- paste0(result$perils, " (", result$peril_id, ")")
+        }
+        # remove "total" entry in peril choices
+        peril_choices_filter <- result$peril_choices[-grep("total", result$peril_choices)]
+        #peril_choices_filter <- result$peril_choices[result$peril_choices != "total"]
+
+        checkChange <- identical(input$input_peril, peril_choices_filter)
+        updateSelectInput(session, inputId = "input_peril", choices = peril_choices_filter, selected = peril_choices_filter)
+        # if above "updateSelectInput" leaves input_peril the same, we still want to call .reloadSummary once
+        if (checkChange) {
+          .reloadSummary(input$input_peril)
+          .reloadSummary_total(result$peril_choices)
+        }
       }
     }
   })
@@ -155,7 +166,7 @@ exposurevalidationsummary <- function(input,
       sum_tot_filter$portfolio <- add_commas(sum_tot_filter$portfolio)
 
       # drop unnecessary columns
-      drops <- c("all", "fail", "success", "nomatch")
+      drops <- c("all", "fail", "fail_ap", "fail_v", "success", "nomatch", "notatrisk", "noreturn")
       sum_tot_filter <- sum_tot_filter[, !(names(sum_tot_filter) %in% drops)]
 
       datatable(
@@ -223,9 +234,9 @@ exposurevalidationsummary <- function(input,
   .extract_df_plot <- function(df) {
     df <- df %>%
       filter(type %in% type_to_plot) %>%
-      mutate(fail = 100*fail/all,
-             success = 100*success/all,
-             nomatch = 100*nomatch/all,
+      mutate(fail = 100 * fail / all,
+             success = 100 * success / all,
+             nomatch = 100 * nomatch / all,
              all = NULL) %>%
       gather(key, value, factor_key = TRUE, -c(peril, type)) %>%
       mutate(peril = as.factor(peril),
@@ -237,17 +248,21 @@ exposurevalidationsummary <- function(input,
   .plot_stack_hist <- function(df) {
     brks <- c(0, 25, 50, 75, 100)
     lbs <- c("0%", "25%", "50%", "75%", "100%")
-    # n_plots_row <- ifelse(length(unique(df$peril)) < 4, length(unique(df$peril)), 4)
-    n_plots_row <- length(unique(df$peril))
+
     # leave only: Fail, Success and Nomatch statuses and remove peril "total"
     key_unwanted <- c("portfolio", "not-modelled", "modelled")
     df <- df %>% filter(key %notin% key_unwanted)
+    # 280: after more detailed keys had been added to the API, the exclusions
+    # above weren't sufficient anymore. Pick fail, success and nomatch
+    # explicitly as done in .extract_df_plot().
+    df <- df %>% filter(key %in% c("fail", "success", "nomatch"))
 
     if (length(grep("total", df$peril)) > 0) {
       df <- df[-grep("total", df$peril), ]
     }
     status <- df$key
     percentage <- df$value
+    n_plots_row <- length(unique(df$peril))
 
     p <- ggplot(data = df, aes(x = type, y = percentage, fill = status)) +
       theme(

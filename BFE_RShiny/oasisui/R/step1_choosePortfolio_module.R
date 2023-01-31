@@ -226,11 +226,12 @@ step1_choosePortfolio <- function(input, output, session,
 
   # Reactive Values and parameters ---------------------------------------------
 
-  #number of Rows per Page in a dataable
+  # number of rows per page in a datatable
   pageLength <- 5
 
-  #values to stop ping pong effect
-  stop_selPfID <- check_selPfID <- 0
+  # values to stop ping pong effect. 2022-12 shouldn't be needed anymore.
+  # stop_selPfID <- 0
+  # check_selPfID <- 0
 
   # list of sub-modules
   sub_modules <- list()
@@ -245,13 +246,14 @@ step1_choosePortfolio <- function(input, output, session,
     tbl_portfoliosData = NULL,
     # flag to know if the user is creating or amending a portfolio
     portfolio_flag = "C",
-    # acceptedfile extensions in file upload
+    # accepted file extensions in file upload
     accepted_ext = NULL
   )
 
-  #Set Params
+  # Set Params
   observe(if (active()) {
-    result$portfolioID <- isolate(portfolioID())
+    # this was being isolated previously, but we would rather not have it that way (?)
+    result$portfolioID <- portfolioID()
   })
 
   # Panels Visualization -------------------------------------------------------
@@ -271,7 +273,7 @@ step1_choosePortfolio <- function(input, output, session,
   observeEvent({
     result$portfolioID
     result$tbl_portfoliosData
-    currstep()
+    #currstep()
   }, ignoreNULL = FALSE, ignoreInit = TRUE, {
     disable("abuttonpfdetails")
     disable("abuttondeletepf")
@@ -284,7 +286,9 @@ step1_choosePortfolio <- function(input, output, session,
       enable("abuttondeletepf")
       enable("abuttonamendpf")
       enable("abuttonuploadsourcefiles")
-      if (!is.null(result$tbl_portfoliosData) && result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$status] == Status$Completed) {
+      # the row selection will only be updated at the end, so rather use the more complicated lookup
+      #if (!is.null(result$tbl_portfoliosData) && result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$status] == Status$Completed) {
+      if (!is.null(result$tbl_portfoliosData) && result$tbl_portfoliosData[result$tbl_portfoliosData[, tbl_portfoliosDataNames$id] == result$portfolioID, tbl_portfoliosDataNames$status] == Status$Completed) {
         enable("abuttonpgotonextstep")
       }
     }
@@ -598,11 +602,12 @@ step1_choosePortfolio <- function(input, output, session,
       }
 
       if (result$portfolioID != pfID) {
-        bl_dirty <- stop_selPfID > check_selPfID
-        logMessage(paste("--- stop_selPfID is:", stop_selPfID))
+        # bl_dirty <- stop_selPfID > check_selPfID
+        # logMessage(paste("--- stop_selPfID is:", stop_selPfID))
         logMessage(paste("updating dt_Portfolios select because portfolioID changed to", result$portfolioID))
         if (result$portfolioID != "") {
-          if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0 && !bl_dirty ) {
+          # if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0 && !bl_dirty) {
+          if (!is.null(result$tbl_portfoliosData) && nrow(result$tbl_portfoliosData) > 0) {
             rowToSelect <- match(result$portfolioID, result$tbl_portfoliosData[, tbl_portfoliosDataNames$id])
             pageSel <- ceiling(rowToSelect/pageLength)
             # backward propagation
@@ -622,7 +627,8 @@ step1_choosePortfolio <- function(input, output, session,
           selectPage(dataTableProxy("dt_Portfolios"), 1)
           logMessage(paste("selected row is:", input$dt_Portfolios_rows_selected))
         }
-        if (bl_dirty) check_selPfID <<- check_selPfID + 1
+        # if (bl_dirty) check_selPfID <<- check_selPfID + 1
+        # if (bl_dirty) check_selPfID <<- stop_selPfID
       }
     }
   })
@@ -661,7 +667,8 @@ step1_choosePortfolio <- function(input, output, session,
           # re-selecting the same programme ID in the drop-down would not re-trigger
           # any of the observers of the drop-down, however we then also want to be
           # sure not to increase stop_selPfID!
-          stop_selPfID <<- stop_selPfID + 1
+          # stop_selPfID <<- stop_selPfID + 1
+          # stop_selPfID <<- check_selPfID + 1
           result$portfolioID <- pfID
         }
       } else {

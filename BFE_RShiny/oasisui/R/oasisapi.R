@@ -161,10 +161,25 @@ OasisAPI <- R6Class(
       tryCatch(warn_for_status(response),
                warning = function(w) {warning(w$message)})
       status <- http_status(response)$category
+      # 292: more detailed logging of API query issues
       if (status == "Client error" && response$headers[["content-type"]] == "text/html") {
-        stop("Client error in api_handle_response, probably trying to access a non-existent query path.")
+        oasisuiNotification(type = "error",
+                            paste0(status_code(response), ": Client error in API query - bad request."))
+        warning(paste("Client error", status_code(response), "in api_handle_response, probably trying to access a non-existent query path."))
+        logMessage(response$url)
       } else if (status == "Client error" && !is.null(content(response)$detail) && content(response)$detail == "Not found.") {
-        warning("Client error in api_handle_response, valid query but API did not find / return the requested resource.")
+        oasisuiNotification(type = "error",
+                            paste0(status_code(response), ": Client error in API query - not found."))
+        warning(paste("Client error", status_code(response), "in api_handle_response, valid query but API did not find / return the requested resource."))
+        logMessage(response$url)
+      } else if (status == "Server error") {
+        oasisuiNotification(type = "error",
+                            paste0(status_code(response), ": Server error upon API query - retry and/or check network / API server."))
+        warning(paste("Server error", status_code(response), "in api_handle_response."))
+      } else if (status_code(response) != 200L) {  # 201 (create ana), 204 (delete pf)
+        # oasisuiNotification(type = "message",
+        #                     paste0(status_code(response), ": Unexpected status code returned by API query..."))
+        logMessage(paste("Unexpected status code", status_code(response), "in api_handle_response."))
       }
       structure(
         list(
@@ -333,17 +348,17 @@ OasisAPI <- R6Class(
               non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_chunks]
             }
             if (!is.null(non_null_content_lst[[i]]$sub_task_error_ids)) {
-              grep_sub_errors<- grep("sub_task_error_ids", names(non_null_content_lst[[i]]))
+              grep_sub_errors <- grep("sub_task_error_ids", names(non_null_content_lst[[i]]))
               non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_sub_errors]
             }
             if (!is.null(non_null_content_lst[[i]]$lookup_chunks)) {
-              grep_sub_errors<- grep("lookup_chunks", names(non_null_content_lst[[i]]))
-              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_sub_errors]
+              grep_chunks <- grep("lookup_chunks", names(non_null_content_lst[[i]]))
+              non_null_content_lst[[i]] <- non_null_content_lst[[i]][- grep_chunks]
             }
           }
           df <- bind_rows(non_null_content_lst) %>%
             as.data.frame()
-        } else if (length(content_lst) == 1 && length(content_lst[[1]]) == 1 && any(grepl("/", content_lst[[1]]))){
+        } else if (length(content_lst) == 1 && length(content_lst[[1]]) == 1 && any(grepl("/", content_lst[[1]]))) {
           df <- content_lst[[1]]
         } else {
           df <- NULL

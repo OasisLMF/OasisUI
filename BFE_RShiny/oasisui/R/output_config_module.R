@@ -411,10 +411,11 @@ def_out_config <- function(input,
 
   # log message and potential render UI in case analysis or flag changes
   observeEvent({
-    result$ana_flag
+    # below result$ana_flag would lead to redundant reactivity, need to cover this differently.
+    # result$ana_flag
     analysisID()
   }, {
-
+    # need to make sure result$ana_flag is updated for the new analysisID when executing this (possibly achieved with the change in callModule(def_out_config...))
     if (length(analysisID()) > 0) {
       if (result$ana_flag == "R") {
         analysis_settings <- session$userData$data_hub$get_ana_settings_content(analysisID(), oasisapi = session$userData$oasisapi)
@@ -458,7 +459,6 @@ def_out_config <- function(input,
         input$sintag,
         "configuration and cleaning up UI"
       ))
-
       # clean up UI
       if (any(grepl("sinsummarylevels", input))) {
         removeUI(selector = "div:has(> #sinsummarylevels)",
@@ -470,18 +470,18 @@ def_out_config <- function(input,
                  multiple = TRUE,
                  immediate = TRUE)
       }
+      # main output configuration panel (perspectives, summary levels, reports)
+      output$summary_levels_reports_ui <- renderUI({
+        oed_field <- oed_field_react()
+        # if oed fields are provided, a vector is returned, otherwise NA
+        if (all(is.na(oed_field))) {
+          logMessage("No list of summary levels provided")
+        } else {
+          # below returns NULL for Summary case
+          dynamicUI_btns(session, analysisID(), result$ana_flag, tag = input$sintag, oed_field_react())
+        }
+      })
     }
-    # main output configuration panel (perspectives, summary levels, reports)
-    output$summary_levels_reports_ui <- renderUI({
-      oed_field <- oed_field_react()
-      # if oed fields are provided, a vector is returned, otherwise NA
-      if (all(is.na(oed_field))) {
-        logMessage("No list of summary levels provided")
-      } else {
-        # below returns NULL for Summary case
-        dynamicUI_btns(session, analysisID(), result$ana_flag, tag = input$sintag, oed_field_react())
-      }
-    })
   })
 
   # disable removeBtn in case there is just a single set of fields
@@ -945,13 +945,28 @@ def_out_config <- function(input,
         model_settings <- .update_mdlsettings_defaults_with_anavalues(model_settings, ana_mdlsettings)
       }
 
-      if (length(names(model_settings)) > 0) {
+      # if (length(names(model_settings)) > 0) {
+      if (!is.null(tbl_modelsDetails)) {
+        # 299: handle case where there are no basic model params, i.e.
+        # model_settings from above might be subset to nothing but we still want
+        # to refresh (otherwise we might keep showing params from the previous
+        # model that the current one doesn't even have)
         # Basic model params
         output$basic_model_param <- renderUI({
           basicConfig_funs(session, model_settings)
         })
         # Advanced model params
         updateNumericInput(session, "tinputnoofsample", value = tbl_ana_settings$number_of_samples)
+        logMessage("updating generic model params")
+        # 299: update / clear output config lists from 239
+        .null_to_empty <- function(x) {
+          if (is.null(x)) ""
+          else x
+        }
+        updateNumericInput(session, "tinputthreshold", value = tbl_ana_settings$gul_threshold)
+        updateTextInput(session, "tinputreturnperiods", value = .null_to_empty(tbl_ana_settings$return_periods))
+        updateTextInput(session, "tinputeventids", value = .null_to_empty(tbl_ana_settings$event_ids))
+        updateTextInput(session, "tinputquantiles", value = .null_to_empty(tbl_ana_settings$quantiles))
         output$advanced_model_param <- renderUI({
             advancedConfig_funs(session, model_settings)
         })

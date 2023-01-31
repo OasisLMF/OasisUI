@@ -141,46 +141,24 @@ exposurevalidationmap <- function(input,
     analysisID()
   }, {
     if (length(active()) > 0 && active() && counter() > 0 && !is.null(analysisID())) {
-      .reloadExposureValidation()
+      retReload <- .reloadExposureValidation()
       perils <- result$uploaded_locs_check$peril[!is.na(result$uploaded_locs_check$peril)] %>%
         unique()
       mapping <- session$userData$data_hub$get_oed_peril_codes_mapping()
       mapped_perils <- lapply(mapping[perils], function(x) {x[["desc"]]})
       result$perils_names <- unlist(mapped_perils,  use.names = FALSE)
-      result$peril_codes <- names(mapped_perils)
+      result$perils_codes <- names(mapped_perils)
       logMessage("Updating input$chkgrp_perils")
       updateCheckboxGroupInput(session, inputId = "chkgrp_perils", choices = as.list(perils), selected = as.list(perils))
     }
   })
 
-  observeEvent({input$chkgrp_perils
-    result$uploaded_locs_check}, ignoreNULL = FALSE, {
-      if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
-        if (is.null(input$chkgrp_perils)) {
-          result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-            mutate(modeled = NA)
-          if (any(grepl(".x", names(result$uploaded_locs_check_peril)))) {
-            names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
-          }
-          names(result$uploaded_locs_check_peril) <- tolower(names(result$uploaded_locs_check_peril))
-        } else {
-          result$uploaded_locs_check_peril <- result$uploaded_locs_check %>%
-            # filter(peril_id %in% input$chkgrp_perils) %>%
-            mutate(modeled = case_when(
-              is.na(peril_id) ~ FALSE,
-              peril_id %in% input$chkgrp_perils ~ TRUE,
-              TRUE ~ NA)
-            ) %>%
-            filter(!is.na(modeled)) %>%
-            select(-peril_id) %>%
-            distinct()
-          if (any(grepl(".x", names(result$uploaded_locs_check_peril)))) {
-            names(result$uploaded_locs_check_peril) <- gsub(".x", "", names(result$uploaded_locs_check_peril))
-          }
-          names(result$uploaded_locs_check_peril) <- tolower(names(result$uploaded_locs_check_peril))
-        }
-      }
-    })
+  observeEvent({input$chkgrp_perils}, ignoreNULL = FALSE, {
+    # note that updateCheckboxGroupInput() manifests late, like any client input
+    # update that needs to ultimately receive a message back from client to
+    # server.
+    .updateUploadedLocsCheckPeril()
+  })
 
   # Show/Hide table button -----------------------------------------------------
   observeEvent(result$uploaded_locs_check_peril, ignoreNULL = FALSE, {
@@ -243,9 +221,10 @@ exposurevalidationmap <- function(input,
 
   # Map ------------------------------------------------------------------------
   output$exposure_map <- renderLeaflet({
+    # this should be called only once for a single analysis map load (i.e. once for initial NULL is fine, but otherwise 2x wouldn't be great)
     if (!is.null(result$uploaded_locs_check_peril) && nrow(result$uploaded_locs_check_peril) > 0) {
-      result$uploaded_locs_check_peril <- result$uploaded_locs_check_peril[, colSums(is.na(result$uploaded_locs_check_peril)) != nrow(result$uploaded_locs_check_peril)]
-      .createExposureValMap(result$uploaded_locs_check_peril)
+      sanitized_tbl <- result$uploaded_locs_check_peril[, colSums(is.na(result$uploaded_locs_check_peril)) != nrow(result$uploaded_locs_check_peril)]
+      .createExposureValMap(sanitized_tbl)
     } else {
       NULL
     }
@@ -308,7 +287,7 @@ exposurevalidationmap <- function(input,
                                                                                         weight = 5,
                                                                                         bringToFront = FALSE,
                                                                                         opacity = 1))
-        #re-set damage ratio everytime the user re-clicks on the map
+        # re-set damage ratio every time the user re-clicks on the map
         updateNumericInput(session, "damage_ratio", value = 100)
 
         if (is.null(input$damage_ratio)) {
@@ -372,7 +351,7 @@ exposurevalidationmap <- function(input,
         if (is.null(country_num)) {
           # if country_num is null, then do nothing
         } else {
-          #get set of coordinates for selected country
+          # get set of coordinates for selected country
           country_js <- js_lite$features$geometry$coordinates[[country_num]]
           if (class(country_js) == "list") {
             lati <- na.omit(unlist(lapply(seq_len(length(country_js)), function(x) {
@@ -506,7 +485,10 @@ exposurevalidationmap <- function(input,
   observeEvent(input$abuttonexposurerefresh, {
     # Get modeled locations
     withModalSpinner(
-      .reloadExposureValidation(),
+      {
+        retReload <- .reloadExposureValidation()
+        if (retReload) .updateUploadedLocsCheckPeril()
+      },
       "Refreshing...",
       size = "s", t = 0.5
     )
@@ -516,10 +498,51 @@ exposurevalidationmap <- function(input,
   # dummy for exposure location comparison
   .reloadExposureValidation <- function() {
     logMessage(".reloadExposureValidation called")
-    uploaded_locs_check <- check_loc(analysisID(), portfolioID(), data_hub = session$userData$data_hub)
+    anaStatus <- session$userData$oasisapi$api_return_query_res(
+      query_path = paste("analyses", analysisID(), sep = "/"),
+      query_method = "GET"
+    )[["status"]]
+    if (anaStatus == "NEW") {
+      uploaded_locs_check <- NULL
+    } else {
+      uploaded_locs_check <- check_loc(analysisID(), portfolioID(), data_hub = session$userData$data_hub)
+    }
     # updating reactive only when needed
-    if (!identical(uploaded_locs_check,result$uploaded_locs_check)) {
+    if (!identical(uploaded_locs_check, result$uploaded_locs_check)) {
       result$uploaded_locs_check <- uploaded_locs_check
+      logMessage(".reloadExposureValidation output TRUE")
+      return(1)
+    }
+    return(0)
+  }
+
+  # util to update result$uploaded_locs_check_peril
+  .updateUploadedLocsCheckPeril <- function() {
+    if (!is.null(result$uploaded_locs_check) && nrow(result$uploaded_locs_check) > 0) {
+      if (is.null(input$chkgrp_perils)) {
+        tmp <- result$uploaded_locs_check %>%
+          mutate(modeled = NA)
+        if (any(grepl(".x", names(tmp)))) {
+          names(tmp) <- gsub(".x", "", names(tmp))
+        }
+        names(tmp) <- tolower(names(tmp))
+      } else {
+        tmp <- result$uploaded_locs_check %>%
+          # filter(peril_id %in% input$chkgrp_perils) %>%
+          mutate(modeled = case_when(
+            is.na(peril_id) ~ FALSE,
+            peril_id %in% input$chkgrp_perils ~ TRUE,
+            TRUE ~ NA)
+          ) %>%
+          filter(!is.na(modeled)) %>%
+          select(-peril_id) %>%
+          distinct()
+        if (any(grepl(".x", names(tmp)))) {
+          names(tmp) <- gsub(".x", "", names(tmp))
+        }
+        names(tmp) <- tolower(names(tmp))
+      }
+      result$uploaded_locs_check_peril <- tmp
     }
     invisible()
   }
@@ -528,10 +551,9 @@ exposurevalidationmap <- function(input,
   .createExposureValMap <- function(df) {
     marker_colors <- c('green', 'red')
     # if ("Latitude" %in% colnames(df)) {
-    # colnames(df) <- tolower(colnames(df))
+    #   colnames(df) <- tolower(colnames(df))
     # }
-
-    if (is.null(input$chkgrp_perils)) {
+    if (is.null(isolate(input$chkgrp_perils))) {  # input$chkgrp_perils isolated to prevent redundant reactivity.
       icon_map <- NULL
       df <- df
       leaflet(df) %>%
@@ -542,7 +564,7 @@ exposurevalidationmap <- function(input,
         mutate(modeled = case_when(
           modeled == "TRUE" ~ 1,
           TRUE ~ 2
-        )) %>% build_marker_data(session = session, paramID = analysisID(), step = "Validation Map")
+        )) %>% build_marker_data(session = session, paramID = isolate(analysisID()), step = "Validation Map")
 
       icon_map <- awesomeIcons(
         icon = 'map-marker-alt',

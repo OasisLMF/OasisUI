@@ -148,65 +148,64 @@ singleAna <- function(input, output, session,
 
   observeEvent(submodulesList$step2_chooseAnalysis$analysisID(), {
     result$anaID <- submodulesList$step2_chooseAnalysis$analysisID()
-    logMessage(paste0("updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", result$anaID))
+    logMessage(paste0("singleAna: updating result$anaID because submodulesList$step2_chooseAnalysis$analysisID() changed to: ", result$anaID))
   })
 
   observeEvent(selectAnaID(), {
     result$anaID <- selectAnaID()
-    logMessage(paste0("updating result$anaID because selectAnaID() changed to: ", result$anaID))
+    logMessage(paste0("singleAna: updating result$anaID because selectAnaID() changed to: ", result$anaID))
   })
 
   # > portfolioID --------------------------------------------------------------
   observeEvent(submodulesList$step1_choosePortfolio$portfolioID(), ignoreInit = TRUE, {
     portfolioID <- submodulesList$step1_choosePortfolio$portfolioID()
-    #Avoid updating input if not necessary
+    # Avoid updating input if not necessary
     if (!is.na(portfolioID) && result$portfolioID != portfolioID) {
-      logMessage(paste0("updating result$portfolioID because submodulesList$step1_choosePortfolio$portfolioID() changed to: ", portfolioID ))
+      logMessage(paste0("singleAna: updating result$portfolioID because submodulesList$step1_choosePortfolio$portfolioID() changed to: ", portfolioID))
       result$portfolioID <- portfolioID
     }
   })
 
   observeEvent(selectPortfolioID(),  ignoreInit = TRUE, {
     portfolioID <- selectPortfolioID()
-    #Avoid updating input if not necessary
+    # Avoid updating input if not necessary
     if (!is.na(portfolioID) && portfolioID != "" && result$portfolioID != portfolioID) {
-      logMessage(paste0("updating result$portfolioID becauseselectPortfolioID() changed to: ", portfolioID ))
+      logMessage(paste0("singleAna: updating result$portfolioID becauseselectPortfolioID() changed to: ", portfolioID))
       result$portfolioID <- portfolioID
     }
   })
 
-  observeEvent(input$portfolioID, ignoreInit = TRUE,{
-    #Avoid updating input if not necessary
+  observeEvent(input$portfolioID, ignoreInit = TRUE, {
+    # Avoid updating input if not necessary
     if (input$portfolioID != result$portfolioID) {
-      logMessage(paste0("updating result$portfolioID because input$portfolioID changed to: ", input$portfolioID ))
+      logMessage(paste0("singleAna: updating result$portfolioID because input$portfolioID changed to: ", input$portfolioID))
       result$portfolioID <- input$portfolioID
     }
   })
 
-  observeEvent(result$portfolioID, ignoreInit = TRUE,{
-    #Avoid updating input if not necessary
+  observeEvent(result$portfolioID, ignoreInit = TRUE, {
+    # Avoid updating input if not necessary
     if (input$portfolioID != result$portfolioID) {
-      logMessage(paste0("updating input$portfolioID because result$portfolioID changed to: ", result$portfolioID ))
+      logMessage(paste0("singleAna: updating input$portfolioID because result$portfolioID changed to: ", result$portfolioID))
       updateSelectizeInput(session, inputId = "portfolioID", selected = result$portfolioID, choices = result$pfChoices)
     }
   })
 
-  observeEvent({
-    workflowSteps$step()
-  }, {if (workflowSteps$step() != 1) {
-    #Avoid updating input if not necessary
-    if (input$portfolioID != result$portfolioID) {
-      logMessage(paste0("updating input$portfolioID because result$portfolioID changed to: ", result$portfolioID ))
-      updateSelectizeInput(session, inputId = "portfolioID", selected = result$portfolioID, choices = result$pfChoices)
-    }  else if (input$portfolioID == "" && input$portfolioID == result$portfolioID) {
-      logMessage(paste0("updating input$portfolioID choices"))
-      updateSelectizeInput(session, inputId = "portfolioID", selected = character(0), choices = result$pfChoices)
+  observeEvent({workflowSteps$step()}, {
+    if (workflowSteps$step() != 1) {
+      # Avoid updating input if not necessary
+      if (input$portfolioID != result$portfolioID) {
+        logMessage(paste0("singleAna: updating input$portfolioID because result$portfolioID changed to: ", result$portfolioID))
+        updateSelectizeInput(session, inputId = "portfolioID", selected = result$portfolioID, choices = result$pfChoices)
+      }  else if (input$portfolioID == "" && input$portfolioID == result$portfolioID) {
+        logMessage(paste0("singleAna: updating input$portfolioID choices"))
+        updateSelectizeInput(session, inputId = "portfolioID", selected = character(0), choices = result$pfChoices)
+      }
     }
-  }
   })
 
   # > prog Table reactives -----------------------------------------------------
-  observeEvent(submodulesList$step1_choosePortfolio$tbl_portfoliosData(), ignoreInit = TRUE,{
+  observeEvent(submodulesList$step1_choosePortfolio$tbl_portfoliosData(), ignoreInit = TRUE, {
     if (is.null(submodulesList$step1_choosePortfolio$tbl_portfoliosData()) || nrow(submodulesList$step1_choosePortfolio$tbl_portfoliosData()) == 0) {
       result$tbl_portfoliosData <- session$userData$data_hub$return_tbl_portfoliosData(Status = Status,
                                                                                        tbl_portfoliosDataNames = tbl_portfoliosDataNames)
