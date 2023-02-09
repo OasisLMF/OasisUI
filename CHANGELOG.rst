@@ -1,6 +1,12 @@
 OasisUI Changelog
 ==================
 
+`1.11.6`_
+ ---------
+* [#292, #299, #277, #280, #282](https://github.com/OasisLMF/OasisUI/pull/305) - Feature/various bugfixes
+* [#306](https://github.com/OasisLMF/OasisUI/pull/306) - Project workflows
+.. _`1.11.6`:  https://github.com/OasisLMF/OasisUI/compare/1.11.5...1.11.6
+
 `1.11.5`_
  ---------
 * [#295](https://github.com/OasisLMF/OasisUI/pull/295) - Option to hide footer version information 
