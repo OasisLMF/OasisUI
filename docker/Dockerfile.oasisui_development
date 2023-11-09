@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Install R dependencies
-COPY ./BFE_RShiny/oasisui/DESCRIPTION ./BFE_RShiny/oasisui/DESCRIPTION
+COPY ../BFE_RShiny/oasisui/DESCRIPTION ./BFE_RShiny/oasisui/DESCRIPTION
 RUN R -e "install.packages('remotes')" && \
     R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')"
 RUN R -e 'devtools::install(pkg = "./BFE_RShiny/oasisui", dependencies = TRUE)'
@@ -29,7 +29,7 @@ RUN R -e 'devtools::install(pkg = "./BFE_RShiny/oasisui", dependencies = TRUE)'
 # Create .Rprofile and set default values
 RUN echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
 
-ENV API_IP="127.0.0.1"
+ENV API_IP="server"
 ENV API_PORT="8000"
 ENV API_VERSION="v1"
 ENV API_SHARE_FILEPATH="./downloads"
