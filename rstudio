@@ -1,0 +1,83 @@
+#!/bin/bash
+
+SHARED_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+R_PROJECT_FILE="$SHARED_DIR/oasisui_dev.Rproj"
+R_CONTAINER_NAME='rstudio_oasisui'
+DOCKERFILE_PATH="$SHARED_DIR/docker/Dockerfile.oasisui_development"
+IMAGE_NAME="oasisui_dev:latest"
+COMPOSE_FILE="$SHARED_DIR/compose/oasis-platform-ui-dev.yml"
+
+export SHARED_DIR
+export UID=${UID:-1000}
+export DISPLAY=${DISPLAY:-:0}
+
+function build() {
+echo "Creating a new R project file with default configurations..."
+{
+  echo "Version: 1.0"
+  echo "RestoreWorkspace: Default"
+  echo "SaveWorkspace: Default"
+  echo "AlwaysSaveHistory: Default"
+  echo "EnableCodeIndexing: Yes"
+  echo "UseSpacesForTab: Yes"
+  echo "NumSpacesForTab: 2"
+  echo "Encoding: UTF-8"
+  echo "RnwWeave: Sweave"
+  echo "LaTeX: pdfLaTeX"
+  echo "BuildType: Package"
+  echo "PackageUseDevtools: Yes"
+  echo "PackagePath: BFE_RShiny/oasisui"
+  echo "PackageInstallArgs: --no-multiarch --with-keep.source"
+} > "$R_PROJECT_FILE"
+
+  if [ -s "$R_PROJECT_FILE" ]; then
+    echo "R project file created successfully with content."
+  else
+    echo "R project file is empty or could not be created."
+    return 1 # Exit the function with an error status
+  fi
+
+  echo "Building UI Docker image..."
+  docker build -f "$DOCKERFILE_PATH" -t "$IMAGE_NAME" .
+}
+
+
+
+
+
+function stop() {
+  echo "Stopping and removing containers..."
+  docker-compose -f "$COMPOSE_FILE" down
+}
+
+function start() {
+  echo "Starting services..."
+  docker-compose -f "$COMPOSE_FILE" up -d
+  echo "connect using: http://localhost:8787/"
+}
+
+# Check and create the R project file if it doesn't exist.
+if [ ! -f "$R_PROJECT_FILE" ]; then
+  cat >> "$R_PROJECT_FILE" <<EOL
+# ... your existing R project configuration ...
+EOL
+fi
+
+# Parse command line argument.
+case "$1" in
+  build)
+    build
+    ;;
+  stop)
+    stop
+    ;;
+  start)
+    start
+    ;;
+  *)
+    echo "Usage: $0 {build|stop|start}"
+    exit 1
+    ;;
+esac
+
+echo "Done."

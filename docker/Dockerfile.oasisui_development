@@ -29,7 +29,7 @@ RUN R -e 'devtools::install(pkg = "./BFE_RShiny/oasisui", dependencies = TRUE)'
 # Create .Rprofile and set default values
 RUN echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
 
-ENV API_IP="127.0.0.1"
+ENV API_IP="server"
 ENV API_PORT="8000"
 ENV API_VERSION="v1"
 ENV API_SHARE_FILEPATH="./downloads"
