@@ -120,6 +120,7 @@ panelModelParams <- function(id) {
           align = "left",
           numericInput(ns("tinputnoofsample"), label = "Number of Samples:", value = 9),
           numericInput(ns("tinputthreshold"), label = "Loss Threshold:", value = 0),
+          checkboxInput(ns("tinputpostlossampli"), label = "Post Loss Amplification", FALSE),
           # 239: additional output cfg options (not part of modelsettings!)
           textInput(ns("tinputreturnperiods"), label = "Return Periods:", value = "") %>%
             bs_embed_tooltip(title = defineSingleAna_tooltips$tinputreturnperiods, placement = "right"),
@@ -912,10 +913,19 @@ def_out_config <- function(input,
       #   --> see "abuttonchoosetag")
       # - copy settings from setting templates (new functionality as of July 2022)
       if (is.null(ana_settings)) {
-        tbl_ana_settings <- session$userData$oasisapi$api_return_query_res(
-          query_path = paste("analyses", analysisID(), "settings", sep = "/"),
+        # check existence before calling on a freshly created analysis that lacks the settings and will result in a 404
+        check_settings_exist <- session$userData$oasisapi$api_return_query_res(
+          query_path = paste("analyses", analysisID(), sep = "/"),
           query_method = "GET"
-        )
+        )[["settings"]]
+        if (is.null(check_settings_exist)) {
+          tbl_ana_settings <- NULL
+        } else {
+          tbl_ana_settings <- session$userData$oasisapi$api_return_query_res(
+            query_path = paste("analyses", analysisID(), "settings", sep = "/"),
+            query_method = "GET"
+          )
+        }
       } else {
         tbl_ana_settings <- ana_settings
       }
@@ -964,6 +974,7 @@ def_out_config <- function(input,
           else x
         }
         updateNumericInput(session, "tinputthreshold", value = tbl_ana_settings$gul_threshold)
+        updateCheckboxInput(session, "tinputpostlossampli", value = tbl_ana_settings$pla)
         updateTextInput(session, "tinputreturnperiods", value = .null_to_empty(tbl_ana_settings$return_periods))
         updateTextInput(session, "tinputeventids", value = .null_to_empty(tbl_ana_settings$event_ids))
         updateTextInput(session, "tinputquantiles", value = .null_to_empty(tbl_ana_settings$quantiles))
@@ -1205,6 +1216,7 @@ def_out_config <- function(input,
       "ui_config_tag" = input$sintag,
       # potential new tag analysis_id
       "gul_threshold" = as.integer(input$tinputthreshold),
+      "pla" = input$tinputpostlossampli,
       # 239: insert additional output cfg options at the desired spot.
       # these are explicitly lists because a single element would be converted
       # differently to json otherwise

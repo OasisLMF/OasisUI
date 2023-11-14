@@ -664,7 +664,6 @@ step2_chooseAnalysis <- function(input, output, session,
   # Create new Analysis --------------------------------------------------------
   observeEvent(input$abuttonsubmit, {
     if (input$anaName != "") {
-
       post_portfolios_create_analysis <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", sep = "/"),
                                                                                   query_body = list(name = input$anaName,
                                                                                                     portfolio = portfolioID(),
@@ -684,15 +683,13 @@ step2_chooseAnalysis <- function(input, output, session,
       result$analysisID <- content(post_portfolios_create_analysis$result)$id
       result$analysisNAME <- content(post_portfolios_create_analysis$result)$name
 
-      logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
-
-      if (length(model_settings) > 0 && !is.null(model_settings$model_configurable) &&
-          model_settings$model_configurable && !is.null(sub_modules$buildCustom$fullsettings())) {
+      hasCustom <- length(model_settings) > 0 && !is.null(model_settings$model_configurable) && model_settings$model_configurable
+      if (hasCustom && !is.null(sub_modules$buildCustom$fullsettings())) {
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
           query_body = sub_modules$buildCustom$fullsettings()
         )
-      } else {
+      } else if (hasCustom && is.null(sub_modules$buildCustom$fullsettings())) {
         gul_summaries <- summary_template
 
         ana_settings_step_2 <- list(analysis_settings = c(
@@ -707,11 +704,11 @@ step2_chooseAnalysis <- function(input, output, session,
 
         post_analysis_settings <- session$userData$oasisapi$api_body_query(
           query_path = paste("analyses", result$analysisID, "settings", sep = "/"),
-          query_body = ana_settings_step_2
+          query_body = ana_settings_step_2  # should this be ana_settings_step_2[[1]]?
         )
       }
 
-      if (post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success" && !is.null(model_settings$model_configurable) && model_settings$model_configurable) {
+      if (hasCustom && post_portfolios_create_analysis$status == "Success" && post_analysis_settings$status == "Success") {
         fileids <- as.list(sub_modules$buildCustom$fileids())
         patch_analyses <- session$userData$oasisapi$api_body_query(query_path = paste("analyses", result$analysisID, sep = "/"),
                                                                    query_body = list(complex_model_data_files = fileids),
@@ -719,6 +716,7 @@ step2_chooseAnalysis <- function(input, output, session,
         # content(patch_analyses$result)
       }
 
+      logMessage(paste0("Calling api_post_analyses_generate_inputs with id", result$analysisID))
       input_generation <- session$userData$oasisapi$api_post_query(
         query_path = paste("analyses", result$analysisID, "generate_inputs",  sep = "/")
       )
