@@ -111,11 +111,16 @@ exposurevalidationsummary <- function(input,
       # note this will remain TRUE as the active tab when switching to step 3!
       # We should get the analysis first to check the status and only continue
       # if the status is > than NEW, otherwise subsequent queries won't work.
+      # Subsequent queries will also fail when creating a new analysis, in
+      # which case the status says "INPUTS_GENERATION_STARTED" at this point.
+      # There should be a second pass through here then when status changes
+      # to "READY", so this makes some sense.
       anaStatus <- session$userData$oasisapi$api_return_query_res(
         query_path = paste("analyses", analysisID(), sep = "/"),
         query_method = "GET"
       )[["status"]]
-      if (anaStatus == "NEW") {
+
+      if (anaStatus %in% c("NEW", "INPUTS_GENERATION_STARTED")) {
         # chill
       } else {
         result$summary_tbl <- session$userData$data_hub$get_ana_validation_summary_content(analysisID())

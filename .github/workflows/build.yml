@@ -118,7 +118,7 @@ jobs:
         exit-code: '1'
         ignore-unfixed: true
         severity: ${{ env.SEVERITY }}
-        security-checks: 'vuln'
+        scanners: 'vuln'
         output: 'app_image.txt'
 
     - name: Store CVE report
