@@ -1,6 +1,13 @@
 OasisUI Changelog
 ==================
 
+`1.11.7`_
+ ---------
+* [#310](https://github.com/OasisLMF/OasisUI/pull/310) - fix for https://github.com/OasisLMF/OasisUI/issues/309
+* [#307, #308](https://github.com/OasisLMF/OasisUI/pull/312) - Feature/308 plus 307 improvements
+* [#313](https://github.com/OasisLMF/OasisUI/pull/313) - Fixed Trivy CVE scanning
+.. _`1.11.7`:  https://github.com/OasisLMF/OasisUI/compare/1.11.6...1.11.7
+
 `1.11.6`_
  ---------
 * [#292, #299, #277, #280, #282](https://github.com/OasisLMF/OasisUI/pull/305) - Feature/various bugfixes
