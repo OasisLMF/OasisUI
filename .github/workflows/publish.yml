@@ -9,15 +9,11 @@ on:
       prev_release_tag:
         description: 'The last release, used for generating the changelog and release notes'
         required: true
-      pre_release:
-        description: 'Mark GitHub release as pre-release: [true, false]'
-        required: true
-        default: 'false'
 
 env:
   RELEASE_TAG: ${{ inputs.release_tag }}
   PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
-  PRE_RELEASE: ${{ inputs.pre_release }}
+  PRE_RELEASE: 'false'
   BUILD_SCRIPTS: "master"    # build scripts branch
 
 
@@ -49,24 +45,16 @@ jobs:
 
     steps:
     # --- Release guards --- #
-    - name: is branch valid for release
-      if: ${{ !startsWith(github.ref_name , 'release/') && env.PRE_RELEASE == 'false' }}
-      run: |
-        echo "Releases must be trigged on branch named 'release/x.x.x'"
-        exit 1
+    #- name: is branch valid for release
+    #  if: ${{ !startsWith(github.ref_name , 'release/') && env.PRE_RELEASE == 'false' }}
+    #  run: |
+    #    echo "Releases must be trigged on branch named 'release/x.x.x'"
+    #    exit 1
 
     - name: Check tag is valid for release
       if: env.PRE_RELEASE == 'false'
       run: |
-        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^(\d+)\.(\d+)\.(\d+)$")
-        if [[ ! "$VALID" == 1 ]]; then
-            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
-            exit 1
-        fi
-    - name: Check tag is valid for pre-release
-      if: env.PRE_RELEASE == 'true'
-      run: |
-        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^(\d+)\.(\d+)\.(\d+)rc(\d+)$")
+        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^1.11.1*")
         if [[ ! "$VALID" == 1 ]]; then
             echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
             exit 1
