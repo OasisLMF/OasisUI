@@ -18,16 +18,16 @@ env:
 
 
 jobs:
-#  update:
-#    uses: ./.github/workflows/version.yml
-#    secrets: inherit
-#    with:
-#      app_version: ${{ inputs.release_tag }}
+  update:
+    uses: ./.github/workflows/version.yml
+    secrets: inherit
+    with:
+      app_version: ${{ inputs.release_tag }}
 
   images:
     uses: ./.github/workflows/build.yml
     secrets: inherit
-#    needs: update
+    needs: update
     with:
       docker_push: 'true'
 
