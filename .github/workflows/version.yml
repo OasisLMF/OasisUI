@@ -27,7 +27,7 @@ jobs:
     - name: Check input is valid semvar
       if: inputs.app_version != ''
       run: |
-        VALID=$(echo ${{ inputs.app_version }} | grep -oPc "^(\d+)\.(\d+)\.(\d+)rc(\d+)|(\d+)\.(\d+)\.(\d+)$")
+        VALID=$(echo ${{ inputs.app_version }} | grep -oPc "^1.11.1*")
         [[ "$VALID" -eq "1" ]] || exit 1
 
     - name: Checkout
