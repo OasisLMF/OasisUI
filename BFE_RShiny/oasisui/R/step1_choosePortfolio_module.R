@@ -57,22 +57,22 @@ panelPortfolioTable <- function(id) {
       oasisuiRefreshButton(ns("abuttonprgtblrfsh"))
     ),
     DTOutput(ns("dt_Portfolios")),
+    # fluidRow(
+    #   column(12,
+    #          oasisuiTableButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
+    #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonamendpf, placement = "right"),
+    #          oasisuiTableButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
+    #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttondeletepf, placement = "right"),
+    #          oasisuiTableButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
+    #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonuploadsourcefiles, placement = "right"),
+    #          oasisuiTableButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
+    #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfdetails, placement = "right")
+    #   )
+    # ),
+    # br(),
     fluidRow(
       column(12,
-             oasisuiTableButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonamendpf, placement = "right"),
-             oasisuiTableButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttondeletepf, placement = "right"),
-             oasisuiTableButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonuploadsourcefiles, placement = "right"),
-             oasisuiTableButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
-               bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfdetails, placement = "right")
-      )
-    ),
-    br(),
-    fluidRow(
-      column(12,
-             oasisuiButton(ns("abuttoncreatepf"), "Create Portfolio", align = "centre"),
+             # oasisuiButton(ns("abuttoncreatepf"), "Create Portfolio", align = "centre"),
              actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Analysis", style = "float:right")
       ),
       style = "margin-top: 10px;"
