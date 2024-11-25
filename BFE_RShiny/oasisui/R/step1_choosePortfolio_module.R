@@ -48,6 +48,10 @@ step1_choosePortfolioUI <- function(id) {
 #' @export
 panelPortfolioTable <- function(id) {
   ns <- NS(id)
+  
+  # Check if we're running the appli version
+  is_appli <- grepl("appli", getwd(), fixed = TRUE)
+  
   oasisuiPanel(
     collapsible = TRUE,
     show = TRUE,
@@ -57,22 +61,34 @@ panelPortfolioTable <- function(id) {
       oasisuiRefreshButton(ns("abuttonprgtblrfsh"))
     ),
     DTOutput(ns("dt_Portfolios")),
-    # fluidRow(
-    #   column(12,
-    #          oasisuiTableButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
-    #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonamendpf, placement = "right"),
-    #          oasisuiTableButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
-    #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttondeletepf, placement = "right"),
-    #          oasisuiTableButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
-    #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonuploadsourcefiles, placement = "right"),
-    #          oasisuiTableButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
-    #            bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfdetails, placement = "right")
-    #   )
-    # ),
-    # br(),
+    
+    # Conditional UI elements based on app type
+    if (!is_appli) {
+      tagList(
+        fluidRow(
+          column(12,
+                 oasisuiTableButton(ns("abuttonamendpf"), "Amend Portfolio", align = "centre") %>%
+                   bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonamendpf, placement = "right"),
+                 oasisuiTableButton(ns("abuttondeletepf"), "Delete Portfolio", align = "centre") %>%
+                   bs_embed_tooltip(title = defineSingleAna_tooltips$abuttondeletepf, placement = "right"),
+                 oasisuiTableButton(ns("abuttonuploadsourcefiles"), "Upload Source Files", align = "centre") %>%
+                   bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonuploadsourcefiles, placement = "right"),
+                 oasisuiTableButton(ns("abuttonpfdetails"), "Show Source Files", align = "centre") %>%
+                   bs_embed_tooltip(title = defineSingleAna_tooltips$abuttonpfdetails, placement = "right")
+          )
+        ),
+        br(),
+        fluidRow(
+          column(12,
+                 oasisuiButton(ns("abuttoncreatepf"), "Create Portfolio", align = "centre")
+          ),
+          style = "margin-top: 10px;"
+        )
+      )
+    },
+    # Common UI element for both "app" and "appli"
     fluidRow(
       column(12,
-             # oasisuiButton(ns("abuttoncreatepf"), "Create Portfolio", align = "centre"),
              actionButton(ns("abuttonpgotonextstep"), "Proceed to Choose Analysis", style = "float:right")
       ),
       style = "margin-top: 10px;"
@@ -151,7 +167,7 @@ panelDefinePortfolio <- function(id) {
 #' @export
 panelLinkFiles <- function(id) {
   ns <- NS(id)
-
+  
   oasisuiPanel(
     collapsible = FALSE,
     ns("panel_pflink"),
@@ -160,7 +176,7 @@ panelLinkFiles <- function(id) {
       uiOutput(ns("paneltitle_linkFiles"), inline = TRUE),
       actionButton(inputId = ns("abuttonhidelinkfilespanel"), label = NULL, icon = icon("times"), style = "float: right;")
     ),
-
+    
     fluidRow(
       # uiOutputs are used here because of the Clear button where they need to be reset.
       # Shiny does not provide an updatefileInput functionality, hence inputs cannot be reset unless the panel is re-rendered.
@@ -170,7 +186,7 @@ panelLinkFiles <- function(id) {
       # Source Account File
       column(3,
              uiOutput(ns("SAFile_ui"))),
-
+      
       # Source Reinsurance File
       column(3,
              uiOutput(ns("SRFile_ui"))),
@@ -219,23 +235,23 @@ step1_choosePortfolio <- function(input, output, session,
                                   active = reactive(TRUE),
                                   currstep = reactive(-1),
                                   portfolioID = reactive("")
-
+                                  
 ) {
-
+  
   ns <- session$ns
-
+  
   # Reactive Values and parameters ---------------------------------------------
-
+  
   # number of rows per page in a datatable
   pageLength <- 5
-
+  
   # values to stop ping pong effect. 2022-12 shouldn't be needed anymore.
   # stop_selPfID <- 0
   # check_selPfID <- 0
-
+  
   # list of sub-modules
   sub_modules <- list()
-
+  
   # > Reactive Values ---------------------------------------------------------
   result <- reactiveValues(
     # reactive for portfolioID
@@ -249,13 +265,13 @@ step1_choosePortfolio <- function(input, output, session,
     # accepted file extensions in file upload
     accepted_ext = NULL
   )
-
+  
   # Set Params
   observe(if (active()) {
     # this was being isolated previously, but we would rather not have it that way (?)
     result$portfolioID <- portfolioID()
   })
-
+  
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
     .hideDivs()
@@ -264,11 +280,11 @@ step1_choosePortfolio <- function(input, output, session,
       .reloadtbl_portfoliosData()
     }
   })
-
+  
   # Enable/ Disable buttons ----------------------------------------------------
-
+  
   # Enable and disable link files buttons
-
+  
   # Enable and disable buttons
   observeEvent({
     result$portfolioID
@@ -293,7 +309,7 @@ step1_choosePortfolio <- function(input, output, session,
       }
     }
   })
-
+  
   ### Portfolio Table ----------------------------------------------------------
   output$dt_Portfolios <- renderDT({
     logMessage("re-rendering portfolio table")
@@ -318,9 +334,9 @@ step1_choosePortfolio <- function(input, output, session,
       nothingToShowTable("No portfolio available")
     }
   })
-
+  
   # Portfolio Details Table ----------------------------------------------------
-
+  
   # Show Portfolio Details
   observeEvent(input$abuttonpfdetails, {
     hide("panelDefinePortfolio")
@@ -328,7 +344,7 @@ step1_choosePortfolio <- function(input, output, session,
     show("panelPortfolioDetails")
     logMessage("showing panelPortfolioDetails")
   })
-
+  
   sub_modules$portfolio_details <- callModule(
     portfolio_details,
     id = "portfolio_details",
@@ -344,13 +360,13 @@ step1_choosePortfolio <- function(input, output, session,
     counter = reactive({input$abuttonpfdetails}),
     active = active
   )
-
+  
   # Hide portfolio Details
   observeEvent(input$buttonhidepfdetails, {
     hide("panelPortfolioDetails")
     logMessage("hiding panelPortfolioDetails")
   })
-
+  
   # Create / Amend portfolio sub-panel -----------------------------------------
   # Create/Amend portfolio title
   output$paneltitle_defPortfolio <- renderUI({
@@ -363,12 +379,12 @@ step1_choosePortfolio <- function(input, output, session,
       paste0('Amend portfolio id ', pfId, ' ', pfName)
     }
   })
-
+  
   # Hide portfolio Definition Panel
   observeEvent(input$abuttonhidedefpfpanel, {
     hide("panelDefinePortfolio")
   })
-
+  
   # Create portfolio
   observeEvent(input$abuttoncreatepf, {
     hide("panelPortfolioDetails")
@@ -379,7 +395,7 @@ step1_choosePortfolio <- function(input, output, session,
     show("panelDefinePortfolio")
     logMessage("showing panelDefinePortfolio")
   })
-
+  
   ### Amend portfolio
   observeEvent(input$abuttonamendpf, {
     hide("panelPortfolioDetails")
@@ -391,7 +407,7 @@ step1_choosePortfolio <- function(input, output, session,
     show("panelDefinePortfolio")
     logMessage("showing panelDefinePortfolio")
   })
-
+  
   # to enable and disable submit button for create portfolio
   observeEvent(input$tinputpfName, {
     if (is.null(input$tinputpfName) || input$tinputpfName == "") {
@@ -400,7 +416,7 @@ step1_choosePortfolio <- function(input, output, session,
       enable("abuttonpfsubmit")
     }
   })
-
+  
   ### Submit Button
   observeEvent(input$abuttonpfsubmit, {
     idxSel <- 1
@@ -430,7 +446,7 @@ step1_choosePortfolio <- function(input, output, session,
                             paste0("Failed to amend a portfolio ", pfId, " could not be updated."))
       }
     }
-
+    
     # Reload portfolio Table
     .reloadtbl_portfoliosData()
     logMessage(paste("updating dt_Portfolios select because portfolio table was reloaded"))
@@ -439,7 +455,7 @@ step1_choosePortfolio <- function(input, output, session,
     }
     hide("panelDefinePortfolio")
   })
-
+  
   # Delete portfolio -----------------------------------------------------------
   # title for delete button
   output$pfdelmodaltitle <- renderUI({
@@ -447,7 +463,7 @@ step1_choosePortfolio <- function(input, output, session,
     pfName <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name]
     paste0('Delete portfolio id ', pfId, ' "', pfName,'"')
   })
-
+  
   # Modal dialog of delete button
   .pfdelmodal <- function() {
     ns <- session$ns
@@ -464,12 +480,12 @@ step1_choosePortfolio <- function(input, output, session,
                 easyClose = TRUE
     )
   }
-
+  
   # Delete portfolio
   observeEvent(input$abuttondeletepf,{
     showModal(.pfdelmodal())
   })
-
+  
   # Confirm delete button
   observeEvent(input$abuttonuconfirmdel, {
     hide("panelPortfolioDetails")
@@ -488,14 +504,14 @@ step1_choosePortfolio <- function(input, output, session,
     .reloadtbl_portfoliosData()
     removeModal()
   })
-
+  
   # Cancel delete button
   observeEvent(input$abuttoncanceldel, {
     removeModal()
   })
-
+  
   # Link files to portfolio ----------------------------------------------------
-
+  
   # Show panel
   observeEvent(input$abuttonuploadsourcefiles, {
     .clearUploadFiles()
@@ -503,7 +519,7 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelDefinePortfolio")
     show("panelLinkFiles")
   })
-
+  
   # Clear panel
   observeEvent(input$abuttonpfclear, ignoreInit = TRUE, {
     # Re-setting fileInputs
@@ -524,7 +540,7 @@ step1_choosePortfolio <- function(input, output, session,
                 accept = result$accepted_ext)
     })
   })
-
+  
   # Link files to portfolio title
   output$paneltitle_linkFiles <- renderUI({
     pfId <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
@@ -536,7 +552,7 @@ step1_choosePortfolio <- function(input, output, session,
       paste0('Amend input files to portfolio id ', pfId, ' ', pfName)
     }
   })
-
+  
   # Rendering of fileInputs
   output$SLFile_ui <- renderUI({
     fileInput(inputId = ns("SLFile"), label = 'Location file:',
@@ -554,28 +570,28 @@ step1_choosePortfolio <- function(input, output, session,
     fileInput(inputId = ns("SRSFile"), label = 'RI scope file:',
               accept = result$accepted_ext)
   })
-
+  
   observeEvent(input$SLFile, ignoreInit = TRUE, {
     .uploadSourceFile(inFile = input$SLFile, query_path = "location_file")
   })
-
+  
   observeEvent(input$SAFile, ignoreInit = TRUE, {
     .uploadSourceFile(inFile = input$SAFile, query_path = "accounts_file")
   })
-
+  
   observeEvent(input$SRFile, ignoreInit = TRUE, {
     .uploadSourceFile(inFile = input$SRFile, query_path = "reinsurance_info_file")
   })
-
+  
   observeEvent(input$SRSFile, ignoreInit = TRUE, {
     .uploadSourceFile(inFile = input$SRSFile, query_path = "reinsurance_scope_file")
   })
-
+  
   # Hide link files panel
   observeEvent(input$abuttonhidelinkfilespanel, {
     hide("panelLinkFiles")
   })
-
+  
   # Define portfolioID ---------------------------------------------------------
   # Add choices to portfolioID, update portfolioID
   observeEvent(result$tbl_portfoliosData, ignoreNULL = FALSE, ignoreInit = TRUE, {
@@ -591,16 +607,16 @@ step1_choosePortfolio <- function(input, output, session,
       result$portfolioID <- pfID
     }
   })
-
+  
   # If portfolioID changes, reload programme model table and set view back to default
   observeEvent(result$portfolioID, ignoreInit = TRUE, {
     if (active()) {
       pfID <- ""
-
+      
       if (!is.null(input$dt_Portfolios_rows_selected)) {
         pfID <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
       }
-
+      
       if (result$portfolioID != pfID) {
         # bl_dirty <- stop_selPfID > check_selPfID
         # logMessage(paste("--- stop_selPfID is:", stop_selPfID))
@@ -632,7 +648,7 @@ step1_choosePortfolio <- function(input, output, session,
       }
     }
   })
-
+  
   # Refresh Buttons ------------------------------------------------------------
   observeEvent(input$abuttonprgtblrfsh, {
     withModalSpinner(
@@ -641,7 +657,7 @@ step1_choosePortfolio <- function(input, output, session,
       size = "s", t = 0.5
     )
   })
-
+  
   # Updates dependent on changed: dt_Portfolios_rows_selected ------------------
   observeEvent(input$dt_Portfolios_rows_selected, ignoreNULL = FALSE, ignoreInit = TRUE, {
     if (active()) {
@@ -649,7 +665,7 @@ step1_choosePortfolio <- function(input, output, session,
       hide("panelPortfolioDetails")
       hide("panelDefinePortfolio")
       hide("panelLinkFiles")
-
+      
       if (length(input$dt_Portfolios_rows_selected) > 0) {
         # note that dt_Portfolios allows single row selection only
         pfID <- result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$id]
@@ -659,8 +675,8 @@ step1_choosePortfolio <- function(input, output, session,
         # 287: re-show the panel to upload source files in any case (to avoid
         # having to re-open it when first uploading location file, which will lead
         # to the analysis status being ready)
-          .clearUploadFiles()
-          show("panelLinkFiles")
+        .clearUploadFiles()
+        show("panelLinkFiles")
         #}
         if (pfID != result$portfolioID) {
           logMessage(paste("updating portfolioID because selection in portfolio table changed to", pfID))
@@ -676,7 +692,7 @@ step1_choosePortfolio <- function(input, output, session,
       }
     }
   })
-
+  
   # Help Functions -------------------------------------------------------------
   # hide all panels
   .hideDivs <- function() {
@@ -687,14 +703,14 @@ step1_choosePortfolio <- function(input, output, session,
     hide("panelDefinePortfolio")
     hide("panelLinkFiles")
   }
-
+  
   #show default view for Section "Choose portfolio" = "1"
   .defaultCreateProg <- function(){
     logMessage(".defaultCreateProg called")
     show("panelPortfolioTable")
   }
-
-
+  
+  
   # Reload portfolio table
   .reloadtbl_portfoliosData <- function() {
     logMessage(".reloadtbl_portfoliosData called")
@@ -702,25 +718,25 @@ step1_choosePortfolio <- function(input, output, session,
     logMessage("portfolio table refreshed")
     invisible()
   }
-
+  
   .clearPortfolioName <- function() {
     logMessage(".clearPortfolioName called")
     updateTextInput(session, "tinputpfName", value = "")
   }
-
+  
   .clearUploadFiles <- function() {
     session$sendCustomMessage(type = "resetFileInputHandler", message =  session$ns("SLFile"))
     session$sendCustomMessage(type = "resetFileInputHandler", message =  session$ns("SAFile"))
     session$sendCustomMessage(type = "resetFileInputHandler", message =  session$ns("SRFile"))
     session$sendCustomMessage(type = "resetFileInputHandler", message =  session$ns("SRSFile"))
   }
-
+  
   .updatePortfolioName <- function() {
     logMessage(".updatePortfolioName called")
     updateTextInput(session, "tinputpfName",
                     value = result$tbl_portfoliosData[input$dt_Portfolios_rows_selected, tbl_portfoliosDataNames$name])
   }
-
+  
   # Upload Location/Account File
   .uploadSourceFile <- function(inFile, query_path) {
     logMessage(paste0("Uploading file ", inFile$datapath))
@@ -750,7 +766,7 @@ step1_choosePortfolio <- function(input, output, session,
     }
     invisible()
   }
-
+  
   # Module output ---------------------------------------------------------------
   moduleOutput <- c(
     list(
@@ -759,6 +775,6 @@ step1_choosePortfolio <- function(input, output, session,
       newstep = reactive({input$abuttonpgotonextstep})
     )
   )
-
+  
   moduleOutput
 }
