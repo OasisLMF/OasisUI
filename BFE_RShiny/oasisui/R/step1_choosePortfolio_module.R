@@ -13,6 +13,8 @@
 #'
 #' @export
 step1_choosePortfolioUI <- function(id) {
+  # Check if we're running the appli version
+  is_appli <- grepl("appli", getwd(), fixed = TRUE)
   ns <- NS(id)
   tagList(
     tags$script('
@@ -30,7 +32,12 @@ step1_choosePortfolioUI <- function(id) {
     div(id = ns("panelPortfolioTable"), panelPortfolioTable(id)),
     hidden(div(id = ns("panelPortfolioDetails"), panelPortfolioDetails(id))),
     hidden(div(id = ns("panelDefinePortfolio"), panelDefinePortfolio(id))),
-    hidden(div(id = ns("panelLinkFiles"), panelLinkFiles(id)))
+    ### Conditionally Render `panelLinkFiles`
+    if (!is_appli) {
+      hidden(div(id = ns("panelLinkFiles"), panelLinkFiles(id)))
+    } else {
+      NULL  # Do not render `panelLinkFiles` at all if `is_appli` is TRUE
+    } 
   )
 }
 
@@ -271,6 +278,9 @@ step1_choosePortfolio <- function(input, output, session,
     # this was being isolated previously, but we would rather not have it that way (?)
     result$portfolioID <- portfolioID()
   })
+
+  # Define `is_appli` once in the server
+  is_appli <- grepl("appli", getwd(), fixed = TRUE)
   
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {
@@ -446,7 +456,7 @@ step1_choosePortfolio <- function(input, output, session,
                             paste0("Failed to amend a portfolio ", pfId, " could not be updated."))
       }
     }
-    
+
     # Reload portfolio Table
     .reloadtbl_portfoliosData()
     logMessage(paste("updating dt_Portfolios select because portfolio table was reloaded"))
