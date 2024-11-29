@@ -15,7 +15,5 @@
 #'
 #' @export
 runOasisui <- function(port = 3838, mode = "app", ...) {
-
   runApp(appDir = system.file(mode, package = "oasisui"), port = port, ...)
-
 }
