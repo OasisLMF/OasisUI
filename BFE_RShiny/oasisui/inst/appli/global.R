@@ -35,3 +35,4 @@ options(oasisui.settings.admin.mode = Sys.getenv("ADMIN_MODE"))
 options(oasisui.settings.hide_footer = Sys.getenv("HIDE_FOOTER_VERSION", unset = FALSE))
 
 options(oasisui.settings.oasis_environment = Sys.getenv("OASIS_ENVIRONMENT"))
+options(oasisui.settings.is_appli = Sys.getenv("APP_DIR") == "appli")

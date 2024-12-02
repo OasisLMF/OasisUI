@@ -50,5 +50,8 @@ EXPOSE 3838
 # ENV MAX_UPLOAD_SIZE=500
 # ENV HIDE_FOOTER_VERSION=TRUE
 
+# Set the Application Working Directory
+ENV APP_DIR=appli
+
 # Launch Oasisui
 CMD ["R", "-e", "oasisui::runOasisui(mode=\"appli\")"]

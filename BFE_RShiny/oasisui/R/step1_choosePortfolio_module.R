@@ -13,8 +13,12 @@
 #'
 #' @export
 step1_choosePortfolioUI <- function(id) {
-  # Check if we're running the appli version
-  is_appli <- grepl("appli", getwd(), fixed = TRUE)
+  # Define `is_appli` - i.e. running minified version of the app
+  # Note: must correspond to the name of the directory it's run from
+  # In this case ./BFE_RShiny/oasisui/inst/appli (/app being the full shinyapp)
+  is_appli <- getOption("oasisui.settings.is_appli")
+  loginfo(sprintf("\n\n----- is_appli ----- \n%s\n-----", is_appli))
+
   ns <- NS(id)
   tagList(
     tags$script('
@@ -54,10 +58,13 @@ step1_choosePortfolioUI <- function(id) {
 #'
 #' @export
 panelPortfolioTable <- function(id) {
-  ns <- NS(id)
+  # Define `is_appli` - i.e. running minified version of the app
+  # Note: must correspond to the name of the directory it's run from
+  # In this case ./BFE_RShiny/oasisui/inst/appli (/app being the full shinyapp)
+  is_appli <- getOption("oasisui.settings.is_appli")
+  loginfo(sprintf("\n\n----- is_appli ----- \n%s\n-----", is_appli))
   
-  # Check if we're running the appli version
-  is_appli <- grepl("appli", getwd(), fixed = TRUE)
+  ns <- NS(id)
   
   oasisuiPanel(
     collapsible = TRUE,
@@ -278,9 +285,6 @@ step1_choosePortfolio <- function(input, output, session,
     # this was being isolated previously, but we would rather not have it that way (?)
     result$portfolioID <- portfolioID()
   })
-
-  # Define `is_appli` once in the server
-  is_appli <- grepl("appli", getwd(), fixed = TRUE)
   
   # Panels Visualization -------------------------------------------------------
   observeEvent(currstep(), {

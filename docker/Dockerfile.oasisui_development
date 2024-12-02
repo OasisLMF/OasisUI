@@ -35,3 +35,5 @@ ENV API_VERSION="v1"
 ENV API_SHARE_FILEPATH="./downloads"
 ENV OASIS_ENVIRONMENT="dev"
 ENV ADMIN_MODE="admin"
+# Set the Application Working Directory
+ENV APP_DIR=appli
