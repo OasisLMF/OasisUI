@@ -26,9 +26,6 @@ RUN R -e "install.packages('remotes')" && \
     R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')"
 RUN R -e 'devtools::install(pkg = "./BFE_RShiny/oasisui", dependencies = TRUE)'
 
-# Create .Rprofile and set default values
-RUN echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
-
 ENV API_IP="server"
 ENV API_PORT="8000"
 ENV API_VERSION="v1"
