@@ -17,7 +17,7 @@ step1_choosePortfolioUI <- function(id) {
   # Note: must correspond to the name of the directory it's run from
   # In this case ./BFE_RShiny/oasisui/inst/appli (/app being the full shinyapp)
   is_appli <- getOption("oasisui.settings.is_appli")
-  loginfo(sprintf("\n\n----- is_appli ----- \n%s\n-----", is_appli))
+  loginfo(sprintf("----- is_appli -----%s-----", is_appli))
 
   ns <- NS(id)
   tagList(
