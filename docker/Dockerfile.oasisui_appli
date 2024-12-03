@@ -54,4 +54,4 @@ EXPOSE 3838
 ENV APP_DIR=appli
 
 # Launch Oasisui
-CMD ["R", "-e", "oasisui::runOasisui(mode=\"appli\")"]
+CMD ["R", "-e", "oasisui::runOasisui()"]
