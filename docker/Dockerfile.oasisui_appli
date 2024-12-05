@@ -20,6 +20,7 @@ apt-get install -y --no-install-recommends libnode-dev libcairo2-dev libxt-dev l
 
 # Install Oasisui with dependencies
 ARG REF_BRANCH
+# Remember to change `REF_BRANCH` when testing new features under development
 ENV REF_BRANCH=${REF_BRANCH:-master}
 RUN R -e "install.packages('remotes')" && \
     # installing older version of package shinyjs from GitHub
