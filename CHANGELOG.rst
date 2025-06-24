@@ -1,6 +1,8 @@
 OasisUI Changelog
 ==================
 
+.. _`1.11.1.0002`:  https://github.com/OasisLMF/OasisUI/compare/1.11.1.0001...1.11.1.0002
+
 .. _`1.11.1.0001`:  https://github.com/OasisLMF/OasisUI/compare/1.11.1...1.11.1.0001
 
 `1.11.0`_
