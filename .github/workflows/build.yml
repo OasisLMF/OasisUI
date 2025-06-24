@@ -123,7 +123,7 @@ jobs:
 
     - name: Store CVE report
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: app_image_scan
         path: ./app_image.txt
@@ -191,7 +191,7 @@ jobs:
 
     - name: Store CVE report
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: proxy_image_scan
         path: ./proxy_image.txt
