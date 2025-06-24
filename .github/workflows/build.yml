@@ -35,7 +35,7 @@ on:
       docker_push:
         description: 'Push the docker image to dockerhub and outout reference'
         required: false
-        default: 'false'
+        default: 'true'
         type: string
       cve_severity:
         description: 'Severities of vulnerabilities to scanned for, fails build if any found'
