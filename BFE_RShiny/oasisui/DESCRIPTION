@@ -33,7 +33,7 @@ Imports:
   rgdal (== 1.5-23),
   R6 (== 2.5.0),
   scales (== 1.1.1),
-  shiny (== 1.6.0),
+  shiny (== 1.7.4),
   shinycssloaders (== 1.0.0),
   shinyjs (== 1.1),
   shinyWidgets (== 0.6.0),
