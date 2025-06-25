@@ -95,13 +95,11 @@ jobs:
       run: |
         docker pull ${{ needs.images.outputs.app_image }}
         docker tag ${{ needs.images.outputs.app_image }} coreoasis/oasisui_app:${{ env.RELEASE_TAG }}
-        docker tag ${{ needs.images.outputs.app_image }} coreoasis/oasisui_app:latest
 
     - name: Pull and tag proxy_image
       run: |
         docker pull ${{ needs.images.outputs.proxy_image }}
         docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:${{ env.RELEASE_TAG }}
-        docker tag ${{ needs.images.outputs.proxy_image }} coreoasis/oasisui_proxy:latest
 
     - name: Check tag matches (Repo)
       run: |
@@ -166,12 +164,6 @@ jobs:
         docker push coreoasis/oasisui_app:${{ env.RELEASE_TAG }}
 
 
-    - name: Push images (Production)
-      if: env.PRE_RELEASE == 'false'
-      run: |
-        docker push coreoasis/oasisui_proxy:latest
-        docker push coreoasis/oasisui_app:latest
-
     # --- Create Release --- #
     - name: Push changes
       run: |
@@ -206,16 +198,16 @@ jobs:
         echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
         echo "run_status=${{ job.status }}" >> $GITHUB_OUTPUT
 
-  # --- Notify Slack --- #
-  slack:
-    uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@main
-    secrets: inherit
-    needs: release
-    with:
-      heading: ${{ needs.release.outputs.heading }}
-      title: ${{ needs.release.outputs.title }}
-      build_branch: ${{ needs.release.outputs.build_branch }}
-      run_url: ${{ needs.release.outputs.run_url }}
-      run_id: ${{ needs.release.outputs.run_id }}
-      run_status: ${{ needs.release.outputs.run_status }}
-      run_date: ${{ needs.release.outputs.run_date }}
+  ## --- Notify Slack --- #
+  #slack:
+  #  uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@main
+  #  secrets: inherit
+  #  needs: release
+  #  with:
+  #    heading: ${{ needs.release.outputs.heading }}
+  #    title: ${{ needs.release.outputs.title }}
+  #    build_branch: ${{ needs.release.outputs.build_branch }}
+  #    run_url: ${{ needs.release.outputs.run_url }}
+  #    run_id: ${{ needs.release.outputs.run_id }}
+  #    run_status: ${{ needs.release.outputs.run_status }}
+  #    run_date: ${{ needs.release.outputs.run_date }}

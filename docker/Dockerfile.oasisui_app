@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.0.5
+FROM rocker/r-ver:4.2
 # -> ubuntu 20.04
 # -> don't use latest R release, since that will keep getting linked with later build-dates and RStudio packagemanager
 # -> sets repository to RStudio packagemanager for specific build date of R version, being 2021-05-17 for R 4.0.5
