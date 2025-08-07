@@ -123,7 +123,7 @@ jobs:
 
     - name: Store CVE report
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: app_image_scan
         path: ./app_image.txt
@@ -181,20 +181,36 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
-        format: 'table'
         scan-type: 'image'
         exit-code: '1'
         ignore-unfixed: true
         severity: ${{ env.SEVERITY }}
         security-checks: 'vuln'
-        output: 'proxy_image.txt'
+
+    - name: Create Report
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+        format: 'sarif'
+        output: ui-app.sarif
+        scan-type: 'image'
+        exit-code: '0'
+        ignore-unfixed: true
+        severity: ${{ env.SEVERITY }}
+        scanners: 'vuln'
+
+    - name: Upload scan results to Security tab
+      if: ( success() || failure() )
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ui-app.sarif
 
     - name: Store CVE report
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: proxy_image_scan
-        path: ./proxy_image.txt
+        path: ./ui-app.sarif
         retention-days: 3
 
     - name: Login to Docker Hub

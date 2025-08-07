@@ -1,5 +1,5 @@
 Package: oasisui
-Version: 1.11.7
+Version: 1.12.0
 License: BSD_3_clause + file LICENSE
 Title: Oasis User Interface
 Description: This package provides an extensible implementation of a user
@@ -7,40 +7,43 @@ Description: This package provides an extensible implementation of a user
   on the popular Shiny framework.
 Authors@R: c(person("Oasis LMF", role = c("aut", "cre", "cph"),
                     email = "support@oasislmf.org"),
-             person("Mirai Solutions GmbH", role = "ctr",
+                    person("Mirai Solutions GmbH", role = "ctr",
                     email = "info@mirai-solutions.com"))
 LazyData: true
-Depends: R (>= 3.5)
+Depends: R (>= 4.1.0)
 NeedsCompilation: no
 Imports:
-  arrow (== 4.0.0.1),
-  bsplus (== 0.1.2),
-  DT (== 0.18),
-  data.table (== 1.14.0),
-  dplyr (== 1.0.6),
-  geojsonio (== 0.9.4),
-  geosphere (== 1.5-10),
-  ggplot2 (== 3.3.3),
-  htmltools (== 0.5.1.1),
-  htmlwidgets (== 1.5.3),
-  httr (== 1.4.2),
-  jsonlite (== 1.7.2),
-  leaflet (== 2.0.4.1),
-  leaflet.extras (== 1.0.0),
-  plotly (== 4.9.3),
-  readr (== 1.4.0),
-  revgeo (== 0.15),
-  rgdal (== 1.5-23),
-  R6 (== 2.5.0),
-  scales (== 1.1.1),
-  shiny (== 1.6.0),
-  shinycssloaders (== 1.0.0),
-  shinyjs (== 1.1),
-  shinyWidgets (== 0.6.0),
-  tibble (== 3.1.2),
-  tidyr (== 1.1.3),
+  bslib (>= 0.8.0),
+  sass (>= 0.4.0),
+  arrow (>= 4.0.0.1),
+  bsplus (>= 0.1.2),
+  DT (>= 0.18),
+  data.table (>= 1.14.0),
+  dplyr (>= 1.0.6),
+  geojsonio (>= 0.9.4),
+  geosphere (>= 1.5-10),
+  ggplot2 (>= 3.3.3),
+  htmltools (>= 0.5.8),
+  htmlwidgets (>= 1.5.3),
+  httr (>= 1.4.2),
+  jsonlite (>= 1.7.2),
+  leaflet (>= 2.0.4.1),
+  leaflet.extras (>= 1.0.0),
+  plotly (>= 4.9.3),
+  readr (>= 1.4.0),
+  revgeo,
+  sf (>= 1.0.0),
+  terra (>= 1.5.0),
+  R6 (>= 2.5.0),
+  scales (>= 1.1.1),
+  shiny (>= 1.8.0),
+  shinycssloaders (>= 1.0.0),
+  shinyjs (>= 2.1.0),
+  shinyWidgets (>= 0.8.0),
+  tibble (>= 3.1.2),
+  tidyr (>= 1.1.3),
   utils,
-  V8 (== 3.4.2)
+  V8 (>= 3.4.2)
 Suggests:
   knitr,
   testthat
