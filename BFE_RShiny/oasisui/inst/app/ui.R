@@ -22,7 +22,10 @@ ui <- function(request) {
       bsplus::use_bs_tooltip()
     ),
     shinyjs::useShinyjs(),
-    shinyjs::extendShinyjs(script = system.file("app", "www", "js", "oasisui.js", package = "oasisui")),
+    shinyjs::extendShinyjs(
+       script = system.file("app", "www", "js", "oasisui.js", package = "oasisui"),
+       functions = NULL
+    )
 
     title = "OasisUI",
 
