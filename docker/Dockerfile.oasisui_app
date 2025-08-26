@@ -1,5 +1,5 @@
 # Use R with Shiny - optimized single-stage build
-FROM rocker/r-ver:4.4
+FROM rocker/r-ver:4.5
 
 # Avoid prompts and set timezone
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
@@ -46,9 +46,7 @@ RUN pip3 install gdal numpy
 ARG REF_BRANCH
 ENV REF_BRANCH=${REF_BRANCH:-master}
 RUN R -e "install.packages('remotes')" && \
-    # Try to install revgeo dependency
-    R -e "tryCatch(install.packages('revgeo'), error = function(e) cat('revgeo not available from CRAN, continuing...\n'))" && \
-    # installing older version of package shinyjs from GitHub
+    R -e "remotes::install_github('mhudecheck/revgeo')" && \
     R -e "remotes::install_github('daattali/shinyjs', ref = '2.1.0', upgrade = 'always')" && \
     R -e "remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
     rm -rf /var/lib/apt/lists/*
