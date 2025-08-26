@@ -46,17 +46,11 @@ ARG REF_BRANCH
 ENV REF_BRANCH=${REF_BRANCH:-master}
 
 
-# Install rgdal and point it to sp.h
-RUN set -e && \
-    R -e "install.packages(c('remotes', 'sp'), verbose = TRUE)" && \
-    R -e "sp_path <- find.package('sp')" && \
-    R -e "configure_args <- paste('--with-sp-include=', file.path(find.package('sp'), 'include'), sep=''); install.packages('rgdal', configure.args = configure_args, repos = 'https://cran.r-project.org')"
-
-# Install Oasisui with dependencies, fail build on error
+# Install Oasisui with dependencies
 RUN set -e && \
     R -e "install.packages('remotes', verbose = TRUE)" && \
     R -e "remotes::install_version('revgeo', repos = 'https://cran.r-project.org')" && \
-    R -e "remotes::install_github('daattali/shinyjs', ref = '2.1.0', upgrade = 'always')" && \
+    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')" && \
     R -e "options(warn=2); remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
     echo "Verifying oasisui package installation..." && \
     R -e "if (!require('oasisui', quietly = TRUE)) quit(status = 1, save = 'no')" && \
