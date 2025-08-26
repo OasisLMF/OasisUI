@@ -38,7 +38,7 @@ Imports:
   scales (>= 1.1.1),
   shiny (>= 1.8.0),
   shinycssloaders (>= 1.0.0),
-  shinyjs (>= 2.1.0),
+  shinyjs (>= 1.1.0),
   shinyWidgets (>= 0.8.0),
   tibble (>= 3.1.2),
   tidyr (>= 1.1.3),
