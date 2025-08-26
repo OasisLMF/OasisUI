@@ -25,7 +25,7 @@ ui <- function(request) {
     shinyjs::extendShinyjs(
        script = system.file("app", "www", "js", "oasisui.js", package = "oasisui"),
        functions = NULL
-    )
+    ),
 
     title = "OasisUI",
 
