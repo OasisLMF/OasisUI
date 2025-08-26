@@ -93,7 +93,7 @@ exposurevalidationmapUI <- function(id) {
 #' @importFrom leaflet.extras drawRectangleOptions
 #' @importFrom revgeo revgeo
 #' @importFrom jsonlite fromJSON
-#' @importFrom rgdal readOGR
+#' @importFrom terra vect
 #' @importFrom shinyjs hide
 #' @importFrom shinyjs show
 #' @importFrom geosphere destPoint
@@ -340,7 +340,7 @@ exposurevalidationmap <- function(input,
 
         h <- revgeo(longitude = p_long, latitude = p_lat)
         js_lite <- fromJSON("./www/shape_files/world_coords.json")
-        js <- readOGR("./www/shape_files/world_coords.json")
+        js <- vect("./www/shape_files/world_coords.json")
 
         country_num <- unlist(lapply(seq_len(length(js_lite$features[[2]][["name"]])), function(x) {
           if(grepl(js_lite$features[[2]][["name"]][[x]], h)) {
@@ -635,7 +635,7 @@ exposurevalidationmap <- function(input,
       }") %>% # make map full screen
           addFullscreenControl(pseudoFullscreen = TRUE)
       } else if (input$tot_tiv_param == "Countries") {
-        js <- readOGR("./www/shape_files/world_coords.json")
+        js <- vect("./www/shape_files/world_coords.json")
 
         leaflet(js) %>%
           addPolygons(color = "black", fill = FALSE, weight = 2) %>%
