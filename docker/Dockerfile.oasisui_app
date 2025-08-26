@@ -1,5 +1,5 @@
 # Use R with Shiny - optimized single-stage build
-FROM rocker/r-ver:4.5
+FROM rocker/r-ver:4.4
 
 # Avoid prompts and set timezone
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
