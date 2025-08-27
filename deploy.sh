@@ -15,7 +15,7 @@ echo "Building OasisUI from '$INSTALL_BRANCH'"
 
 # build
 #docker build -f docker/Dockerfile.oasisui_proxy -t coreoasis/oasisui_proxy .
-docker build -f docker/Dockerfile.oasisui_app --pull --build-arg REF_BRANCH=$INSTALL_BRANCH -t coreoasis/oasisui_app .
+docker build --no-cache --progress=plain -f docker/Dockerfile.oasisui_app --pull --build-arg REF_BRANCH=$INSTALL_BRANCH -t coreoasis/oasisui_app .
 
 # run
 docker network create shiny-net
