@@ -1,6 +1,8 @@
 OasisUI Changelog
 ==================
 
+.. _`1.12.0`:  https://github.com/OasisLMF/OasisUI/compare/1.11.7...1.12.0
+
 `1.11.7`_
  ---------
 * [#310](https://github.com/OasisLMF/OasisUI/pull/310) - fix for https://github.com/OasisLMF/OasisUI/issues/309
