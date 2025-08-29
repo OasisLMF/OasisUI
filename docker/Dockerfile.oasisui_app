@@ -1,31 +1,61 @@
-FROM rocker/r-ver:4.0.5
-# -> ubuntu 20.04
-# -> don't use latest R release, since that will keep getting linked with later build-dates and RStudio packagemanager
-# -> sets repository to RStudio packagemanager for specific build date of R version, being 2021-05-17 for R 4.0.5
-# (see https://github.com/rocker-org/rocker-versioned2/blob/master/dockerfiles/r-ver_4.0.5.Dockerfile for reference)
-# -> installs R to /usr/local/lib/R
+# Use R with Shiny - optimized single-stage build
+FROM rocker/r-ver:4.5
 
-RUN apt-get update && apt-get upgrade -y && \
-apt-get install -y --no-install-recommends libnode-dev libcairo2-dev libxt-dev libcurl4-gnutls-dev libssl-dev libssh2-1-dev libxml2-dev apt-utils libjq-dev gdal-bin proj-bin libgdal-dev libudunits2-dev && \
-    # if desired, add tools such as: sudo, vim, wget, curl, procps
-    # library necessary for dependency of geojsonio
-    apt-get install -y libprotobuf-dev protobuf-compiler  && \
-    apt-get install -y tzdata && \
-    rm -rf /var/lib/apt/lists/*
+# Avoid prompts and set timezone
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
 
-# libcairo2-dev and libxt-dev needed for Cairo, e.g. graphics
-# libcurl4-openssl-dev and libcurl4-gnutls-dev are mutually exclusive. we choose GNU TLS, which seems preferred on Ubuntu / Debian systems and is recommended e.g. by RStudio
-# libssl-dev depends on libssl1.1, which in turn depends on libc6
-# (libcurl4-openssl-dev / openssl would depend on libc6 and libssl1.1 as well)
+# Install system dependencies in one layer with proper cleanup
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    # Core dependencies
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    # Spatial/GIS dependencies
+    libgdal-dev \
+    libproj-dev \
+    gdal-bin \
+    proj-bin \
+    libgeos-dev \
+    libspatialindex-dev \
+    libudunits2-dev \
+    # JavaScript and compilation tools
+    libv8-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    libjq-dev \
+    libnode-dev \
+    libabsl-dev \
+    cmake \
+    pkg-config \
+    python3-pip \
+    # Utilities
+    curl \
+    git \
+    wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
 
-# Install Oasisui with dependencies
+
+RUN pip3 install gdal numpy
+
 ARG REF_BRANCH
 ENV REF_BRANCH=${REF_BRANCH:-master}
-RUN R -e "install.packages('remotes')" && \
-    # installing older version of package shinyjs from GitHub
+
+
+# Install Oasisui with dependencies
+RUN set -e && \
+    R -e "install.packages('remotes', verbose = TRUE)" && \
+    R -e "remotes::install_version('revgeo', repos = 'https://cran.r-project.org')" && \
     R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')" && \
-    R -e "remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
-    rm -rf /var/lib/apt/lists/*
+    R -e "options(warn=2); remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
+    echo "Verifying oasisui package installation..." && \
+    R -e "if (!require('oasisui', quietly = TRUE)) quit(status = 1, save = 'no')" && \
+    rm -rf /var/lib/apt/lists/* && \
+    echo "=== R packages installation complete ==="
 
 # Create the logging directory
 RUN mkdir /var/log/shiny-server
@@ -52,3 +82,5 @@ EXPOSE 3838
 
 # Launch Oasisui
 CMD ["R", "-e", "oasisui::runOasisui()"]
+
+
