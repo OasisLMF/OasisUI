@@ -82,6 +82,7 @@
 #' @importFrom httr content
 #' @importFrom httr upload_file
 #' @importFrom httr write_disk
+#' @importFrom httr modify_url
 #' @importFrom dplyr bind_rows
 #'
 #' @export
@@ -95,16 +96,20 @@ OasisAPI <- R6Class(
     access_token = NULL, # String for API log in; default is NULL
     refresh_token = NULL, # String for API access token refresh; default is NULL
     version = NULL, # Parameter for API connection; default is NULL
+    api_auth_type = NULL, # Parameter for API auth type; default is NULL
+    external_url = NULL, # external host url for ui; default is NULL
     subpath = NULL, # Parameter in case that there is no port
     conn_init = NULL # Structure with the api connection info; default is NULL
   ),
   # Public ----
   public = list(
     # > Initialize ----
-    initialize = function(httptype = "application/json", host, port, version, scheme = c("http", "https"), ...) {
+    initialize = function(httptype = "application/json", host, port, version, api_auth_type, external_url, scheme = c("http", "https"),...) {
       private$httptype <- httptype
       self$api_init(host, port, scheme[1])
       private$version <- version
+      private$api_auth_type <- api_auth_type
+      private$external_url <- paste0(scheme[1], "://", external_url)
     },
     get_http_type = function(){
       private$httptype
@@ -219,16 +224,20 @@ OasisAPI <- R6Class(
 
       self$api_handle_response(response)
     },
-    set_tokens = function(user, pwd, ...){
-      res <- self$api_post_access_token(user, pwd)
-      if (res$status == "Success") {
-        res <- content(res$result)
-        private$access_token <- res$access_token
-        private$refresh_token <- res$refresh_token
-      } else {
-        private$access_token <- NULL
-        private$refresh_token <- NULL
-      }
+    get_api_auth_type = function() {
+      private$api_auth_type
+    },
+    get_oidc_authorize_url = function(next_url = "/") {
+      auth_url <- modify_url(
+        private$external_url,
+        path = file.path(private$subpath, "oidc/authorize/"),
+        query = list(next_url = next_url)
+      )
+      return(auth_url)
+    },
+    set_tokens_from_values = function(access_token, refresh_token = NULL) {
+      private$access_token <- access_token
+      private$refresh_token <- refresh_token
     },
     get_access_token = function(){
       private$access_token

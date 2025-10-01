@@ -21,7 +21,9 @@ server <- function(input, output, session) {
     host = getOption("oasisui.settings.api.server"),
     port = getOption("oasisui.settings.api.port"),
     scheme = getOption("oasisui.settings.api.scheme"),
-    version = getOption("oasisui.settings.api.version")
+    version = getOption("oasisui.settings.api.version"),
+    api_auth_type = getOption("oasisui.settings.api.api_auth_type"),
+    external_url = getOption("oasisui.settings.api.external_url")
   )
 
   # per-session health check
