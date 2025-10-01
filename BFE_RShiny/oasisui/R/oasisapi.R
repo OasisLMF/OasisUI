@@ -84,6 +84,8 @@
 #' @importFrom httr write_disk
 #' @importFrom httr modify_url
 #' @importFrom dplyr bind_rows
+#' @importFrom jsonlite fromJSON
+#' @importFrom openssl base64_decode
 #'
 #' @export
 # OasisAPI ----
@@ -234,6 +236,34 @@ OasisAPI <- R6Class(
         query = list(next_url = next_url)
       )
       return(auth_url)
+    },
+    get_username_from_access_token = function(access_token, default_user = "unknown_username") {
+      token_parts <- strsplit(access_token, "\\.")[[1]]
+      if (length(token_parts) != 3) {
+        warning("Invalid JWT format")
+        return(default_user)
+      }
+
+      payload_b64 <- token_parts[2]
+
+      # Fix padding for Base64 URL
+      pad_len <- 4 - (nchar(payload_b64) %% 4)
+      if (pad_len < 4) {
+        payload_b64 <- paste0(payload_b64, strrep("=", pad_len))
+      }
+
+      # Convert URL-safe Base64 to standard Base64
+      payload_b64 <- gsub("-", "+", gsub("_", "/", payload_b64))
+
+      # Decode and parse JSON
+      payload_json <- rawToChar(openssl::base64_decode(payload_b64))
+      payload <- jsonlite::fromJSON(payload_json)
+
+      if (!is.null(payload$preferred_username) && nzchar(payload$preferred_username)) {
+        return(payload$preferred_username)
+      } else {
+        return(default_user)
+      }
     },
     set_tokens_from_values = function(access_token, refresh_token = NULL) {
       private$access_token <- access_token
