@@ -265,6 +265,17 @@ OasisAPI <- R6Class(
         return(default_user)
       }
     },
+    set_tokens = function(user, pwd, ...){
+      res <- self$api_post_access_token(user, pwd)
+      if (res$status == "Success") {
+        res <- content(res$result)
+        private$access_token <- res$access_token
+        private$refresh_token <- res$refresh_token
+      } else {
+        private$access_token <- NULL
+        private$refresh_token <- NULL
+      }
+    },
     set_tokens_from_values = function(access_token, refresh_token = NULL) {
       private$access_token <- access_token
       private$refresh_token <- refresh_token
