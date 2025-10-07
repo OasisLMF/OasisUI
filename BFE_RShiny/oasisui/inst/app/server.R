@@ -75,7 +75,7 @@ server <- function(input, output, session) {
 
   loginDialogModule <- callModule(
     loginDialog, "login",
-    logout = reactive(auth_modules$pageheader$logout())
+    logout = auth_modules$pageheader$logout
   )
 
   observe({

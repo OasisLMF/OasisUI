@@ -97,6 +97,7 @@ OasisAPI <- R6Class(
     url = NULL, # url to connect with API; default is NULL
     access_token = NULL, # String for API log in; default is NULL
     refresh_token = NULL, # String for API access token refresh; default is NULL
+    id_token = NULL, # String for API id token; default is NULL
     version = NULL, # Parameter for API connection; default is NULL
     api_auth_type = NULL, # Parameter for API auth type; default is NULL
     external_url = NULL, # external host url for ui; default is NULL
@@ -229,6 +230,16 @@ OasisAPI <- R6Class(
     get_api_auth_type = function() {
       private$api_auth_type
     },
+    get_oidc_logout_url = function() {
+      logout_url <- modify_url(
+        private$external_url,
+        path = file.path(private$subpath, "oidc/logout/"),
+        query = list(
+          id_token_hint = private$id_token
+        )
+      )
+      return(logout_url)
+    },
     get_oidc_authorize_url = function(next_url = "/") {
       auth_url <- modify_url(
         private$external_url,
@@ -276,12 +287,16 @@ OasisAPI <- R6Class(
         private$refresh_token <- NULL
       }
     },
-    set_tokens_from_values = function(access_token, refresh_token = NULL) {
+    set_tokens_from_values = function(access_token, id_token = NULL, refresh_token = NULL) {
       private$access_token <- access_token
+      private$id_token <- id_token
       private$refresh_token <- refresh_token
     },
     get_access_token = function(){
       private$access_token
+    },
+    get_id_token = function() {
+      private$id_token
     },
     # > refresh token ----
     get_refresh_token = function(){

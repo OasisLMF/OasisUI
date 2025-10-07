@@ -38,6 +38,9 @@ loginDialog <- function(input, output, session, logout) {
   api_auth_type <- api$get_api_auth_type()
 
   observeEvent(logout(), {
+    if (api_auth_type != "simple") {
+      shinyjs::runjs(sprintf("window.location.href='%s';", api$get_oidc_logout_url()))
+    }
     js$reset()
     result$user <- OASISUI_GUEST_ID
     session$userData$data_hub <- NULL
@@ -71,7 +74,7 @@ loginDialog <- function(input, output, session, logout) {
 
       if (!is.null(query$access_token)) {
         # Tokens came back from callback redirect
-        api$set_tokens_from_values(query$access_token, query$refresh_token)
+        api$set_tokens_from_values(query$access_token, query$id_token, query$refresh_token)
         username <- api$get_username_from_access_token(query$access_token)
         result$user <- username  
 
