@@ -287,10 +287,23 @@ OasisAPI <- R6Class(
         private$refresh_token <- NULL
       }
     },
-    set_tokens_from_values = function(access_token, id_token = NULL, refresh_token = NULL) {
-      private$access_token <- access_token
-      private$id_token <- id_token
-      private$refresh_token <- refresh_token
+    set_tokens_from_session = function(session_token) {
+      response <- POST(
+        private$url,
+        body = list(session_token = session_token),
+        encode = "json",
+        path = paste(private$subpath, "oidc/session_token/", sep = "/")
+      )
+
+      if (status_code(response) == 200) {
+        tokens <- content(response)
+        private$access_token <- tokens$access_token
+        private$id_token <- tokens$id_token
+        private$refresh_token <- tokens$refresh_token
+        return(TRUE)
+      } else {
+        return(FALSE)
+      }
     },
     get_access_token = function(){
       private$access_token

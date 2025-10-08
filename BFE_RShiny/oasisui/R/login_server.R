@@ -72,20 +72,23 @@ loginDialog <- function(input, output, session, logout) {
     observe({
       query <- parseQueryString(session$clientData$url_search)
 
-      if (!is.null(query$access_token)) {
-        # Tokens came back from callback redirect
-        api$set_tokens_from_values(query$access_token, query$id_token, query$refresh_token)
-        username <- api$get_username_from_access_token(query$access_token)
-        result$user <- username  
+      if (!is.null(query$session_token)) {
+        res <- api$set_tokens_from_session(query$session_token)
+        if (res) {
+          username <- api$get_username_from_access_token(api$get_access_token())
+          result$user <- username
 
-        session$userData$data_hub <- DataHub$new(
-          user = api$get_access_token(),
-          destdir = getOption("oasisui.settings.api.share_filepath"),
-          oasisapi = api
-        )
+          session$userData$data_hub <- DataHub$new(
+            user = api$get_access_token(),
+            destdir = getOption("oasisui.settings.api.share_filepath"),
+            oasisapi = api
+          )
 
-        shinyjs::runjs("history.replaceState({}, '', window.location.pathname);")
-        # clears tokens from URL bar
+          # clears tokens from URL bar
+          shinyjs::runjs("history.replaceState({}, '', window.location.pathname);")
+        } else {
+          oasisuiNotification("OIDC token exchange failed.", type = "error")
+        }
       }
     })
   }
