@@ -1,4 +1,4 @@
-FROM rocker/verse:4.5
+FROM rocker/verse:4.0.5
 
 # Install apt dependencies for OasisUI
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,33 +21,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Install R dependencies
-COPY ./BFE_RShiny/oasisui ./BFE_RShiny/oasisui
+COPY ./BFE_RShiny/oasisui/DESCRIPTION ./BFE_RShiny/oasisui/DESCRIPTION
 RUN R -e "install.packages('remotes')" && \
-    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')" && \
-    R -e "remotes::install_github('mhudecheck/revgeo')"
+    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')"
 RUN R -e 'devtools::install(pkg = "./BFE_RShiny/oasisui", dependencies = TRUE)'
 
 # Create .Rprofile and set default values
 RUN echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
 
-# ENV API_IP="server"
-# ENV API_PORT="8000"
-# ENV API_VERSION="v1"
-# ENV API_SHARE_FILEPATH="./downloads"
-# ENV OASIS_ENVIRONMENT="dev"
-# ENV ADMIN_MODE="admin"
-
-# Create the logging directory
-RUN mkdir /var/log/shiny-server
-
-# Make root directory
-RUN mkdir -p /root
-WORKDIR /root
-
-# Add shiny options upon startup
-COPY shinyproxy/Rprofile.site /usr/local/lib/R/etc/
-
-# Set port
-EXPOSE 3838
-
-CMD ["R", "-e", "oasisui::runOasisui()"]
+ENV API_IP="server"
+ENV API_PORT="8000"
+ENV API_VERSION="v1"
+ENV API_SHARE_FILEPATH="./downloads"
+ENV OASIS_ENVIRONMENT="dev"
+ENV ADMIN_MODE="admin"
