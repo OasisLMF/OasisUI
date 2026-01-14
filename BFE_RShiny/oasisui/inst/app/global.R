@@ -14,11 +14,15 @@ loginfo("testing logger", logger = "oasisui.module")
 
 ### Django API -----------------------------------------------------------------
 
-APISettings <- APIgetenv(server = "API_IP",
-                         port = "API_PORT",
-                         scheme = "API_HTTPS",
-                         version = "API_VERSION",
-                         share_filepath = "API_SHARE_FILEPATH")
+APISettings <- APIgetenv(
+  server = "API_IP",
+  port = "API_PORT",
+  scheme = "API_HTTPS",
+  version = "API_VERSION",
+  share_filepath = "API_SHARE_FILEPATH",
+  api_auth_type = "API_AUTH_TYPE",
+  external_url = "INGRESS_EXTERNAL_HOST"
+)
 
 options(oasisui.settings.api.server = APISettings$server)
 options(oasisui.settings.api.port = APISettings$port)
@@ -30,6 +34,8 @@ if (isTRUE(as.logical(APISettings$scheme))) {
 options(oasisui.settings.api.httptype = "application/json")
 options(oasisui.settings.api.version = APISettings$version)
 options(oasisui.settings.api.share_filepath = APISettings$share_filepath)
+options(oasisui.settings.api.api_auth_type = APISettings$api_auth_type)
+options(oasisui.settings.api.external_url = APISettings$external_url)
 
 options(oasisui.settings.admin.mode = Sys.getenv("ADMIN_MODE"))
 options(oasisui.settings.hide_footer = Sys.getenv("HIDE_FOOTER_VERSION", unset = FALSE))
