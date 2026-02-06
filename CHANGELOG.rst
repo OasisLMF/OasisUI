@@ -1,6 +1,13 @@
 OasisUI Changelog
 ==================
 
+`2.0.0`_
+ ---------
+* [#327](https://github.com/OasisLMF/OasisUI/pull/328) - CVE fix request
+* [#330](https://github.com/OasisLMF/OasisUI/pull/330) - Release 1.12.0
+* [#331](https://github.com/OasisLMF/OasisUI/pull/331) - feature/generic_oidc
+.. _`2.0.0`:  https://github.com/OasisLMF/OasisUI/compare/1.12.0...2.0.0
+
 .. _`1.12.0`:  https://github.com/OasisLMF/OasisUI/compare/1.11.7...1.12.0
 
 `1.11.7`_
