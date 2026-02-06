@@ -32,38 +32,66 @@ OASISUI_GUEST_ID <- "unauthorized"
 #'
 #' @export
 loginDialog <- function(input, output, session, logout) {
+  result <- reactiveValues(user = OASISUI_GUEST_ID)
 
-  result <- reactiveValues(
-    user = OASISUI_GUEST_ID
-  )
+  api <- session$userData$oasisapi
+  api_auth_type <- api$get_api_auth_type()
 
   observeEvent(logout(), {
+    if (api_auth_type != "simple") {
+      shinyjs::runjs(sprintf("window.location.href='%s';", api$get_oidc_logout_url()))
+    }
     js$reset()
     result$user <- OASISUI_GUEST_ID
-    session$userData$data_hub <-  NULL
+    session$userData$data_hub <- NULL
   })
 
-  observeEvent(input$abuttonloginbutton, {
-    if (input$abuttonloginbutton > 0) {
+  if (api_auth_type == "simple") {
+    # Simple JWT password login
+    observeEvent(input$abuttonloginbutton, {
       user <- isolate(input$user)
       pwd <- isolate(input$password)
-      session$userData$oasisapi$set_tokens(user, pwd)
-      if (!is.null(session$userData$oasisapi$get_access_token())) {
+      api$set_tokens(user, pwd)
+      if (!is.null(api$get_access_token())) {
         result$user <- user
-        # initialize data_hub R6 class to manage files and files lists in OasisUI
-        session$userData$data_hub <- DataHub$new(user = session$userData$oasisapi$get_access_token(), destdir = getOption("oasisui.settings.api.share_filepath"), oasisapi = session$userData$oasisapi)
+        session$userData$data_hub <- DataHub$new(user = api$get_access_token(),
+                                                 destdir = getOption("oasisui.settings.api.share_filepath"),
+                                                 oasisapi = api)
       } else {
-        result$user = OASISUI_GUEST_ID
+        result$user <- OASISUI_GUEST_ID
         oasisuiNotification("Login Failed, please check your credentials.", type = "error")
       }
-    }
-    logMessage(paste("In Login User: ", result$user))
-  })
+    })
+  } else {
+    # OIDC flow
+    observeEvent(input$oidc_login, {
+      next_url <- session$clientData$url_pathname
+      shinyjs::runjs(sprintf("window.location.href='%s';", api$get_oidc_authorize_url(next_url = next_url)))
+    })
 
-  # Module Output
-  moduleOutput <- list(
-    user = reactive(result$user)
-  )
+    observe({
+      query <- parseQueryString(session$clientData$url_search)
 
-  return(moduleOutput)
+      if (!is.null(query$session_token)) {
+        res <- api$set_tokens_from_session(query$session_token)
+        if (res) {
+          username <- api$get_username_from_access_token(api$get_access_token())
+          result$user <- username
+
+          session$userData$data_hub <- DataHub$new(
+            user = api$get_access_token(),
+            destdir = getOption("oasisui.settings.api.share_filepath"),
+            oasisapi = api
+          )
+
+          # clears tokens from URL bar
+          shinyjs::runjs("history.replaceState({}, '', window.location.pathname);")
+        } else {
+          oasisuiNotification("OIDC token exchange failed.", type = "error")
+        }
+      }
+    })
+  }
+
+  list(user = reactive(result$user))
 }
