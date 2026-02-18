@@ -351,7 +351,8 @@ summarytab <- function(input, output, session,
       outputsAALtmp <- AAL %>%
         select(-c("summary_id")) %>%
         filter(grepl("mean", variable)) %>%
-        separate(variable, into = c("variables", "report", "perspective"), sep = "\\.")
+        separate(variable, into = c("variables", "report", "perspective"), sep = "\\.", 
+                 extra = "drop", fill = "right")
       outputsAALtmp <- outputsAALtmp %>%
         mutate(type = replace(type, type == "1", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
         mutate(type = replace(type, type == "2", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
@@ -462,7 +463,9 @@ summarytab <- function(input, output, session,
           gather(key = "gridcol", value = "Value", colnames)
       }
       data <- data %>%
-        separate(Specification, into = c("loss", "variable", "perspective", "type", "returnperiod"), sep = "\\.") %>%
+        separate(Specification, into = c("loss", "variable", "perspective", "type", "returnperiod"), 
+                 sep = "\\.", extra = "drop", fill = "right") %>%
+        distinct() %>%
         mutate(returnperiod = as.numeric(returnperiod),
                type = as.numeric(type),
                variable = as.factor(variable)) %>%
