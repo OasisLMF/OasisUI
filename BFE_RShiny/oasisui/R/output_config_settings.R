@@ -17,14 +17,14 @@ output_options <- list(
                 "Psept AEP", "Psept OEP",
                 "Return Period File", "Parquet Format"),
 
-  variables_default = c(FALSE, FALSE, FALSE,
-                        FALSE, FALSE, FALSE,
-                        FALSE, FALSE, FALSE,
-                        FALSE, FALSE,
-                        FALSE, FALSE,
-                        FALSE, FALSE,
-                        FALSE, FALSE,
-                        FALSE, FALSE),
+  variables_default = c(FALSE, FALSE, FALSE,   # ELT Sample, ELT Quantile, ELT Moment
+                        FALSE, FALSE, FALSE,   # PLT Sample, PLT Quantile, PLT Moment
+                        TRUE,  FALSE, FALSE,   # ALT Period, ALT Mean Only, ALCT Convergence
+                        TRUE,  TRUE,           # EPT Full Uncertainty AEP, EPT Full Uncertainty OEP
+                        FALSE, FALSE,          # EPT Mean Sample AEP, EPT Mean Sample OEP
+                        FALSE, FALSE,          # EPT per Sample Mean AEP, EPT per Sample Mean OEP
+                        FALSE, FALSE,          # Psept AEP, Psept OEP
+                        FALSE, FALSE),         # Return Period File, Parquet Format
 
   # default empty string is interpreted as aggregation should happen across everything, i.e. without any specific summary level
   # REF: perhaps to be changed to "All Risks" and replace string with default_level elsewhere
