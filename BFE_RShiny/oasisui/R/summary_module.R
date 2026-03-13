@@ -345,7 +345,7 @@ summarytab <- function(input, output, session,
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
     # read AAL files
     AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(),
-                       filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
+                       filepattern = "alt_period", nonkeycols = c("summary_id", "type"), variables = c("ALT Period"))
     if (!is.null(AAL)) {
       # AAL output
       outputsAALtmp <- AAL %>%
@@ -364,9 +364,9 @@ summarytab <- function(input, output, session,
     }
 
     # read OEP & AEP files
-    leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty",
+    leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "ept_full_uncertainty",
                            nonkeycols = c("summary_id", "return_period", "type"),
-                           variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
+                           variables = c("EPT Full Uncertainty AEP", "EPT Full Uncertainty OEP"))
     # REF: make more general, less-hard coded field names e.g.(return_period and others above)
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%

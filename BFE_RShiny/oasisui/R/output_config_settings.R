@@ -62,7 +62,22 @@ reportToVar <- function() {
   L <- as.list(varsdf$labels)
   names(L) <- varsdf$fields
   names(L)[varsdf$lec_output] <- paste("leccalc", names(L)[varsdf$lec_output], sep = "_")
-  L
+  # Backward compatibility: map deprecated output file keys so old analysis results remain viewable
+  deprecated_map <- list(
+    aalcalc                      = "AAL",
+    pltcalc                      = "PLT",
+    eltcalc                      = "ELT",
+    summarycalc                  = "Summary",
+    leccalc_full_uncertainty_aep = "LEC Full Uncertainty AEP",
+    leccalc_full_uncertainty_oep = "LEC Full Uncertainty OEP",
+    leccalc_wheatsheaf_aep       = "LEC Wheatsheaf AEP",
+    leccalc_wheatsheaf_oep       = "LEC Wheatsheaf OEP",
+    leccalc_wheatsheaf_mean_aep  = "LEC Mean Wheatsheaf AEP",
+    leccalc_wheatsheaf_mean_oep  = "LEC Mean Wheatsheaf OEP",
+    leccalc_sample_mean_aep      = "LEC Sample Mean AEP",
+    leccalc_sample_mean_oep      = "LEC Sample Mean OEP"
+  )
+  c(L, deprecated_map)
 }
 
 
@@ -86,7 +101,7 @@ plottypeslist <- list(
     "ylabel" = c("Loss")
   ),
   "AAL bar plot" = list(
-    "Variables" = c("AAL"),
+    "Variables" = c("ALT Period"),
     "x" = c("type"),
     "keycols" = c("mean"),
     "uncertaintycols" = c("standard_deviation"),
