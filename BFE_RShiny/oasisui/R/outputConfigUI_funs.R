@@ -110,17 +110,13 @@ rerunUI <- function(session, analysisID, tag, oed_field, analysisSettings = NULL
 
     # reports
     choices_rep_final <- lapply(seq(1:length(prsp_sum)), function(x) {
-      not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
-      # not_include <- c("id", "return_period_file", "lec_output", "oed_fields", "leccalc")
+      not_include <- c("id", "oed_fields", "ord_output")
       names_reports <- as.list(names(prsp_sum[[x]]))
       names_reports <- names_reports[-which(names_reports %in% not_include)]
-      if (length(names(prsp_sum[[x]]$leccalc)) > 0) {
-        choices_rep_final <- c(names_reports, as.list(names(prsp_sum[[x]]$leccalc)))
-      } else {
-        choices_rep_final <- as.list(names_reports)
-      }
       if (length(names(prsp_sum[[x]]$ord_output)) > 0) {
         choices_rep_final <- c(names_reports, as.list(names(prsp_sum[[x]]$ord_output)))
+      } else {
+        choices_rep_final <- as.list(names_reports)
       }
       choices_rep_final <- unlist(varsdf$labels[which(varsdf$fields %in% choices_rep_final)])
       choices_rep_final

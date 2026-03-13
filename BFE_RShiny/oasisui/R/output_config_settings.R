@@ -7,31 +7,20 @@
 output_options <- list(
   # granularities = c("LOB", "Location", "County","State", "Policy", "Portfolio"),
   losstypes = c("GUL", "IL", "RI"),
-  # reports feasible in plot output:
-  variables = c("Full Sample", "ELT",
-                "LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP",
-                "LEC Wheatsheaf AEP", "LEC Wheatsheaf OEP",
-                "LEC Mean Wheatsheaf AEP", "LEC Mean Wheatsheaf OEP",
-                "LEC Sample Mean AEP", "LEC Sample Mean OEP",
-                "AAL", "PLT",
-                "ELT Sample", "ELT Quantile", "ELT Moment",
+  # reports feasible in plot output (ORD outputs only):
+  variables = c("ELT Sample", "ELT Quantile", "ELT Moment",
                 "PLT Sample", "PLT Quantile", "PLT Moment",
-                "ALT Period",
+                "ALT Period", "ALT Mean Only", "ALCT Convergence",
                 "EPT Full Uncertainty AEP", "EPT Full Uncertainty OEP",
                 "EPT Mean Sample AEP", "EPT Mean Sample OEP",
                 "EPT per Sample Mean AEP", "EPT per Sample Mean OEP",
-                "Psept AEP", "Psept OEP"),
+                "Psept AEP", "Psept OEP",
+                "Return Period File", "Parquet Format"),
 
-  # order = c(6,2,3,4,1,5),
-  variables_default = c(FALSE, FALSE,
-                        TRUE, TRUE,
-                        FALSE, FALSE,
-                        FALSE, FALSE,
-                        FALSE, FALSE,
-                        TRUE, FALSE,
+  variables_default = c(FALSE, FALSE, FALSE,
                         FALSE, FALSE, FALSE,
                         FALSE, FALSE, FALSE,
-                        FALSE,
+                        FALSE, FALSE,
                         FALSE, FALSE,
                         FALSE, FALSE,
                         FALSE, FALSE,
@@ -47,25 +36,20 @@ output_options <- list(
 #' @format \code{data.frame} of variables for output configuration.
 #' @export
 varsdf <- data.frame(
-  vars = c('Summary', 'ELT', 'FullUncAEP', 'FullUncOEP', 'AEPWheatsheaf', 'OEPWheatsheaf',
-           'MeanAEPWheatsheaf', 'MeanOEPWheatsheaf', 'SampleMeanAEP', 'SampleMeanOEP', 'AAL', 'PLT',
-           'ELTSample', 'ELTQuantile', 'ELTMoment', 'PLTSample', 'PLTQuantile', 'PLTMoment',
-           'ALTPeriod', 'EPTFullUncertainty_aep', 'EPTFullUncertaintyOEP', 'EPTMeanSampleAEP',
-           'EPTMeanSampleOEP', 'EPTperSampleMeanAEP', 'EPTperSampleMeanOEP', 'PseptAEP', 'PseptOEP'),
+  vars = c('ELTSample', 'ELTQuantile', 'ELTMoment', 'PLTSample', 'PLTQuantile', 'PLTMoment',
+           'ALTPeriod', 'ALTMeanOnly', 'ALCTConvergence',
+           'EPTFullUncertainty_aep', 'EPTFullUncertaintyOEP', 'EPTMeanSampleAEP',
+           'EPTMeanSampleOEP', 'EPTperSampleMeanAEP', 'EPTperSampleMeanOEP', 'PseptAEP', 'PseptOEP',
+           'ReturnPeriodFile', 'ParquetFormat'),
   labels = output_options$variables,
-  fields = c('summarycalc', 'eltcalc', 'full_uncertainty_aep', 'full_uncertainty_oep',
-             'wheatsheaf_aep',  'wheatsheaf_oep', 'wheatsheaf_mean_aep', 'wheatsheaf_mean_oep',
-             'sample_mean_aep', 'sample_mean_oep',  'aalcalc', 'pltcalc', 'elt_sample', 'elt_quantile',
-             'elt_moment', 'plt_sample', 'plt_quantile', 'plt_moment', 'alt_period', 'ept_full_uncertainty_aep',
-             'ept_full_uncertainty_oep', 'ept_mean_sample_aep', 'ept_mean_sample_oep', 'ept_per_sample_mean_aep',
-             'ept_per_sample_mean_oep', 'psept_aep', 'psept_oep'),
-  # defaultChoice = c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE),
-  lec_output = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE,
-                 TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-                 FALSE, FALSE),
-  ord_output = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-                 FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-                 TRUE, TRUE, TRUE),
+  fields = c('elt_sample', 'elt_quantile', 'elt_moment', 'plt_sample', 'plt_quantile', 'plt_moment',
+             'alt_period', 'alt_meanonly', 'alct_convergence',
+             'ept_full_uncertainty_aep', 'ept_full_uncertainty_oep', 'ept_mean_sample_aep',
+             'ept_mean_sample_oep', 'ept_per_sample_mean_aep', 'ept_per_sample_mean_oep',
+             'psept_aep', 'psept_oep',
+             'return_period_file', 'parquet_format'),
+  lec_output = rep(FALSE, 19),
+  ord_output = rep(TRUE, 19),
   stringsAsFactors = FALSE
 )
 
@@ -90,7 +74,7 @@ reportToVar <- function() {
 #' @export
 plottypeslist <- list(
   "loss per return period line plot" = list(
-    "Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
+    "Variables" = c("EPT Full Uncertainty OEP", "EPT Full Uncertainty AEP"),
     "keycols" = c("loss"),
     "uncertaintycols" = c(),
     "referencecols" = c(),
@@ -115,7 +99,7 @@ plottypeslist <- list(
     "ylabel" = c("Loss")
   ),
   "loss for return period map" = list(
-    "Variables" = c("LEC Full Uncertainty OEP", "LEC Full Uncertainty AEP"),
+    "Variables" = c("EPT Full Uncertainty OEP", "EPT Full Uncertainty AEP"),
     "plottype" = "map"
   )
 )
@@ -138,25 +122,8 @@ plottypeslist <- list(
 #' @format Named \code{list} of output options.
 #' @export
 summary_template <- list(
-  summarycalc = FALSE,
-  eltcalc = FALSE,
-  aalcalc = FALSE,
-  pltcalc = FALSE,
   id = 1,
   oed_fields = list(),
-  lec_output = FALSE,
-  leccalc = list(
-    return_period_file = FALSE,
-    full_uncertainty_aep = FALSE,
-    full_uncertainty_oep = FALSE,
-    wheatsheaf_aep = FALSE,
-    wheatsheaf_oep = FALSE,
-    wheatsheaf_mean_aep = FALSE,
-    wheatsheaf_mean_oep = FALSE,
-    sample_mean_aep = FALSE,
-    sample_mean_oep = FALSE
-  ),
-  # ord_output = FALSE,
   ord_output = list(
     elt_sample = FALSE,
     elt_quantile = FALSE,
@@ -165,6 +132,9 @@ summary_template <- list(
     plt_quantile = FALSE,
     plt_moment = FALSE,
     alt_period = FALSE,
+    alt_meanonly = FALSE,
+    alct_convergence = FALSE,
+    alct_confidence = 0.95,
     ept_full_uncertainty_aep = FALSE,
     ept_full_uncertainty_oep = FALSE,
     ept_mean_sample_aep = FALSE,
@@ -172,6 +142,8 @@ summary_template <- list(
     ept_per_sample_mean_aep = FALSE,
     ept_per_sample_mean_oep = FALSE,
     psept_aep = FALSE,
-    psept_oep = FALSE
+    psept_oep = FALSE,
+    return_period_file = FALSE,
+    parquet_format = FALSE
   )
 )
