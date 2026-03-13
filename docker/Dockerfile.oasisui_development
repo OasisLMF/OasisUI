@@ -57,9 +57,10 @@ RUN chmod -R a+w /usr/local/lib/R/site-library
 # Create .Rprofile and set default values
 RUN echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
 
-ENV API_IP="server"
+ENV API_IP="localhost"
 ENV API_PORT="8000"
-ENV API_VERSION="v1"
+ENV API_VERSION="v2"
 ENV API_SHARE_FILEPATH="./downloads"
 ENV OASIS_ENVIRONMENT="dev"
 ENV ADMIN_MODE="admin"
+ENV API_AUTH_TYPE="simple"
