@@ -479,6 +479,10 @@ DataHub <- R6Class(
           as.data.frame(stringsAsFactors = FALSE)  %>%
           setNames("vals") %>%
           mutate(rowname = rownames(.)) %>%
+          # handle new API format where peril data is nested under "peril_id" key
+          mutate(rowname = sub("^peril_id\\.", "", rowname)) %>%
+          # filter out _by_coverage sub-keys (4+ dot-separated parts)
+          filter(!grepl("^([^.]+\\.){3}", rowname)) %>%
           # below is expected to throw a warning since type2 breakdown will be missing for some items (types):
           # Warning: Expected 4 pieces. Missing pieces filled with `NA` in xx rows ...
           separate(col = rowname, into = c("peril", "key", "type", "type2"), sep = "\\.") %>%
