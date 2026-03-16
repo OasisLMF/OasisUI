@@ -343,9 +343,9 @@ summarytab <- function(input, output, session,
     # TODO: check overlap of helper functions and plots part here with code in outputplots_module.R
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
-    # read AAL files
+    # read AAL files (support both new ORD "ALT Period" and legacy "AAL" label)
     AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(),
-                       filepattern = "alt_period", nonkeycols = c("summary_id", "type"), variables = c("ALT Period"))
+                       filepattern = "alt_period", nonkeycols = c("summary_id", "type"), variables = c("ALT Period", "AAL"))
     if (!is.null(AAL)) {
       # AAL output
       outputsAALtmp <- AAL %>%
@@ -363,10 +363,11 @@ summarytab <- function(input, output, session,
       outputsAAL <- plotAALtmp <- NULL
     }
 
-    # read OEP & AEP files
+    # read OEP & AEP files (support both new ORD "EPT Full Uncertainty" and legacy "LEC Full Uncertainty" labels)
     leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "ept_full_uncertainty",
                            nonkeycols = c("summary_id", "return_period", "type"),
-                           variables = c("EPT Full Uncertainty AEP", "EPT Full Uncertainty OEP"))
+                           variables = c("EPT Full Uncertainty AEP", "EPT Full Uncertainty OEP",
+                                         "LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
     # REF: make more general, less-hard coded field names e.g.(return_period and others above)
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
