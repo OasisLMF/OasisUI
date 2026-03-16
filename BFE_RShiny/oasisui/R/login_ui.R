@@ -26,10 +26,14 @@ loginDialogUI <- function(id) {
               tags$input(id = ns("password"), type = "password",
                           placeholder = "password", size = 15,
                           onkeydown = sprintf(
-                            "if (event.keyCode == 13) document.getElementById('%s').click()",
+                            "if (event.keyCode == 13) { Shiny.setInputValue('%s', this.value, {priority: 'event'}); document.getElementById('%s').click(); }",
+                            ns("password"),
                             ns("abuttonloginbutton"))
                           ),
-              oasisuiButton(ns("abuttonloginbutton"), "Login", class = "btn btn-success")
+              oasisuiButton(ns("abuttonloginbutton"), "Login", class = "btn btn-success",
+                            onclick = sprintf(
+                              "Shiny.setInputValue('%s', document.getElementById('%s').value, {priority: 'event'})",
+                              ns("password"), ns("password")))
       )
     )
   } else if (api_type %in% oidc_api_types) {
