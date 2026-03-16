@@ -51,6 +51,7 @@ RUN set -e && \
     R -e "install.packages('remotes', verbose = TRUE)" && \
     R -e "remotes::install_version('revgeo', repos = 'https://cran.r-project.org')" && \
     R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')" && \
+    R -e "remotes::install_github('bhaskarvk/leaflet.extras', upgrade = 'always')" && \
     R -e "options(warn=2); remotes::install_github('OasisLMF/OasisUI', ref = '${REF_BRANCH}', subdir = 'BFE_RShiny/oasisui')" && \
     echo "Verifying oasisui package installation..." && \
     R -e "if (!require('oasisui', quietly = TRUE)) quit(status = 1, save = 'no')" && \
