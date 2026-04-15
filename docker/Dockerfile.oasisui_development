@@ -1,37 +1,66 @@
-FROM rocker/verse:4.0.5
+FROM rocker/verse:4.5
 
-# Install apt dependencies for OasisUI
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libnode-dev \
-    libcairo2-dev \
-    libxt-dev \
-    libcurl4-gnutls-dev \
+# Avoid prompts and set timezone
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+# Install system dependencies in one layer with proper cleanup
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    # Core dependencies
+    libcurl4-openssl-dev \
     libssl-dev \
-    libssh2-1-dev \
     libxml2-dev \
-    apt-utils \
-    libjq-dev \
+    # Spatial/GIS dependencies
+    libgdal-dev \
+    libproj-dev \
     gdal-bin \
     proj-bin \
-    libgdal-dev \
+    libgeos-dev \
+    libspatialindex-dev \
     libudunits2-dev \
+    # JavaScript and compilation tools
+    libv8-dev \
     libprotobuf-dev \
     protobuf-compiler \
-    tzdata && \
-    rm -rf /var/lib/apt/lists/*
+    libjq-dev \
+    libnode-dev \
+    libabsl-dev \
+    cmake \
+    pkg-config \
+    python3-pip \
+    # Utilities
+    curl \
+    git \
+    wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
+
+
+RUN pip3 install gdal numpy
 
 # Install R dependencies
 COPY ./BFE_RShiny/oasisui/DESCRIPTION ./BFE_RShiny/oasisui/DESCRIPTION
+
+
+
 RUN R -e "install.packages('remotes')" && \
-    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')"
+    R -e "remotes::install_version('revgeo', repos = 'https://cran.r-project.org')" && \
+    R -e "remotes::install_github('daattali/shinyjs', ref = 'v1.1', upgrade = 'always')" && \
+    R -e "remotes::install_github('bhaskarvk/leaflet.extras', upgrade = 'always')"
 RUN R -e 'devtools::install(pkg = "./BFE_RShiny/oasisui", dependencies = TRUE)'
+
+RUN chmod -R a+w /usr/local/lib/R/site-library
 
 # Create .Rprofile and set default values
 RUN echo 'message("Run app with:   oasisui::runOasisui()")' >> /home/rstudio/.Rprofile
 
-ENV API_IP="server"
+ENV API_IP="localhost"
 ENV API_PORT="8000"
-ENV API_VERSION="v1"
+ENV API_VERSION="v2"
 ENV API_SHARE_FILEPATH="./downloads"
 ENV OASIS_ENVIRONMENT="dev"
 ENV ADMIN_MODE="admin"
+ENV API_AUTH_TYPE="simple"

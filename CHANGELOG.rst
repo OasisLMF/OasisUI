@@ -1,6 +1,12 @@
 OasisUI Changelog
 ==================
 
+`2.0.1`_
+ ---------
+* [#332](https://github.com/OasisLMF/OasisUI/pull/332) - Release 2.0.0
+* [#329, #333](https://github.com/OasisLMF/OasisUI/pull/334) - Fixed UI issues for oasis 2.5.x and 2.4.x
+.. _`2.0.1`:  https://github.com/OasisLMF/OasisUI/compare/2.0.0...2.0.1
+
 `2.0.0`_
  ---------
 * [#327](https://github.com/OasisLMF/OasisUI/pull/328) - CVE fix request
