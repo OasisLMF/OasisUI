@@ -332,8 +332,8 @@ panelOutputModule <- function(input, output, session,
         hide("pltsummarylevels")
         hide("chkboxmillions")
         hide("textinputtitle")
-        if ("AAL" %in% loc_num_filter) {
-          loc_num_filter <- loc_num_filter[-which(loc_num_filter == "AAL")]
+        if ("ALT Period" %in% loc_num_filter) {
+          loc_num_filter <- loc_num_filter[-which(loc_num_filter == "ALT Period")]
         }
         idx_r <- which(filesListData()$report == unique(loc_num_filter))
         multiple <- FALSE

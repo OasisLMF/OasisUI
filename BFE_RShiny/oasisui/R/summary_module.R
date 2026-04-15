@@ -343,15 +343,16 @@ summarytab <- function(input, output, session,
     # TODO: check overlap of helper functions and plots part here with code in outputplots_module.R
     # analysis settings
     analysis_settings <- session$userData$data_hub$get_ana_settings_content(selectAnaID)
-    # read AAL files
+    # read AAL files (support both new ORD "ALT Period" and legacy "AAL" label)
     AAL <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(),
-                       filepattern = "aalcalc", nonkeycols = c("summary_id", "type"), variables = c("AAL"))
+                       filepattern = "alt_period", nonkeycols = c("summary_id", "type"), variables = c("ALT Period", "AAL"))
     if (!is.null(AAL)) {
       # AAL output
       outputsAALtmp <- AAL %>%
         select(-c("summary_id")) %>%
         filter(grepl("mean", variable)) %>%
-        separate(variable, into = c("variables", "report", "perspective"), sep = "\\.")
+        separate(variable, into = c("variables", "report", "perspective"), sep = "\\.", 
+                 extra = "drop", fill = "right")
       outputsAALtmp <- outputsAALtmp %>%
         mutate(type = replace(type, type == "1", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "1"], " (Analytical)"))) %>%
         mutate(type = replace(type, type == "2", paste0("AAL ", outputsAALtmp$perspective[outputsAALtmp$type == "2"], " (Sample)")))
@@ -362,10 +363,11 @@ summarytab <- function(input, output, session,
       outputsAAL <- plotAALtmp <- NULL
     }
 
-    # read OEP & AEP files
-    leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "leccalc_full_uncertainty",
+    # read OEP & AEP files (support both new ORD "EPT Full Uncertainty" and legacy "LEC Full Uncertainty" labels)
+    leccalc <- .returnData(id = selectAnaID, tbl_filesListDataana =  tbl_filesListDataana1(), filepattern = "ept_full_uncertainty",
                            nonkeycols = c("summary_id", "return_period", "type"),
-                           variables = c("LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
+                           variables = c("EPT Full Uncertainty AEP", "EPT Full Uncertainty OEP",
+                                         "LEC Full Uncertainty AEP", "LEC Full Uncertainty OEP"))
     # REF: make more general, less-hard coded field names e.g.(return_period and others above)
     if (!is.null(leccalc)) {
       leccalc <- leccalc  %>%
@@ -462,7 +464,9 @@ summarytab <- function(input, output, session,
           gather(key = "gridcol", value = "Value", colnames)
       }
       data <- data %>%
-        separate(Specification, into = c("loss", "variable", "perspective", "type", "returnperiod"), sep = "\\.") %>%
+        separate(Specification, into = c("loss", "variable", "perspective", "type", "returnperiod"), 
+                 sep = "\\.", extra = "drop", fill = "right") %>%
+        distinct() %>%
         mutate(returnperiod = as.numeric(returnperiod),
                type = as.numeric(type),
                variable = as.factor(variable)) %>%
